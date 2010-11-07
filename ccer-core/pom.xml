@@ -20,10 +20,10 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>cz.zcu.kiv.ccer</groupId>
-  <artifactId>core</artifactId>
+  <artifactId>ccer-reactor</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Component Compatibility Evaluation Repository</name>
+  <name>CCER Reactor</name>
 
   <!--
    | describe your project here

@@ -3,15 +3,15 @@
 
   <parent>
     <groupId>cz.zcu.kiv.ccer</groupId>
-    <artifactId>core</artifactId>
+    <artifactId>ccer-reactor</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>cz.zcu.kiv.ccer.core.build</groupId>
+  <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
   <artifactId>provision</artifactId>
 
-  <name>ccer - imported bundles</name>
+  <name>ccer-reactor - imported bundles</name>
 
   <packaging>pom</packaging>
 
@@ -86,6 +86,26 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
+      <artifactId>ace-obr-metadata</artifactId>
+      <version>0.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
+      <artifactId>ace-obr-storage</artifactId>
+      <version>0.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.dependencymanager</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>1.4.0</version>
     </dependency>
   </dependencies>
 

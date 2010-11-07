@@ -2,11 +2,11 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>cz.zcu.kiv.ccer.core.build</groupId>
+  <groupId>cz.zcu.kiv.ccer.reactor.build</groupId>
   <artifactId>deployment</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Component Compatibility Evaluation Repository</name>
+  <name>CCER Reactor</name>
   <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
   <organization>
     <name>ZČU FAV KIV</name>
@@ -115,14 +115,14 @@
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.dm</artifactId>
+      <artifactId>org.apache.felix.dependencymanager</artifactId>
       <version>3.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.osgi.compendium</artifactId>
-      <version>1.5.0-SNAPSHOT</version>
+      <version>1.4.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
