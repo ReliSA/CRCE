@@ -101,6 +101,30 @@
       <version>1.6.1</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
+      <artifactId>ace-obr-metadata</artifactId>
+      <version>0.8.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
+      <artifactId>ace-obr-storage</artifactId>
+      <version>0.8.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.dm</artifactId>
+      <version>3.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <version>1.5.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <properties>
     <org.osgi.service.http.port>8080</org.osgi.service.http.port>
