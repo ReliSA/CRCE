@@ -104,13 +104,13 @@
     <dependency>
       <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-metadata</artifactId>
-      <version>0.8.0</version>
+      <version>0.8.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-storage</artifactId>
-      <version>0.8.0</version>
+      <version>0.8.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
