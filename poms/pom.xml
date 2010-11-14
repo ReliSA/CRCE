@@ -12,7 +12,7 @@
   <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
   <artifactId>shared-plugin-settings</artifactId>
 
-  <name>ccer-reactor - plugin configuration</name>
+  <name>CCER - Reactor - plugin configuration</name>
 
   <packaging>pom</packaging>
 

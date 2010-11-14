@@ -11,7 +11,7 @@
   <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
   <artifactId>provision</artifactId>
 
-  <name>ccer-reactor - imported bundles</name>
+  <name>CCER - Reactor - imported bundles</name>
 
   <packaging>pom</packaging>
 
