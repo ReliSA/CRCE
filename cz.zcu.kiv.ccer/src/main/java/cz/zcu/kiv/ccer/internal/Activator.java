@@ -9,6 +9,7 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.obr.RepositoryAdmin;
 
 /**
  *
@@ -37,14 +38,18 @@ public class Activator extends DependencyActivatorBase {
                     .setService(BundleStore.class)
                     .setRequired(true))
                 .add(createServiceDependency()
-                    .setService(ConfigurationAdmin.class)
-                    .setRequired(true)));
+                    .setService(RepositoryAdmin.class)
+                    .setRequired(true))
+//                .add(createServiceDependency()
+//                    .setService(ConfigurationAdmin.class)
+//                    .setRequired(true))
+                    );
 
         System.out.println("***** config");
 
 
 
-        configure("org.apache.ace.obr.storage.file", "fileLocation", "C:\\repo");
+        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
 //
         System.out.println("***** thread");
 //
@@ -63,6 +68,7 @@ public class Activator extends DependencyActivatorBase {
         }).start();
     }
 
+    @SuppressWarnings("unchecked")
     private void configure(String pid, String... params) throws IOException {
         Configuration conf = m_config.getConfiguration(pid, null);
         Dictionary properties = conf.getProperties();

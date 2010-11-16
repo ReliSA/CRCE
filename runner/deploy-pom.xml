@@ -126,6 +126,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.bundlerepository</artifactId>
+      <version>1.6.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.osgi.service.obr</artifactId>
+      <version>1.0.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>cz.zcu.kiv.ccer</groupId>
       <artifactId>ccer-core</artifactId>
       <version>1.0-SNAPSHOT</version>

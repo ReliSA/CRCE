@@ -107,6 +107,16 @@
       <artifactId>org.osgi.compendium</artifactId>
       <version>1.4.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.bundlerepository</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.osgi.service.obr</artifactId>
+      <version>1.0.2</version>
+    </dependency>
   </dependencies>
 
 </project>
