@@ -58,10 +58,10 @@ public class Activator extends DependencyActivatorBase {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(500);
                 } catch (InterruptedException ex) {
                 }
-//                        System.out.println("m_config == null: " + (m_config == null));
+
                 t.main();
 
             }
