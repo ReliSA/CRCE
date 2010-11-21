@@ -3,7 +3,7 @@ package cz.zcu.kiv.ccer.internal;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
-import org.apache.ace.obr.storage.BundleStore;
+//import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -22,8 +22,6 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
 
-        System.out.println("***** init");
-
         final Test t = new Test();
 
         dm.add(createComponent()
@@ -34,9 +32,9 @@ public class Activator extends DependencyActivatorBase {
 
         dm.add(createComponent()
                 .setImplementation(t)
-                .add(createServiceDependency()
-                    .setService(BundleStore.class)
-                    .setRequired(true))
+//                .add(createServiceDependency()
+//                    .setService(BundleStore.class)
+//                    .setRequired(true))
                 .add(createServiceDependency()
                     .setService(RepositoryAdmin.class)
                     .setRequired(true))
@@ -45,13 +43,10 @@ public class Activator extends DependencyActivatorBase {
 //                    .setRequired(true))
                     );
 
-        System.out.println("***** config");
 
 
-
-        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
+//        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
 //
-        System.out.println("***** thread");
 //
         new Thread(new Runnable() {
 

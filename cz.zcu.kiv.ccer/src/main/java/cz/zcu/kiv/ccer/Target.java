@@ -1,12 +1,12 @@
 
 package cz.zcu.kiv.ccer;
 
-import java.util.List;
+import org.osgi.service.obr.Resource;
 
 public interface Target {
     public Object getComponent();
 
-    public List<Object> getComponentList();
+    public Resource[] getComponentList();
 
     
 }
