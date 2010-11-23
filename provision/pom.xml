@@ -87,7 +87,7 @@
       <artifactId>slf4j-simple</artifactId>
       <version>1.6.1</version>
     </dependency>
-<!--    <dependency>
+    <dependency>
       <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-metadata</artifactId>
       <version>0.8.0-SNAPSHOT</version>
@@ -96,7 +96,7 @@
       <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-storage</artifactId>
       <version>0.8.0-SNAPSHOT</version>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.dependencymanager</artifactId>

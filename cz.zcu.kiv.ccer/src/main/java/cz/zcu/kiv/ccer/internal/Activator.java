@@ -3,7 +3,9 @@ package cz.zcu.kiv.ccer.internal;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
-//import org.apache.ace.obr.storage.BundleStore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -32,28 +34,28 @@ public class Activator extends DependencyActivatorBase {
 
         dm.add(createComponent()
                 .setImplementation(t)
-//                .add(createServiceDependency()
-//                    .setService(BundleStore.class)
-//                    .setRequired(true))
+                .add(createServiceDependency()
+                    .setService(BundleStore.class)
+                    .setRequired(true))
                 .add(createServiceDependency()
                     .setService(RepositoryAdmin.class)
                     .setRequired(true))
-//                .add(createServiceDependency()
-//                    .setService(ConfigurationAdmin.class)
-//                    .setRequired(true))
+                .add(createServiceDependency()
+                    .setService(ConfigurationAdmin.class)
+                    .setRequired(true))
                     );
 
 
 
-//        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
-//
-//
+        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
+
+
         new Thread(new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                 }
 
@@ -64,7 +66,7 @@ public class Activator extends DependencyActivatorBase {
     }
 
     @SuppressWarnings("unchecked")
-    private void configure(String pid, String... params) throws IOException {
+    public void configure(String pid, String... params) throws IOException {
         Configuration conf = m_config.getConfiguration(pid, null);
         Dictionary properties = conf.getProperties();
         if (properties == null) {
