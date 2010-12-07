@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <organization>
-    <name>ZČU FAV KIV</name>
+    <name>ZČU KIV</name>
     <url>http://www.kiv.zcu.cz</url>
   </organization>
 
@@ -35,7 +35,7 @@
     <!--
      | some example OSGi runtime properties
     -->
-    <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+    <org.osgi.service.http.port>8090</org.osgi.service.http.port>
     <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

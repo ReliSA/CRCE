@@ -9,7 +9,7 @@
   <name>CCER - Reactor</name>
   <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
   <organization>
-    <name>ZČU FAV KIV</name>
+    <name>ZČU KIV</name>
     <url>http://www.kiv.zcu.cz</url>
   </organization>
   <repositories>
@@ -103,6 +103,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.ace</groupId>
+      <artifactId>ace-httplistener</artifactId>
+      <version>0.8.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-metadata</artifactId>
       <version>0.8.0-SNAPSHOT</version>
       <scope>provided</scope>
@@ -110,6 +116,12 @@
     <dependency>
       <groupId>org.apache.ace</groupId>
       <artifactId>ace-obr-storage</artifactId>
+      <version>0.8.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ace</groupId>
+      <artifactId>ace-obr-servlet</artifactId>
       <version>0.8.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
@@ -146,7 +158,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+    <org.osgi.service.http.port>8090</org.osgi.service.http.port>
     <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

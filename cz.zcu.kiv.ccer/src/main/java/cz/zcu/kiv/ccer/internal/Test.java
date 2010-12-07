@@ -24,16 +24,11 @@ public class Test {
     private volatile RepositoryAdmin m_repositoryAdmin;
 
     public void main() {
-        try {
-            m_repositoryAdmin.addRepository(new URL("file:///U:/repository.xml"));
-            m_repositoryAdmin.addRepository(new URL("file:///Q:/DIP/m2repo/repository.xml"));
-        } catch (Exception ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
 //        testObrRepository();
 //        testStore();
-        testDeploy();
+//        testDeploy();
+        testRemoteObrRepository();
 
     }
 
@@ -98,6 +93,14 @@ public class Test {
     
     private void testObrRepository() {
         System.out.println("--- test ---");
+        
+        try {
+            m_repositoryAdmin.addRepository(new URL("file:///U:/repository.xml"));
+            m_repositoryAdmin.addRepository(new URL("file:///Q:/DIP/m2repo/repository.xml"));
+        } catch (Exception ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         
         Repository[] repos = m_repositoryAdmin.listRepositories();
         System.out.println("repos size: " + repos.length);
@@ -276,5 +279,19 @@ public class Test {
             System.out.println("not resolved");
         }
         
+    }
+    
+    private void testRemoteObrRepository() {
+        try {
+            m_repositoryAdmin.addRepository(new URL("http://localhost:8080/obr/repository.xml"));
+        } catch (Exception ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        Resource[] resources = m_repositoryAdmin.discoverResources("(uri=*)");
+        
+        for (Resource resource : resources) {
+            System.out.println(resource.getId() + ": " + resource.getURL());
+        }
     }
 }

@@ -3,8 +3,6 @@ package cz.zcu.kiv.ccer.internal;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -24,7 +22,7 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
 
-        final Test t = new Test();
+        final Test test = new Test();
 
         dm.add(createComponent()
                 .setImplementation(this)
@@ -33,7 +31,7 @@ public class Activator extends DependencyActivatorBase {
                     .setRequired(true)));
 
         dm.add(createComponent()
-                .setImplementation(t)
+                .setImplementation(test)
                 .add(createServiceDependency()
                     .setService(BundleStore.class)
                     .setRequired(true))
@@ -48,6 +46,7 @@ public class Activator extends DependencyActivatorBase {
 
 
         configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
+        configure("org.apache.ace.obr.servlet", "org.apache.ace.server.servlet.endpoint", "/obr");
 
 
         new Thread(new Runnable() {
@@ -59,7 +58,7 @@ public class Activator extends DependencyActivatorBase {
                 } catch (InterruptedException ex) {
                 }
 
-                t.main();
+                test.main();
 
             }
         }).start();
