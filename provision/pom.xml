@@ -103,11 +103,11 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.service.obr</artifactId>
         </dependency>
-<!--        <dependency>
+        <dependency>
             <groupId>org.apache.ace</groupId>
             <artifactId>ace-httplistener</artifactId>
             <version>0.8.0-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
             <artifactId>ace-obr-metadata</artifactId>
