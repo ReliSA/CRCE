@@ -1,9 +1,5 @@
 package cz.zcu.kiv.crce.webui.internal;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -21,16 +17,16 @@ public final class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-        manager.add(createComponent()
-                    .setInterface(HttpServlet.class.getName(), null)
-                    .setImplementation(TestServlet.class)
-                    .add(createConfigurationDependency()
-                    .setPropagate(true).setPid("cz.zcu.kiv.crce.webui")));
+//        manager.add(createComponent()
+//                    .setInterface(HttpServlet.class.getName(), null)
+//                    .setImplementation(TestServlet.class)
+//                    .add(createConfigurationDependency()
+//                    .setPropagate(true).setPid("cz.zcu.kiv.crce.webui")));
 
-        Dictionary props = new Hashtable();
-        props.put( "alias", "/whiteboard" );
-        props.put("servlet-name", "My Servlet");
-        context.registerService( TestServlet.class.getName(), new TestServlet(), props );
+//        Dictionary props = new Hashtable();
+//        props.put( "alias", "/whiteboard" );
+//        props.put("servlet-name", "My Servlet");
+//        context.registerService( TestServlet.class.getName(), new TestServlet(), props );
 
 //        m_webContainerRef = context.getServiceReference(WebContainer.class.getName());
 //        if (m_webContainerRef != null) {

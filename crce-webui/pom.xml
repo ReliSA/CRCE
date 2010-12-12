@@ -36,13 +36,6 @@
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
-<!--                    <webXml>${maven.war.webxml}</webXml>-->
-
-<!--                            <tasks>
-                                <echo>[maven.war.src] ${maven.war.src}</echo>
-                                <echo>[maven.war.webapp.dir] ${maven.war.webapp.dir}</echo>
-                                <echo>[maven.war.webxml] ${maven.war.webxml}</echo>
-                            </tasks>-->
                 </configuration>
             </plugin>
 
@@ -60,11 +53,6 @@
                         </goals>
                         <configuration>
                             <instructions>
-<!--                                <Embed-Directory>WEB-INF/lib</Embed-Directory>
-                                <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                                <Embed-Transitive>true</Embed-Transitive>
-                                <Web-ContextPath>ui</Web-ContextPath>
-                                <Webapp-Context>ui</Webapp-Context>-->
                             </instructions>
                         </configuration>
                     </execution>
@@ -86,23 +74,6 @@
 
 
     <dependencies>
-    <!--
-     | uncomment to add all imported (non-local) bundles to your compilation classpath
-    <dependency>
-      <type>pom</type>
-      <groupId>${parent.groupId}</groupId>
-      <artifactId>provision</artifactId>
-      <optional>true</optional>
-    </dependency>
-    -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_compendium</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
@@ -110,27 +81,16 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jsp-api</artifactId>
-            <version>2.0</version>
-            <type>jar</type>
         </dependency>
-        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>
-            <groupId>org.ops4j.pax.web</groupId>
-            <artifactId>pax-web-api</artifactId>
-            <version>0.8.1</version>
-            <scope>provided</scope>
-        </dependency>-->
     </dependencies>
 
 </project>

@@ -41,7 +41,7 @@ public class TestServlet extends HttpServlet implements ManagedService {
         out.close();
         
 //        try {
-//            forwardTo("/index.html", req, resp);
+//            forwardTo("/index.jsp", req, resp);
 //        } catch (Exception e) {
 //            System.out.println("***********");
 //            e.printStackTrace();
