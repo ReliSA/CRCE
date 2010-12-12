@@ -3,6 +3,7 @@ package cz.zcu.kiv.ccer.webui.internal;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -23,22 +24,28 @@ public class TestServlet extends HttpServlet implements ManagedService {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         
-//        PrintWriter out = resp.getWriter();
-//        
-//        ServletContext cx = this.getServletContext();
-//        String test = cx.getInitParameter("test");
-//        
-//
-//        out.println("Hello, world! " + test);
-//        
-//        out.close();
+        PrintWriter out = resp.getWriter();
         
-        try {
-            forwardTo("/jsp/index.jsp", req, resp);
-        } catch (Exception e) {
-            System.out.println("***********");
-            e.printStackTrace();
+        ServletContext cx = this.getServletContext();
+        
+        out.println("Hello, world!");
+
+        Enumeration e = cx.getInitParameterNames();
+
+        while (e.hasMoreElements()) {
+            String element = (String) e.nextElement();
+            out.println(element + ": " + cx.getInitParameter(element));
         }
+        
+        
+        out.close();
+        
+//        try {
+//            forwardTo("/index.html", req, resp);
+//        } catch (Exception e) {
+//            System.out.println("***********");
+//            e.printStackTrace();
+//        }
         
     }
 

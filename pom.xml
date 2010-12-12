@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <organization>
-    <name>ZČU KIV</name>
-    <url>http://www.kiv.zcu.cz</url>
-  </organization>
+    <organization>
+        <name>ZČU KIV</name>
+        <url>http://www.kiv.zcu.cz</url>
+    </organization>
 
   <!--
    | put license details here
@@ -18,83 +18,63 @@
   </licenses>
   -->
 
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>cz.zcu.kiv.ccer</groupId>
-  <artifactId>ccer-reactor</artifactId>
-  <version>1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cz.zcu.kiv.ccer</groupId>
+    <artifactId>ccer-reactor</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-  <name>CCER - Reactor</name>
+    <name>CCER - Reactor</name>
 
-  <!--
-   | describe your project here
-  -->
+    <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
 
-  <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
+    <properties>
+        <org.osgi.service.http.port>8090</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
+        <org.osgi.service.http.secure.enabled>true</org.osgi.service.http.secure.enabled>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <properties>
-    <!--
-     | some example OSGi runtime properties
-    -->
-    <org.osgi.service.http.port>8090</org.osgi.service.http.port>
-    <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <packaging>pom</packaging>
 
-  <packaging>pom</packaging>
+    <modules>
+        <module>poms</module>
+        <module>provision</module>
+        <module>ccer-repository</module>
+        <module>ccer-webui</module>
+    </modules>
 
-  <modules>
-    <module>poms</module>
-    <module>provision</module>
-    <module>ccer-repository</module>
-    <module>ccer-webui</module>
-  </modules>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.ops4j</groupId>
-        <artifactId>maven-pax-plugin</artifactId>
-        <version>1.4</version>
-        <configuration>
-          <!--
-           | some example Pax-Runner settings
-          -->
-          <provision>
-            <param>--platform=felix</param>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <version>1.4</version>
+                <configuration>
+                    <provision>
+                        <param>--platform=felix</param>
 <!--            <param>- -profiles=compendium,web,war</param> -->
-          </provision>
-        </configuration>
-        <executions>
-          <!--
-           | uncomment to auto-generate IDE files
-          <execution>
-            <id>ide-support</id>
-            <goals>
-              <goal>eclipse</goal>
-            </goals>
-          </execution>
-          -->
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                    </provision>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

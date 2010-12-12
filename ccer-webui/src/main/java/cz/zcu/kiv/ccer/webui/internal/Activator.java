@@ -28,9 +28,9 @@ public final class Activator extends DependencyActivatorBase {
                     .setPropagate(true).setPid("cz.zcu.kiv.ccer.webui")));
 
         Dictionary props = new Hashtable();
-        props.put( "alias", "/test" );
+        props.put( "alias", "/whiteboard" );
         props.put("servlet-name", "My Servlet");
-        context.registerService( Servlet.class.getName(), new TestServlet(), props );
+        context.registerService( TestServlet.class.getName(), new TestServlet(), props );
 
 //        m_webContainerRef = context.getServiceReference(WebContainer.class.getName());
 //        if (m_webContainerRef != null) {

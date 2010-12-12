@@ -5,14 +5,14 @@
 
 <web-app>
     <context-param>
-    	<param-name>test</param-name>
-    	<param-value>1234</param-value>
+        <param-name>test</param-name>
+        <param-value>1234</param-value>
     </context-param>
 
   <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>webui.html</welcome-file>
-  </welcome-file-list>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
   <!-- Session listener -->
 <!-- 
@@ -23,15 +23,15 @@
   
   <!-- Servlets -->
  
-<!--  <servlet>
-    <servlet-name>testServlet</servlet-name>
-    <servlet-class>cz.zcu.kiv.ccer.webui.internal.TestServlet</servlet-class>
-  </servlet>
+    <servlet>
+        <servlet-name>testServlet</servlet-name>
+        <servlet-class>cz.zcu.kiv.ccer.webui.internal.TestServlet</servlet-class>
+    </servlet>
   
-  <servlet-mapping>
-    <servlet-name>testServlet</servlet-name>
-    <url-pattern>/test</url-pattern>
-  </servlet-mapping>-->
+    <servlet-mapping>
+        <servlet-name>testServlet</servlet-name>
+        <url-pattern>/test2</url-pattern>
+    </servlet-mapping>
 
 
 </web-app>

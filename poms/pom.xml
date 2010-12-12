@@ -17,6 +17,10 @@
 
     <packaging>pom</packaging>
 
+    <properties>
+        <namespace>cz.zcu.kiv.ccer</namespace>
+    </properties>
+
     <modules>
         <module>wrappers</module>
         <module>compiled</module>

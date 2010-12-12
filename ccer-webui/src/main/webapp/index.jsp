@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello forld!</h1>
+        <h1>JSP</h1>
     </body>
 </html>

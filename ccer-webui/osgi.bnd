@@ -17,6 +17,7 @@ Import-Package: \
   javax.servlet.http, \
   javax.servlet.*, \
   javax.servlet.jsp.*, \
+  javax.servlet.jsp.jstl.*, \
   javax.xml.parsers, \
   javax.xml.namespace, \
   javax.xml.xpath, \
