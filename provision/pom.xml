@@ -2,22 +2,22 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 <!--  <parent>
-    <groupId>cz.zcu.kiv.ccer</groupId>
-    <artifactId>ccer-reactor</artifactId>
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-reactor</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>-->
   
     <parent>
-        <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
+        <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
         <artifactId>shared-plugin-settings</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
+    <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
     <artifactId>provision</artifactId>
 
-    <name>CCER - Reactor - imported bundles</name>
+    <name>CRCE - Reactor - imported bundles</name>
 
     <packaging>pom</packaging>
 

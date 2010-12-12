@@ -1,0 +1,38 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Version>: \
+  ${pom.version}
+
+Bundle-SymbolicName: \
+  ${bundle.symbolicName}
+
+Bundle-Name: CRCE - Web UI
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Import-Package: \
+  javax.servlet, \
+  javax.servlet.http, \
+  javax.servlet.*, \
+  javax.servlet.jsp.*, \
+  javax.servlet.jsp.jstl.*, \
+  javax.xml.parsers, \
+  javax.xml.namespace, \
+  javax.xml.xpath, \
+  org.osgi.framework, \
+  org.osgi.service.log, \
+  org.osgi.service.useradmin, \
+  org.xml.sax, \
+  org.w3c.dom, \
+  junit.framework;resolution:=optional, \
+  *
+
+Dynamic-ImportPackage: *
+
+Bundle-ClassPath: .,WEB-INF/classes
+
+Web-ContextPath: crce
+
+Webapp-Context: crce

@@ -6,24 +6,12 @@
         <url>http://www.kiv.zcu.cz</url>
     </organization>
 
-  <!--
-   | put license details here
-  <licenses>
-    <license>
-      <name>...</name>
-      <url>http://...</url>
-      <comments>
-      </comments>
-    </license>
-  </licenses>
-  -->
-
     <modelVersion>4.0.0</modelVersion>
-    <groupId>cz.zcu.kiv.ccer</groupId>
-    <artifactId>ccer-reactor</artifactId>
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-reactor</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>CCER - Reactor</name>
+    <name>CRCE - Reactor</name>
 
     <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
 
@@ -39,8 +27,8 @@
     <modules>
         <module>poms</module>
         <module>provision</module>
-        <module>ccer-repository</module>
-        <module>ccer-webui</module>
+        <module>crce-repository</module>
+        <module>crce-webui</module>
     </modules>
 
     <build>
@@ -52,7 +40,6 @@
                 <configuration>
                     <provision>
                         <param>--platform=felix</param>
-<!--            <param>- -profiles=compendium,web,war</param> -->
                     </provision>
                 </configuration>
             </plugin>

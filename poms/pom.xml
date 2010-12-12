@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
   
     <parent>
-        <groupId>cz.zcu.kiv.ccer</groupId>
-        <artifactId>ccer-reactor</artifactId>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-reactor</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
+    <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
     <artifactId>shared-plugin-settings</artifactId>
 
-    <name>CCER - Reactor - shared plugin configuration</name>
+    <name>CRCE - Reactor - shared plugin configuration</name>
 
     <packaging>pom</packaging>
 
     <properties>
-        <namespace>cz.zcu.kiv.ccer</namespace>
+        <namespace>cz.zcu.kiv.crce</namespace>
     </properties>
 
     <modules>
@@ -55,7 +55,7 @@
                  | dependency pom representing the global classpath of imported bundles
                 -->
                 <type>pom</type>
-                <groupId>cz.zcu.kiv.ccer.ccer-reactor.build</groupId>
+                <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
                 <artifactId>provision</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <scope>provided</scope>
