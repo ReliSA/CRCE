@@ -1,6 +1,6 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.ccer.repository.internal;
 
-import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.ccer.repository.Repository;
 import java.net.URL;
 import org.osgi.service.obr.RepositoryAdmin;
 import org.osgi.service.obr.Resolver;

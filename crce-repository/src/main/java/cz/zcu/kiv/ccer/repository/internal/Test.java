@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.ccer.repository.internal;
 
 import java.io.FileInputStream;
 import java.io.IOException;
