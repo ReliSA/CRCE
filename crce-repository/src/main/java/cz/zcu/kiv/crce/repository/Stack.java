@@ -1,4 +1,4 @@
-package cz.zcu.kiv.ccer.repository;
+package cz.zcu.kiv.crce.repository;
 
 import java.io.InputStream;
 import org.osgi.service.obr.Resource;

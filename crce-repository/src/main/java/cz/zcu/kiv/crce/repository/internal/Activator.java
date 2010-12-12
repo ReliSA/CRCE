@@ -1,4 +1,4 @@
-package cz.zcu.kiv.ccer.repository.internal;
+package cz.zcu.kiv.crce.repository.internal;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -47,7 +47,7 @@ public class Activator extends DependencyActivatorBase {
 
         configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
         configure("org.apache.ace.obr.servlet", "org.apache.ace.server.servlet.endpoint", "/obr");
-//        configure("cz.zcu.kiv.ccer.webui", "org.apache.ace.server.servlet.endpoint", "/webui");
+//        configure("cz.zcu.kiv.crce.webui", "org.apache.ace.server.servlet.endpoint", "/webui");
 
         new Thread(new Runnable() {
 

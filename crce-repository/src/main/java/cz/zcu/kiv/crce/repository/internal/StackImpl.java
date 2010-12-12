@@ -1,8 +1,8 @@
-package cz.zcu.kiv.ccer.repository.internal;
+package cz.zcu.kiv.crce.repository.internal;
 
-import cz.zcu.kiv.ccer.repository.Plugin;
-import cz.zcu.kiv.ccer.repository.Stack;
-import cz.zcu.kiv.ccer.repository.Session;
+import cz.zcu.kiv.crce.repository.Plugin;
+import cz.zcu.kiv.crce.repository.Stack;
+import cz.zcu.kiv.crce.repository.Session;
 import java.io.InputStream;
 import org.osgi.service.obr.Resource;
 
