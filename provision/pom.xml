@@ -28,11 +28,11 @@
             <artifactId>pax-web-extender-war</artifactId>
             <version>0.8.1</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-extender-whiteboard</artifactId>
             <version>0.8.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>

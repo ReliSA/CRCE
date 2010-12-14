@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.repository.Stack;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
@@ -17,7 +18,7 @@ import org.osgi.service.obr.RepositoryAdmin;
  */
 public class Activator extends DependencyActivatorBase {
 
-    private volatile ConfigurationAdmin m_config;
+    private volatile ConfigurationAdmin m_config;   /* injected */
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
@@ -25,43 +26,39 @@ public class Activator extends DependencyActivatorBase {
         final Test test = new Test();
 
         dm.add(createComponent()
+                .setInterface(Stack.class.getName(), null)
+                .setImplementation(StackImpl.class));
+        
+        dm.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency()
-                    .setService(ConfigurationAdmin.class)
-                    .setRequired(true)));
+                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true)));
 
         dm.add(createComponent()
                 .setImplementation(test)
-                .add(createServiceDependency()
-                    .setService(BundleStore.class)
-                    .setRequired(true))
-                .add(createServiceDependency()
-                    .setService(RepositoryAdmin.class)
-                    .setRequired(true))
-                .add(createServiceDependency()
-                    .setService(ConfigurationAdmin.class)
-                    .setRequired(true))
-                    );
+                .add(createServiceDependency().setService(BundleStore.class).setRequired(true))
+                .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
+                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
+                );
 
 
 
         configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
         configure("org.apache.ace.obr.servlet", "org.apache.ace.server.servlet.endpoint", "/obr");
-//        configure("cz.zcu.kiv.crce.webui", "org.apache.ace.server.servlet.endpoint", "/webui");
+//        configure("cz.zcu.kiv.crce.webui.upload", "org.apache.ace.server.servlet.endpoint", "/upload");
 
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                }
-
-                test.main();
-
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException ex) {
+//                }
+//
+//                test.main();
+//
+//            }
+//        }).start();
     }
 
     @SuppressWarnings("unchecked")

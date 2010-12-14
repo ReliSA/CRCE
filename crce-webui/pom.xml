@@ -91,6 +91,24 @@
             <artifactId>crce-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+<!--    <dependency>
+      <groupId>org.ops4j.pax.web</groupId>
+      <artifactId>pax-web-extender-whiteboard</artifactId>
+      <version>0.8.1</version>
+      <scope>provided</scope>
+    </dependency>-->
+    
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <dependency>
+           <groupId>commons-io</groupId>
+           <artifactId>commons-io</artifactId>
+           <version>2.0</version>
+        </dependency>        
     </dependencies>
 
 </project>

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,17 +48,6 @@ public class TestServlet extends HttpServlet implements ManagedService {
         
     }
 
-    private void forwardTo(String url, HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        System.out.println("url: " + url);
-        
-            RequestDispatcher rd = req.getRequestDispatcher(url);
-            
-            System.out.println("rd: " + (rd != null));
-            
-            rd.forward(req, res);
-    }
-    
-    
     @Override
     public void updated(Dictionary dctnr) throws ConfigurationException {
         System.out.println("servlet updated");
