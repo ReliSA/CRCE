@@ -33,19 +33,6 @@ public class MetadataImpl implements Metadata {
             
     private DataModelHelperExt m_dataModel;
 
-    private MetadataImpl(File metafile) {
-        m_metafile = metafile;
-        m_dataModel = Activator.getHelper();
-        m_resourceAll = new ResourceImpl();
-        
-//        if (m_metafile.exists()) {
-//            readMetadata();
-//        } else {
-//            m_metafile.createNewFile();
-//            m_resource = new ResourceImpl();
-//        }
-    }
-    
     public MetadataImpl(File metafile, Resource staticResource, ResourceImpl metaResource) {
 //        this(metafile);
         m_metafile = metafile;
@@ -53,7 +40,7 @@ public class MetadataImpl implements Metadata {
         
         m_resourceStatic = staticResource;
         m_resourceExt = metaResource;
-        m_resourceAll = cloneResource(staticResource);
+        m_resourceAll = mergeResources(staticResource, metaResource);
     }
     
 //    @Override
@@ -125,38 +112,95 @@ public class MetadataImpl implements Metadata {
         return m_resourceAll;
     }
 
-//    private void readMetadata() throws FileNotFoundException, IOException {
-//        Reader reader = new InputStreamReader(new FileInputStream(m_metafile));
-//        
-//        try {
-//            m_resource = (ResourceImpl) m_dataModel.readResource(reader);
-//        } catch (Exception e) {
-//            e.printStackTrace(); // XXX
-//        } finally {
-//            reader.close();
-//        }
-//        
-//        
-//    }
-
     @Override
     public void setSymbolicName(String name) throws ReadOnlyException {
         if (m_resourceStatic.getSymbolicName() == null) {
             m_resourceExt.put(Resource.SYMBOLIC_NAME, name);
+            m_resourceAll.put(Resource.SYMBOLIC_NAME, name);
         } else {
             throw new ReadOnlyException("Symbolic name of this resource is read only.");
         }
-        
     }
 
     @Override
     public void setVersion(String version) throws ReadOnlyException {
         if ("0.0.0".equals(m_resourceStatic.getVersion().toString())) {
             m_resourceExt.put(Resource.VERSION, version);
+            m_resourceAll.put(Resource.VERSION, version);
         } else {
             throw new ReadOnlyException("Version of this resource is read only.");
         }
+    }
+
+    public static ResourceImpl mergeResources(Resource major, Resource minor) {
+        ResourceImpl out = new ResourceImpl();
         
+        // categories
+        for (String cat : minor.getCategories()) {
+            out.addCategory(cat);
+        }
+        for (String cat : major.getCategories()) {
+            out.addCategory(cat);
+        }
+        
+        // properties
+        Map props;
+        if ((props = minor.getProperties()) != null) {
+            for (Object o : props.keySet()) {
+                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
+                if (!Resource.CATEGORY.equals((String) o)) {    
+                    out.put(o, props.get(o));
+                }
+                
+            }
+        }
+        if ((props = major.getProperties()) != null) {
+            for (Object o : props.keySet()) {
+                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
+                if (!Resource.CATEGORY.equals((String) o)) {    
+                    out.put(o, props.get(o));
+                }
+                
+            }
+        }
+        
+        // capabilities
+        for (org.apache.felix.bundlerepository.Capability cap : minor.getCapabilities()) {
+            CapabilityImpl neww = new CapabilityImpl(cap.getName());
+            for (Property p : cap.getProperties()) {
+                neww.addProperty(p);
+            }
+            out.addCapability(neww);
+        }
+        for (org.apache.felix.bundlerepository.Capability cap : major.getCapabilities()) {
+            CapabilityImpl neww = new CapabilityImpl(cap.getName());
+            for (Property p : cap.getProperties()) {
+                neww.addProperty(p);
+            }
+            out.addCapability(neww);
+        }
+        
+        // requirements
+        for (org.apache.felix.bundlerepository.Requirement req : minor.getRequirements()) {
+            RequirementImpl neww = new RequirementImpl(req.getName());
+            neww.setFilter(req.getFilter());
+            neww.setExtend(req.isExtend());
+            neww.setMultiple(req.isMultiple());
+            neww.setOptional(req.isOptional());
+            neww.addText(req.getComment());
+            out.addRequire(neww);
+        }
+        for (org.apache.felix.bundlerepository.Requirement req : major.getRequirements()) {
+            RequirementImpl neww = new RequirementImpl(req.getName());
+            neww.setFilter(req.getFilter());
+            neww.setExtend(req.isExtend());
+            neww.setMultiple(req.isMultiple());
+            neww.setOptional(req.isOptional());
+            neww.addText(req.getComment());
+            out.addRequire(neww);
+        }
+
+        return out;
     }
     
     public static ResourceImpl cloneResource(Resource src) {

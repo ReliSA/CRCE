@@ -21,5 +21,5 @@ public interface DataModelHelperExt extends DataModelHelper {
     String writeMetadata(Metadata metadata);
     
     void writeMetadata(Metadata metadata, Writer writer) throws IOException;
-    
+
 }

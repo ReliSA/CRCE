@@ -7,10 +7,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.felix.bundlerepository.Capability;
-import org.apache.felix.bundlerepository.Property;
 import org.apache.felix.bundlerepository.Resource;
 import org.apache.felix.bundlerepository.impl.ResourceImpl;
 
@@ -48,48 +44,38 @@ public class MetadataFactoryImpl implements MetadataFactory {
 
         File obrFile = new File(resourceFile.getParentFile(), resourceFile.getName() + Metadata.METAFILE_EXTENSION);
 
-        ResourceImpl metaResource = null;   // resource from metafile
-        Resource staticResource = null;     // resource from artifact
         
+        ResourceImpl metaResource = null;   // resource from metafile
         try {
             metaResource = (ResourceImpl) m_dataModelHelperExt.readMetadata(new FileReader(obrFile));
         } catch (Exception e) {
-            throw new IOException("Can not parse OBR metafile: " + obrFile.getAbsolutePath(), e);
+            // just not a metafile or metafile does not exist, create resource manually
+        }
+        if (metaResource == null) {
+            metaResource = new ResourceImpl();
         }
 
+        
+        Resource staticResource = null;     // resource from artifact
         try {
             staticResource = m_dataModelHelperExt.createResource(resourceFile.toURI().toURL());
-        } catch (Exception e) {
-            // just not a bundle, create resource manually
+        } catch (IOException e) {
+            // TODO
         }
 
         if (staticResource == null) { /* not a bundle */
             staticResource = new ResourceImpl();
-            metaResource.put(Resource.SYMBOLIC_NAME, resourceFile.getName());
-            metaResource.put(Resource.VERSION, "0.0.0", Property.VERSION);
-        } else { /* bundle */
-
+            if (metaResource.getSymbolicName() == null) {
+                metaResource.put(Resource.SYMBOLIC_NAME, resourceFile.getName());
+            }
         }
 
+        assert staticResource.getSymbolicName() != null || metaResource.getSymbolicName() != null : "Static as well as meta sym. name is null";
+        
         Metadata metadata = new MetadataImpl(obrFile, staticResource, metaResource);
 
         return metadata;
 
     }
 
-//    private void mergeCapabilities(Resource src, ResourceImpl dest, boolean overwrite) {
-//        Map<String, Capability> capabilities = new HashMap<String, Capability>();
-//        
-//        for (Capability cap : src.getCapabilities()) {
-//            capabilities.put(cap.getName(), cap);
-//        }
-//        
-//        for (Capability cap : dest.getCapabilities()) {
-//            Capability s = capabilities.get(cap);
-//            if (s == null) {
-//                dest.addCapability(cap);
-//            }
-//        }
-//        
-//    }
 }

@@ -1,9 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 import cz.zcu.kiv.crce.metadata.internal.DataModelHelperExtImpl;
+import java.io.File;
 import org.apache.felix.bundlerepository.Resource;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -11,50 +11,47 @@ import static org.junit.Assert.*;
  */
 public class DataModelHelperExtTest {
 
-    private DataModelHelperExt helper;
-
+    private DataModelHelperExt m_helper;
     private String RES_CONTENT =
             "<capability>"
-                + "<p n='cname' v='cvalue'/>"
+            + "<p n='cname' v='cvalue'/>"
             + "</capability>"
             + "<require name='rname' filter='(rname=rvalue)' extend='false' multiple='false' optional='false'>"
-                + "requirement"
+            + "requirement"
             + "</require>";
-
+    
     private String RES = "<resource symbolicname='sname' version='1.2.3'>"
-                        + RES_CONTENT
-                        + "</resource>";
+            + RES_CONTENT
+            + "</resource>";
     
     private String OBR_STD = "<obr>"
-                    + RES_CONTENT
-                    + "</obr>";
-
-    private String OBR_EXT = "<obr>"
-                    + RES
-                    + "</obr>";
+            + RES_CONTENT
+            + "</obr>";
     
+    private String OBR_EXT = "<obr>"
+            + RES
+            + "</obr>";
+
     @Before
     public void setUp() {
-        helper = new DataModelHelperExtImpl();
+        m_helper = new DataModelHelperExtImpl();
     }
 
     @After
     public void tearDown() {
-        helper = null;
+        m_helper = null;
     }
-    
+
     /**
      * "Standard" OBR format (with capabilities and requirements directly inside <obr> element).
      * @throws Exception 
      */
     @Test
     public void parseObrStd() throws Exception {
-        System.out.println(OBR_STD);
-        Resource resource = helper.readMetadata(OBR_STD);
-        
+        Resource resource = m_helper.readMetadata(OBR_STD);
+
         assert resource.getSymbolicName() == null : "Expected sym. name: null, found: " + resource.getSymbolicName();
         assert "0.0.0".equals(resource.getVersion().toString()) : "Expected version: 0.0.0, found: " + resource.getVersion();
-        
     }
 
     /**
@@ -63,13 +60,23 @@ public class DataModelHelperExtTest {
      */
     @Test
     public void parseObrExt() throws Exception {
-        System.out.println(OBR_EXT);
-        Resource resource = helper.readMetadata(OBR_EXT);
-        
+        Resource resource = m_helper.readMetadata(OBR_EXT);
+
         assert "sname".equals(resource.getSymbolicName()) : "Expected sym. name: sname, found: " + resource.getSymbolicName();
         assert "1.2.3".equals(resource.getVersion().toString()) : "Expected sym. name: rname, found: " + resource.getVersion();
-        
-        
+    }
+
+    @Test
+    public void createOtherResource() throws Exception {
+        File file = new File("src/test/resources/other.txt");
+        Resource r = m_helper.createResource(file.toURI().toURL());
+        assert r == null : "other.txt is not a bundle";
     }
     
+    @Test
+    public void createBundleResource() throws Exception {
+        File file = new File("src/test/resources/bundle.jar");
+        Resource r = m_helper.createResource(file.toURI().toURL());
+        assert r != null : "bundle.jar is a bundle";
+    }
 }

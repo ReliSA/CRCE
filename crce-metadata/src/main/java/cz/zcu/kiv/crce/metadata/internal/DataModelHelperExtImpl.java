@@ -92,12 +92,10 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 
         try {
             resource = (ResourceImpl) super.createResource(bundleUrl);
-        } catch (Exception e) {
-        }
-
-        if (resource == null) {
+        } catch (IllegalArgumentException e) {
+            // not a bundle
             // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
-            resource = new ResourceImpl();
+            return null;
         }
 
         return resource;
@@ -182,6 +180,6 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
         return resource;
 
     }
-    
-    
+
+
 }

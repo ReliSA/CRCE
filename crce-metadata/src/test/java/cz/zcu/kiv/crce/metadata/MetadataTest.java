@@ -84,5 +84,7 @@ public class MetadataTest {
         }
         assert flag : "Error by copying categories";
         
+        // TODO test capabilities and requirements
+        
     }
 }
