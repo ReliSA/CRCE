@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<obr>
+  <resource symbolicname="bundle.resource" version="1.2.3">
+    <capability name="feature">
+      <p n="some.name" v="some.value" />
+    </capability>
+    <require extend="false"
+        filter="(some.name=some.other.value)"
+        multiple="false" name="feature" optional="false">
+        Use Feature some.other.value
+    </require>
+  </resource>
+</obr>
