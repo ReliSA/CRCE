@@ -17,5 +17,5 @@ public interface ResourceCreator {
     
     public void save(Resource resource);
 
-    public void move(Resource resource, URI uri);
+    public void copy(Resource resource, URI uri);
 }

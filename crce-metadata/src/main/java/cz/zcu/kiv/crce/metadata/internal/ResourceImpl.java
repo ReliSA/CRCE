@@ -86,6 +86,11 @@ public class ResourceImpl implements Resource {
     }
 
     @Override
+    public void setVersion(String version) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
     public void setCategory(String category) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

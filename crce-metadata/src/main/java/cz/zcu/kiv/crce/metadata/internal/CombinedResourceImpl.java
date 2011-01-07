@@ -90,6 +90,13 @@ public class CombinedResourceImpl implements CombinedResource {
             m_writableResource.setVersion(version);
         }
     }
+    
+    @Override
+    public void setVersion(String version) {
+        if ("0.0.0".equals(m_staticResource.getVersion().toString())) {
+            m_writableResource.setVersion(version);
+        }
+    }
 
     @Override
     public void setCategory(String category) {
@@ -146,4 +153,5 @@ public class CombinedResourceImpl implements CombinedResource {
     public Resource getStaticResource() {
         return m_staticResource;
     }
+
 }

@@ -1,15 +1,8 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import cz.zcu.kiv.crce.metadata.internal.CombinedResourceCreatorFactory;
 import java.io.File;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -19,57 +12,51 @@ public class MetadataFactoryTest {
 
     private File dir;
     private ResourceCreatorFactory factory;
+    private ResourceCreator creator;
     
     @Before
     public void setUp() {
-        dir = createTempDir();
+        dir = Util.createTempDir();
         factory = new CombinedResourceCreatorFactory();
+        creator = factory.getResourceCreator();
+        assert creator != null : "ResourceCreator is null";
     }
 
     @After
     public void tearDown() {
-        deleteDir(dir);
-        dir = null;
+        Util.deleteDir(dir);
         factory = null;
     }
 
     @Test
-    public void createForBundle() throws Exception {
-        fail("need rewrite");
-//        File testBundle = createResource("bundle.jar");
-//
-//        ResourceCreator meta = factory.createResourceFor(testBundle);
-//
-//        assert meta != null : "Metadata is null";
-//        assert meta.getResource() != null : "Resource is null";
-//
-//        String sn = meta.getResource().getSymbolicName();
-//
-//        assert sn != null : "Symbolic name is null";
-//        assert "eu.kalwi.osgi.OSGi-Bundle1".equals(sn) : "Expected symbolic name: eu.kalwi.osgi.OSGi-Bundle1, found: " + sn;
-//        
-//        String version = meta.getResource().getVersion().toString();
-//        assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
+    public void createBundleResource() throws Exception {
+        File testBundle = Util.prepareFile(dir, "bundle.jar");
+
+        Resource resource = creator.getResource(testBundle.toURI());
+        assert resource != null : "Resource is null";
+        
+        String sn = resource.getSymbolicName();
+        assert sn != null : "Symbolic name is null";
+        assert "eu.kalwi.osgi.OSGi-Bundle1".equals(sn) : "Expected symbolic name: eu.kalwi.osgi.OSGi-Bundle1, found: " + sn;
+        
+        String version = resource.getVersion().toString();
+        assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
     }
 
     @Test
-    public void createForBundleWithMetafile() throws Exception {
-        fail("need rewrite");
-//        File testBundle = createResource("bundle.jar");
-//        createResource("bundle.jar.meta");
-//
-//        ResourceCreator meta = factory.createResourceFor(testBundle);
-//
-//        assert meta != null : "Metadata is null";
-//        assert meta.getResource() != null : "Resource is null";
-//
-//        String sn = meta.getResource().getSymbolicName();
-//
-//        assert sn != null : "Symbolic name is null";
-//        assert "eu.kalwi.osgi.OSGi-Bundle1".equals(sn) : "Expected symbolic name: eu.kalwi.osgi.OSGi-Bundle1, found: " + sn;
-//
-//        String version = meta.getResource().getVersion().toString();
-//        assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
+    public void createBundleResourceWithMetafile() throws Exception {
+        File testBundle = Util.prepareFile(dir, "bundle.jar");
+        Util.prepareFile(dir, "bundle.jar.meta");
+
+        Resource resource = creator.getResource(testBundle.toURI());
+        assert resource != null : "Resource is null";
+
+        String sn = resource.getSymbolicName();
+        assert sn != null : "Symbolic name is null";
+        assert "eu.kalwi.osgi.OSGi-Bundle1".equals(sn) : "Expected symbolic name: eu.kalwi.osgi.OSGi-Bundle1, found: " + sn;
+
+        String version = resource.getVersion().toString();
+        assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
         
 //        for (Capability c : meta.getResource().getCapabilities()) {
 //            if ("feature".equals(c.getName())) {
@@ -82,42 +69,34 @@ public class MetadataFactoryTest {
     }
 
     @Test
-    public void createForOther() throws Exception {
-        fail("need rewrite");
-//        File testBundle = createResource("other.txt");
-//
-//        ResourceCreator meta = factory.createResourceFor(testBundle);
-//
-//        assert meta != null : "Metadata is null";
-//        assert meta.getResource() != null : "Resource is null";
-//
-//        String sn = meta.getResource().getSymbolicName();
-//
-//        assert sn != null : "Symbolic name is null";
-//        assert "other.txt".equals(sn) : "Expected symbolic name: other.txt, found: " + sn;
-//
-//        String version = meta.getResource().getVersion().toString();
-//        assert "0.0.0".equals(version) : "Expected version: 0.0.0, found: " + version;
+    public void createOtherResource() throws Exception {
+        File testBundle = Util.prepareFile(dir, "other.txt");
+
+        Resource resource = creator.getResource(testBundle.toURI());
+        assert resource != null : "Resource is null";
+
+        String sn = resource.getSymbolicName();
+        assert sn != null : "Symbolic name is null";
+        assert "other.txt".equals(sn) : "Expected symbolic name: other.txt, found: " + sn;
+
+        String version = resource.getVersion().toString();
+        assert "0.0.0".equals(version) : "Expected version: 0.0.0, found: " + version;
     }
 
     @Test
-    public void createForOtherWithMetafile() throws Exception {
-        fail("need rewrite");
-//        File testBundle = createResource("other.txt");
-//        createResource("other.txt.meta");
-//
-//        ResourceCreator meta = factory.createResourceFor(testBundle);
-//
-//        assert meta != null : "Metadata is null";
-//        assert meta.getResource() != null : "Resource is null";
-//
-//        String sn = meta.getResource().getSymbolicName();
-//
-//        assert sn != null : "Symbolic name is null";
-//        assert "other.resource".equals(sn) : "Expected symbolic name: other.resource, found: " + sn;
-//
-//        String version = meta.getResource().getVersion().toString();
-//        assert "1.0.0".equals(version) : "Expected version: 1.0.0, found: " + version;
+    public void createOtherResourceWithMetafile() throws Exception {
+        File testBundle = Util.prepareFile(dir, "other.txt");
+        Util.prepareFile(dir, "other.txt.meta");
+
+        Resource resource = creator.getResource(testBundle.toURI());
+        assert resource != null : "Resource is null";
+
+        String sn = resource.getSymbolicName();
+        assert sn != null : "Symbolic name is null";
+        assert "other.resource".equals(sn) : "Expected symbolic name: other.resource, found: " + sn;
+
+        String version = resource.getVersion().toString();
+        assert "1.0.0".equals(version) : "Expected version: 1.0.0, found: " + version;
     }
 
 //    @Test
@@ -142,62 +121,4 @@ public class MetadataFactoryTest {
     
     // =========================================================================
     
-    private File createResource(String file) {
-        File resource = new File("src/test/resources/" + file);
-        assert resource.exists() : "Resource file not exists : " + resource.getAbsolutePath();
-
-        File temp = new File(dir, file);
-
-        copyfile(resource, temp);
-        
-        return temp;
-    }
-
-    private static File createTempDir() {
-        final String baseTempPath = System.getProperty("java.io.tmpdir");
-
-        File tempDir;
-
-        do {
-            tempDir = new File(baseTempPath, "crcetest" + System.nanoTime());
-        } while (tempDir.exists());
-
-        tempDir.mkdir();
-        tempDir.deleteOnExit();
-
-        return tempDir;
-    }
-
-    private static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-
-        return dir.delete();
-    }
-
-    private static void copyfile(File f1, File f2) {
-        try {
-            InputStream in = new FileInputStream(f1);
-            OutputStream out = new FileOutputStream(f2);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        } catch (FileNotFoundException ex) {
-            fail("File not found");
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-    }
 }

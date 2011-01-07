@@ -40,6 +40,8 @@ public interface Resource {
     
     void setVersion(Version version);
     
+    void setVersion(String version);
+    
     void setCategory(String category);
 
     void addCapability(Capability capability);

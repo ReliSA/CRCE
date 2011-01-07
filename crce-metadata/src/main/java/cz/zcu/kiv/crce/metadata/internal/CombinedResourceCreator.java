@@ -19,7 +19,7 @@ public class CombinedResourceCreator implements ResourceCreator {
     private ResourceCreator m_staticResourceCreator;
     private ResourceCreator m_writableResourceCreator;
 
-    CombinedResourceCreator(ResourceCreator staticCreator, ResourceCreator writableCreator) {
+    public CombinedResourceCreator(ResourceCreator staticCreator, ResourceCreator writableCreator) {
         m_staticResourceCreator = staticCreator;
         m_writableResourceCreator = writableCreator;
     }
@@ -32,9 +32,9 @@ public class CombinedResourceCreator implements ResourceCreator {
     }
 
     @Override
-    public void move(Resource resource, URI uri) {
-        m_staticResourceCreator.move(resource, uri);
-        m_writableResourceCreator.move(resource, uri);
+    public void copy(Resource resource, URI uri) {
+        m_staticResourceCreator.copy(resource, uri);
+        m_writableResourceCreator.copy(resource, uri);
     }
 
     @Override

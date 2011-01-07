@@ -2,9 +2,7 @@ package cz.zcu.kiv.crce.metadata;
 
 import cz.zcu.kiv.crce.metadata.internal.DataModelHelperExtImpl;
 import java.io.File;
-import org.apache.felix.bundlerepository.Resource;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -49,11 +47,10 @@ public class DataModelHelperExtTest {
      */
     @Test
     public void parseObrStd() throws Exception {
-        fail("need rewrite");
-//        Resource resource = m_helper.readMetadata(OBR_STD);
-//
-//        assert resource.getSymbolicName() == null : "Expected sym. name: null, found: " + resource.getSymbolicName();
-//        assert "0.0.0".equals(resource.getVersion().toString()) : "Expected version: 0.0.0, found: " + resource.getVersion();
+        Resource resource = m_helper.readMetadata(OBR_STD);
+
+        assert resource.getSymbolicName() == null : "Expected sym. name: null, found: " + resource.getSymbolicName();
+        assert "0.0.0".equals(resource.getVersion().toString()) : "Expected version: 0.0.0, found: " + resource.getVersion();
     }
 
     /**
@@ -62,24 +59,23 @@ public class DataModelHelperExtTest {
      */
     @Test
     public void parseObrExt() throws Exception {
-        fail("need rewrite");
-//        Resource resource = m_helper.readMetadata(OBR_EXT);
-//
-//        assert "sname".equals(resource.getSymbolicName()) : "Expected sym. name: sname, found: " + resource.getSymbolicName();
-//        assert "1.2.3".equals(resource.getVersion().toString()) : "Expected sym. name: rname, found: " + resource.getVersion();
+        Resource resource = m_helper.readMetadata(OBR_EXT);
+
+        assert "sname".equals(resource.getSymbolicName()) : "Expected sym. name: sname, found: " + resource.getSymbolicName();
+        assert "1.2.3".equals(resource.getVersion().toString()) : "Expected sym. name: rname, found: " + resource.getVersion();
     }
 
     @Test
     public void createOtherResource() throws Exception {
         File file = new File("src/test/resources/other.txt");
-        Resource r = m_helper.createResource(file.toURI().toURL());
+        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
         assert r == null : "other.txt is not a bundle";
     }
     
     @Test
     public void createBundleResource() throws Exception {
         File file = new File("src/test/resources/bundle.jar");
-        Resource r = m_helper.createResource(file.toURI().toURL());
+        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
         assert r != null : "bundle.jar is a bundle";
     }
 }

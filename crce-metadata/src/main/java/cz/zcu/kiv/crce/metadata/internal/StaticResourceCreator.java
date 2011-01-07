@@ -16,7 +16,7 @@ public class StaticResourceCreator implements ResourceCreator {
     }
 
     @Override
-    public void move(Resource resource, URI uri) {
+    public void copy(Resource resource, URI uri) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
