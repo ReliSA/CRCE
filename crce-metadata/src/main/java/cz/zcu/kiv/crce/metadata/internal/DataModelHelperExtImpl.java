@@ -1,16 +1,16 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import cz.zcu.kiv.crce.metadata.Metadata;
+import cz.zcu.kiv.crce.metadata.Resource;
 import org.apache.felix.bundlerepository.impl.CapabilityImpl;
 import org.apache.felix.bundlerepository.impl.RequirementImpl;
 import cz.zcu.kiv.crce.metadata.DataModelHelperExt;
+import cz.zcu.kiv.crce.metadata.internal.wrapper.Wrapper;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
-import org.apache.felix.bundlerepository.Resource;
 import org.apache.felix.bundlerepository.impl.DataModelHelperImpl;
 import org.apache.felix.bundlerepository.impl.PullParser;
 import org.apache.felix.bundlerepository.impl.RepositoryParser;
@@ -27,10 +27,10 @@ import static org.apache.felix.bundlerepository.impl.RepositoryParser.*;
 public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataModelHelperExt {
 
     @Override
-    public String writeMetadata(Metadata metadata) {
+    public String writeMetadata(Resource resource) {
         try {
             StringWriter sw = new StringWriter();
-            writeMetadata(metadata, sw);
+            writeMetadata(resource, sw);
             return sw.toString();
         } catch (IOException e) {
             IllegalStateException ex = new IllegalStateException(e);
@@ -40,10 +40,10 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
     }
 
     @Override
-    public void writeMetadata(Metadata metadata, Writer writer) throws IOException {
+    public void writeMetadata(Resource resource, Writer writer) throws IOException {
         XmlWriter w = new XmlWriter(writer);
 
-        Resource resource = ((MetadataImpl) metadata).getFelixResource();
+        org.apache.felix.bundlerepository.Resource felixResource = Wrapper.wrap(resource);
 
         w.element(OBR);
 
@@ -80,7 +80,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 //            
 //            w.end();
 //        } else {
-        writeResource(resource, writer);
+        writeResource(felixResource, writer);
 //        }
 
         w.end();
@@ -114,7 +114,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
     }
 
     @Override
-    public ResourceImpl readMetadata(Reader reader) throws Exception {
+    public Resource readMetadata(Reader reader) throws Exception {
         XmlPullParser parser = new KXmlParser();
         parser.setInput(reader);
 
@@ -123,7 +123,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
             throw new Exception("Expected element " + OBR);
         }
 
-        return parseMetadata(parser);
+        return new ConvertedResource(parseMetadata(parser));
     }
 
     public ResourceImpl parseMetadata(XmlPullParser reader) throws Exception {

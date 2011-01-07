@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import org.apache.felix.bundlerepository.DataModelHelper;
-import org.apache.felix.bundlerepository.Resource;
 
 /**
  *
@@ -18,8 +17,8 @@ public interface DataModelHelperExt extends DataModelHelper {
 
     Resource readMetadata(Reader reader) throws Exception;
 
-    String writeMetadata(Metadata metadata);
+    String writeMetadata(Resource resource);
     
-    void writeMetadata(Metadata metadata, Writer writer) throws IOException;
+    void writeMetadata(Resource resource, Writer writer) throws IOException;
 
 }

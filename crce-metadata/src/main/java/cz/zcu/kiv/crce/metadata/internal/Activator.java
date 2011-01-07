@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.DataModelHelperExt;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -17,8 +17,8 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         manager.add(createComponent()
-            .setInterface(MetadataFactory.class.getName(), null)
-            .setImplementation(MetadataFactoryImpl.class)
+            .setInterface(ResourceCreatorFactory.class.getName(), null)
+            .setImplementation(CombinedResourceCreatorFactory.class)
 //            .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
                 );
         
