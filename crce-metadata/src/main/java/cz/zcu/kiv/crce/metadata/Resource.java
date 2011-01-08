@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata;
 
+import java.net.URI;
 import java.util.Map;
 import org.osgi.framework.Version;
 
@@ -17,7 +18,7 @@ public interface Resource {
 
     String getPresentationName();
 
-    String getURI();
+    URI getUri();
 
     long getSize();
 
@@ -38,6 +39,8 @@ public interface Resource {
 
     void setSymbolicName(String name);
     
+    void setPresentationName(String name);
+    
     void setVersion(Version version);
     
     void setVersion(String version);
@@ -51,5 +54,10 @@ public interface Resource {
     Capability createCapability(String name);
     
     Requirement createRequirement(String name);
+
+    void setSize(long size);
     
+    void setUri(URI uri);
+    
+    boolean isWritable();
 }

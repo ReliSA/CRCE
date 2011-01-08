@@ -12,7 +12,7 @@ public class DataModelHelperExtTest {
 
     private DataModelHelperExt m_helper;
     private String RES_CONTENT =
-            "<capability>"
+            "<capability name='cap'>"
             + "<p n='cname' v='cvalue'/>"
             + "</capability>"
             + "<require name='rname' filter='(rname=rvalue)' extend='false' multiple='false' optional='false'>"

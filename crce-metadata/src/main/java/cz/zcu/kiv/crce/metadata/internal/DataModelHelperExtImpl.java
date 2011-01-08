@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.internal.wrapper.ConvertedResource;
 import cz.zcu.kiv.crce.metadata.Resource;
 import org.apache.felix.bundlerepository.impl.CapabilityImpl;
 import org.apache.felix.bundlerepository.impl.RequirementImpl;

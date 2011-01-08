@@ -56,13 +56,14 @@ public class ResourceWrapper implements org.apache.felix.bundlerepository.Resour
         return resource.getId();
     }
 
-    public URL getURL() {
-        try {
-            return new URL(resource.getURI());
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    // TODO - k cemu to bylo?
+//    public URL getURL() {
+//        try {
+//            return new URL(resource.getUri());
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public Requirement[] getRequirements() {
         return Wrapper.wrap(resource.getRequirements());
@@ -82,7 +83,7 @@ public class ResourceWrapper implements org.apache.felix.bundlerepository.Resour
 
     @Override
     public String getURI() {
-        return resource.getURI();
+        return resource.getUri().toString();
     }
 
     @Override

@@ -24,4 +24,11 @@ public enum Type {
     public String toString() {
         return string;
     }
+    
+    public static Type getValue(String value) {
+        if (value != null) {
+            return valueOf(value.toUpperCase());
+        }
+        return STRING;
+    }
 }

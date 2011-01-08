@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
 

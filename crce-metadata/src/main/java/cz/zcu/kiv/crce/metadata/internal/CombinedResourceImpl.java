@@ -4,9 +4,13 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.CombinedResource;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 import org.osgi.framework.Version;
+
+// TODO specifi exact write behavior
 
 /**
  *
@@ -43,8 +47,12 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
-    public String getURI() {
-        return "file:///not/implemented/combined/uri";
+    public URI getUri() {
+        try {
+            return new URI("file:///not/implemented/combined/uri");
+        } catch (URISyntaxException ex) {
+            return null;
+        }
     }
 
     @Override
@@ -152,6 +160,26 @@ public class CombinedResourceImpl implements CombinedResource {
     @Override
     public Resource getStaticResource() {
         return m_staticResource;
+    }
+
+    @Override
+    public boolean isWritable() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setPresentationName(String name) {
+        m_writableResource.setPresentationName(name);   // TODO check static p.n.?
+    }
+
+    @Override
+    public void setSize(long size) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setUri(URI uri) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }
