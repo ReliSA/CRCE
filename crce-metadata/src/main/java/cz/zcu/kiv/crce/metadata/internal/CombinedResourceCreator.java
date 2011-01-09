@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.Resource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 //import org.apache.felix.bundlerepository.Property;
@@ -25,26 +26,46 @@ public class CombinedResourceCreator implements ResourceCreator {
     }
             
     @Override
-    public void save(Resource resource) {
+    public void save(Resource resource) throws IOException {
         m_staticResourceCreator.save(resource);
         m_writableResourceCreator.save(resource);
         InputStream i;
     }
 
     @Override
-    public void copy(Resource resource, URI uri) {
+    public void copy(Resource resource, URI uri) throws IOException {
         m_staticResourceCreator.copy(resource, uri);
         m_writableResourceCreator.copy(resource, uri);
     }
 
     @Override
-    public Resource getResource(URI uri) {
+    public Resource getResource(URI uri) throws IOException {
         Resource staticResource = m_staticResourceCreator.getResource(uri);
         Resource writableResource = m_writableResourceCreator.getResource(uri);
         
+        if (staticResource == null && writableResource == null) {
+            return null;
+        }
+        
+        if (staticResource == null) {
+            staticResource = new ResourceImpl();
+//            staticResource.setSymbolicName(createSymbolicname(uri));
+        }
+        if (writableResource == null) {
+            writableResource = new ResourceImpl();
+        }
+        if (staticResource.getSymbolicName() == null) {
+            writableResource.setSymbolicName(createSymbolicname(uri));
+        }
+        
+        // TODO set new resource's URIs ?
         return new CombinedResourceImpl(staticResource, writableResource);
     }
     
+    private String createSymbolicname(URI uri) {
+            String[] seg = uri.getPath().split("/");
+            return seg[seg.length - 1];
+    }
     
 //    @Override
 //    public void setSymbolicName(String name) throws ReadOnlyException {

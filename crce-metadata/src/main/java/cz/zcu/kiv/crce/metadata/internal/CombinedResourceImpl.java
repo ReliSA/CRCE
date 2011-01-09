@@ -21,9 +21,9 @@ public class CombinedResourceImpl implements CombinedResource {
     private Resource m_staticResource;
     private Resource m_writableResource;
     
-    public CombinedResourceImpl(Resource stat, Resource wr) {
-        m_staticResource = stat;
-        m_writableResource = wr;
+    public CombinedResourceImpl(Resource staticResource, Resource writableResource) {
+        m_staticResource = staticResource;
+        m_writableResource = writableResource;
     }
     
     @Override
@@ -94,14 +94,14 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public void setVersion(Version version) {
-        if ("0.0.0".equals(m_staticResource.getVersion().toString())) {
+        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && m_staticResource.isWritable()) {
             m_writableResource.setVersion(version);
         }
     }
     
     @Override
     public void setVersion(String version) {
-        if ("0.0.0".equals(m_staticResource.getVersion().toString())) {
+        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && m_staticResource.isWritable()) {
             m_writableResource.setVersion(version);
         }
     }
@@ -164,7 +164,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public boolean isWritable() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return m_staticResource.isWritable() || m_writableResource.isWritable();
     }
 
     @Override

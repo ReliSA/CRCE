@@ -103,19 +103,16 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
     }
 
     @Override
-    public Resource readMetadata(String xml) throws Exception {
+    public Resource readMetadata(String xml) throws IOException, Exception {
         try {
             return readMetadata(new StringReader(xml));
         } catch (IOException e) {
-            IllegalStateException ex = new IllegalStateException(e);
-            ex.initCause(e);
-            throw ex;
+            throw new IllegalStateException(e);
         }
-
     }
 
     @Override
-    public Resource readMetadata(Reader reader) throws Exception {
+    public Resource readMetadata(Reader reader) throws IOException, Exception {
         XmlPullParser parser = new KXmlParser();
         parser.setInput(reader);
 

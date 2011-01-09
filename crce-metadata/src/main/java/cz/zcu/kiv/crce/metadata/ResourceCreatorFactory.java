@@ -1,8 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.IOException;
-import java.net.URI;
-
 /**
  *
  * @author kalwi

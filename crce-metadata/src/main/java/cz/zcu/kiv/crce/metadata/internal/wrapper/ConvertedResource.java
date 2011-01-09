@@ -51,6 +51,8 @@ public class ConvertedResource extends ResourceImpl {
         }
         
         setVersion(resource.getVersion());
+        
+        setWritable(false);
     }
 
 }

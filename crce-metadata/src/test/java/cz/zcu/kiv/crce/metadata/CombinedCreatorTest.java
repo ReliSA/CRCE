@@ -8,7 +8,7 @@ import org.junit.*;
  *
  * @author kalwi
  */
-public class MetadataFactoryTest {
+public class CombinedCreatorTest {
 
     private File dir;
     private ResourceCreatorFactory factory;
@@ -30,9 +30,9 @@ public class MetadataFactoryTest {
 
     @Test
     public void createBundleResource() throws Exception {
-        File testBundle = Util.prepareFile(dir, "bundle.jar");
+        File bundle = Util.prepareFile(dir, "bundle.jar");
 
-        Resource resource = creator.getResource(testBundle.toURI());
+        Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
         
         String sn = resource.getSymbolicName();
@@ -45,10 +45,10 @@ public class MetadataFactoryTest {
 
     @Test
     public void createBundleResourceWithMetafile() throws Exception {
-        File testBundle = Util.prepareFile(dir, "bundle.jar");
+        File bundle = Util.prepareFile(dir, "bundle.jar");
         Util.prepareFile(dir, "bundle.jar.meta");
 
-        Resource resource = creator.getResource(testBundle.toURI());
+        Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
 
         String sn = resource.getSymbolicName();
@@ -70,9 +70,11 @@ public class MetadataFactoryTest {
 
     @Test
     public void createOtherResource() throws Exception {
-        File testBundle = Util.prepareFile(dir, "other.txt");
+        File bundle = Util.prepareFile(dir, "other.txt");
 
-        Resource resource = creator.getResource(testBundle.toURI());
+        System.out.println("bundles URI: " + bundle.toURI() + ", exists: " + bundle.exists());
+        
+        Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
 
         String sn = resource.getSymbolicName();
@@ -85,12 +87,15 @@ public class MetadataFactoryTest {
 
     @Test
     public void createOtherResourceWithMetafile() throws Exception {
-        File testBundle = Util.prepareFile(dir, "other.txt");
+        File bundle = Util.prepareFile(dir, "other.txt");
         Util.prepareFile(dir, "other.txt.meta");
 
-        Resource resource = creator.getResource(testBundle.toURI());
+        Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
 
+        System.out.println("static sn: " + ((CombinedResource) resource).getStaticResource().getSymbolicName());
+        System.out.println("writable sn: " + ((CombinedResource) resource).getWritableResource().getSymbolicName());
+        
         String sn = resource.getSymbolicName();
         assert sn != null : "Symbolic name is null";
         assert "other.resource".equals(sn) : "Expected symbolic name: other.resource, found: " + sn;
