@@ -209,4 +209,36 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public String toString() {
         return getSymbolicName() + "/" + getVersion().toString();
     }
+
+    @Override
+    public String asString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("ID                : ").append(getId()).append("\n");
+        sb.append("Symbolic name     : ").append(getSymbolicName()).append("\n");
+        sb.append("Version           : ").append(getVersion()).append("\n");
+        sb.append("Presentation name : ").append(getPresentationName()).append("\n");
+        sb.append("Size              : ").append(getSize()).append("\n");
+        sb.append("URI               : ").append(getUri()).append("\n");
+        sb.append("Categories:\n");
+        for (String cat : getCategories()) {
+            sb.append("  ").append(cat).append("\n");
+        }
+        sb.append("Capabilities:\n");
+        for (Capability cap : getCapabilities()) {
+            sb.append("  ").append(cap.getName()).append("\n");
+            for (Property prop : cap.getProperties()) {
+                sb.append("    ").append(prop.getName()).append("[").append(prop.getType()).append("]: ").append(prop.getValue()).append("\n");
+            }
+        }
+        sb.append("Requirements:\n");
+        for (Requirement req : getRequirements()) {
+            sb.append("  Opt: ").append(req.isOptional());
+            sb.append(" Mult: ").append(req.isMultiple());
+            sb.append(" Ext: ").append(req.isExtend());
+            sb.append(req.getName()).append(" ").append(req.getFilter()).append(" ").append(req.getComment()).append("\n");
+        }
+        
+        return sb.toString();
+    }
 }

@@ -60,4 +60,6 @@ public interface Resource extends PropertyProvider {
     void setUri(URI uri);
 
     boolean isWritable();
+    
+    String asString();
 }

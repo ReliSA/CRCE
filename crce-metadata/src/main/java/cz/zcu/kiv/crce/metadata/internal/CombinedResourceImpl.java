@@ -15,7 +15,6 @@ import java.util.Set;
 import org.osgi.framework.Version;
 
 // TODO specifi exact write behavior
-
 /**
  *
  * @author kalwi
@@ -24,12 +23,12 @@ public class CombinedResourceImpl implements CombinedResource {
 
     private Resource m_staticResource;
     private Resource m_writableResource;
-    
+
     public CombinedResourceImpl(Resource staticResource, Resource writableResource) {
         m_staticResource = staticResource;
         m_writableResource = writableResource;
     }
-    
+
     @Override
     public String getId() {
         return m_staticResource.getId() != null ? m_staticResource.getId() : m_writableResource.getId();
@@ -52,7 +51,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public URI getUri() {
-        return m_staticResource.getUri() != null? m_staticResource.getUri() : m_writableResource.getUri();
+        return m_staticResource.getUri() != null ? m_staticResource.getUri() : m_writableResource.getUri();
     }
 
     @Override
@@ -108,7 +107,7 @@ public class CombinedResourceImpl implements CombinedResource {
             m_writableResource.setVersion(version);
         }
     }
-    
+
     @Override
     public void setVersion(String version) {
         if ("0.0.0".equals(m_staticResource.getVersion().toString()) && m_staticResource.isWritable()) {
@@ -162,7 +161,7 @@ public class CombinedResourceImpl implements CombinedResource {
         System.arraycopy(second, 0, result, first.length, second.length);
         return result;
     }
-    
+
     public Resource getWritableResource() {
         return m_writableResource;
     }
@@ -288,5 +287,15 @@ public class CombinedResourceImpl implements CombinedResource {
     @Override
     public String toString() {
         return "[" + m_staticResource.toString() + ", " + m_writableResource.toString() + "]";
+    }
+
+    @Override
+    public String asString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Static resource:\n");
+        sb.append(m_staticResource.asString());
+        sb.append("\nWritable resource:\n");
+        sb.append(m_writableResource.asString());
+        return sb.toString();
     }
 }
