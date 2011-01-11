@@ -2,12 +2,16 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.CombinedResource;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.Type;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.osgi.framework.Version;
 
 // TODO specifi exact write behavior
@@ -48,11 +52,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public URI getUri() {
-        try {
-            return new URI("file:///not/implemented/combined/uri");
-        } catch (URISyntaxException ex) {
-            return null;
-        }
+        return m_staticResource.getUri() != null? m_staticResource.getUri() : m_writableResource.getUri();
     }
 
     @Override
@@ -76,8 +76,18 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
-    public Map getProperties() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @SuppressWarnings("unchecked")
+    public Map getPropertiesMap() {
+        Map out = new HashMap();
+        Map tmp = m_writableResource.getPropertiesMap();
+        for (Object key : tmp.keySet()) {
+            out.put(key, tmp.get(key));
+        }
+        tmp = m_staticResource.getPropertiesMap();
+        for (Object key : tmp.keySet()) {
+            out.put(key, tmp.get(key));
+        }
+        return out;
     }
 
     @Override
@@ -174,12 +184,109 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public void setSize(long size) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (m_staticResource.getSize() < 0) {
+            m_writableResource.setSize(size);
+        }
     }
 
     @Override
     public void setUri(URI uri) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // TODO - je dobre, aby tohle bylo takto implementovano?
+        if (m_staticResource.getUri() == null) {
+            m_writableResource.setUri(uri);
+        }
     }
 
+    @Override
+    public Property[] getProperties() {
+        return concat(m_staticResource.getProperties(), m_writableResource.getProperties());
+    }
+
+    @Override
+    public Property getProperty(String name) {
+        Property property = m_staticResource.getProperty(name);
+        if (property == null) {
+            property = m_writableResource.getProperty(name);
+        }
+        return property;
+    }
+
+    @Override
+    public void setProperty(Property property) {
+        if (m_staticResource.getProperty(property.getName()) == null) {
+            m_writableResource.setProperty(property);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, String value, Type type) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, value, type);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, String string) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, string);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, Version version) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, version);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, URL url) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, url);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, URI uri) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, uri);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, long llong) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, llong);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, double ddouble) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, ddouble);
+        }
+    }
+
+    @Override
+    public void setProperty(String name, Set values) {
+        if (m_staticResource.getProperty(name) == null) {
+            m_writableResource.setProperty(name, values);
+        }
+    }
+
+    @Override
+    public void unsetProperty(String name) {
+        m_writableResource.unsetProperty(name);
+    }
+
+    @Override
+    public String getPropertyString(String name) {
+        String str = m_staticResource.getPropertyString(name);
+        return str != null ? str : m_writableResource.getPropertyString(name);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + m_staticResource.toString() + ", " + m_writableResource.toString() + "]";
+    }
 }

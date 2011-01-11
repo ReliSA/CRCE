@@ -24,14 +24,14 @@ public class StaticResourceCreator implements ResourceCreator {
 
     @Override
     public void save(Resource resource) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // do nothing
     }
 
     @Override
     public void copy(Resource resource, URI uri) throws IOException {
         InputStream input = resource.getUri().toURL().openStream();
         OutputStream output = uri.toURL().openConnection().getOutputStream();
-        
+
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int count = input.read(buffer); count != -1; count = input.read(buffer)) {

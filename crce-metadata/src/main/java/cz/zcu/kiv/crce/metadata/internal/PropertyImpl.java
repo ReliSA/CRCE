@@ -73,7 +73,7 @@ public class PropertyImpl implements Property {
 
                 case URL:
                     return new URL(m_value);
-                    
+
                 case VERSION:
                     return VersionTable.getVersion(m_value);
 
@@ -181,6 +181,9 @@ public class PropertyImpl implements Property {
         hash = 41 * hash + (this.m_value != null ? this.m_value.hashCode() : 0);
         return hash;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return m_value;
+    }
 }

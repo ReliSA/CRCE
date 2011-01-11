@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.internal.wrapper.ConvertedResource;
 import cz.zcu.kiv.crce.metadata.Resource;
 import org.apache.felix.bundlerepository.impl.CapabilityImpl;
@@ -20,7 +23,10 @@ import org.apache.felix.bundlerepository.impl.XmlWriter;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 
-import static org.apache.felix.bundlerepository.impl.RepositoryParser.*;
+//import static org.apache.felix.bundlerepository.impl.RepositoryParser.*;
+import static org.apache.felix.bundlerepository.Resource.*;
+
+
 /**
  *
  * @author kalwi
@@ -34,7 +40,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
             writeMetadata(resource, sw);
             return sw.toString();
         } catch (IOException e) {
-            IllegalStateException ex = new IllegalStateException(e);
+            IllegalStateException ex = new IllegalStateException(e); // XXX
             ex.initCause(e);
             throw ex;
         }
@@ -44,7 +50,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
     public void writeMetadata(Resource resource, Writer writer) throws IOException {
         XmlWriter w = new XmlWriter(writer);
 
-        org.apache.felix.bundlerepository.Resource felixResource = Wrapper.wrap(resource);
+//        org.apache.felix.bundlerepository.Resource felixResource = Wrapper.wrap(resource);
 
         w.element(OBR);
 
@@ -81,10 +87,14 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 //            
 //            w.end();
 //        } else {
-        writeResource(felixResource, writer);
+//        writeResource(felixResource, writer);
+        
 //        }
 
+        toXml(w, resource);
+        
         w.end();
+        
     }
 
     @Override
@@ -128,10 +138,10 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
         PullParser parser = new PullParser();
         int event;
         ResourceImpl resource = null;
-        
+
         while ((event = reader.nextTag()) == XmlPullParser.START_TAG) {
             String element = reader.getName();
-            
+
             if (RepositoryParser.RESOURCE.equals(element)) {
                 resource = parser.parseResource(reader);
                 event = reader.nextTag();
@@ -139,14 +149,14 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
             } else if (resource == null) {
                 resource = new ResourceImpl();
             }
-            
-            if (CATEGORY.equals(element)) {
+
+            if (RepositoryParser.CATEGORY.equals(element)) {
                 String category = parser.parseCategory(reader);
                 resource.addCategory(category);
-            } else if (CAPABILITY.equals(element)) {
+            } else if (RepositoryParser.CAPABILITY.equals(element)) {
                 CapabilityImpl capability = parser.parseCapability(reader);
                 resource.addCapability(capability);
-            } else if (REQUIRE.equals(element)) {
+            } else if (RepositoryParser.REQUIRE.equals(element)) {
                 RequirementImpl requirement = parser.parseRequire(reader);
                 resource.addRequire(requirement);
             } else {
@@ -179,5 +189,91 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 
     }
 
+    public void writeResource(Resource resource, Writer writer) throws IOException
+    {
+        XmlWriter w = new XmlWriter(writer);
+        toXml(w, resource);
+    }
+    
+    private static void toXml(XmlWriter w, Resource resource) throws IOException
+    {
+        w.element(RepositoryParser.RESOURCE)
+            .attribute(ID, resource.getId())
+            .attribute(SYMBOLIC_NAME, resource.getSymbolicName())
+            .attribute(PRESENTATION_NAME, resource.getPresentationName())
+            .attribute(URI, getRelativeUri(resource, URI))
+            .attribute(VERSION, resource.getVersion().toString());
 
+        w.textElement(DESCRIPTION, resource.getPropertiesMap().get(DESCRIPTION))
+            .textElement(SIZE, resource.getPropertiesMap().get(SIZE))
+            .textElement(DOCUMENTATION_URI, getRelativeUri(resource, DOCUMENTATION_URI))
+            .textElement(SOURCE_URI, getRelativeUri(resource, SOURCE_URI))
+            .textElement(JAVADOC_URI, getRelativeUri(resource, JAVADOC_URI))
+            .textElement(LICENSE_URI, getRelativeUri(resource, LICENSE_URI));
+
+        String[] categories = resource.getCategories();
+        for (int i = 0; categories != null && i < categories.length; i++)
+        {
+            w.element(RepositoryParser.CATEGORY)
+                .attribute(RepositoryParser.ID, categories[i])
+                .end();
+        }
+        for (Capability capability : resource.getCapabilities()) {
+            toXml(w, capability);
+        }
+        for (Requirement requirement : resource.getRequirements()) {
+            toXml(w, requirement);
+        }
+        w.end();
+    }
+    
+    private static String getRelativeUri(Resource resource, String name) 
+    {
+        String uri = (String) resource.getPropertiesMap().get(name);
+        if (resource instanceof ResourceImpl)
+        {
+            try
+            {
+                uri = java.net.URI.create(((ResourceImpl) resource).getRepository().getURI()).relativize(java.net.URI.create(uri)).toASCIIString();
+            }
+            catch (Throwable t)
+            {
+            }
+        }
+        return uri;
+    }
+
+    private static void toXml(XmlWriter w, Capability capability) throws IOException
+    {
+        w.element(RepositoryParser.CAPABILITY)
+            .attribute(RepositoryParser.NAME, capability.getName());
+        Property[] props = capability.getProperties();
+        for (int j = 0; props != null && j < props.length; j++)
+        {
+            toXml(w, props[j]);
+        }
+        w.end();
+    }
+
+    private static void toXml(XmlWriter w, Property property) throws IOException
+    {
+        w.element(RepositoryParser.P)
+            .attribute(RepositoryParser.N, property.getName())
+            .attribute(RepositoryParser.T, property.getType())
+            .attribute(RepositoryParser.V, property.getValue())
+            .end();
+    }
+    
+    private static void toXml(XmlWriter w, Requirement requirement) throws IOException
+    {
+        w.element(RepositoryParser.REQUIRE)
+            .attribute(RepositoryParser.NAME, requirement.getName())
+            .attribute(RepositoryParser.FILTER, requirement.getFilter())
+            .attribute(RepositoryParser.EXTEND, Boolean.toString(requirement.isExtend()))
+            .attribute(RepositoryParser.MULTIPLE, Boolean.toString(requirement.isMultiple()))
+            .attribute(RepositoryParser.OPTIONAL, Boolean.toString(requirement.isOptional()))
+            .text(requirement.getComment().trim())
+            .end();
+    }
+    
 }

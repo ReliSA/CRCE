@@ -27,9 +27,30 @@ public class CombinedResourceCreator implements ResourceCreator {
             
     @Override
     public void save(Resource resource) throws IOException {
-        m_staticResourceCreator.save(resource);
-        m_writableResourceCreator.save(resource);
-        InputStream i;
+
+        if (resource instanceof CombinedResourceImpl) {
+            CombinedResourceImpl cres = (CombinedResourceImpl) resource;
+            System.out.println("--- saving ---");
+            System.out.println("");
+            System.out.println("combined: " + resource);
+            System.out.println("" + resource.getUri());
+
+            System.out.println("");
+            System.out.println("static: " + cres.getStaticResource());
+            System.out.println("" + cres.getStaticResource().getUri());
+
+            System.out.println("");
+            System.out.println("writable: " + cres.getWritableResource());
+            System.out.println("" + cres.getWritableResource().getUri());
+
+            System.out.println("---");
+
+            m_staticResourceCreator.save(cres.getStaticResource());
+            m_writableResourceCreator.save(cres.getWritableResource());
+        } else {
+            throw new IllegalStateException("Not a CombinedResourceImpl"); // XXX
+        }
+        
     }
 
     @Override

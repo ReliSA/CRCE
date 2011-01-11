@@ -1,68 +1,67 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.Property;
+import org.apache.felix.utils.version.VersionTable;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
 
+import static org.apache.felix.bundlerepository.Resource.*;
+
 /**
  *
  * @author kalwi
  */
-public class ResourceImpl implements Resource {
+public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
-    private String m_id;
-    private String m_symbolicName;
-    private Version m_version;
-    private String m_presentationName;
-    private URI m_uri;
-    private long m_size;
-    
+//    private Map<String, Object> m_map;
     private boolean m_writable;
-    
-//    private final List<Capability> m_capabilities = new ArrayList<Capability>();
-//    private final List<Requirement> m_requirements = new ArrayList<Requirement>();
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
-    
     private final Set<String> m_categories = new HashSet<String>();
 
     public ResourceImpl() {
         m_writable = true;
+//        m_map = new HashMap<String, Object>();
     }
-    
+
     @Override
     public String getId() {
-        return m_id;
+        return getPropertyString(ID);
     }
 
     @Override
     public String getSymbolicName() {
-        return m_symbolicName;
+        return getPropertyString(SYMBOLIC_NAME);
     }
 
     @Override
     public Version getVersion() {
-        return (m_version == null) ? Version.emptyVersion : m_version;
+        Property version = getProperty(VERSION);
+        return version == null ? Version.emptyVersion : (Version) version.getConvertedValue();
     }
 
     @Override
     public String getPresentationName() {
-        return m_presentationName;
+        return getPropertyString(PRESENTATION_NAME);
     }
 
     @Override
     public URI getUri() {
-        return m_uri;
+        Property uri = getProperty(URI);
+        return uri == null ? null : (URI) uri.getConvertedValue();
     }
 
     @Override
     public long getSize() {
-        return m_size;
+        Property size = getProperty(SIZE);
+        return size == null ? -1 : (Long) size.getConvertedValue();
     }
 
     @Override
@@ -81,10 +80,12 @@ public class ResourceImpl implements Resource {
     }
 
     @Override
-    public Map getProperties() {
-        throw new UnsupportedOperationException("Not supported yet.");        
-//        Map map = new HashMap();
-//        return map;
+    public Map getPropertiesMap() {
+        Map<String, String> map = new HashMap<String, String>();
+        for (Property p : getProperties()) {
+            map.put(p.getName(), p.getValue());
+        }
+        return map;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class ResourceImpl implements Resource {
     @Override
     public void setSymbolicName(String name) {
         if (isWritable()) {
-            m_symbolicName = name;
+            setProperty(SYMBOLIC_NAME, name);
         }
     }
 
@@ -105,17 +106,18 @@ public class ResourceImpl implements Resource {
             throw new NullPointerException("Version can not be null.");
         }
         if (isWritable()) {
-            m_version = version;
+            setProperty(VERSION, version);
         }
     }
 
     @Override
     public void setVersion(String version) {
+        // TODO check null ?
         if (isWritable()) {
-            m_version = new Version(version);
+            setProperty(VERSION, VersionTable.getVersion(version));
         }
     }
-    
+
     @Override
     public void setCategory(String category) {
         if (isWritable()) {
@@ -173,32 +175,38 @@ public class ResourceImpl implements Resource {
     protected void setWritable(boolean writable) {
         m_writable = writable;
     }
-    
+
     protected void setId(String id) {
         // TODO writable check?
-        m_id = id;
+        setProperty(ID, id);
     }
 
     @Override
     public void setPresentationName(String name) {
         if (isWritable()) {
-            m_presentationName = name;
+            setProperty(PRESENTATION_NAME, name);
         }
     }
 
     @Override
     public void setSize(long size) {
         if (isWritable()) {
-            m_size = size;
+            if (size < 0) {
+                throw new IllegalArgumentException("Size can't be less than zero");
+            }
+            setProperty(SIZE, size);
         }
     }
 
     @Override
     public void setUri(URI uri) {
         if (isWritable()) {
-            m_uri = uri;
+            setProperty(URI, uri);
         }
     }
-
+    
+    @Override
+    public String toString() {
+        return getSymbolicName() + "/" + getVersion().toString();
+    }
 }
- 

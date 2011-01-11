@@ -7,7 +7,6 @@ import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  *
@@ -47,7 +46,8 @@ public class ConvertedResource extends ResourceImpl {
         try {
             setUri(new URI(resource.getURI()));
         } catch (Exception ex) {
-            setUri(null); // TODO co s tim?
+//            System.out.println("Exception: " + ex.getLocalizedMessage() + ", uri: " + resource.getURI());
+//            setUri(null); // TODO co s tim?
         }
         
         setVersion(resource.getVersion());

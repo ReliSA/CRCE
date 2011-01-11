@@ -37,7 +37,7 @@ public class ResourceWrapper implements org.apache.felix.bundlerepository.Resour
     }
 
     public Map getProperties() {
-        return resource.getProperties();
+        return resource.getPropertiesMap();
     }
 
     public String getSymbolicName() {

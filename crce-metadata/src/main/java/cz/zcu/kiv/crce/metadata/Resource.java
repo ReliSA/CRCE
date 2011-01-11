@@ -8,8 +8,8 @@ import org.osgi.framework.Version;
  *
  * @author kalwi
  */
-public interface Resource {
-    
+public interface Resource extends PropertyProvider {
+
     String getId();
 
     String getSymbolicName();
@@ -27,37 +27,37 @@ public interface Resource {
     Capability[] getCapabilities();
 
     Requirement[] getRequirements();
-    
-    Map getProperties();
-    
+
+    Map getPropertiesMap();
+
     boolean hasCategory(String category);
-    
+
     boolean hasCapability(Capability capability);
-    
+
     boolean hasRequirement(Requirement requirement);
-    
+
 
     void setSymbolicName(String name);
-    
+
     void setPresentationName(String name);
-    
+
     void setVersion(Version version);
-    
+
     void setVersion(String version);
-    
+
     void setCategory(String category);
 
     void addCapability(Capability capability);
 
     void addRequirement(Requirement requirement);
-    
+
     Capability createCapability(String name);
-    
+
     Requirement createRequirement(String name);
 
     void setSize(long size);
-    
+
     void setUri(URI uri);
-    
+
     boolean isWritable();
 }
