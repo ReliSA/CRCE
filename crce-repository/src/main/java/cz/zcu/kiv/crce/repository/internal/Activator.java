@@ -1,15 +1,19 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
+import cz.zcu.kiv.crce.repository.Repository;
 import cz.zcu.kiv.crce.repository.Stack;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
+import org.apache.ace.obr.metadata.MetadataGenerator;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 
 /**
@@ -19,6 +23,9 @@ import org.osgi.service.obr.RepositoryAdmin;
 public class Activator extends DependencyActivatorBase {
 
     private volatile ConfigurationAdmin m_config;   /* injected */
+    private static volatile MetadataGenerator m_metadataGenerator; /* injected */
+    
+    private volatile RepositoryAdmin m_repositoryAdmin; /* injected */
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
@@ -27,7 +34,14 @@ public class Activator extends DependencyActivatorBase {
 
         dm.add(createComponent()
                 .setInterface(Stack.class.getName(), null)
-                .setImplementation(StackImpl.class));
+                .setImplementation(StackImpl.class)
+                .add(createServiceDependency().setService(ResourceCreatorFactory.class).setRequired(true)));
+
+        dm.add(createComponent()
+                .setInterface(Repository.class.getName(), null)
+                .setImplementation(RepositoryImpl.class)
+                .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                );
         
         dm.add(createComponent()
                 .setImplementation(this)
@@ -85,5 +99,9 @@ public class Activator extends DependencyActivatorBase {
 
     @Override
     public void destroy(BundleContext bc, DependencyManager dm) throws Exception {
+    }
+    
+    public static MetadataGenerator getMetadataGenerator() {
+        return m_metadataGenerator;
     }
 }

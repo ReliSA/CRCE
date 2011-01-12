@@ -92,6 +92,11 @@
             <version>${project.version}</version>
         </dependency>
         
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.service.obr</artifactId>
+        </dependency>
+        
 <!--    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-extender-whiteboard</artifactId>
@@ -109,6 +114,10 @@
            <artifactId>commons-io</artifactId>
            <version>2.0</version>
         </dependency>        
+        <dependency>
+            <groupId>org.apache.ace</groupId>
+            <artifactId>ace-obr-storage</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

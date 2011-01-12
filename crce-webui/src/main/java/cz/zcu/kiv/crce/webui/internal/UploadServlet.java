@@ -3,11 +3,14 @@ package cz.zcu.kiv.crce.webui.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -22,9 +25,21 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession(true);
+        
         PrintWriter out = resp.getWriter();
-        out.println("m_stack: " + (Activator.getStack() != null));
-        out.println("m_log: " + (Activator.getLog() != null));
+        out.println("m_stack: " + (Activator.getStack() != null ? "found" : "not found"));
+        
+        Enumeration en = session.getAttributeNames();
+
+        while (en.hasMoreElements()) {
+            String name = (String) en.nextElement();
+            out.println(name + ": " + session.getAttribute(name));
+        }
+        
+        session.setAttribute("id" + new Random().nextInt(100), new Random().nextInt(10));
+        
+        
         out.close();
     }
     
@@ -54,7 +69,7 @@ public class UploadServlet extends HttpServlet {
                 } else {
                     String fileName = fi.getName();
                     InputStream is = fi.getInputStream();
-                    Activator.getStack().store(fileName, is);
+                    Activator.getStack().put(fileName, is);
                     is.close();
                     out.println("stored: " + fileName);
                 }
@@ -76,7 +91,7 @@ public class UploadServlet extends HttpServlet {
 //            else {
 //                String id = path.substring(1);
 //                try {
-//                    if (m_stack.store(id, req.getInputStream())) {
+//                    if (m_stack.put(id, req.getInputStream())) {
 //                        sendResponse(resp, HttpServletResponse.SC_OK);
 //                    }
 //                    else {

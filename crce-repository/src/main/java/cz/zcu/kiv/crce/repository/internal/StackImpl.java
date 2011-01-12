@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
 import cz.zcu.kiv.crce.repository.Plugin;
 import cz.zcu.kiv.crce.repository.Stack;
 import java.io.File;
@@ -7,54 +10,81 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
+import java.util.List;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.obr.Resource;
 
 /**
  *
  * @author kalwi
  */
 public class StackImpl implements Stack {
+
     private int BUFFER_SIZE = 8 * 1024;
+    
+    private volatile ResourceCreatorFactory m_resourceCreatorFactory;   /* injected */
+    private volatile BundleContext m_context; /* Injected by dependency manager */
+    
+    File m_baseDir;
+    
+    private List<Resource> m_resources;
 
-    @Override
-    public boolean store(String name, InputStream resource) throws IOException {
-        File file = new File("U:", name);
-        
-        if (!file.exists()) {
-            FileOutputStream output = null;
-            File tempFile = null;
-            boolean success = false;
-            try {
-                tempFile = File.createTempFile("ccer", ".tmp");
-                output = new FileOutputStream(tempFile);
-                byte[] buffer = new byte[BUFFER_SIZE];
-                for (int count = resource.read(buffer); count != -1; count = resource.read(buffer)) {
-                    output.write(buffer, 0, count);
-                }
-                success = true;
-            }
-            finally {
-                if (output != null) {
-                    output.flush();
-                    output.close();
-                }
-            }
-            if (success) {
-                tempFile.renameTo(file);
-            }
-            return success;
+    private void setUpBaseDir() {
+        m_baseDir = m_context.getDataFile("stack");
+        if (!m_baseDir.exists()) {
+            m_baseDir.mkdir();
+        } else if (!m_baseDir.isDirectory()) {
+            m_baseDir.delete();
+            m_baseDir.mkdir();
         }
-        return false;
         
-        
-    }
-
-    @Override
-    public void commit() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    @Override
+    public synchronized boolean put(String name, InputStream resource) throws IOException {
+        if (m_baseDir == null) {
+            setUpBaseDir();
+        }
+        FileOutputStream output = null;
+        File file = null;
+        boolean success = false;
+        try {
+            file = File.createTempFile("ccer", ".tmp", m_baseDir);
+            output = new FileOutputStream(file);
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int count = resource.read(buffer); count != -1; count = resource.read(buffer)) {
+                output.write(buffer, 0, count);
+            }
+            
+            ResourceCreator creator = m_resourceCreatorFactory.getResourceCreator();
+            
+            Resource r = creator.getResource(file.toURI());
+            
+            r.createCapability("file").setProperty("name", name);
+            
+            r.setSymbolicName(name);
+
+            System.out.println("\n--- created resource ---");
+            System.out.println(r.asString());
+            
+            creator.save(r);
+            
+            success = true;
+        } finally {
+            if (output != null) {
+                output.flush();
+                output.close();
+            }
+        }
+
+        return success;
+    }
+
+    @Override
+    public synchronized void commit() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     @Override
     public void runTestsOnComponent(Object component) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -62,7 +92,7 @@ public class StackImpl implements Stack {
 
     @Override
     public Resource[] getStoredResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return m_resources.toArray(new Resource[0]);
     }
 
     @Override
@@ -72,6 +102,7 @@ public class StackImpl implements Stack {
 
     @Override
     public void updated(Dictionary dctnr) throws ConfigurationException {
+        // do nothing yet
     }
 
 }

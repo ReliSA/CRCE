@@ -293,5 +293,9 @@ public class Test {
         for (Resource resource : resources) {
             System.out.println(resource.getId() + ": " + resource.getURL());
         }
+        
+        System.out.println("");
+        
+        System.out.println("repository URL: " + m_repositoryAdmin.listRepositories()[0].getURL());
     }
 }
