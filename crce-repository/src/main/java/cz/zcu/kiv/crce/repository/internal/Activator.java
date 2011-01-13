@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
 import cz.zcu.kiv.crce.repository.Repository;
-import cz.zcu.kiv.crce.repository.Stack;
+import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
@@ -33,8 +33,8 @@ public class Activator extends DependencyActivatorBase {
         final Test test = new Test();
 
         dm.add(createComponent()
-                .setInterface(Stack.class.getName(), null)
-                .setImplementation(StackImpl.class)
+                .setInterface(ResourceBuffer.class.getName(), null)
+                .setImplementation(ResourceBufferImpl.class)
                 .add(createServiceDependency().setService(ResourceCreatorFactory.class).setRequired(true)));
 
         dm.add(createComponent()

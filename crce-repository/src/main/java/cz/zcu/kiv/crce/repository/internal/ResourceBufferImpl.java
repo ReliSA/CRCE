@@ -4,7 +4,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
 import cz.zcu.kiv.crce.repository.Plugin;
-import cz.zcu.kiv.crce.repository.Stack;
+import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.osgi.service.cm.ConfigurationException;
  *
  * @author kalwi
  */
-public class StackImpl implements Stack {
+public class ResourceBufferImpl implements ResourceBuffer {
 
     private int BUFFER_SIZE = 8 * 1024;
     private volatile ResourceCreatorFactory m_resourceCreatorFactory;   /* Injected by dependency manager */
@@ -27,7 +27,7 @@ public class StackImpl implements Stack {
     private volatile BundleContext m_context; /* Injected by dependency manager */
 
     File m_baseDir;
-    private List<Resource> m_resources = new ArrayList<Resource>();
+    private List<Resource> m_resources = new ArrayList<Resource>(); // TODO remove, make repository.xml instead
 
     private void setUpBaseDir() {
         m_baseDir = m_context.getDataFile("stack");
@@ -41,18 +41,18 @@ public class StackImpl implements Stack {
     }
 
     @Override
-    public synchronized boolean put(String name, InputStream resource) throws IOException {
+    public synchronized Resource put(String name, InputStream resource) throws IOException {
         if (name == null || resource == null || "".equals(name)) {
-            return false;
+            return null;
         }
         if (m_baseDir == null) {
             setUpBaseDir();
         }
         FileOutputStream output = null;
         File file = null;
-        boolean success = false;
+        Resource out = null;
         try {
-            file = File.createTempFile("ccer", ".tmp", m_baseDir);
+            file = File.createTempFile("res", ".tmp", m_baseDir);
             output = new FileOutputStream(file);
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int count = resource.read(buffer); count != -1; count = resource.read(buffer)) {
@@ -61,19 +61,16 @@ public class StackImpl implements Stack {
 
             ResourceCreator creator = m_resourceCreatorFactory.getResourceCreator();
 
-            Resource r = creator.getResource(file.toURI());
+            Resource res = creator.getResource(file.toURI());
 
-            r.createCapability("file").setProperty("name", name);
+            res.createCapability("file").setProperty("name", name);
 
-            r.setSymbolicName(name);
+            res.setSymbolicName(name);
 
-            System.out.println("\n--- created resource >" + name + "<---"); // XXX do logging
-            System.out.println(r.asString());
+            creator.save(res);
+            m_resources.add(res);
 
-            creator.save(r);
-            m_resources.add(r);
-
-            success = true;
+            out = res;
         } finally {
             if (output != null) {
                 output.flush();
@@ -81,7 +78,7 @@ public class StackImpl implements Stack {
             }
         }
 
-        return success;
+        return out;
     }
 
     @Override

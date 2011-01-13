@@ -36,7 +36,6 @@ public class ConvertedResource extends ResourceImpl {
             setCategory(fcat);
         }
         
-        setId(resource.getId());
         setSymbolicName(resource.getSymbolicName());
         setPresentationName(resource.getPresentationName());
         
@@ -51,6 +50,8 @@ public class ConvertedResource extends ResourceImpl {
         }
         
         setVersion(resource.getVersion());
+        
+        setId(resource.getId());
         
         setWritable(false);
     }

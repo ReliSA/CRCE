@@ -7,7 +7,7 @@
 <%@page import="cz.zcu.kiv.crce.metadata.Requirement"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Property"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Capability"%>
-<%@page import="cz.zcu.kiv.crce.repository.Stack"%>
+<%@page import="cz.zcu.kiv.crce.repository.ResourceBuffer"%>
 <%@page import="cz.zcu.kiv.crce.webui.internal.Activator"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Resource"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -29,13 +29,22 @@
                 <input type="file" name="bundle"/><br/>
                 <input type="submit" value="upload"/>
             </form>
+            <%
+                String success = request.getParameter("success");
+                if ("true".equals(success)) {
+                    out.println("<font color='green'><h3>Upload successful</h3></font>");
+                }
+                if ("false".equals(success)) {
+                    out.println("<font color='red'><h3>Upload failed</h3></font>");
+                }
+            %>
 
             <h1>Resources in stack:</h1>
 
             <%
 
 
-                Stack stack = Activator.getStack();
+                ResourceBuffer stack = Activator.getStack();
                 for (Resource res : stack.getStoredResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
                     out.println("Symbolic name: " + res.getSymbolicName() + "<br/>");

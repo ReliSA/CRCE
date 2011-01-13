@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
-import cz.zcu.kiv.crce.repository.Stack;
+import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -10,12 +10,12 @@ import org.osgi.service.obr.RepositoryAdmin;
 
 public final class Activator extends DependencyActivatorBase {
 
-    private static volatile Stack m_stack; /* injected */
+    private static volatile ResourceBuffer m_stack; /* injected */
 
     private static volatile LogService m_log; /* injected */
 
 
-    public static Stack getStack() {
+    public static ResourceBuffer getStack() {
         return m_stack;
     }
 
@@ -27,7 +27,7 @@ public final class Activator extends DependencyActivatorBase {
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         manager.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(Stack.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceBuffer.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false)));
 
 //        final Test t1 = new Test();

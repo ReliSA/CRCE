@@ -97,16 +97,19 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public void setSymbolicName(String name) {
         if (isWritable()) {
             setProperty(SYMBOLIC_NAME, name);
+            setProperty(ID, name + "/" + getVersion());
         }
     }
 
     @Override
     public void setVersion(Version version) {
         if (version == null) {
+            // TODO would be better to set version as 0.0.0 ?
             throw new NullPointerException("Version can not be null.");
         }
         if (isWritable()) {
             setProperty(VERSION, version);
+            setProperty(ID, getSymbolicName() + "/" + version);
         }
     }
 
@@ -177,8 +180,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     }
 
     protected void setId(String id) {
-        // TODO writable check?
-        setProperty(ID, id);
+        if (isWritable()) {
+            setProperty(ID, id);
+        }
     }
 
     @Override

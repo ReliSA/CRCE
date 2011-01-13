@@ -67,6 +67,8 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
             // not a bundle
             // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
             return null;
+        } catch (NullPointerException e) {
+            return null;
         }
 
         return resource;
@@ -188,7 +190,7 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
     }
 
     private static String getRelativeUri(Resource resource, String name) {
-        String uri = (String) resource.getPropertiesMap().get(name);
+        String uri = resource.getPropertiesMap().get(name);
         if (resource instanceof ResourceImpl) {
             try {
                 uri = java.net.URI.create(((ResourceImpl) resource).getRepository().getURI())
