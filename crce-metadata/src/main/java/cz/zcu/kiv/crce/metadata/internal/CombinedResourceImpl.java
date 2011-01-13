@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
@@ -75,15 +76,14 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map getPropertiesMap() {
-        Map out = new HashMap();
-        Map tmp = m_writableResource.getPropertiesMap();
-        for (Object key : tmp.keySet()) {
+    public Map<String, String> getPropertiesMap() {
+        Map<String, String> out = new HashMap<String, String>();
+        Map<String, String> tmp = m_writableResource.getPropertiesMap();
+        for (String key : tmp.keySet()) {
             out.put(key, tmp.get(key));
         }
         tmp = m_staticResource.getPropertiesMap();
-        for (Object key : tmp.keySet()) {
+        for (String key : tmp.keySet()) {
             out.put(key, tmp.get(key));
         }
         return out;
@@ -198,7 +198,11 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public Property[] getProperties() {
-        return concat(m_staticResource.getProperties(), m_writableResource.getProperties());
+        Set<Property> set = new HashSet<Property>();
+        set.addAll(Arrays.asList(m_writableResource.getProperties()));
+        set.addAll(Arrays.asList(m_staticResource.getProperties()));
+        return set.toArray(new Property[set.size()]);
+//        return concat(m_staticResource.getProperties(), m_writableResource.getProperties());
     }
 
     @Override

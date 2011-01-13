@@ -28,7 +28,7 @@ public interface Resource extends PropertyProvider {
 
     Requirement[] getRequirements();
 
-    Map getPropertiesMap();
+    Map<String, String> getPropertiesMap();
 
     boolean hasCategory(String category);
 

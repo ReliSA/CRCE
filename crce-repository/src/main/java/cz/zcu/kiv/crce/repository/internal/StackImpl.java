@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 import org.osgi.framework.BundleContext;
@@ -21,13 +22,12 @@ import org.osgi.service.cm.ConfigurationException;
 public class StackImpl implements Stack {
 
     private int BUFFER_SIZE = 8 * 1024;
-    
-    private volatile ResourceCreatorFactory m_resourceCreatorFactory;   /* injected */
+    private volatile ResourceCreatorFactory m_resourceCreatorFactory;   /* Injected by dependency manager */
+
     private volatile BundleContext m_context; /* Injected by dependency manager */
-    
+
     File m_baseDir;
-    
-    private List<Resource> m_resources;
+    private List<Resource> m_resources = new ArrayList<Resource>();
 
     private void setUpBaseDir() {
         m_baseDir = m_context.getDataFile("stack");
@@ -37,11 +37,14 @@ public class StackImpl implements Stack {
             m_baseDir.delete();
             m_baseDir.mkdir();
         }
-        
+
     }
-    
+
     @Override
     public synchronized boolean put(String name, InputStream resource) throws IOException {
+        if (name == null || resource == null || "".equals(name)) {
+            return false;
+        }
         if (m_baseDir == null) {
             setUpBaseDir();
         }
@@ -55,20 +58,21 @@ public class StackImpl implements Stack {
             for (int count = resource.read(buffer); count != -1; count = resource.read(buffer)) {
                 output.write(buffer, 0, count);
             }
-            
+
             ResourceCreator creator = m_resourceCreatorFactory.getResourceCreator();
-            
+
             Resource r = creator.getResource(file.toURI());
-            
+
             r.createCapability("file").setProperty("name", name);
-            
+
             r.setSymbolicName(name);
 
-            System.out.println("\n--- created resource ---");
+            System.out.println("\n--- created resource >" + name + "<---"); // XXX do logging
             System.out.println(r.asString());
-            
+
             creator.save(r);
-            
+            m_resources.add(r);
+
             success = true;
         } finally {
             if (output != null) {
@@ -104,5 +108,4 @@ public class StackImpl implements Stack {
     public void updated(Dictionary dctnr) throws ConfigurationException {
         // do nothing yet
     }
-
 }

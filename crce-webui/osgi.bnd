@@ -27,6 +27,7 @@ Import-Package: \
   org.xml.sax, \
   org.w3c.dom, \
   junit.framework;resolution:=optional, \
+  cz.zcu.kiv.crce.metadata, \
   *
 
 Dynamic-ImportPackage: *

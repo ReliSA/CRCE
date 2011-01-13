@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -45,10 +47,6 @@ public class UploadServlet extends HttpServlet {
     
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        PrintWriter out = resp.getWriter();
-        
-        out.println("--- post ---");
-        
         if (ServletFileUpload.isMultipartContent(req)){
             ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
             List fileItemsList;
@@ -64,47 +62,17 @@ public class UploadServlet extends HttpServlet {
                 FileItem fi = (FileItem) o;
                 
                 if (fi.isFormField()) {
-                    out.print("name: " + fi.getFieldName());
-                    out.println(", string: " + fi.getString());
+                    // do nothing
                 } else {
                     String fileName = fi.getName();
                     InputStream is = fi.getInputStream();
                     Activator.getStack().put(fileName, is);
                     is.close();
-                    out.println("stored: " + fileName);
                 }
             }
         }
         
-        out.close();
-        
-        
-//        ServletContext cx = this.getServletContext();
-//        
-//        String action = req.getParameter("action");
-//        
-//        if ("send".equals(action)) {
-//            String path = req.getPathInfo();
-//            if ((path == null) || (path.length() <= 1)) {
-//                sendResponse(resp, HttpServletResponse.SC_BAD_REQUEST);
-//            }
-//            else {
-//                String id = path.substring(1);
-//                try {
-//                    if (m_stack.put(id, req.getInputStream())) {
-//                        sendResponse(resp, HttpServletResponse.SC_OK);
-//                    }
-//                    else {
-//                        sendResponse(resp, HttpServletResponse.SC_CONFLICT);
-//                    }
-//                }
-//                catch (IOException e) {
-//                    m_log.log(LogService.LOG_WARNING, "Exception handling request: " + req.getRequestURL(), e);
-//                    sendResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//                }
-//            }
-//            
-//        }
+        resp.sendRedirect("index.jsp");
     }
     
     // send a response with the specified status code

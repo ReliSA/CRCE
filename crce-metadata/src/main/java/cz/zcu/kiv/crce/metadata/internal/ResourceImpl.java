@@ -80,7 +80,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     }
 
     @Override
-    public Map getPropertiesMap() {
+    public Map<String, String> getPropertiesMap() {
         Map<String, String> map = new HashMap<String, String>();
         for (Property p : getProperties()) {
             map.put(p.getName(), p.getValue());
