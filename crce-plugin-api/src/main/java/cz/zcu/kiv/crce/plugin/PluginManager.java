@@ -1,4 +1,6 @@
-package cz.zcu.kiv.crce.repository;
+package cz.zcu.kiv.crce.plugin;
+
+import cz.zcu.kiv.crce.plugin.Plugin;
 
 /**
  *

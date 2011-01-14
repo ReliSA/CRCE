@@ -30,6 +30,7 @@
         <module>crce-repository</module>
         <module>crce-webui</module>
         <module>crce-metadata</module>
+        <module>crce-plugin-api</module>
     </modules>
 
     <build>

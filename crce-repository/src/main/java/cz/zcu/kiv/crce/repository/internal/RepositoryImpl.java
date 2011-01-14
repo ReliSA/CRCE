@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.PluginManager;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Repository;
 import java.io.File;
 import java.io.IOException;

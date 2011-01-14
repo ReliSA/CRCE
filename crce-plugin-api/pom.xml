@@ -11,26 +11,18 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-repository</artifactId>
+    <artifactId>crce-plugin-api</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Repository</name>
+    <name>CRCE - Plugin API</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository</bundle.symbolicName>
-        <bundle.namespace>${namespace}.repository</bundle.namespace>
+        <bundle.symbolicName>${namespace}.plugin</bundle.symbolicName>
+        <bundle.namespace>${namespace}.plugin</bundle.namespace>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-storage</artifactId>
-        </dependency> 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.service.obr</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
@@ -38,18 +30,6 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configadmin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

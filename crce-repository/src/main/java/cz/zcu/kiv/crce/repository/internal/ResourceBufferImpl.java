@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
-import cz.zcu.kiv.crce.repository.Plugin;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.File;
 import java.io.FileOutputStream;
