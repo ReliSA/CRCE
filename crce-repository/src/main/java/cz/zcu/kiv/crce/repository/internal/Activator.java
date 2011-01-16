@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceCreatorFactory;
+import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Repository;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class Activator extends DependencyActivatorBase {
         dm.add(createComponent()
                 .setInterface(ResourceBuffer.class.getName(), null)
                 .setImplementation(ResourceBufferImpl.class)
-                .add(createServiceDependency().setService(ResourceCreatorFactory.class).setRequired(true)));
+                .add(createServiceDependency().setService(ResourceDAOFactory.class).setRequired(true)));
 
         dm.add(createComponent()
                 .setInterface(Repository.class.getName(), null)

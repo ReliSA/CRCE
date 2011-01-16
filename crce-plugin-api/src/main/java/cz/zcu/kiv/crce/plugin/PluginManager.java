@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.plugin;
 
-import cz.zcu.kiv.crce.plugin.Plugin;
-
 /**
  *
  * @author kalwi

@@ -11,15 +11,15 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-plugin-api</artifactId>
+    <artifactId>crce-metadata-metafile</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin API</name>
+    <name>CRCE - Plugin - Metafile Metadata</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.plugin</bundle.symbolicName>
-        <bundle.namespace>${namespace}.plugin</bundle.namespace>
+        <bundle.symbolicName>${namespace}.metadata.metafile</bundle.symbolicName>
+        <bundle.namespace>${namespace}.metadata.metafile</bundle.namespace>
     </properties>
 
     <dependencies>
@@ -32,8 +32,32 @@
             <artifactId>org.apache.felix.configadmin</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.kxml</groupId>
+            <artifactId>kxml2</artifactId>
+            <scope>provided</scope>
+            <version>2.3.0</version>
+        </dependency>
+
+        
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-plugin-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

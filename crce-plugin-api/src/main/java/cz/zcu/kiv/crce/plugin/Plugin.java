@@ -6,4 +6,5 @@ package cz.zcu.kiv.crce.plugin;
  */
 public interface Plugin {
     public String getName();
+    
 }
