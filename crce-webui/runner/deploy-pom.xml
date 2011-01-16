@@ -5,12 +5,12 @@
   <parent>
     <artifactId>compiled-bundle-settings</artifactId>
     <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../poms/compiled/</relativePath>
   </parent>
   <groupId>cz.zcu.kiv.crce.webui.build</groupId>
   <artifactId>deployment</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>CRCE - Repository Web UI</name>
   <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
@@ -32,14 +32,14 @@
     <dependency>
       <groupId>cz.zcu.kiv.crce</groupId>
       <artifactId>crce-webui</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.0-SNAPSHOT</version>
       <type>war</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>cz.zcu.kiv.crce</groupId>
       <artifactId>crce-repository</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -48,7 +48,7 @@
       <dependency>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
         <artifactId>provision</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>provided</scope>
         <optional>true</optional>

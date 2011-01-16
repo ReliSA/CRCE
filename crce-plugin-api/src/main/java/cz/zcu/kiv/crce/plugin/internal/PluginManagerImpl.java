@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -32,6 +33,11 @@ public class PluginManagerImpl implements PluginManager {
     public void removed(Plugin plugin) {
         System.out.println("\nplugin removed: " + plugin.getClass().getName() + " " + plugin.getName());
         System.out.println("");
+    }
+
+    @Override
+    public ResourceDAO getResourceDAO() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

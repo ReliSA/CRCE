@@ -17,7 +17,7 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         manager.add(createComponent()
-                .setImplementation(Activator.class) // TODO this or class?
+                .setImplementation(this) // TODO this or class?
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 );
         

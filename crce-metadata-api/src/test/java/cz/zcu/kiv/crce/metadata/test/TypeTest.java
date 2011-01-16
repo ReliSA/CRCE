@@ -1,5 +1,6 @@
-package cz.zcu.kiv.crce.metadata;
+package cz.zcu.kiv.crce.metadata.test;
 
+import cz.zcu.kiv.crce.metadata.Type;
 import org.junit.*;
 import static cz.zcu.kiv.crce.metadata.Type.*;
 

@@ -7,12 +7,12 @@
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
         <artifactId>compiled-bundle-settings</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-metadata-osgi-bundle</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>CRCE - Plugin - OSGi Metadata</name>
@@ -38,7 +38,6 @@
         <dependency>
             <groupId>net.sf.kxml</groupId>
             <artifactId>kxml2</artifactId>
-            <scope>provided</scope>
             <version>2.3.0</version>
         </dependency>
         
