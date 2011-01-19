@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.osgi.DataModelHelperExt;
 import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResource;
 import java.io.IOException;
@@ -56,6 +56,21 @@ public class OsgiManifestResourceDAO implements ResourceDAO {
     public Resource getResource(URI uri) throws IOException {
         org.apache.felix.bundlerepository.Resource resource = m_dataModelHelper.createResource(uri.toURL());
         return resource == null ? null : new ConvertedResource(resource);
+    }
+
+    @Override
+    public String getPluginId() {
+        return "osgi manifest";
+    }
+
+    @Override
+    public String getName() {
+        return "osgi manifest";
+    }
+
+    @Override
+    public int getPluginPriority() {
+        return 10;
     }
     
     

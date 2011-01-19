@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import java.net.URI;
 
@@ -24,6 +24,16 @@ public class CombinedResourceDAOFactory implements ResourceDAOFactory, Plugin {
     @Override
     public String getName() {
         return "Combined resource creator factory";
+    }
+
+    @Override
+    public String getPluginId() {
+        return "combined";
+    }
+
+    @Override
+    public int getPluginPriority() {
+        return 10;
     }
 
 }

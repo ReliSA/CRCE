@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.metadata.metafile.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +28,8 @@ public class MetafileResourceDAO implements ResourceDAO {
 
     public MetafileResourceDAO() {
         m_dataModelHelper = Activator.getHelper();
+        
+        System.out.println("metafile resource dao constructor");
     }
 
     @Override
@@ -97,5 +99,20 @@ public class MetafileResourceDAO implements ResourceDAO {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Unexpected URI syntax: " + uri.toString() + METAFILE_EXTENSION, e);
         }
+    }
+
+    @Override
+    public String getPluginId() {
+        return "metafile";
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getPluginPriority() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

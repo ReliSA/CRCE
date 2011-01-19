@@ -25,6 +25,11 @@ public enum Type {
         return string;
     }
     
+    /**
+     * Returns <code>Type</code> for given string value.
+     * @param value
+     * @return 
+     */
     public static Type getValue(String value) {
         if (value != null) {
             return valueOf(value.toUpperCase());

@@ -35,7 +35,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
-            <type>bundle</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

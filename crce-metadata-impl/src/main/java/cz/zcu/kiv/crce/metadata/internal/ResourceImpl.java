@@ -14,6 +14,8 @@ import org.osgi.framework.Version;
 
 import static org.apache.felix.bundlerepository.Resource.*;
 
+// TODO synchronization of resource and it's capabilities, requirements and properties
+
 /**
  *
  * @author kalwi

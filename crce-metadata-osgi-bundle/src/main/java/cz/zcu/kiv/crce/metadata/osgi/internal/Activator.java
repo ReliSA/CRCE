@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.osgi.DataModelHelperExt;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -19,7 +19,6 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(ResourceDAO.class.getName(), null)
                 .setImplementation(OsgiManifestResourceDAO.class)
-//                .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 );
     }
 

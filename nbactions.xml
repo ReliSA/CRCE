@@ -6,6 +6,15 @@
                 <goal>install</goal>
                 <goal>pax:provision</goal>
                 
+                
+            </goals>
+        </action>
+        <action>
+            <actionName>rebuild</actionName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>-Dmaven.test.skip</goal>
             </goals>
         </action>
     </actions>

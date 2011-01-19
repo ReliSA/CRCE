@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.repository.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
+import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Repository;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Activator extends DependencyActivatorBase {
         dm.add(createComponent()
                 .setInterface(ResourceBuffer.class.getName(), null)
                 .setImplementation(ResourceBufferImpl.class)
-                .add(createServiceDependency().setService(ResourceDAOFactory.class).setRequired(true)));
+                .add(createServiceDependency().setService(PluginManager.class).setRequired(true)));
 
         dm.add(createComponent()
                 .setInterface(Repository.class.getName(), null)
@@ -82,17 +83,17 @@ public class Activator extends DependencyActivatorBase {
         if (properties == null) {
             properties = new Properties();
         }
-        System.out.println("props=" + properties);
+//        System.out.println("props=" + properties);
         boolean changed = false;
         for (int i = 0; i < params.length; i += 2) {
-            System.out.println("key=" + params[i] + " value=" + params[i + 1]);
+//            System.out.println("key=" + params[i] + " value=" + params[i + 1]);
             if (!params[i + 1].equals(properties.get(params[i]))) {
                 properties.put(params[i], params[i + 1]);
                 changed = true;
             }
         }
         if (changed) {
-            System.out.println("Updating " + pid);
+//            System.out.println("Updating " + pid);
             conf.update(properties);
         }
     }

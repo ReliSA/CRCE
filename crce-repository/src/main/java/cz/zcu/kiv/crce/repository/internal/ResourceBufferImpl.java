@@ -1,9 +1,10 @@
 package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,7 +23,9 @@ import org.osgi.service.cm.ConfigurationException;
 public class ResourceBufferImpl implements ResourceBuffer {
 
     private int BUFFER_SIZE = 8 * 1024;
-    private volatile ResourceDAOFactory m_resourceDAOFactory;   /* Injected by dependency manager */
+    
+//    private volatile ResourceDAOFactory m_resourceDAOFactory;   
+    private volatile PluginManager m_pluginManager; /* Injected by dependency manager */
 
     private volatile BundleContext m_context; /* Injected by dependency manager */
 
@@ -59,7 +62,7 @@ public class ResourceBufferImpl implements ResourceBuffer {
                 output.write(buffer, 0, count);
             }
 
-            ResourceDAO creator = m_resourceDAOFactory.getResourceDAO(m_baseDir.toURI());
+            ResourceDAO creator = m_pluginManager.getResourceDAO(m_baseDir.toURI());
 
             Resource res = creator.getResource(file.toURI());
 

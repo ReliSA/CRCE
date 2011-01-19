@@ -1,15 +1,15 @@
 package cz.zcu.kiv.crce.plugin;
 
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
+import java.net.URI;
 
 /**
  *
  * @author kalwi
  */
 public interface PluginManager {
+
     Plugin[] getPlugins();
-    
-    ResourceDAO getResourceDAO();
-    
+
+    ResourceDAO getResourceDAO(URI baseUri);
     
 }

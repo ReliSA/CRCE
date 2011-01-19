@@ -1,13 +1,15 @@
-package cz.zcu.kiv.crce.metadata;
+package cz.zcu.kiv.crce.plugin;
 
+import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 
 /**
  *
  * @author kalwi
  */
-public interface ResourceDAO {
+public interface ResourceDAO extends Plugin {
 
     /**
      * Returns <code>Resource</code> object for a given resource. Returns
@@ -18,8 +20,14 @@ public interface ResourceDAO {
      * @throws IOException  
      */
     public Resource getResource(URI uri) throws IOException;
-    
+
+    /**
+     * Save TODO
+     * @param resource
+     * @throws IOException 
+     */
     public void save(Resource resource) throws IOException;
 
     public void copy(Resource resource, URI uri) throws IOException;
+    
 }

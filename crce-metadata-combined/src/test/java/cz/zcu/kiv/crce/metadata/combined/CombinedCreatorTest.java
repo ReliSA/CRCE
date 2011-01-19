@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.ResourceDAOFactory;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAOFactory;
 import java.io.File;
 import org.junit.*;
@@ -63,7 +63,7 @@ public class CombinedCreatorTest {
         
 //        for (Capability c : meta.getResource().getCapabilities()) {
 //            if ("feature".equals(c.getName())) {
-//                String value = (String) c.getProperties().get("some.name");
+//                String value = (String) c.getProperties().getResource("some.name");
 //                assert "some.value".equals(value) : "Expected value: some.value, found:" + value;
 //            }
 //        }

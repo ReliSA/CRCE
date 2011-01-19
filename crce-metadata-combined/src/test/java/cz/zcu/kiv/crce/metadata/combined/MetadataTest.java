@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.metadata.combined;
 import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
 import cz.zcu.kiv.crce.metadata.osgi.internal.OsgiManifestResourceDAO;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAO;
 import java.io.File;
 import java.io.IOException;

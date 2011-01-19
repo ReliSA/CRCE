@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import java.io.IOException;
 import java.net.URI;
 //import org.apache.felix.bundlerepository.Property;
@@ -86,6 +86,21 @@ public class CombinedResourceDAO implements ResourceDAO {
             String[] seg = uri.getPath().split("/");
             return seg[seg.length - 1];
     }
+
+    @Override
+    public String getPluginId() {
+        return "combined resource dao";
+    }
+
+    @Override
+    public String getName() {
+        return "combined resource dao";
+    }
+
+    @Override
+    public int getPluginPriority() {
+        return 10;
+    }
     
 //    @Override
 //    public void setSymbolicName(String name) throws ReadOnlyException {
@@ -137,7 +152,7 @@ public class CombinedResourceDAO implements ResourceDAO {
 //            for (Object o : props.keySet()) {
 //                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
 //                if (!Resource.CATEGORY.equals((String) o)) {    
-//                    out.put(o, props.get(o));
+//                    out.put(o, props.getResource(o));
 //                }
 //                
 //            }
@@ -146,7 +161,7 @@ public class CombinedResourceDAO implements ResourceDAO {
 //            for (Object o : props.keySet()) {
 //                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
 //                if (!Resource.CATEGORY.equals((String) o)) {    
-//                    out.put(o, props.get(o));
+//                    out.put(o, props.getResource(o));
 //                }
 //                
 //            }
@@ -205,7 +220,7 @@ public class CombinedResourceDAO implements ResourceDAO {
 //            for (Object o : props.keySet()) {
 //                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
 //                if (!Resource.CATEGORY.equals((String) o)) {    
-//                    out.put(o, props.get(o));
+//                    out.put(o, props.getResource(o));
 //                }
 //                
 //            }
@@ -245,7 +260,7 @@ public class CombinedResourceDAO implements ResourceDAO {
 //            for (Object o : props.keySet()) {
 //                // workaround of bug http://issues.apache.org/jira/browse/FELIX-2757
 //                if (!Resource.CATEGORY.equals((String) o)) {    
-//                    dest.put(o, props.get(o));
+//                    dest.put(o, props.getResource(o));
 //                }
 //                
 //            }
