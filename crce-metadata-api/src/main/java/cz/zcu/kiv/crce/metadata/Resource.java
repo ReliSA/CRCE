@@ -45,7 +45,7 @@ public interface Resource extends PropertyProvider {
 
     void setVersion(String version);
 
-    void setCategory(String category);
+    void addCategory(String category);
 
     void addCapability(Capability capability);
 

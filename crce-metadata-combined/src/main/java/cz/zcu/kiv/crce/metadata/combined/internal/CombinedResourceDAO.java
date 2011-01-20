@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import java.io.IOException;
 import java.net.URI;
@@ -14,7 +15,7 @@ import java.net.URI;
  *
  * @author kalwi
  */
-public class CombinedResourceDAO implements ResourceDAO {
+public class CombinedResourceDAO extends AbstractResourceDAO {
 
     private ResourceDAO m_staticResourceDAO;
     private ResourceDAO m_writableResourceDAO;
@@ -88,19 +89,10 @@ public class CombinedResourceDAO implements ResourceDAO {
     }
 
     @Override
-    public String getPluginId() {
-        return "combined resource dao";
-    }
-
-    @Override
-    public String getName() {
-        return "combined resource dao";
-    }
-
-    @Override
     public int getPluginPriority() {
         return 10;
     }
+
     
 //    @Override
 //    public void setSymbolicName(String name) throws ReadOnlyException {

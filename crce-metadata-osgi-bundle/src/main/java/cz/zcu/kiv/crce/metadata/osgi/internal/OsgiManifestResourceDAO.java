@@ -1,9 +1,8 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.osgi.DataModelHelperExt;
 import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResource;
+import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,14 +12,14 @@ import java.net.URI;
  *
  * @author kalwi
  */
-public class OsgiManifestResourceDAO implements ResourceDAO {
+public class OsgiManifestResourceDAO extends AbstractResourceDAO {
 
     private static int BUFFER_SIZE = 8 * 1024;
     
     private DataModelHelperExt m_dataModelHelper;
 
     public OsgiManifestResourceDAO() {
-        m_dataModelHelper = Activator.getHelper();
+        m_dataModelHelper = DataModelHelperExt.instance();
     }
 
     @Override
@@ -60,11 +59,6 @@ public class OsgiManifestResourceDAO implements ResourceDAO {
 
     @Override
     public String getPluginId() {
-        return "osgi manifest";
-    }
-
-    @Override
-    public String getName() {
         return "osgi manifest";
     }
 

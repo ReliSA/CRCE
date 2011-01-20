@@ -124,7 +124,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     }
 
     @Override
-    public void setCategory(String category) {
+    public void addCategory(String category) {
         if (isWritable()) {
             m_categories.add(category);
         }

@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResource;
-import cz.zcu.kiv.crce.metadata.osgi.DataModelHelperExt;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -29,9 +28,24 @@ import static org.apache.felix.bundlerepository.Resource.*;
  *
  * @author kalwi
  */
-public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataModelHelperExt {
+public class DataModelHelperExt extends DataModelHelperImpl {
 
-    @Override
+    public static final String OBR = "obr";
+    
+    private static DataModelHelperExt instance;
+    
+    static {
+        instance = new DataModelHelperExt();
+    }
+    
+    public static DataModelHelperExt instance() {
+        return instance;
+    }
+    
+    private DataModelHelperExt() {
+        
+    }
+    
     public String writeMetadata(Resource resource) {
         try {
             StringWriter sw = new StringWriter();
@@ -44,7 +58,6 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
         }
     }
 
-    @Override
     public void writeMetadata(Resource resource, Writer writer) throws IOException {
         XmlWriter w = new XmlWriter(writer);
 
@@ -56,25 +69,24 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 
     }
 
-    @Override
-    public ResourceImpl createResource(URL bundleUrl) throws IOException {
-        ResourceImpl resource = null;
+//    @Override
+//    public ResourceImpl createResource(URL bundleUrl) throws IOException {
+//        ResourceImpl resource = null;
+//
+//        try {
+//            resource = (ResourceImpl) super.createResource(bundleUrl);
+//            resource.addCategory("osgi");
+//        } catch (IllegalArgumentException e) {
+//            // not a bundle
+//            // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
+//            return null;
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//
+//        return resource;
+//    }
 
-        try {
-            resource = (ResourceImpl) super.createResource(bundleUrl);
-            resource.addCategory("osgi");
-        } catch (IllegalArgumentException e) {
-            // not a bundle
-            // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
-            return null;
-        } catch (NullPointerException e) {
-            return null;
-        }
-
-        return resource;
-    }
-
-    @Override
     public Resource readMetadata(String xml) throws IOException, Exception {
         try {
             return readMetadata(new StringReader(xml));
@@ -83,7 +95,6 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
         }
     }
 
-    @Override
     public Resource readMetadata(Reader reader) throws IOException, Exception {
         XmlPullParser parser = new KXmlParser();
         parser.setInput(reader);

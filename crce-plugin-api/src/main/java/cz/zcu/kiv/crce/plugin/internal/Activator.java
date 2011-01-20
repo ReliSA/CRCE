@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
+import cz.zcu.kiv.crce.plugin.ResourceIndexer;
         
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -12,7 +13,7 @@ import org.osgi.service.log.LogService;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase {
 
@@ -24,26 +25,12 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(PluginManager.class.getName(), null)
                 .setImplementation(pm)
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
-                .add(createServiceDependency().setService(Plugin.class).setRequired(false).setCallbacks("add", "remove"))
-                .add(createServiceDependency().setService(ResourceDAO.class).setRequired(false).setCallbacks("add", "remove"))
-                .add(createServiceDependency().setService(ResourceDAOFactory.class).setRequired(false).setCallbacks("add", "remove"))
+                .add(createServiceDependency().setRequired(false).setService(LogService.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(Plugin.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAO.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAOFactory.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))
                 );
-        
-        
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-//              pm.print();
-                
-            }
-        }).start();
     }
 
     @Override

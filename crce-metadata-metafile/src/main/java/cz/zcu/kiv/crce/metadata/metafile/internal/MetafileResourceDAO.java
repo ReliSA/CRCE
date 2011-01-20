@@ -2,8 +2,8 @@ package cz.zcu.kiv.crce.metadata.metafile.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
+import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
  *
  * @author kalwi
  */
-public class MetafileResourceDAO implements ResourceDAO {
+public class MetafileResourceDAO extends AbstractResourceDAO {
 
     public static final String METAFILE_EXTENSION = ".meta";
     
@@ -99,20 +99,5 @@ public class MetafileResourceDAO implements ResourceDAO {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Unexpected URI syntax: " + uri.toString() + METAFILE_EXTENSION, e);
         }
-    }
-
-    @Override
-    public String getPluginId() {
-        return "metafile";
-    }
-
-    @Override
-    public String getName() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public int getPluginPriority() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

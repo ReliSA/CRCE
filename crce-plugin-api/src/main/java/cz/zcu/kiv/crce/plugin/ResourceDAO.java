@@ -2,12 +2,11 @@ package cz.zcu.kiv.crce.plugin;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ResourceDAO extends Plugin {
 

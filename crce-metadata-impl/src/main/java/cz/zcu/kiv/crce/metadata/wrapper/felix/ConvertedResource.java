@@ -33,7 +33,7 @@ public class ConvertedResource extends ResourceImpl {
             addRequirement(req);
         }
         for (String fcat : resource.getCategories()) {
-            setCategory(fcat);
+            addCategory(fcat);
         }
         
         setSymbolicName(resource.getSymbolicName());

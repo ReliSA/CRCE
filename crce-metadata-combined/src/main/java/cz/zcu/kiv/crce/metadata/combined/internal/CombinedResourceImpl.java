@@ -116,9 +116,9 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
-    public void setCategory(String category) {
+    public void addCategory(String category) {
         if (!m_staticResource.hasCategory(category)) {
-            m_writableResource.setCategory(category);
+            m_writableResource.addCategory(category);
         }
     }
 

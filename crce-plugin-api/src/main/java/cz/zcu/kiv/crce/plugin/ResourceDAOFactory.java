@@ -4,7 +4,7 @@ import java.net.URI;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ResourceDAOFactory extends Plugin {
     

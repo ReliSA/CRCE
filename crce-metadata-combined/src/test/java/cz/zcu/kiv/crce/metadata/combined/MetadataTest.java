@@ -70,7 +70,7 @@ public class MetadataTest {
 ////        res.put(Resource.SYMBOLIC_NAME, "sname");
 ////        res.put(Resource.VERSION, "1.2.4");
 //        
-//        resource.setCategory("cat");
+//        resource.addCategory("cat");
 //        
 //        
 //        
