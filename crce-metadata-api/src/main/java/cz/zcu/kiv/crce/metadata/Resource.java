@@ -20,6 +20,10 @@ public interface Resource extends PropertyProvider {
 
     URI getUri();
 
+    /**
+     * Returns the resource size in bytes or -1 if size is unknown.
+     * @return the resource size.
+     */
     long getSize();
 
     String[] getCategories();
@@ -55,11 +59,17 @@ public interface Resource extends PropertyProvider {
 
     Requirement createRequirement(String name);
 
+    /**
+     * Sets resource size.
+     * @param size size in bytes to set.
+     */
     void setSize(long size);
 
     void setUri(URI uri);
 
     boolean isWritable();
+    
+    void unsetWritable();
     
     String asString();
 }

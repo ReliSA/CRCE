@@ -4,8 +4,10 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.ResourceIndexer;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 
 /**
  *
@@ -18,6 +20,8 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     @Override
     public Resource getResource(URI uri) throws IOException {
         // TODO optimize via getResourceIndexers(category)
+
+        URL url = uri.toURL();
         
         ResourceIndexer[] indexers = m_pluginManager.getResourceIndexers();
 
@@ -25,14 +29,24 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
             return null;
         }
 
-        Resource resource = indexers[0].index(uri.toURL());
+        Resource resource = indexers[0].index(url.openStream());
 
         if (indexers.length > 1) {
             for (int i = 1; i < indexers.length; i++) {
-                resource = indexers[i].index(uri.toURL(), resource);
+                resource = indexers[i].index(url.openStream(), resource);
             }
         }
+        
+        if ("file".equals(url.getProtocol())) {
+            File f = new File(uri);
+            resource.setSize(f.length());
+        }
+        
+        resource.setUri(uri.normalize());
+        
+        System.out.println("URL normalized: " + url.toExternalForm());
 
+        resource.unsetWritable();
         return resource;
 
     }
@@ -51,6 +65,4 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     public int getPluginPriority() {
         return 10;
     }
-    
-    
 }

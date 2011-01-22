@@ -247,4 +247,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         
         return sb.toString();
     }
+
+    @Override
+    public void unsetWritable() {
+        m_writable = false;
+    }
 }

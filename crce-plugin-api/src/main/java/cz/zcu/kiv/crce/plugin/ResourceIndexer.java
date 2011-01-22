@@ -50,34 +50,6 @@ public interface ResourceIndexer extends Plugin {
     Resource index(InputStream input, Resource resource);
     
     /**
-     * Indexes artifact data from given URL and stores results into new
-     *  <code>Resource</code> instance.
-     * 
-     * <p> If indexer can't index artifact content, an empty resource (with no
-     * capabilities, requirements or categories) is returned.
-     * 
-     * @param artifact
-     * @return 
-     */
-    Resource index(URL artifact);
-    
-    /**
-     * Indexes artifact from given URL and stores results into given
-     * <code>Resource</code> object.
-     * 
-     * <p> If given resource is <code>null</code>, then the new instance of
-     * <code>Resource</code> is created.
-     * 
-     * <p> If indexer can't index artifact content, resource stays unchanged.
-     * 
-     * @param artifact
-     * @param resource
-     * @return
-     * @throws MalformedURLException  
-     */
-    Resource index(URL artifact, Resource resource) throws MalformedURLException;
-    
-    /**
      * Returns set of categories that this indexer can discover from an indexed
      * artifact.
      * @return 

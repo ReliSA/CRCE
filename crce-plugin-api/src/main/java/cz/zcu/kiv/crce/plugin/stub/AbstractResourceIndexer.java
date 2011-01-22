@@ -15,19 +15,10 @@ public abstract class AbstractResourceIndexer extends AbstractPlugin implements 
     abstract public Resource index(InputStream input, Resource resource);
     
     @Override
-    abstract public Resource index(URL artifact, Resource resource);
-
-    
-    @Override
     public Resource index(InputStream input) {
         return index(input, null);
     }
 
-    @Override
-    public Resource index(URL artifact) {
-        return index(artifact, null);
-    }
-    
     @Override
     public String[] getProvidedCategories() {
         return new String[0];

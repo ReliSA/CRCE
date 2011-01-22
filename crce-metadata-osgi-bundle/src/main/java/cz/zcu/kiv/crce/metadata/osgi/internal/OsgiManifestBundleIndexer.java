@@ -6,12 +6,12 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.plugin.stub.AbstractResourceIndexer;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 
 /**
  *
@@ -28,47 +28,47 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     @Override
-    public Resource index(InputStream input, Resource resource) {
-        File tmpFile;
-        OutputStream output;
-
-        // XXX copying file is very ineffective, needs another implementation
-        try {
-            tmpFile = File.createTempFile("jar", "tmp");
-            output = new FileOutputStream(tmpFile);
-
-            byte[] buf = new byte[1024];
-            int len;
-
-            while ((len = input.read(buf)) > 0) {
-                output.write(buf, 0, len);
-            }
-            input.close();
-            output.close();
-
-            return index(tmpFile.toURI().toURL(), resource);
-        } catch (Exception ex) {
-            // TODO could be logged
-            return resource == null ? m_resourceCreator.createResource() : resource;
-        }
-
-    }
-
-    @Override
-    public Resource index(URL artifact) {
-        return index(artifact, null);
-    }
-
-    @Override
-    public Resource index(URL artifact, Resource resource) {
+    public Resource index(final InputStream input, Resource resource) {
         Resource res = (resource == null ? m_resourceCreator.createResource() : resource);
 
         org.apache.felix.bundlerepository.Resource fres;
+        
         try {
-            fres = DataModelHelperExt.instance().createResource(artifact);
+            URLStreamHandler handler = new URLStreamHandler()  {
+                @Override
+                protected URLConnection openConnection(URL u) throws IOException {
+                    return new URLConnection(null)  {
+                        @Override
+                        public void connect() throws IOException {
+                        }
+                        @Override
+                        public InputStream getInputStream() throws IOException {
+                            return input;
+                        }
+                    };
+
+                }
+            };
+            
+            fres = DataModelHelperExt.instance().createResource(new URL("none", "none", 0, "none", handler));
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (IOException ex) {
+            ex.printStackTrace();   // XXX
+            return res;
+        } catch (IllegalArgumentException e) {
+            // not a bundle
             return res;
         }
+
+        if (fres == null) {
+            return res;
+        }
+        
+        res.setSymbolicName(fres.getSymbolicName());
+        res.setVersion(fres.getVersion());
+        res.setPresentationName(fres.getPresentationName());
+        // size is not set
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
             Capability cap = res.createCapability(fcap.getName());
             for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {

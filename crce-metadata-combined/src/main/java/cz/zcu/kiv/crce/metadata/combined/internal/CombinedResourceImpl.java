@@ -302,4 +302,9 @@ public class CombinedResourceImpl implements CombinedResource {
         sb.append(m_writableResource.asString());
         return sb.toString();
     }
+
+    @Override
+    public void unsetWritable() {
+        // TODO - check whether no action is correct
+    }
 }
