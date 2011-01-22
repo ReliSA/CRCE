@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-osgi-bundle</artifactId>
+            <artifactId>crce-metadata-file</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

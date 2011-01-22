@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.file.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import org.apache.felix.dm.DependencyActivatorBase;
@@ -18,6 +19,12 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(FileIndexingResourceDAO.class)
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
+                );
+        
+        manager.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(FileTypeResourceIndexer.class)
+                .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 );
     }
 

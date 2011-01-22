@@ -1,10 +1,10 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
 import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
-import cz.zcu.kiv.crce.metadata.osgi.internal.OsgiManifestResourceDAO;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAO;
+import cz.zcu.kiv.crce.metadata.file.internal.FileIndexingResourceDAO;
 import java.io.File;
 import java.io.IOException;
 import org.junit.*;
@@ -29,7 +29,7 @@ public class MetadataTest {
         dir = Util.createTempDir();
         File bundle = Util.prepareFile(dir, "bundle.jar");
         
-        creator = new CombinedResourceDAO(new OsgiManifestResourceDAO(), new MetafileResourceDAO());
+        creator = new CombinedResourceDAO(new FileIndexingResourceDAO(), new MetafileResourceDAO());
         try {
             resource = (CombinedResource) creator.getResource(bundle.toURI());
         } catch (IOException ex) {

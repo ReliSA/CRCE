@@ -44,8 +44,6 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
         
         resource.setUri(uri.normalize());
         
-        System.out.println("URL normalized: " + url.toExternalForm());
-
         resource.unsetWritable();
         return resource;
 
