@@ -4,4 +4,4 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Embed-Dependency: org.apache.felix.bundlerepository
+Embed-Dependency: kxml2

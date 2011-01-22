@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
  *
@@ -20,7 +21,7 @@ import java.net.URLStreamHandler;
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
-
+    private volatile RepositoryAdmin m_repoAdmin;  /* injected by dependency manager */
 
     @Override
     public Resource index(InputStream input) {
@@ -49,8 +50,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
                 }
             };
-            
-            fres = DataModelHelperExt.instance().createResource(new URL("none", "none", 0, "none", handler));
+            fres = m_repoAdmin.getHelper().createResource(new URL("none", "none", 0, "none", handler));
         } catch (MalformedURLException e) {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (IOException ex) {
@@ -91,5 +91,10 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         // TODO properties, if necessary
         res.addCategory("osgi");
         return res;
+    }
+
+    @Override
+    public String[] getProvidedCategories() {
+        return new String[] {"osgi"};
     }
 }

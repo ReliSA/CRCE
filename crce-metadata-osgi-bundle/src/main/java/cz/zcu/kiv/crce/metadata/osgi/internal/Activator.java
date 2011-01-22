@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.ResourceIndexer;
+import org.apache.felix.bundlerepository.RepositoryAdmin;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -15,15 +15,11 @@ public class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-//        manager.add(createComponent()
-//                .setInterface(ResourceDAO.class.getName(), null)
-//                .setImplementation(OsgiManifestResourceDAO.class)
-//                );
-        
         manager.add(createComponent()
                 .setInterface(ResourceIndexer.class.getName(), null)
                 .setImplementation(OsgiManifestBundleIndexer.class)
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
                 );
     }
 
