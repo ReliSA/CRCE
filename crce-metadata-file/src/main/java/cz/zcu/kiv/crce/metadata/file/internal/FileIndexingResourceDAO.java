@@ -9,7 +9,7 @@ import java.net.URI;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class FileIndexingResourceDAO extends AbstractResourceDAO {
 
@@ -46,4 +46,11 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     public void copy(Resource resource, URI uri) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public int getPluginPriority() {
+        return 10;
+    }
+    
+    
 }

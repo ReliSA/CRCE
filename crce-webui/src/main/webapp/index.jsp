@@ -4,6 +4,7 @@
     Author     : kalwi
 --%>
 
+<%@page import="cz.zcu.kiv.crce.plugin.Plugin"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Requirement"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Property"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Capability"%>
@@ -39,6 +40,14 @@
                 }
             %>
 
+            <h1>Plugins in plugin manager:</h1>
+            <%
+                Plugin[] plugins = Activator.getPluginManager().getPlugins();
+                for (Plugin plugin : plugins) {
+                    out.println(plugin.getPluginId() + "/" + plugin.getPluginPriority() + ": " + plugin.getPluginDescription() + "<br/>");
+                }
+            %>
+            
             <h1>Resources in stack:</h1>
 
             <%

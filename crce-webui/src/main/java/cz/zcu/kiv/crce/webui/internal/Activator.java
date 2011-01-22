@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
@@ -8,13 +9,22 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 
+/**
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ */
 public final class Activator extends DependencyActivatorBase {
 
     private static volatile ResourceBuffer m_stack; /* injected */
 
     private static volatile LogService m_log; /* injected */
 
+    private static volatile PluginManager m_pluginManager; /* injected */
 
+    public static PluginManager getPluginManager() {
+        return m_pluginManager;
+    }
+    
     public static ResourceBuffer getStack() {
         return m_stack;
     }
@@ -28,7 +38,9 @@ public final class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(ResourceBuffer.class).setRequired(true))
-                .add(createServiceDependency().setService(LogService.class).setRequired(false)));
+                .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
+                );
 
 //        final Test t1 = new Test();
 //        final Test t2 = new Test();

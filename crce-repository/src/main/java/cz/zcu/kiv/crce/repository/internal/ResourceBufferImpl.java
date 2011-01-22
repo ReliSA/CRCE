@@ -18,7 +18,7 @@ import org.osgi.service.cm.ConfigurationException;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class ResourceBufferImpl implements ResourceBuffer {
 
@@ -62,8 +62,10 @@ public class ResourceBufferImpl implements ResourceBuffer {
                 output.write(buffer, 0, count);
             }
 
-            ResourceDAO creator = m_pluginManager.getResourceDAO(m_baseDir.toURI());
+            ResourceDAO creator = m_pluginManager.getResourceDAO();
 
+            // m_baseDir.getPath()
+            
             Resource res = creator.getResource(file.toURI());
 
             res.createCapability("file").setProperty("name", name);

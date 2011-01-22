@@ -5,11 +5,10 @@ import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.ResourceIndexer;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import org.osgi.service.log.LogService;
 
 /**
@@ -20,20 +19,32 @@ public class PluginManagerImpl implements PluginManager {
 
     private volatile LogService m_log; /* injected by dependency manager */
 
-    private final List<ResourceDAO> m_resourceDAOs = new ArrayList<ResourceDAO>();
-    private final List<ResourceDAOFactory> m_resourceDAOFactories = new ArrayList<ResourceDAOFactory>();
-    private final List<ResourceIndexer> m_resourcesIndexers = new ArrayList<ResourceIndexer>();
-    private final Map<String, List<ResourceIndexer>> m_resourceIndexersMap = new HashMap<String, List<ResourceIndexer>>();
-    private final List<Plugin> m_plugins = new ArrayList<Plugin>();
-
+    private final Set<Plugin> m_plugins = new TreeSet<Plugin>();
+    private final Set<ResourceDAO> m_resourceDAOs = new TreeSet<ResourceDAO>();
+    private final Set<ResourceDAOFactory> m_resourceDAOFactories = new TreeSet<ResourceDAOFactory>();
+    private final Set<ResourceIndexer> m_resourcesIndexers = new TreeSet<ResourceIndexer>();
+    private final Map<String, Set<ResourceIndexer>> m_resourceIndexersMap = new HashMap<String, Set<ResourceIndexer>>();
+    
     @Override
     public synchronized Plugin[] getPlugins() {
         return m_plugins.toArray(new Plugin[m_plugins.size()]);
     }
 
     @Override
-    public synchronized ResourceDAO getResourceDAO(URI baseUri) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ResourceDAO[] getResourceDAOs() {
+        return m_resourceDAOs.toArray(new ResourceDAO[m_resourceDAOs.size()]);
+    }
+    
+    @Override
+    public synchronized ResourceDAO getResourceDAO() {
+        if (!m_resourceDAOFactories.isEmpty()) {
+            ResourceDAOFactory f = m_resourceDAOFactories.iterator().next();
+            return f.getResourceDAO();
+        }
+        if (!m_resourceDAOs.isEmpty()) {
+            return m_resourceDAOs.iterator().next();
+        }
+        throw new IllegalStateException("No ResourceDAOs or ResourceDAOFactories installed");
     }
 
     @Override
@@ -42,16 +53,14 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public ResourceIndexer[] getResourceIndexers(String category) {
-        List<ResourceIndexer> list = m_resourceIndexersMap.get(category != null ? category : "");
-        if (list != null) {
-            return list.toArray(new ResourceIndexer[list.size()]);
+    public synchronized ResourceIndexer[] getResourceIndexers(String category) {
+        Set<ResourceIndexer> set = m_resourceIndexersMap.get(category != null ? category : "");
+        if (set != null) {
+            return set.toArray(new ResourceIndexer[set.size()]);
         } else {
             return new ResourceIndexer[0];
         }
-        
     }
-    
     
     /**
      * Adds resource indexer to hierarchical structure of resource indexers.
@@ -63,12 +72,12 @@ public class PluginManagerImpl implements PluginManager {
             reqs = new String[]{""};
         }
         for (String req : reqs) {
-            List<ResourceIndexer> list = m_resourceIndexersMap.get(req);
-            if (list == null) {
-                list = new ArrayList<ResourceIndexer>();
-                m_resourceIndexersMap.put(req, list);
+            Set<ResourceIndexer> set = m_resourceIndexersMap.get(req);
+            if (set == null) {
+                set = new TreeSet<ResourceIndexer>();
+                m_resourceIndexersMap.put(req, set);
             }
-            list.add(indexer);
+            set.add(indexer);
         }
     }
 
@@ -82,10 +91,10 @@ public class PluginManagerImpl implements PluginManager {
             reqs = new String[]{""};
         }
         for (String req : reqs) {
-            List<ResourceIndexer> list = m_resourceIndexersMap.get(req);
-            if (list != null) {
-                list.remove(indexer);
-                if (list.isEmpty()) {
+            Set<ResourceIndexer> set = m_resourceIndexersMap.get(req);
+            if (set != null) {
+                set.remove(indexer);
+                if (set.isEmpty()) {
                     m_resourceIndexersMap.remove(req);
                 }
             }
@@ -102,7 +111,7 @@ public class PluginManagerImpl implements PluginManager {
      * Callback method called on adding new plugin.
      * @param plugin 
      */
-    public synchronized void add(Plugin plugin) {
+    synchronized void add(Plugin plugin) {
         if (plugin instanceof ResourceDAO) {
             add((ResourceDAO) plugin);
             return;
@@ -116,19 +125,19 @@ public class PluginManagerImpl implements PluginManager {
         }
     }
 
-    public synchronized void add(ResourceDAO plugin) {
+    synchronized void add(ResourceDAO plugin) {
         m_resourceDAOs.add(plugin);
         m_plugins.add(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAO plugin registered: " + plugin.getPluginId());
     }
 
-    public synchronized void add(ResourceDAOFactory plugin) {
+    synchronized void add(ResourceDAOFactory plugin) {
         m_resourceDAOFactories.add(plugin);
         m_plugins.add(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAOFactory plugin registered: " + plugin.getPluginId());
     }
 
-    public synchronized void add(ResourceIndexer plugin) {
+    synchronized void add(ResourceIndexer plugin) {
         m_resourcesIndexers.add(plugin);
         m_plugins.add(plugin);
         addResourceIndexer(plugin);
@@ -139,7 +148,7 @@ public class PluginManagerImpl implements PluginManager {
      * Callback method called on removing existing plugin.
      * @param plugin 
      */
-    public synchronized void remove(Plugin plugin) {
+    synchronized void remove(Plugin plugin) {
         if (plugin instanceof ResourceDAO) {
             remove((ResourceDAO) plugin);
             return;
@@ -153,19 +162,19 @@ public class PluginManagerImpl implements PluginManager {
         }
     }
 
-    public synchronized void remove(ResourceDAO plugin) {
+    synchronized void remove(ResourceDAO plugin) {
         m_resourceDAOs.remove(plugin);
         m_plugins.add(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAO plugin unregistered: " + plugin.getPluginId());
     }
 
-    public synchronized void remove(ResourceDAOFactory plugin) {
+    synchronized void remove(ResourceDAOFactory plugin) {
         m_resourceDAOFactories.remove(plugin);
         m_plugins.add(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAOFactory plugin unregistered: " + plugin.getPluginId());
     }
 
-    public synchronized void remove(ResourceIndexer plugin) {
+    synchronized void remove(ResourceIndexer plugin) {
         m_resourcesIndexers.remove(plugin);
         m_plugins.add(plugin);
         removeResourceIndexer(plugin);

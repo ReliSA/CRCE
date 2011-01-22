@@ -21,7 +21,7 @@ public class CombinedCreatorTest {
     public void setUp() {
         dir = Util.createTempDir();
         factory = new CombinedResourceDAOFactory();
-        creator = factory.getResourceDAO(dir.toURI());
+        creator = factory.getResourceDAO();
         assert creator != null : "ResourceCreator is null";
     }
 

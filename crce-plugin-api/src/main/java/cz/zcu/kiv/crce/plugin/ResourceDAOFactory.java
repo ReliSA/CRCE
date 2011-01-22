@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.plugin;
 
-import java.net.URI;
-
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
@@ -9,12 +7,17 @@ import java.net.URI;
 public interface ResourceDAOFactory extends Plugin {
     
     /**
-     * Creates a resource DAO with the given base URI. Base URI can specify e.g.
-     * base dir of repository in case of file-based implementation or URI to database
-     * in case of DB-based implementation.
-     * @param baseUri Base URI for newly created ResourceDAO.
+     * Creates an instance of <code>ResourceDAO</code> implementation for the
+     * specified URI scheme, e.g. <code>file</code>, <code>http</code> or
+     * <code>jdbc</code>.
+     * 
+     * <p> See the {@link java.net.URI java.net.URI} documentation for more
+     * details about schemes.
+     * 
+     * @param scheme 
      * @return an instance of <code>ResourceDAO</code>.
+     * @see java.net.URI java.net.URI
      */
-    public ResourceDAO getResourceDAO(URI baseUri);
+    public ResourceDAO getResourceDAO();
 
 }

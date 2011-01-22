@@ -15,7 +15,7 @@ import java.net.URL;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
@@ -69,14 +69,12 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         } catch (IOException ex) {
             return res;
         }
-
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
             Capability cap = res.createCapability(fcap.getName());
             for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {
-                cap.setProperty(fprop.getName(), fprop.getValue(), Type.valueOf(fprop.getType()));
+                cap.setProperty(fprop.getName(), fprop.getValue(), Type.getValue(fprop.getType()));
             }
         }
-
         for (org.apache.felix.bundlerepository.Requirement freq : fres.getRequirements()) {
             Requirement req = res.createRequirement(freq.getName());
             req.setComment(freq.getComment());
@@ -91,7 +89,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
 
         // TODO properties, if necessary
-
+        res.addCategory("osgi");
         return res;
     }
 }

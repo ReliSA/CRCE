@@ -5,7 +5,7 @@ package cz.zcu.kiv.crce.plugin;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public interface Plugin {
+public interface Plugin extends Comparable<Plugin> {
 
     /*
      * Returns the plugin identification, e.g. class name.
