@@ -83,14 +83,14 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
         obtainProperty(name).setValue(values);
     }
 
-    private Property obtainProperty(String name) {
+    private PropertyImpl obtainProperty(String name) {
         Property prop;
         if ((prop = m_map.get(name.toLowerCase())) == null) {
             prop = new PropertyImpl(name);
             m_map.put(name.toLowerCase(), prop);
             m_list.add(prop);
         }
-        return prop;
+        return (PropertyImpl) prop;
     }
 
     @Override

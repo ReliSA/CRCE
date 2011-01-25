@@ -43,12 +43,17 @@
             <h1>Plugins in plugin manager:</h1>
             <%
                 Plugin[] plugins = Activator.getPluginManager().getPlugins();
+                out.println("<table>");
+                out.println("<tr><th>ID</th><th>priority</th><th>description</th></tr>");
                 for (Plugin plugin : plugins) {
-                    out.println(plugin.getPluginId() + "/" + plugin.getPluginPriority() + ": " + plugin.getPluginDescription() + "<br/>");
+                    out.println("<tr>");
+                    out.println("<td>" + plugin.getPluginId() + "</td><td>" + plugin.getPluginPriority() + "</td><td>" + plugin.getPluginDescription() + "</td>");
+                    out.println("</tr>");
                 }
+                out.println("</table>");
             %>
             
-            <h1>Resources in stack:</h1>
+            <h1>Resources in buffer</h1>
 
             <%
 
@@ -56,36 +61,55 @@
                 ResourceBuffer stack = Activator.getStack();
                 for (Resource res : stack.getStoredResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
-                    out.println("Symbolic name: " + res.getSymbolicName() + "<br/>");
-                    out.println("Version: " + res.getVersion() + "<br/>");
-                    out.println("Presentation name : " + res.getPresentationName() + "<br/>");
-                    out.print("Categories: ");
+                    
+                    out.println("<table>");
+                    out.println("<tr><td>Symbolic name:</td><td>" + res.getSymbolicName() + "</td></tr>");
+                    out.println("<tr><td>Version:</td><td>" + res.getVersion() + "</td></tr>");
+                    out.println("<tr><td>Presentation name:</td><td>" + res.getPresentationName() + "</td></tr>");
+                    out.print("<tr><td>Categories:</td><td>");
                     for (String cat : res.getCategories()) {
                         out.print(cat + ", ");
                     }
-                    out.println("<br/>");
+                    out.println("</td></tr>");
+                    out.println("</table>");
+                    
+                    
                     out.println("<h3>Properties</h3>");
+                    out.println("<table border='1'><tr><td>");
+                    out.println("<table>");
+                    out.println("<tr><th>type</th><th>name</th><th>value</th></tr>");
                     for (Property prop : res.getProperties()) {
-                        out.println("Property: " + prop.getName() + ", value: " + prop.getValue() + ", type: " + prop.getType() + "<br/>");
+                        out.println("<tr><td>" + prop.getType() + "</td><td>" + prop.getName() + "</td><td>" + prop.getValue() + "</td></tr>");
                     }
+                    out.println("</table>");
+                    out.println("</tr></td></table>");
 
                     out.println("<h3>Capabilities</h3>");
                     for (Capability cap : res.getCapabilities()) {
-                        out.println("Name: " + cap.getName() + "<br/>");
-                        out.println("<ul>");
+                        out.println("<h4>Name: " + cap.getName() + "</h4>");
+                        out.println("<table border='1'><tr><td>");
+                        out.println("<table>");
+                        out.println("<tr><th>type</th><th>name</th><th>value</th></tr>");
                         for (Property prop : cap.getProperties()) {
-                            out.println("<li>Property: " + prop.getName() + ", value: " + prop.getValue() + ", type: " + prop.getType() + "</li>");
+                            out.println("<tr><td>" + prop.getType() + "</td><td>" + prop.getName() + "</td><td>" + prop.getValue() + "</td></tr>");
                         }
-                        out.println("</ul>");
+                        out.println("</table>");
+                        out.println("</tr></td></table>");
+                        
+                        
                     }
                     out.println("<h3>Requirements</h3>");
+                    out.println("<table>");
+                    out.println("<tr><th>Name</th><th>Filter</th><th>Optional</th><th>Multiple</th><th>Extended</th></tr>");
                     for (Requirement req : res.getRequirements()) {
-                        out.println("Name: " + req.getName()
-                                + ", filter: " + req.getFilter()
-                                + ", opt: " + (req.isOptional() ? "Y" : "N")
-                                + ", mul: " + (req.isMultiple() ? "Y" : "N")
-                                + ", ext: " + (req.isExtend() ? "Y" : "N") + "<br/>");
+                        out.println("<tr><td>" + req.getName() + "</td>"
+                                + "<td>" + req.getFilter() + "</td>"
+                                + "<td>" + (req.isOptional() ? "Y" : "N") + "</td>"
+                                + "<td>" + (req.isMultiple() ? "Y" : "N") + "</td>"
+                                + "<td>" + (req.isExtend() ? "Y" : "N")  + "</td></tr>");
                     }
+                    out.println("</table>");
+                    
                     out.println("<hr/>");
                 }
 

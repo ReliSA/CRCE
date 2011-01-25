@@ -87,43 +87,78 @@ public class PropertyImpl implements Property {
     }
 
     @Override
-    public void setValue(String string) {
+    public boolean isWritable() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PropertyImpl other = (PropertyImpl) obj;
+        if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
+        return hash;
+    }
+
+
+    @Override
+    public String toString() {
+        return m_value;
+    }
+
+    
+
+//    @Override
+    protected void setValue(String string) {
         m_value = string;
         m_type = Type.STRING;
     }
 
-    @Override
-    public void setValue(Version version) {
+//    @Override
+    protected void setValue(Version version) {
         m_value = version.toString();
         m_type = Type.VERSION;
     }
 
-    @Override
-    public void setValue(URL url) {
+//    @Override
+    protected void setValue(URL url) {
         m_value = url.toString();
         m_type = Type.URL;
     }
 
-    @Override
-    public void setValue(URI uri) {
+//    @Override
+    protected void setValue(URI uri) {
         m_value = uri.toString();
         m_type = Type.URI;
     }
 
-    @Override
-    public void setValue(long llong) {
+//    @Override
+    protected void setValue(long llong) {
         m_value = String.valueOf(llong);
         m_type = Type.LONG;
     }
 
-    @Override
-    public void setValue(double ddouble) {
+//    @Override
+    protected void setValue(double ddouble) {
         m_value = String.valueOf(ddouble);
         m_type = Type.DOUBLE;
     }
 
-    @Override
-    public void setValue(Set values) {
+//    @Override
+    protected void setValue(Set values) {
         StringBuilder result;
 
         Iterator i = values.iterator();
@@ -141,49 +176,9 @@ public class PropertyImpl implements Property {
         }
     }
 
-    @Override
-    public boolean isWritable() {
-        return true;
-    }
-
-    @Override
-    public void setValue(String value, Type type) {
+//    @Override
+    protected void setValue(String value, Type type) {
         m_value = value;
         m_type = type;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final PropertyImpl other = (PropertyImpl) obj;
-        if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
-            return false;
-        }
-        if (this.m_type != other.m_type) {
-            return false;
-        }
-        if ((this.m_value == null) ? (other.m_value != null) : !this.m_value.equals(other.m_value)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 41 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
-        hash = 41 * hash + (this.m_type != null ? this.m_type.hashCode() : 0);
-        hash = 41 * hash + (this.m_value != null ? this.m_value.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return m_value;
     }
 }
