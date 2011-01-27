@@ -51,6 +51,12 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>version-generator</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+            <type>bundle</type>
+        </dependency>
     </dependencies>
 
 </project>

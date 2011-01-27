@@ -2,12 +2,14 @@ package cz.zcu.kiv.crce.plugin;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
- * Resource indexer indexes content of an artifact and store obtained metadata
+ * Resource indexer indexes content of an artifact and stores obtained metadata
  * into <code>Resource</code> object.
+ * 
+ * <p> Typical usage of resource indexers is <b>fast</b> scan of an artifacts to
+ * provide information about resources like file type, provided and required
+ * packages and services of bundles etc.
  * 
  * <p> Indexer can set up one or more categories of resource (e.g. 'jar' for JAR
  * files, 'jpeg' for JPEG files etc.) which can ease the resources discovery.

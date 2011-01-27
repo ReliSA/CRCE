@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
+import cz.zcu.kiv.crce.plugin.ActionHandler;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
@@ -30,6 +31,7 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAO.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAOFactory.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ActionHandler.class))
                 );
     }
 

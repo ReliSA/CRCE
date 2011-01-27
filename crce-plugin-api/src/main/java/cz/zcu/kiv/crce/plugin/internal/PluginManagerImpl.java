@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
+import cz.zcu.kiv.crce.plugin.ActionHandler;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
@@ -23,18 +24,29 @@ public class PluginManagerImpl implements PluginManager {
     private final Set<ResourceDAO> m_resourceDAOs = new TreeSet<ResourceDAO>();
     private final Set<ResourceDAOFactory> m_resourceDAOFactories = new TreeSet<ResourceDAOFactory>();
     private final Set<ResourceIndexer> m_resourcesIndexers = new TreeSet<ResourceIndexer>();
+    private final Set<ActionHandler> m_actionHandlers = new TreeSet<ActionHandler>();
     private final Map<String, Set<ResourceIndexer>> m_resourceIndexersMap = new HashMap<String, Set<ResourceIndexer>>();
     
     @Override
-    public synchronized Plugin[] getPlugins() {
+    public synchronized Plugin[] getAllPlugins() {
         return m_plugins.toArray(new Plugin[m_plugins.size()]);
     }
 
     @Override
-    public ResourceDAO[] getResourceDAOs() {
+    public ResourceDAO[] getAllResourceDAOs() {
         return m_resourceDAOs.toArray(new ResourceDAO[m_resourceDAOs.size()]);
     }
     
+    @Override
+    public synchronized ResourceIndexer[] getAllResourceIndexers() {
+        return m_resourcesIndexers.toArray(new ResourceIndexer[m_resourcesIndexers.size()]);
+    }
+
+    @Override
+    public ActionHandler[] getAllActionHandlers() {
+        return m_actionHandlers.toArray(new ActionHandler[m_actionHandlers.size()]);
+    }
+
     @Override
     public synchronized ResourceDAO getResourceDAO() {
         if (!m_resourceDAOFactories.isEmpty()) {
@@ -48,11 +60,6 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public synchronized ResourceIndexer[] getResourceIndexers() {
-        return m_resourcesIndexers.toArray(new ResourceIndexer[m_resourcesIndexers.size()]);
-    }
-
-    @Override
     public synchronized ResourceIndexer[] getResourceIndexers(String category) {
         Set<ResourceIndexer> set = m_resourceIndexersMap.get(category != null ? category : "");
         if (set != null) {
@@ -60,6 +67,11 @@ public class PluginManagerImpl implements PluginManager {
         } else {
             return new ResourceIndexer[0];
         }
+    }
+    
+    @Override
+    public synchronized ActionHandler getActionHandler() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
@@ -123,6 +135,10 @@ public class PluginManagerImpl implements PluginManager {
         if (plugin instanceof ResourceIndexer) {
             add((ResourceIndexer) plugin);
         }
+        if (plugin instanceof ActionHandler) {
+            add((ActionHandler) plugin);
+        }
+        m_log.log(LogService.LOG_ERROR, "Unknown plugin tried to be registered: " + plugin.getPluginId());
     }
 
     synchronized void add(ResourceDAO plugin) {
@@ -144,6 +160,12 @@ public class PluginManagerImpl implements PluginManager {
         m_log.log(LogService.LOG_INFO, "ResourceIndexer plugin registered: " + plugin.getPluginId());
     }
 
+    synchronized void add(ActionHandler plugin) {
+        m_actionHandlers.add(plugin);
+        m_plugins.add(plugin);
+        m_log.log(LogService.LOG_INFO, "ActionHandler plugin registered: " + plugin.getPluginId());
+    }
+    
     /**
      * Callback method called on removing existing plugin.
      * @param plugin 
@@ -160,24 +182,33 @@ public class PluginManagerImpl implements PluginManager {
         if (plugin instanceof ResourceIndexer) {
             remove((ResourceIndexer) plugin);
         }
+        if (plugin instanceof ActionHandler) {
+            remove((ActionHandler) plugin);
+        }
     }
 
     synchronized void remove(ResourceDAO plugin) {
         m_resourceDAOs.remove(plugin);
-        m_plugins.add(plugin);
+        m_plugins.remove(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAO plugin unregistered: " + plugin.getPluginId());
     }
 
     synchronized void remove(ResourceDAOFactory plugin) {
         m_resourceDAOFactories.remove(plugin);
-        m_plugins.add(plugin);
+        m_plugins.remove(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceDAOFactory plugin unregistered: " + plugin.getPluginId());
     }
 
     synchronized void remove(ResourceIndexer plugin) {
         m_resourcesIndexers.remove(plugin);
-        m_plugins.add(plugin);
+        m_plugins.remove(plugin);
         removeResourceIndexer(plugin);
         m_log.log(LogService.LOG_INFO, "ResourceIndexer plugin unregistered: " + plugin.getPluginId());
+    }
+
+    synchronized void remove(ActionHandler plugin) {
+        m_actionHandlers.remove(plugin);
+        m_plugins.remove(plugin);
+        m_log.log(LogService.LOG_INFO, "ActionHandler plugin unregistered: " + plugin.getPluginId());
     }
 }

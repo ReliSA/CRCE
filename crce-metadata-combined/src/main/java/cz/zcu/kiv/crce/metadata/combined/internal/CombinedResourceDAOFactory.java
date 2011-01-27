@@ -15,7 +15,7 @@ public class CombinedResourceDAOFactory extends AbstractPlugin implements Resour
 
     @Override
     public ResourceDAO getResourceDAO() {
-        ResourceDAO[] daos = m_pluginManager.getResourceDAOs();
+        ResourceDAO[] daos = m_pluginManager.getAllResourceDAOs();
 
         if (daos.length < 1) {
             throw new IllegalStateException("No registered ResourceDAOs to create CombinedResourceDAO.");

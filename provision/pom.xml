@@ -23,16 +23,14 @@
   -->
 
     <dependencies>
+        
+        <!-- === PAX-WEB === -->
+        
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-extender-war</artifactId>
             <version>0.8.1</version>
         </dependency>
-<!--        <dependency>
-            <groupId>org.ops4j.pax.web</groupId>
-            <artifactId>pax-web-extender-whiteboard</artifactId>
-            <version>0.8.1</version>
-        </dependency>-->
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>
@@ -44,7 +42,7 @@
             <version>0.8.1</version>
         </dependency>
         
-<!--        <dependency>
+        <dependency>
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-api</artifactId>
             <version>1.5.3</version>
@@ -53,13 +51,15 @@
             <groupId>org.ops4j.pax.logging</groupId>
             <artifactId>pax-logging-service</artifactId>
             <version>1.5.3</version>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>servlet-api-2.5</artifactId>
             <version>6.1.9</version>
         </dependency>
+        
+        <!-- === FELIX === -->
         
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -103,6 +103,8 @@
             <artifactId>org.apache.felix.bundlerepository</artifactId>
         </dependency>
         
+        <!-- === OSGi === -->
+        
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.service.obr</artifactId>
@@ -112,6 +114,8 @@
             <artifactId>org.osgi.compendium</artifactId>
             <version>1.4.0</version>
         </dependency>
+        
+        <!-- === ACE === -->
         
         <dependency>
             <groupId>org.apache.ace</groupId>
@@ -137,7 +141,92 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- === JACC === -->
 
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>types-cmp</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- === OBCC === -->
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-types</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-loader</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-cmp</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>version-generator</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>apache-log4j-extras</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-all</artifactId>
+            <version>3.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-vfs</artifactId>
+            <version>1.0_5</version>
+        </dependency>
+        
+        <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.bcel</artifactId>
+                <version>5.2_3</version>
+        </dependency>
+        
     </dependencies>
 
 </project>

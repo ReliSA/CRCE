@@ -2,11 +2,14 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
-import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
+import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
+import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +24,8 @@ import org.osgi.service.cm.ConfigurationException;
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class ResourceBufferImpl implements ResourceBuffer {
+    
+    private volatile VersionService m_versionService;
 
     private int BUFFER_SIZE = 8 * 1024;
     
@@ -33,7 +38,7 @@ public class ResourceBufferImpl implements ResourceBuffer {
     private List<Resource> m_resources = new ArrayList<Resource>(); // TODO remove, make repository.xml instead
 
     private void setUpBaseDir() {
-        m_baseDir = m_context.getDataFile("stack");
+        m_baseDir = m_context.getDataFile("buffer");
         if (!m_baseDir.exists()) {
             m_baseDir.mkdir();
         } else if (!m_baseDir.isDirectory()) {
@@ -44,8 +49,8 @@ public class ResourceBufferImpl implements ResourceBuffer {
     }
 
     @Override
-    public synchronized Resource put(String name, InputStream resource) throws IOException {
-        if (name == null || resource == null || "".equals(name)) {
+    public synchronized Resource put(String name, InputStream artifact) throws IOException {
+        if (name == null || artifact == null || "".equals(name)) {
             return null;
         }
         if (m_baseDir == null) {
@@ -58,31 +63,73 @@ public class ResourceBufferImpl implements ResourceBuffer {
             file = File.createTempFile("res", ".tmp", m_baseDir);
             output = new FileOutputStream(file);
             byte[] buffer = new byte[BUFFER_SIZE];
-            for (int count = resource.read(buffer); count != -1; count = resource.read(buffer)) {
+            for (int count = artifact.read(buffer); count != -1; count = artifact.read(buffer)) {
                 output.write(buffer, 0, count);
             }
 
-            ResourceDAO creator = m_pluginManager.getResourceDAO();
-
-            // m_baseDir.getPath()
-            
-            Resource res = creator.getResource(file.toURI());
-
-            res.createCapability("file").setProperty("name", name);
-
-            res.setSymbolicName(name);
-
-            creator.save(res);
-            m_resources.add(res);
-
-            out = res;
         } finally {
             if (output != null) {
                 output.flush();
                 output.close();
             }
         }
+        
+        ResourceDAO creator = m_pluginManager.getResourceDAO();
 
+        Resource resource = creator.getResource(file.toURI());
+        
+//        m_pluginManager.getActionHandler().onUploaded(out, name);
+        
+        // TODO move to some plugin
+        resource.createCapability("file").setProperty("original-name", name);
+        resource.setSymbolicName(name);
+        
+        //TODO move versioning to some plugin
+        // <editor-fold defaultstate="collapsed" desc="versioning">
+        Resource cand = null;
+        for (Resource i : m_resources) {
+            if (i.getSymbolicName().equals(resource.getSymbolicName())) {
+                if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
+                    cand = i;
+                }
+            }
+        }
+        if (cand != null) {
+            try {
+                InputStream in = new FileInputStream(new File(cand.getUri()));
+                File source;
+                try {
+                    source = File.createTempFile("source", ".jar");
+                    output = new FileOutputStream(source);
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    for (int count = in.read(buffer); count != -1; count = in.read(buffer)) {
+                        output.write(buffer, 0, count);
+                    }
+                } finally {
+                    in.close();
+                    if (output != null) {
+                        output.flush();
+                        output.close();
+                    }
+                }
+                m_versionService.updateVersion(source, file);
+            } catch (VersionGeneratorException ex) {
+                throw new IllegalStateException(ex.getMessage(), ex);
+            } catch (BundlesIncomparableException ex) {
+                throw new IllegalStateException(ex.getMessage(), ex);
+            }
+            resource = creator.getResource(file.toURI());
+            resource.createCapability("file").setProperty("name", name);
+            resource.setSymbolicName(name);
+        }
+        // </editor-fold>
+        
+        
+        creator.save(resource);
+        m_resources.add(resource);
+
+        out = resource;
+        
         return out;
     }
 

@@ -7,8 +7,9 @@ package cz.zcu.kiv.crce.plugin;
  */
 public interface Plugin extends Comparable<Plugin> {
 
-    /*
-     * Returns the plugin identification, e.g. class name.
+    /**
+     * Returns the plugin unique identification, e.g. class name.
+     * 
      * @return the plugin indentification.
      */
     public String getPluginId();
@@ -16,12 +17,14 @@ public interface Plugin extends Comparable<Plugin> {
     /**
      * Returns plugin priority. If more plugins of the same type are present,
      * the one with the highest priority will be used.
+     * 
      * @return the priority of plugin.
      */
     public int getPluginPriority();
 
     /**
      * Returns the human-readable description of plugin.
+     * 
      * @return the human-readable description of plugin.
      */
     public String getPluginDescription();

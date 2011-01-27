@@ -5,7 +5,13 @@ import java.io.IOException;
 import java.net.URI;
 
 /**
- *
+ * Plugin implementing this class manages retrieving and storing metadata of an
+ * artifact.
+ * 
+ * <p> Typical usage of <code>ResourceDAO</code> plugin is in repository core to
+ * manipulate and manage metadata resource while uploading artifacts, retrieving
+ * them, copying etc.
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ResourceDAO extends Plugin {
@@ -19,9 +25,12 @@ public interface ResourceDAO extends Plugin {
      * @throws IOException  
      */
     public Resource getResource(URI uri) throws IOException;
+    
+    // TODO getResource() with basedir arg returning resource with relative uri
 
     /**
-     * Save TODO
+     * Saves metadata of <code>Resource</code>.
+     * 
      * @param resource
      * @throws IOException 
      */

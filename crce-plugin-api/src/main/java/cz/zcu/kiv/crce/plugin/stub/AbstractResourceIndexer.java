@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.plugin.stub;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ResourceIndexer;
 import java.io.InputStream;
-import java.net.URL;
 
 /**
  *

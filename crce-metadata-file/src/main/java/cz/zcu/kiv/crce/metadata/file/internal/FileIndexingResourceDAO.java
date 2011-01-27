@@ -19,11 +19,11 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
 
     @Override
     public Resource getResource(URI uri) throws IOException {
-        // TODO optimize via getResourceIndexers(category)
+        // TODO optimize via getAllResourceIndexers(category)
 
         URL url = uri.toURL();
         
-        ResourceIndexer[] indexers = m_pluginManager.getResourceIndexers();
+        ResourceIndexer[] indexers = m_pluginManager.getAllResourceIndexers();
 
         if (indexers.length == 0) {
             return null;

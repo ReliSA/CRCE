@@ -1,9 +1,9 @@
 package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Repository;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
@@ -36,7 +36,9 @@ public class Activator extends DependencyActivatorBase {
         dm.add(createComponent()
                 .setInterface(ResourceBuffer.class.getName(), null)
                 .setImplementation(ResourceBufferImpl.class)
-                .add(createServiceDependency().setService(PluginManager.class).setRequired(true)));
+                .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
+                .add(createServiceDependency().setService(VersionService.class).setRequired(true))
+                );
 
         dm.add(createComponent()
                 .setInterface(Repository.class.getName(), null)
@@ -46,7 +48,8 @@ public class Activator extends DependencyActivatorBase {
         
         dm.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true)));
+                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
+                );
 
         dm.add(createComponent()
                 .setImplementation(test)
