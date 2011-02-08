@@ -58,24 +58,27 @@
             <%
 
 
-                ResourceBuffer stack = Activator.getStack();
-                for (Resource res : stack.getStoredResources()) {
+                ResourceBuffer buffer = Activator.getBuffer();
+                for (Resource res : buffer.getStoredResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
                     
                     out.println("<table>");
                     out.println("<tr><td>Symbolic name:</td><td>" + res.getSymbolicName() + "</td></tr>");
                     out.println("<tr><td>Version:</td><td>" + res.getVersion() + "</td></tr>");
                     out.println("<tr><td>Presentation name:</td><td>" + res.getPresentationName() + "</td></tr>");
+                    out.println("<tr><td>Size:</td><td>" + res.getSize() + "</td></tr>");
+                    out.println("<tr><td>URI:</td><td>" + res.getUri().normalize() + "</td></tr>");
                     out.print("<tr><td>Categories:</td><td>");
-                    for (String cat : res.getCategories()) {
-                        out.print(cat + ", ");
+                    String[] cats = res.getCategories();
+                    for (int i = 0; i < cats.length; i++) {
+                        out.print(cats[i] + (i < cats.length - 1 ? ", " : ""));
                     }
                     out.println("</td></tr>");
                     out.println("</table>");
                     
-                    
+                    /*
                     out.println("<h3>Properties</h3>");
-                    out.println("<table border='1'><tr><td>");
+                    out.println("<table border='1' cellspacing='0'><tr><td>");
                     out.println("<table>");
                     out.println("<tr><th>type</th><th>name</th><th>value</th></tr>");
                     for (Property prop : res.getProperties()) {
@@ -83,21 +86,32 @@
                     }
                     out.println("</table>");
                     out.println("</tr></td></table>");
-
+                    */
+                    
                     out.println("<h3>Capabilities</h3>");
+                    
+                    out.println("<table border='1' cellspacing='0' width='500px'>");
+
+                    out.println("<tr><th>Name</th><th>Properties</th></tr>");
+                    
                     for (Capability cap : res.getCapabilities()) {
-                        out.println("<h4>Name: " + cap.getName() + "</h4>");
-                        out.println("<table border='1'><tr><td>");
-                        out.println("<table>");
+                        out.println("<tr>");
+                        out.println("<td>" + cap.getName() + "</td>");
+                        
+                        out.println("<td>");
+                        out.println("<table width='100%'>");
                         out.println("<tr><th>type</th><th>name</th><th>value</th></tr>");
                         for (Property prop : cap.getProperties()) {
                             out.println("<tr><td>" + prop.getType() + "</td><td>" + prop.getName() + "</td><td>" + prop.getValue() + "</td></tr>");
                         }
                         out.println("</table>");
-                        out.println("</tr></td></table>");
-                        
-                        
+                        out.println("</td>");
+                        out.println("</tr>");
                     }
+                    
+                    out.println("</table>");
+                    
+                    
                     out.println("<h3>Requirements</h3>");
                     out.println("<table>");
                     out.println("<tr><th>Name</th><th>Filter</th><th>Optional</th><th>Multiple</th><th>Extended</th></tr>");

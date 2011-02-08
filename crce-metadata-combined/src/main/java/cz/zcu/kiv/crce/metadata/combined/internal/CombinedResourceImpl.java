@@ -71,8 +71,18 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
+    public Capability[] getCapabilities(String name) {
+        return concat(m_staticResource.getCapabilities(name), m_writableResource.getCapabilities(name));
+    }
+
+    @Override
     public Requirement[] getRequirements() {
         return concat(m_staticResource.getRequirements(), m_writableResource.getRequirements());
+    }
+
+    @Override
+    public Requirement[] getRequirements(String name) {
+        return concat(m_staticResource.getRequirements(name), m_writableResource.getRequirements(name));
     }
 
     @Override

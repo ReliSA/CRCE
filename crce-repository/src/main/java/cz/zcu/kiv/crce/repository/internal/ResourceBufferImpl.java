@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.osgi.service.cm.ConfigurationException;
 
 /**
@@ -34,7 +36,7 @@ public class ResourceBufferImpl implements ResourceBuffer {
 
     private volatile BundleContext m_context; /* Injected by dependency manager */
 
-    File m_baseDir;
+    private File m_baseDir;
     private List<Resource> m_resources = new ArrayList<Resource>(); // TODO remove, make repository.xml instead
 
     private void setUpBaseDir() {
@@ -81,46 +83,65 @@ public class ResourceBufferImpl implements ResourceBuffer {
 //        m_pluginManager.getActionHandler().onUploaded(out, name);
         
         // TODO move to some plugin
-        resource.createCapability("file").setProperty("original-name", name);
+        resource.createCapability("file").setProperty("name", name);
         resource.setSymbolicName(name);
         
         //TODO move versioning to some plugin
         // <editor-fold defaultstate="collapsed" desc="versioning">
-        Resource cand = null;
-        for (Resource i : m_resources) {
-            if (i.getSymbolicName().equals(resource.getSymbolicName())) {
-                if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
-                    cand = i;
+        
+        if (resource.hasCategory("osgi")) {
+            Resource cand = null;
+            
+            String ext = name.substring(name.lastIndexOf("."));
+            Version oldVersion = resource.getVersion();
+            
+            for (Resource i : m_resources) {
+                if (i.getSymbolicName().equals(resource.getSymbolicName())) {
+                    if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
+                        cand = i;
+                    }
                 }
             }
-        }
-        if (cand != null) {
-            try {
-                InputStream in = new FileInputStream(new File(cand.getUri()));
-                File source;
+            if (cand != null) {
                 try {
-                    source = File.createTempFile("source", ".jar");
-                    output = new FileOutputStream(source);
-                    byte[] buffer = new byte[BUFFER_SIZE];
-                    for (int count = in.read(buffer); count != -1; count = in.read(buffer)) {
-                        output.write(buffer, 0, count);
+                    InputStream in = new FileInputStream(new File(cand.getUri()));
+                    File source;
+                    try {
+                        source = File.createTempFile("source", ".jar");
+                        output = new FileOutputStream(source);
+                        byte[] buffer = new byte[BUFFER_SIZE];
+                        for (int count = in.read(buffer); count != -1; count = in.read(buffer)) {
+                            output.write(buffer, 0, count);
+                        }
+                    } finally {
+                        in.close();
+                        if (output != null) {
+                            output.flush();
+                            output.close();
+                        }
                     }
-                } finally {
-                    in.close();
-                    if (output != null) {
-                        output.flush();
-                        output.close();
-                    }
+
+                    m_versionService.updateVersion(source, file);
+                } catch (VersionGeneratorException ex) {
+                    throw new IllegalStateException(ex.getMessage(), ex);
+                } catch (BundlesIncomparableException ex) {
+                    throw new IllegalStateException(ex.getMessage(), ex);
                 }
-                m_versionService.updateVersion(source, file);
-            } catch (VersionGeneratorException ex) {
-                throw new IllegalStateException(ex.getMessage(), ex);
-            } catch (BundlesIncomparableException ex) {
-                throw new IllegalStateException(ex.getMessage(), ex);
+                resource = creator.getResource(file.toURI());   // reload changed resource
+
+                resource.addCategory("versioned");
             }
-            resource = creator.getResource(file.toURI());
-            resource.createCapability("file").setProperty("name", name);
-            resource.setSymbolicName(name);
+            
+            Capability[] caps = resource.getCapabilities("file");
+            Capability cap = (caps.length == 0 ? resource.createCapability("file") : caps[0]);
+            cap.setProperty("original-name", name);
+            cap.setProperty("name", resource.getSymbolicName() + "-" + resource.getVersion() + ext);
+            
+            caps = resource.getCapabilities("bundle");
+            cap = (caps.length == 0 ? resource.createCapability("bundle") : caps[0]);
+            cap.setProperty("original-version", oldVersion);
+            
+            
         }
         // </editor-fold>
         

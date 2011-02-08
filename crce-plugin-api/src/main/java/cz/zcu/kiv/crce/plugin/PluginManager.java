@@ -1,5 +1,9 @@
 package cz.zcu.kiv.crce.plugin;
 
+/*
+ * TODO - split Plugin API to core plugins (this) and core independent plugins (ResourceIndexer)
+ */
+
 /**
  * Plugin manager is responsible to register, unregister and provide plugins.
  * 

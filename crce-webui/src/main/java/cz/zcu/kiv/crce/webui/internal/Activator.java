@@ -25,7 +25,7 @@ public final class Activator extends DependencyActivatorBase {
         return m_pluginManager;
     }
     
-    public static ResourceBuffer getStack() {
+    public static ResourceBuffer getBuffer() {
         return m_stack;
     }
 

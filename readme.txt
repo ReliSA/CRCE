@@ -7,5 +7,5 @@ Component Repository with Compatibility Evaluation
 3) CRCE runs on following URL:
 http://localhost:8090/crce
 
-4) Apache Felix Web Console is accessible on this URL:
+4) Apache Felix Web Console is accessible on this URL (login: admin, password: admin):
 http://localhost:8090/system/console

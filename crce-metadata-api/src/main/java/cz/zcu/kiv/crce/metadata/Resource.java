@@ -30,8 +30,12 @@ public interface Resource extends PropertyProvider {
 
     Capability[] getCapabilities();
 
+    Capability[] getCapabilities(String name);
+
     Requirement[] getRequirements();
 
+    Requirement[] getRequirements(String name);
+    
     Map<String, String> getPropertiesMap();
 
     boolean hasCategory(String category);

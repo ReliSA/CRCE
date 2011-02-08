@@ -1,11 +1,13 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import java.util.List;
 import cz.zcu.kiv.crce.metadata.Property;
 import org.apache.felix.utils.version.VersionTable;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -77,8 +79,40 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     }
 
     @Override
+    public Capability[] getCapabilities(String name) {
+        if (name == null) {
+            return getCapabilities();
+        }
+        List<Capability> out = new ArrayList<Capability>();
+        
+        for (Capability cap : m_capabilities) {
+            if (name.equals(cap.getName())) {
+                out.add(cap);
+            }
+        }
+        
+        return out.toArray(new Capability[out.size()]);
+    }
+
+    @Override
     public Requirement[] getRequirements() {
         return m_requirements.toArray(new Requirement[m_requirements.size()]);
+    }
+
+    @Override
+    public Requirement[] getRequirements(String name) {
+        if (name == null) {
+            return getRequirements();
+        }
+        List<Requirement> out = new ArrayList<Requirement>();
+        
+        for (Requirement req : m_requirements) {
+            if (name.equals(req.getName())) {
+                out.add(req);
+            }
+        }
+        
+        return out.toArray(new Requirement[out.size()]);
     }
 
     @Override

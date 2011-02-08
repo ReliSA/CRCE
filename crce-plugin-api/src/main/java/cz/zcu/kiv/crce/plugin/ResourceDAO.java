@@ -20,13 +20,21 @@ public interface ResourceDAO extends Plugin {
      * Returns <code>Resource</code> object for a given resource. Returns
      * <code>null</code> if <code>Resource</code> object can not be created
      * (e.g. resource not exists).
-     * @param uri URI of a res
+     * @param uri URI 
      * @return
      * @throws IOException  
      */
     public Resource getResource(URI uri) throws IOException;
     
-    // TODO getResource() with basedir arg returning resource with relative uri
+//    /**
+//     * TODO
+//     * @param uri
+//     * @param baseUri
+//     * @return
+//     * @throws IOException 
+//     */
+//    public Resource getResource(URI uri, URI baseUri) throws IOException;
+//    
 
     /**
      * Saves metadata of <code>Resource</code>.

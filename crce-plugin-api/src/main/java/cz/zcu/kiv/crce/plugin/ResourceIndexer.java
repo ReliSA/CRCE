@@ -3,6 +3,10 @@ package cz.zcu.kiv.crce.plugin;
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.InputStream;
 
+/*
+ * TODO - move this API to separate ResourceDAO plugin
+ */
+
 /**
  * Resource indexer indexes content of an artifact and stores obtained metadata
  * into <code>Resource</code> object.

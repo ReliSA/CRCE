@@ -4,9 +4,9 @@ cmd /c mvn install:install-file -DgroupId=org.apache.ace -DartifactId=ace-obr-me
 cmd /c mvn install:install-file -DgroupId=org.apache.ace -DartifactId=ace-obr-storage -Dversion=0.8.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/org.apache.ace.obr.storage_0.8.0.SNAPSHOT.jar
 cmd /c mvn install:install-file -DgroupId=org.apache.ace -DartifactId=ace-obr-servlet -Dversion=0.8.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/org.apache.ace.obr.servlet_0.8.0.SNAPSHOT.jar
 cmd /c mvn install:install-file -DgroupId=org.apache.ace -DartifactId=ace-httplistener -Dversion=0.8.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/org.apache.ace.http.listener_0.8.0.SNAPSHOT.jar
-cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=types-cmp -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.types-cmp_1.0.0.SNAPSHOT.jar
-cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=javatypes -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.javatypes_1.0.0.SNAPSHOT.jar
-cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=javatypes-cmp -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.javatypes-cmp_1.0.0.SNAPSHOT.jar
+cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=types-cmp -Dversion=1.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.types-cmp_1.0.0.SNAPSHOT.jar
+cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=javatypes -Dversion=1.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.javatypes_1.0.0.SNAPSHOT.jar
+cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.jacc -DartifactId=javatypes-cmp -Dversion=1.0-SNAPSHOT -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.jacc.javatypes-cmp_1.0.0.SNAPSHOT.jar
 cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.osgi -DartifactId=bundle-types -Dversion=1.0.0 -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.osgi.bundle-types_1.0.0.jar
 cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.osgi -DartifactId=bundle-cmp -Dversion=1.0.0 -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.osgi.bundle-cmp_1.0.0.jar
 cmd /c mvn install:install-file -DgroupId=cz.zcu.kiv.osgi -DartifactId=bundle-loader -Dversion=1.2.0 -Dpackaging=jar -Dfile=external-snapshots/cz.zcu.kiv.osgi.bundle-loader_1.2.0.jar
