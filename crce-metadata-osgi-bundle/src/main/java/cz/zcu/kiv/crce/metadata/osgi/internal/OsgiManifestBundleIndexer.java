@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.Type;
-import cz.zcu.kiv.crce.plugin.stub.AbstractResourceIndexer;
+import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;

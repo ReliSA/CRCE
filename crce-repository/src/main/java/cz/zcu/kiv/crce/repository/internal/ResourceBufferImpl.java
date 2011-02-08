@@ -5,6 +5,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
@@ -76,7 +77,17 @@ public class ResourceBufferImpl implements ResourceBuffer {
             }
         }
         
-        ResourceDAO creator = m_pluginManager.getResourceDAO();
+        System.out.println("\n############################");
+        System.out.println(m_pluginManager);
+        
+        ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
+        
+        ResourceDAO creator;
+        if (factory == null) {
+            creator = m_pluginManager.getPlugin(ResourceDAO.class);
+        } else {
+            creator = factory.getResourceDAO();
+        }
 
         Resource resource = creator.getResource(file.toURI());
         

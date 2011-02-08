@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.plugin.stub;
 
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.ActionHandler;
 

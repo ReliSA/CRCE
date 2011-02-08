@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -23,7 +23,7 @@ public class Activator extends DependencyActivatorBase {
                 );
         
         manager.add(createComponent()
-                .setInterface(ResourceDAOFactory.class.getName(), null)
+                .setInterface(Plugin.class.getName(), null)
                 .setImplementation(CombinedResourceDAOFactory.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );

@@ -1,9 +1,5 @@
 package cz.zcu.kiv.crce.plugin;
 
-/*
- * TODO - split Plugin API to core plugins (this) and core independent plugins (ResourceIndexer)
- */
-
 /**
  * Plugin manager is responsible to register, unregister and provide plugins.
  * 
@@ -13,68 +9,83 @@ public interface PluginManager {
 
     /**
      * Returns all registered plugins ordered by their priority.
+     * 
      * @return an array containing all registered plugins.
      */
-    Plugin[] getAllPlugins();
+    Plugin[] getPlugins();
 
     /**
-     * Returns all registered instances of <code>ResourceDAO</code> ordered by
-     * their priority.
+     * Returns all registered instances of plugins with the specified type.
      * 
-     * <p><i>This method should not be used to obtain preffered instance of
-     * <code>ResourceDAO</code> using zero index of returned array, because
-     * the most preffered implementation may be instantiated by a registered
-     * <code>ResourceDAOFactory</code> plugin. So use rather method
-     * <code>getResourceDAO()</code> for this purpose.
+     * <p>Returned array is sort by plugins priority.
      * 
-     * @return an array containing all registered instances of
-     * <code>ResourceDAO</code>.
+     * <p>Example usage:
+     * <blockquote>
+     * <pre>
+     * PluginManager pm = ... // get instance
+     * ResourceDAO[] daos = pm.getPlugins(ResourceDAO.class);
+     * </pre>
+     * </blockquote>
+     * 
+     * @param <T>
+     * @param type the <code>Class</code> object representing the type of
+     * plugins in returned array.
+     * @return the array with plugins of given type.
      */
-    ResourceDAO[] getAllResourceDAOs();
+    <T> T[] getPlugins(Class<T> type);
     
-    /**
-     * Returns all registered <code>ResourceIndexer</code>s ordered by their
-     * priority.
-     * @return an array containing all registered resource indexers.
-     */
-    ResourceIndexer[] getAllResourceIndexers();
+    
+        // TODO is the following necessary? should be inclusive or exclusive regarding keywords?
+//    /**
+//     * Returns all registered instances of plugins with the specified type and
+//     * keywords.
+//     * 
+//     * <p>Returned array is sort by plugins' priority and contains plugins
+//     * registered with specified keywords only. If keywords are <code>null</code>
+//     * or are not specified, then all plugins of given type are returned.
+//     * If keyword is a zero-length string, then all plugins of given type with
+//     * no keyword are returned.
+//     * 
+//     * @param <T>
+//     * @param type the <code>Class</code> object representing the type of
+//     * plugins in returned array.
+//     * @param keywords an optional array of keywords specifying the selection
+//     * of plugins.
+//     * @return the array with plugins of given type and keywords.
+//     */
+//    <T> T[] getPlugins(Class<T> type, String... keywords);
 
     /**
-     * Returns all registered <code>ActionHandler</code>s ordered by their
-     * priority.
-     * @return array of all registered action handlers.
+     * Returns all registered instances of plugins with the specified type and
+     * keyword.
+     * 
+     * <p>Returned array is sort by plugins' priority and contains plugins
+     * registered with specified keyword only. If keyword is <code>null</code>
+     * or is not specified, then all plugins of given type are returned.
+     * If keyword is a zero-length string, then all plugins of given type with
+     * no keyword are returned.
+     * 
+     * @param <T>
+     * @param type the <code>Class</code> object representing the type of
+     * plugins in returned array.
+     * @param keyword a keyword specifying the selection of plugins.
+     * @return the array with plugins of specified type and with given keyword.
      */
-    ActionHandler[] getAllActionHandlers();
+    <T> T[] getPlugins(Class<T> type, String keyword);
     
     /**
-     * Returns an instance of preferred <code>ResourceDAO</code> implementation.
+     * Returns an instance of preferred plugin implementation of specified type.
      * 
-     * <p> If more implementations of <code>ResourceDAO</code> are present then
-     * the one with hthe ighest priority is returned.
-     * 
-     * @return 
-     */
-    ResourceDAO getResourceDAO();
-
-    /**
-     * Returns all <code>ResourceIndexer</code>s which can be used to index
-     * a resource tagged with given category.
-     * 
-     * <p> Returned indexers are ordered by their priority from the highest
-     * to the lowest.
-     * 
-     * @param category
-     * @return an array of <code>ResourceIndexer</code>s for given category.
-     */
-    ResourceIndexer[] getResourceIndexers(String category);
-    
-    /**
-     * Returns an instance of preferred <code>ActionHandler</code> implementation.
-     * 
-     * <p> If more implementations of <code>ActionHandler</code> are present
+     * <p> If more implementations of plugin with given type are present
      * then the one with the highest priority is returned.
      * 
-     * @return 
+     * @param <T>
+     * @param type the <code>Class</code> object representing the type of
+     * returned plugin.
+     * @return the instance of plugin.
      */
-    ActionHandler getActionHandler();
+    <T> T getPlugin(Class<T> type);
+    
+    <T> T getPlugin(Class<T> type, String keywords);
+    
 }

@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.metadata.combined.internal;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
-import cz.zcu.kiv.crce.plugin.stub.AbstractPlugin;
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 
 /**
  *
@@ -15,7 +15,7 @@ public class CombinedResourceDAOFactory extends AbstractPlugin implements Resour
 
     @Override
     public ResourceDAO getResourceDAO() {
-        ResourceDAO[] daos = m_pluginManager.getAllResourceDAOs();
+        ResourceDAO[] daos = m_pluginManager.getPlugins(ResourceDAO.class);
 
         if (daos.length < 1) {
             throw new IllegalStateException("No registered ResourceDAOs to create CombinedResourceDAO.");

@@ -28,4 +28,15 @@ public interface Plugin extends Comparable<Plugin> {
      * @return the human-readable description of plugin.
      */
     public String getPluginDescription();
+    
+    /**
+     * Returns an optional array of plugin keywords or zero-length array if no
+     * keyword is specified.
+     * 
+     * <p>Keywords can be used to more precise specifying of plugin(s) returned
+     * by <code>PluginManager</code>.
+     * 
+     * @return an array of keywords.
+     */
+    public String[] getKeyWords();
 }

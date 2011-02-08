@@ -8,10 +8,18 @@ import org.osgi.service.cm.ManagedService;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ResourceBuffer extends ManagedService {
-    
+
+    /**
+     * Puts a new resource into resource buffer.
+     * 
+     * @param name A name of uploaded file.
+     * @param resource Uploaded resource.
+     * @return 
+     * @throws IOException 
+     */
     public Resource put(String name, InputStream resource) throws IOException;
 
     public Resource[] getStoredResources();

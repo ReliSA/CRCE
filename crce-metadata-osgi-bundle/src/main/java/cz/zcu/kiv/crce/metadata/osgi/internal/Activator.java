@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.plugin.ResourceIndexer;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
 import org.apache.felix.bundlerepository.RepositoryAdmin;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase {
 
