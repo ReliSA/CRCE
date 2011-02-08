@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <relativePath>../poms</relativePath>
+        <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
+        <artifactId>shared-plugin-settings</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
+    <artifactId>provision</artifactId>
+
+    <name>CRCE - Reactor - imported bundles</name>
+
+    <packaging>pom</packaging>
+
+  <!--
+   | imported (non-local) bundles are listed here as dependencies
+   | and will be deployed by pax:provision unless they are marked
+   | with <optional>true</optional>
+  -->
+
+    <dependencies>
+        
+        <!-- === PAX-WEB === -->
+        
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-extender-war</artifactId>
+            <version>0.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-jetty-bundle</artifactId>
+            <version>0.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-jsp</artifactId>
+            <version>0.8.1</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-service</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>servlet-api-2.5</artifactId>
+            <version>6.1.9</version>
+        </dependency>
+        
+        <!-- === FELIX === -->
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager.shell</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.eventadmin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.prefs</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.scr</artifactId>
+          <version>1.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole</artifactId>
+            <version>3.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.shell</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </dependency>
+        
+        <!-- === OSGi === -->
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.service.obr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        
+        <!-- === ACE === -->
+        
+        <dependency>
+            <groupId>org.apache.ace</groupId>
+            <artifactId>ace-httplistener</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ace</groupId>
+            <artifactId>ace-obr-metadata</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ace</groupId>
+            <artifactId>ace-obr-storage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ace</groupId>
+            <artifactId>ace-obr-servlet</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jsp-api</artifactId>
+            <type>jar</type>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- === JACC === -->
+
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>types-cmp</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- === OBCC === -->
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-types</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-loader</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>bundle-cmp</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>version-generator</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>apache-log4j-extras</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-all</artifactId>
+            <version>3.3</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-vfs</artifactId>
+            <version>1.0_5</version>
+        </dependency>
+        
+        <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.bcel</artifactId>
+                <version>5.2_3</version>
+        </dependency>
+        
+    </dependencies>
+
+</project>
