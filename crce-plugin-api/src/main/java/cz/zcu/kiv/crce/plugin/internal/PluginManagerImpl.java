@@ -88,12 +88,13 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public <T> T getPlugin(Class<T> type, String... keywords) {
-        Map<String, Set<Plugin>> map = m_plugins.get(type);
-        if (map != null) {
-            Set<Plugin> out = new TreeSet<Plugin>();
-        }
-        return null;
+    public <T> T getPlugin(Class<T> type, String keywords) {
+//        Map<String, Set<Plugin>> map = m_plugins.get(type);
+//        if (map != null) {
+//            Set<Plugin> out = new TreeSet<Plugin>();
+//        }
+//        return null;
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     /**
