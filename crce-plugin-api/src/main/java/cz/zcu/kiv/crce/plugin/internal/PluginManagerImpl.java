@@ -15,6 +15,7 @@ import org.osgi.service.log.LogService;
 public class PluginManagerImpl implements PluginManager {
 
     private final String ROOT_CLASS = "java.lang.Object";
+    private final String NO_KEYWORDS = "";
     private volatile LogService m_log; /* injected by dependency manager */
 
     /**
@@ -73,28 +74,22 @@ public class PluginManagerImpl implements PluginManager {
 
     @Override
     public <T> T getPlugin(Class<T> type) {
-        Map<String, Set<Plugin>> map = m_plugins.get(type);
-        if (map != null) {
-            Set<Plugin> set = map.get(null);
-            if (set != null) {
-                if (!set.isEmpty()) {
-                    @SuppressWarnings("unchecked")
-                    T t = (T) set.iterator().next();
-                    return t;
-                }
-            }
-        }
-        return null;
+        return getPlugin(type, null);
     }
 
     @Override
-    public <T> T getPlugin(Class<T> type, String keywords) {
-//        Map<String, Set<Plugin>> map = m_plugins.get(type);
-//        if (map != null) {
-//            Set<Plugin> out = new TreeSet<Plugin>();
-//        }
-//        return null;
-        throw new UnsupportedOperationException("not implemented yet");
+    public <T> T getPlugin(Class<T> type, String keyword) {
+        Map<String, Set<Plugin>> map = m_plugins.get(type);
+        if (map == null) {
+            return null;
+        }
+        Set<Plugin> set = map.get(keyword);
+        if (set == null || set.isEmpty()) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        T t = (T) set.iterator().next();
+        return t;
     }
 
     /**
@@ -111,19 +106,47 @@ public class PluginManagerImpl implements PluginManager {
      * @param plugin 
      */
     synchronized void remove(Plugin plugin) {
-        // TODO
+        removeRecursive(plugin.getClass(), plugin);
         m_log.log(LogService.LOG_INFO, "Plugin unregistered: " + plugin.getPluginId());
     }
 
+    private void removeRecursive(Class clazz, Plugin plugin) {
+        if (ROOT_CLASS.equals(clazz.getName())) {
+            return;
+        }
+        for (Class iface : clazz.getInterfaces()) {
+            Map<String, Set<Plugin>> map = m_plugins.get(iface);
+            if (map == null) {
+                continue;
+            }
+            Set<Plugin> set;
+            if (plugin.getKeywords().length == 0) {
+                if ((set = map.get(NO_KEYWORDS)) != null) {
+                    set.remove(plugin);
+                }
+            } else {
+                for (String keyword : plugin.getKeywords()) {
+                    if ((set = map.get(keyword)) != null) {
+                        set.remove(plugin);
+                    }
+                }
+            }
+            if ((set = map.get(null)) != null) {
+                set.remove(plugin);
+            }
+        }
+        removeRecursive(clazz.getSuperclass(), plugin);
+    }
+    
     private void addRecursive(Class clazz, Plugin plugin) {
         if (ROOT_CLASS.equals(clazz.getName())) {
             return;
         }
         for (Class iface : clazz.getInterfaces()) {
-            if (plugin.getKeyWords().length == 0) {
-                add(iface, plugin, "");
+            if (plugin.getKeywords().length == 0) {
+                add(iface, plugin, NO_KEYWORDS);
             } else {
-                for (String keyword : plugin.getKeyWords()) {
+                for (String keyword : plugin.getKeywords()) {
                     add(iface, plugin, keyword);
                 }
             }
@@ -154,7 +177,7 @@ public class PluginManagerImpl implements PluginManager {
             sb.append("  ").append(clazz.getName()).append(":\n");
             Map<String, Set<Plugin>> map = m_plugins.get(clazz);
             for (String keyword : map.keySet()) {
-                sb.append("    ").append(keyword == null ? "[null]" : ("".equals(keyword)) ? "[none]" : keyword).append(":\n");
+                sb.append("    ").append(keyword == null ? "[null]" : (NO_KEYWORDS.equals(keyword)) ? "[none]" : keyword).append(":\n");
                 for (Plugin plugin : map.get(keyword)) {
                     sb.append("      ").append(plugin.getPluginId()).append("\n");
                 }

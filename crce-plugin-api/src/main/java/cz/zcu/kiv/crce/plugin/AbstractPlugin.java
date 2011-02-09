@@ -28,7 +28,7 @@ public abstract class AbstractPlugin implements Plugin {
     }
 
     @Override
-    public String[] getKeyWords() {
+    public String[] getKeywords() {
         return new String[0];
     }
     

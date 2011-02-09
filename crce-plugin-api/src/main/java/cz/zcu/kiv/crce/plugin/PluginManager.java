@@ -76,7 +76,7 @@ public interface PluginManager {
     /**
      * Returns an instance of preferred plugin implementation of specified type.
      * 
-     * <p> If more implementations of plugin with given type are present
+     * <p> If more implementations of plugin with given type are present,
      * then the one with the highest priority is returned.
      * 
      * @param <T>
@@ -86,6 +86,19 @@ public interface PluginManager {
      */
     <T> T getPlugin(Class<T> type);
     
-    <T> T getPlugin(Class<T> type, String keywords);
+    /**
+     * Returns an instance of preferred plugin implementation of specified type
+     * and keyword.
+     * 
+     * <p> If more implementations of plugin with given type and keyword are
+     * present, then the one with the highest priority is returned.
+     * 
+     * @param <T>
+     * @param type the <code>Class</code> object representing the type of
+     * returned plugin.
+     * @param keyword a keyword specifying the selection of plugins.
+     * @return the instance of plugin.
+     */
+    <T> T getPlugin(Class<T> type, String keyword);
     
 }

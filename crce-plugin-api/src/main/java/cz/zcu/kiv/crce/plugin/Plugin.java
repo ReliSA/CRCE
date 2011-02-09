@@ -38,5 +38,5 @@ public interface Plugin extends Comparable<Plugin> {
      * 
      * @return an array of keywords.
      */
-    public String[] getKeyWords();
+    public String[] getKeywords();
 }
