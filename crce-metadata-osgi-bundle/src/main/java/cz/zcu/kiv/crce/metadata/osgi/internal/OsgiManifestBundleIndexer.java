@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.metadata.osgi.internal;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import java.io.IOException;
@@ -20,17 +19,10 @@ import org.apache.felix.bundlerepository.RepositoryAdmin;
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
-    private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
     private volatile RepositoryAdmin m_repoAdmin;  /* injected by dependency manager */
 
     @Override
-    public Resource index(InputStream input) {
-        return index(input, null);
-    }
-
-    @Override
-    public Resource index(final InputStream input, Resource resource) {
-        Resource res = (resource == null ? m_resourceCreator.createResource() : resource);
+    public String[] index(final InputStream input, Resource resource) {
 
         org.apache.felix.bundlerepository.Resource fres;
         
@@ -55,28 +47,28 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (IOException ex) {
             ex.printStackTrace();   // XXX
-            return res;
+            return new String[0];
         } catch (IllegalArgumentException e) {
             // not a bundle
-            return res;
+            return new String[0];
         }
 
         if (fres == null) {
-            return res;
+            return new String[0];
         }
         
-        res.setSymbolicName(fres.getSymbolicName());
-        res.setVersion(fres.getVersion());
-        res.setPresentationName(fres.getPresentationName());
+        resource.setSymbolicName(fres.getSymbolicName());
+        resource.setVersion(fres.getVersion());
+        resource.setPresentationName(fres.getPresentationName());
         // size is not set
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
-            Capability cap = res.createCapability(fcap.getName());
+            Capability cap = resource.createCapability(fcap.getName());
             for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {
                 cap.setProperty(fprop.getName(), fprop.getValue(), Type.getValue(fprop.getType()));
             }
         }
         for (org.apache.felix.bundlerepository.Requirement freq : fres.getRequirements()) {
-            Requirement req = res.createRequirement(freq.getName());
+            Requirement req = resource.createRequirement(freq.getName());
             req.setComment(freq.getComment());
             req.setExtend(freq.isExtend());
             req.setFilter(freq.getFilter());
@@ -85,12 +77,13 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
 
         for (String category : fres.getCategories()) {
-            res.addCategory(category);
+            resource.addCategory(category);
         }
 
         // TODO properties, if necessary
-        res.addCategory("osgi");
-        return res;
+        resource.addCategory("osgi");
+        
+        return new String[] {"osgi"};
     }
 
     @Override

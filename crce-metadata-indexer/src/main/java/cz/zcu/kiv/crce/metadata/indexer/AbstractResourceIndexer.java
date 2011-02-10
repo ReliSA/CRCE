@@ -11,13 +11,8 @@ import java.io.InputStream;
 public abstract class AbstractResourceIndexer extends AbstractPlugin implements ResourceIndexer {
 
     @Override
-    abstract public Resource index(InputStream input, Resource resource);
+    abstract public String[] index(InputStream input, Resource resource);
     
-    @Override
-    public Resource index(InputStream input) {
-        return index(input, null);
-    }
-
     @Override
     public String[] getProvidedCategories() {
         return new String[0];

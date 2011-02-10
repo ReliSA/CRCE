@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.metadata.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,8 +11,6 @@ import java.io.InputStream;
  */
 public class FileTypeResourceIndexer extends AbstractResourceIndexer {
 
-    private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
-
     private static int BUFFER_LENGTH = 8;
 
     private static String PNG = new String(new byte[] {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47,
@@ -22,9 +19,8 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
     private static String ZIP = new String(new byte[] {(byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04});
     
     @Override
-    public Resource index(InputStream input, Resource resource) {
+    public String[] index(InputStream input, Resource resource) {
         System.out.println("\n--- file type ---");
-        Resource res = resource != null ? resource : m_resourceCreator.createResource();
 
         byte[] buffer = new byte[BUFFER_LENGTH];
         
@@ -34,26 +30,29 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
             input.close();
         } catch (IOException ex) {
             ex.printStackTrace();   // XXX
-            return res;
+            return new String[0];
         }
         
         if (read != BUFFER_LENGTH) {
             System.out.println("read: " + read);
-            return res;
+            return new String[0];
         }
 
         String str = new String(buffer);
         System.out.println("str: " + str);
 
         if (str.startsWith(ZIP)) {
-            res.addCategory("zip");
+            resource.addCategory("zip");
+            return new String[] {"zip"};
         } else if (str.startsWith(JPEG)) {
-            res.addCategory("jpeg");
+            resource.addCategory("jpeg");
+            return new String[] {"jpeg"};
         } else if (str.startsWith(PNG)) {
-            res.addCategory("png");
+            resource.addCategory("png");
+            return new String[] {"png"};
         }
 
-        return res;
+        return new String[0];
     }
     
     public static byte[] hexStringToByteArray(String s) {

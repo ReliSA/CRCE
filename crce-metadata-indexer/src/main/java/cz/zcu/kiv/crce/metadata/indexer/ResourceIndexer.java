@@ -25,24 +25,22 @@ import java.io.InputStream;
  */
 public interface ResourceIndexer extends Plugin {
     
-    /**
-     * Indexes artifact data from given <code>InputStream</code> and stores
-     * results into new <code>Resource</code> instance.
-     * 
-     * <p> If indexer can't index artifact content, an empty resource (with no
-     * capabilities, requirements or categories) is returned.
-     * 
-     * @param input
-     * @return 
-     */
-    Resource index(InputStream input);
+//    /**
+//     * Indexes artifact data from given <code>InputStream</code> and stores
+//     * results into new <code>Resource</code> instance.
+//     * 
+//     * <p> If indexer can't index artifact content, an empty resource (with no
+//     * capabilities, requirements or categories) is returned.
+//     * 
+//     * @param input
+//     * @return 
+//     */
+//    Resource index(InputStream input);
     
     /**
      * Indexes data from given <code>InputStream</code> and stores results into
-     * given <code>Resource</code> object.
-     * 
-     * <p> If given resource is <code>null</code>, then the new instance of
-     * <code>Resource</code> is created.
+     * given <code>Resource</code> object. Returns an array of categories set to
+     * resource by this indexer.
      * 
      * <p> If indexer can't index artifact content, resource stays unchanged.
      * 
@@ -50,7 +48,7 @@ public interface ResourceIndexer extends Plugin {
      * @param resource
      * @return 
      */
-    Resource index(InputStream input, Resource resource);
+    String[] index(InputStream input, Resource resource);
     
     /**
      * Returns set of categories that this indexer can discover from an indexed

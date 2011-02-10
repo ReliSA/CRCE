@@ -14,8 +14,7 @@ import org.osgi.service.log.LogService;
  */
 public class PluginManagerImpl implements PluginManager {
 
-    private final String ROOT_CLASS = "java.lang.Object";
-    private final String NO_KEYWORDS = "";
+    private static final String ROOT_CLASS = "java.lang.Object";
     private volatile LogService m_log; /* injected by dependency manager */
 
     /**

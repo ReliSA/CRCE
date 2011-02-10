@@ -7,6 +7,8 @@ package cz.zcu.kiv.crce.plugin;
  */
 public interface PluginManager {
 
+    public static final String NO_KEYWORDS = "";
+    
     /**
      * Returns all registered plugins ordered by their priority.
      * 
@@ -60,10 +62,10 @@ public interface PluginManager {
      * keyword.
      * 
      * <p>Returned array is sort by plugins' priority and contains plugins
-     * registered with specified keyword only. If keyword is <code>null</code>
-     * or is not specified, then all plugins of given type are returned.
-     * If keyword is a zero-length string, then all plugins of given type with
-     * no keyword are returned.
+     * registered with specified keyword only. If keyword is <code>null</code>,
+     * then <b>all</b> plugins of given type are returned.
+     * If keyword is a <code>NO_KEYWORDS</code> string, then all plugins of given
+     * type with <b>no keyword</b> are returned.
      * 
      * @param <T>
      * @param type the <code>Class</code> object representing the type of

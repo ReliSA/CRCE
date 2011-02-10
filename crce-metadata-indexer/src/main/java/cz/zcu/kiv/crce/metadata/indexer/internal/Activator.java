@@ -20,13 +20,13 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(FileIndexingResourceDAO.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))
                 );
         
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(FileTypeResourceIndexer.class)
-                .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
                 );
     }
 
