@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
-import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
+import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
+import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAOFactory;
 import java.io.File;
 import org.junit.*;

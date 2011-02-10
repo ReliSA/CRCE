@@ -1,8 +1,7 @@
-package cz.zcu.kiv.crce.plugin.stub;
+package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
 import java.io.IOException;
 import java.net.URI;
 

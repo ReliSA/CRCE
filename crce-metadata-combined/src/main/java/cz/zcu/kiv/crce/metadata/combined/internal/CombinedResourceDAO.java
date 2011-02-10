@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
+import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
+import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import java.io.IOException;
 import java.net.URI;
 //import org.apache.felix.bundlerepository.Property;

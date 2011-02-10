@@ -1,4 +1,6 @@
-package cz.zcu.kiv.crce.plugin;
+package cz.zcu.kiv.crce.repository.plugins;
+
+import cz.zcu.kiv.crce.plugin.Plugin;
 
 /**
  * Plugin implementing this interface creates an instance of implementation of

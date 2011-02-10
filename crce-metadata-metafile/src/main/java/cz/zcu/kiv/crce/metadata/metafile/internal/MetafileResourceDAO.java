@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.metadata.metafile.internal;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
-import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
+import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;

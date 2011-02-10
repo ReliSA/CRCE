@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.metadata.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.plugin.stub.AbstractResourceDAO;
+import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
 import java.io.File;

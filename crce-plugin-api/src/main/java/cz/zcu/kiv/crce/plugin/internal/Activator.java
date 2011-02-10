@@ -1,10 +1,7 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
-import cz.zcu.kiv.crce.plugin.ActionHandler;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.plugin.ResourceDAO;
-import cz.zcu.kiv.crce.plugin.ResourceDAOFactory;
         
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -27,9 +24,6 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(pm)
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(Plugin.class))
-                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAO.class))
-                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceDAOFactory.class))
-                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ActionHandler.class))
                 );
     }
 

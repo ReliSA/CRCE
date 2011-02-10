@@ -18,12 +18,6 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String getPluginDescription() {
-        if (this instanceof ResourceDAO) {
-            return "ResourceDAO plugin implementation";
-        }
-        if (this instanceof ResourceDAOFactory) {
-            return "ResourceDAOFactory plugin implementation";
-        }
         return "Unknown plugin: " + getClass().getName();
     }
 
