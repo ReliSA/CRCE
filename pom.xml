@@ -33,6 +33,7 @@
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-metadata-metafile</module>
         <module>crce-metadata-indexer</module>
+        <module>crce-handler-versioning</module>
         <module>crce-plugin-api</module>
         <module>crce-repository</module>
         <module>crce-webui</module>

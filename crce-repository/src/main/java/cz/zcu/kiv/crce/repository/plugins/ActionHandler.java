@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.crce.repository.ResourceBuffer;
 
 /**
  *
@@ -12,22 +14,35 @@ public interface ActionHandler extends Plugin {
      * Invoked when an artifact is uploaded into upload buffer.
      * 
      * @param resource 
-     * @param name  
+     * @param name
+     * @param buffer  
      */
-    void onUploaded(Resource resource, String name);
+    void onUpload(Resource resource, String name, ResourceBuffer buffer);
 
+    void onDownload(Resource resource, Repository repository);
+    
+    void onBufferDownload(Resource resource, ResourceBuffer buffer);
+    
     /**
      * Invoked when resource is commited from buffer to repository.
      * 
-     * @param resource 
+     * @param resource
+     * @param repository  
      */
-    void onCommited(Resource resource);
+    void onStore(Resource resource, Repository repository);
 
     /**
      * Invoked when resource is revoked deleted from buffer.
      * 
-     * @param resource 
+     * @param resource
+     * @param buffer  
      */
-    void onRevoked(Resource resource);
+    void onBufferDelete(Resource resource, ResourceBuffer buffer);
+    
+    void onDelete(Resource resource, Repository repository);
+    
+    void onBufferExecute(Resource resource, ResourceBuffer buffer);
+    
+    void onExecute(Resource resource, Repository repository);
     
 }

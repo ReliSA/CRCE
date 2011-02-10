@@ -7,6 +7,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
@@ -156,6 +157,7 @@ public class ResourceBufferImpl implements ResourceBuffer {
         }
         // </editor-fold>
         
+        m_pluginManager.getPlugin(ActionHandler.class).onUpload(resource, name, this);
         
         creator.save(resource);
         m_resources.add(resource);

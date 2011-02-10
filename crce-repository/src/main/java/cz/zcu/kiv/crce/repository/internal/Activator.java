@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Repository;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
@@ -44,6 +45,12 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Repository.class.getName(), null)
                 .setImplementation(RepositoryImpl.class)
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                );
+        
+        dm.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(PriorityActionHandler.class)
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
         
         dm.add(createComponent()
