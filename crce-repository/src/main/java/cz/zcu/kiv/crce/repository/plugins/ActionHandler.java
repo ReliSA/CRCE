@@ -15,34 +15,37 @@ public interface ActionHandler extends Plugin {
      * 
      * @param resource 
      * @param name
-     * @param buffer  
+     * @param buffer
+     * @return  
      */
-    void onUpload(Resource resource, String name, ResourceBuffer buffer);
+    Resource onUpload(Resource resource, ResourceBuffer buffer, String name);
 
-    void onDownload(Resource resource, Repository repository);
+    Resource onDownload(Resource resource, Repository repository);
     
-    void onBufferDownload(Resource resource, ResourceBuffer buffer);
+    Resource onBufferDownload(Resource resource, ResourceBuffer buffer);
     
     /**
      * Invoked when resource is commited from buffer to repository.
      * 
      * @param resource
-     * @param repository  
+     * @param repository
+     * @return  
      */
-    void onStore(Resource resource, Repository repository);
+    Resource onStore(Resource resource, Repository repository);
 
     /**
      * Invoked when resource is revoked deleted from buffer.
      * 
      * @param resource
-     * @param buffer  
+     * @param buffer
+     * @return  
      */
-    void onBufferDelete(Resource resource, ResourceBuffer buffer);
+    Resource onBufferDelete(Resource resource, ResourceBuffer buffer);
     
-    void onDelete(Resource resource, Repository repository);
+    Resource onDelete(Resource resource, Repository repository);
     
-    void onBufferExecute(Resource resource, ResourceBuffer buffer);
+    Resource onBufferExecute(Resource resource, ResourceBuffer buffer);
     
-    void onExecute(Resource resource, Repository repository);
+    Resource onExecute(Resource resource, Repository repository);
     
 }

@@ -12,43 +12,43 @@ import cz.zcu.kiv.crce.repository.ResourceBuffer;
 public class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public void onStore(Resource resource, Repository repository) {
-        // do nothing
+    public Resource onStore(Resource resource, Repository repository) {
+        return resource;
     }
 
     @Override
-    public void onBufferDelete(Resource resource, ResourceBuffer buffer) {
-        // do nothing
+    public Resource onBufferDelete(Resource resource, ResourceBuffer buffer) {
+        return resource;
     }
 
     @Override
-    public void onUpload(Resource resource, String name, ResourceBuffer buffer) {
-        // do nothing
+    public Resource onUpload(Resource resource, ResourceBuffer buffer, String name) {
+        return resource;
     }
 
     @Override
-    public void onDelete(Resource resource, Repository repository) {
-        // do nothing
+    public Resource onDelete(Resource resource, Repository repository) {
+        return resource;
     }
 
     @Override
-    public void onBufferExecute(Resource resource, ResourceBuffer buffer) {
-        // do nothing
+    public Resource onBufferExecute(Resource resource, ResourceBuffer buffer) {
+        return resource;
     }
 
     @Override
-    public void onExecute(Resource resource, Repository repository) {
-        // do nothing
+    public Resource onExecute(Resource resource, Repository repository) {
+        return resource;
     }
 
     @Override
-    public void onDownload(Resource resource, Repository repository) {
-        // do nothing
+    public Resource onDownload(Resource resource, Repository repository) {
+        return resource;
     }
 
     @Override
-    public void onBufferDownload(Resource resource, ResourceBuffer buffer) {
-        // do nothing
+    public Resource onBufferDownload(Resource resource, ResourceBuffer buffer) {
+        return resource;
     }
 
 }
