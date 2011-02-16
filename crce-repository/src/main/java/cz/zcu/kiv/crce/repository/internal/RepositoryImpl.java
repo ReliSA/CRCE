@@ -129,7 +129,7 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public URL getNewestVersion(String symbolicName) {
+    public Resource getNewestVersion(String symbolicName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

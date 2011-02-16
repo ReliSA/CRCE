@@ -12,7 +12,7 @@ import cz.zcu.kiv.crce.repository.ResourceBuffer;
 public class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public Resource onStore(Resource resource, Repository repository) {
+    public Resource onRepositoryStore(Resource resource, Repository repository) {
         return resource;
     }
 
@@ -22,12 +22,12 @@ public class AbstractActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource onUpload(Resource resource, ResourceBuffer buffer, String name) {
+    public Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name) {
         return resource;
     }
 
     @Override
-    public Resource onDelete(Resource resource, Repository repository) {
+    public Resource onRepositoryDelete(Resource resource, Repository repository) {
         return resource;
     }
 
@@ -37,18 +37,23 @@ public class AbstractActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource onExecute(Resource resource, Repository repository) {
+    public Resource onRepositoryExecute(Resource resource, Repository repository) {
         return resource;
     }
 
     @Override
-    public Resource onDownload(Resource resource, Repository repository) {
+    public Resource onRepositoryDownload(Resource resource, Repository repository) {
         return resource;
     }
 
     @Override
     public Resource onBufferDownload(Resource resource, ResourceBuffer buffer) {
         return resource;
+    }
+
+    @Override
+    public boolean isModifying() {
+        return false;
     }
 
 }

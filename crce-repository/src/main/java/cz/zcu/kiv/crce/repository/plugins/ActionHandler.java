@@ -18,21 +18,12 @@ public interface ActionHandler extends Plugin {
      * @param buffer
      * @return  
      */
-    Resource onUpload(Resource resource, ResourceBuffer buffer, String name);
+    Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name);
 
-    Resource onDownload(Resource resource, Repository repository);
-    
     Resource onBufferDownload(Resource resource, ResourceBuffer buffer);
     
-    /**
-     * Invoked when resource is commited from buffer to repository.
-     * 
-     * @param resource
-     * @param repository
-     * @return  
-     */
-    Resource onStore(Resource resource, Repository repository);
-
+    Resource onBufferExecute(Resource resource, ResourceBuffer buffer);
+    
     /**
      * Invoked when resource is revoked deleted from buffer.
      * 
@@ -42,10 +33,27 @@ public interface ActionHandler extends Plugin {
      */
     Resource onBufferDelete(Resource resource, ResourceBuffer buffer);
     
-    Resource onDelete(Resource resource, Repository repository);
+    /**
+     * Invoked when resource is commited from buffer to repository.
+     * 
+     * @param resource
+     * @param repository
+     * @return  
+     */
+    Resource onRepositoryStore(Resource resource, Repository repository);
+
+    Resource onRepositoryDownload(Resource resource, Repository repository);
     
-    Resource onBufferExecute(Resource resource, ResourceBuffer buffer);
+    Resource onRepositoryDelete(Resource resource, Repository repository);
     
-    Resource onExecute(Resource resource, Repository repository);
+    Resource onRepositoryExecute(Resource resource, Repository repository);
+    
+    /**
+     * Returns <code>true</code> if implementing action handler modifies binary
+     * content of processed artifacts (not metadata!), <code>false</code>
+     * otherwise (content read-only handler).
+     * @return
+     */
+    boolean isModifying();
     
 }

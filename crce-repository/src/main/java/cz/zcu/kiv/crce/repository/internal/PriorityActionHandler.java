@@ -22,22 +22,22 @@ public class PriorityActionHandler extends AbstractActionHandler {
     private static Method ON_BUFFER_DELETE;
     private static Method ON_BUFFER_DOWNLOAD;
     private static Method ON_BUFFER_EXECUTE;
-    private static Method ON_DELETE;
-    private static Method ON_DOWNLOAD;
-    private static Method ON_EXECUTE;
-    private static Method ON_STORE;
-    private static Method ON_UPLOAD;
+    private static Method ON_REPOSITORY_DELETE;
+    private static Method ON_REPOSITORY_DOWNLOAD;
+    private static Method ON_REPOSITORY_EXECUTE;
+    private static Method ON_REPOSITORY_STORE;
+    private static Method ON_BUFFER_UPLOAD;
 
     static {
         try {
-            ON_UPLOAD          = ActionHandler.class.getMethod("onUpload",         Resource.class, ResourceBuffer.class, String.class);
-            ON_BUFFER_DELETE   = ActionHandler.class.getMethod("onBufferDelete",   Resource.class, ResourceBuffer.class);
+            ON_BUFFER_UPLOAD = ActionHandler.class.getMethod("onBufferUpload", Resource.class, ResourceBuffer.class, String.class);
+            ON_BUFFER_DELETE = ActionHandler.class.getMethod("onBufferDelete", Resource.class, ResourceBuffer.class);
             ON_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("onBufferDownload", Resource.class, ResourceBuffer.class);
-            ON_BUFFER_EXECUTE  = ActionHandler.class.getMethod("onBufferExecute",  Resource.class, ResourceBuffer.class);
-            ON_DELETE          = ActionHandler.class.getMethod("onDelete",         Resource.class, Repository.class);
-            ON_DOWNLOAD        = ActionHandler.class.getMethod("onDownload",       Resource.class, Repository.class);
-            ON_EXECUTE         = ActionHandler.class.getMethod("onExecute",        Resource.class, Repository.class);
-            ON_STORE           = ActionHandler.class.getMethod("onStore",          Resource.class, Repository.class);
+            ON_BUFFER_EXECUTE = ActionHandler.class.getMethod("onBufferExecute", Resource.class, ResourceBuffer.class);
+            ON_REPOSITORY_DELETE = ActionHandler.class.getMethod("onRepositoryDelete", Resource.class, Repository.class);
+            ON_REPOSITORY_DOWNLOAD = ActionHandler.class.getMethod("onRepositoryDownload", Resource.class, Repository.class);
+            ON_REPOSITORY_EXECUTE = ActionHandler.class.getMethod("onRepositoryExecute", Resource.class, Repository.class);
+            ON_REPOSITORY_STORE = ActionHandler.class.getMethod("onRepositoryStore", Resource.class, Repository.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Can not create method", ex);
         }
@@ -59,28 +59,28 @@ public class PriorityActionHandler extends AbstractActionHandler {
     }
 
     @Override
-    public Resource onDelete(Resource resource, Repository repository) {
-        return execute(ON_DELETE, new Object[]{resource, repository});
+    public Resource onRepositoryDelete(Resource resource, Repository repository) {
+        return execute(ON_REPOSITORY_DELETE, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onDownload(Resource resource, Repository repository) {
-        return execute(ON_DOWNLOAD, new Object[]{resource, repository});
+    public Resource onRepositoryDownload(Resource resource, Repository repository) {
+        return execute(ON_REPOSITORY_DOWNLOAD, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onExecute(Resource resource, Repository repository) {
-        return execute(ON_EXECUTE, new Object[]{resource, repository});
+    public Resource onRepositoryExecute(Resource resource, Repository repository) {
+        return execute(ON_REPOSITORY_EXECUTE, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onStore(Resource resource, Repository repository) {
-        return execute(ON_STORE, new Object[]{resource, repository});
+    public Resource onRepositoryStore(Resource resource, Repository repository) {
+        return execute(ON_REPOSITORY_STORE, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onUpload(Resource resource, ResourceBuffer buffer, String name) {
-        return execute(ON_UPLOAD, new Object[]{resource, buffer, name});
+    public Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name) {
+        return execute(ON_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
     }
 
     private Resource execute(Method method, Object[] args) {
@@ -88,20 +88,25 @@ public class PriorityActionHandler extends AbstractActionHandler {
 
         Resource out = (Resource) args[0];
 
-        for (ActionHandler handler : handlers) {
-            if (!handler.equals(this)) {
-                args[0] = out;
-                try {
-                    out = (Resource) method.invoke(handler, args);
-                } catch (IllegalAccessException ex) {
-                    m_log.log(LogService.LOG_ERROR, "Unexpected IllegalAccessException", ex);
-                } catch (InvocationTargetException ex) {
-                    m_log.log(LogService.LOG_ERROR, handler.getPluginId() + " handler threw an exception in method " + method.getName(), ex);
-                } catch (Exception e) {
-                    m_log.log(LogService.LOG_ERROR, "Unexpected exception on calling handler", e);
+        boolean modifying = true;
+
+        do {
+            for (ActionHandler handler : handlers) {
+                if (handler.isModifying() == modifying && !handler.equals(this)) {
+                    args[0] = out;
+                    try {
+                        out = (Resource) method.invoke(handler, args);
+                    } catch (IllegalAccessException ex) {
+                        m_log.log(LogService.LOG_ERROR, "Unexpected IllegalAccessException", ex);
+                    } catch (InvocationTargetException ex) {
+                        m_log.log(LogService.LOG_ERROR, handler.getPluginId() + " handler threw an exception in method " + method.getName(), ex);
+                    } catch (Exception e) {
+                        m_log.log(LogService.LOG_ERROR, "Unexpected exception on calling handler", e);
+                    }
                 }
             }
-        }
+        } while (!(modifying = !modifying));    // runs twice, the first for modifying true
+
         return out;
     }
 

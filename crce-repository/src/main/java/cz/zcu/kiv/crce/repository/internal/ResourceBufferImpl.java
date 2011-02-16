@@ -69,9 +69,6 @@ public class ResourceBufferImpl implements ResourceBuffer {
             }
         }
         
-        System.out.println("\n############################");
-        System.out.println(m_pluginManager);
-        
         ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
         
         ResourceDAO creator;
@@ -87,7 +84,7 @@ public class ResourceBufferImpl implements ResourceBuffer {
         resource.createCapability("file").setProperty("name", name);
         resource.setSymbolicName(name);
         
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onUpload(resource, this, name);
+        resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferUpload(resource, this, name);
         
         creator.save(resource);
         m_resources.add(resource);

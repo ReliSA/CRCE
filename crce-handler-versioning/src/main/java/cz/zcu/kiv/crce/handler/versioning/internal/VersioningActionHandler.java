@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.osgi.framework.Version;
+import org.osgi.service.log.LogService;
 
 /**
  *
@@ -25,18 +26,21 @@ import org.osgi.framework.Version;
 public class VersioningActionHandler extends AbstractActionHandler {
 
     private volatile VersionService m_versionService; /* injected by dependency manager */
-    private volatile PluginManager m_pluginManager; /* Injected by dependency manager */
+    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
+    private volatile LogService m_log; /* injected by dependency manager */
+    
     
     private int BUFFER_SIZE = 8 * 1024;
     
     @Override
-    public Resource onUpload(Resource resource, ResourceBuffer buffer, String name) {
-        if (resource.hasCategory("osgi")) {
+    public Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name) {
+        if (resource.hasCategory("osgi") && !resource.hasCategory("versioned")) {
             Resource cand = null;
             
             String ext = name.substring(name.lastIndexOf("."));
             Version oldVersion = resource.getVersion();
             
+            // TODO zmenit na neco inteligentnejsiho (buffer.getInnerRepository().get(filter))
             for (Resource i : buffer.getStoredResources()) {
                 if (i.getSymbolicName().equals(resource.getSymbolicName())) {
                     if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
@@ -61,7 +65,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
                             in.close();
                         } catch (IOException e) {
                             // nothing to do
-                        };
+                        }
                         if (output != null) {
                             try {
                                 output.flush();
@@ -74,11 +78,11 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
                     m_versionService.updateVersion(source, new File(resource.getUri()));
                 } catch (IOException ex) {
-                    ex.printStackTrace();   // XXX
+                    m_log.log(LogService.LOG_ERROR, "Could not update version due to I/O error", ex);
                 } catch (VersionGeneratorException ex) {
-                    throw new IllegalStateException(ex.getMessage(), ex);   // XXX
+                    m_log.log(LogService.LOG_ERROR, "Could not update version due to VersionGeneratorException", ex);
                 } catch (BundlesIncomparableException ex) {
-                    throw new IllegalStateException(ex.getMessage(), ex);   // XXX
+                    m_log.log(LogService.LOG_ERROR, "Could not update version (incomparable bundles)", ex);
                 }
                 
                 ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
@@ -88,14 +92,14 @@ public class VersioningActionHandler extends AbstractActionHandler {
                 } else {
                     creator = factory.getResourceDAO();
                 }
+                
                 try {
                     resource = creator.getResource(resource.getUri());   // reload changed resource
                 } catch (IOException ex) {
-                    ex.printStackTrace();   // XXX
+                    m_log.log(LogService.LOG_ERROR, "Could not reload changed resource", ex);
                 }
-
-                resource.addCategory("versioned");
             }
+            resource.addCategory("versioned");
             
             Capability[] caps = resource.getCapabilities("file");
             Capability cap = (caps.length == 0 ? resource.createCapability("file") : caps[0]);
@@ -111,4 +115,8 @@ public class VersioningActionHandler extends AbstractActionHandler {
         return resource;
     }
 
+    @Override
+    public boolean isModifying() {
+        return true;
+    }
 }
