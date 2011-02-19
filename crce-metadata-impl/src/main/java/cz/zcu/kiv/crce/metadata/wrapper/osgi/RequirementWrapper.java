@@ -1,15 +1,15 @@
-package cz.zcu.kiv.crce.metadata.wrapper.felix;
+package cz.zcu.kiv.crce.metadata.wrapper.osgi;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
-import org.apache.felix.bundlerepository.Capability;
+import org.osgi.service.obr.Capability;
 
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class RequirementWrapper implements org.apache.felix.bundlerepository.Requirement {
+public class RequirementWrapper implements org.osgi.service.obr.Requirement {
 
-    Requirement requirement;
+    private final Requirement requirement;
     
     RequirementWrapper(Requirement requirement) {
         this.requirement = requirement;

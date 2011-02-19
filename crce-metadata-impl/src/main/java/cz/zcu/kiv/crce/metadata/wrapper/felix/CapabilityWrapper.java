@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class CapabilityWrapper implements org.apache.felix.bundlerepository.Capability {
 

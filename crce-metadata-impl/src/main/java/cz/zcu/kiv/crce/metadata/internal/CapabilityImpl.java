@@ -4,7 +4,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class CapabilityImpl extends AbstractPropertyProvider implements Capability {
 

@@ -1,10 +1,12 @@
-package cz.zcu.kiv.crce.metadata.wrapper.felix;
+package cz.zcu.kiv.crce.metadata.wrapper.osgi;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
-import org.apache.felix.bundlerepository.Capability;
-import org.apache.felix.bundlerepository.Repository;
-import org.apache.felix.bundlerepository.Requirement;
+import org.osgi.service.obr.Capability;
+import org.osgi.service.obr.Repository;
+import org.osgi.service.obr.Requirement;
 
 import org.osgi.framework.Version;
 
@@ -12,7 +14,7 @@ import org.osgi.framework.Version;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class ResourceWrapper implements org.apache.felix.bundlerepository.Resource {
+public class ResourceWrapper implements org.osgi.service.obr.Resource {
 
     final Resource resource;
 
@@ -20,63 +22,57 @@ public class ResourceWrapper implements org.apache.felix.bundlerepository.Resour
         this.resource = resource;
     }
 
+    @Override
     public Map getProperties() {
         return resource.getPropertiesMap();
     }
 
+    @Override
     public String getSymbolicName() {
         return resource.getSymbolicName();
     }
 
+    @Override
     public String getPresentationName() {
         return resource.getPresentationName();
     }
 
+    @Override
     public Version getVersion() {
         return resource.getVersion();
     }
 
+    @Override
     public String getId() {
         return resource.getId();
     }
 
-    // TODO - k cemu to bylo?
-//    public URL getURL() {
-//        try {
-//            return new URL(resource.getUri());
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
+    @Override
     public Requirement[] getRequirements() {
         return Wrapper.wrap(resource.getRequirements());
     }
 
+    @Override
     public Capability[] getCapabilities() {
         return Wrapper.wrap(resource.getCapabilities());
     }
 
+    @Override
     public String[] getCategories() {
         return resource.getCategories();
     }
 
+    @Override
     public Repository getRepository() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getURI() {
-        return resource.getUri().toString();
-    }
-
-    @Override
-    public Long getSize() {
-        return resource.getSize();
-    }
-
-    @Override
-    public boolean isLocal() {
-        return false;
+    public URL getURL() {
+        try {
+            return resource.getUri().toURL();
+        } catch (MalformedURLException ex) {
+            throw new UnsupportedOperationException("URI non-convertible to URL is not supported by this implementation", ex);
+        }
     }
 }

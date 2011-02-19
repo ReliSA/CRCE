@@ -20,7 +20,7 @@ import static org.apache.felix.bundlerepository.Resource.*;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 

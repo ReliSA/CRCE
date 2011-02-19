@@ -6,7 +6,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class Wrapper {
 

@@ -14,7 +14,7 @@ import org.osgi.framework.Version;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public abstract class AbstractPropertyProvider implements PropertyProvider {
 

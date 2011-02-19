@@ -10,7 +10,7 @@ import java.net.URI;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class ConvertedResource extends ResourceImpl {
 
