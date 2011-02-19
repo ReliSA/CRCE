@@ -3,24 +3,18 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Repository;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
-import org.osgi.service.obr.Resolver;
 //import org.osgi.service.obr.Resource;
 
 /**
  *
  * @author kalwi
  */
-public class RepositoryImpl implements Repository {
+public class ObrRepositoryImpl implements Repository {
     public static final String RESOURCE_METADATA_FILE_EXTENSION = ".metadata";
     
     private volatile RepositoryAdmin m_repositoryAdmin; /* will be injected by dependencymanager */
@@ -29,7 +23,7 @@ public class RepositoryImpl implements Repository {
     private PluginManager m_pluginManager;
     private URL m_obrBase;
     
-    public RepositoryImpl() {
+    public ObrRepositoryImpl() {
         try {
             m_obrBase = new URL("http://localhost:8080/obr");
         } catch (MalformedURLException ex) {

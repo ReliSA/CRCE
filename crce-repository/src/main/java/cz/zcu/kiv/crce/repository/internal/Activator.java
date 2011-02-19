@@ -41,7 +41,7 @@ public class Activator extends DependencyActivatorBase {
 
         dm.add(createComponent()
                 .setInterface(Repository.class.getName(), null)
-                .setImplementation(RepositoryImpl.class)
+                .setImplementation(ObrRepositoryImpl.class)
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 );
         

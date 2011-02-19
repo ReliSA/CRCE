@@ -144,12 +144,12 @@
                 <version>${dependency.version.ace}</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
+<!--            <dependency>
                 <groupId>org.apache.ace</groupId>
                 <artifactId>ace-obr-metadata</artifactId>
                 <version>${dependency.version.ace}</version>
                 <scope>provided</scope>
-            </dependency>
+            </dependency>-->
             <dependency>
                 <groupId>org.apache.ace</groupId>
                 <artifactId>ace-obr-storage</artifactId>

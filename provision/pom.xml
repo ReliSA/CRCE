@@ -123,10 +123,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-metadata</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
             <artifactId>ace-obr-storage</artifactId>
         </dependency>
         <dependency>
