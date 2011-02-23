@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.metadata;
 
+import java.net.URI;
+
 /**
  * Creates empty OBR entities.
  * 
@@ -26,4 +28,10 @@ public interface ResourceCreator {
      * @return An empty capability.
      */
     Requirement createRequirement(String name);
+
+    /**
+     * TODO
+     * @return 
+     */
+    Repository createRepository(URI uri);
 }

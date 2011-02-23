@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
@@ -7,15 +8,16 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
+import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.List;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.log.LogService;
 
 /**
  *
@@ -25,13 +27,14 @@ public class ResourceBufferImpl implements ResourceBuffer {
     
     private int BUFFER_SIZE = 8 * 1024;
     
-    private volatile PluginManager m_pluginManager; /* Injected by dependency manager */
-
-    private volatile BundleContext m_context; /* Injected by dependency manager */
-
+    private volatile BundleContext m_context; /* injected by dependency manager */
+    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
+    private volatile LogService m_log; /* injected by dependency manager */
+    
     private File m_baseDir;
-    private List<Resource> m_resources = new ArrayList<Resource>(); // TODO remove, make repository.xml instead
-
+    
+    private Repository m_repository;
+    
     private void setUpBaseDir() {
         m_baseDir = m_context.getDataFile("buffer");
         if (!m_baseDir.exists()) {
@@ -40,7 +43,11 @@ public class ResourceBufferImpl implements ResourceBuffer {
             m_baseDir.delete();
             m_baseDir.mkdir();
         }
-
+        try {
+            m_repository = m_pluginManager.getPlugin(RepositoryDAO.class).getRepository(m_baseDir.toURI());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -53,7 +60,6 @@ public class ResourceBufferImpl implements ResourceBuffer {
         }
         FileOutputStream output = null;
         File file = null;
-        Resource out = null;
         try {
             file = File.createTempFile("res", ".tmp", m_baseDir);
             output = new FileOutputStream(file);
@@ -71,27 +77,31 @@ public class ResourceBufferImpl implements ResourceBuffer {
         
         ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
         
-        ResourceDAO creator;
+        ResourceDAO resourceDao;
         if (factory == null) {
-            creator = m_pluginManager.getPlugin(ResourceDAO.class);
+            resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         } else {
-            creator = factory.getResourceDAO();
+            resourceDao = factory.getResourceDAO();
         }
 
-        Resource resource = creator.getResource(file.toURI());
+        Resource resource = resourceDao.getResource(file.toURI());
         
-        // TODO move to some plugin
+        // TODO maybe move to some plugin
         resource.createCapability("file").setProperty("name", name);
         resource.setSymbolicName(name);
         
         resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferUpload(resource, this, name);
         
-        creator.save(resource);
-        m_resources.add(resource);
-
-        out = resource;
+        resourceDao.save(resource);
         
-        return out;
+        Version version = resource.getVersion();
+        for (int i = 2; !m_repository.addResource(resource); i++) {
+            resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
+        }
+        
+        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+        
+        return resource;
     }
 
     @Override
@@ -106,7 +116,17 @@ public class ResourceBufferImpl implements ResourceBuffer {
 
     @Override
     public Resource[] getStoredResources() {
-        return m_resources.toArray(new Resource[0]);
+        if (m_baseDir == null) {
+            setUpBaseDir();
+        }
+//        if (m_repository == null) {
+//            try {
+//                m_repository = m_pluginManager.getPlugin(RepositoryDAO.class).getRepository(m_baseDir.toURI());
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+        return m_repository.getResources();
     }
 
     @Override

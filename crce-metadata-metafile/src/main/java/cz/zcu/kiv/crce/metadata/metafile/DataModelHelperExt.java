@@ -1,17 +1,17 @@
 package cz.zcu.kiv.crce.metadata.metafile;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import org.apache.felix.bundlerepository.DataModelHelper;
 
 // TODO split to resource creators
 /**
  *
  * @author kalwi
  */
-public interface DataModelHelperExt extends DataModelHelper {
+public interface DataModelHelperExt {
 
     public static final String OBR = "obr";
 
@@ -19,7 +19,15 @@ public interface DataModelHelperExt extends DataModelHelper {
 
     Resource readMetadata(Reader reader) throws IOException, Exception;
 
+    Repository readRepository(String xml) throws Exception;
+
+    Repository readRepository(Reader reader) throws IOException, Exception;
+
     String writeMetadata(Resource resource);
 
     void writeMetadata(Resource resource, Writer writer) throws IOException;
+
+    String writeRepository(Repository repository);
+
+    void writeRepository(Repository repository, Writer writer) throws IOException;
 }

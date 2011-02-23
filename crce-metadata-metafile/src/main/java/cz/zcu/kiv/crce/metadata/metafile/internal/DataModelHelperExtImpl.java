@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResource;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.metadata.Type;
@@ -14,8 +17,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
-import org.apache.felix.bundlerepository.impl.DataModelHelperImpl;
 import org.apache.felix.bundlerepository.impl.PullParser;
 import org.apache.felix.bundlerepository.impl.RepositoryParser;
 import org.apache.felix.bundlerepository.impl.ResourceImpl;
@@ -29,7 +30,36 @@ import static org.apache.felix.bundlerepository.Resource.*;
  *
  * @author kalwi
  */
-public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataModelHelperExt {
+public class DataModelHelperExtImpl implements DataModelHelperExt {
+
+    @Override
+    public Repository readRepository(String xml) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Repository readRepository(Reader reader) throws IOException, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public String writeRepository(Repository repository) {
+        try {
+            StringWriter sw = new StringWriter();
+            writeRepository(repository, sw);
+            return sw.toString();
+        } catch (IOException e) {
+            IllegalStateException ex = new IllegalStateException(e);
+            ex.initCause(e);
+            throw ex;
+        }
+    }
+
+    @Override
+    public void writeRepository(Repository repository, Writer writer) throws IOException {
+        XmlWriter w = new XmlWriter(writer);
+        toXml(w, repository);
+    }
 
     @Override
     public String writeMetadata(Resource resource) {
@@ -56,23 +86,23 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
 
     }
 
-    @Override
-    public ResourceImpl createResource(URL bundleUrl) throws IOException {
-        ResourceImpl resource = null;
-
-        try {
-            resource = (ResourceImpl) super.createResource(bundleUrl);
-            resource.addCategory("osgi");
-        } catch (IllegalArgumentException e) {
-            // not a bundle
-            // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
-            return null;
-        } catch (NullPointerException e) {
-            return null;
-        }
-
-        return resource;
-    }
+//    @Override
+//    public ResourceImpl createResource(URL bundleUrl) throws IOException {
+//        ResourceImpl resource = null;
+//
+//        try {
+//            resource = (ResourceImpl) super.createResource(bundleUrl);
+//            resource.addCategory("osgi");
+//        } catch (IllegalArgumentException e) {
+//            // not a bundle
+//            // TODO - atach some other pluginable resource creators, e.g. for CoSi bundles
+//            return null;
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//
+//        return resource;
+//    }
 
     @Override
     public Resource readMetadata(String xml) throws IOException, Exception {
@@ -230,4 +260,33 @@ public class DataModelHelperExtImpl extends DataModelHelperImpl implements DataM
                 .text(requirement.getComment().trim())
                 .end();
     }
+    
+    private static void toXml(XmlWriter w, Repository repository) throws IOException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmss.SSS");
+        w.element(RepositoryParser.REPOSITORY)
+                .attribute(RepositoryParser.NAME, repository.getName())
+                .attribute(RepositoryParser.LASTMODIFIED, format.format(new Date(repository.getLastModified())));
+
+        // TODO referrals
+        
+//        if (repository instanceof RepositoryImpl)
+//        {
+//            Referral[] referrals = ((RepositoryImpl) repository).getReferrals();
+//            for (int i = 0; referrals != null && i < referrals.length; i++)
+//            {
+//                w.element(RepositoryParser.REFERRAL)
+//                    .attribute(RepositoryParser.DEPTH, new Integer(referrals[i].getDepth()))
+//                    .attribute(RepositoryParser.URL, referrals[i].getUrl())
+//                    .end();
+//            }
+//        }
+
+        Resource[] resources = repository.getResources();
+        for (int i = 0; resources != null && i < resources.length; i++) {
+            toXml(w, resources[i], false);
+        }
+
+        w.end();
+    }
+
 }

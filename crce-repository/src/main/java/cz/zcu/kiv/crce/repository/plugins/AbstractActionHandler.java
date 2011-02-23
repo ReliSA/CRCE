@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 
 /**
@@ -12,7 +12,7 @@ import cz.zcu.kiv.crce.repository.ResourceBuffer;
 public class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public Resource onRepositoryStore(Resource resource, Repository repository) {
+    public Resource onRepositoryStore(Resource resource, Store repository) {
         return resource;
     }
 
@@ -27,7 +27,7 @@ public class AbstractActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource onRepositoryDelete(Resource resource, Repository repository) {
+    public Resource onRepositoryDelete(Resource resource, Store repository) {
         return resource;
     }
 
@@ -37,12 +37,12 @@ public class AbstractActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource onRepositoryExecute(Resource resource, Repository repository) {
+    public Resource onRepositoryExecute(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onRepositoryDownload(Resource resource, Repository repository) {
+    public Resource onRepositoryDownload(Resource resource, Store repository) {
         return resource;
     }
 

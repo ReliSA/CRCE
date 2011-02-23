@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 
 /**
@@ -40,13 +40,13 @@ public interface ActionHandler extends Plugin {
      * @param repository
      * @return  
      */
-    Resource onRepositoryStore(Resource resource, Repository repository);
+    Resource onRepositoryStore(Resource resource, Store repository);
 
-    Resource onRepositoryDownload(Resource resource, Repository repository);
+    Resource onRepositoryDownload(Resource resource, Store repository);
     
-    Resource onRepositoryDelete(Resource resource, Repository repository);
+    Resource onRepositoryDelete(Resource resource, Store repository);
     
-    Resource onRepositoryExecute(Resource resource, Repository repository);
+    Resource onRepositoryExecute(Resource resource, Store repository);
     
     /**
      * Returns <code>true</code> if implementing action handler modifies binary

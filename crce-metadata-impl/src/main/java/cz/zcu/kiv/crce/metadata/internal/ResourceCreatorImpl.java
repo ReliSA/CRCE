@@ -1,9 +1,11 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import java.net.URI;
 
 /**
  *
@@ -24,6 +26,11 @@ public class ResourceCreatorImpl implements ResourceCreator {
     @Override
     public Requirement createRequirement(String name) {
         return new RequirementImpl(name);
+    }
+
+    @Override
+    public Repository createRepository(URI uri) {
+        return new RepositoryImpl(uri);
     }
 
 }

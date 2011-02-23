@@ -7,7 +7,7 @@ import java.io.IOException;
  *
  * @author kalwi
  */
-public interface Repository {
+public interface Store {
 
     public void put(Resource resource) throws IOException;
     

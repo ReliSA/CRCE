@@ -66,17 +66,17 @@ public class DataModelHelperExtTest {
         assert "1.2.3".equals(resource.getVersion().toString()) : "Expected sym. name: rname, found: " + resource.getVersion();
     }
 
-    @Test
-    public void createOtherResource() throws Exception {
-        File file = new File("src/test/resources/other.txt");
-        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
-        assert r == null : "other.txt is not a bundle";
-    }
-    
-    @Test
-    public void createBundleResource() throws Exception {
-        File file = new File("src/test/resources/bundle.jar");
-        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
-        assert r != null : "bundle.jar is a bundle";
-    }
+//    @Test
+//    public void createOtherResource() throws Exception {
+//        File file = new File("src/test/resources/other.txt");
+//        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
+//        assert r == null : "other.txt is not a bundle";
+//    }
+//    
+//    @Test
+//    public void createBundleResource() throws Exception {
+//        File file = new File("src/test/resources/bundle.jar");
+//        org.apache.felix.bundlerepository.Resource r = m_helper.createResource(file.toURI().toURL());
+//        assert r != null : "bundle.jar is a bundle";
+//    }
 }

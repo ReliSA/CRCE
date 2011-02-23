@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.ResourceBuffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
@@ -34,10 +34,10 @@ public class PriorityActionHandler extends AbstractActionHandler {
             ON_BUFFER_DELETE = ActionHandler.class.getMethod("onBufferDelete", Resource.class, ResourceBuffer.class);
             ON_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("onBufferDownload", Resource.class, ResourceBuffer.class);
             ON_BUFFER_EXECUTE = ActionHandler.class.getMethod("onBufferExecute", Resource.class, ResourceBuffer.class);
-            ON_REPOSITORY_DELETE = ActionHandler.class.getMethod("onRepositoryDelete", Resource.class, Repository.class);
-            ON_REPOSITORY_DOWNLOAD = ActionHandler.class.getMethod("onRepositoryDownload", Resource.class, Repository.class);
-            ON_REPOSITORY_EXECUTE = ActionHandler.class.getMethod("onRepositoryExecute", Resource.class, Repository.class);
-            ON_REPOSITORY_STORE = ActionHandler.class.getMethod("onRepositoryStore", Resource.class, Repository.class);
+            ON_REPOSITORY_DELETE = ActionHandler.class.getMethod("onRepositoryDelete", Resource.class, Store.class);
+            ON_REPOSITORY_DOWNLOAD = ActionHandler.class.getMethod("onRepositoryDownload", Resource.class, Store.class);
+            ON_REPOSITORY_EXECUTE = ActionHandler.class.getMethod("onRepositoryExecute", Resource.class, Store.class);
+            ON_REPOSITORY_STORE = ActionHandler.class.getMethod("onRepositoryStore", Resource.class, Store.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Can not create method", ex);
         }
@@ -59,22 +59,22 @@ public class PriorityActionHandler extends AbstractActionHandler {
     }
 
     @Override
-    public Resource onRepositoryDelete(Resource resource, Repository repository) {
+    public Resource onRepositoryDelete(Resource resource, Store repository) {
         return execute(ON_REPOSITORY_DELETE, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onRepositoryDownload(Resource resource, Repository repository) {
+    public Resource onRepositoryDownload(Resource resource, Store repository) {
         return execute(ON_REPOSITORY_DOWNLOAD, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onRepositoryExecute(Resource resource, Repository repository) {
+    public Resource onRepositoryExecute(Resource resource, Store repository) {
         return execute(ON_REPOSITORY_EXECUTE, new Object[]{resource, repository});
     }
 
     @Override
-    public Resource onRepositoryStore(Resource resource, Repository repository) {
+    public Resource onRepositoryStore(Resource resource, Store repository) {
         return execute(ON_REPOSITORY_STORE, new Object[]{resource, repository});
     }
 

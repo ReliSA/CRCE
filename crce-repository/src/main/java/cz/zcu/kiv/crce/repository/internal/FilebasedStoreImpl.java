@@ -1,14 +1,14 @@
 package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.Repository;
+import cz.zcu.kiv.crce.repository.Store;
 import java.io.IOException;
 
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class FilebasedRepositoryImpl implements Repository {
+public class FilebasedStoreImpl implements Store {
 
     @Override
     public void put(Resource resource) throws IOException {

@@ -35,7 +35,6 @@
         <module>crce-metadata-indexer</module>
         <module>crce-handler-versioning</module>
         <module>crce-plugin-api</module>
-        <module>crce-obr-metadata</module>
         <module>crce-repository</module>
         <module>crce-webui</module>
     </modules>

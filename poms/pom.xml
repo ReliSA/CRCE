@@ -19,8 +19,8 @@
 
     <properties>
         <namespace>cz.zcu.kiv.crce</namespace>
-        
         <dependency.version.ace>0.8.0-SNAPSHOT</dependency.version.ace>
+        <dependency.version.osgi>4.2.0</dependency.version.osgi>
     </properties>
 
     <modules>
@@ -63,19 +63,33 @@
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
-            
+
+            <!-- TODO remove -->
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_core</artifactId>
                 <version>1.0</version>
                 <scope>provided</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${dependency.version.osgi}</version>
+            </dependency>
             
+            <!-- TODO remove -->
             <dependency>
                 <groupId>org.osgi</groupId>
                 <artifactId>osgi_R4_compendium</artifactId>
                 <version>1.0</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${dependency.version.osgi}</version>
             </dependency>
 
             <dependency>
