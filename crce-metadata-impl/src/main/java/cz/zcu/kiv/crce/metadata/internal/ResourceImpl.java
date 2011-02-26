@@ -29,6 +29,8 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
     private final Set<String> m_categories = new HashSet<String>();
+    
+    private transient int m_hash;
 
     public ResourceImpl() {
         m_writable = true;
@@ -134,6 +136,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         if (isWritable()) {
             setProperty(SYMBOLIC_NAME, name);
             setProperty(ID, name + "/" + getVersion());
+            m_hash = 0;
         }
     }
 
@@ -146,6 +149,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         if (isWritable()) {
             setProperty(VERSION, version);
             setProperty(ID, getSymbolicName() + "/" + version);
+            m_hash = 0;
         }
     }
 
@@ -154,6 +158,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         // TODO check null ?
         if (isWritable()) {
             setProperty(VERSION, VersionTable.getVersion(version));
+            m_hash = 0;
         }
     }
 
@@ -285,5 +290,29 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     @Override
     public void unsetWritable() {
         m_writable = false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Resource) {
+            if (getSymbolicName() == null || getVersion() == null) {
+                return this == obj;
+            }
+            return getSymbolicName().equals(((Resource) obj).getSymbolicName())
+                    && getVersion().equals(((Resource) obj).getVersion());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (m_hash == 0) {
+            if (getSymbolicName() == null || getVersion() == null) {
+                m_hash = super.hashCode();
+            } else {
+                m_hash = getSymbolicName().hashCode() ^ getVersion().hashCode();
+            }
+        }
+        return m_hash;
     }
 }

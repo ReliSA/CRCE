@@ -16,11 +16,11 @@ public class RepositoryImpl implements Repository {
     private Set<Resource> resources = new HashSet<Resource>();
     private String name;
     private long lastModified;
-    
+
     public RepositoryImpl(URI uri) {
         this.uri = uri;
     }
-    
+
     @Override
     public URI getURI() {
         return uri;
@@ -55,4 +55,22 @@ public class RepositoryImpl implements Repository {
         return true;
     }
 
+    @Override
+    public Resource addResource(Resource resource, boolean force) {
+        Resource out = null;
+
+        if (!addResource(resource)) {
+            for (Resource i : resources) {
+                if (i.equals(resource)) {
+                    out = i;
+                    resources.remove(i);
+                    break;
+                }
+            }
+            if (force) {
+                resources.add(resource);
+            }
+        }
+        return out;
+    }
 }

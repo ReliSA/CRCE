@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.plugins;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.Buffer;
 
 /**
  *
@@ -12,42 +12,47 @@ import cz.zcu.kiv.crce.repository.ResourceBuffer;
 public class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public Resource onRepositoryStore(Resource resource, Store repository) {
+    public Resource onStorePut(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onBufferDelete(Resource resource, ResourceBuffer buffer) {
+    public Resource onBufferDelete(Resource resource, Buffer buffer) {
         return resource;
     }
 
     @Override
-    public Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name) {
+    public Resource onBufferUpload(Resource resource, Buffer buffer, String name) {
         return resource;
     }
 
     @Override
-    public Resource onRepositoryDelete(Resource resource, Store repository) {
+    public Resource onStoreDelete(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onBufferExecute(Resource resource, ResourceBuffer buffer) {
+    public Resource onBufferExecute(Resource resource, Buffer buffer) {
         return resource;
     }
 
     @Override
-    public Resource onRepositoryExecute(Resource resource, Store repository) {
+    public Resource[] onBufferCommit(Resource[] resources, Buffer buffer, Store store) {
+        return resources;
+    }
+    
+    @Override
+    public Resource onStoreExecute(Resource resource, Store store) {
         return resource;
     }
 
     @Override
-    public Resource onRepositoryDownload(Resource resource, Store repository) {
+    public Resource onStoreDownload(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onBufferDownload(Resource resource, ResourceBuffer buffer) {
+    public Resource onBufferDownload(Resource resource, Buffer buffer) {
         return resource;
     }
 

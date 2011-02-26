@@ -6,7 +6,7 @@ import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
-import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
 import java.io.File;
@@ -23,7 +23,7 @@ import org.osgi.service.log.LogService;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class ResourceBufferImpl implements ResourceBuffer {
+public class ResourceBufferImpl implements Buffer {
     
     private int BUFFER_SIZE = 8 * 1024;
     

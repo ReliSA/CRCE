@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.handler.versioning.internal;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
@@ -33,7 +33,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
     private int BUFFER_SIZE = 8 * 1024;
     
     @Override
-    public Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name) {
+    public Resource onBufferUpload(Resource resource, Buffer buffer, String name) {
         if (resource.hasCategory("osgi") && !resource.hasCategory("versioned")) {
             Resource cand = null;
             

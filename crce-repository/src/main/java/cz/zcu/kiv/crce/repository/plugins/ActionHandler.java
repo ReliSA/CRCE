@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.plugins;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.Buffer;
 
 /**
  *
@@ -18,11 +18,11 @@ public interface ActionHandler extends Plugin {
      * @param buffer
      * @return  
      */
-    Resource onBufferUpload(Resource resource, ResourceBuffer buffer, String name);
+    Resource onBufferUpload(Resource resource, Buffer buffer, String name);
 
-    Resource onBufferDownload(Resource resource, ResourceBuffer buffer);
+    Resource onBufferDownload(Resource resource, Buffer buffer);
     
-    Resource onBufferExecute(Resource resource, ResourceBuffer buffer);
+    Resource onBufferExecute(Resource resource, Buffer buffer);
     
     /**
      * Invoked when resource is revoked deleted from buffer.
@@ -31,22 +31,37 @@ public interface ActionHandler extends Plugin {
      * @param buffer
      * @return  
      */
-    Resource onBufferDelete(Resource resource, ResourceBuffer buffer);
+    Resource onBufferDelete(Resource resource, Buffer buffer);
+    
+    Resource[] onBufferCommit(Resource[] resource, Buffer buffer, Store store);
     
     /**
      * Invoked when resource is commited from buffer to repository.
      * 
      * @param resource
-     * @param repository
+     * @param store
      * @return  
      */
-    Resource onRepositoryStore(Resource resource, Store repository);
+    Resource onStorePut(Resource resource, Store store);
 
-    Resource onRepositoryDownload(Resource resource, Store repository);
+    Resource onStoreDownload(Resource resource, Store store);
     
-    Resource onRepositoryDelete(Resource resource, Store repository);
+    Resource onStoreDelete(Resource resource, Store store);
     
-    Resource onRepositoryExecute(Resource resource, Store repository);
+    /**
+     * TODO proposed variant:
+     * Resource[] onStoreExecute(Resource[] resources, Store store);
+     * 
+     * TODO how to choose, which plugins will be executed? do an Executable plugin
+     * and pass it (or set of such plugins) as method parameter?
+     * or all plugins will be executed with no choice?
+     * 
+     * 
+     * @param resource
+     * @param store
+     * @return 
+     */
+    Resource onStoreExecute(Resource resource, Store store);
     
     /**
      * Returns <code>true</code> if implementing action handler modifies binary

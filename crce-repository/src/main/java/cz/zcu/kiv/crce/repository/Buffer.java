@@ -10,7 +10,7 @@ import org.osgi.service.cm.ManagedService;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public interface ResourceBuffer extends ManagedService {
+public interface Buffer extends ManagedService {
 
     /**
      * Puts a new resource into resource buffer.

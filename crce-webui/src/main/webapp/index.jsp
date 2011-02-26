@@ -8,7 +8,7 @@
 <%@page import="cz.zcu.kiv.crce.metadata.Requirement"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Property"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Capability"%>
-<%@page import="cz.zcu.kiv.crce.repository.ResourceBuffer"%>
+<%@page import="cz.zcu.kiv.crce.repository.Buffer"%>
 <%@page import="cz.zcu.kiv.crce.webui.internal.Activator"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Resource"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -58,7 +58,7 @@
             <%
 
 
-                ResourceBuffer buffer = Activator.getBuffer();
+                Buffer buffer = Activator.getBuffer();
                 for (Resource res : buffer.getStoredResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
                     

@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.ResourceBuffer;
+import cz.zcu.kiv.crce.repository.Buffer;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
@@ -34,7 +34,7 @@ public class Activator extends DependencyActivatorBase {
         final Test test = new Test();
 
         dm.add(createComponent()
-                .setInterface(ResourceBuffer.class.getName(), null)
+                .setInterface(Buffer.class.getName(), null)
                 .setImplementation(ResourceBufferImpl.class)
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
