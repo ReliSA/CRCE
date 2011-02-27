@@ -8,6 +8,8 @@ import java.io.IOException;
  * @author kalwi
  */
 public interface Store {
+    
+    public void getBuffer(String sessionId);
 
     public void put(Resource resource) throws IOException;
     

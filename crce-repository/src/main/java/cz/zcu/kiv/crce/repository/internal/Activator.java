@@ -3,11 +3,10 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.SessionFactory;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Properties;
-import org.apache.ace.obr.metadata.MetadataGenerator;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -24,22 +23,17 @@ import org.osgi.service.obr.RepositoryAdmin;
 public class Activator extends DependencyActivatorBase {
 
     private volatile ConfigurationAdmin m_config;   /* injected */
-    private static volatile MetadataGenerator m_metadataGenerator; /* injected */
     
-    private volatile RepositoryAdmin m_repositoryAdmin; /* injected */
-
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
 
         final Test test = new Test();
 
         dm.add(createComponent()
-                .setInterface(Buffer.class.getName(), null)
-                .setImplementation(ResourceBufferImpl.class)
-                .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                .setInterface(SessionFactory.class.getName(), null)
+                .setImplementation(SessionFactoryImpl.class)
                 );
-
+        
         dm.add(createComponent()
                 .setInterface(Store.class.getName(), null)
                 .setImplementation(ObrStoreImpl.class)
@@ -109,9 +103,5 @@ public class Activator extends DependencyActivatorBase {
 
     @Override
     public void destroy(BundleContext bc, DependencyManager dm) throws Exception {
-    }
-    
-    public static MetadataGenerator getMetadataGenerator() {
-        return m_metadataGenerator;
     }
 }

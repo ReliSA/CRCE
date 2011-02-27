@@ -135,5 +135,10 @@ public class ObrStoreImpl implements Store {
 //        return resolver.resolve();
     }
 
+    @Override
+    public void getBuffer(String sessionId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
 }

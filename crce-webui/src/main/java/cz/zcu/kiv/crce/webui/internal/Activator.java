@@ -2,31 +2,62 @@ package cz.zcu.kiv.crce.webui.internal;
 
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
-import org.apache.ace.obr.storage.BundleStore;
+import cz.zcu.kiv.crce.repository.SessionFactory;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
-import org.osgi.service.obr.RepositoryAdmin;
 
 /**
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public final class Activator extends DependencyActivatorBase {
+    
+    private static volatile Activator m_instance;
+    private static volatile BundleContext m_context;
 
-    private static volatile Buffer m_stack; /* injected */
+    private static volatile LogService m_log; /* injected */ // TODO must it be static?
+    private static volatile PluginManager m_pluginManager; /* injected */ // TODO must it be static?
+    
+    private volatile SessionFactory m_sessionFactory; 
 
-    private static volatile LogService m_log; /* injected */
-
-    private static volatile PluginManager m_pluginManager; /* injected */
+    public static Activator instance() {
+        return m_instance;
+    }
 
     public static PluginManager getPluginManager() {
         return m_pluginManager;
     }
     
-    public static Buffer getBuffer() {
-        return m_stack;
+    public static Buffer getBuffer(HttpServletRequest req) {
+        if (req == null) {
+            return null;
+        }
+
+        String sid = req.getSession(true).getId();
+        ServiceReference[] refs;
+        try {
+            refs = m_context.getServiceReferences(Buffer.class.getName(), "(" + SessionFactory.SERVICE_SESSION_ID + "=" + sid + ")");
+        } catch (InvalidSyntaxException ex) {
+            throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by bad developer", ex);
+        }
+        
+        ServiceReference reference = null;
+        if (refs != null && refs.length == 1) {
+            reference  = refs[0];
+        }
+        if (reference != null) {
+            return (Buffer) m_context.getService(reference);
+        }
+        if (refs != null && refs.length > 1) { // XXX log it
+            throw new RuntimeException("More than one Buffer services are registered for this session");
+        }
+        
+        return null;
     }
 
     public static LogService getLog() {
@@ -35,9 +66,13 @@ public final class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
+        m_instance = this;
+        m_context = context;
+        
         manager.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(Buffer.class).setRequired(true))
+//                .add(createServiceDependency().setService(Buffer.class).setRequired(true))
+                .add(createServiceDependency().setService(SessionFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 );
@@ -81,5 +116,9 @@ public final class Activator extends DependencyActivatorBase {
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
         // nothing to do
+    }
+    
+    public SessionFactory getSessionFactory() {
+        return m_sessionFactory;
     }
 }

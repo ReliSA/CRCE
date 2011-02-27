@@ -7,6 +7,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.SessionFactory;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
+import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 import org.osgi.service.cm.ConfigurationException;
@@ -23,20 +25,27 @@ import org.osgi.service.log.LogService;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class ResourceBufferImpl implements Buffer {
+public class BufferImpl implements Buffer {
     
     private int BUFFER_SIZE = 8 * 1024;
     
     private volatile BundleContext m_context; /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
     private volatile LogService m_log; /* injected by dependency manager */
+
+    private final Properties m_sessionProperties;
     
     private File m_baseDir;
     
     private Repository m_repository;
     
+    public BufferImpl(String sessionId) {
+        m_sessionProperties = new Properties();
+        m_sessionProperties.put(SessionFactory.SERVICE_SESSION_ID, sessionId);
+    }
+    
     private void setUpBaseDir() {
-        m_baseDir = m_context.getDataFile("buffer");
+        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionFactory.SERVICE_SESSION_ID));
         if (!m_baseDir.exists()) {
             m_baseDir.mkdir();
         } else if (!m_baseDir.isDirectory()) {
@@ -46,7 +55,7 @@ public class ResourceBufferImpl implements Buffer {
         try {
             m_repository = m_pluginManager.getPlugin(RepositoryDAO.class).getRepository(m_baseDir.toURI());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace(); // XXX
         }
     }
 
@@ -137,5 +146,9 @@ public class ResourceBufferImpl implements Buffer {
     @Override
     public void updated(Dictionary dctnr) throws ConfigurationException {
         // do nothing yet
+    }
+
+    Dictionary getSessionProperties() {
+        return m_sessionProperties;
     }
 }

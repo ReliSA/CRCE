@@ -30,7 +30,7 @@ public class UploadServlet extends HttpServlet {
         HttpSession session = req.getSession(true);
 
         PrintWriter out = resp.getWriter();
-        out.println("m_stack: " + (Activator.getBuffer() != null ? "found" : "not found"));
+        out.println("m_stack: " + (Activator.getBuffer(req) != null ? "found" : "not found")); // XXX
 
         Enumeration en = session.getAttributeNames();
 
@@ -67,7 +67,7 @@ public class UploadServlet extends HttpServlet {
                 } else {
                     String fileName = fi.getName();
                     InputStream is = fi.getInputStream();
-                    if (Activator.getBuffer().put(fileName, is) == null) {
+                    if (Activator.getBuffer(req).put(fileName, is) == null) {
                         success = false;
                     }
                     is.close();

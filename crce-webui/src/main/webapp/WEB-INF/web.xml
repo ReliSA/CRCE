@@ -15,11 +15,10 @@
     </welcome-file-list>
 
   <!-- Session listener -->
-<!-- 
-  <listener>
-    <listener-class>org.apache.ace.server.SessionListener</listener-class>
-  </listener>
--->
+    <listener>
+        <listener-class>cz.zcu.kiv.crce.webui.internal.SessionListener</listener-class>
+    </listener>
+
   
   <!-- Servlets -->
  

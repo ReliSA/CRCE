@@ -30,4 +30,9 @@ public class FilebasedStoreImpl implements Store {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public void getBuffer(String sessionId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
