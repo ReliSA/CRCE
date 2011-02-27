@@ -20,19 +20,26 @@ public final class Activator extends DependencyActivatorBase {
     private static volatile Activator m_instance;
     private static volatile BundleContext m_context;
 
-    private static volatile LogService m_log; /* injected */ // TODO must it be static?
-    private static volatile PluginManager m_pluginManager; /* injected */ // TODO must it be static?
-    
-    private volatile SessionFactory m_sessionFactory; 
+    private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
+    private volatile SessionFactory m_sessionFactory;   /* injected by dependency manager */
+    private volatile LogService m_log;                  /* injected by dependency manager */
 
     public static Activator instance() {
         return m_instance;
     }
 
-    public static PluginManager getPluginManager() {
+    public PluginManager getPluginManager() {
         return m_pluginManager;
     }
     
+    public SessionFactory getSessionFactory() {
+        return m_sessionFactory;
+    }
+    
+    public LogService getLog() {
+        return m_log;
+    }
+
     public static Buffer getBuffer(HttpServletRequest req) {
         if (req == null) {
             return null;
@@ -60,10 +67,6 @@ public final class Activator extends DependencyActivatorBase {
         return null;
     }
 
-    public static LogService getLog() {
-        return m_log;
-    }
-
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         m_instance = this;
@@ -71,7 +74,6 @@ public final class Activator extends DependencyActivatorBase {
         
         manager.add(createComponent()
                 .setImplementation(this)
-//                .add(createServiceDependency().setService(Buffer.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
@@ -116,9 +118,5 @@ public final class Activator extends DependencyActivatorBase {
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
         // nothing to do
-    }
-    
-    public SessionFactory getSessionFactory() {
-        return m_sessionFactory;
     }
 }

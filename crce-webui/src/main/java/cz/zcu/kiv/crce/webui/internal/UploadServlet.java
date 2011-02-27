@@ -1,10 +1,8 @@
 package cz.zcu.kiv.crce.webui.internal;
 
-import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
@@ -54,7 +52,7 @@ public class UploadServlet extends HttpServlet {
             try {
                 fileItemsList = servletFileUpload.parseRequest(req);
             } catch (FileUploadException e) {
-                Activator.getLog().log(LogService.LOG_ERROR, "Exception handling request: " + req.getRequestURL(), e);
+                Activator.instance().getLog().log(LogService.LOG_ERROR, "Exception handling request: " + req.getRequestURL(), e);
                 sendResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }

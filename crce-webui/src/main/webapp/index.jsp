@@ -42,7 +42,7 @@
 
             <h1>Plugins in plugin manager:</h1>
             <%
-                Plugin[] plugins = Activator.getPluginManager().getPlugins();
+                Plugin[] plugins = Activator.instance().getPluginManager().getPlugins();
                 out.println("<table>");
                 out.println("<tr><th>ID</th><th>priority</th><th>description</th></tr>");
                 for (Plugin plugin : plugins) {
