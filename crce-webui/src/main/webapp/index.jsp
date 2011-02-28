@@ -58,7 +58,7 @@
             <%
 
 
-                Buffer buffer = Activator.getBuffer(request);
+                Buffer buffer = Activator.instance().getBuffer(request);
                 for (Resource res : buffer.getStoredResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
                     
@@ -126,7 +126,7 @@
                     
                     out.println("<hr/>");
                 }
-
+                
 
             %>
 

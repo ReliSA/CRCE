@@ -7,7 +7,7 @@ import java.io.InputStream;
 import org.osgi.service.cm.ManagedService;
 
 /**
- *
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface Buffer extends ManagedService {
@@ -22,12 +22,17 @@ public interface Buffer extends ManagedService {
      */
     public Resource put(String name, InputStream resource) throws IOException;
 
+    /**
+     * Returns resources stored in buffer.
+     * @return array of resources.
+     */
     public Resource[] getStoredResources();
     
+    /**
+     * TODO analyze requirements for this method
+     * @param plugins 
+     */
     public void executeOnStored(Plugin[] plugins);
     
     public void commit();
-    
-    public void runTestsOnComponent(Object component);
-    
 }

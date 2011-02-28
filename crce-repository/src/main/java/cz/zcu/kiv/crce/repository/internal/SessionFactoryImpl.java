@@ -21,6 +21,7 @@ public class SessionFactoryImpl implements SessionFactory {
     
     private static class Session {
         private Component m_bufferComponent;
+        
     }
 
     @Override
@@ -33,7 +34,9 @@ public class SessionFactoryImpl implements SessionFactory {
                         .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
-                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false));
+                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false))
+//                        .add(m_dependencyManager.createServiceDependency().setService(Store.class, "(name=file)").setRequired(true));
+                        .add(m_dependencyManager.createConfigurationDependency().setPid("cz.zcu.kiv.crce.repository.store"));
                 m_dependencyManager.add(sd.m_bufferComponent);
                 m_sessions.put(sessionId, sd);
             }

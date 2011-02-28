@@ -18,18 +18,18 @@
     <name>CRCE - Metadata Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.metadata</bundle.symbolicName>
+        <bundle.symbolicName>${namespace}.metadata.impl</bundle.symbolicName>
         <bundle.namespace>${namespace}.metadata</bundle.namespace>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_core</artifactId>
+            <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_compendium</artifactId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>

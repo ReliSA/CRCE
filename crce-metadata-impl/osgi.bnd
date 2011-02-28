@@ -5,3 +5,5 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Embed-Dependency: org.apache.felix.bundlerepository
+
+Export-Package: cz.zcu.kiv.crce.metadata.wrapper.*

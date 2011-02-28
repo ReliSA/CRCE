@@ -34,9 +34,19 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(SessionFactoryImpl.class)
                 );
         
+        Properties d = new Properties();
+        d.put("scheme", "http");
         dm.add(createComponent()
-                .setInterface(Store.class.getName(), null)
+                .setInterface(Store.class.getName(), d)
                 .setImplementation(ObrStoreImpl.class)
+                .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                );
+        
+        d = new Properties();
+        d.put("scheme", "file");
+        dm.add(createComponent()
+                .setInterface(Store.class.getName(), d)
+                .setImplementation(FilebasedStoreImpl.class)
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 );
         
@@ -62,6 +72,10 @@ public class Activator extends DependencyActivatorBase {
 
         configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
         configure("org.apache.ace.obr.servlet", "org.apache.ace.server.servlet.endpoint", "/obr");
+
+        configure("cz.zcu.kiv.crce.repository.store", "uri", "file:/U:");
+//        configure("cz.zcu.kiv.crce.repository.store", "uri", "ftp://localhost:8090/obr");
+        
 //        configure("cz.zcu.kiv.crce.webui.upload", "org.apache.ace.server.servlet.endpoint", "/upload");
 
 //        new Thread(new Runnable() {

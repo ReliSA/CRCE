@@ -17,6 +17,9 @@ import org.osgi.service.log.LogService;
  */
 public final class Activator extends DependencyActivatorBase {
     
+    private static final int RETRY_AFTER = 1000;
+    private static final int RETRY_TIMEOUT = 10000;
+    
     private static volatile Activator m_instance;
     private static volatile BundleContext m_context;
 
@@ -40,29 +43,36 @@ public final class Activator extends DependencyActivatorBase {
         return m_log;
     }
 
-    public static Buffer getBuffer(HttpServletRequest req) {
+    public Buffer getBuffer(HttpServletRequest req) {
         if (req == null) {
             return null;
         }
 
         String sid = req.getSession(true).getId();
         ServiceReference[] refs;
-        try {
-            refs = m_context.getServiceReferences(Buffer.class.getName(), "(" + SessionFactory.SERVICE_SESSION_ID + "=" + sid + ")");
-        } catch (InvalidSyntaxException ex) {
-            throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by bad developer", ex);
+        
+        for (int i = 0; i < RETRY_TIMEOUT; i += RETRY_AFTER) {
+            try {
+                refs = m_context.getServiceReferences(Buffer.class.getName(), "(" + SessionFactory.SERVICE_SESSION_ID + "=" + sid + ")");
+            } catch (InvalidSyntaxException ex) {
+                throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by invalid filter" , ex);
+            }
+
+            if (refs != null && refs.length > 0) {
+                if (refs.length > 1) {
+                    m_log.log(LogService.LOG_WARNING, "Only one instance of Buffer was expected for this session, found: " + refs.length);
+                }
+                return (Buffer) m_context.getService(refs[0]);
+            }
+            
+            try {
+                Thread.sleep(RETRY_AFTER);
+            } catch (InterruptedException ex) {
+                // nothing
+            }
         }
         
-        ServiceReference reference = null;
-        if (refs != null && refs.length == 1) {
-            reference  = refs[0];
-        }
-        if (reference != null) {
-            return (Buffer) m_context.getService(reference);
-        }
-        if (refs != null && refs.length > 1) { // XXX log it
-            throw new RuntimeException("More than one Buffer services are registered for this session");
-        }
+        m_log.log(LogService.LOG_ERROR, "No Buffer instance found for this session");
         
         return null;
     }
