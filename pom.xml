@@ -20,6 +20,7 @@
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>true</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <runner>1.5.0</runner> <!-- there are some logging issues with runner 1.6.0 -->
     </properties>
 
     <packaging>pom</packaging>
@@ -64,7 +65,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.4.3</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>

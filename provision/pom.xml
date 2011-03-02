@@ -15,7 +15,6 @@
     <name>CRCE - Reactor - imported bundles</name>
 
     <packaging>pom</packaging>
-
   <!--
    | imported (non-local) bundles are listed here as dependencies
    | and will be deployed by pax:provision unless they are marked
@@ -29,17 +28,22 @@
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-extender-war</artifactId>
-            <version>0.8.1</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>
-            <version>0.8.1</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jsp</artifactId>
-            <version>0.8.1</version>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.web</groupId>
+            <artifactId>pax-web-spi</artifactId>
+            <version>1.0.1</version>
         </dependency>
         
         <dependency>
