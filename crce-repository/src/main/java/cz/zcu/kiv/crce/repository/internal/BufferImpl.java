@@ -2,8 +2,9 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -42,7 +44,7 @@ public class BufferImpl implements Buffer, ManagedService {
     
     private Store m_store = null;
     private File m_baseDir;
-    private Repository m_repository;
+    private WritableRepository m_repository;
     
     public BufferImpl(String sessionId) {
         m_sessionProperties = new Properties();
@@ -124,15 +126,16 @@ public class BufferImpl implements Buffer, ManagedService {
     }
 
     @Override
-    public Resource[] getStoredResources() {
+    public Repository getRepository() {
         if (m_baseDir == null) {
             setUpBaseDir();
         }
-        return m_repository.getResources();
+        return m_repository;
     }
 
+
     @Override
-    public void executeOnStored(Plugin[] plugins) {
+    public void execute(List<Resource> resources, List<Plugin> plugins) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

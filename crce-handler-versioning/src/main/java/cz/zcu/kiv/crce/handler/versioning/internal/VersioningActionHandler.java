@@ -41,7 +41,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
             Version oldVersion = resource.getVersion();
             
             // TODO zmenit na neco inteligentnejsiho (buffer.getInnerRepository().get(filter))
-            for (Resource i : buffer.getStoredResources()) {
+            for (Resource i : buffer.getRepository().getResources()) {
                 if (i.getSymbolicName().equals(resource.getSymbolicName())) {
                     if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
                         cand = i;

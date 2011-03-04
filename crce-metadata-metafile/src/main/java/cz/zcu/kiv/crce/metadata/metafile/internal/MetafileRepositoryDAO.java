@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.metadata.metafile.internal;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.AbstractRepositoryDAO;
 import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
@@ -38,7 +39,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
     }
 
     @Override
-    public Repository getRepository(URI uri) throws IOException {
+    public WritableRepository getRepository(URI uri) throws IOException {
         if (!"file".equals(uri.getScheme())) {
             throw new UnsupportedOperationException("Other URI schemes than 'file' are not supported yet.");
         }
@@ -75,7 +76,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
             rdao = factory.getResourceDAO();
         }
 
-        Repository repository = m_resourceCreator.createRepository(uri);
+        WritableRepository repository = m_resourceCreator.createRepository(uri);
         recurse(repository, directory, rdao);
         
         return repository;
@@ -149,7 +150,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
         }
     }
 
-    private void recurse(Repository repository, File artifact, ResourceDAO rdao) {
+    private void recurse(WritableRepository repository, File artifact, ResourceDAO rdao) {
         if (artifact.isDirectory()) {
             String list[] = artifact.list();
             for (int i = 0; i < list.length; i++) {

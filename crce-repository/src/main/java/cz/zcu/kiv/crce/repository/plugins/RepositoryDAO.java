@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +12,7 @@ import java.net.URI;
  */
 public interface RepositoryDAO extends Plugin {
 
-    Repository getRepository(URI uri) throws IOException;
+    WritableRepository getRepository(URI uri) throws IOException;
     
     void saveRepository(Repository repository) throws IOException;
 }

@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.Set;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class RepositoryImpl implements Repository {
+public class RepositoryImpl implements Repository, WritableRepository {
 
     private URI uri = null;
     private Set<Resource> resources = new HashSet<Resource>();

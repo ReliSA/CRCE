@@ -59,7 +59,7 @@
 
 
                 Buffer buffer = Activator.instance().getBuffer(request);
-                for (Resource res : buffer.getStoredResources()) {
+                for (Resource res : buffer.getRepository().getResources()) {
                     out.println("<h2>" + res.getId() + "</h2>");
                     
                     out.println("<table>");

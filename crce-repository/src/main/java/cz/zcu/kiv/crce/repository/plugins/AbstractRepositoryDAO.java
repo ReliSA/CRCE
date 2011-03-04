@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.io.IOException;
 import java.net.URI;
@@ -12,7 +13,7 @@ import java.net.URI;
 public abstract class AbstractRepositoryDAO extends AbstractPlugin implements RepositoryDAO {
 
     @Override
-    public abstract Repository getRepository(URI uri) throws IOException;
+    public abstract WritableRepository getRepository(URI uri) throws IOException;
 
     @Override
     public abstract void saveRepository(Repository repository) throws IOException;

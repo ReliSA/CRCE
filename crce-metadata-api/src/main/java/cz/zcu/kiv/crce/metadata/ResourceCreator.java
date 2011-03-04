@@ -33,5 +33,5 @@ public interface ResourceCreator {
      * TODO
      * @return 
      */
-    Repository createRepository(URI uri);
+    WritableRepository createRepository(URI uri);
 }
