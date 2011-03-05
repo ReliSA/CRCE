@@ -166,6 +166,21 @@ public class CombinedResourceImpl implements CombinedResource {
         return m_staticResource.hasRequirement(requirement) || m_writableResource.hasRequirement(requirement);
     }
 
+    @Override
+    public void unsetCategory(String category) {
+        m_writableResource.unsetCategory(category);
+    }
+
+    @Override
+    public void unsetCapability(Capability capability) {
+        m_writableResource.unsetCapability(capability);
+    }
+
+    @Override
+    public void unsetRequirement(Requirement requirement) {
+        m_writableResource.unsetRequirement(requirement);
+    }
+    
     public static <T> T[] concat(T[] first, T[] second) {
         T[] result = Arrays.copyOf(first, first.length + second.length);
         System.arraycopy(second, 0, result, first.length, second.length);

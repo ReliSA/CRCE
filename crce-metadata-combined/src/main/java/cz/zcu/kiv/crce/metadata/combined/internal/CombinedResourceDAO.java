@@ -19,7 +19,7 @@ public class CombinedResourceDAO extends AbstractResourceDAO {
         m_staticResourceDAO = staticDAO;
         m_writableResourceDAO = writableDAO;
     }
-            
+
     @Override
     public void save(Resource resource) throws IOException {
 

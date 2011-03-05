@@ -4,8 +4,8 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -14,7 +14,7 @@ import java.util.Set;
 public class RepositoryImpl implements Repository, WritableRepository {
 
     private URI uri = null;
-    private Set<Resource> resources = new HashSet<Resource>();
+    private Map<String, Resource> resources = new HashMap<String, Resource>();
     private String name;
     private long lastModified;
 
@@ -28,8 +28,8 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public Resource[] getResources() {
-        return resources.toArray(new Resource[resources.size()]);
+    public synchronized Resource[] getResources() {
+        return resources.values().toArray(new Resource[resources.size()]);
     }
 
     @Override
@@ -43,35 +43,34 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public boolean Contains(Resource resource) {
-        return resources.contains(resource);
+    public synchronized boolean Contains(Resource resource) {
+        return resources.containsKey(resource.getId());
     }
 
     @Override
-    public boolean addResource(Resource resource) {
-        if (resources.contains(resource)) {
+    public synchronized boolean addResource(Resource resource) {
+        if (resources.containsKey(resource.getId())) {
             return false;
         }
-        resources.add(resource);
+        resources.put(resource.getId(), resource);
+        lastModified = System.nanoTime();
         return true;
     }
 
     @Override
-    public Resource addResource(Resource resource, boolean force) {
-        Resource out = null;
-
-        if (!addResource(resource)) {
-            for (Resource i : resources) {
-                if (i.equals(resource)) {
-                    out = i;
-                    resources.remove(i);
-                    break;
-                }
-            }
-            if (force) {
-                resources.add(resource);
-            }
+    public synchronized Resource addResource(Resource resource, boolean force) {
+        Resource out = resources.get(resource.getId());
+        if (out == null || force) {
+            resources.put(resource.getId(), resource);
+            lastModified = System.nanoTime();
         }
+        return out;
+    }
+
+    @Override
+    public synchronized boolean removeResource(Resource resource) {
+        boolean out = (resources.remove(resource.getId()) != null);
+        lastModified = System.nanoTime();
         return out;
     }
 }

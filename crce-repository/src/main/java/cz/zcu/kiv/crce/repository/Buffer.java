@@ -23,6 +23,17 @@ public interface Buffer extends ManagedService {
      * @throws IOException 
      */
     public Resource put(String name, InputStream resource) throws IOException;
+    
+    /**
+     * Removes the resource from this buffer and returns <code>true</code>, if
+     * the buffer contained the given resource before removing, <code>false</code>
+     * otherwise.
+     * 
+     * @param resource Resource to be removed from this buffer.
+     * @return <code>true</code>, if the buffer contained the resource before
+     * removing.
+     */
+    public boolean remove(Resource resource);
 
     /**
      * Returns resources stored in buffer.

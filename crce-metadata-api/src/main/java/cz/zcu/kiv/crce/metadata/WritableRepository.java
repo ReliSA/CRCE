@@ -1,7 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
+ * Extends read-only <code>Repository</code> interface to support of modyfing
+ * operations.
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface WritableRepository extends Repository {
@@ -35,5 +37,16 @@ public interface WritableRepository extends Repository {
      * version.
      */
     public Resource addResource(Resource resource, boolean force);
+    
+    /**
+     * Removes the resource from repository and returns <code>true</code>, if the
+     * repository contained the given resource before removing, <code>false</code>
+     * otherwise.
+     * 
+     * @param resource Resource to be removed from the repository.
+     * @return <code>true</code>, if the repository contained the resource
+     * before removing.
+     */
+    public boolean removeResource(Resource resource);
 
 }

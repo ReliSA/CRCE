@@ -20,26 +20,26 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
 
     private final Map<String, Property> m_map = new HashMap<String, Property>();
     private final List<Property> m_list = new ArrayList<Property>();
-
+    
     @Override
-    public Property getProperty(String name) {
+    public synchronized Property getProperty(String name) {
         return m_map.get(name.toLowerCase());
     }
 
     @Override
-    public String getPropertyString(String name) {
+    public synchronized String getPropertyString(String name) {
         Property property = m_map.get(name.toLowerCase());
         return property == null ? null : property.toString();
     }
 
     @Override
-    public void setProperty(Property property) {
+    public synchronized void setProperty(Property property) {
         m_map.put(property.getName().toLowerCase(), property);
         m_list.add(property);
     }
 
     @Override
-    public Property[] getProperties() {
+    public synchronized Property[] getProperties() {
         return m_list.toArray(new Property[0]);
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
         obtainProperty(name).setValue(values);
     }
 
-    private PropertyImpl obtainProperty(String name) {
+    private synchronized PropertyImpl obtainProperty(String name) {
         Property prop;
         if ((prop = m_map.get(name.toLowerCase())) == null) {
             prop = new PropertyImpl(name);
@@ -94,7 +94,7 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
     }
 
     @Override
-    public void unsetProperty(String name) {
+    public synchronized void unsetProperty(String name) {
         Property prop = m_map.remove(name.toLowerCase());
         m_list.remove(prop);
     }

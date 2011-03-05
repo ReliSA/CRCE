@@ -121,6 +121,11 @@ public class BufferImpl implements Buffer, ManagedService {
     }
 
     @Override
+    public boolean remove(Resource resource) {
+        return m_repository.removeResource(resource);
+    }
+
+    @Override
     public synchronized void commit() {
         throw new UnsupportedOperationException("Not supported yet.");
     }

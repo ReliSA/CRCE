@@ -63,6 +63,13 @@ public interface Resource extends PropertyProvider {
 
     Requirement createRequirement(String name);
 
+    void unsetCategory(String category);
+    
+    void unsetCapability(Capability capability);
+    
+    void unsetRequirement(Requirement requirement);
+    
+    
     /**
      * Sets resource size.
      * @param size size in bytes to set.

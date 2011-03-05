@@ -72,12 +72,16 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     @Override
     public String[] getCategories() {
-        return m_categories.toArray(new String[m_categories.size()]);
+        synchronized (m_categories) {
+            return m_categories.toArray(new String[m_categories.size()]);
+        }
     }
 
     @Override
     public Capability[] getCapabilities() {
-        return m_capabilities.toArray(new Capability[m_capabilities.size()]);
+        synchronized (m_capabilities) {
+            return m_capabilities.toArray(new Capability[m_capabilities.size()]);
+        }
     }
 
     @Override
@@ -87,9 +91,11 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         }
         List<Capability> out = new ArrayList<Capability>();
         
-        for (Capability cap : m_capabilities) {
-            if (name.equals(cap.getName())) {
-                out.add(cap);
+        synchronized (m_capabilities) {
+            for (Capability cap : m_capabilities) {
+                if (name.equals(cap.getName())) {
+                    out.add(cap);
+                }
             }
         }
         
@@ -98,7 +104,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     @Override
     public Requirement[] getRequirements() {
-        return m_requirements.toArray(new Requirement[m_requirements.size()]);
+        synchronized (m_requirements) {
+            return m_requirements.toArray(new Requirement[m_requirements.size()]);
+        }
     }
 
     @Override
@@ -108,9 +116,11 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         }
         List<Requirement> out = new ArrayList<Requirement>();
         
-        for (Requirement req : m_requirements) {
-            if (name.equals(req.getName())) {
-                out.add(req);
+        synchronized (m_requirements) {
+            for (Requirement req : m_requirements) {
+                if (name.equals(req.getName())) {
+                    out.add(req);
+                }
             }
         }
         
@@ -128,7 +138,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     @Override
     public boolean hasCategory(String category) {
-        return m_categories.contains(category);
+        synchronized (m_categories) {
+            return m_categories.contains(category);
+        }
     }
 
     @Override
@@ -165,21 +177,27 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     @Override
     public void addCategory(String category) {
         if (isWritable()) {
-            m_categories.add(category);
+            synchronized (m_categories) {
+                m_categories.add(category);
+            }
         }
     }
 
     @Override
     public void addCapability(Capability capability) {
         if (isWritable()) {
-            m_capabilities.add(capability);
+            synchronized (m_capabilities) {
+                m_capabilities.add(capability);
+            }
         }
     }
 
     @Override
     public void addRequirement(Requirement requirement) {
         if (isWritable()) {
-            m_requirements.add(requirement);
+            synchronized (m_requirements) {
+                m_requirements.add(requirement);
+            }
         }
     }
 
@@ -187,7 +205,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public Capability createCapability(String name) {
         Capability c = new CapabilityImpl(name);
         if (isWritable()) {
-            m_capabilities.add(c);
+            synchronized (m_capabilities) {
+                m_capabilities.add(c);
+            }
         }
         return c;
     }
@@ -196,19 +216,52 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public Requirement createRequirement(String name) {
         Requirement r = new RequirementImpl(name);
         if (isWritable()) {
-            m_requirements.add(r);
+            synchronized (m_requirements) {
+                m_requirements.add(r);
+            }
         }
         return r;
     }
 
     @Override
+    public void unsetCategory(String category) {
+        if (isWritable()) {
+            synchronized (m_categories) {
+                m_categories.remove(category);
+            }
+        }
+    }
+
+    @Override
+    public void unsetCapability(Capability capability) {
+        if (isWritable()) {
+            synchronized (m_capabilities) {
+                m_capabilities.remove(capability);
+            }
+        }
+    }
+
+    @Override
+    public void unsetRequirement(Requirement requirement) {
+        if (isWritable()) {
+            synchronized (m_requirements) {
+                m_requirements.remove(requirement);
+            }
+        }
+    }
+
+    @Override
     public boolean hasCapability(Capability capability) {
-        return m_capabilities.contains(capability);
+        synchronized (m_capabilities) {
+            return m_capabilities.contains(capability);
+        }
     }
 
     @Override
     public boolean hasRequirement(Requirement requirement) {
-        return m_requirements.contains(requirement);
+        synchronized (m_requirements) {
+            return m_requirements.contains(requirement);
+        }
     }
 
     @Override
