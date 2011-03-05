@@ -68,16 +68,6 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
                 );
 
-
-
-        configure("org.apache.ace.obr.storage.file", "fileLocation", "U:");
-        configure("org.apache.ace.obr.servlet", "org.apache.ace.server.servlet.endpoint", "/obr");
-
-        configure("cz.zcu.kiv.crce.repository.store", "uri", "file:/U:");
-//        configure("cz.zcu.kiv.crce.repository.store", "uri", "ftp://localhost:8090/obr");
-        
-//        configure("cz.zcu.kiv.crce.webui.upload", "org.apache.ace.server.servlet.endpoint", "/upload");
-
 //        new Thread(new Runnable() {
 //
 //            @Override
@@ -97,20 +87,19 @@ public class Activator extends DependencyActivatorBase {
     public void configure(String pid, String... params) throws IOException {
         Configuration conf = m_config.getConfiguration(pid, null);
         Dictionary properties = conf.getProperties();
+        
         if (properties == null) {
             properties = new Properties();
         }
-//        System.out.println("props=" + properties);
+        
         boolean changed = false;
         for (int i = 0; i < params.length; i += 2) {
-//            System.out.println("key=" + params[i] + " value=" + params[i + 1]);
             if (!params[i + 1].equals(properties.get(params[i]))) {
                 properties.put(params[i], params[i + 1]);
                 changed = true;
             }
         }
         if (changed) {
-//            System.out.println("Updating " + pid);
             conf.update(properties);
         }
     }

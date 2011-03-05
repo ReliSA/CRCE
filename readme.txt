@@ -1,13 +1,11 @@
 Component Repository with Compatibility Evaluation
 
-1) Before start, install needed artifacts to local repository by running dep-install.cmd
+1) Before start, install needed artifacts to local repository by running dep-install.cmd.
 
-2) Application temporary use U: drive as a bundle repository until configuration management will be implemented,
-   so substitute some folder to U: drive by following command:
-     C:\> subst U: <some-folder>
-   or rewrite the line in cz.zcu.kiv.crce.repository.internal.Activator
+2) Copy 'conf.default' folder to 'conf' and edit configuration files,
+    - if you don't do that, maven will copy the configuration folder on the first run.
 
-3) Start the application by running start.bat
+3) Start the application by running start.bat.
 
 4) CRCE runs on following URL:
 http://localhost:8090/crce

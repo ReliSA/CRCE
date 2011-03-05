@@ -21,6 +21,10 @@
         <org.osgi.service.http.secure.enabled>true</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <runner>1.5.0</runner> <!-- there are some logging issues with runner 1.6.0 -->
+        <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
+        <felix.fileinstall.poll>5000</felix.fileinstall.poll>
+        <felix.fileinstall.dir>..\\conf</felix.fileinstall.dir>
+        <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
     </properties>
 
     <packaging>pom</packaging>
@@ -69,6 +73,24 @@
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>conf</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>conf.default</directory>
+                                </resource>
+                            </resources>
+                            <overwrite>false</overwrite>
+                        </configuration>            
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
