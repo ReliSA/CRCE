@@ -6,13 +6,12 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import org.osgi.service.cm.ManagedService;
 
 /**
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public interface Buffer extends ManagedService {
+public interface Buffer {
 
     /**
      * Puts a new resource into resource buffer.

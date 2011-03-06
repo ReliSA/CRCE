@@ -9,40 +9,32 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionFactory;
-import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
 
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class BufferImpl implements Buffer, ManagedService {
+public class BufferImpl implements Buffer {
 
-    private volatile BundleContext m_context; /* injected by dependency manager */
+    private volatile BundleContext m_context;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
-    private volatile LogService m_log; /* injected by dependency manager */
+    private volatile LogService m_log;  /* injected by dependency manager */
     
     private final int BUFFER_SIZE = 8 * 1024;
     private final Properties m_sessionProperties;
     
-    private Store m_store = null;
     private File m_baseDir;
     private WritableRepository m_repository;
     
@@ -142,33 +134,6 @@ public class BufferImpl implements Buffer, ManagedService {
     @Override
     public void execute(List<Resource> resources, List<Plugin> plugins) {
         throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void updated(Dictionary dict) throws ConfigurationException {
-        if (dict == null) {
-            return;
-        }
-        URI uri;
-        try {
-            uri = new URI((String) dict.get("uri"));
-        } catch (URISyntaxException ex) {
-            throw new ConfigurationException("uri", "Invalid URI: " + dict.get("uri"), ex);
-        }
-        
-        ServiceReference[] refs;
-        try {
-            refs = m_context.getServiceReferences(Store.class.getName(), "(" + "scheme" + "=" + uri.getScheme() + ")");
-        } catch (InvalidSyntaxException ex) {
-            throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by invalid filter", ex);
-        }
-        
-        if (refs != null && refs.length > 0) {
-            m_store = (Store) m_context.getService(refs[0]);
-            System.out.println("m_store: " + m_store.toString());
-        } else {
-            throw new ConfigurationException("uri", "No registered Store service for given uri: " + uri);
-        }
     }
 
     Dictionary getSessionProperties() {

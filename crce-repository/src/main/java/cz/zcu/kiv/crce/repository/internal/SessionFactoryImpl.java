@@ -18,7 +18,7 @@ public class SessionFactoryImpl implements SessionFactory {
     private volatile DependencyManager m_dependencyManager; /* injected by dependency manager */
     
     private final Map<String, Session> m_sessions = new HashMap<String, Session>();
-    
+
     private static class Session {
         private Component m_bufferComponent;
         
@@ -30,13 +30,13 @@ public class SessionFactoryImpl implements SessionFactory {
             if (!m_sessions.containsKey(sessionId)) {
                 Session sd = new Session();
                 BufferImpl buffer = new BufferImpl(sessionId);
+                
                 sd.m_bufferComponent = m_dependencyManager.createComponent()
                         .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
-                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false))
-//                        .add(m_dependencyManager.createServiceDependency().setService(Store.class, "(name=file)").setRequired(true));
-                        .add(m_dependencyManager.createConfigurationDependency().setPid("cz.zcu.kiv.crce.repository.store"));
+                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false));
+                
                 m_dependencyManager.add(sd.m_bufferComponent);
                 m_sessions.put(sessionId, sd);
             }

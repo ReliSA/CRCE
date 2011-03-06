@@ -25,6 +25,7 @@
         <felix.fileinstall.poll>5000</felix.fileinstall.poll>
         <felix.fileinstall.dir>..\\conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
+        <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
     </properties>
 
     <packaging>pom</packaging>

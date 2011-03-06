@@ -5,14 +5,20 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.SessionFactory;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.Properties;
 import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 
@@ -20,14 +26,33 @@ import org.osgi.service.obr.RepositoryAdmin;
  *
  * @author kalwi
  */
-public class Activator extends DependencyActivatorBase {
+public class Activator extends DependencyActivatorBase implements ManagedService {
 
-    private volatile ConfigurationAdmin m_config;   /* injected */
+    private static volatile Activator m_instance;   /* injected by dependency manager */
+    private static volatile BundleContext m_context;       /* injected by dependency manager */
+    
+    private volatile ConfigurationAdmin m_config;   /* injected by dependency manager */
+
+    private Store m_store = null;
+    
+    public static Activator instance() {
+        return m_instance;
+    }
+
+    public Store getStore() {
+        return m_store;
+    }
     
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
-
-        final Test test = new Test();
+        m_instance = this;
+        m_context = bc;
+        
+        dm.add(createComponent()
+                .setImplementation(this)
+                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
+                .add(createConfigurationDependency().setPid("cz.zcu.kiv.crce.repository"))
+                );
 
         dm.add(createComponent()
                 .setInterface(SessionFactory.class.getName(), null)
@@ -55,12 +80,11 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(PriorityActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
-        
-        dm.add(createComponent()
-                .setImplementation(this)
-                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
-                );
 
+        
+        // XXX vvv - only for testing purposes
+        
+        final Test test = new Test();
         dm.add(createComponent()
                 .setImplementation(test)
                 .add(createServiceDependency().setService(BundleStore.class).setRequired(true))
@@ -81,6 +105,32 @@ public class Activator extends DependencyActivatorBase {
 //
 //            }
 //        }).start();
+    }
+
+    @Override
+    public void updated(Dictionary dict) throws ConfigurationException {
+        if (dict == null) {
+            return;
+        }
+        URI uri;
+        try {
+            uri = new URI((String) dict.get("store.uri"));
+        } catch (URISyntaxException ex) {
+            throw new ConfigurationException("store.uri", "Invalid URI: " + dict.get("uri"), ex);
+        }
+        
+        ServiceReference[] refs;
+        try {
+            refs = m_context.getServiceReferences(Store.class.getName(), "(" + "scheme" + "=" + uri.getScheme() + ")");
+        } catch (InvalidSyntaxException ex) {
+            throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by invalid filter", ex);
+        }
+        
+        if (refs != null && refs.length > 0) {
+            m_store = (Store) m_context.getService(refs[0]);
+        } else {
+            throw new ConfigurationException("store.uri", "No registered Store service for given uri: " + uri);
+        }
     }
 
     @SuppressWarnings("unchecked")
