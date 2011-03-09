@@ -3,3 +3,5 @@
 #-----------------------------------------------------------------
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Export-Package:
