@@ -56,6 +56,12 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
+    public URI getRelativeUri() {
+        URI out = m_staticResource.getRelativeUri();
+        return out != null ? out : m_writableResource.getUri();
+    }
+
+    @Override
     public long getSize() {
         return m_staticResource.getSize();
     }

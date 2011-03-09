@@ -19,6 +19,8 @@ public interface Resource extends PropertyProvider {
     String getPresentationName();
 
     URI getUri();
+    
+    URI getRelativeUri();
 
     /**
      * Returns the resource size in bytes or -1 if size is unknown.

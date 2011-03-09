@@ -45,6 +45,10 @@ public interface ResourceDAO extends Plugin {
      */
     public void save(Resource resource) throws IOException;
 
-    public void copy(Resource resource, URI uri) throws IOException;
+    /**
+     * Removes metadata of <code>Resource</code>.
+     * @param resource 
+     */
+    public void remove(Resource resource) throws IOException;
     
 }

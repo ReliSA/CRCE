@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
@@ -139,7 +140,14 @@ public class BufferImpl implements Buffer {
 
     @Override
     public boolean remove(Resource resource) {
-        return m_repository.removeResource(resource);
+        boolean out = m_repository.removeResource(resource);
+        if (out) {
+            File file = new File(resource.getUri());
+            if (!file.delete()) {
+                m_log.log(LogService.LOG_ERROR, "Can not delete file from buffer (but it was leastwise removed from list of resources): " + resource.getUri());
+            }
+        }
+        return out;
     }
 
     @Override

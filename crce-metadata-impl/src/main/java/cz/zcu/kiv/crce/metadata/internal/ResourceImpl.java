@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import java.util.List;
 import cz.zcu.kiv.crce.metadata.Property;
 import org.apache.felix.utils.version.VersionTable;
@@ -29,6 +30,8 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
     private final Set<String> m_categories = new HashSet<String>();
+    
+    private Repository m_repository = null;
     
     private transient int m_hash;
 
@@ -62,6 +65,19 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public URI getUri() {
         Property uri = getProperty(URI);
         return uri == null ? null : (URI) uri.getConvertedValue();
+    }
+
+    @Override
+    public URI getRelativeUri() {
+        URI absolute = getUri();
+        if (absolute == null) {
+            return null;
+        }
+        if (m_repository == null) {
+            return absolute;
+        }
+        URI repo = m_repository.getURI();
+        return repo == null ? absolute : repo.relativize(absolute);
     }
 
     @Override
@@ -269,16 +285,6 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         return m_writable;
     }
 
-    protected void setWritable(boolean writable) {
-        m_writable = writable;
-    }
-
-    protected void setId(String id) {
-        if (isWritable()) {
-            setProperty(ID, id);
-        }
-    }
-
     @Override
     public void setPresentationName(String name) {
         if (isWritable()) {
@@ -367,5 +373,19 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
             }
         }
         return m_hash;
+    }
+    
+    protected void setWritable(boolean writable) {
+        m_writable = writable;
+    }
+
+    protected void setId(String id) {
+        if (isWritable()) {
+            setProperty(ID, id);
+        }
+    }
+
+    protected void setRepository(Repository repository) {
+        m_repository = repository;
     }
 }

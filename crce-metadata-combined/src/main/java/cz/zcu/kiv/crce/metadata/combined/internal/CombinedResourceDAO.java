@@ -26,8 +26,11 @@ public class CombinedResourceDAO extends AbstractResourceDAO {
         if (resource instanceof CombinedResourceImpl) {
             CombinedResourceImpl cres = (CombinedResourceImpl) resource;
 
-            m_staticResourceDAO.save(cres.getStaticResource());
-            m_writableResourceDAO.save(cres.getWritableResource());
+            try {
+                m_staticResourceDAO.save(cres.getStaticResource());
+            } finally {
+                m_writableResourceDAO.save(cres.getWritableResource());
+            }
         } else {
             throw new IllegalStateException("Not a CombinedResourceImpl"); // XXX
         }
@@ -35,9 +38,12 @@ public class CombinedResourceDAO extends AbstractResourceDAO {
     }
 
     @Override
-    public void copy(Resource resource, URI uri) throws IOException {
-        m_staticResourceDAO.copy(resource, uri);
-        m_writableResourceDAO.copy(resource, uri);
+    public void remove(Resource resource) throws IOException {
+        try {
+            m_staticResourceDAO.remove(resource);
+        } finally {
+            m_writableResourceDAO.remove(resource);
+        }
     }
 
     @Override

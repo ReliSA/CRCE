@@ -6,17 +6,22 @@ import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- *
- * @author kalwi
+ * This implementation of ResourceDAO reads/writes metadata from/to a file,
+ * whose name (URI path) is created by resource's URI path and '.meta' extension.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class MetafileResourceDAO extends AbstractResourceDAO {
 
@@ -28,56 +33,41 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
 
     public MetafileResourceDAO() {
         m_dataModelHelper = Activator.getHelper();
-        
-        System.out.println("metafile resource dao constructor");
     }
 
     @Override
     public void save(Resource resource) throws IOException {
-        // TODO check for file protocol
+        URI metadataUri = getMetafileUri(resource.getUri());
 
-        File file = new File(resource.getUri());
-
-        if (!file.getName().toLowerCase().endsWith(METAFILE_EXTENSION)) {
-            file = new File(file.getPath() + METAFILE_EXTENSION);
-        }
-        
         Writer writer;
-        try {
-            writer = new FileWriter(file);
-        } catch (Exception e) {
-            // TODO
-            return;
+        if ("file".equals(metadataUri.getScheme())) {
+            writer = new FileWriter(new File(metadataUri));
+        } else {
+            // TODO maybe another way to write to HTTP is required (see remove())
+            try {
+                writer = new OutputStreamWriter(metadataUri.toURL().openConnection().getOutputStream());
+            } catch (Exception e) {
+                throw new IOException("Can not open output stream for URI: " + metadataUri, e);
+            }
         }
         m_dataModelHelper.writeMetadata(resource, writer);
         
-        
-        // TODO - vyjimky
-        writer.flush();
-        writer.close();
-    }
-
-    @Override
-    public void copy(Resource resource, URI uri) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            writer.flush();
+        } finally {
+            writer.close();
+        }
     }
 
     @Override
     public Resource getResource(URI uri) throws IOException {
-        // TODO check for file protocol
-
-        URI mfUri;
-        if (uri.toString().toLowerCase().endsWith(METAFILE_EXTENSION)) {
-            mfUri = uri;
-        } else {
-            mfUri = metafileUri(uri);
-        }
+        URI metadataUri = getMetafileUri(uri);
 
         InputStreamReader reader;
         try {
-            reader = new InputStreamReader(mfUri.toURL().openStream());
+            reader = new InputStreamReader(metadataUri.toURL().openStream());
         } catch (MalformedURLException e) {
-            throw new IOException("Malformed URL in URI: " + mfUri.toString(), e);
+            throw new IOException("Malformed URL in URI: " + metadataUri.toString(), e);
         } catch (FileNotFoundException e) {
             Resource resource = m_resourceCreator.createResource();
             resource.setUri(uri);
@@ -93,11 +83,35 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         }
     }
 
-    private URI metafileUri(URI uri) throws IllegalStateException {
-        try {
-            return new URI(uri.toString() + METAFILE_EXTENSION);
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Unexpected URI syntax: " + uri.toString() + METAFILE_EXTENSION, e);
+    @Override
+    public void remove(Resource resource) throws IOException {
+        URI metadataUri = getMetafileUri(resource.getUri());
+        String scheme = metadataUri.getScheme();
+        if ("file".equals(scheme)) {
+            if (!new File(metadataUri).delete()) {
+                throw new IOException("Can not delete metadata file " + metadataUri);
+            }
+        } else if ("http".equals(scheme)) {
+            HttpURLConnection httpCon = (HttpURLConnection) metadataUri.toURL().openConnection();
+            httpCon.setDoOutput(true);
+            httpCon.setRequestMethod("DELETE");
+            httpCon.connect();
+        } else {
+            throw new UnsupportedOperationException("Removing metadata for scheme of given URI is not supported: " + scheme);
         }
+    }
+    
+    private URI getMetafileUri(URI uri) {
+        URI metadataUri = uri;
+
+        if (!uri.toString().toLowerCase().endsWith(METAFILE_EXTENSION)) {
+            try {
+                metadataUri = new URI(uri.toString() + METAFILE_EXTENSION);
+            } catch (URISyntaxException ex) {
+                throw new IllegalArgumentException("Invalid URI syntax: " + uri.toString() + METAFILE_EXTENSION, ex);
+            }
+        }
+        
+        return metadataUri;
     }
 }

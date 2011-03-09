@@ -20,7 +20,7 @@ public abstract class AbstractResourceDAO extends AbstractPlugin implements Reso
     }
 
     @Override
-    public void copy(Resource resource, URI uri) throws IOException {
+    public void remove(Resource resource) throws IOException {
         // do nothing
     }
 }

@@ -74,8 +74,9 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     }
 
     @Override
-    public void copy(Resource resource, URI uri) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void remove(Resource resource) throws IOException {
+        // do nothing
+        // TODO do nothing or delete resource file?
     }
 
     @Override
