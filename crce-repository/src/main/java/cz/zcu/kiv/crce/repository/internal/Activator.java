@@ -21,8 +21,8 @@ import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 
 /**
- *
- * @author kalwi
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase implements ManagedService {
     
@@ -31,10 +31,12 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     private static volatile Activator m_instance;   /* injected by dependency manager */
     private static volatile BundleContext m_context;       /* injected by dependency manager */
     
-//    private volatile ConfigurationAdmin m_config;   /* injected by dependency manager */
-
     private Store m_store = null;
     
+    /**
+     * Returns an instance of this class.
+     * @return 
+     */
     public static Activator instance() {
         return m_instance;
     }
@@ -50,7 +52,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         dm.add(createComponent()
                 .setImplementation(this)
-//                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
                 .add(createConfigurationDependency().setPid(PID))
                 );
 
@@ -82,6 +83,11 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
 
+        dm.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(DefaultResourceDAOFactory.class)
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                );
         
         // XXX vvv - only for testing purposes
         

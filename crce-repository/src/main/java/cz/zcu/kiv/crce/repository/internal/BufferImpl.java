@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
@@ -26,7 +25,8 @@ import org.osgi.framework.Version;
 import org.osgi.service.log.LogService;
 
 /**
- *
+ * Filebased implementation of <code>Buffer</code>.
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class BufferImpl implements Buffer {
@@ -109,14 +109,7 @@ public class BufferImpl implements Buffer {
             }
         }
         
-        ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
-        
-        ResourceDAO resourceDao;
-        if (factory == null) {
-            resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-        } else {
-            resourceDao = factory.getResourceDAO();
-        }
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
 
         Resource resource = resourceDao.getResource(file.toURI());
         
@@ -141,6 +134,12 @@ public class BufferImpl implements Buffer {
     @Override
     public boolean remove(Resource resource) {
         boolean out = m_repository.removeResource(resource);
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        try {
+            resourceDao.remove(resource);
+        } catch (IOException ex) {
+            m_log.log(LogService.LOG_ERROR, "Can not remove resource's metadata: " + resource.getUri(), ex);
+        }
         if (out) {
             File file = new File(resource.getUri());
             if (!file.delete()) {

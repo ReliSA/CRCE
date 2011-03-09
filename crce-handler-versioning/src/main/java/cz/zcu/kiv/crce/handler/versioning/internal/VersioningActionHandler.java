@@ -85,13 +85,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
                     m_log.log(LogService.LOG_ERROR, "Could not update version (incomparable bundles)", ex);
                 }
                 
-                ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
-                ResourceDAO creator;
-                if (factory == null) {
-                    creator = m_pluginManager.getPlugin(ResourceDAO.class);
-                } else {
-                    creator = factory.getResourceDAO();
-                }
+                ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
                 
                 try {
                     resource = creator.getResource(resource.getUri());   // reload changed resource
