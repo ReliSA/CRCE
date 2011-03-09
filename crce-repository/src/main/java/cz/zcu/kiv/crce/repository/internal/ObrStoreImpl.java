@@ -1,11 +1,14 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 //import org.osgi.service.obr.Resource;
@@ -32,7 +35,7 @@ public class ObrStoreImpl implements Store {
     }
     
     @Override
-    public void put(Resource resource) throws IOException {
+    public Resource put(Resource resource) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
 
 ////        m_repositoryAdmin.listRepositories()[0].getURL();
@@ -98,7 +101,6 @@ public class ObrStoreImpl implements Store {
 
     }
 
-    @Override
     public Resource[] get(String filter) {
         throw new UnsupportedOperationException("Not supported yet.");
 //        org.osgi.service.obr.Resource[] resources = m_repositoryAdmin.discoverResources(filter);
@@ -123,22 +125,18 @@ public class ObrStoreImpl implements Store {
     }
 
     @Override
-    public Resource getNewestVersion(String symbolicName) {
+    public boolean remove(Resource resource) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public boolean isCompatible(Resource resource) {
+    public Repository getRepository() {
         throw new UnsupportedOperationException("Not supported yet.");
-//        Resolver resolver = m_repositoryAdmin.resolver();
-//        resolver.add(resource);
-//        return resolver.resolve();
     }
 
     @Override
-    public void getBuffer(String sessionId) {
+    public void execute(List<Resource> resources, List<Executable> plugins) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 
 }

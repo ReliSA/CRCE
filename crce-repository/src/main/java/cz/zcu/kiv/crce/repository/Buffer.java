@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.repository;
 
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -46,7 +46,13 @@ public interface Buffer {
      * @param resources 
      * @param plugins 
      */
-    public void execute(List<Resource> resources, List<Plugin> plugins);
-    
-    public void commit();
+    public void execute(List<Resource> resources, List<Executable> plugins);
+
+    /**
+     * Commits uploaded resources to the configured store and remove them from
+     * the buffer. Resources commited to the store are returned in <code>List</code>.
+     * 
+     * @return list of commited resources.
+     */
+    public List<Resource> commit();
 }

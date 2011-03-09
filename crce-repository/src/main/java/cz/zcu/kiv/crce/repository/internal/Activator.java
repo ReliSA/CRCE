@@ -4,7 +4,6 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.SessionFactory;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
@@ -15,7 +14,6 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -27,11 +25,13 @@ import org.osgi.service.obr.RepositoryAdmin;
  * @author kalwi
  */
 public class Activator extends DependencyActivatorBase implements ManagedService {
+    
+    public static final String PID = "cz.zcu.kiv.crce.repository";
 
     private static volatile Activator m_instance;   /* injected by dependency manager */
     private static volatile BundleContext m_context;       /* injected by dependency manager */
     
-    private volatile ConfigurationAdmin m_config;   /* injected by dependency manager */
+//    private volatile ConfigurationAdmin m_config;   /* injected by dependency manager */
 
     private Store m_store = null;
     
@@ -50,8 +50,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         dm.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
-                .add(createConfigurationDependency().setPid("cz.zcu.kiv.crce.repository"))
+//                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
+                .add(createConfigurationDependency().setPid(PID))
                 );
 
         dm.add(createComponent()
@@ -79,6 +79,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(PriorityActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
 
         
@@ -133,26 +134,26 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void configure(String pid, String... params) throws IOException {
-        Configuration conf = m_config.getConfiguration(pid, null);
-        Dictionary properties = conf.getProperties();
-        
-        if (properties == null) {
-            properties = new Properties();
-        }
-        
-        boolean changed = false;
-        for (int i = 0; i < params.length; i += 2) {
-            if (!params[i + 1].equals(properties.get(params[i]))) {
-                properties.put(params[i], params[i + 1]);
-                changed = true;
-            }
-        }
-        if (changed) {
-            conf.update(properties);
-        }
-    }
+//    @SuppressWarnings("unchecked")
+//    public void configure(String pid, String... params) throws IOException {
+//        Configuration conf = m_config.getConfiguration(pid, null);
+//        Dictionary properties = conf.getProperties();
+//        
+//        if (properties == null) {
+//            properties = new Properties();
+//        }
+//        
+//        boolean changed = false;
+//        for (int i = 0; i < params.length; i += 2) {
+//            if (!params[i + 1].equals(properties.get(params[i]))) {
+//                properties.put(params[i], params[i + 1]);
+//                changed = true;
+//            }
+//        }
+//        if (changed) {
+//            conf.update(properties);
+//        }
+//    }
 
     @Override
     public void destroy(BundleContext bc, DependencyManager dm) throws Exception {

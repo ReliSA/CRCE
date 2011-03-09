@@ -95,7 +95,7 @@ public class PluginManagerImpl implements PluginManager {
      * Callback method called on adding new plugin.
      * @param plugin 
      */
-    public synchronized void add(Plugin plugin) {
+    synchronized void add(Plugin plugin) {
         addRecursive(plugin.getClass(), plugin);
         m_log.log(LogService.LOG_INFO, "Plugin registered: " + plugin.getPluginId());
     }

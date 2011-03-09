@@ -1,12 +1,12 @@
 package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.osgi.service.log.LogService;
@@ -17,18 +17,18 @@ import org.osgi.service.log.LogService;
  */
 public class PriorityActionHandler extends AbstractActionHandler {
 
-    LogService m_log; /* injected by dependency manager */
-
-    private volatile PluginManager m_pluginManager;
-    private static Method ON_BUFFER_UPLOAD;
-    private static Method ON_BUFFER_DELETE;
-    private static Method ON_BUFFER_DOWNLOAD;
-    private static Method ON_BUFFER_EXECUTE;
-    private static Method ON_BUFFER_COMMIT;
-    private static Method ON_STORE_DELETE;
-    private static Method ON_STORE_DOWNLOAD;
-    private static Method ON_STORE_EXECUTE;
-    private static Method ON_STORE_PUT;
+    private volatile LogService m_log;  /* injected by dependency manager */
+    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
+    
+    private static final Method ON_BUFFER_UPLOAD;
+    private static final Method ON_BUFFER_DELETE;
+    private static final Method ON_BUFFER_DOWNLOAD;
+    private static final Method ON_BUFFER_EXECUTE;
+    private static final Method ON_BUFFER_COMMIT;
+    private static final Method ON_STORE_DELETE;
+    private static final Method ON_STORE_DOWNLOAD;
+    private static final Method ON_STORE_EXECUTE;
+    private static final Method ON_STORE_PUT;
 
     static {
         try {
@@ -36,7 +36,7 @@ public class PriorityActionHandler extends AbstractActionHandler {
             ON_BUFFER_DELETE = ActionHandler.class.getMethod("onBufferDelete", Resource.class, Buffer.class);
             ON_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("onBufferDownload", Resource.class, Buffer.class);
             ON_BUFFER_EXECUTE = ActionHandler.class.getMethod("onBufferExecute", Resource.class, Buffer.class);
-            ON_BUFFER_COMMIT = ActionHandler.class.getMethod("onBufferExecute", Resource.class, Buffer.class);
+            ON_BUFFER_COMMIT = ActionHandler.class.getMethod("onBufferCommit", Array.newInstance(Resource.class, 0).getClass(), Buffer.class, Store.class);
             ON_STORE_DELETE = ActionHandler.class.getMethod("onStoreDelete", Resource.class, Store.class);
             ON_STORE_DOWNLOAD = ActionHandler.class.getMethod("onStoreDownload", Resource.class, Store.class);
             ON_STORE_EXECUTE = ActionHandler.class.getMethod("onStoreExecute", Resource.class, Store.class);

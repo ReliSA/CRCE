@@ -1,8 +1,11 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -11,27 +14,22 @@ import java.io.IOException;
 public class FilebasedStoreImpl implements Store {
 
     @Override
-    public void put(Resource resource) throws IOException {
+    public Resource put(Resource resource) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Resource[] get(String filter) {
+    public boolean remove(Resource resource) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Resource getNewestVersion(String symbolicName) {
+    public Repository getRepository() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public boolean isCompatible(Resource resource) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void getBuffer(String sessionId) {
+    public void execute(List<Resource> resources, List<Executable> plugins) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
