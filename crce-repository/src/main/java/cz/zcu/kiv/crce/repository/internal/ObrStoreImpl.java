@@ -6,7 +6,6 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import org.osgi.service.log.LogService;
@@ -26,12 +25,8 @@ public class ObrStoreImpl implements Store {
     private PluginManager m_pluginManager;
     private URL m_obrBase;
     
-    public ObrStoreImpl() {
-        try {
-            m_obrBase = new URL("http://localhost:8080/obr");
-        } catch (MalformedURLException ex) {
-            m_log.log(LogService.LOG_ERROR, "Malformed url", ex);
-        }
+    public ObrStoreImpl(URL obrBase) {
+        m_obrBase = obrBase;
     }
     
     @Override

@@ -34,6 +34,7 @@ public class BufferImpl implements Buffer {
     private volatile BundleContext m_context;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
     private volatile LogService m_log;  /* injected by dependency manager */
+    private volatile Store m_store;     /* injected by dependency manager */
     
     private final int BUFFER_SIZE = 8 * 1024;
     private final Properties m_sessionProperties;
@@ -52,14 +53,12 @@ public class BufferImpl implements Buffer {
     void init() {
         m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionFactory.SERVICE_SESSION_ID));
         if (!m_baseDir.exists()) {
-            m_baseDir.mkdir();
+            m_baseDir.mkdirs();
         } else if (!m_baseDir.isDirectory()) {
-            m_baseDir.delete();
-            m_baseDir.mkdir();
+            throw new IllegalStateException("Base directory is not a directory: " + m_baseDir);
         }
-        
-        if (!m_baseDir.exists() || !m_baseDir.isDirectory()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir.getAbsolutePath());
+        if (!m_baseDir.exists()) {
+            throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
         }
         
         RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
@@ -78,12 +77,12 @@ public class BufferImpl implements Buffer {
         for (File file : m_baseDir.listFiles()) {
             if (!file.delete()) {
                 file.deleteOnExit();
-                m_log.log(LogService.LOG_WARNING, "Can not delete file from destroyed buffer, deleteOnExit was set: " + file.getAbsolutePath());
+                m_log.log(LogService.LOG_WARNING, "Can not delete file from destroyed buffer, deleteOnExit was set: " + file);
             }
         }
         if (!m_baseDir.delete()) {
             m_baseDir.deleteOnExit();
-            m_log.log(LogService.LOG_WARNING, "Can not delete file from destroyed buffer's base dir, deleteOnExit was set: " + m_baseDir.getAbsolutePath());
+            m_log.log(LogService.LOG_WARNING, "Can not delete file from destroyed buffer's base dir, deleteOnExit was set: " + m_baseDir);
         }
     }
     
@@ -153,17 +152,12 @@ public class BufferImpl implements Buffer {
     public synchronized List<Resource> commit() {
         List<Resource> out = new ArrayList<Resource>();
         
-        Store store = Activator.instance().getStore();
-        if (store == null) {
-            throw new IllegalStateException("No Store registered, probably missing configuration for PID: " + Activator.PID);
-        }
-        
-        Resource[] resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(m_repository.getResources(), this, store);
+        Resource[] resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(m_repository.getResources(), this, m_store);
         
         for (Resource resource : resourcesToCommit) {
             Resource res;
             try {
-                res = store.put(resource);
+                res = m_store.put(resource);
             } catch (IOException e) {
                 m_log.log(LogService.LOG_ERROR, "Could not put resource to store: " + resource.getId(), e);
                 continue;

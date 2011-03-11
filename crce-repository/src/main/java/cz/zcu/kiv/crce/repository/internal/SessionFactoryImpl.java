@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionFactory;
+import cz.zcu.kiv.crce.repository.Store;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.felix.dm.Component;
@@ -35,6 +36,7 @@ public class SessionFactoryImpl implements SessionFactory {
                         .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
+                        .add(m_dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
                         .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false));
                 
                 m_dependencyManager.add(sd.m_bufferComponent);

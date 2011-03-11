@@ -21,8 +21,8 @@ public final class Activator extends DependencyActivatorBase {
     private static final int RETRY_TIMEOUT = 10000;
     
     private static volatile Activator m_instance;
-    private static volatile BundleContext m_context;
 
+    private volatile BundleContext m_context;           /* injected by dependency manager */
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
     private volatile SessionFactory m_sessionFactory;   /* injected by dependency manager */
     private volatile LogService m_log;                  /* injected by dependency manager */
@@ -80,7 +80,6 @@ public final class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         m_instance = this;
-        m_context = context;
         
         manager.add(createComponent()
                 .setImplementation(this)
