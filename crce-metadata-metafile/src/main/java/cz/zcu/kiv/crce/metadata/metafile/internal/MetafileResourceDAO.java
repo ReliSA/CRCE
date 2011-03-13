@@ -6,7 +6,6 @@ import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,12 +27,7 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
     public static final String METAFILE_EXTENSION = ".meta";
     
     private volatile ResourceCreator m_resourceCreator;
-    
-    private DataModelHelperExt m_dataModelHelper;
-
-    public MetafileResourceDAO() {
-        m_dataModelHelper = Activator.getHelper();
-    }
+    private volatile DataModelHelperExt m_dataModelHelper;
 
     @Override
     public void save(Resource resource) throws IOException {
@@ -57,6 +51,13 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         } finally {
             writer.close();
         }
+    }
+
+    @Override
+    public Resource moveResource(Resource resource, URI uri) {
+        Resource out = m_resourceCreator.createResource(resource);
+        out.setUri(uri);
+        return out;
     }
 
     @Override
@@ -88,7 +89,8 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         URI metadataUri = getMetafileUri(resource.getUri());
         String scheme = metadataUri.getScheme();
         if ("file".equals(scheme)) {
-            if (!new File(metadataUri).delete()) {
+            File resourceFile = new File(metadataUri);
+            if (resourceFile.exists() && !resourceFile.delete()) {
                 throw new IOException("Can not delete metadata file " + metadataUri);
             }
         } else if ("http".equals(scheme)) {

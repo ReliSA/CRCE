@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
@@ -118,12 +119,11 @@ public class BufferImpl implements Buffer {
         
         resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferUpload(resource, this, name);
         
-        resourceDao.save(resource);
-        
         Version version = resource.getVersion();
         for (int i = 2; !m_repository.addResource(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
         }
+        resourceDao.save(resource);
         
         m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         
@@ -131,55 +131,115 @@ public class BufferImpl implements Buffer {
     }
 
     @Override
-    public boolean remove(Resource resource) {
-        boolean out = m_repository.removeResource(resource);
+    public synchronized boolean remove(Resource resource) throws IOException {
+        if (!isInBuffer(resource)) {
+            if (m_repository.Contains(resource)) {
+                m_log.log(LogService.LOG_WARNING, "Removing resource is not in buffer but it is in internal repository: " + resource.getId());
+            }
+            return false;
+        }
+        
+        resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferDelete(resource, this);
+        
+        // if URI scheme is not 'file', it is detected in previous isInBuffer() check
+        File file = new File(resource.getUri());
+        if (!file.delete()) {
+            throw new IOException("Can not delete artifact file from buffer: " + resource.getUri());
+        }
+        
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
         try {
             resourceDao.remove(resource);
-        } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "Can not remove resource's metadata: " + resource.getUri(), ex);
-        }
-        if (out) {
-            File file = new File(resource.getUri());
-            if (!file.delete()) {
-                m_log.log(LogService.LOG_ERROR, "Can not delete file from buffer (but it was leastwise removed from list of resources): " + resource.getUri());
+        } finally {
+            // once the artifact file was removed, the resource has to be removed
+            // from the repository even in case of exception on removing metadata
+            // to keep consistency of repository with stored artifact files
+            if (!m_repository.removeResource(resource)) {
+                m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
             }
+            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
-        return out;
+        
+        return true;
     }
 
     @Override
-    public synchronized List<Resource> commit() {
+    public synchronized List<Resource> commit(boolean move) throws IOException {
         List<Resource> out = new ArrayList<Resource>();
-        
         Resource[] resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(m_repository.getResources(), this, m_store);
+        List<Resource> resourcesToRemove = new ArrayList<Resource>();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
         
-        for (Resource resource : resourcesToCommit) {
-            Resource res;
-            try {
-                res = m_store.put(resource);
-            } catch (IOException e) {
-                m_log.log(LogService.LOG_ERROR, "Could not put resource to store: " + resource.getId(), e);
-                continue;
+        // put resources to store
+        if (move && (m_store instanceof FilebasedStoreImpl)) {
+            for (Resource resource : resourcesToCommit) {
+                Resource putResource;
+                putResource = ((FilebasedStoreImpl) m_store).move(resource);
+                out.add(putResource);
+                resourcesToRemove.add(resource);
             }
-            m_repository.removeResource(resource);
-            out.add(res);
+        } else {
+            for (Resource resource : resourcesToCommit) {
+                Resource putResource;
+                putResource = m_store.put(resource);
+                out.add(putResource);
+                if (move) {
+                    resourcesToRemove.add(resource);
+                }
+            }
+        }
+        
+        // remove resources from buffer
+        if (move) {
+            for (Resource resource : resourcesToRemove) {
+                File resourceFile = new File(resource.getUri());
+                if (resourceFile.exists()) {
+                    if (!resourceFile.delete()) {
+                        m_log.log(LogService.LOG_ERROR, "Can not delete artifact from buffer: " + resource.getUri());
+                        continue;
+                    }
+                }
+                try {
+                    resourceDao.remove(resource);
+                } catch (IOException e) {
+                    // once the artifact file was removed, the resource has to be removed
+                    // from the repository even in case of exception on removing metadata
+                    // to keep consistency of repository with stored artifact files
+                    if (!m_repository.removeResource(resource)) {
+                        m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                    }
+                    m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+                    throw e;
+                }
+                if (!m_repository.removeResource(resource)) {
+                    m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                }
+            }
+            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
         
         return out;
     }
 
     @Override
-    public Repository getRepository() {
+    public synchronized Repository getRepository() {
         return m_repository;
     }
 
     @Override
-    public void execute(List<Resource> resources, List<Executable> plugins) {
+    public synchronized void execute(List<Resource> resources, List<Executable> plugins) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     Dictionary getSessionProperties() {
         return m_sessionProperties;
+    }
+    
+    private boolean isInBuffer(Resource resource) {
+        URI uri = resource.getUri().normalize();
+        if (!"file".equals(uri.getScheme())) {
+            return false;
+        }
+        return new File(uri).getPath().startsWith(m_baseDir.getAbsolutePath());
     }
 }

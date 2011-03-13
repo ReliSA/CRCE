@@ -69,6 +69,14 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     }
 
     @Override
+    public Resource moveResource(Resource resource, URI uri) {
+        Resource out = m_resourceCreator.createResource(resource);
+        out.setUri(uri);
+        out.unsetWritable();
+        return out;
+    }
+    
+    @Override
     public void save(Resource resource) throws IOException {
         // do nothing
     }

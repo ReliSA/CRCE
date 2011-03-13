@@ -16,6 +16,22 @@ public interface ResourceCreator {
     Resource createResource();
     
     /**
+     * Clone the given resource and return it's deep copy.
+     * 
+     * <p><i>Don't forget about that the implementation of the given resource
+     * could be various, so you don't know whether the given resource is a plain
+     * resource or some kind of combined resource (more resources acting as one
+     * resource). The clone made by this method (if concrete implementation does
+     * not specify it differently) is a plain resource so the inner structure
+     * could be another then the structure of the given resource. Use this
+     * method only if you are sure that you want to get a plain resource.</i>
+     * 
+     * @param resource Resource to be clonned.
+     * @return deep copy of resource.
+     */
+    Resource createResource(Resource resource);
+    
+    /**
      * Creates an empty capability with given name.
      * @param name Name of created capability.
      * @return An empty capability.
@@ -31,6 +47,7 @@ public interface ResourceCreator {
 
     /**
      * TODO
+     * @param uri 
      * @return 
      */
     WritableRepository createRepository(URI uri);

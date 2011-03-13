@@ -3,3 +3,6 @@
 #-----------------------------------------------------------------
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Embed-Dependency:\
+    plexus-utils

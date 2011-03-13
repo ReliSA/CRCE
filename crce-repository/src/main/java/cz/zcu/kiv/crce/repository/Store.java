@@ -7,11 +7,18 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- *
- * @author kalwi
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface Store {
     
+    /**
+     * Puts resource to the <code>Store</code>.
+     * 
+     * @param move
+     * @return
+     * @throws IOException 
+     */
     public Resource put(Resource resource) throws IOException;
    
     /**

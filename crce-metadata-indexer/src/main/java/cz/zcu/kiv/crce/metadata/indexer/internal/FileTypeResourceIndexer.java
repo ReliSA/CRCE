@@ -13,15 +13,13 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
 
     private static int BUFFER_LENGTH = 8;
 
-    private static String PNG = new String(new byte[] {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47,
+    private static String PNG = new String(new byte[]  {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47,
                                                         (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A});
     private static String JPEG = new String(new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF});
-    private static String ZIP = new String(new byte[] {(byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04});
+    private static String ZIP = new String(new byte[]  {(byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04});
     
     @Override
     public String[] index(InputStream input, Resource resource) {
-        System.out.println("\n--- file type ---");
-
         byte[] buffer = new byte[BUFFER_LENGTH];
         
         int read = 0;
@@ -34,12 +32,10 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
         }
         
         if (read != BUFFER_LENGTH) {
-            System.out.println("read: " + read);
             return new String[0];
         }
 
         String str = new String(buffer);
-        System.out.println("str: " + str);
 
         if (str.startsWith(ZIP)) {
             resource.addCategory("zip");
@@ -63,9 +59,6 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
                     + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
-    }
-    private void zip() {
-        
     }
 
     @Override

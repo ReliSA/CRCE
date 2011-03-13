@@ -1,15 +1,19 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
+import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResource;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import org.apache.felix.bundlerepository.impl.CapabilityImpl;
 import org.apache.felix.bundlerepository.impl.RequirementImpl;
 import java.io.IOException;
@@ -17,11 +21,13 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashSet;
 import org.apache.felix.bundlerepository.impl.PullParser;
 import org.apache.felix.bundlerepository.impl.RepositoryParser;
 import org.apache.felix.bundlerepository.impl.ResourceImpl;
 import org.apache.felix.bundlerepository.impl.XmlWriter;
 import org.kxml2.io.KXmlParser;
+import org.osgi.framework.Version;
 import org.xmlpull.v1.XmlPullParser;
 
 import static org.apache.felix.bundlerepository.Resource.*;
@@ -31,6 +37,8 @@ import static org.apache.felix.bundlerepository.Resource.*;
  * @author kalwi
  */
 public class DataModelHelperExtImpl implements DataModelHelperExt {
+    
+    private volatile ResourceCreator m_resourCreator;
 
     @Override
     public Repository readRepository(String xml) throws Exception {
@@ -114,6 +122,7 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Resource readMetadata(Reader reader) throws IOException, Exception {
         XmlPullParser parser = new KXmlParser();
         parser.setInput(reader);
@@ -123,7 +132,68 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
             throw new Exception("Expected element " + OBR);
         }
 
-        return new ConvertedResource(parseMetadata(parser));
+        Resource out = m_resourCreator.createResource();
+        ResourceImpl felixResource = parseMetadata(parser);
+        
+        for (org.apache.felix.bundlerepository.Capability fcap : felixResource.getCapabilities()) {
+            Capability cap = m_resourCreator.createCapability(fcap.getName());
+            for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {
+                cap.setProperty(fprop.getName(), fprop.getValue(), Type.getValue(fprop.getType()));
+            }
+            out.addCapability(cap);
+        }
+        for (org.apache.felix.bundlerepository.Requirement freq : felixResource.getRequirements()) {
+            Requirement req = m_resourCreator.createRequirement(freq.getName());
+            
+            req.setComment(freq.getComment());
+            req.setFilter(freq.getFilter());
+            req.setExtend(freq.isExtend());
+            req.setMultiple(freq.isMultiple());
+            req.setOptional(freq.isOptional());
+            out.addRequirement(req);
+        }
+        for (String fcat : felixResource.getCategories()) {
+            out.addCategory(fcat);
+        }
+
+        Map<String, Object> felixProperties = felixResource.getProperties();
+        
+        for (String key : felixProperties.keySet()) {
+            Object value = felixProperties.get(key);
+            if (value instanceof String) {
+                out.setProperty(key, (String) value);
+            } else if (value instanceof Double) {
+                out.setProperty(key, (Double) value);
+            } else if (value instanceof Long) {
+                out.setProperty(key, (Long) value);
+            } else if (value instanceof URI) {
+                out.setProperty(key, (URI) value);
+            } else if (value instanceof Version) {
+                out.setProperty(key, (Version) value);
+            } else if (value instanceof List) {
+                Set set = new HashSet();
+                set.addAll((List) value);
+                out.setProperty(key, set);
+            } else {
+                out.setProperty(key, value.toString());
+            }
+        }
+        
+        out.setSymbolicName(felixResource.getSymbolicName());
+        out.setPresentationName(felixResource.getPresentationName());
+        out.setSize(felixResource.getSize() != null ? felixResource.getSize() : 0);
+        try {
+            out.setUri(new URI(felixResource.getURI()));
+        } catch (Exception ex) {
+//            System.out.println("Exception: " + ex.getLocalizedMessage() + ", uri: " + resource.getURI());
+//            setUri(null); // TODO co s tim?
+        }
+        
+        out.setVersion(felixResource.getVersion());
+        
+        return out;
+        
+//        return new ConvertedResource(parseMetadata(parser));
     }
 
     public ResourceImpl parseMetadata(XmlPullParser reader) throws Exception {

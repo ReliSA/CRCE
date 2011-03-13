@@ -31,8 +31,9 @@ public interface Buffer {
      * @param resource Resource to be removed from this buffer.
      * @return <code>true</code>, if the buffer contained the resource before
      * removing.
+     * @throws IOException  
      */
-    public boolean remove(Resource resource);
+    public boolean remove(Resource resource) throws IOException;
 
     /**
      * Returns resources stored in buffer.
@@ -50,9 +51,13 @@ public interface Buffer {
 
     /**
      * Commits uploaded resources to the configured store and remove them from
-     * the buffer. Resources commited to the store are returned in <code>List</code>.
+     * the buffer, if <code>move</code> is <code>true</code>. Resources commited
+     * to the store are returned in <code>List</code>.
      * 
+     * @param move if <code>true</code>, commited resources are removed from the
+     * buffer.
      * @return list of commited resources.
+     * @throws IOException  
      */
-    public List<Resource> commit();
+    public List<Resource> commit(boolean move) throws IOException;
 }

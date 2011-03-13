@@ -17,15 +17,12 @@ import org.osgi.framework.Version;
 
 import static org.apache.felix.bundlerepository.Resource.*;
 
-// TODO synchronization of resource and it's capabilities, requirements and properties
-
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
-//    private Map<String, Object> m_map;
     private boolean m_writable;
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
@@ -37,7 +34,6 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     public ResourceImpl() {
         m_writable = true;
-//        m_map = new HashMap<String, Object>();
     }
 
     @Override
@@ -161,7 +157,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     @Override
     public void setSymbolicName(String name) {
-        if (isWritable()) {
+        if (name != null && isWritable()) {
             setProperty(SYMBOLIC_NAME, name);
             setProperty(ID, name + "/" + getVersion());
             m_hash = 0;
@@ -176,7 +172,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
         }
         if (isWritable()) {
             setProperty(VERSION, version);
-            setProperty(ID, getSymbolicName() + "/" + version);
+            if (getSymbolicName() != null) {
+                setProperty(ID, getSymbolicName() + "/" + version);
+            }
             m_hash = 0;
         }
     }
@@ -296,7 +294,7 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     public void setSize(long size) {
         if (isWritable()) {
             if (size < 0) {
-                throw new IllegalArgumentException("Size can't be less than zero");
+                throw new IllegalArgumentException("Size can't be less than zero: " + size);
             }
             setProperty(SIZE, size);
         }
@@ -387,5 +385,9 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     protected void setRepository(Repository repository) {
         m_repository = repository;
+    }
+    
+    protected Repository getRepository() {
+        return m_repository;
     }
 }

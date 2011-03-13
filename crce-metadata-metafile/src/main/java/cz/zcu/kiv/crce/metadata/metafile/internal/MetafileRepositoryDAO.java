@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.AbstractRepositoryDAO;
 import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
@@ -29,9 +30,11 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
 
     private static final String INDEX_FILENAME = "repository";
     private static final String INDEX_EXTENSION = ".xml";
-    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
+    
+    private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
-    private volatile LogService m_log; /* injected by dependency manager */
+    private volatile LogService m_log;                  /* injected by dependency manager */
+    private volatile DataModelHelperExt m_helper;       /* injected by dependency manager */
 
     @Override
     public void generateMetadata(File directory) throws IOException {
@@ -120,7 +123,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
         
         Writer writer = new FileWriter(tempIndex);
         try {
-            Activator.getHelper().writeRepository(repository, writer);
+            m_helper.writeRepository(repository, writer);
         } finally {
             try {
                 writer.close();

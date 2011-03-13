@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
@@ -111,7 +112,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new FilebasedStoreImpl(new File(uri)))
                         .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                        .add(createServiceDependency().setRequired(false).setService(LogService.class));
+                        .add(createServiceDependency().setRequired(false).setService(LogService.class))
+                        .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class));
             } catch (IOException e) {
                 throw new ConfigurationException("store.uri", "Can not create store on given base directory: " + uri, e);
             }

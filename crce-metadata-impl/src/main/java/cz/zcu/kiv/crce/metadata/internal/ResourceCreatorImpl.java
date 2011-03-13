@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
@@ -31,6 +32,52 @@ public class ResourceCreatorImpl implements ResourceCreator {
     @Override
     public WritableRepository createRepository(URI uri) {
         return new RepositoryImpl(uri);
+    }
+
+    /**
+     * This implementation does not copy isWritable flag.
+     */
+    @Override
+    public Resource createResource(Resource resource) {
+        ResourceImpl out = new ResourceImpl();
+        
+        out.setId(resource.getId());
+        out.setPresentationName(resource.getPresentationName());
+        if (resource instanceof ResourceImpl) {
+            out.setRepository(((ResourceImpl) resource).getRepository());
+        }
+        try {
+            out.setSize(resource.getSize());
+        } catch (IllegalArgumentException e) {
+            // do nothing (size of src resource is not set)
+        }
+        out.setSymbolicName(resource.getSymbolicName());
+        out.setUri(resource.getUri());
+        out.setVersion(resource.getVersion());
+        
+        for (Property property : resource.getProperties()) {
+            out.setProperty(new PropertyImpl(property.getName(), property.getType(), property.getValue()));
+        }
+        for (String category : resource.getCategories()) {
+            out.addCategory(category);
+        }
+        for (Capability capability : resource.getCapabilities()) {
+            Capability cap = new CapabilityImpl(capability.getName());
+            for (Property property : capability.getProperties()) {
+                cap.setProperty(new PropertyImpl(property.getName(), property.getType(), property.getValue()));
+            }
+            out.addCapability(cap);
+        }
+        for (Requirement requirement : resource.getRequirements()) {
+            Requirement req = new RequirementImpl(requirement.getName());
+            req.setComment(requirement.getComment());
+            req.setExtend(requirement.isExtend());
+            req.setFilter(requirement.getFilter());
+            req.setMultiple(requirement.isMultiple());
+            req.setOptional(requirement.isOptional());
+            out.addRequirement(req);
+        }
+        return out;
     }
 
 }
