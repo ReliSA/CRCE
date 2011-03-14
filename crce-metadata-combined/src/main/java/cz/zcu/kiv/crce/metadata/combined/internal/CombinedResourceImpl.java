@@ -112,23 +112,40 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public void setSymbolicName(String name) {
-        if (m_staticResource.getSymbolicName() == null) {
-            m_writableResource.setSymbolicName(name);
+        setSymbolicName(name, false);
+    }
+    
+    @Override
+    public void setSymbolicName(String name, boolean isStatic) {
+        if (m_staticResource.getSymbolicName() == null && !isSymbolicNameStatic()) {
+            m_writableResource.setSymbolicName(name, isStatic);
+        }
+    }
+
+    @Override
+    public void setVersion(Version version, boolean isStatic) {
+        // .. && m_staticResource.isWritable()
+        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && !isVersionStatic()) {
+            m_writableResource.setVersion(version, isStatic);
+        }
+    }
+
+    @Override
+    public void setVersion(String version, boolean isStatic) {
+        // ... && m_staticResource.isWritable()
+        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && !isVersionStatic()) {
+            m_writableResource.setVersion(version, isStatic);
         }
     }
 
     @Override
     public void setVersion(Version version) {
-        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && m_staticResource.isWritable()) {
-            m_writableResource.setVersion(version);
-        }
+        setVersion(version, false);
     }
 
     @Override
     public void setVersion(String version) {
-        if ("0.0.0".equals(m_staticResource.getVersion().toString()) && m_staticResource.isWritable()) {
-            m_writableResource.setVersion(version);
-        }
+        setVersion(version, false);
     }
 
     @Override
@@ -337,5 +354,15 @@ public class CombinedResourceImpl implements CombinedResource {
     @Override
     public void unsetWritable() {
         // TODO - check whether no action is correct
+    }
+
+    @Override
+    public boolean isVersionStatic() {
+        return m_staticResource.isVersionStatic() || m_writableResource.isVersionStatic();
+    }
+
+    @Override
+    public boolean isSymbolicNameStatic() {
+        return m_staticResource.isSymbolicNameStatic() || m_writableResource.isSymbolicNameStatic();
     }
 }

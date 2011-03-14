@@ -19,9 +19,10 @@ public interface Buffer {
      * @param name A name of uploaded file.
      * @param resource Uploaded resource.
      * @return 
-     * @throws IOException 
+     * @throws IOException
+     * @throws RevokedArtifactException  
      */
-    public Resource put(String name, InputStream resource) throws IOException;
+    public Resource put(String name, InputStream resource) throws IOException, RevokedArtifactException;
     
     /**
      * Removes the resource from this buffer and returns <code>true</code>, if

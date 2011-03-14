@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
@@ -88,7 +89,7 @@ public class BufferImpl implements Buffer {
     }
     
     @Override
-    public synchronized Resource put(String name, InputStream artifact) throws IOException {
+    public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
         if (name == null || artifact == null || "".equals(name)) {
             return null;
         }
@@ -113,15 +114,35 @@ public class BufferImpl implements Buffer {
 
         Resource resource = resourceDao.getResource(file.toURI());
         
-        // TODO maybe move to some plugin
+        // TODO alternatively can be moved to some plugin
         resource.createCapability("file").setProperty("name", name);
         resource.setSymbolicName(name);
         
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferUpload(resource, this, name);
+        Resource tmp;
+        try {
+            tmp = m_pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name);
+        } catch (RevokedArtifactException e) {
+            if (!file.delete()) {
+                m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + file.getPath());
+            }
+            throw e;
+        }
+        
+        if (tmp == null) {
+            m_log.log(LogService.LOG_ERROR, "ActionHandler onUploadToBuffer returned null resource, using original");
+        } else {
+            resource = tmp;
+        }
         
         Version version = resource.getVersion();
         for (int i = 2; !m_repository.addResource(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
+            if (resource.getVersion().equals(version)) {
+                if (!file.delete()) {
+                    m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + file.getPath());
+                }
+                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Buffer: " + resource.getId());
+            }
         }
         resourceDao.save(resource);
         
@@ -139,7 +160,7 @@ public class BufferImpl implements Buffer {
             return false;
         }
         
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onBufferDelete(resource, this);
+        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromBuffer(resource, this);
         
         // if URI scheme is not 'file', it is detected in previous isInBuffer() check
         File file = new File(resource.getUri());
@@ -174,14 +195,24 @@ public class BufferImpl implements Buffer {
         if (move && (m_store instanceof FilebasedStoreImpl)) {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
-                putResource = ((FilebasedStoreImpl) m_store).move(resource);
+                try {
+                    putResource = ((FilebasedStoreImpl) m_store).move(resource);
+                } catch (RevokedArtifactException ex) {
+                    m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId());
+                    continue;
+                }
                 out.add(putResource);
                 resourcesToRemove.add(resource);
             }
         } else {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
-                putResource = m_store.put(resource);
+                try {
+                    putResource = m_store.put(resource);
+                } catch (RevokedArtifactException ex) {
+                    m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId());
+                    continue;
+                }
                 out.add(putResource);
                 if (move) {
                     resourcesToRemove.add(resource);

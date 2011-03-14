@@ -1,16 +1,16 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -25,22 +25,37 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(true);
-
+        
+        Buffer buffer = Activator.instance().getBuffer(req);
+        
         PrintWriter out = resp.getWriter();
-        out.println("m_stack: " + (Activator.instance().getBuffer(req) != null ? "found" : "not found")); // XXX
-
-        Enumeration en = session.getAttributeNames();
-
-        while (en.hasMoreElements()) {
-            String name = (String) en.nextElement();
-            out.println(name + ": " + session.getAttribute(name));
+        out.println("<h1>Resources to commit:</h1>");
+        for (Resource res : buffer.getRepository().getResources()) {
+            out.println(res.getId() + " " + res.getUri());
         }
-
-        session.setAttribute("id" + new Random().nextInt(100), new Random().nextInt(10));
-
-
-        out.close();
+        
+        List<Resource> commited = buffer.commit(true);
+        out.println("<h1>Commited resources " + commited.size() + ":</h1>");
+        for (Resource res : commited) {
+            out.println(res.getId() + " " + res.getUri() + "<br>");
+        }
+        
+//        HttpSession session = req.getSession(true);
+//
+//        PrintWriter out = resp.getWriter();
+//        out.println("m_stack: " + (Activator.instance().getBuffer(req) != null ? "found" : "not found")); // XXX
+//
+//        Enumeration en = session.getAttributeNames();
+//
+//        while (en.hasMoreElements()) {
+//            String name = (String) en.nextElement();
+//            out.println(name + ": " + session.getAttribute(name));
+//        }
+//
+//        session.setAttribute("id" + new Random().nextInt(100), new Random().nextInt(10));
+//
+//
+//        out.close();
     }
 
     @Override
@@ -65,7 +80,11 @@ public class UploadServlet extends HttpServlet {
                 } else {
                     String fileName = fi.getName();
                     InputStream is = fi.getInputStream();
-                    if (Activator.instance().getBuffer(req).put(fileName, is) == null) {
+                    try {
+                        if (Activator.instance().getBuffer(req).put(fileName, is) == null) {
+                            success = false;
+                        }
+                    } catch (RevokedArtifactException ex) {
                         success = false;
                     }
                     is.close();

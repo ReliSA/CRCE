@@ -2,9 +2,9 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.codehaus.plexus.util.FileUtils;
+import org.osgi.framework.Version;
 import org.osgi.service.log.LogService;
 
 /**
@@ -24,7 +25,6 @@ import org.osgi.service.log.LogService;
 public class FilebasedStoreImpl implements Store {
     
     private volatile PluginManager m_pluginManager;
-    private volatile ResourceCreator m_resourceCreator;
     private volatile LogService m_log;
 
     private WritableRepository m_repository;
@@ -60,11 +60,16 @@ public class FilebasedStoreImpl implements Store {
         }
     }
     
-    public Resource move(Resource resource) throws IOException {
+    public Resource move(Resource resource) throws IOException, RevokedArtifactException {
         if (resource == null) {
             return resource;
         }
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onStorePut(resource, this);
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
+        if (tmp == null) {
+            m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
+        } else {
+            resource = tmp;
+        }
         if ("file".equals(resource.getUri().getScheme())) {
             return putFile(resource, true);
         } else {
@@ -73,11 +78,16 @@ public class FilebasedStoreImpl implements Store {
     }
     
     @Override
-    public Resource put(Resource resource) throws IOException {
+    public Resource put(Resource resource) throws IOException, RevokedArtifactException {
         if (resource == null) {
-            return resource;
+            return null;
         }
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onStorePut(resource, this);
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
+        if (tmp == null) {
+            m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
+        } else {
+            resource = tmp;
+        }
         if ("file".equals(resource.getUri().getScheme())) {
             return putFile(resource, false);
         } else {
@@ -85,7 +95,7 @@ public class FilebasedStoreImpl implements Store {
         }
     }
     
-    private Resource putFile(Resource resource, boolean move) throws IOException {
+    private Resource putFile(Resource resource, boolean move) throws IOException, RevokedArtifactException {
         File sourceFile = new File(resource.getUri());
         File targetFile = File.createTempFile("res", "", m_baseDir);
         
@@ -98,9 +108,18 @@ public class FilebasedStoreImpl implements Store {
             FileUtils.copyFile(sourceFile, targetFile);
         }
 
-        resourceDao.save(out);
+        Version version = out.getVersion();
+        for (int i = 2; !m_repository.addResource(out); i++) {
+            out.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
+            if (resource.getVersion().equals(version)) {
+                if (!targetFile.delete()) {
+                    m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + targetFile.getPath());
+                }
+                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + out.getId());
+            }
+        }
         
-        m_repository.addResource(out);
+        resourceDao.save(out);
         
         m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         

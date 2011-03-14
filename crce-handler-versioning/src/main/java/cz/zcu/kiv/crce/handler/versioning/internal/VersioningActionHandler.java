@@ -33,7 +33,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
     private int BUFFER_SIZE = 8 * 1024;
     
     @Override
-    public Resource onBufferUpload(Resource resource, Buffer buffer, String name) {
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
         if (resource.hasCategory("osgi") && !resource.hasCategory("versioned")) {
             Resource cand = null;
             

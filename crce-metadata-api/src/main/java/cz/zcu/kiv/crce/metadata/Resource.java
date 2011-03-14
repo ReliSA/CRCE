@@ -5,8 +5,8 @@ import java.util.Map;
 import org.osgi.framework.Version;
 
 /**
- *
- * @author kalwi
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface Resource extends PropertyProvider {
 
@@ -48,12 +48,18 @@ public interface Resource extends PropertyProvider {
 
 
     void setSymbolicName(String name);
+    
+    void setSymbolicName(String name, boolean isStatic);
 
     void setPresentationName(String name);
 
     void setVersion(Version version);
+    
+    void setVersion(Version version, boolean isStatic);
 
     void setVersion(String version);
+    
+    void setVersion(String version, boolean isStatic);
 
     void addCategory(String category);
 
@@ -83,6 +89,22 @@ public interface Resource extends PropertyProvider {
     boolean isWritable();
     
     void unsetWritable();
+    
+    /**
+     * Tells whether or not the version of this resource is hard-coded in
+     * artifact's binary data (e.g. in bundle manifest).
+     * @return <code>true</code> if the version is hard-coded and can not be
+     * changed.
+     */
+    boolean isVersionStatic();
+    
+    /**
+     * Tells whether or not the symbolic name of this resource is hard-coded in
+     * artifact's binary data (e.g. in bundle manifest).
+     * @return <code>true</code> if the symbolic name is hard-coded and can not
+     * be changed.
+     */
+    boolean isSymbolicNameStatic();
     
     String asString();
 }

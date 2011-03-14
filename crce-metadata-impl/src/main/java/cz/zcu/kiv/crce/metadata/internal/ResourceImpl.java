@@ -24,6 +24,8 @@ import static org.apache.felix.bundlerepository.Resource.*;
 public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     private boolean m_writable;
+    private boolean m_versionStatic;
+    private boolean m_symbolicNameStatic;
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
     private final Set<String> m_categories = new HashSet<String>();
@@ -157,34 +159,48 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
 
     @Override
     public void setSymbolicName(String name) {
-        if (name != null && isWritable()) {
+        setSymbolicName(name, false);
+    }
+    
+    @Override
+    public void setSymbolicName(String name, boolean isStatic) {
+        if (name != null && isWritable() && !isSymbolicNameStatic()) {
             setProperty(SYMBOLIC_NAME, name);
             setProperty(ID, name + "/" + getVersion());
             m_hash = 0;
+            m_symbolicNameStatic = isStatic;
         }
     }
 
     @Override
     public void setVersion(Version version) {
-        if (version == null) {
-            // TODO would be better to set version as 0.0.0 ?
-            throw new NullPointerException("Version can not be null.");
-        }
-        if (isWritable()) {
+        setVersion(version, false);
+    }
+
+    @Override
+    public void setVersion(Version version, boolean isStatic) {
+        if (version != null && isWritable() && !isVersionStatic()) {
             setProperty(VERSION, version);
             if (getSymbolicName() != null) {
                 setProperty(ID, getSymbolicName() + "/" + version);
             }
             m_hash = 0;
+            m_versionStatic = isStatic;
         }
     }
 
+
     @Override
     public void setVersion(String version) {
-        // TODO check null ?
-        if (isWritable()) {
+        setVersion(version, false);
+    }
+
+    @Override
+    public void setVersion(String version, boolean isStatic) {
+        if (version != null && isWritable() && !isVersionStatic()) {
             setProperty(VERSION, VersionTable.getVersion(version));
             m_hash = 0;
+            m_versionStatic = isStatic;
         }
     }
 
@@ -389,5 +405,15 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     
     protected Repository getRepository() {
         return m_repository;
+    }
+
+    @Override
+    public boolean isVersionStatic() {
+        return m_versionStatic;
+    }
+
+    @Override
+    public boolean isSymbolicNameStatic() {
+        return m_symbolicNameStatic;
     }
 }

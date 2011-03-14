@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 
 /**
  *
@@ -12,27 +13,27 @@ import cz.zcu.kiv.crce.repository.Buffer;
 public class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public Resource onStorePut(Resource resource, Store repository) {
+    public Resource onPutToStore(Resource resource, Store repository) throws RevokedArtifactException {
         return resource;
     }
 
     @Override
-    public Resource onBufferDelete(Resource resource, Buffer buffer) {
+    public Resource onDeleteFromBuffer(Resource resource, Buffer buffer) {
         return resource;
     }
 
     @Override
-    public Resource onBufferUpload(Resource resource, Buffer buffer, String name) {
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
         return resource;
     }
 
     @Override
-    public Resource onStoreDelete(Resource resource, Store repository) {
+    public Resource onDeleteFromStore(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onBufferExecute(Resource resource, Buffer buffer) {
+    public Resource onExecuteInBuffer(Resource resource, Buffer buffer) {
         return resource;
     }
 
@@ -42,17 +43,17 @@ public class AbstractActionHandler extends AbstractPlugin implements ActionHandl
     }
     
     @Override
-    public Resource onStoreExecute(Resource resource, Store store) {
+    public Resource onExecuteInStore(Resource resource, Store store) {
         return resource;
     }
 
     @Override
-    public Resource onStoreDownload(Resource resource, Store repository) {
+    public Resource onDownloadFromStore(Resource resource, Store repository) {
         return resource;
     }
 
     @Override
-    public Resource onBufferDownload(Resource resource, Buffer buffer) {
+    public Resource onDownloadFromBuffer(Resource resource, Buffer buffer) {
         return resource;
     }
 

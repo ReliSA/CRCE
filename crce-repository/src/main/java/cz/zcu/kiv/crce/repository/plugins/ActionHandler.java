@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 
 /**
  *
@@ -16,13 +17,14 @@ public interface ActionHandler extends Plugin {
      * @param resource 
      * @param name
      * @param buffer
-     * @return  
+     * @return
+     * @throws RevokedArtifactException  
      */
-    Resource onBufferUpload(Resource resource, Buffer buffer, String name);
+    Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
 
-    Resource onBufferDownload(Resource resource, Buffer buffer);
+    Resource onDownloadFromBuffer(Resource resource, Buffer buffer);
     
-    Resource onBufferExecute(Resource resource, Buffer buffer);
+    Resource onExecuteInBuffer(Resource resource, Buffer buffer);
     
     /**
      * Invoked when resource is revoked deleted from buffer.
@@ -31,7 +33,7 @@ public interface ActionHandler extends Plugin {
      * @param buffer
      * @return  
      */
-    Resource onBufferDelete(Resource resource, Buffer buffer);
+    Resource onDeleteFromBuffer(Resource resource, Buffer buffer);
     
     Resource[] onBufferCommit(Resource[] resource, Buffer buffer, Store store);
     
@@ -40,17 +42,18 @@ public interface ActionHandler extends Plugin {
      * 
      * @param resource
      * @param store
-     * @return  
+     * @return
+     * @throws RevokedArtifactException  
      */
-    Resource onStorePut(Resource resource, Store store);
+    Resource onPutToStore(Resource resource, Store store) throws RevokedArtifactException;
 
-    Resource onStoreDownload(Resource resource, Store store);
+    Resource onDownloadFromStore(Resource resource, Store store);
     
-    Resource onStoreDelete(Resource resource, Store store);
+    Resource onDeleteFromStore(Resource resource, Store store);
     
     /**
      * TODO proposed variant:
-     * Resource[] onStoreExecute(Resource[] resources, Store store);
+     * Resource[] onExecuteInStore(Resource[] resources, Store store);
      * 
      * TODO how to choose, which plugins will be executed? do an Executable plugin
      * and pass it (or set of such plugins) as method parameter?
@@ -61,7 +64,7 @@ public interface ActionHandler extends Plugin {
      * @param store
      * @return 
      */
-    Resource onStoreExecute(Resource resource, Store store);
+    Resource onExecuteInStore(Resource resource, Store store);
     
     /**
      * Returns <code>true</code> if implementing action handler modifies binary

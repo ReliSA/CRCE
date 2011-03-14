@@ -15,11 +15,12 @@ public interface Store {
     /**
      * Puts resource to the <code>Store</code>.
      * 
-     * @param move
+     * @param resource 
      * @return
-     * @throws IOException 
+     * @throws IOException
+     * @throws RevokedArtifactException  
      */
-    public Resource put(Resource resource) throws IOException;
+    public Resource put(Resource resource) throws IOException, RevokedArtifactException;
    
     /**
      * Removes the resource from this buffer and returns <code>true</code>, if

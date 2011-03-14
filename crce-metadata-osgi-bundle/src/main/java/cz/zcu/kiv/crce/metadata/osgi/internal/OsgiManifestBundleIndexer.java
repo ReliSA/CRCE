@@ -57,8 +57,8 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             return new String[0];
         }
         
-        resource.setSymbolicName(fres.getSymbolicName());
-        resource.setVersion(fres.getVersion());
+        resource.setSymbolicName(fres.getSymbolicName(), true);
+        resource.setVersion(fres.getVersion(), true);
         resource.setPresentationName(fres.getPresentationName());
         // size is not set
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
