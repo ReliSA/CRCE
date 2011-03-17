@@ -263,71 +263,81 @@ public class CombinedResourceImpl implements CombinedResource {
     }
 
     @Override
-    public void setProperty(Property property) {
+    public Resource setProperty(Property property) {
         if (m_staticResource.getProperty(property.getName()) == null) {
             m_writableResource.setProperty(property);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, String value, Type type) {
+    public Resource setProperty(String name, String value, Type type) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, value, type);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, String string) {
+    public Resource setProperty(String name, String string) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, string);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, Version version) {
+    public Resource setProperty(String name, Version version) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, version);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, URL url) {
+    public Resource setProperty(String name, URL url) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, url);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, URI uri) {
+    public Resource setProperty(String name, URI uri) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, uri);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, long llong) {
+    public Resource setProperty(String name, long llong) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, llong);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, double ddouble) {
+    public Resource setProperty(String name, double ddouble) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, ddouble);
         }
+        return this;
     }
 
     @Override
-    public void setProperty(String name, Set values) {
+    public Resource setProperty(String name, Set values) {
         if (m_staticResource.getProperty(name) == null) {
             m_writableResource.setProperty(name, values);
         }
+        return this;
     }
 
     @Override
-    public void unsetProperty(String name) {
+    public Resource unsetProperty(String name) {
         m_writableResource.unsetProperty(name);
+        return this;
     }
 
     @Override

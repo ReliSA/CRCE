@@ -3,7 +3,7 @@
  * 
  * This package contains interfaces of core repository.
  * 
- * <h2>Artifacts processing</h2>
+ * <h2>Artifacts internal processing</h2>
  * 
  * Artifacts and their metadata should be processed (added/removed) in correct
  * order to ensure data/metadata consistency in case of failure (IOException).

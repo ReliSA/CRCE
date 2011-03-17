@@ -21,14 +21,14 @@ public interface Requirement {
     boolean isWritable();
     
     
-    void setFilter(String filter);
+    Requirement setFilter(String filter);
     
-    void setMultiple(boolean multiple);
+    Requirement setMultiple(boolean multiple);
     
-    void setOptional(boolean optional);
+    Requirement setOptional(boolean optional);
     
-    void setExtend(boolean extend);
+    Requirement setExtend(boolean extend);
     
-    void setComment(String comment);
+    Requirement setComment(String comment);
 
 }

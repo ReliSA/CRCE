@@ -7,9 +7,10 @@ import org.osgi.framework.Version;
 
 /**
  *
+ * @param <T> 
  * @author kalwi
  */
-public interface PropertyProvider {
+public interface PropertyProvider<T extends PropertyProvider<T>> {
 
     Property[] getProperties();
 
@@ -17,23 +18,23 @@ public interface PropertyProvider {
     
     String getPropertyString(String name);
 
-    void setProperty(Property property);
+    T setProperty(Property property);
     
-    void setProperty(String name, String value, Type type);
+    T setProperty(String name, String value, Type type);
 
-    void setProperty(String name, String string);
+    T setProperty(String name, String string);
     
-    void setProperty(String name, Version version);
+    T setProperty(String name, Version version);
 
-    void setProperty(String name, URL url);
+    T setProperty(String name, URL url);
     
-    void setProperty(String name, URI uri);
+    T setProperty(String name, URI uri);
     
-    void setProperty(String name, long llong);
+    T setProperty(String name, long llong);
     
-    void setProperty(String name, double ddouble);
+    T setProperty(String name, double ddouble);
     
-    void setProperty(String name, Set values);
+    T setProperty(String name, Set values);
 
-    void unsetProperty(String name);
+    T unsetProperty(String name);
 }

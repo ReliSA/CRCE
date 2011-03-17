@@ -58,7 +58,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public void setFilter(String filter) {
+    public Requirement setFilter(String filter) {
         if (isWritable()) {
             try {
                 String nf = REMOVE_LT.matcher(filter).replaceAll("(!($1>=$2))");
@@ -69,34 +69,39 @@ public class RequirementImpl implements Requirement {
                 throw new IllegalArgumentException(e);
             }
         }
+        return this;
     }
 
     @Override
-    public void setMultiple(boolean multiple) {
+    public Requirement setMultiple(boolean multiple) {
         if (isWritable()) {
             m_multiple = multiple;
         }
+        return this;
     }
 
     @Override
-    public void setOptional(boolean optional) {
+    public Requirement setOptional(boolean optional) {
         if (isWritable()) {
             m_optional = optional;
         }
+        return this;
     }
 
     @Override
-    public void setExtend(boolean extend) {
+    public Requirement setExtend(boolean extend) {
         if (isWritable()) {
             m_extend = extend;
         }
+        return this;
     }
 
     @Override
-    public void setComment(String comment) {
+    public Requirement setComment(String comment) {
         if (isWritable()) {
             m_comment = comment;
         }
+        return this;
     }
 
     @Override

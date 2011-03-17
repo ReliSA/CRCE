@@ -1,5 +1,8 @@
-<repository>
+<obr>
   <resource id="crce-core/1.0.0.SNAPSHOT" presentationname="CRCE - Core" symbolicname="crce-core" version="1.0.0.SNAPSHOT">
+    <capability name='function'>
+      <p n='name' v='nejaka-funkce'/>
+    </capability>
     <capability name='function'>
       <p n='name' v='nejaka-jina-funkce'/>
     </capability>
@@ -8,4 +11,4 @@
       <p n='version' t='version' v='1.0.0.SNAPSHOT'/>
     </capability> -->
   </resource>
-</repository>
+</obr>

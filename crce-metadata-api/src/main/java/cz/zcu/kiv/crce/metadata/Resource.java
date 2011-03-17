@@ -8,7 +8,7 @@ import org.osgi.framework.Version;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public interface Resource extends PropertyProvider {
+public interface Resource extends PropertyProvider<Resource> {
 
     String getId();
 

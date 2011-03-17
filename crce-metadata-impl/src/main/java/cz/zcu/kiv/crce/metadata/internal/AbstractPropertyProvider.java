@@ -14,12 +14,15 @@ import org.osgi.framework.Version;
 
 /**
  *
+ * @param <T> 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public abstract class AbstractPropertyProvider implements PropertyProvider {
+public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> implements PropertyProvider<T> {
 
     private final Map<String, Property> m_map = new HashMap<String, Property>();
     private final List<Property> m_list = new ArrayList<Property>();
+    
+    abstract T getThis();
     
     @Override
     public synchronized Property getProperty(String name) {
@@ -33,9 +36,10 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
     }
 
     @Override
-    public synchronized void setProperty(Property property) {
+    public synchronized T setProperty(Property property) {
         m_map.put(property.getName().toLowerCase(), property);
         m_list.add(property);
+        return getThis();
     }
 
     @Override
@@ -44,43 +48,51 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
     }
 
     @Override
-    public void setProperty(String name, String value, Type type) {
+    public T setProperty(String name, String value, Type type) {
         obtainProperty(name).setValue(value, type);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, String string) {
+    public T setProperty(String name, String string) {
         obtainProperty(name).setValue(string);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, Version version) {
+    public T setProperty(String name, Version version) {
         obtainProperty(name).setValue(version);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, URL url) {
+    public T setProperty(String name, URL url) {
         obtainProperty(name).setValue(url);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, URI uri) {
+    public T setProperty(String name, URI uri) {
         obtainProperty(name).setValue(uri);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, long llong) {
+    public T setProperty(String name, long llong) {
         obtainProperty(name).setValue(llong);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, double ddouble) {
+    public T setProperty(String name, double ddouble) {
         obtainProperty(name).setValue(ddouble);
+        return getThis();
     }
 
     @Override
-    public void setProperty(String name, Set values) {
+    public T setProperty(String name, Set values) {
         obtainProperty(name).setValue(values);
+        return getThis();
     }
 
     private synchronized PropertyImpl obtainProperty(String name) {
@@ -94,8 +106,9 @@ public abstract class AbstractPropertyProvider implements PropertyProvider {
     }
 
     @Override
-    public synchronized void unsetProperty(String name) {
+    public synchronized T unsetProperty(String name) {
         Property prop = m_map.remove(name.toLowerCase());
         m_list.remove(prop);
+        return getThis();
     }
 }

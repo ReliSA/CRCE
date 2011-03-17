@@ -21,7 +21,7 @@ import static org.apache.felix.bundlerepository.Resource.*;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class ResourceImpl extends AbstractPropertyProvider implements Resource {
+public class ResourceImpl extends AbstractPropertyProvider<Resource> implements Resource {
 
     private boolean m_writable;
     private boolean m_versionStatic;
@@ -415,5 +415,10 @@ public class ResourceImpl extends AbstractPropertyProvider implements Resource {
     @Override
     public boolean isSymbolicNameStatic() {
         return m_symbolicNameStatic;
+    }
+
+    @Override
+    protected Resource getThis() {
+        return this;
     }
 }
