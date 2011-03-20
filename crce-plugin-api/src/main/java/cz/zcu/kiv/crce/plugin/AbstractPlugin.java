@@ -1,14 +1,27 @@
 package cz.zcu.kiv.crce.plugin;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
+
 /**
- *
+ * This abstract class implements all methods of <code>Plugin</code> interface.
+ * It can be extended of any plugin - it's recommended to keep unified
+ * behaviour of plugins.
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public abstract class AbstractPlugin implements Plugin {
+public abstract class AbstractPlugin implements Plugin, Comparable<Plugin> {
+    
+    private volatile BundleContext m_context;
 
     @Override
     public String getPluginId() {
         return getClass().getName();
+    }
+    
+    @Override
+    public Version getPluginVersion() {
+        return m_context.getBundle().getVersion();
     }
 
     @Override
@@ -18,7 +31,7 @@ public abstract class AbstractPlugin implements Plugin {
 
     @Override
     public String getPluginDescription() {
-        return "Unknown plugin: " + getClass().getName();
+        return "Implementation of: " + getClass().getName();
     }
 
     @Override
@@ -38,8 +51,6 @@ public abstract class AbstractPlugin implements Plugin {
         return (thisVal < anotherVal ? 1 : -1);
     }
 
-    
-    // needed ?
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -52,17 +63,20 @@ public abstract class AbstractPlugin implements Plugin {
         if ((this.getPluginId() == null) ? (other.getPluginId() != null) : !this.getPluginId().equals(other.getPluginId())) {
             return false;
         }
+        if (this.getPluginVersion().compareTo(other.getPluginVersion()) != 0) {
+            return false;
+        }
         if (this.getPluginPriority() != other.getPluginPriority()) {
             return false;
         }
         return true;
     }
 
-    // needed ?
     @Override
     public int hashCode() {
         int hash = 5;
         hash = 37 * hash + (this.getPluginId() != null ? this.getPluginId().hashCode() : 0);
+        hash = 37 * hash + this.getPluginVersion().hashCode();
         hash = 37 * hash + this.getPluginPriority();
         return hash;
     }

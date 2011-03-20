@@ -41,6 +41,7 @@
         <module>crce-handler-versioning</module>
         <module>crce-plugin-api</module>
         <module>crce-repository</module>
+        <module>crce-results</module>
         <module>crce-webui</module>
     </modules>
 

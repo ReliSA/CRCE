@@ -30,7 +30,6 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T[] getPlugins(Class<T> type) {
         return getPluginsIncl(type, new String[]{null});
     }

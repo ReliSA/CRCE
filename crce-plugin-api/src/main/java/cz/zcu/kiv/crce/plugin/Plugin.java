@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.plugin;
 
+import org.osgi.framework.Version;
+
 /**
  * Common plugin interface. Every plugin must implement it.
  * 
@@ -8,11 +10,18 @@ package cz.zcu.kiv.crce.plugin;
 public interface Plugin extends Comparable<Plugin> {
 
     /**
-     * Returns the plugin unique identification, e.g. class name.
+     * Returns the plugin unique identification.
      * 
      * @return the plugin indentification.
      */
     public String getPluginId();
+
+    /**
+     * Returns the version of plugin.
+     * 
+     * @return the version of plugin.
+     */
+    public Version getPluginVersion();
 
     /**
      * Returns plugin priority. If more plugins of the same type are present,
@@ -28,7 +37,7 @@ public interface Plugin extends Comparable<Plugin> {
      * @return the human-readable description of plugin.
      */
     public String getPluginDescription();
-    
+
     /**
      * Returns an optional array of plugin keywords or zero-length array if no
      * keyword is specified.
