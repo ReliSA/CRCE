@@ -61,7 +61,7 @@ public class FilebasedStoreImpl implements Store {
         }
     }
     
-    public Resource move(Resource resource) throws IOException, RevokedArtifactException {
+    public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
         if (resource == null) {
             return resource;
         }
@@ -71,6 +71,9 @@ public class FilebasedStoreImpl implements Store {
         } else {
             resource = tmp;
         }
+        if (m_repository.contains(resource)) {
+            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
+        }
         if ("file".equals(resource.getUri().getScheme())) {
             return putFile(resource, true);
         } else {
@@ -79,7 +82,7 @@ public class FilebasedStoreImpl implements Store {
     }
     
     @Override
-    public Resource put(Resource resource) throws IOException, RevokedArtifactException {
+    public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
         if (resource == null) {
             return null;
         }
@@ -88,6 +91,9 @@ public class FilebasedStoreImpl implements Store {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
         } else {
             resource = tmp;
+        }
+        if (m_repository.contains(resource)) {
+            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(resource.getUri().getScheme())) {
             return putFile(resource, false);
@@ -109,16 +115,21 @@ public class FilebasedStoreImpl implements Store {
             FileUtils.copyFile(sourceFile, targetFile);
         }
 
-        Version version = out.getVersion();
-        for (int i = 2; !m_repository.addResource(out); i++) {
-            out.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
-            if (resource.getVersion().equals(version)) {
-                if (!targetFile.delete()) {
-                    m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + targetFile.getPath());
-                }
-                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + out.getId());
+        if (!m_repository.addResource(out)) {
+            m_log.log(LogService.LOG_WARNING, "Resource with the same symbolic name and version already exists in Store, but it has not been expected: " + targetFile.getPath());
+            if (!targetFile.delete()) {
+                throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
             }
+            return out;
         }
+        
+//        Version version = out.getVersion();
+//        for (int i = 2; !m_repository.addResource(out); i++) {
+//            out.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
+//            if (resource.getVersion().equals(version)) {
+//                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + out.getId());
+//            }
+//        }
         
         resourceDao.save(out);
         
@@ -132,17 +143,17 @@ public class FilebasedStoreImpl implements Store {
     }
 
     @Override
-    public boolean remove(Resource resource) {
+    public synchronized boolean remove(Resource resource) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Repository getRepository() {
+    public synchronized Repository getRepository() {
         return m_repository;
     }
 
     @Override
-    public void execute(Collection<Resource> resource, Executable plugin, Properties properties) {
+    public synchronized void execute(Collection<Resource> resource, Executable plugin, Properties properties) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

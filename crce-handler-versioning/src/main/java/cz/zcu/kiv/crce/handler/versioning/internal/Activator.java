@@ -23,6 +23,12 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
+        
+        manager.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(IncreaseVersionActionHandler.class)
+                .add(createServiceDependency().setRequired(false).setService(LogService.class))
+                );
     }
 
     @Override

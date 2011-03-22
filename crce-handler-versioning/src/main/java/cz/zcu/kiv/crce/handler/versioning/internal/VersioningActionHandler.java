@@ -5,6 +5,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
+import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
@@ -23,7 +24,7 @@ import org.osgi.service.log.LogService;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class VersioningActionHandler extends AbstractActionHandler {
+public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
 
     private volatile VersionService m_versionService; /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */

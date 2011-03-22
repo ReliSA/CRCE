@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
-import cz.zcu.kiv.crce.metadata.Type;
 
 /**
  *
@@ -13,7 +12,6 @@ public class CapabilityImpl extends AbstractPropertyProvider<Capability> impleme
     private String m_name;
 
     public CapabilityImpl(String name) {
-        setProperty(name, name, Type.LONG);
         m_name = name.intern();
     }
 
