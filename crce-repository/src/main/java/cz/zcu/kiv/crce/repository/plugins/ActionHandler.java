@@ -5,9 +5,16 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import java.util.Collection;
+import java.util.Properties;
 
 /**
- *
+ * This interface defines an executable handler of various events which can
+ * occur during resource life-time.
+ * 
+ * <p>Default execution of handlers is <i>synchronous</i> so the calling method
+ * will wait for the result of execution.
+ * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ActionHandler extends Plugin {
@@ -24,7 +31,9 @@ public interface ActionHandler extends Plugin {
 
     Resource onDownloadFromBuffer(Resource resource, Buffer buffer);
     
-    Resource onExecuteInBuffer(Resource resource, Buffer buffer);
+    Collection<Resource> beforeExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer);
+    
+    Collection<Resource> afterExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer);
     
     /**
      * Invoked when resource is revoked deleted from buffer.
@@ -35,7 +44,7 @@ public interface ActionHandler extends Plugin {
      */
     Resource onDeleteFromBuffer(Resource resource, Buffer buffer);
     
-    Resource[] onBufferCommit(Resource[] resource, Buffer buffer, Store store);
+    Collection<Resource> onBufferCommit(Collection<Resource> resources, Buffer buffer, Store store);
     
     /**
      * Invoked when resource is commited from buffer to repository.
@@ -60,11 +69,15 @@ public interface ActionHandler extends Plugin {
      * or all plugins will be executed with no choice?
      * 
      * 
-     * @param resource
+     * @param resources 
+     * @param executable 
+     * @param properties 
      * @param store
      * @return 
      */
-    Resource onExecuteInStore(Resource resource, Store store);
+    Collection<Resource> beforeExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store);
+    
+    Collection<Resource> afterExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store);
     
     /**
      * Returns <code>true</code> if implementing action handler modifies binary

@@ -5,7 +5,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * 
@@ -46,9 +48,10 @@ public interface Buffer {
      * TODO analyze requirements for this method:
      * - add an executable plugin
      * @param resources 
-     * @param plugins 
+     * @param executable 
+     * @param properties 
      */
-    public void execute(List<Resource> resources, List<Executable> plugins);
+    public void execute(Collection<Resource> resources, Executable executable, Properties properties);
 
     /**
      * Commits uploaded resources to the configured store and remove them from

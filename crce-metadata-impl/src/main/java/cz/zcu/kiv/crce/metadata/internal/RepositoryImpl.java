@@ -43,7 +43,7 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public synchronized boolean Contains(Resource resource) {
+    public synchronized boolean contains(Resource resource) {
         return resources.containsKey(resource.getId());
     }
 

@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
@@ -154,7 +156,7 @@ public class BufferImpl implements Buffer {
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
         if (!isInBuffer(resource)) {
-            if (m_repository.Contains(resource)) {
+            if (m_repository.contains(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in buffer but it is in internal repository: " + resource.getId());
             }
             return false;
@@ -187,7 +189,7 @@ public class BufferImpl implements Buffer {
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
         List<Resource> out = new ArrayList<Resource>();
-        Resource[] resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(m_repository.getResources(), this, m_store);
+        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
         
@@ -210,7 +212,7 @@ public class BufferImpl implements Buffer {
                 try {
                     putResource = m_store.put(resource);
                 } catch (RevokedArtifactException ex) {
-                    m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId());
+                    m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId(), ex);
                     continue;
                 }
                 out.add(putResource);
@@ -258,7 +260,7 @@ public class BufferImpl implements Buffer {
     }
 
     @Override
-    public synchronized void execute(List<Resource> resources, List<Executable> plugins) {
+    public synchronized void execute(Collection<Resource> resources, Executable executable, Properties properties) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

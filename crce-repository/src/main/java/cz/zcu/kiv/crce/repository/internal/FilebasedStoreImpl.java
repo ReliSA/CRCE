@@ -13,7 +13,8 @@ import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
 import org.osgi.framework.Version;
 import org.osgi.service.log.LogService;
@@ -137,11 +138,11 @@ public class FilebasedStoreImpl implements Store {
 
     @Override
     public Repository getRepository() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return m_repository;
     }
 
     @Override
-    public void execute(List<Resource> resources, List<Executable> plugins) {
+    public void execute(Collection<Resource> resource, Executable plugin, Properties properties) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

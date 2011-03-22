@@ -17,7 +17,7 @@ import org.osgi.service.obr.Requirement;
 import org.osgi.service.obr.Resolver;
 import org.osgi.service.obr.Resource;
 
-public class Test {
+public class UselessTest {
 
     private volatile BundleStore m_store; /* will be injected by dependencymanager */
 
@@ -45,7 +45,7 @@ public class Test {
             System.out.println("stored: " + (m_store.get(fileName) != null));
             
         } catch (IOException ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         
@@ -58,7 +58,7 @@ public class Test {
         try {
             m_store.updated(props);
         } catch (ConfigurationException e) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, e);
         }
 
         System.out.println("");
@@ -76,9 +76,9 @@ public class Test {
             
             System.out.println("get repo: " + (m_store.get("repository.xml") != null));
         } catch (ConfigurationException ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
 //        System.out.println("\nget2");
@@ -86,7 +86,7 @@ public class Test {
 //            System.out.println("readonly1.png: " + (m_store.get("readonly1.png") != null));
 //            System.out.println("readonly2.png: " + (m_store.get("test/readonly2.png") != null));
 //        } catch (IOException ex) {
-//            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+//            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
 //        }
         
     }
@@ -98,7 +98,7 @@ public class Test {
             m_repositoryAdmin.addRepository(new URL("file:///U:/repository.xml"));
             m_repositoryAdmin.addRepository(new URL("file:///Q:/DIP/m2repo/repository.xml"));
         } catch (Exception ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         
@@ -285,7 +285,7 @@ public class Test {
         try {
             m_repositoryAdmin.addRepository(new URL("http://localhost:8080/obr/repository.xml"));
         } catch (Exception ex) {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UselessTest.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         Resource[] resources = m_repositoryAdmin.discoverResources("(uri=*)");

@@ -40,6 +40,6 @@ public interface Repository {
      * @param resource
      * @return 
      */
-    boolean Contains(Resource resource);
+    boolean contains(Resource resource);
 
 }

@@ -4,7 +4,8 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Properties;
 
 /**
  * 
@@ -42,9 +43,10 @@ public interface Store {
     /**
      * TODO analyze requirements for this method:
      * - add an executable plugin
-     * @param resources 
-     * @param plugins 
+     * @param resource 
+     * @param plugin 
+     * @param properties 
      */
-    public void execute(List<Resource> resources, List<Executable> plugins);
+    public void execute(Collection<Resource> resource, Executable plugin, Properties properties);
     
 }

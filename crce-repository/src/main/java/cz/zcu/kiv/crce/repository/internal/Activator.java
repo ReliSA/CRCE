@@ -63,7 +63,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         // XXX vvv - only for testing purposes
         
-        final Test test = new Test();
+        final UselessTest test = new UselessTest();
         dm.add(createComponent()
                 .setImplementation(test)
                 .add(createServiceDependency().setService(BundleStore.class).setRequired(true))
