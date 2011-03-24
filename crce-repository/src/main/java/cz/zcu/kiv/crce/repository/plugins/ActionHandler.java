@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -31,9 +31,9 @@ public interface ActionHandler extends Plugin {
 
     Resource onDownloadFromBuffer(Resource resource, Buffer buffer);
     
-    Collection<Resource> beforeExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer);
+    List<Resource> beforeExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer);
     
-    Collection<Resource> afterExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer);
+    List<Resource> afterExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer);
     
     /**
      * Invoked when resource is revoked deleted from buffer.
@@ -44,7 +44,7 @@ public interface ActionHandler extends Plugin {
      */
     Resource onDeleteFromBuffer(Resource resource, Buffer buffer);
     
-    Collection<Resource> onBufferCommit(Collection<Resource> resources, Buffer buffer, Store store);
+    List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store);
     
     /**
      * Invoked when resource is commited from buffer to repository.
@@ -75,9 +75,9 @@ public interface ActionHandler extends Plugin {
      * @param store
      * @return 
      */
-    Collection<Resource> beforeExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store);
+    List<Resource> beforeExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store);
     
-    Collection<Resource> afterExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store);
+    List<Resource> afterExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store);
     
     /**
      * Returns <code>true</code> if implementing action handler modifies binary

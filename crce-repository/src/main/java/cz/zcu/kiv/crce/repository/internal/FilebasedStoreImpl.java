@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
-import org.osgi.framework.Version;
 import org.osgi.service.log.LogService;
 
 /**

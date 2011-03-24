@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -40,17 +40,17 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Collection<Resource> beforeExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
+    public List<Resource> beforeExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
         return resources;
     }
 
     @Override
-    public Collection<Resource> afterExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
+    public List<Resource> afterExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
         return resources;
     }
 
     @Override
-    public Collection<Resource> onBufferCommit(Collection<Resource> resources, Buffer buffer, Store store) {
+    public List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
         return resources;
     }
     
@@ -70,12 +70,12 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Collection<Resource> beforeExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store) {
+    public List<Resource> beforeExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
         return resources;
     }
 
     @Override
-    public Collection<Resource> afterExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store) {
+    public List<Resource> afterExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
         return resources;
     }
 

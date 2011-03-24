@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.plugins;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,5 +28,5 @@ public interface Executable extends Plugin {
      * @param repository the repository of all available resources.
      * @param properties plugin configuration properties.
      */
-    void execute(Collection<Resource> resources, Repository repository, Properties properties);
+    void execute(List<Resource> resources, Repository repository, Properties properties);
 }

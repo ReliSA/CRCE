@@ -10,7 +10,7 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import org.osgi.service.log.LogService;
 
@@ -40,13 +40,13 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             ON_BUFFER_UPLOAD = ActionHandler.class.getMethod("onUploadToBuffer", Resource.class, Buffer.class, String.class);
             ON_BUFFER_DELETE = ActionHandler.class.getMethod("onDeleteFromBuffer", Resource.class, Buffer.class);
             ON_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("onDownloadFromBuffer", Resource.class, Buffer.class);
-            BEFORE_BUFFER_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInBuffer", Collection.class, Executable.class, Properties.class, Buffer.class);
-            AFTER_BUFFER_EXECUTE = ActionHandler.class.getMethod("afterExecuteInBuffer", Collection.class, Executable.class, Properties.class, Buffer.class);
-            ON_BUFFER_COMMIT = ActionHandler.class.getMethod("onBufferCommit", Collection.class, Buffer.class, Store.class);
+            BEFORE_BUFFER_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInBuffer", List.class, Executable.class, Properties.class, Buffer.class);
+            AFTER_BUFFER_EXECUTE = ActionHandler.class.getMethod("afterExecuteInBuffer", List.class, Executable.class, Properties.class, Buffer.class);
+            ON_BUFFER_COMMIT = ActionHandler.class.getMethod("onBufferCommit", List.class, Buffer.class, Store.class);
             ON_STORE_DELETE = ActionHandler.class.getMethod("onDeleteFromStore", Resource.class, Store.class);
             ON_STORE_DOWNLOAD = ActionHandler.class.getMethod("onDownloadFromStore", Resource.class, Store.class);
-            BEFORE_STORE_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInStore", Collection.class, Executable.class, Properties.class, Store.class);
-            AFTER_STORE_EXECUTE = ActionHandler.class.getMethod("afterExecuteInStore", Collection.class, Executable.class, Properties.class, Store.class);
+            BEFORE_STORE_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
+            AFTER_STORE_EXECUTE = ActionHandler.class.getMethod("afterExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
             ON_STORE_PUT = ActionHandler.class.getMethod("onPutToStore", Resource.class, Store.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Can not create method: " + ex.getMessage(), ex);
@@ -78,14 +78,14 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Resource> beforeExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
-        return (Collection<Resource>) execute(BEFORE_BUFFER_EXECUTE, new Object[]{resources, executable, properties, buffer})[0];
+    public List<Resource> beforeExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
+        return (List<Resource>) execute(BEFORE_BUFFER_EXECUTE, new Object[]{resources, executable, properties, buffer})[0];
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Resource> afterExecuteInBuffer(Collection<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
-        return (Collection<Resource>) execute(AFTER_BUFFER_EXECUTE, new Object[]{resources, executable, properties, buffer})[0];
+    public List<Resource> afterExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer) {
+        return (List<Resource>) execute(AFTER_BUFFER_EXECUTE, new Object[]{resources, executable, properties, buffer})[0];
     }
     
     @Override
@@ -113,20 +113,20 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Resource> onBufferCommit(Collection<Resource> resources, Buffer buffer, Store store) {
-        return (Collection<Resource>) execute(ON_BUFFER_COMMIT, new Object[]{resources, buffer, store})[0];
+    public List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
+        return (List<Resource>) execute(ON_BUFFER_COMMIT, new Object[]{resources, buffer, store})[0];
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Resource> beforeExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store) {
-        return (Collection<Resource>) execute(BEFORE_STORE_EXECUTE, new Object[]{resources, executable, properties, store})[0];
+    public List<Resource> beforeExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
+        return (List<Resource>) execute(BEFORE_STORE_EXECUTE, new Object[]{resources, executable, properties, store})[0];
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Resource> afterExecuteInStore(Collection<Resource> resources, Executable executable, Properties properties, Store store) {
-        return (Collection<Resource>) execute(AFTER_STORE_EXECUTE, new Object[]{resources, executable, properties, store})[0];
+    public List<Resource> afterExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
+        return (List<Resource>) execute(AFTER_STORE_EXECUTE, new Object[]{resources, executable, properties, store})[0];
     }
     
     /**
