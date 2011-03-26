@@ -18,7 +18,7 @@
     <name>CRCE - Repository API</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository</bundle.symbolicName>
+        <bundle.symbolicName>${namespace}.repository.api</bundle.symbolicName>
         <bundle.namespace>${namespace}.repository</bundle.namespace>
     </properties>
 
@@ -27,31 +27,12 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
         
-<!--        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-metadata</artifactId>
-        </dependency>-->
+        <!-- for VersioningBundleStore iface: -->
         <dependency>
             <groupId>org.apache.ace</groupId>
             <artifactId>ace-obr-storage</artifactId>
         </dependency> 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.service.obr</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.dependencymanager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
@@ -63,16 +44,6 @@
             <artifactId>crce-plugin-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -2,8 +2,9 @@
 # Use this file to add customized Bnd instructions for the bundle
 #-----------------------------------------------------------------
 
-Bundle-Activator:
+Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Export-Package: ${bundle.namespace}.*;version="${pom.version}"
+Export-Package:
 
-Private-Package:
+Embed-Dependency:\
+    plexus-utils
