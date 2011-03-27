@@ -160,7 +160,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
                 recurse(repository, new File(artifact, list[i]), rdao);
             }
         } else {
-            if (!artifact.getName().endsWith(MetafileResourceDAO.METAFILE_EXTENSION)) {
+            if (!artifact.getName().endsWith(MetafileResourceDAO.METAFILE_EXTENSION) && !artifact.getName().equals(INDEX_FILENAME + INDEX_EXTENSION)) {
                 Resource resource;
                 try {
                     resource = rdao.getResource(artifact.toURI());
