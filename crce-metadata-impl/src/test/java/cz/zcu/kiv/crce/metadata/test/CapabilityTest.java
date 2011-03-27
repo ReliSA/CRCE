@@ -1,6 +1,9 @@
-package cz.zcu.kiv.crce.metadata;
+package cz.zcu.kiv.crce.metadata.test;
 
-import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,35 +66,51 @@ public class CapabilityTest {
         assert c1.getProperties().length == 2;
     }
     
-//    @Test
-//    public void equals() throws Exception {
-//        Capability c1 = rc.createCapability("a");
-//        Capability c2 = rc.createCapability("a");
-//        
-//        assert c1.equals(c2);
-//        
-//        c1.setProperty("p1", "p1");
-//        assert !c1.equals(c2);
-//        
-//        c2.setProperty("p1", "p1");
-//        assert c1.equals(c2);
-//        
-//        
-//        
-//        Set<Capability> cs = new HashSet<Capability>();
-//        
-//        cs.add(c1);
-//        
-//        assert cs.contains(c1);
-//        assert !cs.contains(c2);
-//        
-//        c1.setProperty("p1", "p1");
-//        
-//        assert cs.contains(c1);
-//    }
+    @Test
+    public void equals() throws Exception {
+        Capability c1 = rc.createCapability("a");
+        Capability c2 = rc.createCapability("a");
+        
+        assert c1.equals(c2);
+        
+        c1.setProperty("p1", "v1");
+        assert !c1.equals(c2);
+        
+        c2.setProperty(new PropertyImpl("p1", Type.STRING, "v1"));
+        assert c1.equals(c2);
+    }
+    
     
     @Test
-    public void hash() throws Exception {
+    public void equalsNames() {
+        Capability c1 = rc.createCapability("cap");
+        Capability c2 = rc.createCapability("cap");
+        Capability c3 = rc.createCapability("cap3");
+        
+        assert c1.equals(c2);
+        assert !c1.equals(c3);
+        assert !c2.equals(c3);
+    }
+    
+    @Test
+    public void hashSet() throws Exception {
+        Capability c1 = rc.createCapability("a");
+        Capability c2 = rc.createCapability("a");
+        
+        Set<Capability> set = new HashSet<Capability>();
+        
+        set.add(c1);
+        
+        assert set.contains(c1);
+        assert set.contains(c2);
+        
+        c1.setProperty("p1", "p1");
+        assert set.contains(c1);
+        assert !set.contains(c2);
+
+        c2.setProperty("p1", "p1");
+        assert set.contains(c1);
+        assert set.contains(c2);
         
     }
 }

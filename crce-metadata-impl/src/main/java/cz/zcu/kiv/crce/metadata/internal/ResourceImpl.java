@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.util.List;
 import cz.zcu.kiv.crce.metadata.Property;
 import org.apache.felix.utils.version.VersionTable;
@@ -30,7 +30,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
     private final Set<String> m_categories = new HashSet<String>();
     
-    private Repository m_repository = null;
+    private WritableRepository m_repository = null;
     
     private transient int m_hash;
 
@@ -165,10 +165,17 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     @Override
     public void setSymbolicName(String name, boolean isStatic) {
         if (name != null && isWritable() && !isSymbolicNameStatic()) {
+            WritableRepository r;
+            if ((r = m_repository) != null) {
+                m_repository.removeResource(this);
+            }
             setProperty(SYMBOLIC_NAME, name);
             setProperty(ID, name + "/" + getVersion());
             m_hash = 0;
             m_symbolicNameStatic = isStatic;
+            if ((m_repository = r) != null) {
+                m_repository.addResource(this);
+            }
         }
     }
 
@@ -180,12 +187,17 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     @Override
     public void setVersion(Version version, boolean isStatic) {
         if (version != null && isWritable() && !isVersionStatic()) {
-            setProperty(VERSION, version);
-            if (getSymbolicName() != null) {
-                setProperty(ID, getSymbolicName() + "/" + version);
+            WritableRepository r;
+            if ((r = m_repository) != null) {
+                m_repository.removeResource(this);
             }
+            setProperty(VERSION, version);
+            setProperty(ID, getSymbolicName() + "/" + version);
             m_hash = 0;
             m_versionStatic = isStatic;
+            if ((m_repository = r) != null) {
+                m_repository.addResource(this);
+            }
         }
     }
 
@@ -197,11 +209,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
     @Override
     public void setVersion(String version, boolean isStatic) {
-        if (version != null && isWritable() && !isVersionStatic()) {
-            setProperty(VERSION, VersionTable.getVersion(version));
-            m_hash = 0;
-            m_versionStatic = isStatic;
-        }
+        setVersion(VersionTable.getVersion(version), isStatic);
     }
 
     @Override
@@ -399,11 +407,11 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
         }
     }
 
-    protected void setRepository(Repository repository) {
+    protected void setRepository(WritableRepository repository) {
         m_repository = repository;
     }
     
-    protected Repository getRepository() {
+    protected WritableRepository getRepository() {
         return m_repository;
     }
 
