@@ -13,7 +13,7 @@ import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
 import org.osgi.service.log.LogService;
@@ -152,8 +152,23 @@ public class FilebasedStoreImpl implements Store {
     }
 
     @Override
-    public synchronized void execute(Collection<Resource> resource, Executable plugin, Properties properties) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public synchronized void execute(List<Resource> resources, final Executable executable, final Properties properties) {
+        final ActionHandler ah = m_pluginManager.getPlugin(ActionHandler.class);
+        final List<Resource> res = ah.beforeExecuteInStore(resources, executable, properties, this);
+        final Store store = this;
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    executable.executeOnStore(res, store, properties);
+                } catch (Exception e) {
+                    m_log.log(LogService.LOG_ERROR, "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
+                }
+                ah.afterExecuteInStore(res, executable, properties, store);
+            }
+        }).start();
     }
 
 }

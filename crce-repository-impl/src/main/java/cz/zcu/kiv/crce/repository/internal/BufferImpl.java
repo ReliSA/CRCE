@@ -260,8 +260,23 @@ public class BufferImpl implements Buffer {
     }
 
     @Override
-    public synchronized void execute(Collection<Resource> resources, Executable executable, Properties properties) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public synchronized void execute(List<Resource> resources, final Executable executable, final Properties properties) {
+        final ActionHandler ah = m_pluginManager.getPlugin(ActionHandler.class);
+        final List<Resource> res = ah.beforeExecuteInBuffer(resources, executable, properties, this);
+        final Buffer buffer = this;
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    executable.executeOnBuffer(res, m_store, buffer, properties);
+                } catch (Exception e) {
+                    m_log.log(LogService.LOG_ERROR, "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
+                }
+                ah.afterExecuteInBuffer(res, executable, properties, buffer);
+            }
+        }).start();
     }
 
     Dictionary getSessionProperties() {

@@ -7,9 +7,8 @@ import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
 //import org.osgi.service.obr.Resource;
@@ -132,7 +131,7 @@ public class ObrStoreImpl implements Store {
     }
 
     @Override
-    public void execute(Collection<Resource> resource, Executable plugin, Properties properties) {
+    public void execute(List<Resource> resource, Executable plugin, Properties properties) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
