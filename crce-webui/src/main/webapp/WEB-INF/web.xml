@@ -31,6 +31,16 @@
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
+	<servlet>
+        <servlet-name>resource</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>resource</servlet-name>
+        <url-pattern>/resource</url-pattern>
+    </servlet-mapping>
+	
+
 
     <servlet>
         <servlet-name>UploadServlet</servlet-name>
