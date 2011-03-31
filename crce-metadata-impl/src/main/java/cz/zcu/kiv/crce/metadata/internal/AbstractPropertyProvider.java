@@ -5,9 +5,7 @@ import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Type;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
@@ -19,8 +17,7 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> implements PropertyProvider<T> {
 
-    private final Map<String, Property> m_map = new HashMap<String, Property>();
-    private final List<Property> m_list = new ArrayList<Property>();
+    final Map<String, Property> m_map = new HashMap<String, Property>();
     
     abstract T getThis();
     
@@ -38,13 +35,12 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
     @Override
     public synchronized T setProperty(Property property) {
         m_map.put(property.getName().toLowerCase(), property);
-        m_list.add(property);
         return getThis();
     }
 
     @Override
     public synchronized Property[] getProperties() {
-        return m_list.toArray(new Property[0]);
+        return m_map.values().toArray(new Property[0]);
     }
 
     @Override
@@ -100,15 +96,13 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
         if ((prop = m_map.get(name.toLowerCase())) == null) {
             prop = new PropertyImpl(name);
             m_map.put(name.toLowerCase(), prop);
-            m_list.add(prop);
         }
         return (PropertyImpl) prop;
     }
 
     @Override
     public synchronized T unsetProperty(String name) {
-        Property prop = m_map.remove(name.toLowerCase());
-        m_list.remove(prop);
+        m_map.remove(name.toLowerCase());
         return getThis();
     }
 }

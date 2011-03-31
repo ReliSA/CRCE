@@ -108,4 +108,45 @@ public class RequirementImpl implements Requirement {
     public boolean isWritable() {
         return m_writable;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RequirementImpl other = (RequirementImpl) obj;
+        if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
+            return false;
+        }
+        if (this.m_multiple != other.m_multiple) {
+            return false;
+        }
+        if (this.m_optional != other.m_optional) {
+            return false;
+        }
+        if (this.m_extend != other.m_extend) {
+            return false;
+        }
+        if ((this.m_filter == null) ? (other.m_filter != null) : !this.m_filter.equals(other.m_filter)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 23 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
+        hash = 23 * hash + (this.m_multiple ? 1 : 0);
+        hash = 23 * hash + (this.m_optional ? 1 : 0);
+        hash = 23 * hash + (this.m_extend ? 1 : 0);
+        hash = 23 * hash + (this.m_filter != null ? this.m_filter.hashCode() : 0);
+        return hash;
+    }
+    
+    
+    
 }

@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository</artifactId>
+            <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         

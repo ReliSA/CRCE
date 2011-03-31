@@ -103,23 +103,28 @@ public class PropertyImpl implements Property {
         if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
             return false;
         }
+        if (this.m_type != other.m_type) {
+            return false;
+        }
+        if ((this.m_value == null) ? (other.m_value != null) : !this.m_value.equals(other.m_value)) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 83 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
+        hash = 59 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
+        hash = 59 * hash + (this.m_type != null ? this.m_type.hashCode() : 0);
+        hash = 59 * hash + (this.m_value != null ? this.m_value.hashCode() : 0);
         return hash;
     }
-
-
+    
     @Override
     public String toString() {
         return m_value;
     }
-
-    
 
 //    @Override
     protected void setValue(String string) {

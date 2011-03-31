@@ -13,8 +13,10 @@
 
     <name>CRCE - Reactor</name>
 
-    <description>Component repository supporting compatibility evaluation, Generated using Pax-Construct</description>
+    <description>Component Repository supporting Compatibility Evaluation</description>
 
+    <url>https://www.assembla.com/spaces/crce/</url>
+    
     <properties>
         <org.osgi.service.http.port>8090</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
@@ -40,7 +42,8 @@
         <module>crce-metadata-indexer</module>
         <module>crce-handler-versioning</module>
         <module>crce-plugin-api</module>
-        <module>crce-repository</module>
+        <module>crce-repository-api</module>
+        <module>crce-repository-impl</module>
         <module>crce-results</module>
         <module>crce-webui</module>
     </modules>
@@ -54,6 +57,7 @@
                 <configuration>
                     <provision>
                         <param>--platform=felix</param>
+                        <param>--repositories=http://repo1.maven.org/maven2,http://repository.ops4j.org/maven2,http://subversion.assembla.com/svn/crce/third-parties,http://subversion.assembla.com/svn/crce/releases,http://subversion.assembla.com/svn/crce/snapshots</param>
                     </provision>
                 </configuration>
             </plugin>
@@ -94,6 +98,48 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>com.google.code.maven-svn-wagon</groupId>
+                <artifactId>maven-svn-wagon</artifactId>
+                <version>1.3</version>
+            </extension>
+        </extensions>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>crce.maven.repository.releases</id>
+            <name>CRCE Releases Repository</name>
+            <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>crce.maven.repository.snapshots</id>
+            <name>CRCE Snapshots Repository</name>
+            <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>crce.maven.repository.releases</id>
+            <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
+        </repository>
+        <repository>
+            <id>crce.maven.repository.snapshots</id>
+            <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
+        </repository>
+        <repository>
+            <id>crce.maven.repository.third-parties</id>
+            <url>svn:http://subversion.assembla.com/svn/crce/third-parties</url>
+        </repository>
+    </repositories>
+
+    <developers>
+        <developer>
+            <id>kalwi</id>
+            <name>Jiří Kučera</name>
+        </developer>
+    </developers>
+    
 </project>

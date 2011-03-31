@@ -68,7 +68,7 @@ public class Util {
             in.close();
             out.close();
         } catch (FileNotFoundException ex) {
-            fail("File not found");
+            fail("File not found: " + f1.getAbsolutePath());
         } catch (IOException e) {
             fail(e.getMessage());
         }

@@ -1,28 +1,85 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
-import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAOFactory;
 import java.io.File;
 import org.junit.*;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Inject;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+import static org.ops4j.pax.exam.CoreOptions.*;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author kalwi
  */
-public class CombinedCreatorTest {
+@RunWith(JUnit4TestRunner.class)
+public class CombinedCreatorTest extends IntegrationTestBase {
 
+    @Inject
+    private BundleContext bundleContext;
+    
     private File dir;
     private ResourceDAOFactory factory;
     private ResourceDAO creator;
     
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidSyntaxException {
         dir = Util.createTempDir();
-        factory = new CombinedResourceDAOFactory();
-        creator = factory.getResourceDAO();
-        assert creator != null : "ResourceCreator is null";
+        
+        Bundle[] bs = bundleContext.getBundles();
+        
+        System.out.println("");
+        for (Bundle b : bs ) {
+            System.out.println(b.getSymbolicName() + ": " + b.getVersion());
+        }
+
+        System.out.println("");
+        
+            ServiceReference[] srs = bundleContext.getServiceReferences(null, null) ;
+            
+            for (ServiceReference sr : srs) {
+                System.out.println("sr: " + sr + ", " + bundleContext.getService(sr).getClass().getName());
+                
+            }
+            
+            ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
+            PluginManager pm = (PluginManager) bundleContext.getService(sr);
+            factory = pm.getPlugin(ResourceDAOFactory.class);
+//    //        factory = new CombinedResourceDAOFactory();
+//            assert factory != null : "factory null";
+//            assert (factory instanceof CombinedResourceDAOFactory);
+            System.out.println(pm.toString());
+            System.out.println("factory: " + factory);
+//            factory.hashCode();
+//            creator = factory.getResourceDAO();
+//            assert creator != null : "ResourceCreator is null";
+    }
+
+    @Configuration
+    public Option[] configuration() {
+        return options(
+                provision(
+                mavenBundle().groupId("org.osgi").artifactId("org.osgi.core"),
+                mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium"),
+                mavenBundle().groupId("org.apache.felix").artifactId("org.apache.felix.dependencymanager").versionAsInProject(),
+                mavenBundle().groupId("org.apache.felix").artifactId("org.apache.felix.shell"),
+                mavenBundle().groupId("org.apache.felix").artifactId("org.osgi.service.obr"),
+                mavenBundle().groupId("org.apache.ace").artifactId("ace-obr-storage"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-api"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-plugin-api"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-repository-api"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-metafile")
+                ));
     }
 
     @After
@@ -31,6 +88,21 @@ public class CombinedCreatorTest {
         factory = null;
     }
 
+    @Test
+    public void example() throws Exception {
+        System.out.println("#################################################");
+        System.out.println("#################################################");
+        System.out.println("#################################################");
+        
+            ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
+            PluginManager pm = (PluginManager) bundleContext.getService(sr);
+            factory = pm.getPlugin(ResourceDAOFactory.class);
+            System.out.println(pm.toString());
+            System.out.println("factory: " + factory);
+        assertNotNull(pm);
+        assertNotNull(factory);
+    }
+    
     @Test
     public void createBundleResource() throws Exception {
         File bundle = Util.prepareFile(dir, "bundle.jar");

@@ -63,7 +63,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository</artifactId>
+            <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -80,8 +80,42 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        
-
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-default</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>maven-paxexam-plugin</artifactId>
+                <version>1.2.4</version>
+                <executions>
+                    <execution>
+                        <id>generate-config</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

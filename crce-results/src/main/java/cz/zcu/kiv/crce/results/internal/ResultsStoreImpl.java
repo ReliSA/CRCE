@@ -7,7 +7,9 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.results.Result;
 import cz.zcu.kiv.crce.results.ResultsStore;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,56 +22,43 @@ public class ResultsStoreImpl implements ResultsStore {
     private File m_baseDir;
 
     @Override
-    public Result getResult(Resource resource, Capability capability) {
-        /*
-         * 
-         */
+    public Result storeResult(Resource resource, URI resultsFile, Plugin provider) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Result storeResult(Plugin provider, Resource resource, URI result, Capability... capability) {
-        /*
-         * 
-         */
+    public Result associateCapability(Result result, Capability capability) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Capability[] getCapabilities(Result plugin, Resource resource) {
-        /*
-         * resource -> Capability[] {all}
-         * Capability[] {all} ~ plugin.getCapabilityName(resource) -> Capability[] {provided by plugin}
-         */
+    public Result associateRequirements(Result result, Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Result> getResults(Resource resource, Plugin plugin) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Result> getResults(Resource resource, Plugin plugin, boolean allVersions) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Result> getResults(Resource resource, Capability capability) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Result> getResults(Resource resource, Requirement requirement) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public Result getProvider(Resource resource, Capability capability) {
-        /* 
-         * capability -> name
-         * pluginManager.get(Result, name) -> provider
-         */
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public Result storeResult(Plugin provider, Resource resource, URI result, Requirement... requirement) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Result getResult(Resource resource, Requirement requirement) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Result associateResult(Result result, Capability... capabilities) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Result associateResult(Result result, Requirement... requirements) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
