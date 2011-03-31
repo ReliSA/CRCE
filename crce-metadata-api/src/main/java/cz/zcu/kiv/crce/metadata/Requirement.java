@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
- * @author kalwi
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface Requirement {
     
@@ -20,6 +20,7 @@ public interface Requirement {
     
     boolean isWritable();
     
+    boolean isSatisfied(Capability capability);
     
     Requirement setFilter(String filter);
     

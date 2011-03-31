@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import java.util.regex.Pattern;
 import org.apache.felix.utils.filter.FilterImpl;
@@ -110,6 +111,11 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
+    public boolean isSatisfied(Capability capability) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -146,7 +152,7 @@ public class RequirementImpl implements Requirement {
         hash = 23 * hash + (this.m_filter != null ? this.m_filter.hashCode() : 0);
         return hash;
     }
-    
-    
+
+   
     
 }
