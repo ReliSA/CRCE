@@ -31,8 +31,9 @@ public interface Store {
      * @param resource Resource to be removed from this buffer.
      * @return <code>true</code>, if the buffer contained the resource before
      * removing.
+     * @throws IOException  
      */
-    public boolean remove(Resource resource);
+    public boolean remove(Resource resource) throws IOException;
 
     /**
      * Returns resources stored in buffer.

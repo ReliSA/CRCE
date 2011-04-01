@@ -13,6 +13,7 @@ import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
@@ -122,14 +123,6 @@ public class FilebasedStoreImpl implements Store {
             return out;
         }
         
-//        Version version = out.getVersion();
-//        for (int i = 2; !m_repository.addResource(out); i++) {
-//            out.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
-//            if (resource.getVersion().equals(version)) {
-//                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + out.getId());
-//            }
-//        }
-        
         resourceDao.save(out);
         
         m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
@@ -142,8 +135,36 @@ public class FilebasedStoreImpl implements Store {
     }
 
     @Override
-    public synchronized boolean remove(Resource resource) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public synchronized boolean remove(Resource resource) throws IOException {
+        if (!isInStore(resource)) {
+            if (m_repository.contains(resource)) {
+                m_log.log(LogService.LOG_WARNING, "Removing resource is not in store but it is in internal repository: " + resource.getId());
+            }
+            return false;
+        }
+        
+        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromStore(resource, this);
+        
+        // if URI scheme is not 'file', it is detected in previous isInStore() check
+        File file = new File(resource.getUri());
+        if (!file.delete()) {
+            throw new IOException("Can not delete artifact file from store: " + resource.getUri());
+        }
+        
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        try {
+            resourceDao.remove(resource);
+        } finally {
+            // once the artifact file was removed, the resource has to be removed
+            // from the repository even in case of exception on removing metadata
+            // to keep consistency of repository with stored artifact files
+            if (!m_repository.removeResource(resource)) {
+                m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+            }
+            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+        }
+        
+        return true;
     }
 
     @Override
@@ -171,4 +192,11 @@ public class FilebasedStoreImpl implements Store {
         }).start();
     }
 
+    private boolean isInStore(Resource resource) {
+        URI uri = resource.getUri().normalize();
+        if (!"file".equals(uri.getScheme())) {
+            return false;
+        }
+        return new File(uri).getPath().startsWith(m_baseDir.getAbsolutePath());
+    }
 }
