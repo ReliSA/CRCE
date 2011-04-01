@@ -122,6 +122,10 @@
 
     <repositories>
         <repository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
             <id>crce.maven.repository.releases</id>
             <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
         </repository>
