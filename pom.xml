@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
         <felix.fileinstall.poll>5000</felix.fileinstall.poll>
-        <felix.fileinstall.dir>..\\conf</felix.fileinstall.dir>
+        <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
     </properties>

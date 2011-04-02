@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.repository.internal;
 
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
@@ -11,16 +10,13 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
-import org.apache.ace.obr.storage.BundleStore;
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
-import org.osgi.service.obr.RepositoryAdmin;
 
 /**
  * 
@@ -29,6 +25,8 @@ import org.osgi.service.obr.RepositoryAdmin;
 public class Activator extends DependencyActivatorBase implements ManagedService {
     
     public static final String PID = "cz.zcu.kiv.crce.repository";
+    
+    public static final String STORE_URI = "store.uri";
 
     private volatile LogService m_log;              /* injected by dependency manager */
     private volatile DependencyManager m_manager;   /* injected by dependency manager */
@@ -61,29 +59,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
         
-        // XXX vvv - only for testing purposes
-        
-        final UselessTest test = new UselessTest();
-        dm.add(createComponent()
-                .setImplementation(test)
-                .add(createServiceDependency().setService(BundleStore.class).setRequired(true))
-                .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
-                .add(createServiceDependency().setService(ConfigurationAdmin.class).setRequired(true))
-                );
-
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException ex) {
-//                }
-//
-//                test.main();
-//
-//            }
-//        }).start();
     }
 
     @Override
@@ -99,9 +74,9 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         URI uri;
         try {
-            uri = new URI((String) dict.get("store.uri"));
+            uri = new URI((String) dict.get(STORE_URI));
         } catch (URISyntaxException ex) {
-            throw new ConfigurationException("store.uri", "Invalid URI: " + dict.get("uri"), ex);
+            throw new ConfigurationException(STORE_URI, "Invalid URI: " + dict.get("uri"), ex);
         }
 
         Component store;
@@ -114,7 +89,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                         .add(createServiceDependency().setRequired(false).setService(LogService.class));
             } catch (IOException e) {
-                throw new ConfigurationException("store.uri", "Can not create store on given base directory: " + uri, e);
+                throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
             }
         } else if ("http".equals(uri.getScheme())) {
             try {
@@ -122,10 +97,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new ObrStoreImpl(uri.toURL()));
             } catch (MalformedURLException ex) {
-                throw new ConfigurationException("store.uri", "OBR Store URI is not an URL: " + uri, ex);
+                throw new ConfigurationException(STORE_URI, "OBR Store URI is not an URL: " + uri, ex);
             }
         } else {
-            throw new ConfigurationException("store.uri", "No Store implementation for given URI scheme: " + uri.getScheme());
+            throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
         }
         
         m_manager.add(store);
