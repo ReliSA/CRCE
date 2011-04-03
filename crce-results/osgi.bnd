@@ -4,5 +4,6 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-#Embed-Dependency:\
+Embed-Dependency:\
+    commons-io
 #    plexus-utils
