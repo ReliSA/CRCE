@@ -1,0 +1,252 @@
+/* CSS Document */
+
+body {
+  margin: 0 auto;
+  text-align: center;
+  font-family: Arial;
+}
+
+img {
+  border: 0;
+}
+
+a {
+  color: #666;
+}
+
+a:hover {
+  color: #BBB;
+}
+
+h2 {
+  color: #444;
+  padding: 10px 10px 0 10px;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.konec {
+  clear: both;
+  width: 0;
+  visibility: hidden;
+  height: 0;
+  font-size: 0;
+  display: block;
+}
+
+#stranka {
+  width: 902px;
+  margin: 0 auto;
+  border: 1px solid #AAA;
+}
+
+/*--------------------HLAVICKA----------------------------------------*/
+#hlavicka {
+  /*border: 1px solid black;*/
+  width: 100%;
+  text-align: left;
+}
+
+#hlavicka .logo_img {
+  float: left;
+  width: 600px;
+  color: red;
+  /*border: 1px solid black;*/
+  margin: 10px 0px 0px 12px;
+}
+
+#hlavicka .nazev {
+  float: left;
+  width: 600px;
+  color: #666;
+  font-weight: bold;
+  font-size: 1.6em;
+  /*border: 1px solid black;*/
+  margin: 5px 0px 5px 12px;
+}
+
+#hlavicka .vyhledavani {
+  float: right;
+  width: 250px;
+  text-align: right;
+  /*border: 1px solid black;*/
+  margin: 10px 15px 0 0;
+}
+
+#hlavicka .vyhledavani .text{
+  width: 150px;
+  color: #222;
+  background-color: #EEE;
+  border: 1px solid #AAA;
+}
+
+#hlavicka .vyhledavani .tlacitko{
+  width: 55px;
+  background-color: #666;
+  border: 1px solid #AAA;
+  color: #FFF; 
+  font-weight: bold;
+}
+
+#hlavicka .vyhledavani .tlacitko:hover {
+  color: #222;
+  background-color: #BBB;
+  border: 1px solid #AAA;
+}
+
+/*--------------------MENU----------------------------------------*/
+#menu {
+  background-color: #AAA;
+  margin: 0 auto;
+  padding: 0;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+
+#menu li {
+  float: left;
+  display: inline;
+  list-style-type: none;
+  text-align: center;
+}
+
+#menu li a {
+  text-decoration: none;
+  color: #222;
+  float: left;
+  display: inline;
+  padding: 3px 20px;
+  font-weight: bold;
+  font-size: 1.1em;
+  border-right: 2px solid #444;
+}
+
+#menu li a:hover {
+  color: #EEE;
+}
+#menu li a.aktivni {
+  color: #FFF;
+}
+
+/* Vycisteni menu */
+.vycisteni:after {
+  display: block;
+  clear: both;
+  visibility: hidden;
+  height: 0;
+  font-size: 0;
+  content: ' ';
+}
+
+.vycisteni {min-height: 1px;}
+.vycisteni {display: inline-block;}
+
+/* Backslash hack - nemel by to videt IE/Mac \*/
+.vycisteni {display: block;}
+/* Konec hacku */
+
+/*--------------------TELO----------------------------------------*/
+#telo {
+  width: 100%;
+  padding-top: 10px;
+  text-align: left;
+  margin: 0 auto;
+  /*border: 1px solid black;*/
+  background-color: #EEE;
+}
+
+.komponenta {
+  width: 880px;
+  margin: 0 auto;
+  border: 1px solid #AAA;
+}
+
+.komponenta .nadpis {
+  /*border: 1px solid black;*/
+  background-color: #CCC;
+  padding: 1px 10px 1px 10px;
+}           
+
+.komponenta .nadpis .popis {
+  width: 770px;
+  float: left;
+  /*padding: 0 0 0 10px;*/
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1em;
+  color: #222;
+  /*border: 1px solid black;*/
+}
+
+.komponenta .nadpis .popis:hover {
+  color: #777;
+}
+
+.komponenta .nadpis .nabidka {
+  float: right;
+  text-align: right;
+  /*padding: 0 10px 0 0;*/
+  /*border: 1px solid black;*/
+  width: 80px;
+}
+
+.komponenta .informace {
+  /*border: 1px solid black;*/
+  background-color: #EEE;
+  padding: 5px 10px 5px 10px;
+}
+
+#animacni_odkazy {
+  width: 880px;
+  margin: 0 auto;
+  font-size: 0.8em;
+  padding-top: 5px;
+  text-align: right;
+}
+
+/*--------------------PATICKA----------------------------------------*/
+#paticka {
+  padding-top: 10px;
+  width: 100%;
+  font-size: 0.6em;
+  /*border: 1px solid black;*/
+  background-color: #EEE;
+  color: #333;
+}
+
+
+/*--------------------FORMULAR----------------------------------------*/
+
+table {
+  padding: 10px;
+}
+
+th {
+  font-weight: bold;
+}
+
+td {
+  text-align: center;
+  margin: 0 auto;
+}
+
+table .text{
+  width: 300px;
+  color: #222;
+  background-color: #FFF;
+  border: 1px solid #AAA;
+}
+
+table .tlacitko{
+  margin: 10px 0 0 0;
+  text-align: center;
+  background-color: #666;
+  border: 1px solid #AAA;
+  color: #FFF; 
+  font-weight: bold;
+}
+
+table .tlacitko:hover {
+  color: #222;
+  background-color: #BBB;
+}
