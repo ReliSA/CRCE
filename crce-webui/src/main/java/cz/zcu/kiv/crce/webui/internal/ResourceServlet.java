@@ -28,7 +28,7 @@ public class ResourceServlet extends HttpServlet {
 		Resource[] store = Activator.instance().getStore().getRepository().getResources();
 		session.setAttribute("store", store);	
 		try {
-			req.getRequestDispatcher("test.jsp").forward(req, resp);
+			req.getRequestDispatcher("jsp/plugins.jsp").forward(req, resp);
 			
 			
 		} catch (ServletException e) {

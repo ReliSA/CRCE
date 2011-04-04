@@ -155,6 +155,12 @@ h2 {
   background-color: #EEE;
 }
 
+.pridat {
+  width: 880px;
+  margin: 0 auto;
+  padding: 10px 0 10px 0;
+}
+
 .komponenta {
   width: 880px;
   margin: 0 auto;
@@ -168,7 +174,7 @@ h2 {
 }           
 
 .komponenta .nadpis .popis {
-  width: 770px;
+  width: 740px;
   float: left;
   /*padding: 0 0 0 10px;*/
   text-decoration: none;
@@ -187,7 +193,7 @@ h2 {
   text-align: right;
   /*padding: 0 10px 0 0;*/
   /*border: 1px solid black;*/
-  width: 80px;
+  width: 120px;
 }
 
 .komponenta .informace {
