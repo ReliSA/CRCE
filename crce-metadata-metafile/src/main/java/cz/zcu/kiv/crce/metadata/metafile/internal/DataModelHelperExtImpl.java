@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
+import cz.zcu.kiv.crce.results.Result;
 import java.util.Set;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,26 @@ import static org.apache.felix.bundlerepository.Resource.*;
 public class DataModelHelperExtImpl implements DataModelHelperExt {
     
     private volatile ResourceCreator m_resourCreator;
+
+    @Override
+    public Result readResult(String xml) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Result readResult(Reader reader) throws IOException, Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String writeResult(Result result) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void writeResult(Result result, Writer writer) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     @Override
     public Repository readRepository(String xml) throws Exception {

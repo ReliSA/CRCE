@@ -107,6 +107,7 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
         if (!m_baseDir.exists() && !m_baseDir.mkdirs()) {
             throw new ConfigurationException(path, "Results store directory does not exists and can not be created: " + m_baseDir.getPath());
         }
+        
     }
 
 }

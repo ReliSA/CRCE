@@ -11,14 +11,14 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-results</artifactId>
+    <artifactId>crce-results-api</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Results</name>
+    <name>CRCE - Results API</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.results</bundle.symbolicName>
+        <bundle.symbolicName>${namespace}.results.api</bundle.symbolicName>
         <bundle.namespace>${namespace}.results</bundle.namespace>
     </properties>
 
@@ -27,15 +27,11 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
+        </dependency>-->
         
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.dependencymanager</artifactId>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>

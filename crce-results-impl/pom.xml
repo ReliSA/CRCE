@@ -11,16 +11,15 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-metadata-metafile</artifactId>
+    <artifactId>crce-results-impl</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - Metafile Metadata</name>
+    <name>CRCE - Results Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.metadata.metafile</bundle.symbolicName>
-        <bundle.namespace>${namespace}.metadata.metafile</bundle.namespace>
-        <skipTests>true</skipTests>
+        <bundle.symbolicName>${namespace}.results.impl</bundle.symbolicName>
+        <bundle.namespace>${namespace}.results</bundle.namespace>
     </properties>
 
     <dependencies>
@@ -38,27 +37,8 @@
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.sf.kxml</groupId>
-            <artifactId>kxml2</artifactId>
-            <scope>provided</scope>
-            <version>2.3.0</version>
-        </dependency>
-
-        
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-impl</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -70,30 +50,15 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>crce-results-api</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        
-        
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-
-        <!-- EMBEDDED by BND -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.bundlerepository</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
