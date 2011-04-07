@@ -9,21 +9,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-   <%
-   /*
-   		String hello = (String) session.getAttribute("hello");
-   		Resource[] resources = (Resource[]) session.getAttribute("resources");
-   		Plugin[] plugins = (Plugin[]) session.getAttribute("plugins");
-   		Resource[] store = (Resource[]) session.getAttribute("store");
-   		if(hello!=null && resources!=null && plugins!=null && store!=null)
-   		{
-   		 	out.print(hello);
-   		 	out.print("Resources size : "+resources.length+" Plugin size: "+plugins.length+" Store length: "+store.length);
-   		}
-   		else out.print("DIED");
-   	*/
-   %>
    
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"> 
@@ -86,24 +71,31 @@
     </ul>
     
   	<div id="telo">
+  	
+  	  <form method="post" action="#">
   	       
       <c:forEach items="${store}" var="resource">
   		<div class="komponenta">
   			<div class="nadpis">
-  				<a class="popis" href="#">${resource.presentationName} ${resource.version}</a>
+  				<a class="popis" href="#">${resource.symbolicName} ${resource.version} ${resource.presentationName}</a>
   				<div class="nabidka">
             <a href="#"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
             <a href="form.html"><img src="graphic/edit.png" alt="edit" title="Edit component ${resource.presentationName} ${resource.version}" /></a>
             <a href="#"><img src="graphic/del.png" alt="delete" title="Delete component Lorem ${resource.presentationName} ${resource.version}"/></a>
+          	<input type="checkbox" name="${resource.presentationName}_${resource.version}" />
           </div>
   				<div class="konec"></div>
   			</div>
   			<div class="informace">
-  				<div class="polozka"><strong>Id:</strong> ${resource.id}</div>
-  				<div class="polozka"><strong>Symbolic name:</strong> ${resource.symbolicName}</div>
-  				<div class="polozka"><strong>URI:</strong> ${resource.uri}</div>
-  				<div class="polozka"><strong>Relative URI:</strong> ${resource.relativeUri}</div>
-  				<div class="polozka"><strong>Size:</strong> ${resource.size}</div>
+  				<div class="polozka"><strong>Properties:</strong> 
+  					<ul>
+  						<li><strong>Id:</strong> ${resource.id}</li>
+  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
+  						<li><strong>URI:</strong> ${resource.uri}</li>
+  						<li><strong>Relative URI:</strong> ${resource.relativeUri}</li>
+  						<li><strong>Size:</strong> ${resource.size}</li>
+  					</ul>
+  				</div>
   				<div class="polozka"><strong>Categories:</strong> 
   					<ul>
   						<c:forEach items="${resource.categories}" var="category">
@@ -139,6 +131,10 @@
   		<div id="animacni_odkazy">
   		  <a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
   		</div>
+  		
+  		<input class="tlacitko" type="submit" value="EXECUTE" />
+  	</form>
+  	
   	</div>
   
   	<div id="paticka">&copy; ASWI project 2011</div>

@@ -237,11 +237,18 @@ td {
 }
 
 table .text{
-  width: 300px;
+  width: 500px;
   color: #222;
   background-color: #FFF;
   border: 1px solid #AAA;
 }
+
+table .chyba{
+  color: red;
+  font-weight: bold;
+  padding: 0 10px 0 10px;
+}
+	
 
 table .tlacitko{
   margin: 10px 0 0 0;

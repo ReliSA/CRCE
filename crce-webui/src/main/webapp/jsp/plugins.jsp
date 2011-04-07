@@ -10,24 +10,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-   <%
-   /*
-   		String hello = (String) session.getAttribute("hello");
-   		Resource[] resources = (Resource[]) session.getAttribute("resources");
-   		
-   		Plugin[] plugins = (Plugin[]) session.getAttribute("plugins");
-   		plugins[0]*/
-   		/*
-   		Resource[] store = (Resource[]) session.getAttribute("store");
-   		if(hello!=null && resources!=null && plugins!=null && store!=null)
-   		{
-   		 	out.print(hello);
-   		 	out.print("Resources size : "+resources.length+" Plugin size: "+plugins.length+" Store length: "+store.length);
-   		}
-   		else out.print("DIED");
-   	*/
-   %>
    
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"> 

@@ -26,9 +26,10 @@ public class ResourceServlet extends HttpServlet {
 		session.setAttribute("plugins", plugins);
 		
 		Resource[] store = Activator.instance().getStore().getRepository().getResources();
-		session.setAttribute("store", store);	
+		session.setAttribute("store", store);
+		
 		try {
-			req.getRequestDispatcher("jsp/plugins.jsp").forward(req, resp);
+			req.getRequestDispatcher("jsp/store.jsp").forward(req, resp);
 			
 			
 		} catch (ServletException e) {
