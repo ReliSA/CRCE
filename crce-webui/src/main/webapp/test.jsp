@@ -67,7 +67,7 @@
   		<div class="nazev">Software components storage</div>
       
   		<div class="vyhledavani">
-        <form method="get" action="#">
+        <form method="post" action="#">
           <input class="text" type="text" name="search" />
           <input class="tlacitko" type="submit" value="search" />
         </form>
