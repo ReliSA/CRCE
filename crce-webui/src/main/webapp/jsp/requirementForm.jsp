@@ -31,37 +31,38 @@
   	<div class="konec"></div>
     
     <ul id="menu" class="vycisteni">
-    	<li><a href="#">Buffer</a></li>
-    	<li><a href="#">Store</a></li>
-        <li><a href="#">Search</a></li>
-        <li><a href="#">Plugins</a></li>
+    	<li><a class="aktivni" href="resource?link=buffer">Buffer</a></li>
+    	<li><a href="resource?link=store">Store</a></li>
+    	<li><a href="#">Upload</a></li>
+        <li><a href="resource?link=plugins">Plugins</a></li>
     </ul>
     
   	<div id="telo">
   	
       <h2>Requirement form</h2>
-      <table>
+      
       <form action="#" method="post">
-        <tr>
-        	<th>Name:</th>
-        	<td><input class="text" type="text" name="name" value="${requirement.name}" /></td>
-        	<td class="chyba">${nameError}</td>
-        </tr>
-        <tr>
-        	<th>Filter:</th>
-        	<td><input class="text" type="text" name="filter" value="${requirement.filter}" /></td>
-        	<td class="chyba">${filterError}</td>
-        </tr>
-        <tr>
-        	<th>Comment:</th>
-        	<td><textarea class="text" name="comment">${requirement.comment}</textarea></td>
-        	<td class="chyba">${commentError}</td>
-        </tr>
-        <tr>
-        	<td colspan="2"><input class="tlacitko" type="submit" value="save values" /></td>
-        </tr>
+	      <table>
+	        <tr>
+	        	<th>Name:</th>
+	        	<td><input class="text" type="text" name="name" value="${requirement.name}" /></td>
+	        	<td class="chyba">${nameError}</td>
+	        </tr>
+	        <tr>
+	        	<th>Filter:</th>
+	        	<td><input class="text" type="text" name="filter" value="${requirement.filter}" /></td>
+	        	<td class="chyba">${filterError}</td>
+	        </tr>
+	        <tr>
+	        	<th>Comment:</th>
+	        	<td><textarea class="text" name="comment">${requirement.comment}</textarea></td>
+	        	<td class="chyba">${commentError}</td>
+	        </tr>
+	        <tr>
+	        	<td colspan="2"><input class="tlacitko" type="submit" value="save values" /></td>
+	        </tr>      
+	      </table>
       </form>
-      </table>
   		
   	</div>
   

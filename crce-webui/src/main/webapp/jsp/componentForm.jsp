@@ -31,10 +31,10 @@
   	<div class="konec"></div>
     
     <ul id="menu" class="vycisteni">
-    	<li><a href="#">Buffer</a></li>
-    	<li><a href="#">Store</a></li>
-        <li><a href="#">Search</a></li>
-        <li><a href="#">Plugins</a></li>
+    	<li><a class="aktivni" href="resource?link=buffer">Buffer</a></li>
+    	<li><a href="resource?link=store">Store</a></li>
+    	<li><a href="#">Upload</a></li>
+        <li><a href="resource?link=plugins">Plugins</a></li>
     </ul>
     
   	<div id="telo">

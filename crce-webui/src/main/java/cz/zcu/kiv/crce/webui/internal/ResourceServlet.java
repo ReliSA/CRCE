@@ -72,9 +72,8 @@ public class ResourceServlet extends HttpServlet {
 		if(link==null) return false;
 		if(link.equals("buffer"))
 		{
-			Resource[] resources = Activator.instance().getBuffer(req).getRepository().getResources();
-			System.out.println(resources.length);
-			session.setAttribute("resources", resources);
+			Resource[] buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+			session.setAttribute("buffer", buffer);
 			return true;
 		}
 		

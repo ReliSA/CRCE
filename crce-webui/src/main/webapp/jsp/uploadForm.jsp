@@ -31,35 +31,24 @@
   	<div class="konec"></div>
     
     <ul id="menu" class="vycisteni">
-    	<li><a class="aktivni" href="resource?link=buffer">Buffer</a></li>
+    	<li><a href="resource?link=buffer">Buffer</a></li>
     	<li><a href="resource?link=store">Store</a></li>
-    	<li><a href="#">Upload</a></li>
+    	<li><a class="aktivni" href="#">Upload</a></li>
         <li><a href="resource?link=plugins">Plugins</a></li>
     </ul>
     
   	<div id="telo">
   	
-      <h2>Property form</h2>
-      
-      <form action="#" method="post">
+      <h2>Upload form</h2>
+      <form method="post" enctype="multipart/form-data" action="/crce/upload" accept-charset="utf-8">
 	      <table>
 	        <tr>
-	        	<th>Name:</th>
-	        	<td><input class="text" type="text" name="name" value="${property.name}" /></td>
-	        	<td class="chyba">${nameError}</td>
+	        	<th>jar file:</th>
+	        	<td><input class="text" type="file" name="bundle" value="" /></td>
+	        	<td class="chyba">${bundleError}</td>
 	        </tr>
 	        <tr>
-	        	<th>Type:</th>
-	        	<td><input class="text" type="text" name="type" value="${property.type}" /></td>
-	        	<td class="chyba">${typeError}</td>
-	        </tr>
-	        <tr>
-	        	<th>Value:</th>
-	        	<td><input class="text" type="text" name="value" value="${property.value}" /></td>
-	        	<td class="chyba">${valueError}</td>
-	        </tr>
-	        <tr>
-	        	<td colspan="2"><input class="tlacitko" type="submit" value="save values" /></td>
+	        	<td colspan="2"><input class="tlacitko" type="submit" value="upload file" /></td>
 	        </tr>
 	      </table>
       </form>

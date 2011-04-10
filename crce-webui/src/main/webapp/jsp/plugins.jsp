@@ -64,10 +64,10 @@
   	</div>
   	<div class="konec"></div>
     
-    <ul id="menu" class="vycisteni">
+   <ul id="menu" class="vycisteni">
     	<li><a href="resource?link=buffer">Buffer</a></li>
     	<li><a href="resource?link=store">Store</a></li>
-        <li><a href="">Search</a></li>
+    	<li><a href="resource?link=uploadForm">Upload</a></li>
         <li><a class="aktivni" href="resource?link=plugins">Plugins</a></li>
     </ul>
     
@@ -78,9 +78,9 @@
   			<div class="nadpis">
   				<a class="popis" href="#">${plugin.pluginId}</a>
   				<div class="nabidka">
-            <a href="#"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
-            <a href="form.html"><img src="graphic/edit.png" alt="edit" title="Edit component ${resource.presentationName} ${resource.version}" /></a>
-            <a href="#"><img src="graphic/del.png" alt="delete" title="Delete component Lorem ${resource.presentationName} ${resource.version}"/></a>
+            <a href="#"><img src="graphic/save.png" alt="download" title="Download plugin ${plugin.pluginDescription}" /></a>
+            <a href="form.html"><img src="graphic/edit.png" alt="edit" title="Edit plugin ${plugin.pluginDescription}" /></a>
+            <a href="#"><img src="graphic/del.png" alt="delete" title="Delete plugin ${plugin.pluginDescription}"/></a>
           </div>
   				<div class="konec"></div>
   			</div>
