@@ -72,10 +72,27 @@
     
   	<div id="telo">
 	  <div class="pridat">
-		<a href="#"> <img src="graphic/add.png" alt="upload" title="upload" />Upload new component</a>
+		<form method="POST" enctype="multipart/form-data" action="/crce/upload" accept-charset="utf-8">
+                <input type="file" name="bundle"/><br/>
+                <input type="submit" value="upload"/>
+        </form>
+        
+        <c:choose>
+        	<c:when test="${success}">
+        		Upload Succesful
+        	</c:when>
+        	
+        	<c:when test="${success == null }">
+        	</c:when>
+        	
+        	<c:otherwise>
+        		Upload not succesful!
+        	</c:otherwise>
+        </c:choose>
+        
   	  </div>
   	       
-      <c:forEach items="${store}" var="resource">
+      <c:forEach items="${resources}" var="resource">
   		<div class="komponenta">
   			<div class="nadpis">
   				<a class="popis" href="#">${resource.presentationName} ${resource.version}</a>

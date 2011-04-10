@@ -18,7 +18,14 @@ public class ResourceServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String regex = req.getParameter("search");
+			
+			String source = (String )req.getSession().getAttribute("source");
+			if(source!= null && source.equals("upload")){
+				doGet(req,resp);
+				return;
+			}
+			
+			String regex = req.getParameter("search");
 
 	}
 
@@ -35,11 +42,12 @@ public class ResourceServlet extends HttpServlet {
 		try {
 			if(fillSession(session,link,req))
 			{
-				resp.sendRedirect("jsp/"+link+".jsp");
-				//req.getRequestDispatcher("jsp/"+link+".jsp").forward(req, resp);
+				//resp.sendRedirect("jsp/"+link+".jsp");
+				req.getRequestDispatcher("jsp/"+link+".jsp").forward(req, resp);
 			}
 			else
 			{
+				System.out.println("Default forward");
 				req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
 			}
 
@@ -51,11 +59,21 @@ public class ResourceServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+	private static void cleanSession(HttpSession session){
+		session.removeAttribute("resources");
+		session.removeAttribute("plugins");
+		session.removeAttribute("store");
+		session.removeAttribute("success");
+		session.removeAttribute("source");
+	}
+	
 	private boolean fillSession(HttpSession session, String link, HttpServletRequest req){
+		cleanSession(session);
 		if(link==null) return false;
 		if(link.equals("buffer"))
 		{
 			Resource[] resources = Activator.instance().getBuffer(req).getRepository().getResources();
+			System.out.println(resources.length);
 			session.setAttribute("resources", resources);
 			return true;
 		}

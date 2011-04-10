@@ -93,8 +93,13 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-
-        resp.sendRedirect("index.jsp?success=" + success);
+        req.getSession().setAttribute("success", success);
+        req.getSession().setAttribute("source", "upload");
+        System.out.println("I'm here why do I not forward? Because I'm bitch");
+       
+        req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
+       
+        System.out.println("Here shouldnt I be");
     }
 
     // send a response with the specified status code
