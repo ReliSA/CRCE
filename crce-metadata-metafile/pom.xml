@@ -28,18 +28,11 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
+
         
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.configadmin</artifactId>
         </dependency>
         
         <dependency>
@@ -73,6 +66,14 @@
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-results-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

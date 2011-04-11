@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
@@ -81,5 +82,15 @@ public class RepositoryImpl implements Repository, WritableRepository {
         }
         lastModified = System.nanoTime();
         return out;
+    }
+
+    @Override
+    public Resource[] getResources(String filter) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Resource[] getResources(Requirement[] requirements) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -5,6 +5,11 @@ import java.util.Map;
 import org.osgi.framework.Version;
 
 /**
+ * Resource represents an artifact and it's OBR metadata.
+ * 
+ * <p>An unique identificator of a resource is it's symbolic name and version.
+ * 
+ * <p>Resource have capabilities, requirements, properties and categories.
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
@@ -45,7 +50,8 @@ public interface Resource extends PropertyProvider<Resource> {
     boolean hasCapability(Capability capability);
 
     boolean hasRequirement(Requirement requirement);
-
+    
+    /* --- setters --- */
 
     void setSymbolicName(String name);
     

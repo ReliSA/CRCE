@@ -3,8 +3,10 @@ package cz.zcu.kiv.crce.metadata;
 import java.net.URI;
 
 /**
- * Represents a repository.
+ * Represents a set of resources. Repository can be assigned to a physical URI
+ * which resources are stored on, but it does not manage physical content.
  * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface Repository {
 
@@ -21,6 +23,20 @@ public interface Repository {
      */
     Resource[] getResources();
 
+    /**
+     * 
+     * @param filter
+     * @return 
+     */
+    Resource[] getResources(String filter);
+    
+    /**
+     * 
+     * @param requirements
+     * @return 
+     */
+    Resource[] getResources(Requirement[] requirements);
+    
     /**
      * Return the name of this repository.
      * 
