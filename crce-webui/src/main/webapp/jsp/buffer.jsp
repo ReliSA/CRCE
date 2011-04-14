@@ -71,7 +71,12 @@
     </ul>
     
   	<div id="telo">
-  	
+  	  
+  	  		<form method="POST" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
+                <input type="file" name="bundle"/><br/>
+                <input type="submit" value="upload"/>
+            </form>
+  	   	
   	  <form method="post" action="#">
   	       
       <c:forEach items="${buffer}" var="resource">
@@ -86,7 +91,7 @@
   				<div class="nabidka">
   					<a href="#"><img src="graphic/commit.png" alt="commit" title="Commit component ${resource.presentationName} ${resource.version}" /></a>
 		            <a href="#"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
-		            <a href="#"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
+		            <a href="edit?uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
 		            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
 		          	<input type="checkbox" name="${resource.presentationName}_${resource.version}" />
           		</div>

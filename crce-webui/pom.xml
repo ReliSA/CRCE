@@ -137,6 +137,13 @@
             <groupId>org.apache.ace</groupId>
             <artifactId>ace-obr-storage</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>javax.servlet</groupId>
+        	<artifactId>jstl</artifactId>
+        	<version>1.2</version>
+        	<type>jar</type>
+        	<scope>runtime</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -87,7 +87,7 @@
   				</a>
   				<div class="nabidka">
 		            <a href="#"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
-		            <a href="#"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
+		            <a href="edit?uri=${resource.uri}&link=store"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
 		            <a href="#"><img src="graphic/set.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
 		          	<input type="checkbox" name="${resource.presentationName}_${resource.version}" />
           		</div>
