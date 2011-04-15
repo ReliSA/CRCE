@@ -2,7 +2,9 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
@@ -78,6 +80,11 @@ public class ResourceCreatorImpl implements ResourceCreator {
             out.addRequirement(req);
         }
         return out;
+    }
+
+    @Override
+    public Resolver createResolver(Repository... repository) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

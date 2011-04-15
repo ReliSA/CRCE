@@ -51,4 +51,11 @@ public interface ResourceCreator {
      * @return 
      */
     WritableRepository createRepository(URI uri);
+
+    /**
+     * Creates a resolver for the given repositories.
+     * @param repository
+     * @return 
+     */
+    Resolver createResolver(Repository... repository);
 }
