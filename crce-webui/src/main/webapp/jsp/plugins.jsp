@@ -1,3 +1,5 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <jsp:include page="include/header.jsp" flush="true">
 	<jsp:param name="title" value="Plugins list" />
 	<jsp:param name="plugins" value="true" />
