@@ -4,7 +4,6 @@
 	<jsp:param name="title" value="Buffer list" />
 	<jsp:param name="buffer" value="true" />
 </jsp:include>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
   	<div id="telo">
   	  
 		<form method="post" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
