@@ -20,13 +20,20 @@ public class ResourceServlet extends HttpServlet {
 			throws ServletException, IOException {
 			
 			String source = (String )req.getSession().getAttribute("source");
+			System.out.println(source);
 			if(source!= null && (source.equals("upload") || source.equals("commit")))
 			{
 				doGet(req,resp);
 				return;
 			}
+			else if(req.getParameter("filter")!=null){
+				
+				String filter = req.getParameter("filter");
+				fillSession(source,req,filter);
+				req.getRequestDispatcher("jsp/"+source+".jsp").forward(req, resp);
+			}
 			
-			String regex = req.getParameter("search");
+			
 
 	}
 
@@ -41,7 +48,7 @@ public class ResourceServlet extends HttpServlet {
 			
 		}
 		try {
-			if(fillSession(session,link,req))
+			if(fillSession(link,req,null))
 			{
 				//resp.sendRedirect("jsp/"+link+".jsp");
 				req.getRequestDispatcher("jsp/"+link+".jsp").forward(req, resp);
@@ -68,26 +75,33 @@ public class ResourceServlet extends HttpServlet {
 		session.removeAttribute("source");
 	}
 	
-	private boolean fillSession(HttpSession session, String link, HttpServletRequest req){
+	private boolean fillSession(String link, HttpServletRequest req, String filter){
+		HttpSession session = req.getSession();
 		cleanSession(session);
 		if(link==null) return false;
 		if(link.equals("buffer"))
 		{
-			Resource[] buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+			Resource[] buffer;
+			if(filter==null) buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+			else buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
 			session.setAttribute("buffer", buffer);
 			return true;
 		}
 		
 		else if(link.equals("plugins"))
 		{
-				Plugin[] plugins = Activator.instance().getPluginManager().getPlugins();
+			    Plugin[] plugins;
+				if(filter==null) plugins = Activator.instance().getPluginManager().getPlugins();
+				else plugins = Activator.instance().getPluginManager().getPlugins(Plugin.class, filter);
 				session.setAttribute("plugins", plugins);
 				return true;
 		}
 		
 		else if(link.equals("store"))
 		{
-			Resource[] store = Activator.instance().getStore().getRepository().getResources();
+			Resource[] store;
+			if(filter==null) store = Activator.instance().getStore().getRepository().getResources();
+			else store = Activator.instance().getStore().getRepository().getResources(filter);
 			session.setAttribute("store", store);
 			return true;
 		}
@@ -95,6 +109,21 @@ public class ResourceServlet extends HttpServlet {
 		else
 		{
 			link=null;
+			return false;
+		}
+	}
+	private boolean getObjectBooleanValue(Object object){
+		try{
+		String param = (String) object;
+		System.out.println(param);
+		if(param!=null && param.equals("true")) 
+			{
+				System.out.println(param);
+				return true;
+			}
+		else return false;
+		}
+		catch(Exception e){
 			return false;
 		}
 	}

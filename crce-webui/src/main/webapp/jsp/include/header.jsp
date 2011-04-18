@@ -67,10 +67,12 @@
 	  		<div class="nazev">Software components storage</div>
 	      
 	  		<div class="vyhledavani">
-	        <form method="get" action="#">
-	          <input class="text" type="text" name="search" />
+	  		
+	        <form method="post" action="resource">
+	          <input class="text" type="text" name="filter" />
 	          <input class="tlacitko" type="submit" value="search" />
 	        </form>
+	        
 	      </div>
 	  	</div>
 	  	<div class="konec"></div>
