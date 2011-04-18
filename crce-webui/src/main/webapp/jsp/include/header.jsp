@@ -48,7 +48,20 @@
 	<body>
 
 	<div id="stranka">
-  	
+		
+		<c:choose>
+		<c:when test="${param.buffer}">
+			<c:set scope="session" var="source" value="buffer"/>		
+		</c:when>
+		<c:when test="${param.store}">
+			<c:set scope="session" var="source" value="store"/>		
+		</c:when>
+		
+		<c:when test="${param.plugins}">
+			<c:set scope="session" var="source" value="plugins"/>		
+		</c:when>
+		</c:choose>
+		  	
 	  	<div id="hlavicka">
 	  		<div class="logo_img"><a href="index.html"><img src="graphic/crce.png" alt="logo" /></a></div>
 	  		<div class="nazev">Software components storage</div>
