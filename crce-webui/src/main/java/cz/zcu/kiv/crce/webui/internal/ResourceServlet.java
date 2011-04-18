@@ -20,7 +20,8 @@ public class ResourceServlet extends HttpServlet {
 			throws ServletException, IOException {
 			
 			String source = (String )req.getSession().getAttribute("source");
-			if(source!= null && source.equals("upload")){
+			if(source!= null && (source.equals("upload") || source.equals("commit")))
+			{
 				doGet(req,resp);
 				return;
 			}

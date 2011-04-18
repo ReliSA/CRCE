@@ -4,7 +4,7 @@
 	<jsp:param name="title" value="Buffer list" />
 	<jsp:param name="buffer" value="true" />
 </jsp:include>
-    
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
   	<div id="telo">
   	  
 		<form method="post" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
@@ -23,8 +23,7 @@
 	  					<span class="pName">${resource.presentationName}</span>
 	  					<span class="category"><c:forEach items="${resource.categories}" var="category">${$category}</c:forEach></span>
 	  				</a>
-	  				<div class="nabidka">
-	  					<a href="#"><img src="graphic/commit.png" alt="commit" title="Commit component ${resource.presentationName} ${resource.version}" /></a>
+	  				<div class="nabidka">	  					
 			            <a href="#"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
 			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
@@ -81,7 +80,10 @@
   			<input class="tlacitko" type="submit" value="EXECUTE" />
   		
   		</form>
-  	
+  		
+  		<form method="post" action="download">
+  		<input class="tlacitko" type="submit" value="COMMIT"/>
+  		</form>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />

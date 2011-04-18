@@ -63,8 +63,7 @@
 	  	<div class="konec"></div>
     
 	    <ul id="menu" class="vycisteni">
-	    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Buffer</a></li>
+	    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
 	    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Store</a></li>
-	    	<li><a href="#">Upload</a></li>
-	        <li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
+	    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
 	    </ul>
