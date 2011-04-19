@@ -53,22 +53,33 @@
 	  					<ul>
 	  						<c:forEach items="${resource.capabilities}" var="capability">
 	  							<li>
-	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /> Edit</a>
-	  								<ul>
+	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
+	  								<table class="poskytuje">
 		  								<c:forEach items="${capability.properties}" var="property">
-		  									<li>${property.name} (${property.type}) - ${property.value}</li>
+		  									<tr>
+		  										<td class="jmeno">${property.name}</td>
+		  										<td class="typ">${property.type}</td>
+		  										<td class="hodnota">${property.value}</td>
+		  									</tr>
 		  								</c:forEach>
-	  								</ul>
+	  								</table>
 	  							</li>
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
 	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
-	  					<ul>
+						<table class="vyzaduje">
+	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<li>${requirement.name} - ${requirement.filter}</li>
+	  							<tr>
+	  								<td>${requirement.name}</td>
+	  								<td class="filter">${requirement.filter}</td>
+	  								<td>${requirement.multiple}</td>
+	  								<td>${requirement.optional}</td>
+	  								<td>${requirement.extend}</td>
+	  							</tr>
 	  						</c:forEach>
-	  					</ul>
+	  					</table>
 	  				</div>
 	  			</div>
 	  		</div>
@@ -87,14 +98,14 @@
   		</c:if>
 			
 			<c:if test="${not empty buffer}">  		
-  				<input class="tlacitko" type="submit" value="EXECUTE TESTS" />
+  				<input class="tlacitko" type="submit" value="EXECUTE TESTS ON CHECKED" />
   			</c:if>
   		
   		</form>
   		
   		<c:if test="${not empty buffer}">
   		<form class="execute_commit" method="post" action="download">
-  			<input class="tlacitko" type="submit" value="COMMIT"/>
+  			<input class="tlacitko" type="submit" value="COMMIT ALL"/>
   		</form>
   		</c:if>
   	</div>

@@ -47,12 +47,12 @@
 	  					<ul>
 	  						<c:forEach items="${resource.capabilities}" var="capability">
 	  							<li>
-	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /> Edit</a>
-	  								<ul>
+	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
+	  								<table class="poskytuje">
 		  								<c:forEach items="${capability.properties}" var="property">
-		  									<li>${property.name} (${property.type}) - ${property.value}</li>
+		  									<tr><td class="jmeno">${property.name}</td><td class="typ">${property.type}</td><td class="hodnota">${property.value}</td></tr>
 		  								</c:forEach>
-	  								</ul>
+	  								</table>
 	  							</li>
 	  						</c:forEach>
 	  					</ul>
