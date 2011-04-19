@@ -31,16 +31,6 @@
 	        	<td class="chyba">${symbolicNameError}</td>
 	        </tr>
 	        <tr>
-	        	<th>URI:</th>
-	        	<td><input class="text" type="text" name="uri" value="${component.uri}" /></td>
-	        	<td class="chyba">${uriError}</td>
-	        </tr>
-	        <tr>
-	        	<th>Relative URI:</th>
-	        	<td><input class="text" type="text" name="relativeUri" value="${component.relativeUri}" /></td>
-	        	<td class="chyba">${relativeUriError}</td>
-	        </tr>
-	        <tr>
 	        	<td colspan="2"><input class="tlacitko" type="submit" value="Save values" /></td>
 	        </tr>
 		</table>
