@@ -165,6 +165,7 @@ h2 {
   width: 880px;
   margin: 0 auto;
   border: 1px solid #AAA;
+  overflow: hidden;
 }
 
 .komponenta .nadpis {
@@ -236,7 +237,47 @@ h2 {
   color: #333;
 }
 
+/*-------------TLACITKO----------------------------------------------*/
 
+.tlacitko {
+  text-align: center;
+  background-color: #666;
+  border: 1px solid #AAA;
+  color: #FFF; 
+  font-weight: bold;
+}
+
+.tlacitko:hover {
+  color: #222;
+  background-color: #BBB;
+}
+
+/*----------------UPLOAD---------------------------------------------*/
+
+.upload {
+	padding: 5px;
+	width: 880px;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	background-color: #CCC;
+}
+
+.upload td {
+	text-align: left;
+	width: 100%;
+}
+
+.upload .text {
+  width: 80%;
+  color: #222;
+  background-color: #FFF;
+  border: 1px solid #AAA;
+}
+
+.upload .tlacitko {
+	width: 100px;
+	font-size: 1.1em;
+}
 /*--------------------FORMULAR----------------------------------------*/
 
 .formular {
@@ -266,32 +307,12 @@ h2 {
 }
 	
 
-.formular .tlacitko{
-  margin: 10px 0 0 0;
+.formular .tlacitko {
+	margin: 10px 0 0 0;
 }
 
-/*----------------UPLOAD---------------------------------------------*/
+/*-----------------EXECUTE_COMMIT-------------------------*/
 
-.upload {
-	padding: 10px;
+.execute_commit .tlacitko {
+	margin: 0 0 10px 10px;
 }
-
-.upload .text {
-  width: 300px;
-  color: #222;
-  background-color: #FFF;
-  border: 1px solid #AAA;
-}
-
-.tlacitko {
-  text-align: center;
-  background-color: #666;
-  border: 1px solid #AAA;
-  color: #FFF; 
-  font-weight: bold;
-}
-
-.tlacitko:hover {
-  color: #222;
-  background-color: #BBB;
-}	

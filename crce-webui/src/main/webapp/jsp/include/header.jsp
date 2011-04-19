@@ -63,17 +63,15 @@
 		</c:choose>
 		  	
 	  	<div id="hlavicka">
-	  		<div class="logo_img"><a href="index.html"><img src="graphic/crce.png" alt="logo" /></a></div>
+	  		<div class="logo_img"><a href="resource"><img src="graphic/crce.png" alt="logo" /></a></div>
 	  		<div class="nazev">Software components storage</div>
 	      
 	  		<div class="vyhledavani">
-	  		
-	        <form method="post" action="resource">
-	          <input class="text" type="text" name="filter" />
-	          <input class="tlacitko" type="submit" value="search" />
-	        </form>
-	        
-	      </div>
+		        <form method="post" action="resource">
+					<input class="text" type="text" name="filter" />
+					<input class="tlacitko" type="submit" value="Search" />
+		        </form>
+			</div>
 	  	</div>
 	  	<div class="konec"></div>
     

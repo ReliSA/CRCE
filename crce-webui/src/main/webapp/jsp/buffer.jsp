@@ -10,12 +10,12 @@
 		<table class="upload">
 			<tr>
 				<td><input class="text" type="file" name="bundle"/></td>
-				<td><input class="tlacitko" type="submit" value="upload"/></td>
+				<td><input class="tlacitko" type="submit" value="Upload"/></td>
 			</tr>
 		</table>
 		</form>
   	   	
-		<form method="post" action="#">
+		<form class="execute_commit" method="post" action="#">
   	       
 		<c:forEach items="${buffer}" var="resource">
 			<div class="komponenta">
@@ -74,17 +74,29 @@
 	  		</div>
   		</c:forEach>
   		
-  		<div id="animacni_odkazy">
-			<a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
-  		</div>
+  		<c:if test="${empty buffer}">
+	  		<div class="komponenta">
+	  			<div class="nadpis">No resources uploaded.</div>
+	  		</div>
+		</c:if>
   		
-  			<input class="tlacitko" type="submit" value="EXECUTE" />
+  		<c:if test="${not empty buffer}">
+	  		<div id="animacni_odkazy">
+				<a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
+	  		</div>
+  		</c:if>
+			
+			<c:if test="${not empty buffer}">  		
+  				<input class="tlacitko" type="submit" value="EXECUTE TESTS" />
+  			</c:if>
   		
   		</form>
   		
-  		<form method="post" action="download">
+  		<c:if test="${not empty buffer}">
+  		<form class="execute_commit" method="post" action="download">
   			<input class="tlacitko" type="submit" value="COMMIT"/>
   		</form>
+  		</c:if>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />

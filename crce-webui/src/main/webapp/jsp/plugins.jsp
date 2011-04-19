@@ -28,9 +28,17 @@
 	  		</div>
   		</c:forEach>
   		
+  		<c:if test="${empty plugins}">
+			<div class="komponenta">
+				<div class="nadpis">No plugins.</div>
+			</div>
+		</c:if>
+  		
+  		<c:if test="${not empty plugins}">
   		<div id="animacni_odkazy">
 			<a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
   		</div>
+  		</c:if>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />

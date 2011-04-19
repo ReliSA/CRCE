@@ -7,7 +7,7 @@
     
   	<div id="telo">
   	
-		<form method="post" action="#">
+		<form class="execute_commit" method="post" action="#">
   	       
 		<c:forEach items="${store}" var="resource">
 	  		<div class="komponenta">
@@ -67,12 +67,22 @@
 	  			</div>
 	  		</div>
 		</c:forEach>
+		
+		<c:if test="${empty store}">
+			<div class="komponenta">
+				<div class="nadpis">No resources in store.</div>
+			</div>
+		</c:if>
   		
-	  	<div id="animacni_odkazy">
-			<a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
-		</div>
+  		<c:if test="${not empty store}">
+		  	<div id="animacni_odkazy">
+				<a class="rozbalit" href="#">Show all</a> - <a class="sbalit" href="#">Hide all</a>
+			</div>
+		</c:if>
   		
-  			<input class="tlacitko" type="submit" value="EXECUTE" />
+  			<c:if test="${not empty store}">
+  				<input class="tlacitko" type="submit" value="EXECUTE TESTS" />
+  			</c:if>
   		</form>
   	
   	</div>
