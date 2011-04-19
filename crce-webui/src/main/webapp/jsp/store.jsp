@@ -58,11 +58,18 @@
 	  					</ul>
 	  				</div>
 	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
-	  					<ul>
+						<table class="vyzaduje">
+	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<li>${requirement.name} - ${requirement.filter}</li>
+	  							<tr>
+	  								<td>${requirement.name}</td>
+	  								<td class="filter">${requirement.filter}</td>
+	  								<td>${requirement.multiple}</td>
+	  								<td>${requirement.optional}</td>
+	  								<td>${requirement.extend}</td>
+	  							</tr>
 	  						</c:forEach>
-	  					</ul>
+	  					</table>
 	  				</div>
 	  			</div>
 	  		</div>
