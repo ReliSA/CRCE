@@ -239,35 +239,51 @@ h2 {
 
 /*--------------------FORMULAR----------------------------------------*/
 
-table {
+.formular {
   padding: 10px;
 }
 
-th {
+.formular th {
   font-weight: bold;
 }
 
-td {
+.formular td {
   text-align: center;
   margin: 0 auto;
 }
 
-table .text{
+.formular .text{
   width: 500px;
   color: #222;
   background-color: #FFF;
   border: 1px solid #AAA;
 }
 
-table .chyba{
+.formular .chyba{
   color: red;
   font-weight: bold;
   padding: 0 10px 0 10px;
 }
 	
 
-table .tlacitko{
+.formular .tlacitko{
   margin: 10px 0 0 0;
+}
+
+/*----------------UPLOAD---------------------------------------------*/
+
+.upload {
+	padding: 10px;
+}
+
+.upload .text {
+  width: 300px;
+  color: #222;
+  background-color: #FFF;
+  border: 1px solid #AAA;
+}
+
+.tlacitko {
   text-align: center;
   background-color: #666;
   border: 1px solid #AAA;
@@ -275,7 +291,7 @@ table .tlacitko{
   font-weight: bold;
 }
 
-table .tlacitko:hover {
+.tlacitko:hover {
   color: #222;
   background-color: #BBB;
-}
+}	

@@ -7,8 +7,12 @@
   	<div id="telo">
   	  
 		<form method="post" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
-			<input type="file" name="bundle"/><br/>
-			<input type="submit" value="upload"/>
+		<table class="upload">
+			<tr>
+				<td><input class="text" type="file" name="bundle"/></td>
+				<td><input class="tlacitko" type="submit" value="upload"/></td>
+			</tr>
+		</table>
 		</form>
   	   	
 		<form method="post" action="#">
@@ -35,8 +39,6 @@
 	  					<ul>
 	  						<li><strong>Id:</strong> ${resource.id} <a href="#" title="edit id"><img src="graphic/edit.png" alt="edit id" title="edit id" /></a></li>
 	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName} <a href="#" title="edit symbolic name"><img src="graphic/edit.png" alt="edit symbolic name" title="edit symbolic name" /></a></li>
-	  						<li><strong>URI:</strong> ${resource.uri} <a href="#" title="edit uri"><img src="graphic/edit.png" alt="edit uri" title="edit uri" /></a></li>
-	  						<li><strong>Relative URI:</strong> ${resource.relativeUri} <a href="#" title="edit relative uri"><img src="graphic/edit.png" alt="edit relative uri" title="edit relative uri" /></a></li>
 	  						<li><strong>Size:</strong> ${resource.size} <a href="#" title="edit size"><img src="graphic/edit.png" alt="edit size" title="edit size" /></a></li>
 	  					</ul>
 	  				</div>
@@ -81,7 +83,7 @@
   		</form>
   		
   		<form method="post" action="download">
-  		<input class="tlacitko" type="submit" value="COMMIT"/>
+  			<input class="tlacitko" type="submit" value="COMMIT"/>
   		</form>
   	</div>
   

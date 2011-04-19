@@ -11,11 +11,6 @@
 			<div class="komponenta">
 	  			<div class="nadpis">
 	  				<a class="popis" href="#">${plugin.pluginId}</a>
-	  				<div class="nabidka">
-	            <a href="#"><img src="graphic/save.png" alt="download" title="Download plugin ${plugin.pluginDescription}" /></a>
-	            <a href="form.html"><img src="graphic/edit.png" alt="edit" title="Edit plugin ${plugin.pluginDescription}" /></a>
-	            <a href="#"><img src="graphic/del.png" alt="delete" title="Delete plugin ${plugin.pluginDescription}"/></a>
-	          </div>
 	  				<div class="konec"></div>
 	  			</div>
 	  			<div class="informace">

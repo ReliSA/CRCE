@@ -9,7 +9,7 @@
 		<h2>Requirement form</h2>
       
 		<form action="#" method="post">
-		<table>
+		<table class="formular">
 	        <tr>
 	        	<th>Name:</th>
 	        	<td><input class="text" type="text" name="name" value="${requirement.name}" /></td>

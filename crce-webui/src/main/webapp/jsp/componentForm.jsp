@@ -9,7 +9,7 @@
 		<h2>Component form</h2>
 		
 		<form action="#" method="post">
-		<table>
+		<table class="formular">
 	        <tr>
 	        	<th>Presentation name:</th>
 	        	<td><input class="text" type="text" name="presentationName" value="${component.presentationName}" /></td>

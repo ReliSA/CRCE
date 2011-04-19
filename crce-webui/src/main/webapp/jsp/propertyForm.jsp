@@ -9,7 +9,7 @@
 		<h2>Property form</h2>
       
 		<form action="#" method="post">
-		<table>
+		<table class="formular">
 	        <tr>
 	        	<th>Name:</th>
 	        	<td><input class="text" type="text" name="name" value="${property.name}" /></td>
