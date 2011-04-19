@@ -29,11 +29,11 @@
 	  				<div class="konec"></div>
 	  			</div>
 	  			<div class="informace">
-	  				<div class="polozka"><strong>Properties: </strong> <a href="#" title="add new property"><img src="graphic/add.png" alt="add new property" title="add new property"/> Add new</a> 
+	  				<div class="polozka"><strong>Properties: </strong> <a href="#" title="Edit properties"><img src="graphic/edit.png" alt="edit properties" title="edit properties"/> Edit</a> 
 	  					<ul>
-	  						<li><strong>Id:</strong> ${resource.id} <a href="#" title="edit id"><img src="graphic/edit.png" alt="edit id" title="edit id" /></a></li>
-	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName} <a href="#" title="edit symbolic name"><img src="graphic/edit.png" alt="edit symbolic name" title="edit symbolic name" /></a></li>
-	  						<li><strong>Size:</strong> ${resource.size} <a href="#" title="edit size"><img src="graphic/edit.png" alt="edit size" title="edit size" /></a></li>
+	  						<li><strong>Id:</strong> ${resource.id}</li>
+	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
+	  						<li><strong>Size:</strong> ${resource.size}</li>
 	  					</ul>
 	  				</div>
 	  				<div class="polozka"><strong>Categories: </strong> <a href="#" title="edit categories"><img src="graphic/edit.png" alt="edit categories" title="edit categories" /> Edit</a> 
@@ -47,20 +47,20 @@
 	  					<ul>
 	  						<c:forEach items="${resource.capabilities}" var="capability">
 	  							<li>
-	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
+	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /> Edit</a>
 	  								<ul>
 		  								<c:forEach items="${capability.properties}" var="property">
-		  									<li>${property.name} (${property.type}) - ${property.value} <a href="#" title="edit property"><img src="graphic/edit.png" alt="edit property" title="edit property" /></a></li>
+		  									<li>${property.name} (${property.type}) - ${property.value}</li>
 		  								</c:forEach>
 	  								</ul>
 	  							</li>
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/add.png" alt="add new requrements" title="add new requirements" /> Add new</a> 
+	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
 	  					<ul>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<li>${requirement.name} - ${requirement.filter} <a href="#"><img src="graphic/edit.png" alt="edit" title="edit requirement" /></a></li>
+	  							<li>${requirement.name} - ${requirement.filter}</li>
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
