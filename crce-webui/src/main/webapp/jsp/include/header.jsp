@@ -20,27 +20,7 @@
     
     	<script type="text/javascript" src="js/jquery-1.5.1.js"></script>
     
-	    <script type="text/javascript">
-	      $(document).ready(function(){
-	        $(".informace").hide();
-	      
-	        $(".popis").click(function(){
-	          $(this).parent().next(".informace").slideToggle(500)
-	          return false;
-	        });
-	        
-	        $(".rozbalit").click(function(){
-	          $(".informace").slideDown(500)
-	          return false;
-	        });
-	        
-	        $(".sbalit").click(function(){
-	          $(".informace").slideUp(500)
-	          return false;
-	        });
-	      
-	      });
-	    </script>
+	    <script type="text/javascript" src="js/slide.js"></script>
 
     	<title>Software components storage - ${param.title}</title>
 	</head>
