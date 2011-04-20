@@ -301,14 +301,14 @@ h2 {
 }
 
 .upload .text {
-  width: 80%;
+  width: 95%;
   color: #222;
   background-color: #FFF;
   border: 1px solid #AAA;
 }
 
 .upload .tlacitko {
-	width: 100px;
+	width: 200px;
 	font-size: 1.1em;
 }
 /*--------------------FORMULAR----------------------------------------*/
