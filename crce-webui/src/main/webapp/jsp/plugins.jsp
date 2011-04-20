@@ -30,7 +30,7 @@
   		
   		<c:if test="${empty plugins}">
 			<div class="komponenta">
-				<div class="nadpis">No plugins.</div>
+				<div class="nadpis"><strong>No plugins.</strong></div>
 			</div>
 		</c:if>
   		

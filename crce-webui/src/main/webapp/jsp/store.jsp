@@ -16,9 +16,11 @@
 	  					<span class="sName">${resource.symbolicName}</span> 
 	  					<span class="version">${resource.version}</span> 
 	  					<span class="pName">${resource.presentationName}</span>
-	  					<span class="category"><c:forEach items="${resource.categories}" var="category">
+	  					<span class="category">
+	  						<c:forEach items="${resource.categories}" var="category">
 	  							${category}
-	  						</c:forEach></span>
+	  						</c:forEach>
+	  					</span>
 	  				</a>
 	  				<div class="nabidka">
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
@@ -77,7 +79,7 @@
 		
 		<c:if test="${empty store}">
 			<div class="komponenta">
-				<div class="nadpis">No resources in store.</div>
+				<div class="nadpis"><strong>No resources in store.</strong></div>
 			</div>
 		</c:if>
   		
