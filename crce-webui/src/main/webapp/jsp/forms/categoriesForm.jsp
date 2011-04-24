@@ -6,13 +6,13 @@
     
   	<div id="telo">
   	
-		<h2>Categories form - ${presentationName} ${version}</h2>
+		<h2>Categories form - ${resource.presentationName} ${resource.version}</h2>
 		
-		<a href="#"><img src="graphic/add.png" alt="add new category" title="add new category" />Add new category</a><br />
+		<a href="edit?type=addCategory&uri=${resource.uri}"><img src="graphic/add.png" alt="add new category" title="add new category" />Add new category</a><br />
       
 	  	<ul>
-	  		<c:forEach items="${categories}" var="category">
-				<li>${category} <a href="edit?action=deleteCategory&presentationName=${presentationName}&version=${version}&category=${category}"><img src="graphic/del.png" alt="delete category" title="delete category" /></a></li>
+	  		<c:forEach items="${resource.categories}" var="category">
+				<li>${category} <a href="edit?type=deleteCategory&uri=${resource.uri}&category=${category}"><img src="graphic/del.png" alt="delete category" title="delete category" /></a></li>
 	  		</c:forEach>
 	  	</ul>
   		

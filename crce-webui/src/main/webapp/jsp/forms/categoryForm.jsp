@@ -6,11 +6,11 @@
     
   	<div id="telo">
   	
-		<h2>Category form - ${presentationName} ${version}</h2>
+		<h2>Category form - ${resource.presentationName} ${resource.version}</h2>
 		
-		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
+		<form name="addCategory" action="#" method="post">
+			<input type="hidden" name="form" value="addCategory" />
+			<input type="hidden" name="uri" value="${resource.uri}" />
 		
 		<table class="formular">	  		
 			<tr>

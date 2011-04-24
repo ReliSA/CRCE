@@ -32,7 +32,7 @@
 	  				</a>
 	  				<div class="nabidka">	  					
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
-			            <a href="edit?uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
+			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
 			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
 			          	<input type="checkbox" name="${resource.presentationName}_${resource.version}" />
 	          		</div>
@@ -46,7 +46,7 @@
 	  						<li><strong>Size:</strong> ${resource.size}</li>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Categories: </strong> <a href="#" title="edit categories"><img src="graphic/edit.png" alt="edit categories" title="edit categories" /> Edit</a> 
+	  				<div class="polozka"><strong>Categories: </strong> <a href="edit?type=category&uri=${resource.uri}" title="edit categories"><img src="graphic/edit.png" alt="edit categories" title="edit categories" /> Edit</a> 
 	  					<ul>
 	  						<c:forEach items="${resource.categories}" var="category">
 	  							<li>${category}</li>
