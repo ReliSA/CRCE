@@ -90,7 +90,7 @@ public class CombinedResourceDAO extends AbstractResourceDAO {
         if (writableResource == null) {
             writableResource = m_resourceCreator.createResource();
         }
-        if (staticResource.getSymbolicName() == null) {
+        if (staticResource.getSymbolicName() == null && writableResource.getSymbolicName() == null) {
             writableResource.setSymbolicName(createSymbolicname(uri));
         }
         
