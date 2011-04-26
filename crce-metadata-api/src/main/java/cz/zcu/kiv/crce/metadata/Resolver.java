@@ -7,8 +7,10 @@ package cz.zcu.kiv.crce.metadata;
 public interface Resolver {
     
     void add(Resource resource);
+    
+    void clean();
 
-    Requirement[] getUnsatisfiedRequirements();
+    Reason[] getUnsatisfiedRequirements();
 
     Resource[] getOptionalResources();
 

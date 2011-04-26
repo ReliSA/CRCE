@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.wrapper.felix;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
@@ -12,7 +13,7 @@ import java.net.URI;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class ConvertedResource extends ResourceImpl {
+public class ConvertedResource extends ResourceImpl implements Resource { // TODO ResourceImpl is probably not visible for other bundles
 
     public ConvertedResource(org.apache.felix.bundlerepository.Resource resource) {
         for (org.apache.felix.bundlerepository.Capability fcap : resource.getCapabilities()) {
