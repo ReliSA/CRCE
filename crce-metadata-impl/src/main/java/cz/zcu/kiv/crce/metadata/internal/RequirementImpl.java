@@ -112,7 +112,12 @@ public class RequirementImpl implements Requirement {
 
     @Override
     public boolean isSatisfied(Capability capability) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (capability instanceof CapabilityImpl) {
+            return m_name.equals(capability.getName())
+                    && m_filter.matchCase(((CapabilityImpl) capability).m_map)
+                    && (m_filter.toString().indexOf("(mandatory:<*") >= 0 || ((CapabilityImpl) capability).m_map.get("mandatory:") == null);
+        }
+        throw new UnsupportedOperationException("Not implemented yet");
     }
     
     @Override
@@ -152,7 +157,5 @@ public class RequirementImpl implements Requirement {
         hash = 23 * hash + (this.m_filter != null ? this.m_filter.hashCode() : 0);
         return hash;
     }
-
-   
     
 }
