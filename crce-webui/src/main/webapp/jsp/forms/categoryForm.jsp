@@ -6,7 +6,9 @@
     
   	<div id="telo">
   	
-		<h2>Category form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Add new category</h2>
+		
+		<h3>${resource.presentationName} - ${resource.version}</h3>
 		
 		<form name="addCategory" action="#" method="post">
 			<input type="hidden" name="form" value="addCategory" />
@@ -19,7 +21,7 @@
 				<td class="chyba">${categoryError}</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input class="tlacitko" type="submit" value="Save category" /></td>
+				<td><input class="tlacitko" type="submit" value="Save category" /></td>
 			</tr>
 		</table>
 		</form>

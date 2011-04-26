@@ -6,15 +6,19 @@
     
   	<div id="telo">
   	
-		<h2>Categories form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Existing categories</h2>
 		
-		<a href="edit?type=addCategory&uri=${resource.uri}"><img src="graphic/add.png" alt="add new category" title="add new category" />Add new category</a><br />
-      
-	  	<ul>
-	  		<c:forEach items="${resource.categories}" var="category">
+		<h3>${resource.presentationName} - ${resource.version}</h3>
+
+		<ul>
+		  	<c:forEach items="${resource.categories}" var="category">
 				<li>${category} <a href="edit?type=deleteCategory&uri=${resource.uri}&category=${category}"><img src="graphic/del.png" alt="delete category" title="delete category" /></a></li>
-	  		</c:forEach>
-	  	</ul>
+		  	</c:forEach>
+		</ul>
+		
+		<p>		
+			<a href="edit?type=addCategory&uri=${resource.uri}"><img src="graphic/add.png" alt="add new category" title="add new category" />Add new category</a><br />
+      	</p>
   		
   	</div>
   	
