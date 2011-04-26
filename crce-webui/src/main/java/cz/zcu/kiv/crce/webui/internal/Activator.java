@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionFactory;
@@ -29,6 +30,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile SessionFactory m_sessionFactory;   /* injected by dependency manager */
     private volatile LogService m_log;                  /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
+    private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
 
     public static Activator instance() {
         return m_instance;
@@ -40,6 +42,10 @@ public final class Activator extends DependencyActivatorBase {
     
     public SessionFactory getSessionFactory() {
         return m_sessionFactory;
+    }
+    
+    public ResourceCreator getCreator(){
+    	return this.m_creator;
     }
     
     public LogService getLog() {
@@ -92,6 +98,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 );
 
 //        final Test t1 = new Test();

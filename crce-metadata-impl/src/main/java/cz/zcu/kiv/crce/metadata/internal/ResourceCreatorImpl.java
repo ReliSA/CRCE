@@ -1,12 +1,16 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.wrapper.felix.ConvertedResolver;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
+import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
  *
@@ -14,6 +18,8 @@ import java.net.URI;
  */
 public class ResourceCreatorImpl implements ResourceCreator {
 
+    private volatile RepositoryAdmin m_repoAdmin;
+    
     @Override
     public Resource createResource() {
         return new ResourceImpl();
@@ -78,6 +84,11 @@ public class ResourceCreatorImpl implements ResourceCreator {
             out.addRequirement(req);
         }
         return out;
+    }
+
+    @Override
+    public Resolver createResolver(Repository... repositories) {
+        return new ConvertedResolver(m_repoAdmin, repositories);
     }
 
 }

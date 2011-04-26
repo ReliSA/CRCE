@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.wrapper.felix;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -10,16 +11,14 @@ import cz.zcu.kiv.crce.metadata.Resource;
  */
 public class Wrapper {
 
-//    public static Resource wrap(org.apache.felix.bundlerepository.Resource resource) {
-//        Resource out = new ResourceImpl();
-//        
-//        resource.
-//    }
+    public static org.apache.felix.bundlerepository.Repository wrap(Repository repository) {
+        return new RepositoryWrapper(repository);
+    }
     
     public static org.apache.felix.bundlerepository.Resource wrap(Resource resource) {
         return new ResourceWrapper(resource);
     }
-
+    
     public static org.apache.felix.bundlerepository.Requirement wrap(Requirement resolver) {
         return new RequirementWrapper(resolver);
     }
@@ -58,4 +57,22 @@ public class Wrapper {
         return cap;
     }
 
+    public static org.apache.felix.bundlerepository.Repository[] wrap(Repository[] repositories)
+    {
+        org.apache.felix.bundlerepository.Repository[] rep = new org.apache.felix.bundlerepository.Repository[repositories.length];
+        for (int i = 0; i < repositories.length; i++)
+        {
+            rep[i] = wrap(repositories[i]);
+        }
+        return rep;
+    }
+
+    public static Resource unwrap(org.apache.felix.bundlerepository.Resource resource) {
+        if (resource instanceof ResourceWrapper) {
+            return ((ResourceWrapper) resource).resource;
+        } else {
+            return new ConvertedResource(resource);
+        }
+    }
+    
 }

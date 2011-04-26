@@ -16,6 +16,7 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(ResourceCreator.class.getName(), null)
                 .setImplementation(ResourceCreatorImpl.class)
+                .add(createServiceDependency().setRequired(true).setService(org.apache.felix.bundlerepository.RepositoryAdmin.class))
                 );
     }
 

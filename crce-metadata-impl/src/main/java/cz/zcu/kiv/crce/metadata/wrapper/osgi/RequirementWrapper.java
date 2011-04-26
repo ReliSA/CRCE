@@ -11,7 +11,7 @@ public class RequirementWrapper implements org.osgi.service.obr.Requirement {
 
     private final Requirement requirement;
     
-    RequirementWrapper(Requirement requirement) {
+    protected RequirementWrapper(Requirement requirement) {
         this.requirement = requirement;
     }
 
