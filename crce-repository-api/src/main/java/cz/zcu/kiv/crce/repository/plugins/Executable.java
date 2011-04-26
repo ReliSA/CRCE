@@ -65,4 +65,13 @@ public interface Executable extends Plugin {
      * @return <code>true</code> if the plugin needs to be executed exclusively.
      */
     boolean isExclusive();
+    
+    /**
+     * Returns the instance of <code>Properties</code> which can be used to
+     * reconfigure this plugin for specific execution.
+     * <em>Note:</em> Implementing class is responsible to clean changed properties
+     * after execution if needed.
+     * @return the instance of <code>Properties</code>.
+     */
+    Properties getProperties();
 }
