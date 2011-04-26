@@ -11,6 +11,7 @@ public class SessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
+    	se.getSession();
         String sid = se.getSession().getId();
         Activator.instance().getSessionFactory().createSession(sid);
     }

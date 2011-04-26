@@ -3,7 +3,8 @@
     PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
     "http://java.sun.com/dtd/web-app_2_3.dtd"> -->
 
-<web-app>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    
     <context-param>
         <param-name>test</param-name>
         <param-value>1234</param-value>
@@ -31,6 +32,32 @@
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
 
+	<servlet>
+		<servlet-name>download</servlet-name>
+		<servlet-class>cz.zcu.kiv.crce.webui.internal.DownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+        <servlet-name>resource</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>resource</servlet-name>
+        <url-pattern>/resource</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+        <servlet-name>edit</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.EditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>edit</servlet-name>
+        <url-pattern>/edit</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>UploadServlet</servlet-name>

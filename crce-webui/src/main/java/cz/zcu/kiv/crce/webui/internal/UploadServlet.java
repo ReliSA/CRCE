@@ -6,6 +6,7 @@ import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,10 +26,29 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        boolean failed = false;
+        if(req.getParameter("uri")!=null)
+        {
+        	Buffer buffer = Activator.instance().getBuffer(req);
+        	Resource[] array = buffer.getRepository().getResources();
+        	try{
+        		URI uri = new URI((String)req.getParameter("uri"));
+        		Resource found = EditServlet.findResource(uri, array);
+        		buffer.commit(true);//TO-DO! Bad API -> Resources should be committed one by one
+        	}
+        	catch(Exception e)
+        	{
+        		failed=true;
+        	}
+        }
+        else
+        {
+        	failed=true;
+        }
+        if(failed) resp.sendError(resp.SC_EXPECTATION_FAILED, "Bad arguments"+req.getParameter("uri"));
+        else req.getRequestDispatcher("resource?link=buffer");
         
-        Buffer buffer = Activator.instance().getBuffer(req);
-        
-        PrintWriter out = resp.getWriter();
+        /*PrintWriter out = resp.getWriter();
         out.println("<h1>Resources to commit:</h1>");
         for (Resource res : buffer.getRepository().getResources()) {
             out.println(res.getId() + " " + res.getUri());
@@ -38,7 +58,7 @@ public class UploadServlet extends HttpServlet {
         out.println("<h1>Commited resources " + commited.size() + ":</h1>");
         for (Resource res : commited) {
             out.println(res.getId() + " " + res.getUri() + "<br>");
-        }
+        }*/
         
 //        HttpSession session = req.getSession(true);
 //
@@ -93,8 +113,13 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-
-        resp.sendRedirect("index.jsp?success=" + success);
+        req.getSession().setAttribute("success", success);
+        req.getSession().setAttribute("source", "upload");
+        //System.out.println("I'm here why do I not forward? Because I'm bitch");
+       
+        req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
+       
+        //System.out.println("Here shouldnt I be");
     }
 
     // send a response with the specified status code
