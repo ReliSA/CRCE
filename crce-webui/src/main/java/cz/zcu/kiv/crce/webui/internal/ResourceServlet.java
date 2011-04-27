@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
+import org.osgi.framework.InvalidSyntaxException;
 
 public class ResourceServlet extends HttpServlet {
 
@@ -81,13 +82,20 @@ public class ResourceServlet extends HttpServlet {
 		if(link==null) return false;
 		if(link.equals("buffer"))
 		{
-			Resource[] buffer;
-			if(filter==null) buffer = Activator.instance().getBuffer(req).getRepository().getResources();
-			else buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
-			session.setAttribute("buffer", buffer);
-			return true;
-		}
-		
+                    /* TODO - verify this block (return false on InvalidSyntaxException) */
+                    Resource[] buffer;
+                    if (filter == null) {
+                        buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+                    } else {
+                        try {
+                            buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
+                        } catch (InvalidSyntaxException ex) {
+                            return false;
+                        }
+                    }
+                    session.setAttribute("buffer", buffer);
+                    return true;
+                }		
 		else if(link.equals("plugins"))
 		{
 			    Plugin[] plugins;
@@ -99,11 +107,19 @@ public class ResourceServlet extends HttpServlet {
 		
 		else if(link.equals("store"))
 		{
-			Resource[] store;
-			if(filter==null) store = Activator.instance().getStore().getRepository().getResources();
-			else store = Activator.instance().getStore().getRepository().getResources(filter);
-			session.setAttribute("store", store);
-			return true;
+                     /* TODO - verify this block (return false on InvalidSyntaxException) */
+                    Resource[] store;
+                    if (filter == null) {
+                        store = Activator.instance().getStore().getRepository().getResources();
+                    } else {
+                        try {
+                            store = Activator.instance().getStore().getRepository().getResources(filter);
+                        } catch (InvalidSyntaxException ex) {
+                            return false;
+                        }
+                    }
+                    session.setAttribute("store", store);
+                    return true;
 		}
 		
 		else
