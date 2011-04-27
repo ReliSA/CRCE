@@ -6,17 +6,17 @@
     
   	<div id="telo">
   	
-		<h2>Requirements form - ${presentationName} ${version}</h2>
+		<h2>Requirements form - ${resource.presentationName} ${resource.version}</h2>
 		
 		<a href="#"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
       
 		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
+			<input type="hidden" name="uri" value="${uri}" />
+			<input type="hidden" name="form" value="requirements" />
 			
 		<table class="vyzaduje">
 	  		<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
-	  		<c:forEach items="${requirements}" var="requirement" varStatus="counter">
+	  		<c:forEach items="${resource.requirements}" var="requirement" varStatus="counter">
 		  		<tr>
 		  			<td><input class="text" type="text" name="name_${counter.count}" value="${requirement.name}" /></td>
 		  			<td class="filter"><input class="text" type="text" name="filter_${counter.count}" value="${requirement.filter}" /></td>

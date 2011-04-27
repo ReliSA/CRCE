@@ -53,7 +53,7 @@
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Capabilities: </strong> <a href="#"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
+	  				<div class="polozka"><strong>Capabilities: </strong> <a href="edit?type=addCapability"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
 	  					<ul>
 	  						<c:forEach items="${resource.capabilities}" var="capability">
 	  							<li>

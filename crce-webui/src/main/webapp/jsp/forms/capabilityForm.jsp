@@ -6,11 +6,10 @@
     
   	<div id="telo">
   	
-		<h2>Capability form - ${presentationName} ${version}</h2>
+		<h2>Capability form - ${resource.presentationName} ${resource.version}</h2>
 		
 		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
+			<input type="hidden" name="uri" value="${resource.uri}" />
 		
 		<table class="formular">	  		
 			<tr>

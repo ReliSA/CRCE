@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 public class EditServlet extends HttpServlet {
@@ -38,12 +39,131 @@ public class EditServlet extends HttpServlet {
 			if (addCategory(req,resp, parameters)) {
 				success = editCategories(req, resp);
 			}
+		} else if ("requirements".equals(form)) {
+			if (saveRequirements(req,resp, parameters)) {
+				success = editRequirements(req, resp, parameters);
+			}
+		} else if ("capabilities".equals(form)) {
+			if (saveCapabilities(req,resp, parameters)) {
+				success = editCapabilities(req, resp, parameters);
+			}
 		}
 		if (!success) {
 			resp.sendError(HttpServletResponse.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
 		}
 	}
 	
+	private boolean saveCapabilities(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String category = null;
+		String uri = null;
+		if (parameters.containsKey("uri")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+		} else return false;
+		
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				return false;
+			}
+			Resource resource = findResource(resURI, array);
+			
+			Requirement[] requirements = resource.getRequirements();
+			for (int i = 0; i < requirements.length; i++) {
+				if(parameters.containsKey("name_" + (i - 1))) {
+					resource.unsetRequirement(requirements[i]);
+					resource.addRequirement(requirements[i]);
+				}
+			}
+			
+			int categoriesLengthBefore = resource.getCategories().length; 
+			resource.addCategory(category);
+			
+//			Zjištění zda kategorie byla odstraněna.
+			if (categoriesLengthBefore < resource.getCategories().length) {
+				req.getSession().setAttribute("success", false);
+			} else {
+				req.getSession().setAttribute("success", true);
+			}
+			
+		} catch (URISyntaxException e) {
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean saveRequirements(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		if (parameters.containsKey("uri")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+		} else return false;
+		
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				System.out.println("1");
+				return false;
+			}
+			Resource resource = findResource(resURI, array);
+			
+			Requirement[] requirements = resource.getRequirements();
+			int requirLengthBefore = 0;
+			String name = null;
+			Requirement requir = null;
+			String filter = null;
+			boolean multiple = false;
+			boolean extend = false;
+			boolean optional = false;
+			for (int i = 0; i < requirements.length; i++) {
+				if(parameters.containsKey("name_" + (i - 1))) {
+					name = ((String[]) parameters.get("name_" + (i - 1)))[0];
+					filter = ((String[]) parameters.get("filter_" + (i - 1)))[0];
+//					multiple = Boolean.valueOf(((String[]) parameters.get("multiple_" + (i - 1)))[0]);
+//					optional = Boolean.valueOf(((String[]) parameters.get("optional_" + (i - 1)))[0]);
+//					extend = Boolean.valueOf(((String[]) parameters.get("extend_" + (i - 1)))[0]);
+					requir = resource.createRequirement(name);
+					requir.setFilter(filter);
+					requir.setMultiple(multiple);
+					requir.setOptional(optional);
+					requir.setExtend(extend);
+					requirLengthBefore = resource.getRequirements().length;
+					resource.unsetRequirement(requirements[i]);
+					
+					if(requirLengthBefore == resource.getRequirements().length){
+						req.getSession().setAttribute("success", false);
+						return true;
+					}
+					
+//					resource.addRequirement(requir);
+				}
+			}
+			System.out.println("2");
+			
+		} catch (URISyntaxException e) {
+			System.out.println("3");
+			return false;
+		} catch (FileNotFoundException e) {
+			System.out.println("3b");
+			return false;
+		}
+		return true;
+	}
+
 	private boolean addCategory(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String category = null;
@@ -108,14 +228,24 @@ public class EditServlet extends HttpServlet {
 			
 		} else if("deleteCategory".equals(type)) {
 			if(deleteCategory(req, resp, parameters)){
-				
 				success = editCategories(req, resp);
 			} else {
 				success = false;
 			}
 		} else if("addCategory".equals(type)) {
-				success = addCategories(req, resp, parameters);
+			success = addCategories(req, resp, parameters);
 				
+		} else if("addCapability".equals(type)) {
+			success = addCapabilities(req, resp, parameters);
+			
+		} else if("capability".equals(type)) {
+			System.out.println("deb3s");
+			success = editCapabilities(req, resp, parameters);
+			if(!success)System.out.println("deb3s");
+				
+		} else if("requirement".equals(type)) {
+			success = editRequirements(req, resp, parameters);
+		
 		} else {
 			success = false;
 		}
@@ -125,6 +255,95 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+	private boolean editRequirements(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);			
+			req.getRequestDispatcher("jsp/forms/requirementsForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	private boolean addCapabilities(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);			
+			req.getRequestDispatcher("jsp/forms/capabilityForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+			
+		return true;
+	}
+
+	private boolean editCapabilities(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			String id;
+			String resURI = null;;
+			if (parameters.containsKey("capabilityId")
+					&& parameters.containsKey("uri")) {
+				id = ((String[]) parameters.get("capabilityId"))[0];
+				resURI  = ((String[]) parameters.get("uri"))[0];
+			} else {
+				System.out.println("deb3ALE");
+				return false;
+			}
+			System.out.println("deb3aALE");
+			Resource resource = findResource(new URI(resURI), array);
+			
+			req.getSession().setAttribute("resource", resource);
+			req.getSession().setAttribute("capability", resource.getCapabilities()[Integer.valueOf(id) - 1]);
+			req.getSession().setAttribute("capabilityId", id);
+			req.getRequestDispatcher("jsp/forms/capabilitiesForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			System.out.println("deb3bALE");
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+
 	private boolean addCategories(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		
