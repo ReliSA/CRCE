@@ -1,12 +1,19 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.apache.felix.utils.collections.MapToDictionary;
+import org.apache.felix.utils.filter.FilterImpl;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 
 /**
  *
@@ -85,12 +92,51 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public Resource[] getResources(String filter) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Resource[] getResources(String filter) throws InvalidSyntaxException {
+        if (filter == null || filter.trim().equals("")) {
+            return getResources();
+        }
+        MapToDictionary dict = new MapToDictionary(null);
+        List<Resource> matches = new ArrayList<Resource>();
+        Filter f = FilterImpl.newInstance(filter);
+        for (Resource resource : resources.values()) {
+            dict.setSourceMap(resource.getPropertiesMap());
+            if (f == null || f.match(dict)) {
+                matches.add(resource);
+            }
+        }
+        return matches.toArray(new Resource[matches.size()]);
     }
 
     @Override
     public Resource[] getResources(Requirement[] requirements) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (requirements == null || requirements.length == 0) {
+            return getResources();
+        }
+        MapToDictionary dict = new MapToDictionary(null);
+        List<Resource> matches = new ArrayList<Resource>();
+
+        for (Resource resource : resources.values()) {
+            dict.setSourceMap(resource.getPropertiesMap());
+            boolean match = true;
+            for (Requirement requirement : requirements) {
+                boolean reqMatch = false;
+                Capability[] caps = resource.getCapabilities();
+                for (int capIdx = 0; (caps != null) && (capIdx < caps.length); capIdx++) {
+                    if (requirement.isSatisfied(caps[capIdx])) {
+                        reqMatch = true;
+                        break;
+                    }
+                }
+                match &= reqMatch;
+                if (!match) {
+                    break;
+                }
+            }
+            if (match) {
+                matches.add(resource);
+            }
+        }
+        return matches.toArray(new Resource[matches.size()]);
     }
 }

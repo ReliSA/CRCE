@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.wrapper.felix;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Reason;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -73,6 +74,20 @@ public class Wrapper {
         } else {
             return new ConvertedResource(resource);
         }
+    }
+    
+    public static Resource[] unwrap(org.apache.felix.bundlerepository.Resource[] resources) {
+        Resource[] out = new Resource[resources.length];
+        if (resources[0] instanceof ResourceWrapper) {
+            for (int i = 0; i < resources.length; i++) {
+                out[i] = unwrap(resources[i]);
+            }
+        } else {
+            for (int i = 0; i < resources.length; i++) {
+                out[i] = new ConvertedResource(resources[i]);
+            }
+        }
+        return out;
     }
     
 }

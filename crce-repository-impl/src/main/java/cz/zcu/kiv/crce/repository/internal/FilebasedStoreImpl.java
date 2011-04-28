@@ -45,13 +45,6 @@ public class FilebasedStoreImpl implements Store {
     }
     
     void init() {
-        RepositoryDAO repDao = m_pluginManager.getPlugin(RepositoryDAO.class);
-        try {
-            m_repository = repDao.getRepository(m_baseDir.toURI());
-        } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
-        }
-        
         RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
         
         try {

@@ -32,7 +32,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public String getId() {
-        return m_staticResource.getId() != null ? m_staticResource.getId() : m_writableResource.getId();
+        return getSymbolicName() + "/" + getVersion();
     }
 
     @Override

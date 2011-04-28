@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.internal.ReasonImpl;
+import cz.zcu.kiv.crce.metadata.internal.ReasonImpl;    // FIXME probably not visible to another bundles
 import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
@@ -39,31 +39,18 @@ public class ConvertedResolver implements Resolver {
     
     @Override
     public Reason[] getUnsatisfiedRequirements() {
-        org.apache.felix.bundlerepository.Reason[] reasons = m_resolver.getUnsatisfiedRequirements();
-                
-        Reason[] out = new Reason[reasons.length];
-        
-        for (int i = 0; i < reasons.length; i++) {
-            
-            Resource res = Wrapper.unwrap(reasons[i].getResource());
-            
-            Requirement req = ((RequirementWrapper) reasons[i].getRequirement()).requirement;
-            
-            out[i] = new ReasonImpl(res, req);
-        }
-        
-        return out;
+        return convertReasons(m_resolver.getUnsatisfiedRequirements());
         
     }
 
     @Override
     public Resource[] getOptionalResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Wrapper.unwrap(m_resolver.getOptionalResources());
     }
 
     @Override
-    public Requirement[] getReason(Resource resource) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Reason[] getReason(Resource resource) {
+        return convertReasons(m_resolver.getReason(Wrapper.wrap(resource)));
     }
 
     @Override
@@ -73,12 +60,12 @@ public class ConvertedResolver implements Resolver {
 
     @Override
     public Resource[] getRequiredResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Wrapper.unwrap(m_resolver.getRequiredResources());
     }
 
     @Override
     public Resource[] getAddedResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Wrapper.unwrap(m_resolver.getAddedResources());
     }
 
     @Override
@@ -86,4 +73,15 @@ public class ConvertedResolver implements Resolver {
         return m_resolver.resolve();
     }
     
+    public static Reason[] convertReasons(org.apache.felix.bundlerepository.Reason[] reasons) {
+        Reason[] out = new Reason[reasons.length];
+
+        for (int i = 0; i < reasons.length; i++) {
+            Resource res = Wrapper.unwrap(reasons[i].getResource());
+            Requirement req = ((RequirementWrapper) reasons[i].getRequirement()).requirement;
+            out[i] = new ReasonImpl(res, req);
+        }
+
+        return out;
+    }
 }

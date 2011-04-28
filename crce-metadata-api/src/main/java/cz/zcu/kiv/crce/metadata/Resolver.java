@@ -14,7 +14,7 @@ public interface Resolver {
 
     Resource[] getOptionalResources();
 
-    Requirement[] getReason(Resource resource);
+    Reason[] getReason(Resource resource);
 
     Resource[] getResources(Requirement requirement);
 
