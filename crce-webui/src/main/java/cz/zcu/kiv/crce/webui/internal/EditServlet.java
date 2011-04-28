@@ -43,6 +43,10 @@ public class EditServlet extends HttpServlet {
 			if (saveRequirements(req,resp, parameters)) {
 				success = editRequirements(req, resp, parameters);
 			}
+		} else if ("addRequirement".equals(form)) {
+			if (addRequirementForm(req,resp, parameters)) {
+				success = editRequirements(req, resp, parameters);
+			}
 		} else if ("capabilities".equals(form)) {
 			if (saveCapabilities(req,resp, parameters)) {
 				success = editCapabilities(req, resp, parameters);
@@ -53,6 +57,70 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+	private boolean addRequirementForm(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		if (parameters.containsKey("uri")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+		} else return false;
+		
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				System.out.println("1");
+				return false;
+			}
+			Resource resource = findResource(resURI, array);
+			String name = null;
+			Requirement requir = null;
+			String filter = null;
+			boolean multiple = false;
+			boolean extend = false;
+			boolean optional = false;
+			Requirement requirBefore = null;
+				if(parameters.containsKey("name")
+						&& parameters.containsKey("filter")) {
+					name = ((String[]) parameters.get("name"))[0];
+					filter = ((String[]) parameters.get("filter"))[0];
+					if(parameters.containsKey("multiple")) {
+						multiple = (((String[]) parameters.get("multiple"))[0]).equals("on");
+					}
+					if(parameters.containsKey("optional")) {
+						optional = (((String[]) parameters.get("optional"))[0]).equals("on");
+					}
+					if(parameters.containsKey("extend")) {
+						extend = (((String[]) parameters.get("extend"))[0]).equals("on");
+					}
+					requir = resource.createRequirement(name);
+					try {
+						requir.setFilter(filter);
+					} catch (IllegalArgumentException e) {
+						resource.unsetRequirement(requir);
+						resource.addRequirement(requirBefore);
+					}
+					requir.setMultiple(multiple);
+					requir.setOptional(optional);
+					requir.setExtend(extend);
+				}
+			System.out.println("2");
+			
+		} catch (URISyntaxException e) {
+			System.out.println("3");
+			return false;
+		} catch (FileNotFoundException e) {
+			System.out.println("3b");
+			return false;
+		}
+		return true;
+
+	}
+
 	private boolean saveCapabilities(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String category = null;
@@ -116,7 +184,6 @@ public class EditServlet extends HttpServlet {
 			} else  if ("buffer".equals(link)) {
 				array = Activator.instance().getBuffer(req).getRepository().getResources();
 			} else {
-				System.out.println("1");
 				return false;
 			}
 			Resource resource = findResource(resURI, array);
@@ -129,26 +196,51 @@ public class EditServlet extends HttpServlet {
 			boolean multiple = false;
 			boolean extend = false;
 			boolean optional = false;
+			Requirement requirBefore = null;
 			for (int i = 0; i < requirements.length; i++) {
-				if(parameters.containsKey("name_" + (i - 1))) {
-					name = ((String[]) parameters.get("name_" + (i - 1)))[0];
-					filter = ((String[]) parameters.get("filter_" + (i - 1)))[0];
-//					multiple = Boolean.valueOf(((String[]) parameters.get("multiple_" + (i - 1)))[0]);
-//					optional = Boolean.valueOf(((String[]) parameters.get("optional_" + (i - 1)))[0]);
-//					extend = Boolean.valueOf(((String[]) parameters.get("extend_" + (i - 1)))[0]);
+				System.out.println(i);
+				if(parameters.containsKey("name_" + (i + 1))
+						&& parameters.containsKey("filter_" + (i + 1))) {
+					
+					name = ((String[]) parameters.get("name_" + (i + 1)))[0];
+					filter = ((String[]) parameters.get("filter_" + (i + 1)))[0];
+					
+					if(parameters.containsKey("multiple_" + (i + 1))) {
+						multiple = (((String[]) parameters.get("multiple_" + (i + 1)))[0]).equals("on");
+					}
+					if(parameters.containsKey("optional_" + (i + 1))) {
+						optional = (((String[]) parameters.get("optional_" + (i + 1)))[0]).equals("on");
+					}
+					if(parameters.containsKey("extend_" + (i + 1))) {
+						extend = (((String[]) parameters.get("extend_" + (i + 1)))[0]).equals("on");
+					}
+					System.out.println(i + " : " + multiple);
+					System.out.println(i + " : " + optional);
+					System.out.println(i + " : " + extend);
+//					requirBefore = requirements[i];
+					requirLengthBefore = requirements.length;
+					resource.unsetRequirement(requirements[i]);
+					if(requirLengthBefore == resource.getRequirements().length){
+						req.getSession().setAttribute("success", false);
+						req.getSession().setAttribute("message", "Cannot change requirement.");
+						System.err.println("Cannot change requirement.");
+						continue;
+					}
+					
 					requir = resource.createRequirement(name);
-					requir.setFilter(filter);
+					try {
+						requir.setFilter(filter);
+					} catch (IllegalArgumentException e) {
+						req.getSession().setAttribute("success", false);
+						req.getSession().setAttribute("message", "Cannot change requirement.");
+						System.err.println("Cannot change requirement.");
+						resource.unsetRequirement(requir);
+						resource.addRequirement(requirBefore);
+						continue;
+					}
 					requir.setMultiple(multiple);
 					requir.setOptional(optional);
 					requir.setExtend(extend);
-					requirLengthBefore = resource.getRequirements().length;
-					resource.unsetRequirement(requirements[i]);
-					
-					if(requirLengthBefore == resource.getRequirements().length){
-						req.getSession().setAttribute("success", false);
-						return true;
-					}
-					
 //					resource.addRequirement(requir);
 				}
 			}
@@ -246,6 +338,9 @@ public class EditServlet extends HttpServlet {
 		} else if("requirement".equals(type)) {
 			success = editRequirements(req, resp, parameters);
 		
+		} else if("addRequirement".equals(type)) {
+					success = addRequirement(req, resp, parameters);
+					
 		} else {
 			success = false;
 		}
@@ -255,6 +350,32 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+	private boolean addRequirement(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);			
+			req.getRequestDispatcher("jsp/forms/requirementForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+			
+		return true;
+	}
+
 	private boolean editRequirements(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		
