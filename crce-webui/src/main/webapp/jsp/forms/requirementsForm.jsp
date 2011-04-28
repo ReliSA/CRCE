@@ -8,7 +8,7 @@
   	
 		<h2>Requirements form - ${resource.presentationName} ${resource.version}</h2>
 		
-		<a href="#"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
+		<a href="edit?type=addRequirement&uri=${resource.uri}"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
       
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${uri}" />
