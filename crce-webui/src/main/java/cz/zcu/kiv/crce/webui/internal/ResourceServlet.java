@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.osgi.framework.InvalidSyntaxException;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 
@@ -79,11 +81,18 @@ public class ResourceServlet extends HttpServlet {
 		HttpSession session = req.getSession();
 		cleanSession(session);
 		if(link==null) return false;
+		
 		if(link.equals("buffer"))
 		{
 			Resource[] buffer;
 			if(filter==null) buffer = Activator.instance().getBuffer(req).getRepository().getResources();
-			else buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
+			else
+				try {
+					buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					session.setAttribute("success", false);
+					buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+				}
 			session.setAttribute("buffer", buffer);
 			return true;
 		}
@@ -101,7 +110,13 @@ public class ResourceServlet extends HttpServlet {
 		{
 			Resource[] store;
 			if(filter==null) store = Activator.instance().getStore().getRepository().getResources();
-			else store = Activator.instance().getStore().getRepository().getResources(filter);
+			else
+				try {
+					store = Activator.instance().getStore().getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					session.setAttribute("success", false);
+					store = Activator.instance().getStore().getRepository().getResources();
+				}
 			session.setAttribute("store", store);
 			return true;
 		}
