@@ -44,6 +44,8 @@
         <module>crce-plugin-api</module>
         <module>crce-repository-api</module>
         <module>crce-repository-impl</module>
+        <module>crce-results-api</module>
+        <module>crce-results-impl</module>
         <module>crce-webui</module>
     </modules>
 
