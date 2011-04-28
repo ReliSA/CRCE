@@ -23,6 +23,7 @@ public class CheckServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		System.out.println(req.getSession().getAttribute("source"));
 		Resource[] res = chooseFrom(req);
 		if(res==null) req.getRequestDispatcher("resource").forward(req, resp);
 		else
@@ -41,8 +42,7 @@ public class CheckServlet extends HttpServlet {
 		else if(source.equals("store")) return doCheck(Activator.instance().getStore().getRepository());
 		else return null;
 	}
-	private Resource[] doCheck(Repository repository) {
-		HashMap<Resource, ArrayList<Requirement>> unsatisfied = new HashMap<Resource, ArrayList<Requirement>>();
+	private Resource[] doCheck(Repository repository) {		
 		Resource[] resources = repository.getResources();
 		ArrayList<Resource> ext = new ArrayList<Resource>();
 		ResourceCreator rc = Activator.instance().getCreator();

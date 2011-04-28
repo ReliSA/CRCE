@@ -15,7 +15,7 @@
 		</table>
 		</form>
   	   	
-		<form class="execute_commit" method="post" action="#">
+		<form class="execute_commit" method="post" action="test">
   	       
 		<c:forEach items="${buffer}" var="resource">
 			<div class="komponenta">
@@ -34,7 +34,7 @@
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
 			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
-			          	<input type="checkbox" name="${resource.uri}" />
+			          	<input type="checkbox" name="check" value="${resource.uri}" />
 	          		</div>
 	  				<div class="konec"></div>
 	  			</div>

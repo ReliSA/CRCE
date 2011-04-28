@@ -7,7 +7,7 @@
     
   	<div id="telo">
   	
-		<form class="execute_commit" method="post" action="#">
+		<form class="execute_commit" method="post" s>
   	       
 		<c:forEach items="${store}" var="resource">
 	  		<div class="komponenta">

@@ -51,6 +51,15 @@
 	</servlet-mapping>
 	
 	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>cz.zcu.kiv.crce.webui.internal.RuntimeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
         <servlet-name>resource</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
     </servlet>

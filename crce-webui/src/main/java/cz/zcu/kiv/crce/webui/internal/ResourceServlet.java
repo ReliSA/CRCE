@@ -41,7 +41,7 @@ public class ResourceServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-		HttpSession session = req.getSession();
+		
 		String link = null;
 		
 		if (req.getParameter("link") != null && req.getParameter("link") instanceof String) 
@@ -72,12 +72,16 @@ public class ResourceServlet extends HttpServlet {
 	private static void cleanSession(HttpSession session){
 		session.removeAttribute("resources");
 		session.removeAttribute("plugins");
-		session.removeAttribute("store");
-		//session.removeAttribute("success");
-		session.removeAttribute("source");
+		session.removeAttribute("store");		
+	}
+	
+	public static void setError(HttpSession session, boolean success, String message){
+		session.setAttribute("success", success);
+		session.setAttribute("message", message);
 	}
 	
 	private boolean fillSession(String link, HttpServletRequest req, String filter){
+		String errorMessage = filter+" is not a valid filter";
 		HttpSession session = req.getSession();
 		cleanSession(session);
 		if(link==null) return false;
@@ -90,7 +94,7 @@ public class ResourceServlet extends HttpServlet {
 				try {
 					buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
 				} catch (InvalidSyntaxException e) {
-					session.setAttribute("success", false);
+					setError(session,false,errorMessage);
 					buffer = Activator.instance().getBuffer(req).getRepository().getResources();
 				}
 			session.setAttribute("buffer", buffer);
@@ -114,7 +118,7 @@ public class ResourceServlet extends HttpServlet {
 				try {
 					store = Activator.instance().getStore().getRepository().getResources(filter);
 				} catch (InvalidSyntaxException e) {
-					session.setAttribute("success", false);
+					setError(session,false,errorMessage);
 					store = Activator.instance().getStore().getRepository().getResources();
 				}
 			session.setAttribute("store", store);
@@ -127,19 +131,5 @@ public class ResourceServlet extends HttpServlet {
 			return false;
 		}
 	}
-	private boolean getObjectBooleanValue(Object object){
-		try{
-		String param = (String) object;
-		System.out.println(param);
-		if(param!=null && param.equals("true")) 
-			{
-				System.out.println(param);
-				return true;
-			}
-		else return false;
-		}
-		catch(Exception e){
-			return false;
-		}
-	}
+	
 }
