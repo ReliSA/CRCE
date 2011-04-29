@@ -10,7 +10,19 @@
 		<form class="execute_commit" method="post" s>
   	       
 		<c:forEach items="${store}" var="resource">
-	  		<div class="komponenta">
+	  		<div class="komponenta 
+	  			<c:catch var="exception">${resource.satisfied}</c:catch>
+				<c:if test="${empty exception}">
+					<c:choose>
+						<c:when test="${resource.satisfied == true}">
+							uspech		
+						</c:when>
+						<c:when test="${resource.satisfied == false}">
+							neuspech
+						</c:when>
+					</c:choose>
+				</c:if>
+			">
 	  			<div class="nadpis">
 	  				<a class="popis" href="#">
 	  					<span class="sName">${resource.symbolicName}</span> 
@@ -25,7 +37,7 @@
 	  				<div class="nabidka">
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=store"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
-			            <a href="#"><img src="graphic/set.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
+			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
 			          	<input type="checkbox" name="${resource.uri}" />
 	          		</div>
 	  				<div class="konec"></div>
@@ -63,7 +75,19 @@
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<tr>
+	  							<tr 
+	  								<c:catch var="exception">${requirement.satisfied}</c:catch>
+		  							<c:if test="${empty exception}">
+										<c:choose>
+											<c:when test="${requirement.satisfied == true}">
+												class="uspech"		
+											</c:when>
+											<c:when test="${requirement.satisfied == false}">
+												class="neuspech"
+											</c:when>
+										</c:choose>
+									</c:if>
+	  							>
 	  								<td>${requirement.name}</td>
 	  								<td class="filter">${requirement.filter}</td>
 	  								<td>${requirement.multiple}</td>

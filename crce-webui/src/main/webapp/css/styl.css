@@ -156,6 +156,24 @@ h3 {
 .vycisteni {display: block;}
 /* Konec hacku */
 
+/*-------------------------ZPRAVA USPECH NEUSPECH---------------------------------*/
+#zprava {
+	color: #FFF;
+	text-align: center;
+	width: 100%;
+	margin: 0 auto;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.uspech {
+	background-color: green;
+}
+	
+.neuspech {
+	background-color: red;
+}
+
 /*--------------------TELO----------------------------------------*/
 #telo {
   width: 100%;

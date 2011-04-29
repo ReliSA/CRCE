@@ -18,7 +18,19 @@
 		<form class="execute_commit" method="post" action="test">
   	       
 		<c:forEach items="${buffer}" var="resource">
-			<div class="komponenta">
+			<div class="komponenta 
+				<c:catch var="exception">${resource.satisfied}</c:catch>
+				<c:if test="${empty exception}">
+					<c:choose>
+						<c:when test="${resource.satisfied == true}">
+							uspech		
+						</c:when>
+						<c:when test="${resource.satisfied == false}">
+							neuspech
+						</c:when>
+					</c:choose>
+				</c:if>
+			">
 	  			<div class="nadpis">
 	  				<a class="popis" href="#">
 	  					<span class="sName">${resource.symbolicName}</span> 
@@ -75,7 +87,19 @@
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<tr>
+	  							<tr 
+		  							<c:catch var="exception">${requirement.satisfied}</c:catch>
+		  							<c:if test="${empty exception}">
+										<c:choose>
+											<c:when test="${requirement.satisfied == true}">
+												class="uspech"		
+											</c:when>
+											<c:when test="${requirement.satisfied == false}">
+												class="neuspech"
+											</c:when>
+										</c:choose>
+									</c:if>
+	  							>
 	  								<td>${requirement.name}</td>
 	  								<td class="filter">${requirement.filter}</td>
 	  								<td>${requirement.multiple}</td>
