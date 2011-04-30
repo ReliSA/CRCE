@@ -6,7 +6,9 @@
     
   	<div id="telo">
   	
-		<h2>Capability form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Add new capability</h2>
+		
+		<h3>${resource.presentationName} - ${resource.version}</h3>
 		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${resource.uri}" />
@@ -14,7 +16,7 @@
 		<table class="formular">	  		
 			<tr>
 				<th>Capability name:</th>
-				<td><input type="text" name="capability" value="${capability}" /></td>
+				<td><input class="text" type="text" name="capability" value="${capability}" /></td>
 				<td class="chyba">${capabilityError}</td>
 			</tr>
 			<tr>

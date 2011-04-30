@@ -6,7 +6,9 @@
     
   	<div id="telo">
   	
-		<h2>Requirement form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Add new requirement</h2>
+		
+		<h3>${resource.presentationName} - ${resource.version}</h3>
 		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${resource.uri}" />

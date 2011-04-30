@@ -17,7 +17,7 @@
 		<table class="formular">	  		
 			<tr>
 				<th>Category name:</th>
-				<td><input type="text" name="category" value="${category}" /></td>
+				<td><input class="text" type="text" name="category" value="${category}" /></td>
 				<td class="chyba">${categoryError}</td>
 			</tr>
 			<tr>

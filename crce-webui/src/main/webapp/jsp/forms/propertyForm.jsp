@@ -6,7 +6,9 @@
     
 	<div id="telo">
   	
-		<h2>Property form - ${presentationName} ${version}</h2>
+		<h2>Add new property</h2>
+		
+		<h3>${presentationName} - ${version}</h3>
       
 		<form action="#" method="post">
 			<input type="hidden" name="presentationName" value="${presentationName}" />

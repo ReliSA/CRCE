@@ -6,9 +6,13 @@
     
   	<div id="telo">
   	
-		<h2>Capabilities form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Capabilities form</h2>
 		
-		<a href="#"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
+		<h3>${resource.presentationName} - ${resource.version}</h3>
+		
+		<p>
+			<a href="#"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
+		</p>
       
 		<form action="#" method="post">
 			<input type="hidden" name="form" value="capabilities" />
@@ -16,12 +20,12 @@
 			<input type="hidden" name="capabilityId" value="${capabilityId}" />
 			
 			<table class="poskytuje">
-				<tr><td>Name</td><td>Type</td><td>Value</td></tr>
+				<tr><th>Name</th><th>Type</th><th>Value</th></tr>
 				<c:forEach items="${capability.properties}" var="property" varStatus="counter">
 		  			<tr>
-		  				<td class="jmeno"><input type="text" value="${property.name}_${counter.count}" /></td>
-		  				<td class="typ"><input type="text" value="${property.type}_${counter.count}" /></td>
-		  				<td class="hodnota"><input type="text" value="${property.value}_${counter.count}" /></td>
+		  				<td class="jmeno"><input class="text" type="text" name="name_${counter.count}" value="${property.name}" /></td>
+		  				<td class="typ"><input class="text" type="text" name="type_${counter.count}" value="${property.type}" /></td>
+		  				<td class="hodnota"><input class="text" type="text" name="value_${counter.count}" value="${property.value}" /></td>
 		  			</tr>
 		  		</c:forEach>
 		  		<tr><td colspan="3"><input class="tlacitko" type="submit" value="Save capabilities" /></td></tr>

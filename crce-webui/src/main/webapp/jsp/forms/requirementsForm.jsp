@@ -6,10 +6,14 @@
     
   	<div id="telo">
   	
-		<h2>Requirements form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Requirements form</h2>
 		
-		<a href="edit?type=addRequirement&uri=${resource.uri}"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
-      
+		<h3>${resource.presentationName} - ${resource.version}</h3>
+		
+		<p>
+			<a href="edit?type=addRequirement&uri=${resource.uri}"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
+      	</p>
+		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${uri}" />
 			<input type="hidden" name="form" value="requirements" />
@@ -18,7 +22,7 @@
 	  		<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  		<c:forEach items="${resource.requirements}" var="requirement" varStatus="counter">
 		  		<tr>
-		  			<td><input class="text" type="text" name="name_${counter.count}" value="${requirement.name}" /></td>
+		  			<td class="jmeno"><input class="text" type="text" name="name_${counter.count}" value="${requirement.name}" /></td>
 		  			<td class="filter"><input class="text" type="text" name="filter_${counter.count}" value="${requirement.filter}" /></td>
 		  			<td><input type="checkbox" name="multiple_${counter.count}" <c:if test="${requirement.multiple}">checked="checked"</c:if> /></td>
 		  			<td><input type="checkbox" name="optional_${counter.count}" <c:if test="${requirement.optional}">checked="checked"</c:if> /></td>

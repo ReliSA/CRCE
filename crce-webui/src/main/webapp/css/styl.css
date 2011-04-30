@@ -222,15 +222,15 @@ h3 {
 }
 
 .komponenta .nadpis .popis .version {
-  color: red;
+  color: #20b2aa;
 }
 
 .komponenta .nadpis .popis .pName {
-  color: green;
+  color: #000080;
 }
 
 .komponenta .nadpis .popis .category {
-  color: blue;
+  color: #0000ff;
 }
 
 .komponenta .nadpis .nabidka {
@@ -249,34 +249,61 @@ h3 {
 
 /*--------------------POSKYTUJE-------------------------*/
 
-.komponenta .poskytuje {
+.poskytuje {
+	padding: 10px;
 	width: 100%;
+	margin: 0 auto;
 }
 
-.komponenta .poskytuje .jmeno {
+.poskytuje th {
+	text-align: left;
+	font-weight: bold;
+}
+
+.poskytuje .text {
+	width: 98%;
+}
+
+.poskytuje .jmeno {
 	
 }
 
-.komponenta .poskytuje .typ {
+.poskytuje .typ {
 	width: 90px;
 }
 
-.komponenta .poskytuje .hodnota {
+.poskytuje .hodnota {
 	max-width: 580px;
 	width: 580px;
 }
 
 /*-------------------------VYZADUJE------------------------------*/
-.komponenta .vyzaduje {
-	width: 830px;
+.vyzaduje {
+	padding: 10px;
+	width: 100%;
 	margin: 0 auto;	
 }
 
-.komponenta .vyzaduje th {
-	text-align: left;
+.komponenta .vyzaduje {
+	padding: 0px;
+	width: 830px;
 }
 
-.komponenta .vyzaduje .filter {
+.vyzaduje th {
+	text-align: left;
+	font-weight: bold;
+}
+
+.vyzaduje .text {
+	width: 98%;
+	margin: 0 auto;
+}
+
+.vyzaduje .jmeno {
+	width: 100px;
+}
+
+.vyzaduje .filter {
 	width: 600px;
 }
 
@@ -345,6 +372,8 @@ h3 {
 
 .formular {
   padding: 10px;
+  width: 100%;
+  text-align: left;
 }
 
 .formular th {
@@ -352,7 +381,7 @@ h3 {
 }
 
 .formular td {
-  text-align: center;
+  text-align: left;
   margin: 0 auto;
 }
 
