@@ -11,8 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.Type;
 
 public class EditServlet extends HttpServlet {
 	/**
@@ -38,18 +41,34 @@ public class EditServlet extends HttpServlet {
 		if ("addCategory".equals(form)) {
 			if (addCategory(req,resp, parameters)) {
 				success = editCategories(req, resp);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot add category.");
+					success = true;
+				}
 			}
 		} else if ("requirements".equals(form)) {
 			if (saveRequirements(req,resp, parameters)) {
 				success = editRequirements(req, resp, parameters);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot save requirements.");
+					success = true;
+				}
 			}
 		} else if ("addRequirement".equals(form)) {
 			if (addRequirementForm(req,resp, parameters)) {
 				success = editRequirements(req, resp, parameters);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+					success = true;
+				}
 			}
 		} else if ("capabilities".equals(form)) {
 			if (saveCapabilities(req,resp, parameters)) {
 				success = editCapabilities(req, resp, parameters);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+					success = true;
+				}
 			}
 		}
 		if (!success) {
@@ -62,7 +81,9 @@ public class EditServlet extends HttpServlet {
 		String uri = null;
 		if (parameters.containsKey("uri")) {
 			uri = ((String[]) parameters.get("uri"))[0];
-		} else return false;
+		} else {
+			return false;
+		}
 		
 		try {
 			URI resURI = new URI(uri);
@@ -73,7 +94,6 @@ public class EditServlet extends HttpServlet {
 			} else  if ("buffer".equals(link)) {
 				array = Activator.instance().getBuffer(req).getRepository().getResources();
 			} else {
-				System.out.println("1");
 				return false;
 			}
 			Resource resource = findResource(resURI, array);
@@ -108,26 +128,28 @@ public class EditServlet extends HttpServlet {
 					requir.setOptional(optional);
 					requir.setExtend(extend);
 				}
-			System.out.println("2");
 			
 		} catch (URISyntaxException e) {
-			System.out.println("3");
 			return false;
 		} catch (FileNotFoundException e) {
-			System.out.println("3b");
 			return false;
 		}
+		req.getSession().setAttribute("success", true);
 		return true;
 
 	}
 
 	private boolean saveCapabilities(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
-		String category = null;
+		int capabilityId = -1;
 		String uri = null;
-		if (parameters.containsKey("uri")) {
+		if (parameters.containsKey("uri")
+				&& parameters.containsKey("capabilityId")) {
 			uri = ((String[]) parameters.get("uri"))[0];
-		} else return false;
+			capabilityId = Integer.valueOf(((String[]) parameters.get("capabilityId"))[0]);
+		} else {
+			return false;
+		}
 		
 		try {
 			URI resURI = new URI(uri);
@@ -138,28 +160,31 @@ public class EditServlet extends HttpServlet {
 			} else  if ("buffer".equals(link)) {
 				array = Activator.instance().getBuffer(req).getRepository().getResources();
 			} else {
-				return false;
+				{
+					return false;
+				}
 			}
 			Resource resource = findResource(resURI, array);
 			
-			Requirement[] requirements = resource.getRequirements();
-			for (int i = 0; i < requirements.length; i++) {
-				if(parameters.containsKey("name_" + (i - 1))) {
-					resource.unsetRequirement(requirements[i]);
-					resource.addRequirement(requirements[i]);
+			Capability capability= resource.getCapabilities()[capabilityId - 1];
+			Property[] properties = capability.getProperties();
+			for (int i = 0; i < properties.length; i++) {
+				String name = ((String[]) parameters.get("name_" + (i + 1)))[0];
+				String type = ((String[]) parameters.get("type_" + (i + 1)))[0];
+				String value = ((String[]) parameters.get("value_" + (i + 1)))[0];
+//				requirBefore = requirements[i];
+				int propertiesLengthBefore = properties.length;
+				capability.unsetProperty(properties[i].getName());
+				if(propertiesLengthBefore == capability.getProperties().length){
+					req.getSession().setAttribute("success", false);
+					req.getSession().setAttribute("message", "Cannot change property.");
+					System.err.println("Cannot change property.");
+					continue;
 				}
-			}
-			
-			int categoriesLengthBefore = resource.getCategories().length; 
-			resource.addCategory(category);
-			
-//			Zjištění zda kategorie byla odstraněna.
-			if (categoriesLengthBefore < resource.getCategories().length) {
-				req.getSession().setAttribute("success", false);
-			} else {
-				req.getSession().setAttribute("success", true);
-			}
-			
+				if(type.equals("version"))
+				capability.setProperty(name, value, Type.getValue(type));
+				}
+//				resource.addRequirement(requir);
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
@@ -285,7 +310,6 @@ public class EditServlet extends HttpServlet {
 			
 //			Zjištění zda kategorie byla odstraněna.
 			if (categoriesLengthBefore < resource.getCategories().length) {
-				req.getSession().setAttribute("success", false);
 			} else {
 				req.getSession().setAttribute("success", true);
 			}
@@ -303,6 +327,7 @@ public class EditServlet extends HttpServlet {
 			throws ServletException, IOException {
 		cleanSession(req.getSession());
 		
+		req.getSession().removeAttribute("success");
 		boolean success	= false;
 		Map<?,?> parameters = (Map<?,?>) req.getParameterMap();
 		
@@ -314,32 +339,58 @@ public class EditServlet extends HttpServlet {
 		} 
 		if ("deleteCompoment".equals(type)) {
 			success = deleteComponent(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot delete component.");
+				success = true;
+			}
 		
 		} else if("category".equals(type)){
 			success = editCategories(req, resp);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit category.");
+				success = true;
+			}
 			
 		} else if("deleteCategory".equals(type)) {
-			if(deleteCategory(req, resp, parameters)){
-				success = editCategories(req, resp);
-			} else {
-				success = false;
+			if(!deleteCategory(req, resp, parameters)){
+				ResourceServlet.setError(req.getSession(), false, "Cannot delete category.");
+				success = true;
 			}
+			success = editCategories(req, resp);
 		} else if("addCategory".equals(type)) {
 			success = addCategories(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot add category.");
+				success = true;
+			}
 				
 		} else if("addCapability".equals(type)) {
 			success = addCapabilities(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
+				success = true;
+			}
 			
 		} else if("capability".equals(type)) {
-			System.out.println("deb3s");
 			success = editCapabilities(req, resp, parameters);
-			if(!success)System.out.println("deb3s");
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit capabilities.");
+				success = true;
+			}
 				
 		} else if("requirement".equals(type)) {
 			success = editRequirements(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit requirements.");
+				success = true;
+			}
 		
 		} else if("addRequirement".equals(type)) {
 					success = addRequirement(req, resp, parameters);
+					if (!success){
+						ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+						success = true;
+					}
 					
 		} else {
 			success = false;
@@ -543,10 +594,8 @@ public class EditServlet extends HttpServlet {
 			resource.unsetCategory(category);
 			
 //			Zjištění zda kategorie byla odstraněna.
-			if (categoriesLengthBefore < resource.getCategories().length) {
-				req.getSession().setAttribute("success", false);
-			} else {
-				req.getSession().setAttribute("success", true);
+			if (!(categoriesLengthBefore < resource.getCategories().length)) {
+				return false;
 			}
 			
 		} catch (URISyntaxException e) {
@@ -576,10 +625,13 @@ public class EditServlet extends HttpServlet {
 				Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
 				Resource found = findResource(fileUri, array);
 				System.out.println("Found!"+found.getPresentationName());
-				if(!Activator.instance().getBuffer(req).remove(found)) System.out.println("wtf?");;
+				if(!Activator.instance().getBuffer(req).remove(found)){
+				}
 				
 				
-			} else return false;
+			} else {
+				return false;
+			}
 			
 			req.getRequestDispatcher("resource").forward(req, resp);
 							
