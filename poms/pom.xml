@@ -93,13 +93,13 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.shell</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.0</version>
                 <scope>provided</scope>
             </dependency>
             
