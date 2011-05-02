@@ -3,14 +3,17 @@ package cz.zcu.kiv.crce.results.internal;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.results.Result;
 import cz.zcu.kiv.crce.results.ResultsStore;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.util.Dictionary;
 import java.util.List;
@@ -25,7 +28,11 @@ import org.osgi.service.cm.ManagedService;
  */
 public class ResultsStoreImpl implements ResultsStore, ManagedService {
 
+    public static final String RESULT_EXTENSION = ".result";
+    
     private volatile BundleContext m_context;
+    private volatile DataModelHelperExt m_helper;
+    
     private File m_baseDir;
 
     @Override
@@ -41,7 +48,7 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
         
         File file = File.createTempFile("result", "", dir);
         
-        InputStream input = resultsFile.toURL().openConnection().getInputStream();
+        InputStream input = resultsFile.toURL().openStream();
         OutputStream output = new FileOutputStream(file);
         
         try {
@@ -54,7 +61,17 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
         
         Result result = new ResultImpl(file, resource, provider);
         
-        // TODO save result
+        Writer writer = new FileWriter(getResultMetafile(file));
+        
+        try {
+            m_helper.writeMetadata(resource, writer);
+        } finally {
+            try {
+                writer.flush();
+            } finally {
+                writer.close();
+            }
+        }
         
         return result;
     }
@@ -108,6 +125,10 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
             throw new ConfigurationException(path, "Results store directory does not exists and can not be created: " + m_baseDir.getPath());
         }
         
+    }
+    
+    private File getResultMetafile(File resultFile) throws IOException {
+        return new File(resultFile.getCanonicalPath() + RESULT_EXTENSION);
     }
 
 }
