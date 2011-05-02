@@ -60,7 +60,7 @@
 	    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
 	    </ul>
 	    
-	    <c:if test="${not empty success && success != 'null'}">
+	    <c:if test="${not empty success}">
 	    	<c:choose>
 				<c:when test="${success == true}">
 					<div id="zprava" class="uspech">${message}</div>		
@@ -69,7 +69,7 @@
 					<div id="zprava" class="neuspech">${message}</div>	
 				</c:when>
 			</c:choose>
-			<c:set scope="session" var="success" value="null"/>
-			<c:set scope="session" var="message" value="null"/>		
+			<c:set scope="session" var="success" value=""/>
+			<c:set scope="session" var="message" value=""/>		
 	    </c:if>
 	    
