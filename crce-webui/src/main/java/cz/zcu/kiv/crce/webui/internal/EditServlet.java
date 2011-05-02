@@ -172,17 +172,25 @@ public class EditServlet extends HttpServlet {
 				String name = ((String[]) parameters.get("name_" + (i + 1)))[0];
 				String type = ((String[]) parameters.get("type_" + (i + 1)))[0];
 				String value = ((String[]) parameters.get("value_" + (i + 1)))[0];
-//				requirBefore = requirements[i];
+				Property propBefore = properties[i];
 				int propertiesLengthBefore = properties.length;
 				capability.unsetProperty(properties[i].getName());
+				
 				if(propertiesLengthBefore == capability.getProperties().length){
 					req.getSession().setAttribute("success", false);
 					req.getSession().setAttribute("message", "Cannot change property.");
 					System.err.println("Cannot change property.");
 					continue;
 				}
-				if(type.equals("version"))
-				capability.setProperty(name, value, Type.getValue(type));
+				
+				try{
+					capability.setProperty(name, value, Type.getValue(type));
+				} catch (IllegalArgumentException e){
+					capability.setProperty(propBefore);
+					req.getSession().setAttribute("success", false);
+					req.getSession().setAttribute("message", "Cannot change property.");
+					System.err.println("Cannot change property.");
+				}
 				}
 //				resource.addRequirement(requir);
 		} catch (URISyntaxException e) {
