@@ -1,11 +1,11 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import org.junit.*;
 import org.junit.runner.RunWith;

@@ -1,9 +1,9 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 
 /**
  * Simple <code>ResourceDAOFactory</code> implementation which returns default

@@ -2,8 +2,8 @@ package cz.zcu.kiv.crce.metadata.combined.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.repository.plugins.AbstractResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import java.io.IOException;
 import java.net.URI;
 

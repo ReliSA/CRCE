@@ -35,6 +35,7 @@
         <module>poms</module>
         <module>provision</module>
         <module>crce-metadata-api</module>
+        <module>crce-metadata-dao-api</module>
         <module>crce-metadata-impl</module>
         <module>crce-metadata-combined</module>
         <module>crce-metadata-osgi-bundle</module>

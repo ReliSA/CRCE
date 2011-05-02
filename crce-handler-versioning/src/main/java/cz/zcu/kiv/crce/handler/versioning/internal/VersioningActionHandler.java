@@ -2,12 +2,12 @@ package cz.zcu.kiv.crce.handler.versioning.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;

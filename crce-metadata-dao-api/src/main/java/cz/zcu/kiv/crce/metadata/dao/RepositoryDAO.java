@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.plugins;
+package cz.zcu.kiv.crce.metadata.dao;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
