@@ -45,6 +45,9 @@ public class EditServlet extends HttpServlet {
 					ResourceServlet.setError(req.getSession(), false, "Cannot add category.");
 					success = true;
 				}
+			} else {
+				ResourceServlet.setError(req.getSession(), false, "Cannot add category.");
+				success = true;
 			}
 		} else if ("requirements".equals(form)) {
 			if (saveRequirements(req,resp, parameters)) {
@@ -60,7 +63,10 @@ public class EditServlet extends HttpServlet {
 				if (!success){
 					ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
 					success = true;
-				}
+				} 
+				} else {
+					ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+					success = true;
 			}
 		} else if ("capabilities".equals(form)) {
 			if (saveCapabilities(req,resp, parameters)) {
@@ -602,7 +608,7 @@ public class EditServlet extends HttpServlet {
 			resource.unsetCategory(category);
 			
 //			Zjištění zda kategorie byla odstraněna.
-			if (!(categoriesLengthBefore < resource.getCategories().length)) {
+			if (categoriesLengthBefore == resource.getCategories().length) {
 				return false;
 			}
 			
