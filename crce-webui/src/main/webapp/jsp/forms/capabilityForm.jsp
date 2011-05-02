@@ -12,7 +12,7 @@
 		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${resource.uri}" />
-		
+			<input type="hidden" name="form" value="capability" />
 		<table class="formular">	  		
 			<tr>
 				<th>Capability name:</th>

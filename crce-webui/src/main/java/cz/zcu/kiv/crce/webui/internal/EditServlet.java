@@ -31,13 +31,10 @@ public class EditServlet extends HttpServlet {
 		Map<?,?> parameters = req.getParameterMap();
 		String form = null;
 		
-		if (req.getParameter("htmlFormName") != null) {
-			System.out.println((String)req.getParameter("htmlFormName"));
-		}
-		
 		if (parameters.containsKey("form")) {
 			form =((String[]) parameters.get("form"))[0];
 		}
+		System.out.println(form);
 		if ("addCategory".equals(form)) {
 			if (addCategory(req,resp, parameters)) {
 				success = editCategories(req, resp);
@@ -75,6 +72,21 @@ public class EditServlet extends HttpServlet {
 					ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
 					success = true;
 				}
+			} else {
+				ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+				success = true;
+			}
+		} else if ("capability".equals(form)) {
+			if (saveCapability(req,resp, parameters)) {
+				System.out.println("Capab");
+				success = editCapabilities(req, resp, parameters, true);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+					success = true;
+				}
+			} else {
+				ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+				success = true;
 			}
 		}
 		if (!success) {
@@ -82,6 +94,46 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+	private boolean editCapabilities(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		return editCapabilities(req, resp, parameters, false);
+	}
+
+	private boolean saveCapability(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		String capabilityName;
+		if (parameters.containsKey("uri")
+				&& parameters.containsKey("capability")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+			capabilityName = ((String[]) parameters.get("capability"))[0];
+		} else {
+			return false;
+		}
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				{
+					return false;
+				}
+			}
+			Resource resource = findResource(resURI, array);
+			resource.createCapability(capabilityName);
+			req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().length));
+		} catch (URISyntaxException e) {
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
+		}
+		return true;
+	}
+
 	private boolean addRequirementForm(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String uri = null;
@@ -385,8 +437,21 @@ public class EditServlet extends HttpServlet {
 				success = true;
 			}
 			
+		} else if("addCapabilityProperty".equals(type)) {
+			if(addCapabilityProperty(req, resp, parameters)){
+				success = editCapabilities(req, resp, parameters, false);
+				
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
+					success = true;
+				}
+			} else {
+				ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
+				success = true;
+				
+			}
 		} else if("capability".equals(type)) {
-			success = editCapabilities(req, resp, parameters);
+			
 			if (!success){
 				ResourceServlet.setError(req.getSession(), false, "Cannot edit capabilities.");
 				success = true;
@@ -492,9 +557,10 @@ public class EditServlet extends HttpServlet {
 	}
 
 	private boolean editCapabilities(HttpServletRequest req,
-			HttpServletResponse resp, Map<?, ?> parameters) {
+			HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
 		String link = (String) req.getSession().getAttribute("source");
 		Resource[] array;
+		
 		if ("store".equals(link)) {
 			array = Activator.instance().getStore().getRepository().getResources();
 		} else  if ("buffer".equals(link)) {
@@ -504,13 +570,19 @@ public class EditServlet extends HttpServlet {
 		}
 		
 		try {
-			String id;
+			String id = null;
 			String resURI = null;;
-			if (parameters.containsKey("capabilityId")
+			if(b && parameters.containsKey("uri")
+					&& req.getAttribute("capabilityId") != null){
+				resURI  = ((String[]) parameters.get("uri"))[0];
+				id = (String) req.getAttribute("capabilityId");				
+			}else if (parameters.containsKey("capabilityId")
 					&& parameters.containsKey("uri")) {
 				id = ((String[]) parameters.get("capabilityId"))[0];
 				resURI  = ((String[]) parameters.get("uri"))[0];
 			} else {
+				System.out.println(parameters.containsKey("capabilityId"));
+				System.out.println(parameters.containsKey("uri"));
 				System.out.println("deb3ALE");
 				return false;
 			}

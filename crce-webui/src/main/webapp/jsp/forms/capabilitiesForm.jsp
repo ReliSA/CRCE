@@ -11,7 +11,7 @@
 		<h3>${resource.presentationName} - ${resource.version}</h3>
 		
 		<p>
-			<a href="#"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
+			<a href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
 		</p>
       
 		<form action="#" method="post">
