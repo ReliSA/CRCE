@@ -88,12 +88,67 @@ public class EditServlet extends HttpServlet {
 				ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
 				success = true;
 			}
+		} else if ("property".equals(form)) {
+			if (!saveProperty(req,resp, parameters)) {
+				ResourceServlet.setError(req.getSession(), false, "Cannot add property.");
+			}
+			success = editCapabilities(req, resp, parameters, true);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Error while loading capabilities.");
+				success = true;
+			}
 		}
 		if (!success) {
 			resp.sendError(HttpServletResponse.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
 		}
 	}
 	
+	private boolean saveProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		String id = null;
+		if (parameters.containsKey("uri")
+				&& parameters.containsKey("capabilityId")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+			id = ((String[]) parameters.get("capabilityId"))[0];
+			System.out.println(id);
+		} else {
+			return false;
+		}
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				{
+					System.out.println("csosasa2");
+					return false;
+				}
+			}
+			Resource resource = findResource(resURI, array);
+			Capability capability = resource.getCapabilities()[Integer.valueOf(id) - 1];
+			String name = ((String[]) parameters.get("name"))[0];
+			String type = ((String[]) parameters.get("type"))[0];
+			String value = ((String[]) parameters.get("value"))[0];
+			
+			System.out.println("TEST: " + id);
+			try{
+				capability.setProperty(name, value, Type.getValue(type));
+			} catch (IllegalArgumentException e){
+				return false;
+			}
+		} catch (URISyntaxException e) {
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
+		}
+		return true;
+	}
+
 	private boolean editCapabilities(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		return editCapabilities(req, resp, parameters, false);
@@ -438,18 +493,12 @@ public class EditServlet extends HttpServlet {
 			}
 			
 		} else if("addCapabilityProperty".equals(type)) {
-			if(addCapabilityProperty(req, resp, parameters)){
-				success = editCapabilities(req, resp, parameters, false);
+				success = addCapabilityProperty(req, resp, parameters);
 				
 				if (!success){
 					ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
 					success = true;
 				}
-			} else {
-				ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
-				success = true;
-				
-			}
 		} else if("capability".equals(type)) {
 			success = editCapabilities(req, resp, parameters);
 			if (!success){
@@ -483,8 +532,28 @@ public class EditServlet extends HttpServlet {
 
 	private boolean addCapabilityProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
-		// TODO Auto-generated method stub
-		return false;
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);
+			req.getSession().setAttribute("capabilityId", (String) req.getParameter("capabilityId"));
+			req.getRequestDispatcher("jsp/forms/propertyForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+			
+		return true;
 	}
 
 	private boolean addRequirement(HttpServletRequest req,
@@ -593,7 +662,7 @@ public class EditServlet extends HttpServlet {
 				System.out.println("deb3ALE");
 				return false;
 			}
-			System.out.println("deb3aALE");
+			System.out.println("deb3aALE " + id + resURI);
 			Resource resource = findResource(new URI(resURI), array);
 			
 			req.getSession().setAttribute("resource", resource);

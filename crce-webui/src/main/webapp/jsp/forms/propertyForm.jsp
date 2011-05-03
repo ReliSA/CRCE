@@ -8,11 +8,12 @@
   	
 		<h2>Add new property</h2>
 		
-		<h3>${presentationName} - ${version}</h3>
+		<h3>${resource.presentationName} - ${resource.version}</h3>
       
 		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
+			<input type="hidden" name="uri" value="${resource.uri}" />
+			<input type="hidden" name="capabilityId" value="${capabilityId}" />
+			<input type="hidden" name="form" value="property" />
 		
 		<table class="formular">
 	        <tr>
