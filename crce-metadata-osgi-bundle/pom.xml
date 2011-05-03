@@ -24,11 +24,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        
-        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
@@ -48,12 +43,6 @@
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-impl</artifactId>
-            <version>${project.version}</version>
         </dependency>
         
         <dependency>
