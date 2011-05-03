@@ -20,13 +20,22 @@ public class RuntimeServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		if(storeBufferAction(req)) parseParams(req);
 		
+		//if(storeBufferAction(req)) parseParams(req);
+		//req.getSession().setAttribute("resources", parseParams(req));
+		
+		// TEST!!!!!! - NENI SPRAVNE!!!!!!
+		req.getSession().setAttribute("resources", Activator.instance().getStore().getRepository().getResources());
+		req.getSession().setAttribute("tests", Activator.instance().getPluginManager().getPlugins());
+		
+		req.getRequestDispatcher("jsp/forms/testForm.jsp").forward(req, resp);
 	}
 	
 	private Resource[] parseParams(HttpServletRequest req){
-		String[] uris = (String [])req.getParameterValues("check");
+		String[] uris = (String []) req.getParameterValues("check");
 		System.out.println(uris.length);
+		
+		//return uris;
 		return null;
 	}
 	

@@ -530,6 +530,11 @@ public class EditServlet extends HttpServlet {
 		}
 		return true;
 	}
+	
+	private boolean addCapabilityProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		return false;
+	}
 
 	private boolean addCapabilities(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {

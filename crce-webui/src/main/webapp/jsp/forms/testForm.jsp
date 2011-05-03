@@ -29,12 +29,31 @@
 				<table class="formular">	  		
 					<c:forEach items="${tests}" var="test">
 						<tr>
-							<td><input type="radio" name="test" value="${test}" /></td>
-							<td>${test}</td>
+							<td><input type="radio" name="test" value="${test.pluginId}" /></td>
+							<td>${test.pluginId}</td>
 						</tr>
 			  		</c:forEach>
-			  		<tr><td><input class="tlacitko" type="submit" value="Test" /></td></tr>
 				</table>
+				
+				<h3>Test parameters: </h3>
+				<table id="options" class="formular">
+					<tr>
+						<th>Name: </th>
+						<td><input type="text" name="name_1" /></td>
+						<th>Value: </th>
+						<td><input class="text" type="text" name="value_1" /></td>
+					</tr>				
+				</table>
+
+				<p>
+					<a href="#" onclick="plus(); return false;" title="Add parameter"><img src="graphic/add.png" alt="add" /> Add parameter</a>
+					<a href="#" onclick="minus(); return false;" title="Remove parameter"><img src="graphic/del.png" alt="delete" /> Remove parameter</a>
+				</p> 
+				
+				<p>
+					<input class="tlacitko" type="submit" value="RUN TEST" />
+				</p>
+				
 				</form>
 	  		</c:when>
 	  		<c:when test="${empty tests}">

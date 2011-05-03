@@ -21,6 +21,8 @@
     	<script type="text/javascript" src="js/jquery-1.5.1.js"></script>
     
 	    <script type="text/javascript" src="js/slide.js"></script>
+	    
+	    <script type="text/javascript" src="js/plus_minus_form.js"></script>
 
     	<title>Software components storage - ${param.title}</title>
 	</head>
