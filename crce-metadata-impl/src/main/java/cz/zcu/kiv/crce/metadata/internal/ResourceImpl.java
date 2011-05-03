@@ -158,12 +158,12 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     }
 
     @Override
-    public void setSymbolicName(String name) {
+    public synchronized void setSymbolicName(String name) {
         setSymbolicName(name, false);
     }
     
     @Override
-    public void setSymbolicName(String name, boolean isStatic) {
+    public synchronized void setSymbolicName(String name, boolean isStatic) {
         if (name != null && isWritable() && !isSymbolicNameStatic()) {
             WritableRepository r;
             if ((r = m_repository) != null) {
@@ -180,12 +180,12 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     }
 
     @Override
-    public void setVersion(Version version) {
+    public synchronized void setVersion(Version version) {
         setVersion(version, false);
     }
 
     @Override
-    public void setVersion(Version version, boolean isStatic) {
+    public synchronized void setVersion(Version version, boolean isStatic) {
         if (version != null && isWritable() && !isVersionStatic()) {
             WritableRepository r;
             if ((r = m_repository) != null) {
@@ -203,12 +203,12 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
 
     @Override
-    public void setVersion(String version) {
+    public synchronized void setVersion(String version) {
         setVersion(version, false);
     }
 
     @Override
-    public void setVersion(String version, boolean isStatic) {
+    public synchronized void setVersion(String version, boolean isStatic) {
         setVersion(VersionTable.getVersion(version), isStatic);
     }
 
@@ -407,7 +407,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
         }
     }
 
-    protected void setRepository(WritableRepository repository) {
+    protected synchronized void setRepository(WritableRepository repository) {
         m_repository = repository;
     }
     

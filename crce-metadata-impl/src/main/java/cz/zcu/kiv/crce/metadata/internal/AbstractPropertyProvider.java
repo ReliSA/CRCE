@@ -19,6 +19,10 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
 
     final Map<String, Property> m_map = new HashMap<String, Property>();
     
+    /**
+     * Returns <code>this</code>. For generic casting purpose.
+     * @return instance of this object.
+     */
     abstract T getThis();
     
     @Override
@@ -44,54 +48,54 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
     }
 
     @Override
-    public T setProperty(String name, String value, Type type) {
+    public synchronized T setProperty(String name, String value, Type type) {
         obtainProperty(name).setValue(value, type);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, String string) {
+    public synchronized T setProperty(String name, String string) {
         obtainProperty(name).setValue(string);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, Version version) {
+    public synchronized T setProperty(String name, Version version) {
         obtainProperty(name).setValue(version);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, URL url) {
+    public synchronized T setProperty(String name, URL url) {
         obtainProperty(name).setValue(url);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, URI uri) {
+    public synchronized T setProperty(String name, URI uri) {
         obtainProperty(name).setValue(uri);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, long llong) {
+    public synchronized T setProperty(String name, long llong) {
         obtainProperty(name).setValue(llong);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, double ddouble) {
+    public synchronized T setProperty(String name, double ddouble) {
         obtainProperty(name).setValue(ddouble);
         return getThis();
     }
 
     @Override
-    public T setProperty(String name, Set values) {
+    public synchronized T setProperty(String name, Set values) {
         obtainProperty(name).setValue(values);
         return getThis();
     }
 
-    private synchronized PropertyImpl obtainProperty(String name) {
+    private PropertyImpl obtainProperty(String name) {
         Property prop;
         if ((prop = m_map.get(name.toLowerCase())) == null) {
             prop = new PropertyImpl(name);
