@@ -451,7 +451,7 @@ public class EditServlet extends HttpServlet {
 				
 			}
 		} else if("capability".equals(type)) {
-			
+			success = editCapabilities(req, resp, parameters);
 			if (!success){
 				ResourceServlet.setError(req.getSession(), false, "Cannot edit capabilities.");
 				success = true;
@@ -480,6 +480,13 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+
+	private boolean addCapabilityProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	private boolean addRequirement(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		
@@ -529,11 +536,6 @@ public class EditServlet extends HttpServlet {
 			return false;
 		}
 		return true;
-	}
-	
-	private boolean addCapabilityProperty(HttpServletRequest req,
-			HttpServletResponse resp, Map<?, ?> parameters) {
-		return false;
 	}
 
 	private boolean addCapabilities(HttpServletRequest req,
