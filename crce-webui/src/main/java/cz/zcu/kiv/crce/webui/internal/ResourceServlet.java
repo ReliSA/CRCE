@@ -58,7 +58,7 @@ public class ResourceServlet extends HttpServlet {
 			else
 			{
 				System.out.println("Default forward");
-				req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
+				req.getRequestDispatcher("resource?link=store").forward(req, resp);
 			}
 
 		} catch (ServletException e) {
