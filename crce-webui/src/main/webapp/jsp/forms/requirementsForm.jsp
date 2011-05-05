@@ -8,7 +8,7 @@
   	
 		<h2>Requirements form</h2>
 		
-		<h3>${resource.presentationName} - ${resource.version}</h3>
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
 		
 		<p>
 			<a href="edit?type=addRequirement&uri=${resource.uri}"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />

@@ -8,7 +8,7 @@
   	
 		<h2>Add new capability</h2>
 		
-		<h3>${resource.presentationName} - ${resource.version}</h3>
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
 		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${resource.uri}" />

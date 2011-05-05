@@ -8,7 +8,7 @@
   	
 		<h2>Existing categories</h2>
 		
-		<h3>${resource.presentationName} - ${resource.version}</h3>
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
 
 		<ul>
 		  	<c:forEach items="${resource.categories}" var="category">

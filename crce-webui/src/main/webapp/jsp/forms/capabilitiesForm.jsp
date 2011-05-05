@@ -8,7 +8,8 @@
   	
 		<h2>Capabilities form</h2>
 		
-		<h3>${resource.presentationName} - ${resource.version}</h3>
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
+		<h3>Capability: ${capability.name}</h3>
 		
 		<p>
 			<a href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
