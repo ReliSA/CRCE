@@ -289,6 +289,11 @@ h3 {
 	width: 830px;
 }
 
+.vyzaduje input {
+	width: 98%;
+	margin: 0 auto;
+}
+
 .vyzaduje th {
 	text-align: left;
 	font-weight: bold;
@@ -297,6 +302,11 @@ h3 {
 .vyzaduje .text {
 	width: 98%;
 	margin: 0 auto;
+}
+
+.vyzaduje .komentar {
+	width: 98%;
+	padding: 0 0 10px 0;
 }
 
 .vyzaduje .jmeno {

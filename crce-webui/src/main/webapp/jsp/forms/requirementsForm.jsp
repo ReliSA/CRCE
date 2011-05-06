@@ -20,6 +20,7 @@
 			
 		<table class="vyzaduje">
 	  		<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
+	  		<tr><th colspan="5">Comment</th></tr>
 	  		<c:forEach items="${resource.requirements}" var="requirement" varStatus="counter">
 		  		<tr>
 		  			<td class="jmeno"><input class="text" type="text" name="name_${counter.count}" value="${requirement.name}" /></td>
@@ -28,6 +29,7 @@
 		  			<td><input type="checkbox" name="optional_${counter.count}" <c:if test="${requirement.optional}">checked="checked"</c:if> /></td>
 		  			<td><input type="checkbox" name="extend_${counter.count}" <c:if test="${requirement.extend}">checked="checked"</c:if> /></td>
 		  		</tr>
+		  		<tr><td colspan="5" class="komentar"><input type="text" name="comment_${counter.count}" value='${requirement.comment}' /></td></tr>
 	  		</c:forEach>
 	  		<tr><td colspan="5"><input class="tlacitko" type="submit" value="Save requirements" /></td></tr>
 	  	</table>

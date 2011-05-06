@@ -94,6 +94,9 @@
 	  								<td>${requirement.optional}</td>
 	  								<td>${requirement.extend}</td>
 	  							</tr>
+	  							<tr>
+	  								<td colspan="5" class="komentar">${requirement.comment}</td>
+	  							</tr>
 	  						</c:forEach>
 	  					</table>
 	  				</div>
