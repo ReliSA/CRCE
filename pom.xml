@@ -20,7 +20,7 @@
     <properties>
         <org.osgi.service.http.port>8090</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
-        <org.osgi.service.http.secure.enabled>true</org.osgi.service.http.secure.enabled>
+        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
         <felix.fileinstall.poll>5000</felix.fileinstall.poll>

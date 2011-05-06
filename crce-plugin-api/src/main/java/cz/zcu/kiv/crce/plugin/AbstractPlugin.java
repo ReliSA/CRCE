@@ -16,15 +16,6 @@ import org.osgi.service.cm.ManagedService;
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
     
-    public static final String CFG_ID = "plugin.id";
-    public static final String CFG_VERSION = "plugin.version";
-    public static final String CFG_PRIORITY = "plugin.priority";
-    public static final String CFG_KEYWORDS = "plugin.keywords";
-    public static final String CFG_DESCRIPTION = "plugin.description";
-    
-    public static final String PRIORITY_MAX_VALUE = "MAX";
-    public static final String PRIORITY_MIN_VALUE = "MIN";
-    
     private volatile BundleContext m_context;
 
     private Dictionary properties = new Properties();
