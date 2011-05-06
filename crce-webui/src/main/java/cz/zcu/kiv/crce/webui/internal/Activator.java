@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.webui.internal;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.SessionFactory;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public final class Activator extends DependencyActivatorBase {
 
     private volatile BundleContext m_context;           /* injected by dependency manager */
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
-    private volatile SessionFactory m_sessionFactory;   /* injected by dependency manager */
+    private volatile SessionRegister m_sessionRegister;   /* injected by dependency manager */
     private volatile LogService m_log;                  /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
@@ -40,8 +40,8 @@ public final class Activator extends DependencyActivatorBase {
         return m_pluginManager;
     }
     
-    public SessionFactory getSessionFactory() {
-        return m_sessionFactory;
+    public SessionRegister getSessionFactory() {
+        return m_sessionRegister;
     }
     
     public ResourceCreator getCreator(){
@@ -60,32 +60,7 @@ public final class Activator extends DependencyActivatorBase {
         }
 
         String sid = req.getSession(true).getId();
-        ServiceReference[] refs;
-        
-        for (int i = 0; i < RETRY_TIMEOUT; i += RETRY_AFTER) {
-            try {
-                refs = m_context.getServiceReferences(Buffer.class.getName(), "(" + SessionFactory.SERVICE_SESSION_ID + "=" + sid + ")");
-            } catch (InvalidSyntaxException ex) {
-                throw new IllegalArgumentException("Unexpected InvalidSyntaxException caused by invalid filter" , ex);
-            }
-
-            if (refs != null && refs.length > 0) {
-                if (refs.length > 1) {
-                    m_log.log(LogService.LOG_WARNING, "Only one instance of Buffer was expected for this session, found: " + refs.length);
-                }
-                return (Buffer) m_context.getService(refs[0]);
-            }
-            
-            try {
-                Thread.sleep(RETRY_AFTER);
-            } catch (InterruptedException ex) {
-                // nothing
-            }
-        }
-        
-        m_log.log(LogService.LOG_ERROR, "No Buffer instance found for this session");
-        
-        return null;
+        return m_sessionRegister.getSessionData(sid).getBuffer();
     }
 
     @Override
@@ -94,7 +69,7 @@ public final class Activator extends DependencyActivatorBase {
         
         manager.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(SessionFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))

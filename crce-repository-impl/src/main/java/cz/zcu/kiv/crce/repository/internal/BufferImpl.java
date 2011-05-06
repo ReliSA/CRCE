@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.SessionFactory;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -47,14 +47,14 @@ public class BufferImpl implements Buffer {
     
     public BufferImpl(String sessionId) {
         m_sessionProperties = new Properties();
-        m_sessionProperties.put(SessionFactory.SERVICE_SESSION_ID, sessionId);
+        m_sessionProperties.put(SessionRegister.SERVICE_SESSION_ID, sessionId);
     }
     
     /*
      * Called by dependency manager
      */
     void init() {
-        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionFactory.SERVICE_SESSION_ID));
+        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
         if (!m_baseDir.exists()) {
             m_baseDir.mkdirs();
         } else if (!m_baseDir.isDirectory()) {
