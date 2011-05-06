@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.handler.versioning.internal;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
@@ -86,7 +85,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     m_log.log(LogService.LOG_ERROR, "Could not update version (incomparable bundles)", ex);
                 }
                 
-                ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+                ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
                 
                 try {
                     resource = creator.getResource(resource.getUri());   // reload changed resource

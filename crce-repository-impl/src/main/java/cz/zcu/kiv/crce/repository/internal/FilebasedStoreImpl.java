@@ -5,7 +5,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
@@ -99,7 +98,7 @@ public class FilebasedStoreImpl implements Store {
         File sourceFile = new File(resource.getUri());
         File targetFile = File.createTempFile("res", "", m_baseDir);
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (move) {
@@ -144,7 +143,7 @@ public class FilebasedStoreImpl implements Store {
             throw new IOException("Can not delete artifact file from store: " + resource.getUri());
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
             resourceDao.remove(resource);
         } finally {

@@ -5,7 +5,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -112,7 +111,7 @@ public class BufferImpl implements Buffer {
             }
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         Resource resource = resourceDao.getResource(file.toURI());
         
@@ -170,7 +169,7 @@ public class BufferImpl implements Buffer {
             throw new IOException("Can not delete artifact file from buffer: " + resource.getUri());
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
             resourceDao.remove(resource);
         } finally {
@@ -191,7 +190,7 @@ public class BufferImpl implements Buffer {
         List<Resource> out = new ArrayList<Resource>();
         Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         // put resources to store
         if (move && (m_store instanceof FilebasedStoreImpl)) {

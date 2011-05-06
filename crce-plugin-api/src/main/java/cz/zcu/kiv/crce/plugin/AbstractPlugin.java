@@ -20,11 +20,11 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
 
     private Dictionary properties = new Properties();
     
-    private String id;
-    private Version version;
-    private int priority;
-    private String[] keywords;
-    private String description;
+    private String id = this.getClass().getName();
+    private Version version = new Version("0.0.0");
+    private int priority = 0;
+    private String[] keywords = new String[0];
+    private String description = "Abstract plugin";
     
     @Override
     public String getPluginId() {

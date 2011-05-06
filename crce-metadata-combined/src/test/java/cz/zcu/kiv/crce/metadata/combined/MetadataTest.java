@@ -29,7 +29,7 @@ public class MetadataTest {
         dir = Util.createTempDir();
         File bundle = Util.prepareFile(dir, "bundle.jar");
         
-        creator = new CombinedResourceDAO(new FileIndexingResourceDAO(), new MetafileResourceDAO());
+//        creator = new CombinedResourceDAO(new FileIndexingResourceDAO(), new MetafileResourceDAO()); - WAS REMOVED
         try {
             resource = (CombinedResource) creator.getResource(bundle.toURI());
         } catch (IOException ex) {

@@ -20,9 +20,9 @@ public class Activator extends DependencyActivatorBase {
         
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
-                .setImplementation(CombinedResourceDAOFactory.class)
+                .setImplementation(CombinedResourceDAO.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
                 .add(createConfigurationDependency().setPid(PID))
                 );
     }
