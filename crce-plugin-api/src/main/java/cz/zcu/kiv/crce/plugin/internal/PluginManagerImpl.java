@@ -118,12 +118,12 @@ public class PluginManagerImpl implements PluginManager {
                 continue;
             }
             Set<Plugin> set;
-            if (plugin.getKeywords().length == 0) {
+            if (plugin.getPluginKeywords().length == 0) {
                 if ((set = map.get(NO_KEYWORDS)) != null) {
                     set.remove(plugin);
                 }
             } else {
-                for (String keyword : plugin.getKeywords()) {
+                for (String keyword : plugin.getPluginKeywords()) {
                     if ((set = map.get(keyword)) != null) {
                         set.remove(plugin);
                     }
@@ -141,10 +141,10 @@ public class PluginManagerImpl implements PluginManager {
             return;
         }
         for (Class iface : clazz.getInterfaces()) {
-            if (plugin.getKeywords().length == 0) {
+            if (plugin.getPluginKeywords().length == 0) {
                 add(iface, plugin, NO_KEYWORDS);
             } else {
-                for (String keyword : plugin.getKeywords()) {
+                for (String keyword : plugin.getPluginKeywords()) {
                     add(iface, plugin, keyword);
                 }
             }

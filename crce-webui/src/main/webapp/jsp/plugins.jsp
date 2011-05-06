@@ -19,7 +19,7 @@
 	  				<div class="polozka"><strong>Version:</strong> ${plugin.pluginVersion}</div>
 	  				<div class="polozka"><strong>Keywords:</strong> 
 	  					<ul>
-	  						<c:forEach items="${plugin.keywords}" var="keyword">
+	  						<c:forEach items="${plugin.pluginKeywords}" var="keyword">
 	  							<li>${keyword}</li>
 	  						</c:forEach>
 	  					</ul>

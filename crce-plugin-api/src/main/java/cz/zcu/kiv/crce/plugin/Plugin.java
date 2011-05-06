@@ -1,13 +1,14 @@
 package cz.zcu.kiv.crce.plugin;
 
 import org.osgi.framework.Version;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * Common plugin interface. Every plugin must implement it.
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public interface Plugin extends Comparable<Plugin> {
+public interface Plugin extends Comparable<Plugin>, ManagedService {
 
     /**
      * Returns the plugin unique identification.
@@ -47,5 +48,5 @@ public interface Plugin extends Comparable<Plugin> {
      * 
      * @return an array of keywords.
      */
-    public String[] getKeywords();
+    public String[] getPluginKeywords();
 }

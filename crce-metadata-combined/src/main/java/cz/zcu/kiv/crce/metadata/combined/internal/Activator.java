@@ -13,6 +13,8 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends DependencyActivatorBase {
 
+    public static final String PID = "cz.zcu.kiv.crce.metadata.combined";
+    
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         
@@ -21,6 +23,7 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(CombinedResourceDAOFactory.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createConfigurationDependency().setPid(PID))
                 );
     }
 

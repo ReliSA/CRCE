@@ -16,5 +16,7 @@ public abstract class AbstractRepositoryDAO extends AbstractPlugin implements Re
     public abstract WritableRepository getRepository(URI uri) throws IOException;
 
     @Override
-    public abstract void saveRepository(Repository repository) throws IOException;
+    public void saveRepository(Repository repository) throws IOException {
+        // do nothing
+    }
 }

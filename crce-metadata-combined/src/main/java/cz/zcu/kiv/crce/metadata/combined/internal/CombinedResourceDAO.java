@@ -103,8 +103,4 @@ public class CombinedResourceDAO extends AbstractResourceDAO {
             return seg[seg.length - 1];
     }
 
-    @Override
-    public int getPluginPriority() {
-        return 10; // TODO configurable
-    }
 }

@@ -4,6 +4,8 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFactory;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
+import java.util.Dictionary;
+import org.osgi.service.cm.ConfigurationException;
 
 /**
  *
@@ -29,7 +31,7 @@ public class CombinedResourceDAOFactory extends AbstractPlugin implements Resour
     }
 
     @Override
-    public int getPluginPriority() {
-        return 10;  // TODO configure
+    public void updated(Dictionary properties) throws ConfigurationException {
+        super.updated(properties);
     }
 }

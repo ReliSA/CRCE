@@ -1,7 +1,11 @@
 package cz.zcu.kiv.crce.plugin;
 
+import java.util.Dictionary;
+import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 
 /**
  * This abstract class implements all methods of <code>Plugin</code> interface.
@@ -10,33 +14,50 @@ import org.osgi.framework.Version;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public abstract class AbstractPlugin implements Plugin, Comparable<Plugin> {
+public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
+    
+    public static final String CFG_ID = "plugin.id";
+    public static final String CFG_VERSION = "plugin.version";
+    public static final String CFG_PRIORITY = "plugin.priority";
+    public static final String CFG_KEYWORDS = "plugin.keywords";
+    public static final String CFG_DESCRIPTION = "plugin.description";
+    
+    public static final String PRIORITY_MAX_VALUE = "MAX";
+    public static final String PRIORITY_MIN_VALUE = "MIN";
     
     private volatile BundleContext m_context;
 
+    private Dictionary properties = new Properties();
+    
+    private String id;
+    private Version version;
+    private int priority;
+    private String[] keywords;
+    private String description;
+    
     @Override
     public String getPluginId() {
-        return getClass().getName();
+        return id;
     }
     
     @Override
     public Version getPluginVersion() {
-        return m_context.getBundle().getVersion();
+        return version;
     }
 
     @Override
     public int getPluginPriority() {
-        return 0;
+        return priority;
     }
 
     @Override
     public String getPluginDescription() {
-        return "Implementation of: " + getClass().getName();
+        return description;
     }
 
     @Override
-    public String[] getKeywords() {
-        return new String[0];
+    public String[] getPluginKeywords() {
+        return keywords;
     }
     
     @Override
@@ -60,13 +81,13 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin> {
             return false;
         }
         final AbstractPlugin other = (AbstractPlugin) obj;
-        if ((this.getPluginId() == null) ? (other.getPluginId() != null) : !this.getPluginId().equals(other.getPluginId())) {
+        if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
             return false;
         }
-        if (this.getPluginVersion().compareTo(other.getPluginVersion()) != 0) {
+        if (this.version.compareTo(other.version) != 0) {
             return false;
         }
-        if (this.getPluginPriority() != other.getPluginPriority()) {
+        if (this.priority != other.priority) {
             return false;
         }
         return true;
@@ -75,10 +96,89 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin> {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 37 * hash + (this.getPluginId() != null ? this.getPluginId().hashCode() : 0);
-        hash = 37 * hash + this.getPluginVersion().hashCode();
-        hash = 37 * hash + this.getPluginPriority();
+        hash = 37 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 37 * hash + this.version.hashCode();
+        hash = 37 * hash + this.priority;
         return hash;
     }
 
+    @SuppressWarnings("unused")
+    private void init() {
+        if (properties.get(CFG_ID) == null) {
+            id = getClass().getName();
+        }
+        if (properties.get(CFG_VERSION) == null) {
+            version = m_context.getBundle().getVersion();
+        }
+        if (properties.get(CFG_DESCRIPTION) == null) {
+            description = "Implementation of: " + getClass().getName();
+        }
+        if (properties.get(CFG_PRIORITY) == null) {
+            priority = 0;
+        }
+        if (properties.get(CFG_KEYWORDS) == null) {
+            keywords = new String[0];
+        }
+    }
+
+    @Override
+    public void updated(Dictionary properties) throws ConfigurationException {
+        if (properties != null) {
+            
+            String value;
+
+            // configure ID
+            if ((value = (String) properties.get(CFG_ID)) != null) {
+                if ("".equals(value.trim())) {
+                    throw new ConfigurationException(CFG_ID, "Plugin ID can not be empty", null);
+                }
+                id = value;
+            }
+            
+            // configure VERSION
+            if ((value = (String) properties.get(CFG_VERSION)) != null) {
+                try {
+                    version = Version.parseVersion(value);
+                } catch (IllegalArgumentException e) {
+                    throw new ConfigurationException(CFG_VERSION, "Improperly formated version", e);
+                }
+            }
+            
+            // configure PRIORITY
+            if ((value = (String) properties.get(CFG_PRIORITY)) != null) {
+                try {
+                    priority = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    if (PRIORITY_MAX_VALUE.equals(value.trim().toUpperCase())) {
+                        priority = Integer.MAX_VALUE;
+                    } else if (PRIORITY_MIN_VALUE.equals(value.trim().toUpperCase())) {
+                        priority = Integer.MIN_VALUE;
+                    } else {
+                        throw new ConfigurationException(CFG_PRIORITY, "Priority must be an integer", e);
+                    }
+                }
+            }
+            
+            // configure KEYWORDS
+            if ((value = (String) properties.get(CFG_KEYWORDS)) != null) {
+                if ("".equals(value.trim())) {
+                    keywords = new String[0];
+                } else {
+                    String[] split = value.split(",");
+                    keywords = new String[split.length];
+                    for (int i = 0; i < keywords.length; i++) {
+                        keywords[i] = split[i].trim();
+                    }
+                }
+            }
+            
+            // configure DESCRIPTION
+            if ((value = (String) properties.get(CFG_DESCRIPTION)) != null) {
+                description = value;
+            }
+
+        }
+        
+        this.properties = properties;
+    }
 }
