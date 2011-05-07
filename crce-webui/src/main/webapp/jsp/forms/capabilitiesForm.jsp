@@ -25,7 +25,14 @@
 				<c:forEach items="${capability.properties}" var="property" varStatus="counter">
 		  			<tr>
 		  				<td class="jmeno"><input class="text" type="text" name="name_${counter.count}" value="${property.name}" /></td>
-		  				<td class="typ"><input class="text" type="text" name="type_${counter.count}" value="${property.type}" /></td>
+		  				<td class="typ">
+		  					<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
+		  					<select class="text" name="type_${counter.count}">
+								<c:forEach items="${types}" var="type">
+									<option value="${type}" <c:if test="${type eq property.type}">selected="selected"</c:if>>$type</option>
+								</c:forEach>
+							</select>
+		  				</td>
 		  				<td class="hodnota"><input class="text" type="text" name="value_${counter.count}" value="${property.value}" /></td>
 		  			</tr>
 		  		</c:forEach>

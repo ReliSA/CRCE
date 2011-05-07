@@ -23,7 +23,14 @@
 	        </tr>
 	        <tr>
 	        	<th>Type:</th>
-	        	<td><input class="text" type="text" name="type" value="${property.type}" /></td>
+	        	<td class="typ">
+		  			<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
+		  			<select class="text" name="type_${counter.count}">
+						<c:forEach items="${types}" var="type">
+							<option value="${type}" <c:if test="${type eq property.type}">selected="selected"</c:if>>$type</option>
+							</c:forEach>
+					</select>
+		  		</td>
 	        	<td class="chyba">${typeError}</td>
 	        </tr>
 	        <tr>
