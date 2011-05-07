@@ -74,6 +74,7 @@
 	  				<div class="polozka"><strong>Requirements: </strong> <a href="edit?type=requirement&uri=${resource.uri}"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
+	  						<tr><th colspan="5">Comment</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
 	  							<tr 
 	  								<c:catch var="exception">${requirement.satisfied}</c:catch>

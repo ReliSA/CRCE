@@ -86,6 +86,7 @@
 	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
+	  						<tr><th colspan="5">Comment</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
 	  							<tr 
 		  							<c:catch var="exception">${requirement.satisfied}</c:catch>
@@ -105,6 +106,9 @@
 	  								<td>${requirement.multiple}</td>
 	  								<td>${requirement.optional}</td>
 	  								<td>${requirement.extend}</td>
+	  							</tr>
+	  							<tr>
+	  								<td colspan="5" class="komentar">${requirement.comment}</td>
 	  							</tr>
 	  						</c:forEach>
 	  					</table>
