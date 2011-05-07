@@ -11,6 +11,9 @@
 			<div class="komponenta">
 	  			<div class="nadpis">
 	  				<a class="popis" href="#">${plugin.pluginId}</a>
+	  				<div class="nabidka">
+			            <a href="#"><img src="graphic/edit.png" alt="edit" title="Edit plugin ${plugin.pluginId}" /></a>
+	          		</div>
 	  				<div class="konec"></div>
 	  			</div>
 	  			<div class="informace">
