@@ -154,14 +154,15 @@ public class BufferImpl implements Buffer {
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
+        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
+        
         if (!isInBuffer(resource)) {
             if (m_repository.contains(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in buffer but it is in internal repository: " + resource.getId());
+                // TODO remove from repo
             }
             return false;
         }
-        
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromBuffer(resource, this);
         
         // if URI scheme is not 'file', it is detected in previous isInBuffer() check
         File file = new File(resource.getUri());
@@ -187,8 +188,9 @@ public class BufferImpl implements Buffer {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
+        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
+        
         List<Resource> out = new ArrayList<Resource>();
-        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         

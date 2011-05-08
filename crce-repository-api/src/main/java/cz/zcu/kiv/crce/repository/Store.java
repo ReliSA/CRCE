@@ -44,10 +44,10 @@ public interface Store {
     /**
      * TODO analyze requirements for this method:
      * - add an executable plugin
-     * @param resource 
-     * @param plugin 
+     * @param resources
+     * @param executable
      * @param properties 
      */
-    public void execute(List<Resource> resource, Executable plugin, Properties properties);
+    public void execute(List<Resource> resources, Executable executable, Properties properties);
     
 }

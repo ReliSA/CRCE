@@ -110,7 +110,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
     }
 
     @Override
-    public boolean isModifying() {
+    public boolean isExclusive() {
         return true;
     }
 }

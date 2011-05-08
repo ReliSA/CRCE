@@ -1,8 +1,6 @@
 package cz.zcu.kiv.crce.metadata.indexer;
 
-import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
-import java.io.InputStream;
 
 /**
  *
@@ -10,9 +8,6 @@ import java.io.InputStream;
  */
 public abstract class AbstractResourceIndexer extends AbstractPlugin implements ResourceIndexer {
 
-    @Override
-    abstract public String[] index(InputStream input, Resource resource);
-    
     @Override
     public String[] getProvidedCategories() {
         return new String[0];
@@ -23,6 +18,11 @@ public abstract class AbstractResourceIndexer extends AbstractPlugin implements 
         return new String[0];
     }
 
+    @Override
+    public String[] getPluginKeywords() {
+        return getRequiredCategories();
+    }
+    
     @Override
     public String getPluginDescription() {
         return "ResourceIndexer plugin implementation";

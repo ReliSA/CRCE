@@ -18,6 +18,9 @@ import java.util.Properties;
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public interface ActionHandler extends Plugin {
+
+    Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
+    
     /**
      * Invoked when an artifact is uploaded into upload buffer.
      * 
@@ -28,12 +31,21 @@ public interface ActionHandler extends Plugin {
      * @throws RevokedArtifactException  
      */
     Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
+    
+    Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
 
-    Resource onDownloadFromBuffer(Resource resource, Buffer buffer);
+
+    Resource beforeDownloadFromBuffer(Resource resource, Buffer buffer);
+    
+    Resource afterDownloadFromBuffer(Resource resource, Buffer buffer);
+    
     
     List<Resource> beforeExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer);
     
     List<Resource> afterExecuteInBuffer(List<Resource> resources, Executable executable, Properties properties, Buffer buffer);
+    
+    
+    Resource beforeDeleteFromBuffer(Resource resource, Buffer buffer);
     
     /**
      * Invoked when resource is revoked deleted from buffer.
@@ -42,10 +54,16 @@ public interface ActionHandler extends Plugin {
      * @param buffer
      * @return  
      */
-    Resource onDeleteFromBuffer(Resource resource, Buffer buffer);
+    Resource afterDeleteFromBuffer(Resource resource, Buffer buffer);
     
-    List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store);
     
+    List<Resource> beforeBufferCommit(List<Resource> resources, Buffer buffer, Store store);
+    
+    List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store);
+    
+    
+    Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException;
+
     /**
      * Invoked when resource is commited from buffer to repository.
      * 
@@ -54,11 +72,17 @@ public interface ActionHandler extends Plugin {
      * @return
      * @throws RevokedArtifactException  
      */
-    Resource onPutToStore(Resource resource, Store store) throws RevokedArtifactException;
+    Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException;
 
-    Resource onDownloadFromStore(Resource resource, Store store);
     
-    Resource onDeleteFromStore(Resource resource, Store store);
+    Resource beforeDownloadFromStore(Resource resource, Store store);
+    
+    Resource afterDownloadFromStore(Resource resource, Store store);
+    
+    
+    Resource beforeDeleteFromStore(Resource resource, Store store);
+    
+    Resource afterDeleteFromStore(Resource resource, Store store);
     
     /**
      * TODO proposed variant:
@@ -85,6 +109,6 @@ public interface ActionHandler extends Plugin {
      * otherwise (content read-only handler).
      * @return
      */
-    boolean isModifying();
+    boolean isExclusive();
     
 }

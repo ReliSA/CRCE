@@ -54,10 +54,10 @@ public class FilebasedStoreImpl implements Store {
     }
     
     public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return resource;
         }
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
         if (tmp == null) {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
         } else {
@@ -75,10 +75,10 @@ public class FilebasedStoreImpl implements Store {
     
     @Override
     public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
         if (tmp == null) {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
         } else {
@@ -128,14 +128,14 @@ public class FilebasedStoreImpl implements Store {
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
+        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
+        
         if (!isInStore(resource)) {
             if (m_repository.contains(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in store but it is in internal repository: " + resource.getId());
             }
             return false;
         }
-        
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromStore(resource, this);
         
         // if URI scheme is not 'file', it is detected in previous isInStore() check
         File file = new File(resource.getUri());

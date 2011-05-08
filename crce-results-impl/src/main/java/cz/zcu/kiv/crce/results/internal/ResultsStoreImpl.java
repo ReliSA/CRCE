@@ -17,6 +17,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -36,44 +37,45 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
     private File m_baseDir;
 
     @Override
-    public Result storeResult(Resource resource, URI resultsFile, Plugin provider) throws IOException {
-        File dir = new File(m_baseDir,
-                resource.getSymbolicName() + File.separator
-                + resource.getVersion() + File.separator
-                + provider.getPluginId() + provider.getPluginVersion());
-
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new IOException("Directory for result can not be created: " + dir);
-        }
-        
-        File file = File.createTempFile("result", "", dir);
-        
-        InputStream input = resultsFile.toURL().openStream();
-        OutputStream output = new FileOutputStream(file);
-        
-        try {
-            IOUtils.copyLarge(input, output);
-        } finally {
-            output.flush();
-            IOUtils.closeQuietly(output);
-            IOUtils.closeQuietly(input);
-        }
-        
-        Result result = new ResultImpl(file, resource, provider);
-        
-        Writer writer = new FileWriter(getResultMetafile(file));
-        
-        try {
-            m_helper.writeMetadata(resource, writer);
-        } finally {
-            try {
-                writer.flush();
-            } finally {
-                writer.close();
-            }
-        }
-        
-        return result;
+    public Map<Resource, Result> storeResult(List<Resource> resource, URI resultsFile, Plugin provider) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+//        File dir = new File(m_baseDir,
+//                resource.getSymbolicName() + File.separator
+//                + resource.getVersion() + File.separator
+//                + provider.getPluginId() + provider.getPluginVersion());
+//
+//        if (!dir.exists() && !dir.mkdirs()) {
+//            throw new IOException("Directory for result can not be created: " + dir);
+//        }
+//        
+//        File file = File.createTempFile("result", "", dir);
+//        
+//        InputStream input = resultsFile.toURL().openStream();
+//        OutputStream output = new FileOutputStream(file);
+//        
+//        try {
+//            IOUtils.copyLarge(input, output);
+//        } finally {
+//            output.flush();
+//            IOUtils.closeQuietly(output);
+//            IOUtils.closeQuietly(input);
+//        }
+//        
+//        Result result = new ResultImpl(file, resource, provider);
+//        
+//        Writer writer = new FileWriter(getResultMetafile(file));
+//        
+//        try {
+//            m_helper.writeMetadata(resource, writer);
+//        } finally {
+//            try {
+//                writer.flush();
+//            } finally {
+//                writer.close();
+//            }
+//        }
+//        
+//        return result;
     }
 
     @Override
@@ -103,11 +105,6 @@ public class ResultsStoreImpl implements ResultsStore, ManagedService {
 
     @Override
     public List<Result> getResults(Resource resource, Requirement requirement) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Result getProvider(Resource resource, Capability capability) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
