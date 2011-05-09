@@ -6,6 +6,8 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.internal.ReasonImpl;    // FIXME probably not visible to another bundles
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
@@ -56,7 +58,16 @@ public class ConvertedResolver implements Resolver {
 
     @Override
     public Resource[] getResources(Requirement requirement) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Reason[] reasons = convertReasons(m_resolver.getUnsatisfiedRequirements());
+        List<Resource> list = new ArrayList<Resource>();
+        
+        for (Reason reason : reasons) {
+            if (reason.getRequirement().equals(requirement)) {
+                list.add(reason.getResource());
+            }
+        }
+        
+        return list.toArray(new Resource[list.size()]);
     }
 
     @Override
