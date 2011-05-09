@@ -25,6 +25,7 @@ public class ConvertedResolver implements Resolver {
         } else {
             m_repositories = new Repository[0];
         }
+        m_resolver = m_repoAdmin.resolver(Wrapper.wrap(m_repositories));
     }
 
     @Override

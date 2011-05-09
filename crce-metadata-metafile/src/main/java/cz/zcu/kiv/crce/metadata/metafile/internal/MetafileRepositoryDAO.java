@@ -4,12 +4,11 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.metadata.dao.AbstractRepositoryDAO;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.AbstractRepositoryDAO;
-import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,32 +51,29 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
         if (!directory.isDirectory()) {
             throw new IOException("File is not a directory: " + directory.getAbsolutePath());
         }
+
         
-        /* Do not use MetafileResourceDAO directly, it could be included in other
-         * ResourceDAO or ResourceDAOFactory implementation like
-         * CombinedResourceMetadataDAOFactory.
-         * 
-         * 
-         * TODO direct or indirect using of MetafileResourceDAO could be
-         * parametrized (e.g. via ManagedService) for these possible scenarios:
-         * 
-         * 1) indirect use via CombinedResourceMetadataDAOFactory
-         * - OBR metafile contains custom metadata only
-         * - static metadata must be indexed by indexers
-         * 
-         * 2) direct use
-         * - OBR metafile contains both static and custom metadata
-         * - no need to index static metadata
-         * 
-         */
+//  ResourceDAOFactory was removed so I don't know now if something from this comment could be useful
+//        
+//        /* Do not use MetafileResourceDAO directly, it could be included in other
+//         * ResourceDAO or ResourceDAOFactory implementation like
+//         * CombinedResourceMetadataDAOFactory.
+//         * 
+//         * 
+//         * TODO direct or indirect using of MetafileResourceDAO could be
+//         * parametrized (e.g. via ManagedService) for these possible scenarios:
+//         * 
+//         * 1) indirect use via CombinedResourceMetadataDAOFactory
+//         * - OBR metafile contains custom metadata only
+//         * - static metadata must be indexed by indexers
+//         * 
+//         * 2) direct use
+//         * - OBR metafile contains both static and custom metadata
+//         * - no need to index static metadata
+//         * 
+//         */
         
-        ResourceDAOFactory factory = m_pluginManager.getPlugin(ResourceDAOFactory.class);
-        ResourceDAO rdao;
-        if (factory == null) {
-            rdao = m_pluginManager.getPlugin(ResourceDAO.class);
-        } else {
-            rdao = factory.getResourceDAO();
-        }
+        ResourceDAO rdao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         WritableRepository repository = m_resourceCreator.createRepository(uri);
         recurse(repository, directory, rdao);

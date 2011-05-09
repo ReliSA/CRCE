@@ -26,7 +26,7 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
     private volatile LogService m_log;
 
     @Override
-    public Resource onPutToStore(Resource resource, Store store) throws RevokedArtifactException {
+    public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
         if (resource.isVersionStatic()) {
             return resource;
         }

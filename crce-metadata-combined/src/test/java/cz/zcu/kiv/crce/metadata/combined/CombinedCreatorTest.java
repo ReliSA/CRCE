@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -29,7 +28,6 @@ public class CombinedCreatorTest extends IntegrationTestBase {
     private BundleContext bundleContext;
     
     private File dir;
-    private ResourceDAOFactory factory;
     private ResourceDAO creator;
     
     @Before
@@ -54,12 +52,9 @@ public class CombinedCreatorTest extends IntegrationTestBase {
             
             ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
             PluginManager pm = (PluginManager) bundleContext.getService(sr);
-            factory = pm.getPlugin(ResourceDAOFactory.class);
-//    //        factory = new CombinedResourceDAOFactory();
-//            assert factory != null : "factory null";
-//            assert (factory instanceof CombinedResourceDAOFactory);
+            creator = pm.getPlugin(ResourceDAO.class);
             System.out.println(pm.toString());
-            System.out.println("factory: " + factory);
+            System.out.println("creator: " + creator);
 //            factory.hashCode();
 //            creator = factory.getResourceDAO();
 //            assert creator != null : "ResourceCreator is null";
@@ -85,7 +80,7 @@ public class CombinedCreatorTest extends IntegrationTestBase {
     @After
     public void tearDown() {
         Util.deleteDir(dir);
-        factory = null;
+        creator = null;
     }
 
     @Test
@@ -96,11 +91,11 @@ public class CombinedCreatorTest extends IntegrationTestBase {
         
             ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
             PluginManager pm = (PluginManager) bundleContext.getService(sr);
-            factory = pm.getPlugin(ResourceDAOFactory.class);
+            creator = pm.getPlugin(ResourceDAO.class);
             System.out.println(pm.toString());
-            System.out.println("factory: " + factory);
+            System.out.println("creator: " + creator);
         assertNotNull(pm);
-        assertNotNull(factory);
+        assertNotNull(creator);
     }
     
     @Test

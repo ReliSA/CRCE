@@ -13,13 +13,13 @@ public class SessionListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent se) {
     	se.getSession();
         String sid = se.getSession().getId();
-        Activator.instance().getSessionFactory().createSession(sid);
+        Activator.instance().getSessionFactory().registerSession(sid);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         String sid = se.getSession().getId();
-        Activator.instance().getSessionFactory().destroySession(sid);
+        Activator.instance().getSessionFactory().unregisterSession(sid);
     }
 
 }

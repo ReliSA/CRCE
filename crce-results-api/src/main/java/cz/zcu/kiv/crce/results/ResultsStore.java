@@ -7,6 +7,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 /*
  * Zmeny od schuzky 2011-03-24:
  * Aby sly vytvorit M:N vazby mezi Capabilities/Requirements a Results,
@@ -42,7 +43,7 @@ public interface ResultsStore {
      * @return the created <code>Result</code>.
      * @throws IOException  
      */
-    Result storeResult(Resource resource, URI resultsFile, Plugin provider) throws IOException;
+    Map<Resource, Result> storeResult(List<Resource> resource, URI resultsFile, Plugin provider) throws IOException;
     
     /**
      * Associates the results to the capability.
@@ -94,7 +95,5 @@ public interface ResultsStore {
     List<Result> getResults(Resource resource, Capability capability);
     
     List<Result> getResults(Resource resource, Requirement requirement);
-    
-    Result getProvider(Resource resource, Capability capability);
     
 }

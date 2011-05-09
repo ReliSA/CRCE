@@ -11,7 +11,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.util.zip.ZipException;
 import org.apache.felix.bundlerepository.RepositoryAdmin;
+import org.osgi.service.log.LogService;
 
 /**
  *
@@ -20,6 +22,7 @@ import org.apache.felix.bundlerepository.RepositoryAdmin;
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     private volatile RepositoryAdmin m_repoAdmin;  /* injected by dependency manager */
+    private volatile LogService m_log;             /* injected by dependency manager */
 
     @Override
     public String[] index(final InputStream input, Resource resource) {
@@ -45,8 +48,12 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             fres = m_repoAdmin.getHelper().createResource(new URL("none", "none", 0, "none", handler));
         } catch (MalformedURLException e) {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
+        } catch (ZipException e) {
+            m_log.log(LogService.LOG_WARNING, "Zip file is corrupted");
+            resource.addCategory("corrupted");
+            return new String[] {"corrupted"};
         } catch (IOException ex) {
-            ex.printStackTrace();   // XXX
+            m_log.log(LogService.LOG_ERROR, "I/O error on indexing resource: " + resource.getId(), ex);
             return new String[0];
         } catch (IllegalArgumentException e) {
             // not a bundle
@@ -88,6 +95,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     @Override
     public String[] getProvidedCategories() {
-        return new String[] {"osgi"};
+        return new String[] {"osgi", "corrupted"};
     }
 }

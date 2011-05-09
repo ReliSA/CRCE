@@ -1,9 +1,9 @@
 package cz.zcu.kiv.crce.metadata.combined;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.internal.FileIndexingResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.combined.internal.CombinedResourceDAO;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class MetadataTest {
         dir = Util.createTempDir();
         File bundle = Util.prepareFile(dir, "bundle.jar");
         
-        creator = new CombinedResourceDAO(new FileIndexingResourceDAO(), new MetafileResourceDAO());
+//        creator = new CombinedResourceDAO(new FileIndexingResourceDAO(), new MetafileResourceDAO()); - WAS REMOVED
         try {
             resource = (CombinedResource) creator.getResource(bundle.toURI());
         } catch (IOException ex) {

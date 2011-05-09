@@ -59,7 +59,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public Requirement setFilter(String filter) {
+    public synchronized Requirement setFilter(String filter) {
         if (isWritable()) {
             try {
                 String nf = REMOVE_LT.matcher(filter).replaceAll("(!($1>=$2))");
@@ -74,7 +74,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public Requirement setMultiple(boolean multiple) {
+    public synchronized Requirement setMultiple(boolean multiple) {
         if (isWritable()) {
             m_multiple = multiple;
         }
@@ -82,7 +82,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public Requirement setOptional(boolean optional) {
+    public synchronized Requirement setOptional(boolean optional) {
         if (isWritable()) {
             m_optional = optional;
         }
@@ -90,7 +90,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public Requirement setExtend(boolean extend) {
+    public synchronized Requirement setExtend(boolean extend) {
         if (isWritable()) {
             m_extend = extend;
         }
@@ -98,7 +98,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public Requirement setComment(String comment) {
+    public synchronized Requirement setComment(String comment) {
         if (isWritable()) {
             m_comment = comment;
         }
@@ -106,7 +106,7 @@ public class RequirementImpl implements Requirement {
     }
 
     @Override
-    public boolean isWritable() {
+    public synchronized boolean isWritable() {
         return m_writable;
     }
 
@@ -117,7 +117,7 @@ public class RequirementImpl implements Requirement {
                     && m_filter.matchCase(((CapabilityImpl) capability).m_map)
                     && (m_filter.toString().indexOf("(mandatory:<*") >= 0 || ((CapabilityImpl) capability).m_map.get("mandatory:") == null);
         }
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("Other implementation of Metadata API is not supported");
     }
     
     @Override

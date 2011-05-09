@@ -25,7 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
         
         <!-- for VersioningBundleStore iface: -->

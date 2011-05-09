@@ -3,14 +3,13 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -55,10 +54,10 @@ public class FilebasedStoreImpl implements Store {
     }
     
     public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return resource;
         }
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
         if (tmp == null) {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
         } else {
@@ -76,10 +75,10 @@ public class FilebasedStoreImpl implements Store {
     
     @Override
     public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
+        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).onPutToStore(resource, this);
         if (tmp == null) {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
         } else {
@@ -99,7 +98,7 @@ public class FilebasedStoreImpl implements Store {
         File sourceFile = new File(resource.getUri());
         File targetFile = File.createTempFile("res", "", m_baseDir);
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (move) {
@@ -129,6 +128,8 @@ public class FilebasedStoreImpl implements Store {
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
+        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
+        
         if (!isInStore(resource)) {
             if (m_repository.contains(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in store but it is in internal repository: " + resource.getId());
@@ -136,15 +137,13 @@ public class FilebasedStoreImpl implements Store {
             return false;
         }
         
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromStore(resource, this);
-        
         // if URI scheme is not 'file', it is detected in previous isInStore() check
         File file = new File(resource.getUri());
         if (!file.delete()) {
             throw new IOException("Can not delete artifact file from store: " + resource.getUri());
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
             resourceDao.remove(resource);
         } finally {

@@ -23,36 +23,82 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     private volatile LogService m_log;  /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
     
+    private static final Method BEFORE_BUFFER_UPLOAD;
     private static final Method ON_BUFFER_UPLOAD;
-    private static final Method ON_BUFFER_DELETE;
-    private static final Method ON_BUFFER_DOWNLOAD;
+    private static final Method AFTER_BUFFER_UPLOAD;
+    
+    private static final Method BEFORE_BUFFER_DOWNLOAD;
+    private static final Method AFTER_BUFFER_DOWNLOAD;
+    
     private static final Method BEFORE_BUFFER_EXECUTE;
     private static final Method AFTER_BUFFER_EXECUTE;
-    private static final Method ON_BUFFER_COMMIT;
-    private static final Method ON_STORE_DELETE;
-    private static final Method ON_STORE_DOWNLOAD;
+    
+    private static final Method BEFORE_BUFFER_DELETE;
+    private static final Method AFTER_BUFFER_DELETE;
+    
+    private static final Method BEFORE_BUFFER_COMMIT;
+    private static final Method AFTER_BUFFER_COMMIT;
+
+    
+    private static final Method BEFORE_STORE_PUT;
+    private static final Method AFTER_STORE_PUT;
+    
+    private static final Method BEFORE_STORE_DELETE;
+    private static final Method AFTER_STORE_DELETE;
+    
+    private static final Method BEFORE_STORE_DOWNLOAD;
+    private static final Method AFTER_STORE_DOWNLOAD;
+    
     private static final Method BEFORE_STORE_EXECUTE;
     private static final Method AFTER_STORE_EXECUTE;
-    private static final Method ON_STORE_PUT;
 
     static {
         try {
+            BEFORE_BUFFER_UPLOAD = ActionHandler.class.getMethod("beforeUploadToBuffer", Resource.class, Buffer.class, String.class);
             ON_BUFFER_UPLOAD = ActionHandler.class.getMethod("onUploadToBuffer", Resource.class, Buffer.class, String.class);
-            ON_BUFFER_DELETE = ActionHandler.class.getMethod("onDeleteFromBuffer", Resource.class, Buffer.class);
-            ON_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("onDownloadFromBuffer", Resource.class, Buffer.class);
+            AFTER_BUFFER_UPLOAD = ActionHandler.class.getMethod("afterUploadToBuffer", Resource.class, Buffer.class, String.class);
+            
+            BEFORE_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("beforeDownloadFromBuffer", Resource.class, Buffer.class);
+            AFTER_BUFFER_DOWNLOAD = ActionHandler.class.getMethod("afterDownloadFromBuffer", Resource.class, Buffer.class);
+            
             BEFORE_BUFFER_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInBuffer", List.class, Executable.class, Properties.class, Buffer.class);
             AFTER_BUFFER_EXECUTE = ActionHandler.class.getMethod("afterExecuteInBuffer", List.class, Executable.class, Properties.class, Buffer.class);
-            ON_BUFFER_COMMIT = ActionHandler.class.getMethod("onBufferCommit", List.class, Buffer.class, Store.class);
-            ON_STORE_DELETE = ActionHandler.class.getMethod("onDeleteFromStore", Resource.class, Store.class);
-            ON_STORE_DOWNLOAD = ActionHandler.class.getMethod("onDownloadFromStore", Resource.class, Store.class);
+
+            BEFORE_BUFFER_DELETE = ActionHandler.class.getMethod("beforeDeleteFromBuffer", Resource.class, Buffer.class);
+            AFTER_BUFFER_DELETE = ActionHandler.class.getMethod("afterDeleteFromBuffer", Resource.class, Buffer.class);
+            
+            BEFORE_BUFFER_COMMIT = ActionHandler.class.getMethod("beforeBufferCommit", List.class, Buffer.class, Store.class);
+            AFTER_BUFFER_COMMIT = ActionHandler.class.getMethod("afterBufferCommit", List.class, Buffer.class, Store.class);
+            
+            BEFORE_STORE_PUT = ActionHandler.class.getMethod("beforePutToStore", Resource.class, Store.class);
+            AFTER_STORE_PUT = ActionHandler.class.getMethod("afterPutToStore", Resource.class, Store.class);
+            
+            BEFORE_STORE_DELETE = ActionHandler.class.getMethod("beforeDeleteFromStore", Resource.class, Store.class);
+            AFTER_STORE_DELETE = ActionHandler.class.getMethod("afterDeleteFromStore", Resource.class, Store.class);
+            
+            BEFORE_STORE_DOWNLOAD = ActionHandler.class.getMethod("beforeDownloadFromStore", Resource.class, Store.class);
+            AFTER_STORE_DOWNLOAD = ActionHandler.class.getMethod("afterDownloadFromStore", Resource.class, Store.class);
+            
             BEFORE_STORE_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
             AFTER_STORE_EXECUTE = ActionHandler.class.getMethod("afterExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
-            ON_STORE_PUT = ActionHandler.class.getMethod("onPutToStore", Resource.class, Store.class);
         } catch (Exception ex) {
             throw new IllegalStateException("Can not create method: " + ex.getMessage(), ex);
         }
     }
 
+    @Override
+    public Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+        Object[] out = execute(BEFORE_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
+        if (out[1] != null) {
+            if (out[1] instanceof RevokedArtifactException) {
+                throw (RevokedArtifactException) out[1];
+            } else {
+                throw new IllegalStateException("beforeUploadToBuffer throw unexpected exception", (Throwable) out[1]);
+            }
+        }
+        return (Resource) out[0];
+    }
+    
     @Override
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
         Object[] out = execute(ON_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
@@ -60,20 +106,33 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("onPutToStore throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("onUploadToBuffer throw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];
     }
 
     @Override
-    public Resource onDeleteFromBuffer(Resource resource, Buffer buffer) {
-        return (Resource) execute(ON_BUFFER_DELETE, new Object[]{resource, buffer})[0];
+    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+        Object[] out = execute(AFTER_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
+        if (out[1] != null) {
+            if (out[1] instanceof RevokedArtifactException) {
+                throw (RevokedArtifactException) out[1];
+            } else {
+                throw new IllegalStateException("afterUploadToBuffer throw unexpected exception", (Throwable) out[1]);
+            }
+        }
+        return (Resource) out[0];
+    }
+    
+    @Override
+    public Resource beforeDownloadFromBuffer(Resource resource, Buffer buffer) {
+        return (Resource) execute(BEFORE_BUFFER_DOWNLOAD, new Object[]{resource, buffer})[0];
     }
 
     @Override
-    public Resource onDownloadFromBuffer(Resource resource, Buffer buffer) {
-        return (Resource) execute(ON_BUFFER_DOWNLOAD, new Object[]{resource, buffer})[0];
+    public Resource afterDownloadFromBuffer(Resource resource, Buffer buffer) {
+        return (Resource) execute(AFTER_BUFFER_DOWNLOAD, new Object[]{resource, buffer})[0];
     }
 
     @Override
@@ -89,18 +148,30 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
     
     @Override
-    public Resource onDeleteFromStore(Resource resource, Store repository) {
-        return (Resource) execute(ON_STORE_DELETE, new Object[]{resource, repository})[0];
+    public Resource beforeDeleteFromBuffer(Resource resource, Buffer buffer) {
+        return (Resource) execute(BEFORE_BUFFER_DELETE, new Object[]{resource, buffer})[0];
     }
 
     @Override
-    public Resource onDownloadFromStore(Resource resource, Store repository) {
-        return (Resource) execute(ON_STORE_DOWNLOAD, new Object[]{resource, repository})[0];
+    public Resource afterDeleteFromBuffer(Resource resource, Buffer buffer) {
+        return (Resource) execute(AFTER_BUFFER_DELETE, new Object[]{resource, buffer})[0];
     }
 
     @Override
-    public Resource onPutToStore(Resource resource, Store repository) throws RevokedArtifactException {
-        Object[] out = execute(ON_STORE_PUT, new Object[]{resource, repository});
+    @SuppressWarnings("unchecked")
+    public List<Resource> beforeBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
+        return (List<Resource>) execute(BEFORE_BUFFER_COMMIT, new Object[]{resources, buffer, store})[0];
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
+        return (List<Resource>) execute(AFTER_BUFFER_COMMIT, new Object[]{resources, buffer, store})[0];
+    }
+
+    @Override
+    public Resource beforePutToStore(Resource resource, Store repository) throws RevokedArtifactException {
+        Object[] out = execute(BEFORE_STORE_PUT, new Object[]{resource, repository});
         if (out[1] != null) {
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
@@ -112,11 +183,38 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
-        return (List<Resource>) execute(ON_BUFFER_COMMIT, new Object[]{resources, buffer, store})[0];
+    public Resource afterPutToStore(Resource resource, Store repository) throws RevokedArtifactException {
+        Object[] out = execute(AFTER_STORE_PUT, new Object[]{resource, repository});
+        if (out[1] != null) {
+            if (out[1] instanceof RevokedArtifactException) {
+                throw (RevokedArtifactException) out[1];
+            } else {
+                throw new IllegalStateException("onPutToStore throw unexpected exception", (Throwable) out[1]);
+            }
+        }
+        return (Resource) out[0];
     }
 
+    @Override
+    public Resource beforeDeleteFromStore(Resource resource, Store store) {
+        return (Resource) execute(BEFORE_STORE_DELETE, new Object[]{resource, store})[0];
+    }
+
+    @Override
+    public Resource afterDeleteFromStore(Resource resource, Store store) {
+        return (Resource) execute(AFTER_STORE_DELETE, new Object[]{resource, store})[0];
+    }
+    
+    @Override
+    public Resource beforeDownloadFromStore(Resource resource, Store store) {
+        return (Resource) execute(BEFORE_STORE_DOWNLOAD, new Object[]{resource, store})[0];
+    }
+
+    @Override
+    public Resource afterDownloadFromStore(Resource resource, Store store) {
+        return (Resource) execute(AFTER_STORE_DOWNLOAD, new Object[]{resource, store})[0];
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     public List<Resource> beforeExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
@@ -145,7 +243,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
         Throwable exception = null;
         do {
             for (ActionHandler handler : handlers) {
-                if (handler.isModifying() == modifying && !handler.equals(this)) {
+                if (handler.isExclusive() == modifying && !handler.equals(this)) {
                     args[0] = out;
                     try {
                         out = method.invoke(handler, args);
@@ -169,7 +267,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public boolean isModifying() {
+    public boolean isExclusive() {
         return true;
     }
 

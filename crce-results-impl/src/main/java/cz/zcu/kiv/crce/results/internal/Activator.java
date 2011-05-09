@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.results.internal;
 
+import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.results.ResultsStore;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -22,6 +23,7 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(ResultsStore.class.getName(), null)
                 .setImplementation(ResultsStoreImpl.class)
                 .add(createConfigurationDependency().setPid(PID))
+                .add(createServiceDependency().setRequired(true).setService(DataModelHelperExt.class))
                 );
     }
 

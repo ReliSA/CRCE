@@ -3,16 +3,15 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.ResourceDAOFactory;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.SessionFactory;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import cz.zcu.kiv.crce.repository.plugins.RepositoryDAO;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,14 +47,14 @@ public class BufferImpl implements Buffer {
     
     public BufferImpl(String sessionId) {
         m_sessionProperties = new Properties();
-        m_sessionProperties.put(SessionFactory.SERVICE_SESSION_ID, sessionId);
+        m_sessionProperties.put(SessionRegister.SERVICE_SESSION_ID, sessionId);
     }
     
     /*
      * Called by dependency manager
      */
     void init() {
-        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionFactory.SERVICE_SESSION_ID));
+        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
         if (!m_baseDir.exists()) {
             m_baseDir.mkdirs();
         } else if (!m_baseDir.isDirectory()) {
@@ -112,7 +111,7 @@ public class BufferImpl implements Buffer {
             }
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         Resource resource = resourceDao.getResource(file.toURI());
         
@@ -155,14 +154,15 @@ public class BufferImpl implements Buffer {
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
+        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
+        
         if (!isInBuffer(resource)) {
             if (m_repository.contains(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in buffer but it is in internal repository: " + resource.getId());
+                // TODO remove from repo
             }
             return false;
         }
-        
-        resource = m_pluginManager.getPlugin(ActionHandler.class).onDeleteFromBuffer(resource, this);
         
         // if URI scheme is not 'file', it is detected in previous isInBuffer() check
         File file = new File(resource.getUri());
@@ -170,7 +170,7 @@ public class BufferImpl implements Buffer {
             throw new IOException("Can not delete artifact file from buffer: " + resource.getUri());
         }
         
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
             resourceDao.remove(resource);
         } finally {
@@ -188,10 +188,11 @@ public class BufferImpl implements Buffer {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
+        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
+        
         List<Resource> out = new ArrayList<Resource>();
-        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).onBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAOFactory.class).getResourceDAO();
+        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         // put resources to store
         if (move && (m_store instanceof FilebasedStoreImpl)) {

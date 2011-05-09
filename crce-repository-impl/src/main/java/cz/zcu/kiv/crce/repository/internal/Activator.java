@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.SessionFactory;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -42,7 +42,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 );
 
         dm.add(createComponent()
-                .setInterface(SessionFactory.class.getName(), null)
+                .setInterface(SessionRegister.class.getName(), null)
                 .setImplementation(SessionFactoryImpl.class)
                 );
         
@@ -52,13 +52,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
-
-        dm.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
-                .setImplementation(DefaultResourceDAOFactory.class)
-                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                );
-        
     }
 
     @Override

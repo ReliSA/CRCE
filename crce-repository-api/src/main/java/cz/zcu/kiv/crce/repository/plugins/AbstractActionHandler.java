@@ -20,22 +20,12 @@ import java.util.Properties;
 public abstract class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
     @Override
-    public Resource onPutToStore(Resource resource, Store repository) throws RevokedArtifactException {
-        return resource;
-    }
-
-    @Override
-    public Resource onDeleteFromBuffer(Resource resource, Buffer buffer) {
-        return resource;
+    public boolean isExclusive() {
+        return false;
     }
 
     @Override
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        return resource;
-    }
-
-    @Override
-    public Resource onDeleteFromStore(Resource resource, Store repository) {
         return resource;
     }
 
@@ -50,26 +40,6 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public List<Resource> onBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
-        return resources;
-    }
-    
-    @Override
-    public Resource onDownloadFromStore(Resource resource, Store repository) {
-        return resource;
-    }
-
-    @Override
-    public Resource onDownloadFromBuffer(Resource resource, Buffer buffer) {
-        return resource;
-    }
-
-    @Override
-    public boolean isModifying() {
-        return false;
-    }
-
-    @Override
     public List<Resource> beforeExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
         return resources;
     }
@@ -77,6 +47,76 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     @Override
     public List<Resource> afterExecuteInStore(List<Resource> resources, Executable executable, Properties properties, Store store) {
         return resources;
+    }
+
+    @Override
+    public Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+        return resource;
+    }
+
+    @Override
+    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+        return resource;
+    }
+
+    @Override
+    public Resource beforeDownloadFromBuffer(Resource resource, Buffer buffer) {
+        return resource;
+    }
+
+    @Override
+    public Resource afterDownloadFromBuffer(Resource resource, Buffer buffer) {
+        return resource;
+    }
+
+    @Override
+    public Resource beforeDeleteFromBuffer(Resource resource, Buffer buffer) {
+        return resource;
+    }
+
+    @Override
+    public Resource afterDeleteFromBuffer(Resource resource, Buffer buffer) {
+        return resource;
+    }
+
+    @Override
+    public List<Resource> beforeBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
+        return resources;
+    }
+
+    @Override
+    public List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
+        return resources;
+    }
+
+    @Override
+    public Resource beforeDeleteFromStore(Resource resource, Store store) {
+        return resource;
+    }
+
+    @Override
+    public Resource afterDeleteFromStore(Resource resource, Store store) {
+        return resource;
+    }
+
+    @Override
+    public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
+        return resource;
+    }
+
+    @Override
+    public Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException {
+        return resource;
+    }
+
+    @Override
+    public Resource beforeDownloadFromStore(Resource resource, Store store) {
+        return resource;
+    }
+
+    @Override
+    public Resource afterDownloadFromStore(Resource resource, Store store) {
+        return resource;
     }
 
 }

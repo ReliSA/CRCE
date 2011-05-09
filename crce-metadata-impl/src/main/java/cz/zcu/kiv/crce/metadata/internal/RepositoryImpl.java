@@ -92,7 +92,7 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public Resource[] getResources(String filter) throws InvalidSyntaxException {
+    public synchronized Resource[] getResources(String filter) throws InvalidSyntaxException {
         if (filter == null || filter.trim().equals("")) {
             return getResources();
         }
@@ -109,7 +109,7 @@ public class RepositoryImpl implements Repository, WritableRepository {
     }
 
     @Override
-    public Resource[] getResources(Requirement[] requirements) {
+    public synchronized Resource[] getResources(Requirement[] requirements) {
         if (requirements == null || requirements.length == 0) {
             return getResources();
         }

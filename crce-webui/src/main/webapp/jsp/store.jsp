@@ -121,7 +121,9 @@
   				<input class="tlacitko" type="submit" value="EXECUTE TESTS ON CHECKED" />
   			</c:if>
   		</form>
-  	
+  		<form name="compataibility" action="check" method="post">
+  		<input class="tlacitko" type="submit" value="CHECK COMPATIBILITY"/>
+  		</form>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />
