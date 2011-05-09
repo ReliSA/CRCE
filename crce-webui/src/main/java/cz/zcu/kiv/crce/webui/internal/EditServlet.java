@@ -78,14 +78,13 @@ public class EditServlet extends HttpServlet {
 			}
 		} else if ("capability".equals(form)) {
 			if (saveCapability(req,resp, parameters)) {
-				System.out.println("Capab");
 				success = editCapabilities(req, resp, parameters, true);
 				if (!success){
-					ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+					ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
 					success = true;
 				}
 			} else {
-				ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
+				ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
 				success = true;
 			}
 		} else if ("property".equals(form)) {
@@ -181,11 +180,18 @@ public class EditServlet extends HttpServlet {
 				}
 			}
 			Resource resource = findResource(resURI, array);
+			int lengthBefore = resource.getCapabilities().length;
 			resource.createCapability(capabilityName);
+			if (lengthBefore == resource.getCapabilities().length) {
+				resp.sendRedirect("resource");
+				return false;
+			}
 			req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().length));
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		
