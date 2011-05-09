@@ -69,7 +69,7 @@ public class ResourceServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	private static void cleanSession(HttpSession session){
+	public static void cleanSession(HttpSession session){
 		session.removeAttribute("resources");
 		session.removeAttribute("plugins");
 		session.removeAttribute("store");		
