@@ -25,7 +25,7 @@
 	        	<th>Type:</th>
 	        	<td class="typ">
 		  			<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
-		  			<select class="text" name="type_${counter.count}">
+		  			<select class="text" name="propertyType">
 						<c:forEach items="${types}" var="type">
 							<option value="${type}">${type}</option>
 							</c:forEach>

@@ -132,10 +132,11 @@ public class EditServlet extends HttpServlet {
 			Resource resource = findResource(resURI, array);
 			Capability capability = resource.getCapabilities()[Integer.valueOf(id) - 1];
 			String name = ((String[]) parameters.get("name"))[0];
-			String type = ((String[]) parameters.get("type"))[0];
+			String type = ((String[]) parameters.get("propertyType"))[0];
 			String value = ((String[]) parameters.get("value"))[0];
 			
-			System.out.println("TEST: " + id);
+			
+			System.out.println("Name: " + name + " Type: " + type + " Value: " + value);
 			try{
 				capability.setProperty(name, value, Type.getValue(type));
 			} catch (IllegalArgumentException e){
@@ -525,7 +526,6 @@ public class EditServlet extends HttpServlet {
 		} else {
 			success = false;
 		}
-		
 		if (!success) {
 			resp.sendError(HttpServletResponse.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
 		}
