@@ -16,7 +16,7 @@
 		<table class="formular">	  		
 			<tr>
 				<th>Capability name:</th>
-				<td><input class="text" type="text" name="capability" value="${capability}" /></td>
+				<td><input class="text" type="text" name="capability" value="" /></td>
 				<td class="chyba">${capabilityError}</td>
 			</tr>
 			<tr>

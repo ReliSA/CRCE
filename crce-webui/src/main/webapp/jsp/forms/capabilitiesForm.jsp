@@ -29,7 +29,7 @@
 		  					<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
 		  					<select class="text" name="type_${counter.count}">
 								<c:forEach items="${types}" var="type">
-									<option value="${type}" <c:if test="${type eq property.type}">selected="selected"</c:if>>$type</option>
+									<option value="${type}" <c:if test="${type eq property.type}">selected="selected"</c:if>>${type}</option>
 								</c:forEach>
 							</select>
 		  				</td>

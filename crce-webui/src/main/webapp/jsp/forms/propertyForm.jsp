@@ -18,7 +18,7 @@
 		<table class="formular">
 	        <tr>
 	        	<th>Name:</th>
-	        	<td><input class="text" type="text" name="name" value="${property.name}" /></td>
+	        	<td><input class="text" type="text" name="name" value="" /></td>
 	        	<td class="chyba">${nameError}</td>
 	        </tr>
 	        <tr>
@@ -27,7 +27,7 @@
 		  			<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
 		  			<select class="text" name="type_${counter.count}">
 						<c:forEach items="${types}" var="type">
-							<option value="${type}" <c:if test="${type eq property.type}">selected="selected"</c:if>>$type</option>
+							<option value="${type}">${type}</option>
 							</c:forEach>
 					</select>
 		  		</td>
@@ -35,7 +35,7 @@
 	        </tr>
 	        <tr>
 	        	<th>Value:</th>
-	        	<td><input class="text" type="text" name="value" value="${property.value}" /></td>
+	        	<td><input class="text" type="text" name="value" value="" /></td>
 	        	<td class="chyba">${valueError}</td>
 	        </tr>
 	        <tr>

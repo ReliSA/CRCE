@@ -22,7 +22,6 @@ public class EditServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -72,6 +71,7 @@ public class EditServlet extends HttpServlet {
 					ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
 					success = true;
 				}
+				
 			} else {
 				ResourceServlet.setError(req.getSession(), false, "Cannot save capabilities.");
 				success = true;
@@ -146,6 +146,7 @@ public class EditServlet extends HttpServlet {
 		} catch (FileNotFoundException e) {
 			return false;
 		}
+		
 		return true;
 	}
 
@@ -186,6 +187,7 @@ public class EditServlet extends HttpServlet {
 		} catch (FileNotFoundException e) {
 			return false;
 		}
+		
 		return true;
 	}
 
@@ -623,6 +625,7 @@ public class EditServlet extends HttpServlet {
 			URI resURI = new URI((String) req.getParameter("uri"));
 			Resource resource = findResource(resURI, array);
 			req.getSession().setAttribute("resource", resource);			
+			req.getSession().setAttribute("types", Type.values());
 			req.getRequestDispatcher("jsp/forms/capabilityForm.jsp").forward(req, resp);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -666,6 +669,7 @@ public class EditServlet extends HttpServlet {
 			Resource resource = findResource(new URI(resURI), array);
 			
 			req.getSession().setAttribute("resource", resource);
+			req.getSession().setAttribute("types", Type.values());
 			req.getSession().setAttribute("capability", resource.getCapabilities()[Integer.valueOf(id) - 1]);
 			req.getSession().setAttribute("capabilityId", id);
 			req.getRequestDispatcher("jsp/forms/capabilitiesForm.jsp").forward(req, resp);
