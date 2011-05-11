@@ -93,7 +93,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("beforeUploadToBuffer throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("beforeUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];
@@ -106,7 +106,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("onUploadToBuffer throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("onUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];
@@ -119,7 +119,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("afterUploadToBuffer throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("afterUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];
@@ -176,7 +176,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("onPutToStore throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("beforePutToStore threw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];
@@ -189,7 +189,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
             } else {
-                throw new IllegalStateException("onPutToStore throw unexpected exception", (Throwable) out[1]);
+                throw new IllegalStateException("afterPutToStore threw unexpected exception", (Throwable) out[1]);
             }
         }
         return (Resource) out[0];

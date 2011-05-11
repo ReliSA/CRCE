@@ -46,6 +46,6 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
 
     @Override
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        return super.onUploadToBuffer(resource, buffer, name); // TODO
+        return super.onUploadToBuffer(resource, buffer, name); // TODO implement
     }
 }

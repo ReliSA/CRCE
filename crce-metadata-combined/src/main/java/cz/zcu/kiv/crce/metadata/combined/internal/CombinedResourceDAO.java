@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import java.io.IOException;
 import java.net.URI;
@@ -14,7 +15,7 @@ import org.osgi.service.cm.ConfigurationException;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class CombinedResourceDAO extends AbstractResourceDAO {
+public class CombinedResourceDAO extends AbstractResourceDAO implements Plugin {
 
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
