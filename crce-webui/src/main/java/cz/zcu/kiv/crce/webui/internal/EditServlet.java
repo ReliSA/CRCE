@@ -16,6 +16,8 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 
 public class EditServlet extends HttpServlet {
 	/**
@@ -55,15 +57,15 @@ public class EditServlet extends HttpServlet {
 			}
 		} else if ("addRequirement".equals(form)) {
 			if (addRequirementForm(req,resp, parameters)) {
+				ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+				success = true;
+			}
 				success = editRequirements(req, resp, parameters);
 				if (!success){
 					ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
 					success = true;
 				} 
-				} else {
-					ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
-					success = true;
-			}
+				
 		} else if ("capabilities".equals(form)) {
 			if (saveCapabilities(req,resp, parameters)) {
 				success = editCapabilities(req, resp, parameters);
@@ -141,9 +143,15 @@ public class EditServlet extends HttpServlet {
 			} catch (IllegalArgumentException e){
 				return false;
 			}
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		
@@ -186,6 +194,11 @@ public class EditServlet extends HttpServlet {
 				resp.sendRedirect("resource");
 				return false;
 			}
+			
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
 			req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().length));
 		} catch (URISyntaxException e) {
 			return false;
@@ -239,7 +252,13 @@ public class EditServlet extends HttpServlet {
 					if(parameters.containsKey("extend")) {
 						extend = (((String[]) parameters.get("extend"))[0]).equals("on");
 					}
+					int lengthBefore = resource.getRequirements().length;
 					requir = resource.createRequirement(name);
+					if (lengthBefore == resource.getRequirements().length) {
+						req.getSession().setAttribute("success", false);
+						req.getSession().setAttribute("message", "Cannot add requirement.");
+						return false;
+					}
 					try {
 						requir.setFilter(filter);
 					} catch (IllegalArgumentException e) {
@@ -250,10 +269,15 @@ public class EditServlet extends HttpServlet {
 					requir.setOptional(optional);
 					requir.setExtend(extend);
 				}
+				PluginManager pm = Activator.instance().getPluginManager();
+				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+				rd.save(resource);
 			
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		req.getSession().setAttribute("success", true);
@@ -314,10 +338,15 @@ public class EditServlet extends HttpServlet {
 					System.err.println("Cannot change property.");
 				}
 				}
-//				resource.addRequirement(requir);
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		return true;
@@ -399,13 +428,17 @@ public class EditServlet extends HttpServlet {
 //					resource.addRequirement(requir);
 				}
 			}
-			System.out.println("2");
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
 			
 		} catch (URISyntaxException e) {
 			System.out.println("3");
 			return false;
 		} catch (FileNotFoundException e) {
 			System.out.println("3b");
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		return true;
@@ -441,12 +474,19 @@ public class EditServlet extends HttpServlet {
 //			Zjištění zda kategorie byla odstraněna.
 			if (categoriesLengthBefore < resource.getCategories().length) {
 			} else {
-				req.getSession().setAttribute("success", true);
+				req.getSession().setAttribute("success", false);
+				req.getSession().setAttribute("message", "Cannot add category.");
 			}
+			
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
 			
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		return true;
@@ -770,9 +810,15 @@ public class EditServlet extends HttpServlet {
 				return false;
 			}
 			
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
 		} catch (URISyntaxException e) {
 			return false;
 		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
 			return false;
 		}
 		return true;
