@@ -5,7 +5,6 @@ import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -24,9 +23,15 @@ import org.osgi.service.log.LogService;
  */
 public class UploadServlet extends HttpServlet {
 
-    @Override
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean failed = false;
+       
         if(req.getParameter("uri")!=null)
         {
         	Buffer buffer = Activator.instance().getBuffer(req);
@@ -45,7 +50,7 @@ public class UploadServlet extends HttpServlet {
         {
         	failed=true;
         }
-        if(failed) resp.sendError(resp.SC_EXPECTATION_FAILED, "Bad arguments"+req.getParameter("uri"));
+        if(failed) ResourceServlet.setError(req.getSession(), !failed, "Commit failed");
         else req.getRequestDispatcher("resource?link=buffer");
         
         /*PrintWriter out = resp.getWriter();
@@ -81,6 +86,7 @@ public class UploadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean success = true;
+        String message;
         if (ServletFileUpload.isMultipartContent(req)) {
             ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
             List fileItemsList;
@@ -113,13 +119,11 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-        req.getSession().setAttribute("success", success);
-        req.getSession().setAttribute("source", "upload");
-        //System.out.println("I'm here why do I not forward? Because I'm bitch");
-       
-        req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
-       
-        //System.out.println("Here shouldnt I be");
+        if(success) message = "Upload was succesful";
+        else message = "Upload failed";
+        ResourceServlet.setError(req.getSession(), success, message);
+        req.getSession().setAttribute("source", "upload");      
+        req.getRequestDispatcher("resource?link=buffer").forward(req, resp);        
     }
 
     // send a response with the specified status code

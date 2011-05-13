@@ -40,6 +40,42 @@
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>check</servlet-name>
+		<servlet-class>cz.zcu.kiv.crce.webui.internal.CheckServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>check</servlet-name>
+		<url-pattern>/check</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>cz.zcu.kiv.crce.webui.internal.RuntimeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+        <servlet-name>resource</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>resource</servlet-name>
+        <url-pattern>/resource</url-pattern>
+    </servlet-mapping>
+	
+	<servlet>
+        <servlet-name>edit</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.EditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>edit</servlet-name>
+        <url-pattern>/edit</url-pattern>
+    </servlet-mapping>
 
 	<servlet>
         <servlet-name>resource</servlet-name>

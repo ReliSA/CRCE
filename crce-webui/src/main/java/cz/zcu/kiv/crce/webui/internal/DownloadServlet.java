@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -17,13 +18,29 @@ import cz.zcu.kiv.crce.metadata.Resource;
 
 public class DownloadServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final int BUFSIZE = 128;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 	throws ServletException, IOException {
-		Activator.instance().getBuffer(req).commit(true);
+		boolean success;
+		String message;
+		Resource[] buffer = (Resource [])req.getSession().getAttribute("buffer");
+		List<Resource> list = Activator.instance().getBuffer(req).commit(true);
+		if(list.size()==buffer.length) {
+			success=true;
+			message="All resources commited succesfully";
+		}
+		else {
+			success=false;
+			message="Not all resources commited succesfully";
+		}
 		req.getSession().setAttribute("source","commit");
+		ResourceServlet.setError(req.getSession(), success, message);
 		req.getRequestDispatcher("resource?link=store").forward(req, resp);
 	}
 
@@ -31,6 +48,7 @@ public class DownloadServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 	throws ServletException, IOException {
 		boolean failed = false;
+		String message;
 		if (req.getParameter("uri") != null)
 		{
 			String link = (String) req.getSession().getAttribute("source");
@@ -63,8 +81,11 @@ public class DownloadServlet extends HttpServlet {
 		else {
 			failed = true;
 		}
-		if(failed) resp.sendError(resp.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
-		else req.getRequestDispatcher("resource").forward(req, resp);
+		
+		if(failed) message="Download failed"; 
+		else message="Download succesfull";
+		ResourceServlet.setError(req.getSession(), !failed, message);
+		
 	}
 
 

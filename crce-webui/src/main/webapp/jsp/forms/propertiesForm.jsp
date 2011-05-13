@@ -6,7 +6,9 @@
     
   	<div id="telo">
   	
-		<h2>Properties form - ${resource.presentationName} ${resource.version}</h2>
+		<h2>Properties form</h2>
+		
+		<h3>${resource.presentationName} - ${resource.version}</h3>
 		
 		<form action="#" method="post">
 			<input type="hidden" name="presentationName" value="${resource.presentationName}" />

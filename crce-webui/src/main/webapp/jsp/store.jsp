@@ -7,10 +7,22 @@
     
   	<div id="telo">
   	
-		<form class="execute_commit" method="post" action="#">
+		<form class="execute_commit" method="post" action="test">
   	       
 		<c:forEach items="${store}" var="resource">
-	  		<div class="komponenta">
+	  		<div class="komponenta 
+	  			<c:catch var="exception">${resource.satisfied}</c:catch>
+				<c:if test="${empty exception}">
+					<c:choose>
+						<c:when test="${resource.satisfied == true}">
+							uspech		
+						</c:when>
+						<c:when test="${resource.satisfied == false}">
+							neuspech
+						</c:when>
+					</c:choose>
+				</c:if>
+			">
 	  			<div class="nadpis">
 	  				<a class="popis" href="#">
 	  					<span class="sName">${resource.symbolicName}</span> 
@@ -25,8 +37,8 @@
 	  				<div class="nabidka">
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=store"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
-			            <a href="#"><img src="graphic/set.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
-			          	<input type="checkbox" name="${resource.presentationName}_${resource.version}" />
+			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
+			          	<input type="checkbox" name="check" value="${resource.uri}" />
 	          		</div>
 	  				<div class="konec"></div>
 	  			</div>
@@ -45,11 +57,11 @@
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Capabilities: </strong> <a href="#"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
+	  				<div class="polozka"><strong>Capabilities: </strong> <a href="edit?type=addCapability&uri=${resource.uri}"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
 	  					<ul>
-	  						<c:forEach items="${resource.capabilities}" var="capability">
+	  						<c:forEach items="${resource.capabilities}" var="capability" varStatus="capabilityId">
 	  							<li>
-	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
+	  								${capability.name} <a href="edit?type=capability&uri=${resource.uri}&capabilityId=${capabilityId.count}" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
 	  								<table class="poskytuje">
 		  								<c:forEach items="${capability.properties}" var="property">
 		  									<tr><td class="jmeno">${property.name}</td><td class="typ">${property.type}</td><td class="hodnota">${property.value}</td></tr>
@@ -59,16 +71,32 @@
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
+	  				<div class="polozka"><strong>Requirements: </strong> <a href="edit?type=requirement&uri=${resource.uri}"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
+	  						<tr><th colspan="5">Comment</th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
-	  							<tr>
+	  							<tr 
+	  								<c:catch var="exception">${requirement.satisfied}</c:catch>
+		  							<c:if test="${empty exception}">
+										<c:choose>
+											<c:when test="${requirement.satisfied == true}">
+												class="uspech"		
+											</c:when>
+											<c:when test="${requirement.satisfied == false}">
+												class="neuspech"
+											</c:when>
+										</c:choose>
+									</c:if>
+	  							>
 	  								<td>${requirement.name}</td>
 	  								<td class="filter">${requirement.filter}</td>
 	  								<td>${requirement.multiple}</td>
 	  								<td>${requirement.optional}</td>
 	  								<td>${requirement.extend}</td>
+	  							</tr>
+	  							<tr>
+	  								<td colspan="5" class="komentar">${requirement.comment}</td>
 	  							</tr>
 	  						</c:forEach>
 	  					</table>
@@ -90,10 +118,12 @@
 		</c:if>
   		
   			<c:if test="${not empty store}">
-  				<input class="tlacitko" type="submit" value="EXECUTE TESTS" />
+  				<input class="tlacitko" type="submit" value="EXECUTE TESTS ON CHECKED" />
   			</c:if>
   		</form>
-  	
+  		<form name="compataibility" action="check" method="post">
+  		<input class="tlacitko" type="submit" value="CHECK COMPATIBILITY"/>
+  		</form>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />

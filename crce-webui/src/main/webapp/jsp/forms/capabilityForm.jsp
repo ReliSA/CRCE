@@ -6,16 +6,17 @@
     
   	<div id="telo">
   	
-		<h2>Capability form - ${presentationName} ${version}</h2>
+		<h2>Add new capability</h2>
+		
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
 		
 		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
-		
+			<input type="hidden" name="uri" value="${resource.uri}" />
+			<input type="hidden" name="form" value="capability" />
 		<table class="formular">	  		
 			<tr>
 				<th>Capability name:</th>
-				<td><input type="text" name="capability" value="${capability}" /></td>
+				<td><input class="text" type="text" name="capability" value="" /></td>
 				<td class="chyba">${capabilityError}</td>
 			</tr>
 			<tr>

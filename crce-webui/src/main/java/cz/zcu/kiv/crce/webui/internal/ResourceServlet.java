@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.osgi.framework.InvalidSyntaxException;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import org.osgi.framework.InvalidSyntaxException;
@@ -40,7 +42,7 @@ public class ResourceServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-		HttpSession session = req.getSession();
+		
 		String link = null;
 		
 		if (req.getParameter("link") != null && req.getParameter("link") instanceof String) 
@@ -57,7 +59,7 @@ public class ResourceServlet extends HttpServlet {
 			else
 			{
 				System.out.println("Default forward");
-				req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
+				req.getRequestDispatcher("resource?link=store").forward(req, resp);
 			}
 
 		} catch (ServletException e) {
@@ -68,34 +70,38 @@ public class ResourceServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	private static void cleanSession(HttpSession session){
+	public static void cleanSession(HttpSession session){
 		session.removeAttribute("resources");
 		session.removeAttribute("plugins");
-		session.removeAttribute("store");
-		//session.removeAttribute("success");
-		session.removeAttribute("source");
+		session.removeAttribute("store");		
+	}
+	
+	public static void setError(HttpSession session, boolean success, String message){
+		session.setAttribute("success", success);
+		session.setAttribute("message", message);
 	}
 	
 	private boolean fillSession(String link, HttpServletRequest req, String filter){
+		String errorMessage = filter+" is not a valid filter";
 		HttpSession session = req.getSession();
 		cleanSession(session);
 		if(link==null) return false;
+		
 		if(link.equals("buffer"))
 		{
-                    /* TODO - verify this block (return false on InvalidSyntaxException) */
-                    Resource[] buffer;
-                    if (filter == null) {
-                        buffer = Activator.instance().getBuffer(req).getRepository().getResources();
-                    } else {
-                        try {
-                            buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
-                        } catch (InvalidSyntaxException ex) {
-                            return false;
-                        }
-                    }
-                    session.setAttribute("buffer", buffer);
-                    return true;
-                }		
+			Resource[] buffer;
+			if(filter==null) buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+			else
+				try {
+					buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					setError(session,false,errorMessage);
+					buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+				}
+			session.setAttribute("buffer", buffer);
+			return true;
+		}
+		
 		else if(link.equals("plugins"))
 		{
 			    Plugin[] plugins;
@@ -107,19 +113,17 @@ public class ResourceServlet extends HttpServlet {
 		
 		else if(link.equals("store"))
 		{
-                     /* TODO - verify this block (return false on InvalidSyntaxException) */
-                    Resource[] store;
-                    if (filter == null) {
-                        store = Activator.instance().getStore().getRepository().getResources();
-                    } else {
-                        try {
-                            store = Activator.instance().getStore().getRepository().getResources(filter);
-                        } catch (InvalidSyntaxException ex) {
-                            return false;
-                        }
-                    }
-                    session.setAttribute("store", store);
-                    return true;
+			Resource[] store;
+			if(filter==null) store = Activator.instance().getStore().getRepository().getResources();
+			else
+				try {
+					store = Activator.instance().getStore().getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					setError(session,false,errorMessage);
+					store = Activator.instance().getStore().getRepository().getResources();
+				}
+			session.setAttribute("store", store);
+			return true;
 		}
 		
 		else
@@ -128,19 +132,5 @@ public class ResourceServlet extends HttpServlet {
 			return false;
 		}
 	}
-	private boolean getObjectBooleanValue(Object object){
-		try{
-		String param = (String) object;
-		System.out.println(param);
-		if(param!=null && param.equals("true")) 
-			{
-				System.out.println(param);
-				return true;
-			}
-		else return false;
-		}
-		catch(Exception e){
-			return false;
-		}
-	}
+	
 }

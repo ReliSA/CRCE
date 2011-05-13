@@ -6,26 +6,36 @@
     
 	<div id="telo">
   	
-		<h2>Property form - ${presentationName} ${version}</h2>
+		<h2>Add new property</h2>
+		
+		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
       
 		<form action="#" method="post">
-			<input type="hidden" name="presentationName" value="${presentationName}" />
-			<input type="hidden" name="version" value="${version}" />
+			<input type="hidden" name="uri" value="${resource.uri}" />
+			<input type="hidden" name="capabilityId" value="${capabilityId}" />
+			<input type="hidden" name="form" value="property" />
 		
 		<table class="formular">
 	        <tr>
 	        	<th>Name:</th>
-	        	<td><input class="text" type="text" name="name" value="${property.name}" /></td>
+	        	<td><input class="text" type="text" name="name" value="" /></td>
 	        	<td class="chyba">${nameError}</td>
 	        </tr>
 	        <tr>
 	        	<th>Type:</th>
-	        	<td><input class="text" type="text" name="type" value="${property.type}" /></td>
+	        	<td class="typ">
+		  			<!--<input class="text" type="text" name="type_${counter.count}" value="${property.type}" />  -->
+		  			<select class="text" name="propertyType">
+						<c:forEach items="${types}" var="type">
+							<option value="${type}">${type}</option>
+							</c:forEach>
+					</select>
+		  		</td>
 	        	<td class="chyba">${typeError}</td>
 	        </tr>
 	        <tr>
 	        	<th>Value:</th>
-	        	<td><input class="text" type="text" name="value" value="${property.value}" /></td>
+	        	<td><input class="text" type="text" name="value" value="" /></td>
 	        	<td class="chyba">${valueError}</td>
 	        </tr>
 	        <tr>
