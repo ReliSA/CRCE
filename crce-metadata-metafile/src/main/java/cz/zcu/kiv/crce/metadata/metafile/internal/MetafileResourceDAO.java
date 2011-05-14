@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.osgi.service.log.LogService;
 
 /**
  * This implementation of ResourceDAO reads/writes metadata from/to a file,
@@ -28,6 +29,7 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
     
     private volatile ResourceCreator m_resourceCreator;
     private volatile DataModelHelperExt m_dataModelHelper;
+    private volatile LogService m_log;
 
     @Override
     public void save(Resource resource) throws IOException {
@@ -80,7 +82,8 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         } catch (IOException e) {
             throw new IOException("Can not read XML data", e);
         } catch (Exception e) {
-            throw new IOException("Can not parse XML data", e);
+            m_log.log(LogService.LOG_ERROR, "Can not parse XML data (probably corrupted content): " + e.getMessage());
+            return m_resourceCreator.createResource();
         }
     }
 
