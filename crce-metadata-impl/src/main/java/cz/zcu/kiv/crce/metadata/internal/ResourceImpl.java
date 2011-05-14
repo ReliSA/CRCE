@@ -26,6 +26,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     private boolean m_writable;
     private boolean m_versionStatic;
     private boolean m_symbolicNameStatic;
+    
     private final Set<Capability> m_capabilities = new HashSet<Capability>();
     private final Set<Requirement> m_requirements = new HashSet<Requirement>();
     private final Set<String> m_categories = new HashSet<String>();
@@ -359,10 +360,13 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
         }
         sb.append("Requirements:\n");
         for (Requirement req : getRequirements()) {
-            sb.append("  Opt: ").append(req.isOptional());
-            sb.append(" Mult: ").append(req.isMultiple());
-            sb.append(" Ext: ").append(req.isExtend());
-            sb.append(req.getName()).append(" ").append(req.getFilter()).append(" ").append(req.getComment()).append("\n");
+            sb.append("  O: ").append(req.isOptional() ? "T" : "F");
+            sb.append("\tM: ").append(req.isMultiple() ? "T" : "F");
+            sb.append("\tE: ").append(req.isExtend() ? "T" : "F");
+            sb.append("\tN: ").append(req.getName());
+            sb.append("\tF: ").append(req.getFilter());
+            sb.append("\tC: ").append(req.getComment());
+            sb.append("\n");
         }
         
         return sb.toString();

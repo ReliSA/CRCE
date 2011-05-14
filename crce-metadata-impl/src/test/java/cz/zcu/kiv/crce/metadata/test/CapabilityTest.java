@@ -93,7 +93,7 @@ public class CapabilityTest {
     }
     
     @Test
-    public void hashSet() throws Exception {
+    public void hashSetContains() throws Exception {
         Capability c1 = rc.createCapability("a");
         Capability c2 = rc.createCapability("a");
         
@@ -111,6 +111,5 @@ public class CapabilityTest {
         c2.setProperty("p1", "p1");
         assert set.contains(c1);
         assert set.contains(c2);
-        
     }
 }

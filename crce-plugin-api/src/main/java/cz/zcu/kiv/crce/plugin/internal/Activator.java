@@ -6,6 +6,7 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
 /**
@@ -14,16 +15,17 @@ import org.osgi.service.log.LogService;
  */
 public class Activator extends DependencyActivatorBase {
 
+    static final PluginManagerImpl pm = new PluginManagerImpl();
+    
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-        
-        final PluginManager pm = new PluginManagerImpl();
         
         manager.add(createComponent()
                 .setInterface(PluginManager.class.getName(), null)
                 .setImplementation(pm)
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
-                .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(Plugin.class))
+                .add(createServiceDependency().setRequired(true).setService(EventAdmin.class))
+                .add(createServiceDependency().setRequired(false).setCallbacks("register", "unregister").setService(Plugin.class))
                 );
     }
 
@@ -31,5 +33,5 @@ public class Activator extends DependencyActivatorBase {
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
         // nothing yet
     }
-
+    
 }

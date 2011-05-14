@@ -16,16 +16,15 @@ public class RequirementImpl implements Requirement {
     private static final Pattern REMOVE_GT = Pattern.compile("\\(([^<>=~()]*)>([^*=]([^\\\\\\*\\(\\)]|\\\\|\\*|\\(|\\))*)\\)");
     private static final Pattern REMOVE_NV = Pattern.compile("\\(version>=0.0.0\\)");
     private String m_name;
-    private boolean m_multiple;
-    private boolean m_optional;
-    private boolean m_extend;
-    private String m_comment;
+    private boolean m_multiple = false;
+    private boolean m_optional = false;
+    private boolean m_extend = false;
+    private String m_comment = "";
     private FilterImpl m_filter = null;
-    private boolean m_writable;
+    private boolean m_writable = true;
 
     public RequirementImpl(String name) {
         m_name = name.intern();
-        m_writable = true;
     }
 
     @Override
@@ -151,10 +150,6 @@ public class RequirementImpl implements Requirement {
     public int hashCode() {
         int hash = 3;
         hash = 23 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
-        hash = 23 * hash + (this.m_multiple ? 1 : 0);
-        hash = 23 * hash + (this.m_optional ? 1 : 0);
-        hash = 23 * hash + (this.m_extend ? 1 : 0);
-        hash = 23 * hash + (this.m_filter != null ? this.m_filter.hashCode() : 0);
         return hash;
     }
     

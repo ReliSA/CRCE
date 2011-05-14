@@ -13,17 +13,24 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import org.codehaus.plexus.util.FileUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 /**
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class FilebasedStoreImpl implements Store {
+public class FilebasedStoreImpl implements Store, EventHandler {
     
+    private volatile BundleContext m_context;
     private volatile PluginManager m_pluginManager;
     private volatile LogService m_log;
 
@@ -42,8 +49,31 @@ public class FilebasedStoreImpl implements Store {
             throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
         }
     }
-    
+
     void init() {
+        Dictionary props = new Hashtable();
+        props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
+        props.put(EventConstants.EVENT_FILTER, "(types=*" + ResourceDAO.class.getName() + "*)");
+        m_context.registerService(EventHandler.class.getName(), this, props);
+        loadRepository();
+    }
+
+    
+    
+    @Override
+    public void handleEvent(Event event) {
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                loadRepository();
+            }
+        }).start();
+        
+    }
+    
+    private synchronized void loadRepository() {
         RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
         
         try {
