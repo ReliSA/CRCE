@@ -348,7 +348,7 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
                 .attribute(RepositoryParser.EXTEND, Boolean.toString(requirement.isExtend()))
                 .attribute(RepositoryParser.MULTIPLE, Boolean.toString(requirement.isMultiple()))
                 .attribute(RepositoryParser.OPTIONAL, Boolean.toString(requirement.isOptional()))
-                .text(requirement.getComment().trim())
+                .text(requirement.getComment() != null ? requirement.getComment().trim() : "")
                 .end();
     }
     

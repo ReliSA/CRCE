@@ -28,6 +28,7 @@ public class CombinedResourceImpl implements CombinedResource {
     public CombinedResourceImpl(Resource staticResource, Resource writableResource) {
         m_staticResource = staticResource;
         m_writableResource = writableResource;
+        m_writableResource.setUri(m_staticResource.getUri());
     }
 
     @Override
