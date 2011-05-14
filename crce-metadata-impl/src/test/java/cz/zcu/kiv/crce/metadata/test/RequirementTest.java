@@ -1,7 +1,12 @@
 package cz.zcu.kiv.crce.metadata.test;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
+import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.*;
 
 /**
@@ -10,12 +15,14 @@ import org.junit.*;
  */
 public class RequirementTest {
 
-    Requirement r1;
-    Requirement r2;
-    Requirement r3;
+    private Requirement r1;
+    private Requirement r2;
+    private Requirement r3;
+    private ResourceCreator rc;
     
     @Before
-    public void init() {
+    public void before(){
+        rc = new ResourceCreatorImpl();
         r1 = new RequirementImpl("req");
         r2 = new RequirementImpl("req");
         r3 = new RequirementImpl("req3");
@@ -73,9 +80,38 @@ public class RequirementTest {
         assert !r1.equals(r2);
 
         r2.setOptional(true);
+        assert !r1.equals(r2);
+        
         r2.setMultiple(true);
+        assert !r1.equals(r2);
+        
         r2.setExtend(true);
+        assert !r1.equals(r2);
+
         r2.setFilter("(&(a=1)(b=2))");
         assert r1.equals(r2);
     }
+    
+    @Test
+    public void hashSet() throws Exception {
+        Requirement r1 = rc.createRequirement("a");
+        Requirement r2 = rc.createRequirement("a");
+        
+        Set<Requirement> set = new HashSet<Requirement>();
+        
+        set.add(r1);
+        
+        assert set.contains(r1);
+        assert set.contains(r2);
+        
+        r1.setFilter("(a=b)");
+        assert set.contains(r1);
+        assert !set.contains(r2);
+
+        r2.setFilter("(a=b)");
+        assert set.contains(r1);
+        assert set.contains(r2);
+        
+    }
+    
 }

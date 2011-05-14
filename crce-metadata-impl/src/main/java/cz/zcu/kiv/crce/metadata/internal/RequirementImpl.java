@@ -150,10 +150,6 @@ public class RequirementImpl implements Requirement {
     public int hashCode() {
         int hash = 3;
         hash = 23 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
-        hash = 23 * hash + (this.m_multiple ? 1 : 0);
-        hash = 23 * hash + (this.m_optional ? 1 : 0);
-        hash = 23 * hash + (this.m_extend ? 1 : 0);
-        hash = 23 * hash + (this.m_filter != null ? this.m_filter.hashCode() : 0);
         return hash;
     }
     
