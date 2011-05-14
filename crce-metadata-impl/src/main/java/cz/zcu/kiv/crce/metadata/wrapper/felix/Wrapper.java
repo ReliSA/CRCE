@@ -5,6 +5,8 @@ import cz.zcu.kiv.crce.metadata.Reason;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 
 /**
  *
@@ -85,6 +87,34 @@ public class Wrapper {
         } else {
             for (int i = 0; i < resources.length; i++) {
                 out[i] = new ConvertedResource(resources[i]);
+            }
+        }
+        return out;
+    }
+    
+    public static Capability unwrap(org.apache.felix.bundlerepository.Capability capability) {
+        if (capability instanceof CapabilityWrapper) {
+            return ((CapabilityWrapper) capability).m_capability;
+        }
+        Capability out = new CapabilityImpl(capability.getName());
+        for (org.apache.felix.bundlerepository.Property property : capability.getProperties()) {
+            String name = property.getName();
+            String type = property.getType();
+            String value = property.getValue();
+            if (org.apache.felix.bundlerepository.Property.DOUBLE.equals(type)) {
+                out.setProperty(name, value, Type.DOUBLE);
+            } else if (org.apache.felix.bundlerepository.Property.LONG.equals(type)) {
+                out.setProperty(name, value, Type.LONG);
+            } else if (org.apache.felix.bundlerepository.Property.SET.equals(type)) {
+                out.setProperty(name, value, Type.SET);
+            } else if (org.apache.felix.bundlerepository.Property.URI.equals(type)) {
+                out.setProperty(name, value, Type.URI);
+            } else if (org.apache.felix.bundlerepository.Property.URL.equals(type)) {
+                out.setProperty(name, value, Type.URL);
+            } else if (org.apache.felix.bundlerepository.Property.VERSION.equals(type)) {
+                out.setProperty(name, value, Type.VERSION);
+            } else {
+                out.setProperty(name, value, Type.STRING);
             }
         }
         return out;
