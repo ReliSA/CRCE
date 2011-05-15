@@ -48,6 +48,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     }
                 }
             }
+            String category = null;
             if (cand != null) {
                 try {
                     InputStream in = new FileInputStream(new File(cand.getUri()));
@@ -77,12 +78,19 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     }
 
                     m_versionService.updateVersion(source, new File(resource.getUri()));
+                    category = "versioned";
                 } catch (IOException ex) {
                     m_log.log(LogService.LOG_ERROR, "Could not update version due to I/O error", ex);
+                    category = null;
                 } catch (VersionGeneratorException ex) {
-                    m_log.log(LogService.LOG_ERROR, "Could not update version due to VersionGeneratorException", ex);
+                    m_log.log(LogService.LOG_WARNING, "Could not update version (VersionGeneratorException): " + ex.getMessage());
+                    category = "non-versionable";
                 } catch (BundlesIncomparableException ex) {
-                    m_log.log(LogService.LOG_ERROR, "Could not update version (incomparable bundles)", ex);
+                    m_log.log(LogService.LOG_WARNING, "Could not update version (incomparable bundles): " + ex.getMessage());
+                    category = "non-versionable";
+                } catch (Exception e) {
+                    m_log.log(LogService.LOG_ERROR, "Could not update version (unknown error)", e);
+                    category = null;
                 }
                 
                 ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
@@ -93,7 +101,10 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     m_log.log(LogService.LOG_ERROR, "Could not reload changed resource", ex);
                 }
             }
-            resource.addCategory("versioned");
+            
+            if (category != null) {
+                resource.addCategory(category);
+            }
             
             Capability[] caps = resource.getCapabilities("file");
             Capability cap = (caps.length == 0 ? resource.createCapability("file") : caps[0]);
