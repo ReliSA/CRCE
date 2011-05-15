@@ -215,7 +215,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
     @Override
     public void addCategory(String category) {
-        if (isWritable()) {
+        if (isWritable() && category != null) {
             synchronized (m_categories) {
                 m_categories.add(category);
             }
@@ -224,7 +224,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
     @Override
     public void addCapability(Capability capability) {
-        if (isWritable()) {
+        if (isWritable() && capability != null) {
             synchronized (m_capabilities) {
                 m_capabilities.add(capability);
             }
@@ -233,7 +233,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
     @Override
     public void addRequirement(Requirement requirement) {
-        if (isWritable()) {
+        if (isWritable() && requirement != null) {
             synchronized (m_requirements) {
                 m_requirements.add(requirement);
             }

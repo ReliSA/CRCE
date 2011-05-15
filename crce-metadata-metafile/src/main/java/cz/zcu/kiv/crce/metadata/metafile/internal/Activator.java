@@ -29,6 +29,7 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(MetafileResourceDAO.class)
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setService(DataModelHelperExt.class).setRequired(true))
                 );
         

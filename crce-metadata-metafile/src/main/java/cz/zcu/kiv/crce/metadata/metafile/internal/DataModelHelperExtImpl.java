@@ -278,6 +278,9 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
     }
 
     private static void toXml(XmlWriter w, Resource resource, boolean metafile) throws IOException {
+        if (resource == null || w == null) {
+            return;
+        }
         String version = resource.getVersion().toString();
         if (metafile && "0.0.0".equals(version)) {
             version = null;
@@ -325,6 +328,9 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
     }
 
     private static void toXml(XmlWriter w, Capability capability) throws IOException {
+        if (capability == null || w == null) {
+            return;
+        }
         w.element(RepositoryParser.CAPABILITY).attribute(RepositoryParser.NAME, capability.getName());
         Property[] props = capability.getProperties();
         for (int j = 0; props != null && j < props.length; j++) {
@@ -334,6 +340,9 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
     }
 
     private static void toXml(XmlWriter w, Property property) throws IOException {
+        if (property == null || w == null) {
+            return;
+        }
         w.element(RepositoryParser.P)
                 .attribute(RepositoryParser.N, property.getName())
                 .attribute(RepositoryParser.T, property.getType() == Type.STRING ? null : property.getType())
@@ -342,17 +351,25 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
     }
 
     private static void toXml(XmlWriter w, Requirement requirement) throws IOException {
+        if (requirement == null || w == null) {
+            return;
+        }
         w.element(RepositoryParser.REQUIRE)
-                .attribute(RepositoryParser.NAME, requirement.getName())
-                .attribute(RepositoryParser.FILTER, requirement.getFilter())
-                .attribute(RepositoryParser.EXTEND, Boolean.toString(requirement.isExtend()))
-                .attribute(RepositoryParser.MULTIPLE, Boolean.toString(requirement.isMultiple()))
-                .attribute(RepositoryParser.OPTIONAL, Boolean.toString(requirement.isOptional()))
-                .text(requirement.getComment() != null ? requirement.getComment().trim() : "")
-                .end();
+                    .attribute(RepositoryParser.NAME, requirement.getName())
+                    .attribute(RepositoryParser.FILTER, requirement.getFilter())
+                    .attribute(RepositoryParser.EXTEND, Boolean.toString(requirement.isExtend()))
+                    .attribute(RepositoryParser.MULTIPLE, Boolean.toString(requirement.isMultiple()))
+                    .attribute(RepositoryParser.OPTIONAL, Boolean.toString(requirement.isOptional()));
+        if (requirement.getComment() != null) {
+            w.text(requirement.getComment().trim());
+        } 
+        w.end();
     }
     
     private static void toXml(XmlWriter w, Repository repository) throws IOException {
+        if (repository == null || w == null) {
+            return;
+        }
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmss.SSS");
         w.element(RepositoryParser.REPOSITORY)
                 .attribute(RepositoryParser.NAME, repository.getName())

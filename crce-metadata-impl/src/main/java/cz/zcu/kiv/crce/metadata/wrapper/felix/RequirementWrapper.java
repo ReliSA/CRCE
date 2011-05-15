@@ -47,7 +47,7 @@ public class RequirementWrapper implements org.apache.felix.bundlerepository.Req
 
     @Override
     public boolean isSatisfied(Capability capability) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return requirement.isSatisfied(Wrapper.unwrap(capability));
     }
 
 }

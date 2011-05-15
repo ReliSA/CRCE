@@ -37,12 +37,14 @@ public class CheckServlet extends HttpServlet {
 	}
 	private Resource[] chooseFrom(HttpServletRequest req){
 		String source = (String )req.getSession().getAttribute("source");
+		System.out.println(source+"choose");
 		if(source == null) return null;
 		else if(source.equals("buffer")) return doCheck(Activator.instance().getBuffer(req).getRepository());
 		else if(source.equals("store")) return doCheck(Activator.instance().getStore().getRepository());
 		else return null;
 	}
-	private Resource[] doCheck(Repository repository) {		
+	private Resource[] doCheck(Repository repository) {
+		System.out.println(repository.getName());
 		Resource[] resources = repository.getResources();
 		ArrayList<Resource> ext = new ArrayList<Resource>();
 		ResourceCreator rc = Activator.instance().getCreator();
@@ -59,14 +61,17 @@ public class CheckServlet extends HttpServlet {
 				if(ext.indexOf(r.getResource())>0)
 				{
 					ext.get(ext.indexOf(r.getResource())).addRequirement(r.getRequirement());
+					System.out.println("found");
 				}
 				
 			}
+			System.out.println(ext.size());
 			return ext.toArray(new Resource[ext.size()]);
 
 		}
 		else
 		{
+			System.out.println("noproblemo");
 			return resources;
 		}
 	}
