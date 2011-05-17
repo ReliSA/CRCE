@@ -42,8 +42,11 @@
 				<c:set scope="session" var="source" value="plugins"/>		
 			</c:when>
 		</c:choose>
+		
 		  	
 	  	<div id="hlavicka">
+	  	
+	  	<!-- 
 	  		<div class="logo_img"><a href="resource"><img src="graphic/crce.png" alt="logo" /></a></div>
 	  		<div class="nazev">Software components storage</div>
 	      
@@ -53,15 +56,25 @@
 					<input class="tlacitko" type="submit" value="Search" />
 		        </form>
 			</div>
+		 -->
+		 
+		 <div class="loga_h"></div>
+		 
 	  	</div>
 	  	<div class="konec"></div>
-    
-	    <ul id="menu" class="vycisteni">
-	    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Store</a></li>
-	    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
-	    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
-	    </ul>
-	    
+    	<div id="menu">
+		    <ul class="vycisteni">
+		    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Store</a></li>
+		    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
+		    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
+		    </ul>
+		    <div class="vyhledavani_h">
+			        <form method="post" action="resource">
+						<input class="text" type="text" name="filter" />
+						<input class="tlacitko" type="submit" value="OK" />
+			        </form>
+			</div>
+	    </div>
 	    <c:if test="${not empty success}">
 	    	<c:choose>
 				<c:when test="${success == true}">

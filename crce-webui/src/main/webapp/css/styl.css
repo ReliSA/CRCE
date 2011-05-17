@@ -3,7 +3,7 @@
 body {
   margin: 0 auto;
   text-align: center;
-  font-family: Arial;
+  font-family: Verdana;
 }
 
 img {
@@ -48,15 +48,24 @@ h3 {
 #stranka {
   width: 902px;
   margin: 0 auto;
+  margin-top: 20px;
   border: 1px solid #AAA;
 }
 
 /*--------------------HLAVICKA----------------------------------------*/
+
 #hlavicka {
   /*border: 1px solid black;*/
   width: 100%;
+  background: url('../graphic/hlavicka_bg.png') no-repeat;
   text-align: left;
+  padding: 26px 0px;
 }
+
+#hlavicka .loga_h {
+	height: 90px;
+	background: url('../graphic/hlavicka_loga.png') no-repeat;
+	}
 
 #hlavicka .logo_img {
   float: left;
@@ -76,11 +85,13 @@ h3 {
   margin: 5px 0px 5px 12px;
 }
 
+
+
 #hlavicka .vyhledavani {
   float: right;
   width: 250px;
   text-align: right;
-  /*border: 1px solid black;*/
+  border: 1px solid black;*/
   margin: 10px 15px 0 0;
 }
 
@@ -106,37 +117,73 @@ h3 {
 }
 
 /*--------------------MENU----------------------------------------*/
+
+
+#menu .vyhledavani_h {
+  float: right;
+  width: 250px;
+  height: 24px;
+  /*line-height: 20px;*/
+  text-align: right;
+  margin-right: 6px;
+  
+}
+
+#menu .vyhledavani_h .text{
+  width: 150px;
+  height: 16px;
+  color: #565c59;
+  background-color: white;
+  border: 1px solid black;
+  margin-top: 2px;
+  
+}
+
+#menu .vyhledavani_h .tlacitko{
+  width: 25px;
+  height: 18px;
+  background-color: #eeeee5;
+  color: black;
+  font-family: Verdana;
+  font-weight: normal;
+  line-height: 16px;
+  font-size: 8pt; 
+}
+
 #menu {
-  background-color: #AAA;
-  margin: 0 auto;
-  padding: 0;
-  border-top: 1px solid #666;
-  border-bottom: 1px solid #666;
+  background: url('../graphic/menu_bg.png') repeat-x;
+  height: 24px;
+  
+}
+
+#menu ul {
+	padding: 0px;
+	margin: 0px;
+	float: left;
 }
 
 #menu li {
-  float: left;
   display: inline;
-  list-style-type: none;
-  text-align: center;
+  list-style: none;
+  padding: 0px 10px;
 }
 
-#menu li a {
+#menu li a:link,
+#menu li a:visited,
+#menu li a:active,
+#menu li a:hover {
+	
   text-decoration: none;
-  color: #222;
-  float: left;
-  display: inline;
-  padding: 3px 20px;
+  color: white;
   font-weight: bold;
-  font-size: 1.1em;
-  border-right: 2px solid #444;
+  font-size: 0.7em;
 }
 
 #menu li a:hover {
-  color: #EEE;
+  text-decoration: underline;
 }
 #menu li a.aktivni {
-  color: #FFF;
+  color: #c0c0a0;
 }
 
 /* Vycisteni menu */
@@ -162,16 +209,17 @@ h3 {
 	text-align: center;
 	width: 100%;
 	margin: 0 auto;
+	padding: 3px 0px;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 0.7em;
 }
 
 .uspech {
-	background-color: green;
+	background-color: #b2c980;
 }
 	
 .neuspech {
-	background-color: red;
+	background-color: #f86965;
 }
 
 /*--------------------TELO----------------------------------------*/
@@ -180,7 +228,7 @@ h3 {
   padding: 10px 0 10px 0;
   text-align: left;
   margin: 0 auto;
-  background-color: #EEE;
+  background-color: #EEEEE5;
 }
 
 .pridat {
@@ -196,68 +244,128 @@ h3 {
   overflow: hidden;
 }
 
-.komponenta .nadpis {
+.komponenta div.nadpis {
   /*border: 1px solid black;*/
-  background-color: #CCC;
-  padding: 1px 10px 1px 10px;
+  background: url('../graphic/heading-bg.png') repeat-x;
+  height: 21px;
+  line-height: 21px; 
+  padding: 0px 10px 0px 10px;
+  font-weight: bold;
+  font-size: 0.7em;
 }
 
 .komponenta .nadpis .popis {
-  width: 740px;
-  float: left;
+width: 740px;
+height: 21px;
+line-height: 21px; 
+float: left;
+border: 0px solid black;
+}
+
+.komponenta .nadpis .popis a {
+  width: 100%;
   /*padding: 0 0 0 10px;*/
   text-decoration: none;
-  font-weight: bold;
-  font-size: 1em;
-  color: #222;
+  
+  /*color: #222;*/
   /*border: 1px solid black;*/
 }
 
+.komponenta .nadpis .popis a:hover {
+text-decoration: underline;	
+}
+
 .komponenta .nadpis:hover {
-  background-color: #777;
+  /*background-color: #777;*/
 }
 
 .komponenta .nadpis .popis .sName {
-  color: black;
+  color: #7b847c;
+  font-style: italic;
+  margin-left: 10px;
+  font-size: 0.9em;
 }
 
 .komponenta .nadpis .popis .version {
-  color: #20b2aa;
+  color: #464a47;
+  margin-left: 10px;
+}
+
+.komponenta .nadpis .popis .version_obsah {
+  color: #7b847c;
 }
 
 .komponenta .nadpis .popis .pName {
-  color: #000080;
+  color: #464a47;
+   
 }
 
 .komponenta .nadpis .popis .category {
-  color: #0000ff;
+  color: #464a47;
+}
+
+.komponenta .nadpis .popis .category_obsah {
+  color: #7b847c;
 }
 
 .komponenta .nadpis .nabidka {
   float: right;
   text-align: right;
-  /*padding: 0 10px 0 0;*/
-  /*border: 1px solid black;*/
+  margin: 2px 0 0 0;
+  border: 0px solid black;
   width: 120px;
+  height: 19px;
+  line-height: 19px;
 }
 
 .komponenta .informace {
   /*border: 1px solid black;*/
-  background-color: #EEE;
+  /*background-color: #EEE;*/
   padding: 5px 10px 5px 10px;
+  font-size: 0.8em;
+}
+
+.komponenta .polozka {
+color: #464a47;
+padding-bottom: 10px;
+}
+
+.komponenta .polozka li {
+font-size: 0.9em;	
+}
+
+.komponenta a.edit {
+text-decoration: underline;
+font-size: 0.8em;
+}
+
+.komponenta a.edit:hover {
+text-decoration: none;	
+}
+
+.komponenta .polozka .inline {
+margin-bottom: 10px;	
+}
+
+.komponenta .polozka .inline li {
+float: left;
+padding-left: 5px;
+list-style: none;
 }
 
 /*--------------------POSKYTUJE-------------------------*/
 
 .poskytuje {
-	padding: 10px;
+	padding: 5px;
 	width: 100%;
 	margin: 0 auto;
+	
 }
 
 .poskytuje th {
 	text-align: left;
 	font-weight: bold;
+	
 }
 
 .poskytuje .text {
@@ -281,7 +389,8 @@ h3 {
 .vyzaduje {
 	padding: 10px;
 	width: 100%;
-	margin: 0 auto;	
+	margin: 0 auto;
+	font-size: 0.9em;	
 }
 
 .komponenta .vyzaduje {
@@ -297,6 +406,7 @@ h3 {
 .vyzaduje th {
 	text-align: left;
 	font-weight: bold;
+	background: #f5f5f1;
 }
 
 .vyzaduje .text {
@@ -311,6 +421,8 @@ h3 {
 .vyzaduje .komentar {
 	width: 98%;
 	padding: 0 0 10px 0;
+	font-size: 0.9em;
+	font-style: italic;
 }
 
 .vyzaduje .jmeno {
@@ -328,6 +440,8 @@ h3 {
   font-size: 0.8em;
   padding-top: 5px;
   text-align: right;
+  border: 0px solid black;
+  
 }
 
 /*--------------------PATICKA----------------------------------------*/
@@ -345,25 +459,39 @@ h3 {
 
 .tlacitko {
   text-align: center;
-  background-color: #666;
-  border: 1px solid #AAA;
-  color: #FFF; 
-  font-weight: bold;
+  /*background-color: #666;*/
+  background: #ddddca;
+  /*border: 1px solid #AAA;*/
+  border: 1px solid #c8b8b5;
+  color: #000; 
+  font-size: 0.8em;
+  
 }
 
 .tlacitko:hover {
-  color: #222;
-  background-color: #BBB;
+  /*color: #222;*/
+  background-color: #FFF;
+}
+
+div.tlac {
+float: left;
+margin-right: 5px;
 }
 
 /*----------------UPLOAD---------------------------------------------*/
 
-.upload {
-	padding: 5px;
-	width: 880px;
-	margin: 0 auto;
-	margin-bottom: 10px;
-	background-color: #999;
+div.upload {
+background-color: #999;
+margin-bottom: 10px;
+padding: 5px;
+	}
+
+table.upload {
+	
+	/*width: 880px;*/
+	/*margin: 0 auto;*/
+	
+	
 }
 
 .upload td {
@@ -372,15 +500,15 @@ h3 {
 }
 
 .upload .text {
-  width: 95%;
+  width: 400px;
   color: #222;
   background-color: #FFF;
   border: 1px solid #AAA;
 }
 
 .upload .tlacitko {
-	width: 200px;
-	font-size: 1.1em;
+	/*width: 200px;*/
+	font-size: 0.8em;
 }
 /*--------------------FORMULAR----------------------------------------*/
 
