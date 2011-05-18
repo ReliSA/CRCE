@@ -64,7 +64,7 @@
 	  	<div class="konec"></div>
     	<div id="menu">
 		    <ul class="vycisteni">
-		    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Store</a></li>
+		    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Repository</a></li>
 		    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
 		    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
 		    </ul>
