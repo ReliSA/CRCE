@@ -20,8 +20,8 @@
 	  			</div>
 	  			<div class="informace">
 	  				<div class="polozka"><strong>Description:</strong> ${plugin.pluginDescription}</div>	
-	  				<div class="polozka"><strong>Priority:</strong> ${plugin.pluginPriority}</div>
-	  				<div class="polozka"><strong>Version:</strong> ${plugin.pluginVersion}</div>
+	  				<div class="polozka"><strong>Priority:</strong> ${plugin.pluginPriority} <a class="edit" href="edit?type=ZADAT&uri=${resource.uri}" title="edit plugin priority">[edit]</a></div>
+	  				<div class="polozka"><strong>Version:</strong> ${plugin.pluginVersion} <a class="edit" href="edit?type=ZADAT&uri=${resource.uri}" title="edit plugin version">[edit]</a></div>
 	  				<div class="polozka"><strong>Keywords:</strong> 
 	  					<ul>
 	  						<c:forEach items="${plugin.pluginKeywords}" var="keyword">

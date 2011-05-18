@@ -8,7 +8,7 @@
   	
 		<h2>Add new category</h2>
 		
-		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
+		<h3><strong>Resource:</strong> ${resource.presentationName} - ${resource.version}</h3>
 		
 		<form name="addCategory" action="#" method="post">
 			<input type="hidden" name="form" value="addCategory" />
