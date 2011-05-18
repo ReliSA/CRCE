@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -25,6 +26,9 @@ import java.util.List;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 /**
@@ -32,7 +36,7 @@ import org.osgi.service.log.LogService;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
-public class BufferImpl implements Buffer {
+public class BufferImpl implements Buffer, EventHandler {
 
     private volatile BundleContext m_context;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
@@ -53,7 +57,13 @@ public class BufferImpl implements Buffer {
     /*
      * Called by dependency manager
      */
+    @SuppressWarnings({"UseOfObsoleteCollectionType", "unchecked"})
     void init() {
+        Dictionary props = new java.util.Hashtable();
+        props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
+        props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
+        m_context.registerService(EventHandler.class.getName(), this, props);
+        
         m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
         if (!m_baseDir.exists()) {
             m_baseDir.mkdirs();
@@ -64,19 +74,20 @@ public class BufferImpl implements Buffer {
             throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
         }
         
-        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
-        
-        try {
-            m_repository = rd.getRepository(m_baseDir.toURI());
-        } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
-        }
+//        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
+//        
+//        try {
+//            m_repository = rd.getRepository(m_baseDir.toURI());
+//        } catch (IOException ex) {
+//            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
+//        }
     }
 
     /*
      * Called by dependency manager
      */
-    void stop() {
+    synchronized void stop() {
+        m_repository = null;
         for (File file : m_baseDir.listFiles()) {
             if (!file.delete()) {
                 file.deleteOnExit();
@@ -89,8 +100,38 @@ public class BufferImpl implements Buffer {
         }
     }
     
+    
+    @Override
+    public void handleEvent(final Event event) {
+        final Object lock = this;
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                m_log.log(LogService.LOG_WARNING, "Buffer handles event:" + event.getProperty(PluginManager.PROPERTY_PLUGIN_ID) + ", ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
+                synchronized (lock) {
+                    m_repository = null;
+                }
+            }
+        }).start();
+    }
+
+    private synchronized void loadRepository() {
+        m_log.log(LogService.LOG_WARNING, "loadRepository() with ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
+
+        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
+        
+        try {
+            m_repository = rd.getRepository(m_baseDir.toURI());
+        } catch (IOException ex) {
+            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
+            m_repository = m_pluginManager.getPlugin(ResourceCreator.class).createRepository(m_baseDir.toURI());
+        }
+    }
+    
     @Override
     public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
+        m_log.log(LogService.LOG_WARNING, "ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
         if (name == null || artifact == null || "".equals(name)) {
             return null;
         }
@@ -135,6 +176,9 @@ public class BufferImpl implements Buffer {
             resource = tmp;
         }
         
+        if (m_repository == null) {
+            loadRepository();
+        }
         Version version = resource.getVersion();
         for (int i = 2; !m_repository.addResource(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
@@ -157,9 +201,9 @@ public class BufferImpl implements Buffer {
         resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
         
         if (!isInBuffer(resource)) {
-            if (m_repository.contains(resource)) {
-                m_log.log(LogService.LOG_WARNING, "Removing resource is not in buffer but it is in internal repository: " + resource.getId());
-                // TODO remove from repo
+            if (m_repository != null && m_repository.contains(resource)) {
+                m_log.log(LogService.LOG_WARNING, "Resource to be removed is not in buffer but it is in internal repository: " + resource.getId());
+                m_repository.removeResource(resource);
             }
             return false;
         }
@@ -177,6 +221,9 @@ public class BufferImpl implements Buffer {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
             // to keep consistency of repository with stored artifact files
+            if (m_repository == null) {
+                loadRepository();
+            }
             if (!m_repository.removeResource(resource)) {
                 m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
             }
@@ -225,6 +272,9 @@ public class BufferImpl implements Buffer {
         
         // remove resources from buffer
         if (move) {
+            if (m_repository == null) {
+                loadRepository();
+            }
             for (Resource resource : resourcesToRemove) {
                 File resourceFile = new File(resource.getUri());
                 if (resourceFile.exists()) {
@@ -256,7 +306,10 @@ public class BufferImpl implements Buffer {
     }
 
     @Override
-    public synchronized Repository getRepository() {
+    public Repository getRepository() {
+        if (m_repository == null) {
+            loadRepository();
+        }
         return m_repository;
     }
 

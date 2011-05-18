@@ -9,13 +9,16 @@ public interface PluginManager {
 
     public static final String NO_KEYWORDS = "";
     
-    public static final String TOPIC_REGISTERED = PluginManager.class.getName().replace(".", "/") + "/REGISTERED";
-    public static final String TOPIC_UNREGISTERED = PluginManager.class.getName().replace(".", "/") + "/UNREGISTERED";
-    public static final String TOPIC_CONFIGURED = PluginManager.class.getName().replace(".", "/") + "/CONFIGURED";
+    public static final String TOPIC_PLUGIN_REGISTERED = PluginManager.class.getName().replace(".", "/") + "/REGISTERED";
+    public static final String TOPIC_PLUGIN_UNREGISTERED = PluginManager.class.getName().replace(".", "/") + "/UNREGISTERED";
+    public static final String TOPIC_PLUGIN_CONFIGURED = PluginManager.class.getName().replace(".", "/") + "/CONFIGURED";
     
-    public static final String EVENT_PLUGIN_ID = "id";
-    public static final String EVENT_PLUGIN_TYPES = "types";
-    public static final String EVENT_PLUGIN_PRIORITY = "priority";
+    public static final String PROPERTY_PLUGIN_ID = "id";
+    public static final String PROPERTY_PLUGIN_VERSION = "version";
+    public static final String PROPERTY_PLUGIN_PRIORITY = "priority";
+    public static final String PROPERTY_PLUGIN_DESCRIPTION = "description";
+    public static final String PROPERTY_PLUGIN_KEYWORDS = "keywords";
+    public static final String PROPERTY_PLUGIN_TYPES = "types";
     
     /**
      * Returns all registered plugins ordered by their priority.
