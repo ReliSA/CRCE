@@ -272,7 +272,8 @@ border: 0px solid black;
 }
 
 .komponenta .nadpis .popis a:hover {
-text-decoration: underline;	
+text-decoration: underline;
+color: #BBB;
 }
 
 .komponenta .nadpis:hover {
@@ -432,6 +433,10 @@ list-style: none;
 .vyzaduje .filter {
 	width: 600px;
 }
+
+.vyzaduje td.req-neuspech {
+color: #f86965;
+	}
 
 /*---------------ANIMACNI_ODKAZY---------------------------------------*/
 #animacni_odkazy {
