@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.osgi.service.log.LogService;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -81,7 +83,7 @@ public class RuntimeServlet extends HttpServlet {
 	
 	private boolean storeBufferAction(HttpServletRequest req){
 		String source = (String) req.getSession().getAttribute("source");
-		System.out.println(source);
+		Activator.instance().getLog().log(LogService.LOG_DEBUG, source);
 		if(source!=null && (source.equals("buffer") || source.equals("store"))) return true;
 		else return false;
 	}

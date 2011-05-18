@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.log.LogService;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 
 public class DownloadServlet extends HttpServlet {
@@ -67,7 +69,7 @@ public class DownloadServlet extends HttpServlet {
 				{
 					Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
 					Resource found = EditServlet.findResource(fileUri, array);
-					System.out.println("Found!"+found.getPresentationName());
+					Activator.instance().getLog().log(LogService.LOG_DEBUG, "Found!"+found.getPresentationName());
 					doDownload(req ,resp ,found);
 				}
 				else failed=true;
