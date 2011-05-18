@@ -145,7 +145,7 @@
   		<c:if test="${not empty buffer}">
   		<form class="execute_commit" method="post" action="download">
   			<div class="tlac">
-  			<input class="tlacitko" type="submit" value="commit all" />
+  			<input class="tlacitko" type="submit" value="commit all to repository" />
   			</div>
   		</form>
   		</c:if>
