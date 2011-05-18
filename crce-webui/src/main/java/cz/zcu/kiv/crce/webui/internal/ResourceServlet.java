@@ -35,6 +35,10 @@ public class ResourceServlet extends HttpServlet {
 				fillSession(source,req,filter);
 				req.getRequestDispatcher("jsp/"+source+".jsp").forward(req, resp);
 			}
+			else
+			{				
+				doGet(req,resp);
+			}
 			
 			
 

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.felix.dm.impl.Logger;
 import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -35,9 +36,11 @@ public class RuntimeServlet extends HttpServlet {
 			else{
 				if (message==null) message="No bundles selected";
 				ResourceServlet.setError(req.getSession(), false, message);
-				req.getRequestDispatcher("resource?link="+req.getSession().getAttribute("source"));
+				req.getRequestDispatcher("jsp/"+req.getSession().getAttribute("source")+".jsp").forward(req, resp);
 			}
 		}
+		ResourceServlet.setError(req.getSession(), false, "Wrong params!");
+		req.getRequestDispatcher("resource").forward(req, resp);
 		
 	}
 	
@@ -64,6 +67,7 @@ public class RuntimeServlet extends HttpServlet {
 		
 		
 		String[] uris = (String [])req.getParameterValues("check");
+		if(uris==null || uris.length==0) return null;		
 		Resource[] array = fetchRightArray((String)req.getSession().getAttribute("source"),req);
 		Resource[] toTest = new Resource[uris.length];
 		for(int i=0;i<uris.length;i++){		
