@@ -8,6 +8,7 @@ import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import java.net.URI;
+import java.util.Map;
 
 /**
  *
@@ -38,11 +39,21 @@ public class ConvertedResource extends ResourceImpl implements Resource { // TOD
         }
         
         setSymbolicName(resource.getSymbolicName());
-        setPresentationName(resource.getPresentationName());
-        
-//        resource.getProperties(); // TODO
-        
+        setVersion(resource.getVersion());
         setSize(resource.getSize() != null ? resource.getSize() : 0);
+        
+        Map properties = resource.getProperties();
+        for (Object o : properties.keySet()) {
+            String key = (String) o;
+            if (!org.apache.felix.bundlerepository.Resource.SYMBOLIC_NAME.equals(key) &&
+                    !org.apache.felix.bundlerepository.Resource.VERSION.equals(key) &&
+                    !org.apache.felix.bundlerepository.Resource.SIZE.equals(key) &&
+                    !org.apache.felix.bundlerepository.Resource.CATEGORY.equals(key)) {
+                setProperty(key, String.valueOf(properties.get(key)));
+            }
+        }
+        
+        
         try {
             setUri(new URI(resource.getURI()));
         } catch (Exception ex) {

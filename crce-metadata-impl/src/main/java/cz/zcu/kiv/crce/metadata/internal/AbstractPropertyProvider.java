@@ -27,18 +27,18 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
     
     @Override
     public synchronized Property getProperty(String name) {
-        return m_map.get(name.toLowerCase());
+        return m_map.get(name);
     }
 
     @Override
     public synchronized String getPropertyString(String name) {
-        Property property = m_map.get(name.toLowerCase());
+        Property property = m_map.get(name);
         return property == null ? null : property.toString();
     }
 
     @Override
     public synchronized T setProperty(Property property) {
-        m_map.put(property.getName().toLowerCase(), property);
+        m_map.put(property.getName(), property);
         return getThis();
     }
 
@@ -97,16 +97,16 @@ public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> im
 
     private PropertyImpl obtainProperty(String name) {
         Property prop;
-        if ((prop = m_map.get(name.toLowerCase())) == null) {
+        if ((prop = m_map.get(name)) == null) {
             prop = new PropertyImpl(name);
-            m_map.put(name.toLowerCase(), prop);
+            m_map.put(name, prop);
         }
         return (PropertyImpl) prop;
     }
 
     @Override
     public synchronized T unsetProperty(String name) {
-        m_map.remove(name.toLowerCase());
+        m_map.remove(name);
         return getThis();
     }
 }

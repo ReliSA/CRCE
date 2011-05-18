@@ -22,6 +22,9 @@ public class PropertyImpl implements Property {
     private String m_value;
 
     public PropertyImpl(String name) {
+        if (name == null) {
+            name = "null";
+        }
         m_name = name.intern();
     }
 

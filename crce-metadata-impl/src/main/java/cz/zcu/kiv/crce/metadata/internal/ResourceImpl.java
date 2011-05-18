@@ -215,7 +215,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
 
     @Override
     public void addCategory(String category) {
-        if (isWritable() && category != null) {
+        if (isWritable() && category != null && !"".equals(category.trim())) {
             synchronized (m_categories) {
                 m_categories.add(category);
             }

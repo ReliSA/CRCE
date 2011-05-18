@@ -292,13 +292,24 @@ public class DataModelHelperExtImpl implements DataModelHelperExt {
                 .attribute(URI, metafile ? null : getRelativeUri(resource, URI))
                 .attribute(VERSION, version);
 
-        w.textElement(DESCRIPTION, resource.getPropertiesMap().get(DESCRIPTION))
-                .textElement(SIZE, resource.getPropertiesMap().get(SIZE))
-                .textElement(DOCUMENTATION_URI, getRelativeUri(resource, DOCUMENTATION_URI))
-                .textElement(SOURCE_URI, getRelativeUri(resource, SOURCE_URI))
-                .textElement(JAVADOC_URI, getRelativeUri(resource, JAVADOC_URI))
-                .textElement(LICENSE_URI, getRelativeUri(resource, LICENSE_URI));
-
+        for (Property property : resource.getProperties()) {
+            String name = property.getName();
+            String value = property.getValue();
+            Type type = property.getType();
+            if (!name.equals(ID) &
+                    !name.equals(SYMBOLIC_NAME) &
+                    !name.equals(PRESENTATION_NAME) &
+                    !name.equals(URI) &
+                    !name.equals(VERSION)) {
+                    w.element(name)
+                            .attribute("type", type != null ? type : "null")
+                            .text(value != null ? value : "null")
+                            .end();
+                    
+                    
+            }
+        }
+            
         String[] categories = resource.getCategories();
         for (int i = 0; categories != null && i < categories.length; i++) {
             w.element(RepositoryParser.CATEGORY).attribute(RepositoryParser.ID, categories[i])
