@@ -10,7 +10,9 @@
 		<c:forEach items="${plugins}" var="plugin">
 			<div class="komponenta">
 	  			<div class="nadpis">
-	  				<a class="popis" href="#">${plugin.pluginId}</a>
+	  				<div class="popis">
+	  				<a class="" href="#"><span class="pName">${plugin.pluginId}</span></a>
+	  				</div>
 	  				<div class="nabidka">
 			            <a href="#"><img src="graphic/edit.png" alt="edit" title="Edit plugin ${plugin.pluginId}" /></a>
 	          		</div>
