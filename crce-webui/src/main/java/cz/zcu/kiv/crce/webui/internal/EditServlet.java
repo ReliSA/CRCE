@@ -57,7 +57,7 @@ public class EditServlet extends HttpServlet {
 				}
 			}
 		} else if ("addRequirement".equals(form)) {
-			if (addRequirementForm(req,resp, parameters)) {
+			if (!addRequirementForm(req,resp, parameters)) {
 				ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
 				success = true;
 			}
@@ -253,6 +253,10 @@ public class EditServlet extends HttpServlet {
 					if(parameters.containsKey("extend")) {
 						extend = (((String[]) parameters.get("extend"))[0]).equals("on");
 					}
+					String comment = null;
+					if(parameters.containsKey("comment")) {
+						comment  = (((String[]) parameters.get("comment"))[0]);
+					}
 					int lengthBefore = resource.getRequirements().length;
 					requir = resource.createRequirement(name);
 					if (lengthBefore == resource.getRequirements().length) {
@@ -269,6 +273,7 @@ public class EditServlet extends HttpServlet {
 					requir.setMultiple(multiple);
 					requir.setOptional(optional);
 					requir.setExtend(extend);
+					requir.setComment(comment);
 				}
 				PluginManager pm = Activator.instance().getPluginManager();
 				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
@@ -336,7 +341,6 @@ public class EditServlet extends HttpServlet {
 					capability.setProperty(propBefore);
 					req.getSession().setAttribute("success", false);
 					req.getSession().setAttribute("message", "Cannot change property.");
-					System.err.println("Cannot change property.");
 				}
 				}
 			PluginManager pm = Activator.instance().getPluginManager();
@@ -378,6 +382,7 @@ public class EditServlet extends HttpServlet {
 			String name = null;
 			Requirement requir = null;
 			String filter = null;
+			String comment = null;
 			boolean multiple = false;
 			boolean extend = false;
 			boolean optional = false;
@@ -398,14 +403,16 @@ public class EditServlet extends HttpServlet {
 					}
 					if(parameters.containsKey("extend_" + (i + 1))) {
 						extend = (((String[]) parameters.get("extend_" + (i + 1)))[0]).equals("on");
-					}					
+					}
+					if(parameters.containsKey("comment_" + (i + 1))) {
+						comment = (((String[]) parameters.get("comment_" + (i + 1)))[0]);
+					}
 //					requirBefore = requirements[i];
 					requirLengthBefore = requirements.length;
 					resource.unsetRequirement(requirements[i]);
 					if(requirLengthBefore == resource.getRequirements().length){
 						req.getSession().setAttribute("success", false);
 						req.getSession().setAttribute("message", "Cannot change requirement.");
-						System.err.println("Cannot change requirement.");
 						continue;
 					}
 					
@@ -415,7 +422,6 @@ public class EditServlet extends HttpServlet {
 					} catch (IllegalArgumentException e) {
 						req.getSession().setAttribute("success", false);
 						req.getSession().setAttribute("message", "Cannot change requirement.");
-						System.err.println("Cannot change requirement.");
 						resource.unsetRequirement(requir);
 						resource.addRequirement(requirBefore);
 						continue;
@@ -423,6 +429,7 @@ public class EditServlet extends HttpServlet {
 					requir.setMultiple(multiple);
 					requir.setOptional(optional);
 					requir.setExtend(extend);
+					requir.setComment(comment);
 //					resource.addRequirement(requir);
 				}
 			}
