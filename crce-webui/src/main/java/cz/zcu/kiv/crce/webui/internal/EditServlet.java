@@ -464,8 +464,8 @@ public class EditServlet extends HttpServlet {
 					requirLengthBefore = requirements.length;
 					resource.unsetRequirement(requirements[i]);
 					if(requirLengthBefore == resource.getRequirements().length){
-						req.getSession().setAttribute("success", false);
-						req.getSession().setAttribute("message", "Cannot change requirement.");
+//TODO						req.getSession().setAttribute("success", false);
+//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
 						continue;
 					}
 					
@@ -473,8 +473,8 @@ public class EditServlet extends HttpServlet {
 					try {
 						requir.setFilter(filter);
 					} catch (IllegalArgumentException e) {
-						req.getSession().setAttribute("success", false);
-						req.getSession().setAttribute("message", "Cannot change requirement.");
+//TODO						req.getSession().setAttribute("success", false);
+//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
 						resource.unsetRequirement(requir);
 						resource.addRequirement(requirBefore);
 						continue;
