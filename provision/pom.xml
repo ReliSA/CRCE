@@ -133,7 +133,7 @@
             <optional>true</optional>
         </dependency>-->
 
-        <!-- === JACC === -->
+        <!-- === JaCC === -->
 
         <dependency>
             <groupId>cz.zcu.kiv.jacc</groupId>

@@ -56,7 +56,7 @@
         
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
-<!--        <module>crce-metadata-cosi-bundle</module>-->
+        <module>crce-metadata-cosi-bundle</module>
         
         <!-- UI & Optional Plugins -->
         <module>crce-handler-versioning</module>

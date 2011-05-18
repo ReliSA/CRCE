@@ -7,41 +7,46 @@
   	<div id="telo">
   	  
 		<form method="post" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
-		<table class="upload">
-			<tr>
-				<td><input class="text" type="file" name="bundle"/></td>
-				<td><input class="tlacitko" type="submit" value="Upload"/></td>
-			</tr>
-		</table>
+		<div class="upload">
+			<table class="upload">
+				<tr>
+					<td><input class="text" type="file" name="bundle"/></td>
+					<td><div class="tlac"><input class="tlacitko" type="submit" value="Upload"/></div></td>
+				</tr>
+			</table>
+		</div>
 		</form>
   	   	
 		<form class="execute_commit" method="post" action="test">
   	       
 		<c:forEach items="${buffer}" var="resource">
-			<div class="komponenta 
+			<div class="komponenta
+				
 				<c:catch var="exception">${resource.satisfied}</c:catch>
 				<c:if test="${empty exception}">
 					<c:choose>
 						<c:when test="${resource.satisfied == true}">
-							uspech		
+							uspech1	
 						</c:when>
 						<c:when test="${resource.satisfied == false}">
-							neuspech
+							neuspech1
 						</c:when>
 					</c:choose>
 				</c:if>
 			">
 	  			<div class="nadpis">
-	  				<a class="popis" href="#">
-	  					<span class="sName">${resource.symbolicName}</span> 
-	  					<span class="version">${resource.version}</span> 
+	  				<div class="popis">
+	  				<a class="" href="#">
 	  					<span class="pName">${resource.presentationName}</span>
-	  					<span class="category">
+	  					<span class="sName">(${resource.symbolicName})</span> 
+	  					<span class="version">ver: </span><span class="version_obsah">${resource.version}</span> 
+	  					<span class="category">cats: </span><span class="category_obsah">
 	  						<c:forEach items="${resource.categories}" var="category">
 	  							${category}
 	  						</c:forEach>
 	  					</span>
 	  				</a>
+	  				</div>
 	  				<div class="nabidka">	  					
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=buffer"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
@@ -129,17 +134,22 @@
 	  		</div>
   		</c:if>
 			
-			<c:if test="${not empty buffer}">  		
-  				<input class="tlacitko" type="submit" value="EXECUTE TESTS ON CHECKED" />
+			<c:if test="${not empty buffer}">
+				<div class="tlac">  		
+  				<input class="tlacitko" type="submit" value="execute tests on selected" />
+  				</div>
   			</c:if>
   		
   		</form>
   		
   		<c:if test="${not empty buffer}">
   		<form class="execute_commit" method="post" action="download">
-  			<input class="tlacitko" type="submit" value="COMMIT ALL"/>
+  			<div class="tlac">
+  			<input class="tlacitko" type="submit" value="commit all" />
+  			</div>
   		</form>
   		</c:if>
+  		<div class="vycisteni"></div>
   	</div>
   
 <jsp:include page="include/footer.jsp" flush="true" />

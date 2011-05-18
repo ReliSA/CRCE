@@ -19,6 +19,7 @@ public class ResourceExt extends ResourceWrap {
 	
 	@Override
 	public void addRequirement(Requirement requirement) {
+		satisfied=false;
 		r.unsetRequirement(requirement);
 		RequirementExt rext = new RequirementExt(requirement);
 		r.addRequirement(rext);
