@@ -99,12 +99,65 @@ public class EditServlet extends HttpServlet {
 				ResourceServlet.setError(req.getSession(), false, "Error while loading capabilities.");
 				success = true;
 			}
+		} else if ("editProperties".equals(form)) {
+			if (!saveResourceProperty(req,resp, parameters)) {
+				ResourceServlet.setError(req.getSession(), false, "Cannot change properties.");
+			}
+			success = editProperties(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Error while loading capabilities.");
+				success = true;
+			}
 		}
 		if (!success) {
 			resp.sendError(HttpServletResponse.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
 		}
 	}
 	
+	private boolean saveResourceProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		if (parameters.containsKey("uri")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+		} else {
+			return false;
+		}
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				{
+					
+					return false;
+				}
+			}
+			Resource resource = findResource(resURI, array);
+			String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
+			String version = ((String[]) parameters.get("version"))[0];
+			
+			resource.setVersion(version);
+			resource.setSymbolicName(symbolicName);
+			
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
+		} catch (URISyntaxException e) {
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+
 	private boolean saveProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String uri = null;
@@ -572,6 +625,13 @@ public class EditServlet extends HttpServlet {
 						success = true;
 					}
 					
+		} else if("properties".equals(type)) {
+			success = editProperties(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+				success = true;
+			}
+			
 		} else {
 			success = false;
 		}
@@ -580,6 +640,30 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+
+	private boolean editProperties(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);			
+			req.getRequestDispatcher("jsp/forms/propertiesForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 
 	private boolean addCapabilityProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {

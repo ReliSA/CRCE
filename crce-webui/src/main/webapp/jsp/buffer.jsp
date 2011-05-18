@@ -56,7 +56,7 @@
 	  				<div class="konec"></div>
 	  			</div>
 	  			<div class="informace">
-	  				<div class="polozka"><strong>Properties: </strong> <a href="#" title="edit properties"><img src="graphic/edit.png" alt="edit properties" title="edit properties"/> Edit</a> 
+	  				<div class="polozka"><strong>Properties: </strong> <a href="edit?type=properties&uri=${resource.uri}" title="edit properties"><img src="graphic/edit.png" alt="edit properties" title="edit properties"/> Edit</a> 
 	  					<ul>
 	  						<li><strong>Id:</strong> ${resource.id}</li>
 	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
