@@ -10,7 +10,9 @@
 		<c:forEach items="${plugins}" var="plugin">
 			<div class="komponenta">
 	  			<div class="nadpis">
-	  				<a class="popis" href="#">${plugin.pluginId}</a>
+	  				<div class="popis">
+	  				<a class="" href="#"><span class="pName">${plugin.pluginId}</span></a>
+	  				</div>
 	  				<div class="nabidka">
 			            <a href="#"><img src="graphic/edit.png" alt="edit" title="Edit plugin ${plugin.pluginId}" /></a>
 	          		</div>
@@ -18,8 +20,8 @@
 	  			</div>
 	  			<div class="informace">
 	  				<div class="polozka"><strong>Description:</strong> ${plugin.pluginDescription}</div>	
-	  				<div class="polozka"><strong>Priority:</strong> ${plugin.pluginPriority}</div>
-	  				<div class="polozka"><strong>Version:</strong> ${plugin.pluginVersion}</div>
+	  				<div class="polozka"><strong>Priority:</strong> ${plugin.pluginPriority} <a class="edit" href="edit?type=ZADAT&uri=${resource.uri}" title="edit plugin priority">[edit]</a></div>
+	  				<div class="polozka"><strong>Version:</strong> ${plugin.pluginVersion} <a class="edit" href="edit?type=ZADAT&uri=${resource.uri}" title="edit plugin version">[edit]</a></div>
 	  				<div class="polozka"><strong>Keywords:</strong> 
 	  					<ul>
 	  						<c:forEach items="${plugin.pluginKeywords}" var="keyword">

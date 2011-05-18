@@ -47,11 +47,13 @@ public class CheckServlet extends HttpServlet {
 	}
 	private Resource[] doCheck(Repository repository) {		
 		Resource[] resources = repository.getResources();
+		Resource[] cloned = new Resource[resources.length];
+		System.arraycopy(resources, 0, cloned, 0, resources.length);
 		ArrayList<Resource> ext = new ArrayList<Resource>();
 		HashMap<URI,Resource> extMap = new HashMap<URI,Resource>();
 		ResourceCreator rc = Activator.instance().getCreator();
 		Resolver resolver = rc.createResolver(repository);
-		for (Resource r : resources) 
+		for (Resource r : cloned) 
 		{
 			resolver.add(r);
 			r.getUri();

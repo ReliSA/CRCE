@@ -8,19 +8,19 @@
   	
 		<h2>Requirements form</h2>
 		
-		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
+		<h3><Strong>Resource:</Strong> ${resource.presentationName} - ${resource.version}</h3>
 		
 		<p>
-			<a href="edit?type=addRequirement&uri=${resource.uri}"><img src="graphic/add.png" alt="add new requirement" title="add new requirement" />Add new requirement</a><br />
+			<a class="edit-addnew" href="edit?type=addRequirement&uri=${resource.uri}"><!-- <img src="graphic/add.png" alt="add new requirement" title="add new requirement" /> -->[add new requirement]</a><br />
       	</p>
 		
 		<form action="#" method="post">
 			<input type="hidden" name="uri" value="${uri}" />
 			<input type="hidden" name="form" value="requirements" />
 			
-		<table class="vyzaduje">
+		<table class="vyzaduje formy">
 	  		<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
-	  		<tr><th colspan="5">Comment</th></tr>
+	  		<tr><th colspan="5"><i>Comment</i></th></tr><br />
 	  		<c:forEach items="${resource.requirements}" var="requirement" varStatus="counter">
 		  		<tr>
 		  			<td class="jmeno"><input class="text" type="text" name="name_${counter.count}" value="${requirement.name}" /></td>

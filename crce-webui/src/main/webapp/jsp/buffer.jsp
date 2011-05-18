@@ -56,7 +56,7 @@
 	  				<div class="konec"></div>
 	  			</div>
 	  			<div class="informace">
-	  				<div class="polozka"><strong>Properties: </strong> <a href="#" title="edit properties"><img src="graphic/edit.png" alt="edit properties" title="edit properties"/> Edit</a> 
+	  				<div class="polozka"><strong>Properties: </strong> <a href="edit?type=properties&uri=${resource.uri}" title="edit properties"><img src="graphic/edit.png" alt="edit properties" title="edit properties"/> Edit</a> 
 	  					<ul>
 	  						<li><strong>Id:</strong> ${resource.id}</li>
 	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
@@ -70,11 +70,11 @@
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Capabilities: </strong> <a href="edit?type=addCapability"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
+	  				<div class="polozka"><strong>Capabilities: </strong> <a href="edit?type=addCapability&uri=${resource.uri}"><img src="graphic/add.png" alt="add capability" title="add capability" /> Add new</a> 
 	  					<ul>
-	  						<c:forEach items="${resource.capabilities}" var="capability">
+	  						<c:forEach items="${resource.capabilities}" var="capability" varStatus="capabilityId">
 	  							<li>
-	  								${capability.name} <a href="#" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
+	  								${capability.name} <a href="edit?type=capability&uri=${resource.uri}&capabilityId=${capabilityId.count}" title="edit capability"><img src="graphic/edit.png" alt="edit capability" title="edit capability" /></a>
 	  								<table class="poskytuje">
 		  								<c:forEach items="${capability.properties}" var="property">
 		  									<tr>
@@ -88,7 +88,7 @@
 	  						</c:forEach>
 	  					</ul>
 	  				</div>
-	  				<div class="polozka"><strong>Requirements: </strong> <a href="#"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
+	  				<div class="polozka"><strong>Requirements: </strong> <a href="edit?type=requirement&uri=${resource.uri}"><img src="graphic/edit.png" alt="edit requrements" title="edit requirements" /> Edit</a> 
 						<table class="vyzaduje">
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<tr><th colspan="5">Comment</th></tr>
@@ -145,7 +145,7 @@
   		<c:if test="${not empty buffer}">
   		<form class="execute_commit" method="post" action="download">
   			<div class="tlac">
-  			<input class="tlacitko" type="submit" value="commit all" />
+  			<input class="tlacitko" type="submit" value="commit all to repository" />
   			</div>
   		</form>
   		</c:if>

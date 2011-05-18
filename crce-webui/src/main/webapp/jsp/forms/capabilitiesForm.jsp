@@ -8,11 +8,12 @@
   	
 		<h2>Capabilities form</h2>
 		
-		<h3>Resource: ${resource.presentationName} - ${resource.version}</h3>
-		<h3>Capability: ${capability.name}</h3>
+		<h3><strong>Resource:</strong> ${resource.presentationName} - ${resource.version}</h3>
+		<h3><strong>Capability:</strong> ${capability.name}</h3>
+		
 		
 		<p>
-			<a href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}"><img src="graphic/add.png" alt="add new property" title="add new property" />Add new property</a><br />
+			<a class="edit-addnew" href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}"><!-- <img src="graphic/add.png" alt="add new property" title="add new property" /> -->[add new property]</a><br />
 		</p>
       
 		<form action="#" method="post">
@@ -20,7 +21,7 @@
 			<input type="hidden" name="presentationName" value="${resource.uri}" />
 			<input type="hidden" name="capabilityId" value="${capabilityId}" />
 			
-			<table class="poskytuje">
+			<table class="poskytuje formy">
 				<tr><th>Name</th><th>Type</th><th>Value</th></tr>
 				<c:forEach items="${capability.properties}" var="property" varStatus="counter">
 		  			<tr>
@@ -39,6 +40,7 @@
 		  		<tr><td colspan="3"><input class="tlacitko" type="submit" value="Save capabilities" /></td></tr>
 	  		</table>
 		</form>
+	  
   		
   	</div>
   	

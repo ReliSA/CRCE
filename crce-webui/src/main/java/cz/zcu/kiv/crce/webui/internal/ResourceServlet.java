@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
@@ -23,7 +24,7 @@ public class ResourceServlet extends HttpServlet {
 			throws ServletException, IOException {
 			
 			String source = (String )req.getSession().getAttribute("source");
-			System.out.println(source);
+			Activator.instance().getLog().log(LogService.LOG_DEBUG, source);
 			if(source!= null && (source.equals("upload") || source.equals("commit")))
 			{
 				doGet(req,resp);
@@ -34,6 +35,10 @@ public class ResourceServlet extends HttpServlet {
 				String filter = req.getParameter("filter");
 				fillSession(source,req,filter);
 				req.getRequestDispatcher("jsp/"+source+".jsp").forward(req, resp);
+			}
+			else
+			{				
+				doGet(req,resp);
 			}
 			
 			
@@ -58,7 +63,7 @@ public class ResourceServlet extends HttpServlet {
 			}
 			else
 			{
-				System.out.println("Default forward");
+				Activator.instance().getLog().log(LogService.LOG_DEBUG, "Default forward");
 				req.getRequestDispatcher("resource?link=store").forward(req, resp);
 			}
 

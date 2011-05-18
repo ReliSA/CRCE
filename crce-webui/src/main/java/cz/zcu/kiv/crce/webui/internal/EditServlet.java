@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.osgi.service.log.LogService;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -34,8 +36,7 @@ public class EditServlet extends HttpServlet {
 		
 		if (parameters.containsKey("form")) {
 			form =((String[]) parameters.get("form"))[0];
-		}
-		System.out.println(form);
+		}		
 		if ("addCategory".equals(form)) {
 			if (addCategory(req,resp, parameters)) {
 				success = editCategories(req, resp);
@@ -56,7 +57,7 @@ public class EditServlet extends HttpServlet {
 				}
 			}
 		} else if ("addRequirement".equals(form)) {
-			if (addRequirementForm(req,resp, parameters)) {
+			if (!addRequirementForm(req,resp, parameters)) {
 				ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
 				success = true;
 			}
@@ -98,21 +99,26 @@ public class EditServlet extends HttpServlet {
 				ResourceServlet.setError(req.getSession(), false, "Error while loading capabilities.");
 				success = true;
 			}
+		} else if ("editProperties".equals(form)) {
+			if (!saveResourceProperty(req,resp, parameters)) {
+				ResourceServlet.setError(req.getSession(), false, "Cannot change properties.");
+			}
+			success = editProperties(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Error while loading capabilities.");
+				success = true;
+			}
 		}
 		if (!success) {
 			resp.sendError(HttpServletResponse.SC_ACCEPTED,"NOT FOUND OR FAILED TO PROCEED");
 		}
 	}
 	
-	private boolean saveProperty(HttpServletRequest req,
+	private boolean saveResourceProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String uri = null;
-		String id = null;
-		if (parameters.containsKey("uri")
-				&& parameters.containsKey("capabilityId")) {
+		if (parameters.containsKey("uri")) {
 			uri = ((String[]) parameters.get("uri"))[0];
-			id = ((String[]) parameters.get("capabilityId"))[0];
-			System.out.println(id);
 		} else {
 			return false;
 		}
@@ -126,7 +132,55 @@ public class EditServlet extends HttpServlet {
 				array = Activator.instance().getBuffer(req).getRepository().getResources();
 			} else {
 				{
-					System.out.println("csosasa2");
+					
+					return false;
+				}
+			}
+			Resource resource = findResource(resURI, array);
+			String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
+			String version = ((String[]) parameters.get("version"))[0];
+			
+			resource.setVersion(version);
+			resource.setSymbolicName(symbolicName);
+			
+			PluginManager pm = Activator.instance().getPluginManager();
+			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+			rd.save(resource);
+			
+		} catch (URISyntaxException e) {
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
+		} catch (IOException e) {
+			return false;
+		}
+		
+		return true;
+	}
+
+	private boolean saveProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String uri = null;
+		String id = null;
+		if (parameters.containsKey("uri")
+				&& parameters.containsKey("capabilityId")) {
+			uri = ((String[]) parameters.get("uri"))[0];
+			id = ((String[]) parameters.get("capabilityId"))[0];
+			
+		} else {
+			return false;
+		}
+		try {
+			URI resURI = new URI(uri);
+			String link = (String) req.getSession().getAttribute("source");
+			Resource[] array;
+			if ("store".equals(link)) {
+				array = Activator.instance().getStore().getRepository().getResources();
+			} else  if ("buffer".equals(link)) {
+				array = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				{
+					
 					return false;
 				}
 			}
@@ -137,7 +191,7 @@ public class EditServlet extends HttpServlet {
 			String value = ((String[]) parameters.get("value"))[0];
 			
 			
-			System.out.println("Name: " + name + " Type: " + type + " Value: " + value);
+			
 			try{
 				capability.setProperty(name, value, Type.getValue(type));
 			} catch (IllegalArgumentException e){
@@ -252,6 +306,10 @@ public class EditServlet extends HttpServlet {
 					if(parameters.containsKey("extend")) {
 						extend = (((String[]) parameters.get("extend"))[0]).equals("on");
 					}
+					String comment = null;
+					if(parameters.containsKey("comment")) {
+						comment  = (((String[]) parameters.get("comment"))[0]);
+					}
 					int lengthBefore = resource.getRequirements().length;
 					requir = resource.createRequirement(name);
 					if (lengthBefore == resource.getRequirements().length) {
@@ -268,6 +326,7 @@ public class EditServlet extends HttpServlet {
 					requir.setMultiple(multiple);
 					requir.setOptional(optional);
 					requir.setExtend(extend);
+					requir.setComment(comment);
 				}
 				PluginManager pm = Activator.instance().getPluginManager();
 				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
@@ -325,7 +384,7 @@ public class EditServlet extends HttpServlet {
 				if(propertiesLengthBefore == capability.getProperties().length){
 					req.getSession().setAttribute("success", false);
 					req.getSession().setAttribute("message", "Cannot change property.");
-					System.err.println("Cannot change property.");
+					Activator.instance().getLog().log(LogService.LOG_DEBUG, "Cannot change property.");
 					continue;
 				}
 				
@@ -335,7 +394,6 @@ public class EditServlet extends HttpServlet {
 					capability.setProperty(propBefore);
 					req.getSession().setAttribute("success", false);
 					req.getSession().setAttribute("message", "Cannot change property.");
-					System.err.println("Cannot change property.");
 				}
 				}
 			PluginManager pm = Activator.instance().getPluginManager();
@@ -377,12 +435,13 @@ public class EditServlet extends HttpServlet {
 			String name = null;
 			Requirement requir = null;
 			String filter = null;
+			String comment = null;
 			boolean multiple = false;
 			boolean extend = false;
 			boolean optional = false;
 			Requirement requirBefore = null;
 			for (int i = 0; i < requirements.length; i++) {
-				System.out.println(i);
+				
 				if(parameters.containsKey("name_" + (i + 1))
 						&& parameters.containsKey("filter_" + (i + 1))) {
 					
@@ -398,16 +457,15 @@ public class EditServlet extends HttpServlet {
 					if(parameters.containsKey("extend_" + (i + 1))) {
 						extend = (((String[]) parameters.get("extend_" + (i + 1)))[0]).equals("on");
 					}
-					System.out.println(i + " : " + multiple);
-					System.out.println(i + " : " + optional);
-					System.out.println(i + " : " + extend);
+					if(parameters.containsKey("comment_" + (i + 1))) {
+						comment = (((String[]) parameters.get("comment_" + (i + 1)))[0]);
+					}
 //					requirBefore = requirements[i];
 					requirLengthBefore = requirements.length;
 					resource.unsetRequirement(requirements[i]);
 					if(requirLengthBefore == resource.getRequirements().length){
-						req.getSession().setAttribute("success", false);
-						req.getSession().setAttribute("message", "Cannot change requirement.");
-						System.err.println("Cannot change requirement.");
+//TODO						req.getSession().setAttribute("success", false);
+//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
 						continue;
 					}
 					
@@ -415,9 +473,8 @@ public class EditServlet extends HttpServlet {
 					try {
 						requir.setFilter(filter);
 					} catch (IllegalArgumentException e) {
-						req.getSession().setAttribute("success", false);
-						req.getSession().setAttribute("message", "Cannot change requirement.");
-						System.err.println("Cannot change requirement.");
+//TODO						req.getSession().setAttribute("success", false);
+//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
 						resource.unsetRequirement(requir);
 						resource.addRequirement(requirBefore);
 						continue;
@@ -425,6 +482,7 @@ public class EditServlet extends HttpServlet {
 					requir.setMultiple(multiple);
 					requir.setOptional(optional);
 					requir.setExtend(extend);
+					requir.setComment(comment);
 //					resource.addRequirement(requir);
 				}
 			}
@@ -432,11 +490,9 @@ public class EditServlet extends HttpServlet {
 			ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
 			rd.save(resource);
 			
-		} catch (URISyntaxException e) {
-			System.out.println("3");
+		} catch (URISyntaxException e) {			
 			return false;
-		} catch (FileNotFoundException e) {
-			System.out.println("3b");
+		} catch (FileNotFoundException e) {			
 			return false;
 		} catch (IOException e) {
 			return false;
@@ -504,7 +560,7 @@ public class EditServlet extends HttpServlet {
 		String type = null;;
 		if (parameters.containsKey("type")) {
 			type = ((String[]) parameters.get("type"))[0];
-			System.out.println("deb 1" + type);
+			
 			
 		} 
 		if ("deleteCompoment".equals(type)) {
@@ -569,6 +625,13 @@ public class EditServlet extends HttpServlet {
 						success = true;
 					}
 					
+		} else if("properties".equals(type)) {
+			success = editProperties(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
+				success = true;
+			}
+			
 		} else {
 			success = false;
 		}
@@ -577,6 +640,30 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+
+	private boolean editProperties(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+		try {
+			URI resURI = new URI((String) req.getParameter("uri"));
+			Resource resource = findResource(resURI, array);
+			req.getSession().setAttribute("resource", resource);			
+			req.getRequestDispatcher("jsp/forms/propertiesForm.jsp").forward(req, resp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 
 	private boolean addCapabilityProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
@@ -705,13 +792,9 @@ public class EditServlet extends HttpServlet {
 					&& parameters.containsKey("uri")) {
 				id = ((String[]) parameters.get("capabilityId"))[0];
 				resURI  = ((String[]) parameters.get("uri"))[0];
-			} else {
-				System.out.println(parameters.containsKey("capabilityId"));
-				System.out.println(parameters.containsKey("uri"));
-				System.out.println("deb3ALE");
+			} else {				
 				return false;
-			}
-			System.out.println("deb3aALE " + id + resURI);
+			}			
 			Resource resource = findResource(new URI(resURI), array);
 			
 			req.getSession().setAttribute("resource", resource);
@@ -719,8 +802,7 @@ public class EditServlet extends HttpServlet {
 			req.getSession().setAttribute("capability", resource.getCapabilities()[Integer.valueOf(id) - 1]);
 			req.getSession().setAttribute("capabilityId", id);
 			req.getRequestDispatcher("jsp/forms/capabilitiesForm.jsp").forward(req, resp);
-		} catch (Exception e) {
-			System.out.println("deb3bALE");
+		} catch (Exception e) {			
 			e.printStackTrace();
 			return false;
 		}
@@ -841,8 +923,7 @@ public class EditServlet extends HttpServlet {
 				Activator.instance().getStore().remove(found);
 			} else if("buffer".equals(link)) {
 				Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
-				Resource found = findResource(fileUri, array);
-				System.out.println("Found!"+found.getPresentationName());
+				Resource found = findResource(fileUri, array);				
 				if(!Activator.instance().getBuffer(req).remove(found)){
 				}
 				
