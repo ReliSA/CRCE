@@ -39,7 +39,7 @@
 	  				<div class="nabidka">
 			            <a href="download?uri=${resource.uri}"><img src="graphic/save.png" alt="download" title="Download component ${resource.presentationName} ${resource.version}" /></a>
 			            <a href="edit?type=deleteCompoment&uri=${resource.uri}&link=store"><img src="graphic/del.png" alt="delete" title="Delete component ${resource.presentationName} ${resource.version}"/></a>
-			            <a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>
+			            <!--<a href="#"><img src="graphic/check.png" alt="check" title="Check component ${resource.presentationName} ${resource.version} compatibility"/></a>-->
 			          	<input type="checkbox" name="check" value="${resource.uri}" />
 	          		</div>
 	  				<div class="konec"></div>
@@ -79,6 +79,17 @@
 	  						<tr><th>Name</th><th>Filter</th><th>Multiple</th><th>Optional</th><th>Extend</th></tr>
 	  						<tr><th colspan="5"><i>Comment</i></th></tr>
 	  						<c:forEach items="${resource.requirements}" var="requirement">
+	  							<c:catch var="exception">${requirement.satisfied}</c:catch>
+		  							<c:if test="${empty exception}">
+										<c:choose>
+											<c:when test="${requirement.satisfied == false}">
+												<c:if test="${firstSatisfied != true }">
+													<tr><td colspan="5">Unsatisfied requirements: </td></tr>
+													<c:set var="firstSatisfied" value="true" scope="page" />
+												</c:if>
+											</c:when>
+										</c:choose>
+									</c:if>
 	  							<tr 
 	  								<c:catch var="exception">${requirement.satisfied}</c:catch>
 		  							<c:if test="${empty exception}">
@@ -102,6 +113,7 @@
 	  								<td colspan="5" class="komentar">${requirement.comment}</td>
 	  							</tr>
 	  						</c:forEach>
+	  						<c:set var="firstSatisfied" value="false" scope="page" />
 	  					</table>
 	  				</div>
 	  			</div>
