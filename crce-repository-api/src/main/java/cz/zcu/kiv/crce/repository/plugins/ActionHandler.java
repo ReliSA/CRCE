@@ -19,7 +19,7 @@ import java.util.Properties;
  */
 public interface ActionHandler extends Plugin {
 
-    Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
+    String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException;
     
     /**
      * Invoked when an artifact is uploaded into upload buffer.

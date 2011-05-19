@@ -32,6 +32,7 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
         }
 
         Repository repository = store.getRepository();
+        
         Version version = resource.getVersion();
         for (int i = 2; repository.contains(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
@@ -46,6 +47,20 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
 
     @Override
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        return super.onUploadToBuffer(resource, buffer, name); // TODO implement
+        if (resource.isVersionStatic()) {
+            return resource;
+        }
+        
+        Repository repository = buffer.getRepository();
+        
+        Version version = resource.getVersion();
+        for (int i = 2; repository.contains(resource); i++) {
+            resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
+            if (resource.getVersion().equals(version)) {
+                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Buffer: " + resource.getId());
+            }
+        }
+        
+        return resource;
     }
 }

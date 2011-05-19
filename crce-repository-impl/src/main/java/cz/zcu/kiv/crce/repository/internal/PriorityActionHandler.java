@@ -54,7 +54,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
 
     static {
         try {
-            BEFORE_BUFFER_UPLOAD = ActionHandler.class.getMethod("beforeUploadToBuffer", Resource.class, Buffer.class, String.class);
+            BEFORE_BUFFER_UPLOAD = ActionHandler.class.getMethod("beforeUploadToBuffer", String.class, Buffer.class);
             ON_BUFFER_UPLOAD = ActionHandler.class.getMethod("onUploadToBuffer", Resource.class, Buffer.class, String.class);
             AFTER_BUFFER_UPLOAD = ActionHandler.class.getMethod("afterUploadToBuffer", Resource.class, Buffer.class, String.class);
             
@@ -87,8 +87,8 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        Object[] out = execute(BEFORE_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+        Object[] out = execute(BEFORE_BUFFER_UPLOAD, new Object[]{name, buffer});
         if (out[1] != null) {
             if (out[1] instanceof RevokedArtifactException) {
                 throw (RevokedArtifactException) out[1];
@@ -96,7 +96,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
                 throw new IllegalStateException("beforeUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
         }
-        return (Resource) out[0];
+        return (String) out[0];
     }
     
     @Override

@@ -127,14 +127,17 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(resource.getUri().getScheme())) {
-            return putFile(resource, false);
+            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putFile(resource, false), this);
         } else {
-            return putAnother(resource, false);
+            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putAnother(resource, false), this);
         }
     }
     
     private Resource putFile(Resource resource, boolean move) throws IOException, RevokedArtifactException {
         File sourceFile = new File(resource.getUri());
+        if (!sourceFile.exists()) {
+            throw new RevokedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
+        }
         if (m_repository == null) {
             loadRepository();
         }
@@ -175,6 +178,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 m_log.log(LogService.LOG_WARNING, "Removing resource is not in store but it is in internal repository: " + resource.getId());
                 m_repository.removeResource(resource);
             }
+            m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
             return false;
         }
         
@@ -199,7 +203,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
-        
+        m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
         return true;
     }
 

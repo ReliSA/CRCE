@@ -123,7 +123,8 @@ public class BufferImpl implements Buffer, EventHandler {
     
     @Override
     public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
-        if (name == null || artifact == null || "".equals(name)) {
+        String name2 = m_pluginManager.getPlugin(ActionHandler.class).beforeUploadToBuffer(name, this);
+        if (name2 == null || artifact == null || "".equals(name2)) {
             throw new RevokedArtifactException("No file name was given on uploading to buffer");
         }
         FileOutputStream output = null;
@@ -148,15 +149,15 @@ public class BufferImpl implements Buffer, EventHandler {
         Resource resource = resourceDao.getResource(file.toURI());
         
         // TODO alternatively can be moved to some plugin
-        resource.createCapability("file").setProperty("name", name);
-        resource.setSymbolicName(name);
+        resource.createCapability("file").setProperty("name", name2);
+        resource.setSymbolicName(name2);
         if (resource.getPresentationName() == null || "".equals(resource.getPresentationName().trim())) {
-            resource.setPresentationName(name);
+            resource.setPresentationName(name2);
         }
         
         Resource tmp;
         try {
-            tmp = m_pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name);
+            tmp = m_pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
         } catch (RevokedArtifactException e) {
             if (!file.delete()) {
                 m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + file.getPath());
@@ -173,21 +174,15 @@ public class BufferImpl implements Buffer, EventHandler {
         if (m_repository == null) {
             loadRepository();
         }
-        Version version = resource.getVersion();
-        for (int i = 2; !m_repository.addResource(resource); i++) {
-            resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
-            if (resource.getVersion().equals(version)) {
-                if (!file.delete()) {
-                    m_log.log(LogService.LOG_ERROR, "Can not delete file of revoked artifact: " + file.getPath());
-                }
-                throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Buffer: " + resource.getId());
-            }
+        if (!m_repository.addResource(resource)) {
+            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in buffer: " + resource.getId());
         }
+        
         resourceDao.save(resource);
         
         m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         
-        return resource;
+        return m_pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
     }
 
     @Override
@@ -196,7 +191,7 @@ public class BufferImpl implements Buffer, EventHandler {
         
         if (!isInBuffer(resource)) {
             if (m_repository != null && m_repository.contains(resource)) {
-                m_log.log(LogService.LOG_WARNING, "Resource to be removed is not in buffer but it is in internal repository: " + resource.getId());
+                m_log.log(LogService.LOG_WARNING, "Resource to be removed is not in buffer but it is in internal repository: " + resource.getId() + ", cleaning up");
                 m_repository.removeResource(resource);
             }
             return false;
@@ -224,6 +219,8 @@ public class BufferImpl implements Buffer, EventHandler {
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
         
+        m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromBuffer(resource, this);
+        
         return true;
     }
 
@@ -231,7 +228,7 @@ public class BufferImpl implements Buffer, EventHandler {
     public synchronized List<Resource> commit(boolean move) throws IOException {
         List<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         
-        List<Resource> out = new ArrayList<Resource>();
+        List<Resource> commited = new ArrayList<Resource>();
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
         Map<String, String[]> toRemoveNonrenamed = new HashMap<String, String[]>(); // K: new ID, V: old sn, old ver
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
@@ -248,7 +245,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId());
                     continue;
                 }
-                out.add(putResource);
+                commited.add(putResource);
                 resourcesToRemove.add(resource);
             }
         } else {
@@ -260,7 +257,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId(), ex);
                     continue;
                 }
-                out.add(putResource);
+                commited.add(putResource);
                 if (move) {
                     resourcesToRemove.add(resource);
                 }
@@ -311,7 +308,9 @@ public class BufferImpl implements Buffer, EventHandler {
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
         
-        return out;
+        m_pluginManager.getPlugin(ActionHandler.class).afterBufferCommit(commited, this, m_store);
+        
+        return commited;
     }
 
     @Override

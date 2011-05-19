@@ -50,8 +50,8 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        return resource;
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+        return name;
     }
 
     @Override
