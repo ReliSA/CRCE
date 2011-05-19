@@ -12,9 +12,9 @@
 
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>..</directory>
             <includes>
-                <include>README*</include>
+                <include>README</include>
             </includes>
             <outputDirectory>.</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
