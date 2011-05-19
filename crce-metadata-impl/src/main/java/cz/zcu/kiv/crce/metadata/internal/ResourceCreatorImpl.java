@@ -13,8 +13,8 @@ import java.net.URI;
 import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceCreator</code> interface.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class ResourceCreatorImpl implements ResourceCreator {
 

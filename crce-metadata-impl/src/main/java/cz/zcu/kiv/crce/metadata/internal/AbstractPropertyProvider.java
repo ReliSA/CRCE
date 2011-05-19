@@ -11,9 +11,10 @@ import java.util.Set;
 import org.osgi.framework.Version;
 
 /**
- *
+ * Abstract implementatio of <code>PropertyProvider</code> interface. It serves
+ * to provide unique implementation of providing Properties.
  * @param <T> 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> implements PropertyProvider<T> {
 

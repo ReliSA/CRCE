@@ -19,7 +19,7 @@ import org.osgi.service.log.LogService;
  * resource with the same symbolic name and version (now with the suffix), then
  * the number in the suffix is increased by one. The first number is 2.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class IncreaseVersionActionHandler extends AbstractActionHandler implements ActionHandler {
 

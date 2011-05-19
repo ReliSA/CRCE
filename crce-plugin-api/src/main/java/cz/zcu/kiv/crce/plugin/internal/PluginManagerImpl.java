@@ -13,8 +13,8 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>PluginManager</code>.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class PluginManagerImpl implements PluginManager {
 

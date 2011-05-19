@@ -4,7 +4,7 @@ package cz.zcu.kiv.crce.metadata;
  * Extends read-only <code>Repository</code> interface to support of modyfing
  * operations.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface WritableRepository extends Repository {
 

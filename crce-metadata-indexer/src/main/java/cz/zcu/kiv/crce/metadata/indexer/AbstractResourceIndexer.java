@@ -3,8 +3,9 @@ package cz.zcu.kiv.crce.metadata.indexer;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Abstract implementation of <code>ResourceIndexer</code> which can be extended
+ * by other implementations.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractResourceIndexer extends AbstractPlugin implements ResourceIndexer {
 

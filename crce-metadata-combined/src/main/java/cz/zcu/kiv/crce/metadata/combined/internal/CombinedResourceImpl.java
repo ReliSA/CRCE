@@ -17,10 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
 
-// TODO specifi exact write behavior
 /**
- *
- * @author kalwi
+ * Implementation of <code>CombinedResource</code>.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class CombinedResourceImpl implements CombinedResource {
 

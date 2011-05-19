@@ -19,8 +19,8 @@ import org.osgi.framework.Version;
 import static org.apache.felix.bundlerepository.Resource.*;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>Resource</code> interface.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class ResourceImpl extends AbstractPropertyProvider<Resource> implements Resource {
 

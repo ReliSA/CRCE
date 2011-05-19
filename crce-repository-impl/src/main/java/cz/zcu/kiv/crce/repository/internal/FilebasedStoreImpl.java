@@ -25,8 +25,8 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Filebased implementation of <code>Store</code>.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class FilebasedStoreImpl implements Store, EventHandler {
     

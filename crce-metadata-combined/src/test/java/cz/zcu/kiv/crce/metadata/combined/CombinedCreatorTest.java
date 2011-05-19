@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 @RunWith(JUnit4TestRunner.class)
 public class CombinedCreatorTest extends IntegrationTestBase {

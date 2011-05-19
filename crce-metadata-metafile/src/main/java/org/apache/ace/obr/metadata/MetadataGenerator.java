@@ -21,6 +21,10 @@ package org.apache.ace.obr.metadata;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Interface from Apache ACE Metadata project to provide basic integration with
+ * Apache ACE.
+ */
 public interface MetadataGenerator
 {
 

@@ -34,8 +34,8 @@ import org.xmlpull.v1.XmlPullParser;
 import static org.apache.felix.bundlerepository.Resource.*;
 
 /**
- *
- * @author kalwi
+ * Implementation of <code>DataModelHelperExt</code>
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class DataModelHelperExtImpl implements DataModelHelperExt {
     

@@ -14,8 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which provides indexing of artifacts
+ * with indexers to a static (read-only) metadata representation.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class FileIndexingResourceDAO extends AbstractResourceDAO {
 

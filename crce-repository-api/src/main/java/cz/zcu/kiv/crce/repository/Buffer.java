@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * This interface defines a temporary store for uploading artifacts before putting
+ * them to the permanent store.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Buffer {
 

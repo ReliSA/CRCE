@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
@@ -35,7 +34,7 @@ import org.osgi.service.log.LogService;
 /**
  * Filebased implementation of <code>Buffer</code>.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class BufferImpl implements Buffer, EventHandler {
 

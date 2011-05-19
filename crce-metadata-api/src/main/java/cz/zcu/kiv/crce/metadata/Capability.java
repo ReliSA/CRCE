@@ -1,8 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
- * @author kalwi
+ * Represents an OBR Capability.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Capability extends PropertyProvider<Capability> {
 

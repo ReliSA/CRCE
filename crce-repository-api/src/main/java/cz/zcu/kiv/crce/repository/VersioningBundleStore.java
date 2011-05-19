@@ -10,7 +10,7 @@ import org.apache.ace.obr.storage.BundleStore;
  * 
  * It could be implemented by CRCE and it is included here for not to be forgotten.
  * 
- * @author kalwi
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface VersioningBundleStore extends BundleStore {
 

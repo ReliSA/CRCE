@@ -22,8 +22,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.osgi.service.log.LogService;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which provides support for
+ * reading and writing repository and its metadata from/to XML file.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements MetadataGenerator, RepositoryDAO {
 

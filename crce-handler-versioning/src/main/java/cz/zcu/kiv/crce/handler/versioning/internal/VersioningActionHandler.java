@@ -21,8 +21,10 @@ import java.io.OutputStream;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ActionHandler</code> which compares commited OSGi
+ * bundle to existing bundles with the same symbolic name and sets a new version
+ * based on comparison.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
     

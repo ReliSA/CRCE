@@ -21,7 +21,7 @@ import org.osgi.service.log.LogService;
  * This implementation of ResourceDAO reads/writes metadata from/to a file,
  * whose name (URI path) is created by resource's URI path and '.meta' extension.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileResourceDAO extends AbstractResourceDAO {
 

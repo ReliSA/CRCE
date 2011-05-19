@@ -12,8 +12,9 @@ import java.util.Dictionary;
 import org.osgi.service.cm.ConfigurationException;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which creates combined
+ * Resources.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class CombinedResourceDAO extends AbstractResourceDAO implements Plugin {
 

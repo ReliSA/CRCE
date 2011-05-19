@@ -15,7 +15,7 @@ import java.util.Properties;
  * <p>Default execution of handlers is <i>synchronous</i> so the calling method
  * will wait for the result of execution.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface ActionHandler extends Plugin {
 

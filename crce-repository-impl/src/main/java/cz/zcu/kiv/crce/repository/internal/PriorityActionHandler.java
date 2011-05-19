@@ -15,8 +15,9 @@ import java.util.Properties;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Root implementation of <code>ActionHandler</code> which calls other
+ * implementations and call them in order given by their priority.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class PriorityActionHandler extends AbstractPlugin implements ActionHandler {
 

@@ -25,7 +25,7 @@ import org.osgi.service.cm.ManagedService;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class ResultsStoreImpl implements ResultsStore, ManagedService {
 

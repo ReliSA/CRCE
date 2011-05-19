@@ -1,8 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
- * @author kalwi
+ * A property that can be set to a Resource or a Capability.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Property {
 
