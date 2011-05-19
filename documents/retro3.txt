@@ -1,0 +1,42 @@
+Retro 3. ( za treti iteraci)
+
+1) komunikace neni idealni, je vetsi potreba komunikovat, 
+navic bylo komplikovane se sejit
+
+navrhy na zlepseni: 
+
+zvolit jiny komunikacni prostredek nez email
+
+popr. nechat spusteny skype ci icq
+
+urcit hodinu, kdy si kazdy zkontroluje zpravy
+
+2) prace fungovala, zadavatel pruzne reaguje
+
+nefungovalo JSTL (jiz ok), Assembla a Jazz
+
+komplikace s paralelnim vyvojem API od zadavatele
+
+3) JSTL
+
+4) iterace byla naplnena a kvuli problemum v b.2 doslo ke skluzu
+
+cile se posouvaji do dalsi iterace
+
+5) Milnik LCA - stabilni pozadavky a architektura
+
+6) Nezkusenost a neocekavane situace, nepresne odhady, odstranime casem
+
+7) b.2
+
+8) ne, z duvodu skluzu pretekaji do dalsi iterace (b.2)
+
+9) dokonceni artefaktu melo skluz
+
+10) nebyly nalezeny zasadni chyby
+
+---------------
+
+
+
+

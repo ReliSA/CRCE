@@ -1,0 +1,14 @@
+Retro 4 (za ctvrtou a patou iteraci)
+1) Od minule se zlepsila
+2) Problemy s api, nefunguje debug (a ani nikdy nebude), cacheovani pri merge - neprojevi se zmeny v kodu, nedoimplementovane metody v api
+Dobre - komunikace, prace docela utikala
+3) Merge ! - bugy po mergi
+4) Vsechny polozk uzavreny, dosazeny stanovene cile podle aktualizovaneho planu
+5) Ne
+6) Odhady nadale nepresne kvuli nemoznosti debugovani a dalsim chybam
+7) ad2
+8) ano, nektere ale presly do dalsi iterace
+9) n/a
+10) V nasi casti projektu ne (zpusobene pouze spodnimi vrstvami), bez zmen spodnich vrstev zajistovanych zadavajicim nelze
+11) komunikace zlepsena, odhady ad6
+12) pravdepodobne nic
