@@ -18,7 +18,7 @@
     <url>https://www.assembla.com/spaces/crce/</url>
     
     <properties>
-        <org.osgi.service.http.port>8090</org.osgi.service.http.port>
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -14,6 +14,8 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends DependencyActivatorBase {
 
+    public static final String PID = "cz.zcu.kiv.crce.metadata.indexer.resource";
+    
     @Override
     public void init(BundleContext context, final DependencyManager manager) throws Exception {
         manager.add(createComponent()
@@ -22,6 +24,7 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))
+                .add(createConfigurationDependency().setPid(PID))
                 );
         
         manager.add(createComponent()

@@ -5,20 +5,23 @@ import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
+import org.osgi.service.cm.ConfigurationException;
 
 /**
  * Implementation of <code>ResourceDAO</code> which provides indexing of artifacts
  * with indexers to a static (read-only) metadata representation.
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public class FileIndexingResourceDAO extends AbstractResourceDAO {
+public class FileIndexingResourceDAO extends AbstractResourceDAO implements Plugin {
 
     private volatile PluginManager m_pluginManager;
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
@@ -89,7 +92,7 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
     }
 
     @Override
-    public int getPluginPriority() {
-        return 10;
+    public void updated(Dictionary properties) throws ConfigurationException {
+        super.updated(properties);
     }
 }

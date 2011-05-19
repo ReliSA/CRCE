@@ -16,6 +16,8 @@ import org.osgi.service.log.LogService;
  */
 public class Activator extends DependencyActivatorBase {
 
+    public static final String PID = "cz.zcu.kiv.crce.metadata.metafile.resource";
+    
     @Override
     public void init(BundleContext context, final DependencyManager manager) throws Exception {
         
@@ -31,6 +33,7 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setService(DataModelHelperExt.class).setRequired(true))
+                .add(createConfigurationDependency().setPid(PID))
                 );
         
         MetafileRepositoryDAO repositoryDAO = new MetafileRepositoryDAO();
