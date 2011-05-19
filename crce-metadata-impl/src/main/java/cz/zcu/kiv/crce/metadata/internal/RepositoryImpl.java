@@ -61,9 +61,7 @@ public class RepositoryImpl implements Repository, WritableRepository {
             return false;
         }
         resources.put(resource.getId(), resource);
-        if (resource instanceof ResourceImpl) {
-            ((ResourceImpl) resource).setRepository(this);
-        }
+        resource.setRepository(this);
         lastModified = System.nanoTime();
         return true;
     }
@@ -73,8 +71,8 @@ public class RepositoryImpl implements Repository, WritableRepository {
         Resource out = resources.get(resource.getId());
         if (out == null || force) {
             resources.put(resource.getId(), resource);
-            if (resource instanceof ResourceImpl) {
-                ((ResourceImpl) resource).setRepository(this);
+            if (resource.getRepository() != this) {
+                resource.setRepository(this);
             }
             lastModified = System.nanoTime();
         }
@@ -84,8 +82,8 @@ public class RepositoryImpl implements Repository, WritableRepository {
     @Override
     public synchronized boolean removeResource(Resource resource) {
         boolean out = (resources.remove(resource.getId()) != null);
-        if (resource instanceof ResourceImpl) {
-            ((ResourceImpl) resource).setRepository(null);
+        if (resource.getRepository() == this) {
+            resource.setRepository(null);
         }
         lastModified = System.nanoTime();
         return out;
@@ -138,5 +136,10 @@ public class RepositoryImpl implements Repository, WritableRepository {
             }
         }
         return matches.toArray(new Resource[matches.size()]);
+    }
+
+    @Override
+    public String toString() {
+        return "Repository on URI: " + String.valueOf(uri) + ", size: " + resources.size();
     }
 }

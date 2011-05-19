@@ -49,8 +49,8 @@ public class ResourceCreatorImpl implements ResourceCreator {
         
         out.setId(resource.getId());
         out.setPresentationName(resource.getPresentationName());
-        if (resource instanceof ResourceImpl) {
-            out.setRepository(((ResourceImpl) resource).getRepository());
+        if (resource.getRepository() instanceof WritableRepository) {
+            out.setRepository((WritableRepository) resource.getRepository());
         }
         try {
             out.setSize(resource.getSize());

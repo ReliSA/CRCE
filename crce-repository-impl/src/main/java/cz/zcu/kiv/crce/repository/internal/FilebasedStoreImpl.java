@@ -68,7 +68,6 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
             @Override
             public void run() {
-                m_log.log(LogService.LOG_WARNING, "Store handles event:" + event.getProperty(PluginManager.PROPERTY_PLUGIN_ID) + ", ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
                 synchronized (lock) {
                     m_repository = null;
                 }
@@ -77,8 +76,6 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
     
     private synchronized void loadRepository() {
-        m_log.log(LogService.LOG_WARNING, "loadRepository() with ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
-
         RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
         
         try {
@@ -92,7 +89,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
         Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
-            return resource;
+            return null;
         }
         if (tmp == null) {
             m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore() returned null resource, using original");
@@ -138,27 +135,26 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     
     private Resource putFile(Resource resource, boolean move) throws IOException, RevokedArtifactException {
         File sourceFile = new File(resource.getUri());
+        if (m_repository == null) {
+            loadRepository();
+        }
         File targetFile = File.createTempFile("res", "", m_baseDir);
         
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
-        Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (move) {
             FileUtils.rename(sourceFile, targetFile);
         } else {
             FileUtils.copyFile(sourceFile, targetFile);
         }
-        if (m_repository == null) {
-            loadRepository();
-        }
+        Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (!m_repository.addResource(out)) {
             m_log.log(LogService.LOG_WARNING, "Resource with the same symbolic name and version already exists in Store, but it has not been expected: " + targetFile.getPath());
             if (!targetFile.delete()) {
                 throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
             }
-            return out;
+            return null;
         }
-        
         resourceDao.save(out);
         
         m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
@@ -199,7 +195,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 loadRepository();
             }
             if (!m_repository.removeResource(resource)) {
-                m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                m_log.log(LogService.LOG_WARNING, "Store's internal repository does not contain removing resource: " + resource.getId());
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }

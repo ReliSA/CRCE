@@ -20,9 +20,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -42,6 +43,7 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
     private volatile LogService m_log;  /* injected by dependency manager */
     private volatile Store m_store;     /* injected by dependency manager */
+    private volatile ResourceCreator m_resourceCreator;     /* injected by dependency manager */
     
     private final int BUFFER_SIZE = 8 * 1024;
     private final Properties m_sessionProperties;
@@ -74,13 +76,6 @@ public class BufferImpl implements Buffer, EventHandler {
             throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
         }
         
-//        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
-//        
-//        try {
-//            m_repository = rd.getRepository(m_baseDir.toURI());
-//        } catch (IOException ex) {
-//            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
-//        }
     }
 
     /*
@@ -108,7 +103,6 @@ public class BufferImpl implements Buffer, EventHandler {
 
             @Override
             public void run() {
-                m_log.log(LogService.LOG_WARNING, "Buffer handles event:" + event.getProperty(PluginManager.PROPERTY_PLUGIN_ID) + ", ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
                 synchronized (lock) {
                     m_repository = null;
                 }
@@ -117,8 +111,6 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     private synchronized void loadRepository() {
-        m_log.log(LogService.LOG_WARNING, "loadRepository() with ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
-
         RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
         
         try {
@@ -131,9 +123,8 @@ public class BufferImpl implements Buffer, EventHandler {
     
     @Override
     public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
-        m_log.log(LogService.LOG_WARNING, "ResourceDAO:" + m_pluginManager.getPlugin(ResourceDAO.class).getPluginId());
         if (name == null || artifact == null || "".equals(name)) {
-            return null;
+            throw new RevokedArtifactException("No file name was given on uploading to buffer");
         }
         FileOutputStream output = null;
         File file = null;
@@ -159,6 +150,9 @@ public class BufferImpl implements Buffer, EventHandler {
         // TODO alternatively can be moved to some plugin
         resource.createCapability("file").setProperty("name", name);
         resource.setSymbolicName(name);
+        if (resource.getPresentationName() == null || "".equals(resource.getPresentationName().trim())) {
+            resource.setPresentationName(name);
+        }
         
         Resource tmp;
         try {
@@ -235,10 +229,11 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
-        Collection<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
+        List<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         
         List<Resource> out = new ArrayList<Resource>();
         List<Resource> resourcesToRemove = new ArrayList<Resource>();
+        Map<String, String[]> toRemoveNonrenamed = new HashMap<String, String[]>(); // K: new ID, V: old sn, old ver
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         // put resources to store
@@ -246,7 +241,9 @@ public class BufferImpl implements Buffer, EventHandler {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
                 try {
+                    String[] old = new String[] {resource.getSymbolicName(), resource.getVersion().toString()};
                     putResource = ((FilebasedStoreImpl) m_store).move(resource);
+                    toRemoveNonrenamed.put(resource.getId(), old);
                 } catch (RevokedArtifactException ex) {
                     m_log.log(LogService.LOG_INFO, "Resource can not be commited, it was revoked by store: " + resource.getId());
                     continue;
@@ -290,13 +287,25 @@ public class BufferImpl implements Buffer, EventHandler {
                     // from the repository even in case of exception on removing metadata
                     // to keep consistency of repository with stored artifact files
                     if (!m_repository.removeResource(resource)) {
-                        m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                        // cleanup (after renamed resource)
+                        Resource fake = m_resourceCreator.createResource();
+                        fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
+                        fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
+                        if (!m_repository.removeResource(fake)) {
+                            m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                        }
                     }
                     m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
                     throw e;
                 }
                 if (!m_repository.removeResource(resource)) {
-                    m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                    // cleanup (after renamed resource)
+                    Resource fake = m_resourceCreator.createResource();
+                    fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
+                    fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
+                    if (!m_repository.removeResource(fake)) {
+                        m_log.log(LogService.LOG_WARNING, "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                    }
                 }
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
