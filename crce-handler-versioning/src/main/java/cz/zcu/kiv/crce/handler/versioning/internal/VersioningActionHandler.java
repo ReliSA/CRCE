@@ -5,6 +5,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
@@ -16,7 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.osgi.framework.Version;
 import org.osgi.service.log.LogService;
 
 /**
@@ -24,24 +25,26 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
+    
+    private static final String CATEGORY_VERSIONED = "versioned";
 
-    private volatile VersionService m_versionService; /* injected by dependency manager */
-    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
-    private volatile LogService m_log; /* injected by dependency manager */
-    
-    
+    private volatile VersionService m_versionService;   /* injected by dependency manager */
+    private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
+    private volatile LogService m_log;                  /* injected by dependency manager */
+
     private int BUFFER_SIZE = 8 * 1024;
-    
+
     @Override
-    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
-        if (resource.hasCategory("osgi") && !resource.hasCategory("versioned")) {
+    public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
+        if (resource == null || !resource.hasCategory("osgi")) {
+            return resource;
+        }
+        if (!resource.hasCategory(CATEGORY_VERSIONED)) {
+
             Resource cand = null;
-            
-            String ext = name.substring(name.lastIndexOf("."));
-            Version oldVersion = resource.getVersion();
-            
-            // TODO zmenit na neco inteligentnejsiho (buffer.getInnerRepository().get(filter))
-            for (Resource i : buffer.getRepository().getResources()) {
+
+            // TODO improve (by using store.getRepository().getResources(someFilter))
+            for (Resource i : store.getRepository().getResources()) {
                 if (i.getSymbolicName().equals(resource.getSymbolicName())) {
                     if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
                         cand = i;
@@ -49,7 +52,10 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 }
             }
             String category = null;
-            if (cand != null) {
+            if (cand == null) {
+                category = CATEGORY_VERSIONED;
+                resource.addCategory("initial-version");
+            } else {
                 try {
                     InputStream in = new FileInputStream(new File(cand.getUri()));
                     OutputStream output = null;
@@ -78,7 +84,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     }
 
                     m_versionService.updateVersion(source, new File(resource.getUri()));
-                    category = "versioned";
+                    category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
                     m_log.log(LogService.LOG_ERROR, "Could not update version due to I/O error", ex);
                     category = null;
@@ -92,30 +98,42 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     m_log.log(LogService.LOG_ERROR, "Could not update version (unknown error)", e);
                     category = null;
                 }
-                
+
                 ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
-                
+
                 try {
                     resource = creator.getResource(resource.getUri());   // reload changed resource
                 } catch (IOException ex) {
                     m_log.log(LogService.LOG_ERROR, "Could not reload changed resource", ex);
                 }
             }
-            
+
             if (category != null) {
                 resource.addCategory(category);
             }
+        }
+        
+        return resource;
+    }
+
+    @Override
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
+        if (!resource.hasCategory("osgi")) {
+            return resource;
+        }
+        if (!resource.hasCategory("versioned")) {
+
+            String ext = name.substring(name.lastIndexOf("."));
             
             Capability[] caps = resource.getCapabilities("file");
             Capability cap = (caps.length == 0 ? resource.createCapability("file") : caps[0]);
             cap.setProperty("original-name", name);
             cap.setProperty("name", resource.getSymbolicName() + "-" + resource.getVersion() + ext);
-            
-            caps = resource.getCapabilities("bundle");
-            cap = (caps.length == 0 ? resource.createCapability("bundle") : caps[0]);
-            cap.setProperty("original-version", oldVersion);
-            
-            
+
+//            caps = resource.getCapabilities("bundle");
+//            cap = (caps.length == 0 ? resource.createCapability("bundle") : caps[0]);
+            cap.setProperty("original-version", resource.getVersion());
+
         }
         return resource;
     }

@@ -94,7 +94,8 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         if ("file".equals(scheme)) {
             File resourceFile = new File(metadataUri);
             if (resourceFile.exists() && !resourceFile.delete()) {
-                throw new IOException("Can not delete metadata file " + metadataUri);
+                m_log.log(LogService.LOG_ERROR, "Can not delete metadata file " + metadataUri + ", it will be deleted later");
+                resourceFile.deleteOnExit();
             }
         } else if ("http".equals(scheme)) {
             HttpURLConnection httpCon = (HttpURLConnection) metadataUri.toURL().openConnection();
