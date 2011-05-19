@@ -4,7 +4,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
-import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -16,8 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Dictionary;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.log.LogService;
 
 /**
@@ -26,7 +23,7 @@ import org.osgi.service.log.LogService;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public class MetafileResourceDAO extends AbstractResourceDAO implements Plugin {
+public class MetafileResourceDAO extends AbstractResourceDAO {
 
     public static final String METAFILE_EXTENSION = ".meta";
     
@@ -97,7 +94,7 @@ public class MetafileResourceDAO extends AbstractResourceDAO implements Plugin {
         if ("file".equals(scheme)) {
             File resourceFile = new File(metadataUri);
             if (resourceFile.exists() && !resourceFile.delete()) {
-                m_log.log(LogService.LOG_ERROR, "Can not delete metadata file " + metadataUri + ", it will be deleted later");
+                m_log.log(LogService.LOG_WARNING, "Can not delete metadata file " + metadataUri + ", it will be deleted later");
                 resourceFile.deleteOnExit();
             }
         } else if ("http".equals(scheme)) {
@@ -122,10 +119,5 @@ public class MetafileResourceDAO extends AbstractResourceDAO implements Plugin {
         }
         
         return metadataUri;
-    }
-    
-    @Override
-    public void updated(Dictionary properties) throws ConfigurationException {
-        super.updated(properties);
     }
 }

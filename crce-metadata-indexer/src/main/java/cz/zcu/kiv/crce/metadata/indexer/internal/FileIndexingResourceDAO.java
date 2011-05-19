@@ -11,10 +11,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
-import org.osgi.service.cm.ConfigurationException;
 
 /**
  * Implementation of <code>ResourceDAO</code> which provides indexing of artifacts
@@ -26,6 +24,7 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO implements Plug
     private volatile PluginManager m_pluginManager;
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
 
+    private static final int PLUGIN_PRIORITY = 100;
 
     @Override
     public Resource getResource(URI uri) throws IOException {
@@ -92,7 +91,7 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO implements Plug
     }
 
     @Override
-    public void updated(Dictionary properties) throws ConfigurationException {
-        super.updated(properties);
+    public int getPluginPriority() {
+        return PLUGIN_PRIORITY;
     }
 }
