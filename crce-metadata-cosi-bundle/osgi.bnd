@@ -1,0 +1,12 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Private-Package:\
+  ${bundle.namespace}.internal.*,\
+  cz.zcu.kiv.cosi.*\
+  
+
+
