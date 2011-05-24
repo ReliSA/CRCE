@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.webui.custom;
 
+import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -320,5 +322,16 @@ public class ResourceAdapter implements Resource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public Repository getRepository() {
+		// TODO Auto-generated method stub
+		return null;
+    }
+
+    @Override
+    public void setRepository(WritableRepository repository) {
+		// TODO Auto-generated method stub
+    }
 
 }

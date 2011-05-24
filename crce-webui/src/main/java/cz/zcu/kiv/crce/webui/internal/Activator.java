@@ -10,18 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Activator of this bundle
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public final class Activator extends DependencyActivatorBase {
-    
-    private static final int RETRY_AFTER = 1000;
-    private static final int RETRY_TIMEOUT = 10000;
     
     private static volatile Activator m_instance;
 
