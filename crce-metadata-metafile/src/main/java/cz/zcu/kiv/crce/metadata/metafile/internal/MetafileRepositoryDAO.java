@@ -22,8 +22,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.osgi.service.log.LogService;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which provides support for
+ * reading and writing repository and its metadata from/to XML file.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements MetadataGenerator, RepositoryDAO {
 
@@ -41,7 +42,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
     }
 
     @Override
-    public WritableRepository getRepository(URI uri) throws IOException {
+    public synchronized WritableRepository getRepository(URI uri) throws IOException {
         if (!"file".equals(uri.getScheme())) {
             throw new UnsupportedOperationException("Other URI schemes than 'file' are not supported yet.");
         }
@@ -74,6 +75,14 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
 //         */
         
         ResourceDAO rdao = m_pluginManager.getPlugin(ResourceDAO.class);
+        
+        for (int i = 0; rdao == null && i < 5; rdao = m_pluginManager.getPlugin(ResourceDAO.class), i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                // do nothing
+            }
+        }
 
         WritableRepository repository = m_resourceCreator.createRepository(uri);
         recurse(repository, directory, rdao);
@@ -162,6 +171,9 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
                     resource = rdao.getResource(artifact.toURI());
                 } catch (IOException e) {
                     m_log.log(LogService.LOG_ERROR, "Can not index resource " + artifact.getAbsolutePath(), e);
+                    return;
+                } catch (NullPointerException e) {
+                    m_log.log(LogService.LOG_WARNING, "No resourceDAO found, try it later");
                     return;
                 }
 

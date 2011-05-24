@@ -1,8 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
+ * Represents a requirement to a capability with the same name.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Requirement {
     

@@ -5,8 +5,8 @@ import cz.zcu.kiv.crce.repository.SessionData;
 import org.apache.felix.dm.Component;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>SessionData</code>
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class SessionDataImpl implements SessionData {
 

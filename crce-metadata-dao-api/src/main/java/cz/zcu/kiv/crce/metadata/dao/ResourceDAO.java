@@ -13,7 +13,7 @@ import java.net.URI;
  * manipulate and manage metadata resource while uploading artifacts, retrieving
  * them, copying etc.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface ResourceDAO extends Plugin {
 

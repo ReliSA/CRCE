@@ -12,8 +12,8 @@ import org.apache.felix.utils.version.VersionTable;
 import org.osgi.framework.Version;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of metadata <code>Property</code> interface.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class PropertyImpl implements Property {
 
@@ -22,6 +22,9 @@ public class PropertyImpl implements Property {
     private String m_value;
 
     public PropertyImpl(String name) {
+        if (name == null) {
+            name = "null";
+        }
         m_name = name.intern();
     }
 

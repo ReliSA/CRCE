@@ -16,8 +16,9 @@ import org.apache.felix.bundlerepository.RepositoryAdmin;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * implementation of <code>ResourceIndexer</code> which provides support for
+ * indexing OSGi components metadata. It uses Apache OBR internaly.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 

@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.metadata.combined.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.combined.CombinedResource;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -15,10 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import org.osgi.framework.Version;
 
-// TODO specifi exact write behavior
 /**
- *
- * @author kalwi
+ * Implementation of <code>CombinedResource</code>.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class CombinedResourceImpl implements CombinedResource {
 
@@ -376,4 +377,16 @@ public class CombinedResourceImpl implements CombinedResource {
     public boolean isSymbolicNameStatic() {
         return m_staticResource.isSymbolicNameStatic() || m_writableResource.isSymbolicNameStatic();
     }
+
+    @Override
+    public Repository getRepository() {
+        return m_staticResource.getRepository();
+    }
+
+    @Override
+    public void setRepository(WritableRepository repository) {
+        m_staticResource.setRepository(repository);
+//        m_writableResource.setRepository(repository);
+    }
+    
 }

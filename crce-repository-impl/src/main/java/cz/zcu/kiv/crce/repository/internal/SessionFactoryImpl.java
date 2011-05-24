@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionData;
@@ -11,8 +12,8 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>SessionFactory.</code>
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class SessionFactoryImpl implements SessionRegister {
 
@@ -34,7 +35,8 @@ public class SessionFactoryImpl implements SessionRegister {
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(m_dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
-                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false));
+                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false))
+                        .add(m_dependencyManager.createServiceDependency().setService(ResourceCreator.class).setRequired(true));
                 
                 m_dependencyManager.add(sd.m_bufferComponent);
                 m_sessions.put(sessionId, sd);

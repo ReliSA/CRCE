@@ -13,8 +13,8 @@ import java.net.URI;
 import org.apache.felix.bundlerepository.RepositoryAdmin;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceCreator</code> interface.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class ResourceCreatorImpl implements ResourceCreator {
 
@@ -49,8 +49,8 @@ public class ResourceCreatorImpl implements ResourceCreator {
         
         out.setId(resource.getId());
         out.setPresentationName(resource.getPresentationName());
-        if (resource instanceof ResourceImpl) {
-            out.setRepository(((ResourceImpl) resource).getRepository());
+        if (resource.getRepository() instanceof WritableRepository) {
+            out.setRepository((WritableRepository) resource.getRepository());
         }
         try {
             out.setSize(resource.getSize());

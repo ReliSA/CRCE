@@ -35,7 +35,7 @@ import java.util.Properties;
  * manifest of bundle) - in this case it ensures that the metadata will be valid
  * during the execution of other Executable plugins.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Executable extends Plugin {
 

@@ -21,7 +21,7 @@ import org.osgi.service.log.LogService;
  * This implementation of ResourceDAO reads/writes metadata from/to a file,
  * whose name (URI path) is created by resource's URI path and '.meta' extension.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileResourceDAO extends AbstractResourceDAO {
 
@@ -94,7 +94,8 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         if ("file".equals(scheme)) {
             File resourceFile = new File(metadataUri);
             if (resourceFile.exists() && !resourceFile.delete()) {
-                throw new IOException("Can not delete metadata file " + metadataUri);
+                m_log.log(LogService.LOG_WARNING, "Can not delete metadata file " + metadataUri + ", it will be deleted later");
+                resourceFile.deleteOnExit();
             }
         } else if ("http".equals(scheme)) {
             HttpURLConnection httpCon = (HttpURLConnection) metadataUri.toURL().openConnection();

@@ -3,10 +3,8 @@ package cz.zcu.kiv.crce.plugin.internal;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,8 +13,8 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>PluginManager</code>.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class PluginManagerImpl implements PluginManager {
 
@@ -110,12 +108,15 @@ public class PluginManagerImpl implements PluginManager {
 
         m_log.log(LogService.LOG_INFO, "Plugin registered: " + plugin.getPluginId());
 
-        Dictionary properties = new Hashtable();
-        properties.put(EVENT_PLUGIN_ID, plugin.getPluginId());
-        properties.put(EVENT_PLUGIN_TYPES, types.toString());
-        properties.put(EVENT_PLUGIN_PRIORITY, plugin.getPluginPriority());
-        Event event = new Event(TOPIC_REGISTERED, properties);
-        m_eventAdmin.sendEvent(event);
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PROPERTY_PLUGIN_ID, plugin.getPluginId());
+        properties.put(PROPERTY_PLUGIN_VERSION, plugin.getPluginVersion().toString());
+        properties.put(PROPERTY_PLUGIN_PRIORITY, plugin.getPluginPriority());
+        properties.put(PROPERTY_PLUGIN_DESCRIPTION, plugin.getPluginDescription());
+        properties.put(PROPERTY_PLUGIN_KEYWORDS, plugin.getPluginKeywords().toString());
+        properties.put(PROPERTY_PLUGIN_TYPES, types.toString());
+        
+        m_eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
     }
 
     /**
@@ -125,13 +126,18 @@ public class PluginManagerImpl implements PluginManager {
     synchronized void unregister(Plugin plugin) {
         Set<String> types = new HashSet<String>();
         removeRecursive(plugin.getClass(), plugin, types);
+        
         m_log.log(LogService.LOG_INFO, "Plugin unregistered: " + plugin.getPluginId());
-        Dictionary properties = new Hashtable();
-        properties.put(EVENT_PLUGIN_ID, plugin.getPluginId());
-        properties.put(EVENT_PLUGIN_TYPES, types.toString());
-        properties.put(EVENT_PLUGIN_PRIORITY, plugin.getPluginPriority());
-        Event event = new Event(TOPIC_REGISTERED, properties);
-        m_eventAdmin.sendEvent(event);
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PROPERTY_PLUGIN_ID, plugin.getPluginId());
+        properties.put(PROPERTY_PLUGIN_VERSION, plugin.getPluginVersion().toString());
+        properties.put(PROPERTY_PLUGIN_PRIORITY, plugin.getPluginPriority());
+        properties.put(PROPERTY_PLUGIN_DESCRIPTION, plugin.getPluginDescription());
+        properties.put(PROPERTY_PLUGIN_KEYWORDS, plugin.getPluginKeywords().toString());
+        properties.put(PROPERTY_PLUGIN_TYPES, types.toString());
+
+        m_eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
     }
 
     private void removeRecursive(Class clazz, Plugin plugin, Set<String> types) {

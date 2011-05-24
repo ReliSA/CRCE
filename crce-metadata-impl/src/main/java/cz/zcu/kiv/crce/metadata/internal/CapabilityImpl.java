@@ -4,8 +4,9 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of metadata <code>Capability</code> interface.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class CapabilityImpl extends AbstractPropertyProvider<Capability> implements Capability, PropertyProvider<Capability> {
 

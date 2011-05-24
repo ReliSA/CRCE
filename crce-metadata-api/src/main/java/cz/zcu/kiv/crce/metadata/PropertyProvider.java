@@ -6,9 +6,10 @@ import java.util.Set;
 import org.osgi.framework.Version;
 
 /**
- *
+ * Common interface for subclasses that can provide Properties.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  * @param <T> 
- * @author kalwi
  */
 public interface PropertyProvider<T extends PropertyProvider<T>> {
 

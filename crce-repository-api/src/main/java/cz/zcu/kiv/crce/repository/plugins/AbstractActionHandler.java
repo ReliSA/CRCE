@@ -15,7 +15,7 @@ import java.util.Properties;
  * <p>This class is recommended to be used as superclass for all implementations
  * of <code>ActionHandler</code> so then it's not necessary to implement all
  * methods.
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
@@ -50,8 +50,8 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Resource beforeUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
-        return resource;
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+        return name;
     }
 
     @Override

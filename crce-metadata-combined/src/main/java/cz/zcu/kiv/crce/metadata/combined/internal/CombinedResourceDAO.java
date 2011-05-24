@@ -12,8 +12,9 @@ import java.util.Dictionary;
 import org.osgi.service.cm.ConfigurationException;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which creates combined
+ * Resources.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class CombinedResourceDAO extends AbstractResourceDAO implements Plugin {
 
@@ -62,7 +63,7 @@ public class CombinedResourceDAO extends AbstractResourceDAO implements Plugin {
     @Override
     public Resource moveResource(Resource resource, URI uri) {
         if (!(resource instanceof CombinedResourceImpl)) {
-            throw new IllegalStateException("Not a CombinedResourceImpl"); // XXX
+            throw new IllegalStateException("Not a CombinedResourceImpl: " + resource.getClass()); // XXX
         }
         Resource staticResource = m_staticResourceDAO.moveResource(((CombinedResourceImpl) resource).getStaticResource(), uri);
         

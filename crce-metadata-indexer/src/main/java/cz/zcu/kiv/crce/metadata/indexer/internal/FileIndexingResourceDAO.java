@@ -5,6 +5,7 @@ import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -14,14 +15,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of <code>ResourceDAO</code> which provides indexing of artifacts
+ * with indexers to a static (read-only) metadata representation.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public class FileIndexingResourceDAO extends AbstractResourceDAO {
+public class FileIndexingResourceDAO extends AbstractResourceDAO implements Plugin {
 
     private volatile PluginManager m_pluginManager;
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
 
+    private static final int PLUGIN_PRIORITY = 100;
 
     @Override
     public Resource getResource(URI uri) throws IOException {
@@ -89,6 +92,6 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
 
     @Override
     public int getPluginPriority() {
-        return 10;
+        return PLUGIN_PRIORITY;
     }
 }

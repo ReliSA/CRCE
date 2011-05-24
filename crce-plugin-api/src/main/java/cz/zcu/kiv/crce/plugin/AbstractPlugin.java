@@ -1,11 +1,11 @@
 package cz.zcu.kiv.crce.plugin;
 
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
@@ -19,12 +19,11 @@ import org.osgi.service.event.EventAdmin;
  * It can be extended of any plugin - it's recommended to keep unified
  * behaviour of plugins.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
 
     private volatile BundleContext m_context;
-    private volatile DependencyManager m_manager;
     private Dictionary properties = new Properties();
     private String id = this.getClass().getName();
     private Version version = new Version("0.0.0");
@@ -179,8 +178,13 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                 if (ref != null) {
                     EventAdmin eventAdmin = (EventAdmin) m_context.getService(ref);
 
-                    Dictionary props = new Hashtable();
-                    props.put(PluginManager.EVENT_PLUGIN_ID, this.getPluginId());
+                    Map<String, Object> props = new HashMap<String, Object>();
+                    
+                    props.put(PluginManager.PROPERTY_PLUGIN_ID, id);
+                    props.put(PluginManager.PROPERTY_PLUGIN_VERSION, version.toString());
+                    props.put(PluginManager.PROPERTY_PLUGIN_PRIORITY, priority);
+                    props.put(PluginManager.PROPERTY_PLUGIN_DESCRIPTION, description);
+                    props.put(PluginManager.PROPERTY_PLUGIN_KEYWORDS, keywords.toString());
                     
                     Set<String> types = new HashSet<String>();
 
@@ -190,12 +194,9 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                         }
                     }
                     
-                    props.put(PluginManager.EVENT_PLUGIN_TYPES, types.toString());
-                    props.put(PluginManager.EVENT_PLUGIN_PRIORITY, this.getPluginPriority());
+                    props.put(PluginManager.PROPERTY_PLUGIN_TYPES, types.toString());
 
-                    Event reportGeneratedEvent = new Event(PluginManager.TOPIC_CONFIGURED, props);
-
-                    eventAdmin.sendEvent(reportGeneratedEvent);
+                    eventAdmin.sendEvent(new Event(PluginManager.TOPIC_PLUGIN_CONFIGURED, props));
                 }
             }
         }

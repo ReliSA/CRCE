@@ -7,8 +7,8 @@ import org.apache.felix.utils.filter.FilterImpl;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Implementation of Requirement interface.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class RequirementImpl implements Requirement {
 

@@ -11,7 +11,7 @@ import org.osgi.framework.Version;
  * 
  * <p>Resource have capabilities, requirements, properties and categories.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Resource extends PropertyProvider<Resource> {
 
@@ -26,6 +26,8 @@ public interface Resource extends PropertyProvider<Resource> {
     URI getUri();
     
     URI getRelativeUri();
+    
+    Repository getRepository();
 
     /**
      * Returns the resource size in bytes or -1 if size is unknown.
@@ -91,6 +93,8 @@ public interface Resource extends PropertyProvider<Resource> {
     void setSize(long size);
 
     void setUri(URI uri);
+    
+    void setRepository(WritableRepository repository);
 
     boolean isWritable();
     

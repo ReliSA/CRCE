@@ -1,8 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
- * @author kalwi
+ * This enumeration indicates the type of Properties.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public enum Type {
 

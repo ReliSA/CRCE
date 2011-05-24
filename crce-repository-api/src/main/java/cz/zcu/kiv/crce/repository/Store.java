@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * This interface defines permanent store for artifacts.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Store {
     

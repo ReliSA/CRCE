@@ -19,8 +19,8 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
 
 /**
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Activator of this bundle.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase implements ManagedService {
     
@@ -59,26 +59,38 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         if (dict == null) {
             return;
         }
-        
+
         if (m_context.getServiceReference(Store.class.getName()) != null) {
             m_log.log(LogService.LOG_WARNING, "Store URI reconfiguration on runtime is not supported");
             return;
         }
-        
-        URI uri;
+
+        String path = (String) dict.get(STORE_URI);
+
+        URI uri = null;
+        File file = null;
         try {
-            uri = new URI((String) dict.get(STORE_URI));
+            uri = new URI(path);
+            if (uri.getScheme() == null) {
+                file = new File(path);
+            } else if ("file".equals(uri.getScheme())) {
+                file = new File(uri);
+            }
         } catch (URISyntaxException ex) {
-            throw new ConfigurationException(STORE_URI, "Invalid URI: " + dict.get("uri"), ex);
+            file = new File(path);
         }
 
         Component store;
-        
-        if ("file".equals(uri.getScheme())) {
+
+        if (file != null) {
+            if (!file.exists() && !file.mkdirs()) {
+                throw new ConfigurationException(STORE_URI, "Can not create directory on given path: " + path);
+            }
+
             try {
                 store = createComponent()
                         .setInterface(Store.class.getName(), null)
-                        .setImplementation(new FilebasedStoreImpl(new File(uri)))
+                        .setImplementation(new FilebasedStoreImpl(file))
                         .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                         .add(createServiceDependency().setRequired(false).setService(LogService.class));
             } catch (IOException e) {
@@ -92,17 +104,18 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             } catch (MalformedURLException ex) {
                 throw new ConfigurationException(STORE_URI, "OBR Store URI is not an URL: " + uri, ex);
             }
+
         } else {
             throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
         }
-        
+
         m_manager.add(store);
-        
+
         // for more instances of Store (e.g. user would like to choose a store for uploading resources)
         // th ManagedServiceFactory can be used, see:
         // http://www.osgilook.com/2009/08/04/factory-pattern-on-steroids-the-managedservicefactory/
         // http://changelos.com/2010/12/19/using-a-managedservicefactory/
-        
+
     }
 
     @Override

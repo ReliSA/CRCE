@@ -1,8 +1,9 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * Object of this interface type can evaluate dependencies between added resources.
+ * 
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface Resolver {
     

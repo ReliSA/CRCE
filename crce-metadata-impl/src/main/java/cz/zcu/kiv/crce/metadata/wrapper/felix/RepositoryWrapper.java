@@ -5,7 +5,7 @@ import org.apache.felix.bundlerepository.Resource;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class RepositoryWrapper implements org.apache.felix.bundlerepository.Repository {
 

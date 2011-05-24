@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
-// TODO split to resource creators
 /**
- *
- * @author kalwi
+ * This helper provides support for storing and reading Metadata entities
+ * to/from XML.
+ * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public interface DataModelHelperExt {
 
