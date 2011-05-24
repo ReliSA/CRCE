@@ -18,7 +18,7 @@
     <url>https://www.assembla.com/spaces/crce/</url>
     
     <properties>
-        <org.osgi.service.http.port>8090</org.osgi.service.http.port>
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,19 +34,32 @@
     <modules>
         <module>poms</module>
         <module>provision</module>
+        
+        <module>crce-target</module>
+        
+        <!-- API -->
+        <module>crce-plugin-api</module>
         <module>crce-metadata-api</module>
         <module>crce-metadata-dao-api</module>
-        <module>crce-metadata-impl</module>
-        <module>crce-metadata-combined</module>
-        <module>crce-metadata-osgi-bundle</module>
-        <module>crce-metadata-metafile</module>
-        <module>crce-metadata-indexer</module>
-        <module>crce-handler-versioning</module>
-        <module>crce-plugin-api</module>
         <module>crce-repository-api</module>
-        <module>crce-repository-impl</module>
         <module>crce-results-api</module>
+        
+        <!-- API Implementation -->
+        <module>crce-metadata-impl</module>
+        <module>crce-repository-impl</module>
         <module>crce-results-impl</module>
+        
+        <!-- Core Plugins -->
+        <module>crce-metadata-indexer</module>
+        <module>crce-metadata-metafile</module>
+        <module>crce-metadata-combined</module>
+        
+        <!-- Indexers -->
+        <module>crce-metadata-osgi-bundle</module>
+        <module>crce-metadata-cosi-bundle</module>
+        
+        <!-- UI & Optional Plugins -->
+        <module>crce-handler-versioning</module>
         <module>crce-webui</module>
     </modules>
 
