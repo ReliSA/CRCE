@@ -4,6 +4,10 @@
     Author     : kalwi
 --%>
 
+<%
+ response.sendRedirect("resource");
+ %>
+
 <%@page import="cz.zcu.kiv.crce.plugin.Plugin"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Requirement"%>
 <%@page import="cz.zcu.kiv.crce.metadata.Property"%>
