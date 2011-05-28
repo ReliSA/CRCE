@@ -69,7 +69,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         URI uri = null;
         File file = null;
-        try {
+        try {        	
             uri = new URI(path);
             if (uri.getScheme() == null) {
                 file = new File(path);
