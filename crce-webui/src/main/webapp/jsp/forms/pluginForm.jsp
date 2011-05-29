@@ -11,17 +11,17 @@
 		<h3>Plugin: ${plugin.pluginId}</h3>
 		
 		<form action="#" method="post">
-			<input type="hidden" name="uri" value="${plugin.pluginId}" />
+			<input type="hidden" name="id" value="${plugin.pluginId}" />
 			<input type="hidden" name="form" value="plugin" />
 		<table class="formular">	  		
 			<tr>
 				<th>Priority:</th>
-				<td><input class="text" type="text" name="priority" value="${priority}" /></td>
+				<td><input class="text" type="text" name="priority" value="${plugin.pluginPriority}" /></td>
 				<td class="chyba">${priorityError}</td>
 			</tr>
 			<tr>
 				<th>Keywords:</th>
-				<td><input class="text" type="text" name="keywords" value="${keywords}" /></td>
+				<td><input class="text" type="text" name="keywords" value="${plugin.pluginVersion}" /></td>
 				<td class="chyba">${keywordsError}</td>
 			</tr>
 			<tr>

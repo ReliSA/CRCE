@@ -19,6 +19,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.Type;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
 public class EditServlet extends HttpServlet {
@@ -90,6 +91,18 @@ public class EditServlet extends HttpServlet {
 				ResourceServlet.setError(req.getSession(), false, "Cannot add capability.");
 				success = true;
 			}
+		} else if ("plugin".equals(form)) {
+			if (savePlugin(req,resp, parameters)) {
+				success = editPlugin(req, resp, parameters);
+				if (!success){
+					ResourceServlet.setError(req.getSession(), false, "Cannot edit plugin.");
+					success = true;
+				}
+			} else {
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit plugin.");
+				editPlugin(req, resp, parameters);
+				success = true;
+			}
 		} else if ("property".equals(form)) {
 			if (!saveProperty(req,resp, parameters)) {
 				ResourceServlet.setError(req.getSession(), false, "Cannot add property.");
@@ -114,6 +127,23 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+	private boolean savePlugin(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		Plugin[] array;
+		array = Activator.instance().getPluginManager().getPlugins();
+		String plugId =(String) req.getParameter("plugId");
+		try {
+			Plugin plugin = findResource(plugId, array);
+//			String priority = ((String[]) parameters.get("priority"))[0];
+//			String keywords = ((String[]) parameters.get("keywords"))[0];
+			//TODO after implementation of plugin setters, set priority and keywords 
+		} catch (IOException e) {
+			return false;
+		}
+		
+	return false;
+	}
+
 	private boolean saveResourceProperty(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
 		String uri = null;
@@ -464,8 +494,8 @@ public class EditServlet extends HttpServlet {
 					requirLengthBefore = requirements.length;
 					resource.unsetRequirement(requirements[i]);
 					if(requirLengthBefore == resource.getRequirements().length){
-//TODO						req.getSession().setAttribute("success", false);
-//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
+						req.getSession().setAttribute("success", false);
+						req.getSession().setAttribute("message", "Cannot change requirement.");
 						continue;
 					}
 					
@@ -473,8 +503,8 @@ public class EditServlet extends HttpServlet {
 					try {
 						requir.setFilter(filter);
 					} catch (IllegalArgumentException e) {
-//TODO						req.getSession().setAttribute("success", false);
-//TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
+						req.getSession().setAttribute("success", false);
+						req.getSession().setAttribute("message", "Cannot change requirement.");
 						resource.unsetRequirement(requir);
 						resource.addRequirement(requirBefore);
 						continue;
@@ -632,6 +662,13 @@ public class EditServlet extends HttpServlet {
 				success = true;
 			}
 			
+		} else if("editPlugin".equals(type)) {
+			success = editPlugin(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit plugin.");
+				success = true;
+			}
+			
 		} else {
 			success = false;
 		}
@@ -640,6 +677,27 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+
+	private boolean editPlugin(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		
+			Plugin[] array;
+			array = Activator.instance().getPluginManager().getPlugins();
+			String plugId =(String) req.getParameter("plugId");
+			try {
+				Plugin plugin = findResource(plugId, array);
+				req.getSession().setAttribute("plugin", plugin);			
+				req.getRequestDispatcher("jsp/forms/pluginForm.jsp").forward(req, resp);
+			} catch (FileNotFoundException e) {
+				return false;
+			} catch (ServletException e) {
+				return false;
+			} catch (IOException e) {
+				return false;
+			}
+			
+		return true;
+	}
 
 	private boolean editProperties(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
@@ -946,6 +1004,20 @@ public class EditServlet extends HttpServlet {
 		for(Resource r : array)
 		{
 			if(r.getUri().equals(uri))
+				{
+					found = r;
+					break;
+				}
+		}
+		if(found==null) throw new FileNotFoundException();
+		return found;
+	}
+	
+	public static Plugin findResource(String plugId, Plugin[] array) throws FileNotFoundException{
+		Plugin found = null;
+		for(Plugin r : array)
+		{
+			if(r.getPluginId().equals(plugId))
 				{
 					found = r;
 					break;
