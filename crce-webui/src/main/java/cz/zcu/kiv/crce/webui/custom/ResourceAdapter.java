@@ -14,7 +14,11 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.Type;
-
+/**
+ * Adapter for {@link Resource} interface
+ * @author Sandcrew
+ *
+ */
 public class ResourceAdapter implements Resource {
 
 	@Override

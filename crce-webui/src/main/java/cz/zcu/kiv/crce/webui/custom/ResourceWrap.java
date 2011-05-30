@@ -8,10 +8,19 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-
+/**
+ * A wrapper for {@link Resource}
+ * @author Sandcrew
+ *
+ */
 abstract class ResourceWrap extends ResourceAdapter{
-	protected Resource r;
+	protected Resource r; // resource to be wrapped
 	
+	/**
+	 * Constructor that creates new instance of Wrap class
+	 * with Resource as param
+	 * @param r - Resource to be wrapped by this class
+	 */
 	protected ResourceWrap(Resource r){
 		this.r=r;
 	}

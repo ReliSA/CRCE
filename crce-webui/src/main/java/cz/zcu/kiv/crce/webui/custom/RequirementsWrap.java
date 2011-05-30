@@ -1,11 +1,18 @@
 package cz.zcu.kiv.crce.webui.custom;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
-
+/**
+ * A wrapper class for {@link Requirement} implementation
+ * @author Sandcrew
+ *
+ */
 public class RequirementsWrap extends RequirementAdapter {
 	protected Requirement r;
 	
-	
+	/**
+	 * Constructor for wrap
+	 * @param r - Requirement to be wrapped by this class
+	 */
 	public RequirementsWrap(Requirement r){
 		this.r=r;
 	}

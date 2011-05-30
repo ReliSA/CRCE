@@ -18,8 +18,8 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.osgi.service.log.LogService;
 
 /**
- *
- * @author kalwi
+ * A servlet which is responsible for filling the buffer
+ * @author CouchCoders
  */
 public class UploadServlet extends HttpServlet {
 

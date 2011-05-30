@@ -18,7 +18,12 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 
-
+/**
+ * A servlet which handles the test action
+ * Runs tests on the server and redirects back to the page.
+ * @author Sandcrew
+ *
+ */
 
 public class RuntimeServlet extends HttpServlet {
 

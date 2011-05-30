@@ -3,7 +3,13 @@ package cz.zcu.kiv.crce.webui.custom;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 
-public class RequirementAdapter implements Requirement{
+/**
+ * Adapter for RequirementClass -> Creates an adapter for wrapper {@link RequirementWrap}
+ * 
+ * @author Sandcrew
+ * 
+ */
+public class RequirementAdapter implements Requirement {
 
 	@Override
 	public String getName() {

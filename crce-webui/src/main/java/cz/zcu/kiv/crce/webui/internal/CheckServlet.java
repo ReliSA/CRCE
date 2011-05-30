@@ -19,8 +19,15 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.webui.custom.ResourceExt;
-
+/**
+ * A class for the Check Action
+ * @author Sandcrew
+ *
+ */
 public class CheckServlet extends HttpServlet {
+	/**
+	 * Handles the CheckAction
+	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {		
@@ -38,6 +45,12 @@ public class CheckServlet extends HttpServlet {
 		}
 
 	}
+	/**
+	 * Parses request attribute source and returns an array of Resources from the right repository
+	 * calling doCheck
+	 * @param req 
+	 * @return
+	 */
 	private Resource[] chooseFrom(HttpServletRequest req){
 		String source = (String )req.getSession().getAttribute("source");		
 		if(source == null) return null;
@@ -45,6 +58,12 @@ public class CheckServlet extends HttpServlet {
 		else if(source.equals("store")) return doCheck(Activator.instance().getStore().getRepository());
 		else return null;
 	}
+	/**
+	 * Makes the check on the repository selected by source param.
+	 * Creates ResourceExt wrapper for all the Resources
+	 * @param repository - Repository to be checked
+	 * @return ResourceExt with unsatisfied Requirements of selected repository
+	 */
 	private Resource[] doCheck(Repository repository) {		
 		Resource[] resources = repository.getResources();
 		Resource[] cloned = new Resource[resources.length];

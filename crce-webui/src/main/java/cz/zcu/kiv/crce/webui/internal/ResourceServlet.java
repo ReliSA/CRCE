@@ -17,7 +17,11 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 public class ResourceServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Main core of the application. Responsible for loading
+	 * Resources from repository and though update the page
+	 * DoPost is just redirected to doGet
+	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -43,7 +47,11 @@ public class ResourceServlet extends HttpServlet {
 			
 
 	}
-
+	/**
+	 * Reads required data for the page. Saves them to the session
+	 * and redirects via link param.
+	 * 
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
 		
@@ -74,17 +82,34 @@ public class ResourceServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * A static session cleaner method
+	 * Removes atts such as resources, plugins and store
+	 * @param session - session to be cleaned
+	 * 
+	 */
 	public static void cleanSession(HttpSession session){
 		session.removeAttribute("resources");
 		session.removeAttribute("plugins");
 		session.removeAttribute("store");		
 	}
-	
+	/**
+	 * A core method for getting the page now how the action ended	 * 
+	 * @param session - session of the page
+	 * @param success - true if there was an success false - error
+	 * @param message - A message which will be displayd on the page
+	 */
 	public static void setError(HttpSession session, boolean success, String message){
 		session.setAttribute("success", success);
 		session.setAttribute("message", message);
 	}
-	
+	/**
+	 * Private method for filling the session
+	 * @param link - Which page will be displayed
+	 * @param req - Request to parse
+	 * @param filter - Filter to narrow selected resources
+	 * @return
+	 */
 	private boolean fillSession(String link, HttpServletRequest req, String filter){
 		String errorMessage = filter+" is not a valid filter";
 		HttpSession session = req.getSession();

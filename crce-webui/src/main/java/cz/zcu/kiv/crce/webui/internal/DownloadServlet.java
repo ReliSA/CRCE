@@ -17,7 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-
+/**
+ * A class which handles a download action and commit action.
+ * Main purpose is to offer user a file which was stored before
+ * @author Sandcrew
+ *
+ */
 public class DownloadServlet extends HttpServlet {
 
 	/**
@@ -25,8 +30,13 @@ public class DownloadServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final int BUFSIZE = 128;
-
-	@Override
+	
+	/**
+	 * Commit action -> This is responsible for 
+	 * moving all the bundles from buffer repository to store
+	 * Sets Error or success via {@link ResourceServlet}
+	 */
+	@Override	
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 	throws ServletException, IOException {
 		boolean success;
@@ -45,7 +55,9 @@ public class DownloadServlet extends HttpServlet {
 		ResourceServlet.setError(req.getSession(), success, message);
 		req.getRequestDispatcher("resource?link=store").forward(req, resp);
 	}
-
+	/**
+	 * Responsible for offering user a resource he wants to download via doDownload method 
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 	throws ServletException, IOException {
