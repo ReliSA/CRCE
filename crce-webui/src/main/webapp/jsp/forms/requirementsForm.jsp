@@ -29,7 +29,10 @@
 		  			<td><input type="checkbox" name="optional_${counter.count}" <c:if test="${requirement.optional}">checked="checked"</c:if> /></td>
 		  			<td><input type="checkbox" name="extend_${counter.count}" <c:if test="${requirement.extend}">checked="checked"</c:if> /></td>
 		  		</tr>
-		  		<tr><td colspan="5" class="komentar"><input type="text" name="comment_${counter.count}" value='${requirement.comment}' /></td></tr>
+		  		<tr>
+		  			<td colspan="4" class="komentar"><input type="text" name="comment_${counter.count}" value='${requirement.comment}' /></td>
+		  			<td><a class="edit" href="edit?item=${counter.count}&type=deleteRequirement&uri=${resource.uri}">[delete]</a></td>
+		  		</tr>
 	  		</c:forEach>
 	  		<tr><td colspan="5"><input class="tlacitko" type="submit" value="Save requirements" /></td></tr>
 	  	</table>

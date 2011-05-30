@@ -13,7 +13,8 @@
 		
 		
 		<p>
-			<a class="edit-addnew" href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}"><!-- <img src="graphic/add.png" alt="add new property" title="add new property" /> -->[add new property]</a><br />
+			<a class="edit-addnew" href="edit?type=addCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}">[add new property]</a><br />
+			<a class="edit-addnew" href="edit?type=deleteCapability&uri=${resource.uri}&capabilityId=${capabilityId}">[delete capability]</a><br />
 		</p>
       
 		<form action="#" method="post">
@@ -35,6 +36,7 @@
 							</select>
 		  				</td>
 		  				<td class="hodnota"><input class="text" type="text" name="value_${counter.count}" value="${property.value}" /></td>
+		  				<td><a class="edit-addnew" href="edit?item=${counter.count}&type=deleteCapabilityProperty&uri=${resource.uri}&capabilityId=${capabilityId}">[delete]</a></td>
 		  			</tr>
 		  		</c:forEach>
 		  		<tr><td colspan="3"><input class="tlacitko" type="submit" value="Save capabilities" /></td></tr>
