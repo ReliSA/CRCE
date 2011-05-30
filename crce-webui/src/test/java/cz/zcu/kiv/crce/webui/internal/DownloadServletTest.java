@@ -27,7 +27,7 @@ public class DownloadServletTest {
 		WebClient webClient = new WebClient();
 		HtmlPage currentPage;
 		try {
-			currentPage =(HtmlPage) webClient.getPage("http://localhost:8090/crce/resource");
+			currentPage =(HtmlPage) webClient.getPage("http://localhost:8080/crce/resource");
 			
 //			Zkontroluj, že se načetl Store 
 			String pageAsText = currentPage.asText();

@@ -27,7 +27,7 @@ public class EditServletTest {
 	@Before
 	public void prepareWebClient() {
 		try {
-			currentPage =(HtmlPage) webClient.getPage("http://localhost:8090/crce/resource");
+			currentPage =(HtmlPage) webClient.getPage("http://localhost:8080/crce/resource");
 		} catch (FailingHttpStatusCodeException e) {
 			fail("FHSCE: " + e.toString());
 		} catch (MalformedURLException e) {
