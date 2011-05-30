@@ -22,11 +22,19 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
+/**
+ * @author koty
+ *	A class which handles edit of resources and plugins
+ */
 public class EditServlet extends HttpServlet {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * This method handles the responses from forms
+	 * adding attributes to resource and savingthis attributes
+	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -577,7 +585,11 @@ public class EditServlet extends HttpServlet {
 		}
 		return true;
 	}
-
+	/**
+	 * This method handles the responses to links
+	 * forwarding to forms to edit attributes of resources
+	 * and deleting attributes. 
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -640,8 +652,43 @@ public class EditServlet extends HttpServlet {
 				ResourceServlet.setError(req.getSession(), false, "Cannot edit capabilities.");
 				success = true;
 			}
+			
+		} else if("deleteCapabilityProperty".equals(type)) {
+			success = deleteCapabilityProperty(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot delete property.");
+				success = true;
+			}
+			
+			success = editCapabilities(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit capabilities.");
+				success = true;
+			}
+				
+		}else if("deleteCapability".equals(type)) {
+			success = deleteCapability(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot delete capability.");
+				success = true;
+			}
+			
+			resp.sendRedirect("resource");
 				
 		} else if("requirement".equals(type)) {
+			success = editRequirements(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot edit requirements.");
+				success = true;
+			}
+		
+		} else if("deleteRequirement".equals(type)) {
+			success = deleteRequirement(req, resp, parameters);
+			if (!success){
+				ResourceServlet.setError(req.getSession(), false, "Cannot delete requirement.");
+				success = true;
+			}
+			
 			success = editRequirements(req, resp, parameters);
 			if (!success){
 				ResourceServlet.setError(req.getSession(), false, "Cannot edit requirements.");
@@ -677,6 +724,138 @@ public class EditServlet extends HttpServlet {
 		}
 	}
 	
+
+	private boolean deleteCapability(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+			URI resURI;
+			int capId;
+			try {
+				resURI = new URI((String) req.getParameter("uri"));
+				if (parameters.containsKey("capabilityId")) {
+					capId = Integer.valueOf(((String[])parameters.get("capabilityId"))[0]) - 1;
+				} else {
+					return false;
+				}
+				Resource resource = findResource(resURI, array);
+				Capability capability = resource.getCapabilities()[capId];
+				int lengthBefore = resource.getCapabilities().length;
+				resource.unsetCapability(capability);
+				if (resource.getCapabilities().length == lengthBefore) {
+					return false;
+				}
+				PluginManager pm = Activator.instance().getPluginManager();
+				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+				rd.save(resource);
+				
+			} catch (URISyntaxException e) {
+				return false;
+			} catch (FileNotFoundException e) {
+				return false;
+			} catch (IOException e) {
+				return false;
+			}
+		return true;
+	}
+
+	private boolean deleteCapabilityProperty(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+			URI resURI;
+			int id;
+			int capId;
+			try {
+				resURI = new URI((String) req.getParameter("uri"));
+				if (parameters.containsKey("item")) {
+					id = Integer.valueOf(((String[])parameters.get("item"))[0]) - 1;
+				} else {
+					return false;
+				}
+				if (parameters.containsKey("capabilityId")) {
+					capId = Integer.valueOf(((String[])parameters.get("capabilityId"))[0]) - 1;
+				} else {
+					return false;
+				}
+				Resource resource = findResource(resURI, array);
+				Capability capability = resource.getCapabilities()[capId];
+				int lengthBefore = capability.getProperties().length;
+				capability.unsetProperty(capability.getProperties()[id].getName());
+				if (capability.getProperties().length == lengthBefore) {
+					return false;
+				}
+				PluginManager pm = Activator.instance().getPluginManager();
+				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+				rd.save(resource);
+				
+			} catch (URISyntaxException e) {
+				return false;
+			} catch (FileNotFoundException e) {
+				return false;
+			} catch (IOException e) {
+				return false;
+			}
+		return true;
+	}
+
+	private boolean deleteRequirement(HttpServletRequest req,
+			HttpServletResponse resp, Map<?, ?> parameters) {
+		String link = (String) req.getSession().getAttribute("source");
+		Resource[] array;
+		if ("store".equals(link)) {
+			array = Activator.instance().getStore().getRepository().getResources();
+		} else  if ("buffer".equals(link)) {
+			array = Activator.instance().getBuffer(req).getRepository().getResources();
+		} else {
+			return false;
+		}
+		
+			URI resURI;
+			int id;
+			try {
+				resURI = new URI((String) req.getParameter("uri"));
+				if (parameters.containsKey("item")) {
+					id = Integer.valueOf(((String[])parameters.get("item"))[0]) - 1;
+				} else {
+					return false;
+				}
+				Resource resource = findResource(resURI, array);
+				int lengthBefore = resource.getRequirements().length;
+				resource.unsetRequirement(resource.getRequirements()[id]);
+				if (resource.getRequirements().length == lengthBefore) {
+					return false;
+				}
+				PluginManager pm = Activator.instance().getPluginManager();
+				ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
+				rd.save(resource);
+				
+			} catch (URISyntaxException e) {
+				return false;
+			} catch (FileNotFoundException e) {
+				return false;
+			} catch (IOException e) {
+				return false;
+			}
+			
+		return true;
+	}
 
 	private boolean editPlugin(HttpServletRequest req,
 			HttpServletResponse resp, Map<?, ?> parameters) {
@@ -890,7 +1069,7 @@ public class EditServlet extends HttpServlet {
 			e.printStackTrace();
 			return false;
 		}
-			
+		
 		return true;
 	}
 
@@ -914,7 +1093,6 @@ public class EditServlet extends HttpServlet {
 			e.printStackTrace();
 			return false;
 		}
-		
 		return true;
 	}
 	
@@ -999,6 +1177,13 @@ public class EditServlet extends HttpServlet {
 		return true;
 	}
 	
+	/**
+	 * This method find resource by his uri
+	 * @param uri resource uri
+	 * @param array of resources
+	 * @return found resource
+	 * @throws FileNotFoundException
+	 */
 	public static Resource findResource(URI uri, Resource[] array) throws FileNotFoundException{
 		Resource found = null;
 		for(Resource r : array)
@@ -1013,6 +1198,14 @@ public class EditServlet extends HttpServlet {
 		return found;
 	}
 	
+	/**
+	 * This method find plugin by his id
+	 * 
+	 * @param plugId
+	 * @param array of plugins
+	 * @return found plugin
+	 * @throws FileNotFoundException
+	 */
 	public static Plugin findResource(String plugId, Plugin[] array) throws FileNotFoundException{
 		Plugin found = null;
 		for(Plugin r : array)
