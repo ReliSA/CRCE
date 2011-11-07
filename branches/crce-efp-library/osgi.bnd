@@ -1,0 +1,15 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Export-Package:\
+  cz.zcu.kiv.efps.*;version="1.2-SNAPSHOT"
+
+Embed-Dependency:\
+    efpTypes,\
+    efpRegistryClient,\
+    efpAssignment,\
+    efpAssignmentCoSi,\
+    efpAssignmentOSGi

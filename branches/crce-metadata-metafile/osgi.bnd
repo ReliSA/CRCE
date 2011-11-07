@@ -1,0 +1,14 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Export-Package:\
+  org.apache.ace.obr.metadata;version="0.8.0.SNAPSHOT",\
+  !${bundle.namespace}.internal.*,\
+  ${bundle.namespace}.*;version="${pom.version}"
+
+Embed-Dependency:\
+    org.apache.felix.bundlerepository,\
+    plexus-utils
