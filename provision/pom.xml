@@ -197,6 +197,40 @@
             <version>5.2_3</version>
         </dependency>
         
+<!--                -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>1.4</version>
+        </dependency>     
+    
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.7.0</version>
+        </dependency>       
+ <!--         
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax_annotation_vf2</artifactId>
+            <version>1.0</version>
+        </dependency>   
+        
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-pokusny-modul</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>       
+ -->       
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-efp-indexer</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>    
+      
+
+      
+        
     </dependencies>
 
 </project>
