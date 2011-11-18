@@ -4,4 +4,9 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Export-Package:
+Export-Package:\
+    cz.zcu.kiv.crce.efp.*
+
+
+Embed-Dependency:\
+    *;groupId=!${project.groupId}|org.apache.felix

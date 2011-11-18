@@ -5,13 +5,6 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Export-Package:\
-    cz.zcu.kiv.efps.* 
-  
+    cz.zcu.kiv.crce.efp.*
 
-Embed-Dependency:\
-    efpTypes,\
-    efpRegistryClient,\
-    efpAssignment,\
-    efpAssignmentCoSi,\
-    efpAssignmentOSGi,\
-    *
+

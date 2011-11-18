@@ -8,20 +8,10 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.efps.assignment.api.ComponentEfpAccessor;
 import cz.zcu.kiv.efps.assignment.api.EfpAwareComponentLoader;
 import cz.zcu.kiv.efps.assignment.client.EfpAssignmentClient;
-import cz.zcu.kiv.efps.assignment.core.AssignmentRTException;
-import cz.zcu.kiv.efps.assignment.cosi.CosiAssignmentImpl;
-import cz.zcu.kiv.efps.assignment.extension.CommonBundleFilesManagerImpl;
-import cz.zcu.kiv.efps.assignment.extension.api.EfpDataLocation;
-import cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentImpl;
 import cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentRTException;
-import cz.zcu.kiv.efps.assignment.repomirror.api.MirroredDataManipulator;
-import cz.zcu.kiv.efps.assignment.repomirror.impl.XMLDataManipulator;
 import cz.zcu.kiv.efps.assignment.types.Feature;
-import cz.zcu.kiv.efps.assignment.types.Feature.AssignmentSide;
 import cz.zcu.kiv.efps.types.lr.LR;
-import cz.zcu.kiv.efps.types.lr.LrAssignment;
 import cz.zcu.kiv.efps.types.properties.EFP;
-import cz.zcu.kiv.efps.assignment.repository.generated.ObjectFactory;
 
 
 public class Indexer {
@@ -65,8 +55,8 @@ public class Indexer {
 			System.out.println("OSGiAssignmentRTException in accessor.getAllFeatures()!");
 			return false;
 		}
-		
-		
+
+
 		if(debugInfo)
 			System.out.println("Feature list loaded.");
 
@@ -76,9 +66,9 @@ public class Indexer {
 
 		Set<LR> LRset=accessor.getLRs();
 		arrayLR=LRset.toArray(new LR[0]);
-		
+
 		return true;
-	}	
+	}
 
 	public void assignEFPsOBR() {
 
@@ -86,7 +76,7 @@ public class Indexer {
 
 			//vsechna efp v repository.xml
 			List<EFP> listEfp=accessor.getEfps(feature);
-			
+
 			if(debugInfo)
 				dbg.getFeatureInfos(feature,listEfp);
 
@@ -96,7 +86,7 @@ public class Indexer {
 				featureWithEfp(listEfp,feature);
 		}
 	}
-	
+
 	//------------------------------------------
 
 	void featureWithoutEfp(Feature feature){
@@ -115,7 +105,7 @@ public class Indexer {
 
 	void featureWithEfp(List<EFP> listEfp,Feature feature){
 		for(EFP efp : listEfp ){
-			
+
 			//if(ono.getSide()==Feature.AssignmentSide.PROVIDED); !!!!!
 			Capability cap=resource.createCapability("EFP");
 
@@ -139,13 +129,13 @@ public class Indexer {
 
 			if(efp.getGamma()!=null)
 				cap.setProperty("gamma", efp.getGamma().toString());
-			
+
 			cap.setProperty("efp-summary", efp.toString());
 		}
 	}
 
 	//------------------------------------------
-	
+
 	public void loadResource(Resource resource){
 		this.resource = resource;
 	}
@@ -153,7 +143,7 @@ public class Indexer {
 	public Resource getResource(){
 		return resource;
 	}
-	
+
 	public ComponentEfpAccessor getAccessor() {
 		return accessor;
 	}
