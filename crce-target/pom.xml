@@ -114,11 +114,13 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.webconsole</artifactId>
             <version>3.1.8</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.shell</artifactId>
             <version>1.4.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -223,6 +225,21 @@
             <version>5.2_3</version> <!-- 4 -->
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+           <groupId>commons-io</groupId>
+           <artifactId>commons-io</artifactId>
+           <version>2.0.1</version>
+           <scope>provided</scope>
+        </dependency>        
+        
 
         <!-- CRCE -->
         
@@ -317,22 +334,6 @@
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
-        
-        
-        
-        
-        
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>1.2.2</version>
-        </dependency>
-        <dependency>
-           <groupId>commons-io</groupId>
-           <artifactId>commons-io</artifactId>
-           <version>2.0.1</version>
-        </dependency>        
-        
         
     </dependencies>
     

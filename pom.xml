@@ -35,7 +35,7 @@
         <module>poms</module>
         <module>provision</module>
         
-        <module>crce-target</module>
+<!--        <module>crce-target</module>-->
         
         <!-- API -->
         <module>crce-plugin-api</module>
@@ -62,6 +62,15 @@
         <module>crce-handler-versioning</module>
         <module>crce-webui</module>
     </modules>
+    
+    <profiles>
+      <profile>
+        <id>target</id>
+        <modules>
+          <module>crce-target</module>
+        </modules>
+      </profile>
+    </profiles>
 
     <build>
         <plugins>
