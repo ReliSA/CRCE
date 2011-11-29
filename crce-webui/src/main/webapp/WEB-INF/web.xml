@@ -76,25 +76,7 @@
         <servlet-name>edit</servlet-name>
         <url-pattern>/edit</url-pattern>
     </servlet-mapping>
-
-	<servlet>
-        <servlet-name>resource</servlet-name>
-        <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>resource</servlet-name>
-        <url-pattern>/resource</url-pattern>
-    </servlet-mapping>
 	
-	<servlet>
-        <servlet-name>edit</servlet-name>
-        <servlet-class>cz.zcu.kiv.crce.webui.internal.EditServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>edit</servlet-name>
-        <url-pattern>/edit</url-pattern>
-    </servlet-mapping>
-
     <servlet>
         <servlet-name>UploadServlet</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.UploadServlet</servlet-class>
