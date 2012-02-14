@@ -28,6 +28,8 @@ Import-Package: \
   org.w3c.dom, \
   junit.framework;resolution:=optional, \
   cz.zcu.kiv.crce.metadata, \
+  com.sun.org.apache.xerces.internal.jaxp.validation, \
+  com.sun.xml.internal.bind.v2, \
   *
 
 Dynamic-ImportPackage: *

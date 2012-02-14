@@ -27,6 +27,18 @@
         <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
+        <org.osgi.framework.system.packages.extra>
+        com.sun.*,
+        javax.xml.*,
+        com.sun.org.apache.xerces.internal.*,
+        javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,
+        javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,
+        javax.microedition.io,javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
+        javax.servlet.http,javax.servlet.jsp,javax.sql,
+        org.w3c.dom,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers,
+        org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,
+        com.sun.java_cup.internal,com.sun.xml.internal.bind.v2
+        </org.osgi.framework.system.packages.extra>
     </properties>
 
     <packaging>pom</packaging>
@@ -57,6 +69,7 @@
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-metadata-cosi-bundle</module>
+        <module>crce-efp-indexer</module>
         
         <!-- UI & Optional Plugins -->
         <module>crce-handler-versioning</module>
@@ -145,6 +158,31 @@
     </distributionManagement>
 
     <repositories>
+        <!-- sacco repo -->
+      	<repository>
+      		<id>sacco.maven.repository</id>
+      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-repository</url>
+      	</repository>
+      	<repository>
+      		<id>sacco.maven.snapshots.repository</id>
+      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-snapshots-repository</url>
+      	</repository>
+      	<repository>
+      		<id>sacco.maven.third-parties.repository</id>
+      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-third-parties-repository</url>
+      	</repository>
+      
+      	<repository>
+      		<id>gson</id>
+      		<url>http://google-gson.googlecode.com/svn/mavenrepo</url>
+      		<snapshots>
+      			<enabled>true</enabled>
+      		</snapshots>
+      		<releases>
+      			<enabled>true</enabled>
+      		</releases>
+      	</repository>
+
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>

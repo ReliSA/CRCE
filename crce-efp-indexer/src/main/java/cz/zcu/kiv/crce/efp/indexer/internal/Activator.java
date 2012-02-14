@@ -8,36 +8,22 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
-
+/**
+ * CRCE-EFP-Indexer activator class.
+ */
 public class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
     	
-    	for(int i=0;i<3;i++)
-    		System.out.println("------------START ACTIVATOR EFP Indexeru ------------");
-    	
+    	// In indexer is used PluginManager and LogService dependency injection.
     	manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(IndexerActionHandler.class)
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                
-                //.add(createServiceDependency().setRequired(true).setService(org.apache.felix.bundlerepository.RepositoryAdmin.class))
                 );
-    	
-    	/*
-        manager.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
-                .setImplementation(Trida2.class)
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
-                );
-        
-        
-                */
-    	
-     	
-    }
+     }
     
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {

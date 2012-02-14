@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.efp.indexer.internal;
 
-import cz.zcu.kiv.crce.efp.indexer.internal.Indexer;
+import cz.zcu.kiv.crce.efp.indexer.internal.EFPIndexer;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,120 +16,106 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.efps.assignment.types.Feature;
 
-
+/**
+ * IndexerActionHandler class ensures general tasks about efp-indexing process. 
+ * Verification OSGi bundle, initialization indexing process 
+ * and saving modified OBR metadata of resource.   
+ */
 public class IndexerActionHandler extends AbstractActionHandler implements ActionHandler {
 
+	/** LogService injected by dependency manager. */
 	private volatile LogService m_log;
-	private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
-
-	private boolean debugInfo=true,test=true;
-	private boolean jarFile;
-
+	
+	/** PluginManager injected by dependency manager. */
+	private volatile PluginManager m_pluginManager;
+	
 	@Override
 	public Resource afterUploadToBuffer(Resource resource, Buffer buffer,
 			String name) throws RevokedArtifactException {
 
-		resource=handleNewResource(resource,name);
+		m_log.log(LogService.LOG_INFO,"afterUploadToBuffer");
 		
+		// Indexing process starts in afterUploadToBuffer trigger.
 		try{
-			if(test)
-				wrongIndexerResultTest(buffer);
-		}
-		catch(Exception e){
+		resource=handleNewResource(resource,name);
+		}catch(Exception e){
 			e.printStackTrace();
+			m_log.log(LogService.LOG_WARNING,"Unexpected error during handling with resource!");
+			m_log.log(LogService.LOG_WARNING,"Maybe there was a resource with old EFP format verison!");
 		}
-
+		
 		return resource;
-
 	}
 
-	// Metoda testuje, zda pro ruzne resources v bufferu se vrati stejne, 
-	// nebo ruzne features v metode loadEFPs().
-	void wrongIndexerResultTest(Buffer buffer){
-		Resource[] resArray=buffer.getRepository().getResources();
-		for(Resource testingRes : resArray ){
-			System.out.println("\n========== Resource "+testingRes.getSymbolicName()+" test. ==========");
-			Indexer indexer = new Indexer(testingRes.getUri().getPath(), true);
-
-			if(!indexer.loadEFPs()){
-				System.out.println("-- Resource is not OSGi bundle. --");
-				continue;
-			}
-			sysoInfos(testingRes,null);
-			System.out.println("-----------------");
-		}
-	}
-
+	/**
+	 * In case that input resource file is JAR file and OSGi bundle, 
+	 * there is started indexing process.
+	 * 
+	 * @param resource - Resource uploaded to buffer, which enters into indexing process.
+	 * @param name - Name of resource file.
+	 * @return resource - Modified resource with indexed EFP data in OBR format 
+	 * or original resource in case of indexing fault.
+	 */
 	public Resource handleNewResource(Resource resource, String name){
-		if(debugInfo)
-			System.out.println("afterUploadToBuffer");
 
-		jarFile=false;
-		if(name.endsWith(".jar")){
+		boolean jarFile=false;
+		if(name.endsWith(".jar")){	// Test of input file, whether it is JAF file.
 			jarFile=true;
-			System.out.println("-- Resource is jar file. --");
+			m_log.log(LogService.LOG_INFO, "-- Resource is jar file. --");
 		}
 
-		if(!jarFile)
+		if(!jarFile)				// To indexing process continues only JAR files.
 			return resource;
 
-		String path=resource.getUri().getPath(); // cesta k artefaktu
-		if(debugInfo)
-			System.out.println("Resource path: "+path);
+		String path=resource.getUri().getPath(); // Path of resource artifact.
+		
+		m_log.log(LogService.LOG_INFO,"Resource path: "+path);
 
-		Indexer indexer = new Indexer(path, true);
+		EFPIndexer indexer = new EFPIndexer(path, m_log);		// Main indexing class.
 
-		if(!indexer.loadEFPs()){
-			System.out.println("-- Resource is not OSGi bundle. --");
+		if(!indexer.loadFeatures()){
+			m_log.log(LogService.LOG_WARNING,"-- Resource is not OSGi bundle. --");
+			// In case that resource is not OSGi bundle, indexing process fails.
 			return resource;
 		}
-		indexer.loadResource(resource);
-		indexer.assignEFPsOBR();
-		resource = indexer.getResource();
+		
+		indexer.setResource(resource);		// Setting of resource into indexer instance.
+		indexer.InitAssignmentEFPtoOBR();	// Method initializes indexing process.
+		resource = indexer.getResource();	// Getting modified resource from indexer instance.
 
 		try{
-			saveResourceOBR(resource);
+			saveResourceOBR(resource);		// Saving modified OBR metadata.
 		}
-		catch(IllegalStateException e){
+		catch(IllegalStateException e){		// Info about error during saving process.
 			e.printStackTrace();
-			System.out.println("IllegalStateException!!!");
+			m_log.log(LogService.LOG_ERROR,"Error during saving process!\nIllegalStateException!!!");
 		}
-		catch(NullPointerException e){
+		catch(NullPointerException e){		// Info about error during saving process.
 			e.printStackTrace();
-			System.out.println("NullPointerException!!!");
+			m_log.log(LogService.LOG_ERROR,"Error during saving process!\nNullPointerException!!!");
 		}
-
-		sysoInfos(resource,name);
 
 		return resource;
 	}
 
+	/**
+	 * Method saves indexed EFP data. Without saving would be modified OBR metadata lost.
+	 * 
+	 * @param resource - Modified instance with indexed EFP data.
+	 */
 	public void saveResourceOBR(Resource resource){
 		ResourceDAO rd =m_pluginManager.getPlugin(ResourceDAO.class);
 		try {
-			rd.save(resource);
+			rd.save(resource);		 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		if(debugInfo)
-			System.out.println("-- resource saved --");
+		m_log.log(LogService.LOG_INFO,"-- Resource was saved. --");
 	}
 
-	void sysoInfos(Resource resource,String name){
-		System.out.println("+-+");
-		System.out.println(resource.getSymbolicName());
-		System.out.println(resource.getId());
-		System.out.println(resource.getPresentationName());
-		System.out.println(resource.getUri());
-		System.out.println(name);
-		System.out.println("+-+");
-	}
-
-
+/*
 	@Override
 	public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
 
@@ -147,8 +133,5 @@ public class IndexerActionHandler extends AbstractActionHandler implements Actio
 
 		return resource;
 	}
-
-
-
-
+*/	
 }
