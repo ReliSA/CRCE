@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.io.IOException;
+//import java.util.ArrayList;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -27,17 +28,24 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	/** PluginManager injected by dependency manager. */
 	private volatile PluginManager mPluginManager;
 
+	/**
+	 * EFPIndexer class ensures loading all features of resource
+	 * and initial steps of indexing EFP properties into resource OBR metadata.
+	 */
+	private EFPIndexer indexer;
+
+
 	@Override
+	// Indexing process starts in afterUploadToBuffer trigger.
 	public final Resource afterUploadToBuffer(Resource resource,
 			final Buffer buffer, final String name) throws RevokedArtifactException {
 
 		mLog.log(LogService.LOG_INFO, "afterUploadToBuffer");
 
-		// Indexing process starts in afterUploadToBuffer trigger.
 		try {
 			resource = handleNewResource(resource, name);
 		} catch (Exception e) {
-		e.printStackTrace();
+			e.printStackTrace();
 			mLog.log(LogService.LOG_WARNING, "Unexpected error during handling with resource!");
 			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
 		}
@@ -45,37 +53,57 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		return resource;
 	}
 
+
+	/**
+	 * Method checks whether uploaded artifact is or is not JAR file.
+	 * @param artefactName - Name of processed artifact file.
+	 * @return boolean result whether artifact is or is not JAR file.
+	 */
+	public final boolean jarFileArtefact(final String artefactName) {
+		if (artefactName.endsWith(".jar")) {	// Test of input file, whether it is JAF file.
+			mLog.log(LogService.LOG_INFO, "-- Resource is jar file. --");
+			return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Method creates instance of the EFPIndexer class and tries to load features of OSGi resource.
+	 * @param resourcePath - Path to processed resource.
+	 * @return boolean result of feature loading process.
+	 */
+	public final boolean indexerInitialization(final String resourcePath) {
+		indexer = new EFPIndexer(resourcePath, mLog);
+
+		if (!indexer.loadFeatures()) {
+			mLog.log(LogService.LOG_WARNING, "-- Resource is not OSGi bundle. --");
+			// In case that resource is not OSGi bundle, indexing process fails.
+			return false;
+		}
+		return true;
+	}
+
+
 	/**
 	 * In case that input resource file is JAR file and OSGi bundle,
 	 * there is started indexing process.
 	 *
 	 * @param resource - Resource uploaded to buffer, which enters into indexing process.
-	 * @param name - Name of resource file.
+	 * @param artefactName - Name of resource file.
 	 * @return resource - Modified resource with indexed EFP data in OBR format
 	 * or original resource in case of indexing fault.
 	 */
-	public final Resource handleNewResource(Resource resource, final String name){
+	public final Resource handleNewResource(Resource resource, final String artefactName) {
 
-		boolean jarFile = false;
-		if (name.endsWith(".jar")) {	// Test of input file, whether it is JAF file.
-			jarFile = true;
-			mLog.log(LogService.LOG_INFO, "-- Resource is jar file. --");
+		if (!jarFileArtefact(artefactName)) { // To indexing process continue only JAR files.
+			return resource;
 		}
 
-		if (!jarFile) { // To indexing process continues only JAR files.
-		return resource;
-		}
+		String resourcePath = resource.getUri().getPath(); // Path of resource artifact.
+		mLog.log(LogService.LOG_INFO, "Resource path: " + resourcePath);
 
-		String path = resource.getUri().getPath(); // Path of resource artifact.
-
-		mLog.log(LogService.LOG_INFO, "Resource path: " + path);
-
-		// Main indexing class.
-		EFPIndexer indexer = new EFPIndexer(path, mLog);
-
-		if (!indexer.loadFeatures()) {
-			mLog.log(LogService.LOG_WARNING, "-- Resource is not OSGi bundle. --");
-			// In case that resource is not OSGi bundle, indexing process fails.
+		if (!indexerInitialization(resourcePath)) {
 			return resource;
 		}
 
@@ -83,16 +111,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		indexer.initAssignmentEFPtoOBR();					// Method initializes indexing process.
 		resource = indexer.getContainer().getResource();	// Getting modified resource from indexer instance.
 
-		try {
-			saveResourceOBR(resource); // Saving modified OBR metadata.
-		} catch (IllegalStateException e) { // Info about error during saving process.
-			e.printStackTrace();
-			mLog.log(LogService.LOG_ERROR, "Error during saving process!\nIllegalStateException!!!");
-		} catch (NullPointerException e) { 	// Info about error during saving process.
-			e.printStackTrace();
-			mLog.log(LogService.LOG_ERROR, "Error during saving process!\nNullPointerException!!!");
-			mLog.log(LogService.LOG_ERROR, "Maybe there is 'null' some requirement filter!");
-		}
+		saveResourceOBR(resource); // Saving modified OBR metadata.
 
 		return resource;
 	}
@@ -103,33 +122,27 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * @param resource - Modified instance with indexed EFP data.
 	 */
 	public final void saveResourceOBR(final Resource resource) {
-		ResourceDAO rd = mPluginManager.getPlugin(ResourceDAO.class);
 		try {
+			ResourceDAO rd = mPluginManager.getPlugin(ResourceDAO.class);
 			rd.save(resource);
+			mLog.log(LogService.LOG_INFO, "-- Resource was saved. --");
+
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e) { 	// Info about error during saving process.
+			e.printStackTrace();
+			mLog.log(LogService.LOG_ERROR, "Error during saving process!\nNullPointerException!!!");
+			mLog.log(LogService.LOG_ERROR, "Maybe there is 'null' some requirement filter!");
 		}
-
-		mLog.log(LogService.LOG_INFO, "-- Resource was saved. --");
 	}
 
-/*
-	@Override
-	public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
 
-		if(debugInfo)
-			System.out.println("beforePutToStore");
+	//--- Setter
 
-		return resource;
+	/**
+	 * @param mLog the mLog to set
+	 */
+	public final void setmLog(final LogService mLog) {
+		this.mLog = mLog;
 	}
-
-	@Override
-	public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
-
-		if(debugInfo)
-			System.out.println("onUploadToBuffer");
-
-		return resource;
-	}
-*/
 }
