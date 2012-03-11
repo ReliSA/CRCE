@@ -5,9 +5,11 @@ import java.util.List;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.efps.assignment.types.Feature;
+import cz.zcu.kiv.efps.assignment.values.EfpAssignedValue;
 import cz.zcu.kiv.efps.assignment.values.EfpAssignedValue.AssignmentType;
 import cz.zcu.kiv.efps.assignment.values.EfpFormulaValue;
 import cz.zcu.kiv.efps.assignment.values.EfpNamedValue;
+import cz.zcu.kiv.efps.types.datatypes.EfpValueType;
 import cz.zcu.kiv.efps.types.lr.LR;
 import cz.zcu.kiv.efps.types.properties.EFP;
 
@@ -42,74 +44,85 @@ public class OBRTranscriptFormat {
 	 * @param listEfp - List of EFP, which belongs to feature.
 	 * @param feature - Feature entering for processing.
 	 */
-	final void featureWithEfpRequired(final List<EFP> listEfp, final Feature feature){
+	public final void featureWithEfpRequired(final List<EFP> listEfp, final Feature feature) {
 
 		for (EFP efp : listEfp) {
 			Requirement req = container.getResource().createRequirement("EFP");
-			req.setFilter("(&(package=" + feature.getName() + ")(efp-name="
-					+ efp.getName() + ")(type=NAMED))");
 
-      // Testing AssignmentType.direct
-			try {
-				if (container.getAccessor()
-						.getAssignedValue(feature, efp, null)
-						.getAssignmentType() == AssignmentType.direct) {
-					req.setFilter("(&(package=" + feature.getName()
-							+ ")(efp-name=" + efp.getName() + ")(type=DIRECT))");
-					String value = container.getAccessor()
-							.getAssignedValue(feature, efp, null)
-							.computeValue().toString();
-					req.setFilter("(&(package=" + feature.getName()
-							+ ")(efp-name=" + efp.getName()
-							+ ")(type=DIRECT)(value=" + value + "))");
-				}
-			} catch (Exception e) {
-				// NO direct AssignmentType
-			}
+			String reqFilter = "(&(package=" + feature.getName() + ")(efp-name="
+			+ efp.getName() + ")(assignment-type=NAMED))"; // default filter value
 
-			// Testing AssignmentType.formula
-			try {
-				if (container.getAccessor()
-						.getAssignedValue(feature, efp, null)
-						.getAssignmentType() == AssignmentType.formula) {
-					req.setFilter("(&(package=" + feature.getName()
-							+ ")(efp-name=" + efp.getName()
-							+ ")(type=FORMULA))");
-					String formula = ((EfpFormulaValue) container.getAccessor()
-							.getAssignedValue(feature, efp, null)).getFormula();
-					req.setFilter("(&(package=" + feature.getName()
-							+ ")(efp-name=" + efp.getName()
-							+ ")(type=FORMULA)(formula=" + formula + "))");
-				}
-			} catch (Exception e) {
-				// NO formula AssignmentType
-			}
+			EfpAssignedValue efpAssignedValue = null;
+			efpAssignedValue = container.getAccessor().getAssignedValue(feature, efp, null);
 
-			// Testing AssignmentType.named
-			for (LR lr : container.getArrayLR()) {
-				try {
-					if (container.getAccessor()
-							.getAssignedValue(feature, efp, lr)
-							.getAssignmentType() == AssignmentType.named) {
-						String valueName = ((EfpNamedValue) container
-								.getAccessor().getAssignedValue(feature, efp,
-										lr)).getValueName();
-						req.setFilter("(&(package=" + feature.getName()
-								+ ")(efp-name=" + efp.getName()
-								+ ")(type=NAMED)(value-name=" + valueName
-								+ "))");
-						String value = container.getAccessor()
-								.getAssignedValue(feature, efp, lr)
-								.computeValue().getLabel();
-						req.setFilter("(&(package=" + feature.getName()
-								+ ")(efp-name=" + efp.getName()
-								+ ")(type=NAMED)(value-name=" + valueName
-								+ ")(value=" + value + "))");
+			if (efpAssignedValue != null) {
+				if (efpAssignedValue.getAssignmentType() == AssignmentType.direct) {
+					// Testing AssignmentType.direct
+					reqFilter = "(&(package=" + feature.getName()
+					+ ")(efp-name=" + efp.getName() + ")(assignment-type=DIRECT))";
+
+					EfpValueType efpValue = efpAssignedValue.computeValue();
+
+					if (efpValue != null) {
+						reqFilter = "(&(package=" + feature.getName() + ")(efp-name="
+						+ efp.getName()	+ ")(assignment-type=DIRECT)(computed-value=" + efpValue + "))";
 					}
-				} catch (NullPointerException e) {
-					// There was no-matching computeValue() result from given getAssignedValue(feature, efp, val).
+
+				} else if (efpAssignedValue.getAssignmentType() == AssignmentType.formula) {
+					// Testing AssignmentType.formula
+
+					reqFilter = "(&(package=" + feature.getName()
+					+ ")(efp-name=" + efp.getName()	+ ")(assignment-type=FORMULA))";
+
+					String formula = ((EfpFormulaValue) efpAssignedValue).getFormula();
+
+					if (formula != null) {
+						reqFilter = "(&(package=" + feature.getName() + ")(efp-name="
+						+ efp.getName() + ")(assignment-type=FORMULA)(formula=" + formula + "))";
+					}
+				}
+			} else {
+				// Testing AssignmentType.named
+				for (LR lr : container.getArrayLR()) {
+					
+					EfpAssignedValue namedValue = container.getAccessor().getAssignedValue(feature, efp, lr);
+
+					if (namedValue == null) {
+						continue;
+					}
+
+					if (namedValue.getAssignmentType() == AssignmentType.named) {
+
+						String valueName = ((EfpNamedValue) namedValue).getValueName();
+
+						if (valueName != null) {
+							reqFilter = "(&(package=" + feature.getName() + ")(efp-name="
+							+ efp.getName()	+ ")(assignment-type=NAMED)(value-name=" + valueName + "))";
+						}
+
+						EfpValueType valueType;
+
+						try {
+							valueType = namedValue.computeValue();
+							if (valueType == null) {
+								break;
+							}
+						} catch (NullPointerException e) {
+							//TODO To handle with values from several LRs on one EFP.
+							break;
+						}
+
+						String value = valueType.getLabel();
+
+						if (value != null) {
+							reqFilter = "(&(package=" + feature.getName() + ")(efp-name=" + efp.getName()
+							+ ")(assignment-type=NAMED)(value-name=" + valueName + ")(computed-value=" + value + "))";
+						}
+					}
 				}
 			}
+
+			req.setFilter(reqFilter);
 		}
 	}
 
@@ -119,7 +132,7 @@ public class OBRTranscriptFormat {
 	 * @param listEfp - List of EFP, which belongs to feature.
 	 * @param feature - Feature entering for processing.
 	 */
-	final void featureWithEfpProvided(final List<EFP> listEfp, final Feature feature) {
+	public final void featureWithEfpProvided(final List<EFP> listEfp, final Feature feature) {
 		for (EFP efp : listEfp) {
 
 			Capability cap = container.getResource().createCapability("EFP");
@@ -130,59 +143,80 @@ public class OBRTranscriptFormat {
 			cap.setProperty("efp-name", efp.getName());
 			cap.setProperty("efp-id", efp.getId());
 
+			String wholeType = efp.getValueType().getName();
+			// String wholeType gets for example value: cz.zcu.kiv.efps.types.datatypes.EfpNumberInterval
+			String valueType;
 			try {
-				String wholeType = efp.getValueType().getName();
-				String valueType = wholeType.substring(wholeType.lastIndexOf(".") + 1);
+				valueType = wholeType.substring(wholeType.lastIndexOf(".") + 1);
+				// There is attempt to get only "EfpNumberInterval" value from example above.
+			} catch (ArrayIndexOutOfBoundsException e) {
+				valueType = null;
+			}
+			if (valueType != null) {
 				cap.setProperty("value-type", valueType);
-			} catch (Exception e) {
-				// Error during efp-value-type string processing.
 			}
 
-			// Testing AssignmentType.direct
-			try {
-				if (container.getAccessor()
-						.getAssignedValue(feature, efp, null)
-						.getAssignmentType() == AssignmentType.direct) {
+			EfpAssignedValue efpAssignedValue = null;
+			efpAssignedValue = container.getAccessor().getAssignedValue(feature, efp, null);
+
+			if (efpAssignedValue != null) {
+				// Testing AssignmentType.direct
+				if (efpAssignedValue.getAssignmentType() == AssignmentType.direct) {
 					cap.setProperty("assignment-type", "DIRECT");
-					cap.setProperty("computed-value", container.getAccessor()
-							.getAssignedValue(feature, efp, null)
-							.computeValue().toString());
-				}
-			} catch (Exception e) {
-				// NO direct AssignmentType
-			}
 
-			// Testing AssignmentType.formula
-			try {
-				if (container.getAccessor()
-						.getAssignedValue(feature, efp, null)
-						.getAssignmentType() == AssignmentType.formula) {
-					cap.setProperty("assignment-type", "FORMULA");
-					cap.setProperty("formula",
-							((EfpFormulaValue) container.getAccessor()
-									.getAssignedValue(feature, efp, null))
-									.getFormula());
-				}
-			} catch (Exception e) {
-			// NO formula AssignmentType
-			}
-
-			// Testing AssignmentType.named
-			for (LR lr : container.getArrayLR()) {
-				try {
-					if (container.getAccessor()
-							.getAssignedValue(feature, efp, lr)
-							.getAssignmentType() == AssignmentType.named) {
-						cap.setProperty("assignment-type", "NAMED");
-						cap.setProperty("value-name",
-								((EfpNamedValue) container.getAccessor()
-										.getAssignedValue(feature, efp, lr))
-										.getValueName());
-						cap.setProperty("lr-name", lr.getName());
+					EfpValueType efpValue = efpAssignedValue.computeValue();
+					if (efpValue != null) {
+						cap.setProperty("computed-value", efpValue.toString());
 					}
-					cap.setProperty("computed-value", container.getAccessor().getAssignedValue(feature, efp, lr).computeValue().getLabel());
-				} catch (NullPointerException e) {
-					//There was no-matching computeValue() result from given getAssignedValue(feature, efp, lr).
+
+				} else if (efpAssignedValue.getAssignmentType() == AssignmentType.formula) {
+					// Testing AssignmentType.formula
+					cap.setProperty("assignment-type", "FORMULA");
+
+					String formula = ((EfpFormulaValue) efpAssignedValue).getFormula();
+					if (formula != null) {
+						cap.setProperty("formula", formula);
+					}
+				}
+			} else {
+				// Testing AssignmentType.named
+				for (LR lr : container.getArrayLR()) {
+
+					EfpAssignedValue namedValue = container.getAccessor().getAssignedValue(feature, efp, lr);
+
+					if (namedValue == null) {
+						continue;
+					}
+
+					if (namedValue.getAssignmentType() == AssignmentType.named) {
+						cap.setProperty("assignment-type", "NAMED");
+
+						String valueName = ((EfpNamedValue) namedValue).getValueName();
+
+						if (valueName != null) {
+							cap.setProperty("value-name", valueName);
+						}
+						cap.setProperty("lr-name", lr.getName());
+						cap.setProperty("lr-id", lr.getId());
+
+						EfpValueType efpValueType;
+
+						try {
+							efpValueType = namedValue.computeValue();
+							if (efpValueType == null) {
+								break;
+							}
+						} catch (NullPointerException e) {
+							//TODO To handle with values from several LRs on one EFP.
+							break;
+						}
+
+						String value = efpValueType.getLabel();
+
+						if (value != null) {
+							cap.setProperty("computed-value", value);
+						}
+					}
 				}
 			}
 

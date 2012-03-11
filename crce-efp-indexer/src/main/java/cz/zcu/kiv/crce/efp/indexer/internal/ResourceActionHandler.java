@@ -40,13 +40,10 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	public final Resource afterUploadToBuffer(Resource resource,
 			final Buffer buffer, final String name) throws RevokedArtifactException {
 
-		mLog.log(LogService.LOG_INFO, "afterUploadToBuffer");
-
 		try {
 			resource = handleNewResource(resource, name);
 		} catch (Exception e) {
-			e.printStackTrace();
-			mLog.log(LogService.LOG_WARNING, "Unexpected error during handling with resource!");
+			mLog.log(LogService.LOG_ERROR, "Unexpected error in module crce-efp-indexer during handling with a resource!");
 			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
 		}
 
@@ -60,7 +57,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * @return boolean result whether artifact is or is not JAR file.
 	 */
 	public final boolean jarFileArtefact(final String artefactName) {
-		if (artefactName.endsWith(".jar")) {	// Test of input file, whether it is JAF file.
+		if (artefactName.endsWith(".jar")) {	
+			// Test of input file, whether it is JAF file.
 			mLog.log(LogService.LOG_INFO, "-- Resource is jar file. --");
 			return true;
 		}
@@ -74,10 +72,9 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * @return boolean result of feature loading process.
 	 */
 	public final boolean indexerInitialization(final String resourcePath) {
-		indexer = new EFPIndexer(resourcePath, mLog);
+		this.indexer = new EFPIndexer(resourcePath, mLog);
 
 		if (!indexer.loadFeatures()) {
-			mLog.log(LogService.LOG_WARNING, "-- Resource is not OSGi bundle. --");
 			// In case that resource is not OSGi bundle, indexing process fails.
 			return false;
 		}
@@ -128,14 +125,12 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			mLog.log(LogService.LOG_INFO, "-- Resource was saved. --");
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			mLog.log(LogService.LOG_ERROR, "IOException during saving process!");
 		} catch (NullPointerException e) { 	// Info about error during saving process.
-			e.printStackTrace();
-			mLog.log(LogService.LOG_ERROR, "Error during saving process!\nNullPointerException!!!");
-			mLog.log(LogService.LOG_ERROR, "Maybe there is 'null' some requirement filter!");
+			mLog.log(LogService.LOG_ERROR, "NullPointerException during saving process!");
+			mLog.log(LogService.LOG_WARNING, "Maybe there is 'null' some requirement filter!");
 		}
 	}
-
 
 	//--- Setter
 
@@ -145,4 +140,13 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	public final void setmLog(final LogService mLog) {
 		this.mLog = mLog;
 	}
+
+
+	/**
+	 * @return the indexer
+	 */
+	public final EFPIndexer getIndexer() {
+		return indexer;
+	}
+
 }

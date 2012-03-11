@@ -13,17 +13,30 @@ import org.osgi.service.log.LogService;
  */
 public class Activator extends DependencyActivatorBase {
 
+	private static volatile Activator m_instance;
+	
+	private volatile LogService m_log;                  /* injected by dependency manager */
+	
+    public LogService getLog() {
+        return m_log;
+    }
+    
+    public static Activator instance() {
+        return m_instance;
+    }
+	
 	@Override
 	public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
-
+		m_instance = this;
+		
 		// In indexer is used PluginManager and LogService dependency injection.
 		manager.add(createComponent()
 				.setInterface(Plugin.class.getName(), null)
 				.setImplementation(ResourceActionHandler.class)
-				.add(createServiceDependency().setRequired(false).setService(LogService.class))
+				.add(createServiceDependency().setService(LogService.class).setRequired(false))
 				.add(createServiceDependency().setRequired(true).setService(PluginManager.class)));
 	}
-
+	
 	@Override
 	public void destroy(final BundleContext context, final DependencyManager manager)
 			throws Exception {

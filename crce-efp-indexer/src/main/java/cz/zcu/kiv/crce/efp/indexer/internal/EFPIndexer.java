@@ -4,9 +4,6 @@ import java.util.Set;
 
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.efps.assignment.api.ComponentEfpAccessor;
-import cz.zcu.kiv.efps.assignment.api.EfpAwareComponentLoader;
 import cz.zcu.kiv.efps.assignment.client.EfpAssignmentClient;
 import cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentRTException;
 import cz.zcu.kiv.efps.assignment.types.Feature;
@@ -19,7 +16,7 @@ import cz.zcu.kiv.efps.types.properties.EFP;
  */
 public class EFPIndexer {
 
-	private IndexerDataContainer container = new IndexerDataContainer();
+	private IndexerDataContainer container;
 
 	/** LogService injected by dependency manager into ResourceActionHandler. */
 	private LogService mLog;
@@ -31,6 +28,7 @@ public class EFPIndexer {
 	 * @param mLog - Provides logging service.
 	 */
 	public EFPIndexer(final String sourceFilePath, final LogService mLog) {
+		container = new IndexerDataContainer();
 		container.setSourceFilePath(sourceFilePath);
 		this.mLog = mLog;
 	}
@@ -54,7 +52,7 @@ public class EFPIndexer {
 			container.setFeatureList(container.getAccessor().getAllFeatures());
 			mLog.log(LogService.LOG_INFO, "Feature list loaded.");
 		} catch (OSGiAssignmentRTException e) {
-			mLog.log(LogService.LOG_WARNING, "OSGiAssignmentRTException in accessor.getAllFeatures()!");
+			mLog.log(LogService.LOG_WARNING, "-- The resource is not valid OSGi bundle or it contains unsupported EFP metadata version. --");
 			return false;
 		}
 
@@ -67,7 +65,7 @@ public class EFPIndexer {
 	/**
 	 * Method extracts list of EFP from each feature. Next there is called individual feature OBR processing.
 	 */
-	public final void initAssignmentEFPtoOBR() {
+	public final boolean initAssignmentEFPtoOBR() {
 
 		OBRTranscriptFormat obrTF = new OBRTranscriptFormat(container);
 
@@ -83,6 +81,8 @@ public class EFPIndexer {
 				}
 			}
 		}
+		
+		return true;
 	}
 
 	//------------------------------------------
