@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.util.List;
 
+import org.osgi.service.log.LogService;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.efps.assignment.api.ComponentEfpAccessor;
 import cz.zcu.kiv.efps.assignment.api.EfpAwareComponentLoader;
@@ -9,7 +11,7 @@ import cz.zcu.kiv.efps.assignment.types.Feature;
 import cz.zcu.kiv.efps.types.lr.LR;
 
 /**
- *
+ * Contains instances and variables with data for indexing purpose.
  */
 public class IndexerDataContainer {
 
@@ -31,6 +33,10 @@ public class IndexerDataContainer {
 
 	/** Resource can be OSGi bundle or other artifact uploaded into CRCE buffer. */
 	private Resource resource;
+
+	/** LogService injected by dependency manager into ResourceActionHandler. */
+	private LogService logger;
+
 
 	//------------------------------------------
 	// Getters and Setters
@@ -117,6 +123,20 @@ public class IndexerDataContainer {
 	 */
 	public final void setResource(final Resource resource) {
 		this.resource = resource;
+	}
+
+	/**
+	 * @return the logger
+	 */
+	public final LogService getLogger() {
+		return logger;
+	}
+
+	/**
+	 * @param logger the logger to set
+	 */
+	public final void setLogger(final LogService logger) {
+		this.logger = logger;
 	}
 
 }

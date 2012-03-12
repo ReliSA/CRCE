@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.io.IOException;
-//import java.util.ArrayList;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -57,7 +56,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * @return boolean result whether artifact is or is not JAR file.
 	 */
 	public final boolean jarFileArtefact(final String artefactName) {
-		if (artefactName.endsWith(".jar")) {	
+		if (artefactName.endsWith(".jar")) {
 			// Test of input file, whether it is JAF file.
 			mLog.log(LogService.LOG_INFO, "-- Resource is jar file. --");
 			return true;
@@ -105,7 +104,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		}
 
 		indexer.getContainer().setResource(resource);		// Setting of resource into indexer instance.
-		indexer.initAssignmentEFPtoOBR();					// Method initializes indexing process.
+		indexer.initTranscriptEFPtoOBR();					// Method initializes indexing process.
 		resource = indexer.getContainer().getResource();	// Getting modified resource from indexer instance.
 
 		saveResourceOBR(resource); // Saving modified OBR metadata.
