@@ -43,8 +43,8 @@ public class Activator extends DependencyActivatorBase {
 		manager.add(createComponent()
 				.setInterface(Plugin.class.getName(), null)
 				.setImplementation(ResourceActionHandler.class)
-				.add(createServiceDependency().setService(LogService.class).setRequired(false))
 				.add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+				.add(createServiceDependency().setService(LogService.class).setRequired(false))
 				);
 	}
 

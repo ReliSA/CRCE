@@ -42,7 +42,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		try {
 			resource = handleNewResource(resource, name);
 		} catch (Exception e) {
-			mLog.log(LogService.LOG_ERROR, "Unexpected error in module crce-efp-indexer during handling with a resource!");
+			mLog.log(LogService.LOG_ERROR, "Unexpected error " + e.getClass().getName()
+					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
 			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
 		}
 
@@ -70,8 +71,13 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * @param resourcePath - Path to processed resource.
 	 * @return boolean result of feature loading process.
 	 */
-	public final boolean indexerInitialization(final String resourcePath) {
+	public final boolean indexerInitialization(final Resource resource) {
+
+		String resourcePath = resource.getUri().getPath(); // Path of resource artifact moved to the buffer.
+		mLog.log(LogService.LOG_DEBUG, "Resource path: " + resourcePath);
+
 		this.indexer = new EFPIndexer(resourcePath, mLog);
+		indexer.getContainer().setResource(resource);		// Setting of resource into indexer instance.
 
 		if (!indexer.loadFeatures()) {
 			// In case that resource is not OSGi bundle, indexing process fails.
@@ -96,14 +102,10 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			return resource;
 		}
 
-		String resourcePath = resource.getUri().getPath(); // Path of resource artifact.
-		mLog.log(LogService.LOG_INFO, "Resource path: " + resourcePath);
-
-		if (!indexerInitialization(resourcePath)) {
+		if (!indexerInitialization(resource)) {
 			return resource;
 		}
 
-		indexer.getContainer().setResource(resource);		// Setting of resource into indexer instance.
 		indexer.initTranscriptEFPtoOBR();					// Method initializes indexing process.
 		resource = indexer.getContainer().getResource();	// Getting modified resource from indexer instance.
 
@@ -125,7 +127,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 
 		} catch (IOException e) {
 			mLog.log(LogService.LOG_ERROR, "IOException during saving process!");
-		} catch (NullPointerException e) { 	// Info about error during saving process.
+		} catch (NullPointerException e) {
 			mLog.log(LogService.LOG_ERROR, "NullPointerException during saving process!");
 			mLog.log(LogService.LOG_WARNING, "Maybe there is 'null' some requirement filter!");
 		}

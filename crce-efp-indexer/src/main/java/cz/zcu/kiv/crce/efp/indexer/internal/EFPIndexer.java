@@ -5,6 +5,7 @@ import java.util.Set;
 import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.efps.assignment.client.EfpAssignmentClient;
+import cz.zcu.kiv.efps.assignment.core.AssignmentRTException;
 import cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentRTException;
 import cz.zcu.kiv.efps.assignment.types.Feature;
 import cz.zcu.kiv.efps.types.lr.LR;
@@ -53,9 +54,16 @@ public class EFPIndexer {
 		try {
 			container.setFeatureList(container.getAccessor().getAllFeatures());
 			mLog.log(LogService.LOG_INFO, "Feature list loaded.");
+
 		} catch (OSGiAssignmentRTException e) {
-			String warningMessage = "-- The resource with path " + container.getSourceFilePath()
-					+ " is not valid OSGi bundle or it contains unsupported EFP metadata version. --";
+			String warningMessage = "-- The resource " + container.getResource().getPresentationName()
+					+ " is not valid OSGi bundle. --";
+			mLog.log(LogService.LOG_WARNING, warningMessage);
+			return false;
+			
+		} catch (AssignmentRTException e) {
+			String warningMessage = "-- The resource " + container.getResource().getPresentationName()
+					+ " contains unsupported EFP metadata version. --";
 			mLog.log(LogService.LOG_WARNING, warningMessage);
 			return false;
 		}
@@ -78,11 +86,9 @@ public class EFPIndexer {
 			List<EFP> listEfp = container.getAccessor().getEfps(feature);
 
 			if (listEfp.size() != 0) {
-				if (feature.getSide() == Feature.AssignmentSide.PROVIDED) {
-					obrTF.featureWithEfpProvided(listEfp, feature);
-				} else if (feature.getSide() == Feature.AssignmentSide.REQUIRED) {
-					obrTF.featureWithEfpRequired(listEfp, feature);
-				}
+				
+				obrTF.featureWithEfp(listEfp, feature);
+				
 			}
 		}
 	}
