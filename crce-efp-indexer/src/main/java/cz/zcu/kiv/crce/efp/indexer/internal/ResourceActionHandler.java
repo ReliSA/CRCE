@@ -41,6 +41,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 
 		try {
 			resource = handleNewResource(resource, name);
+			saveResourceOBR(resource); // Saving modified OBR metadata.
+
 		} catch (Exception e) {
 			mLog.log(LogService.LOG_ERROR, "Unexpected error " + e.getClass().getName()
 					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
@@ -68,7 +70,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 
 	/**
 	 * Method creates instance of the EFPIndexer class and tries to load features of OSGi resource.
-	 * @param resourcePath - Path to processed resource.
+	 * @param resource - Processed resource, which can be the OSGi bundle or not.
 	 * @return boolean result of feature loading process.
 	 */
 	public final boolean indexerInitialization(final Resource resource) {
@@ -107,11 +109,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		}
 
 		indexer.initTranscriptEFPtoOBR();					// Method initializes indexing process.
-		resource = indexer.getContainer().getResource();	// Getting modified resource from indexer instance.
-
-		saveResourceOBR(resource); // Saving modified OBR metadata.
-
-		return resource;
+		return indexer.getContainer().getResource();	// Getting modified resource from indexer instance.
 	}
 
 	/**

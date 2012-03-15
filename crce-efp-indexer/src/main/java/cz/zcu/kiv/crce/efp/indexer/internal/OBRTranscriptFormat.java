@@ -265,6 +265,9 @@ public class OBRTranscriptFormat {
 		public void addProperty(final String name, final int value) {
 			if (side == AssignmentSide.PROVIDED) {
 				cap.setProperty(name, value);
+				// Code of method is same as addProperty(String name, String value).
+				// Important difference is that into cap.setProperty() method 
+				// enters Integer value and this has an impact on indexed metadata. 
 			} else if (side == AssignmentSide.REQUIRED) {
 				reqFilter += "(" + name + "=" + value + ")";
 				req.setFilter("(&" + reqFilter + ")");

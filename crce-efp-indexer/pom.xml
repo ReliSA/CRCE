@@ -27,6 +27,10 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.service.obr</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -53,11 +57,30 @@
             <scope>provided</scope>
         </dependency>
 
-    <dependency>
-      <groupId>cz.zcu.kiv.efps</groupId>
-      <artifactId>efpAssignmentOSGi</artifactId>
-      <version>1.3-SNAPSHOT</version>
-    </dependency>
+        <dependency>
+          <groupId>cz.zcu.kiv.efps</groupId>
+          <artifactId>efpAssignmentOSGi</artifactId>
+          <version>1.3-SNAPSHOT</version>
+        </dependency>
+    
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-metafile</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </dependency>
 
     </dependencies>
 
