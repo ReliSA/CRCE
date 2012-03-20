@@ -15,12 +15,6 @@ import cz.zcu.kiv.efps.types.lr.LR;
  */
 public class IndexerDataContainer {
 
-	/** Path of resource file entering indexing process. */
-	private String sourceFilePath;
-
-	/** This interface serves API to obtain EFPs attached to a component. */
-	private EfpAwareComponentLoader loader;
-
 	/** This interface accesses EFPs attached to a component.
 	 * It allows to read all feature, EFPs and values attached to the EFPs on the component. */
 	private ComponentEfpAccessor accessor;
@@ -35,39 +29,10 @@ public class IndexerDataContainer {
 	private Resource resource;
 
 	/** LogService injected by dependency manager into ResourceActionHandler. */
-	private LogService logger;
-
+	private volatile LogService logger;
 
 	//------------------------------------------
 	// Getters and Setters
-
-	/**
-	 * @return the sourceFilePath
-	 */
-	public final String getSourceFilePath() {
-		return sourceFilePath;
-	}
-
-	/**
-	 * @param sourceFilePath the sourceFilePath to set
-	 */
-	public final void setSourceFilePath(final String sourceFilePath) {
-		this.sourceFilePath = sourceFilePath;
-	}
-
-	/**
-	 * @return the loader
-	 */
-	public final EfpAwareComponentLoader getLoader() {
-		return loader;
-	}
-
-	/**
-	 * @param loader the loader to set
-	 */
-	public final void setLoader(final EfpAwareComponentLoader loader) {
-		this.loader = loader;
-	}
 
 	/**
 	 * @return the accessor
