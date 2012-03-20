@@ -119,9 +119,11 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-        if(success) message = "Upload was succesful";
-        else message = "Upload failed";
-        ResourceServlet.setError(req.getSession(), success, message);
+        if(success) message = "Upload was succesful.";
+        else message = "Upload failed.";
+        String efpIndexerResult = "<BR>" + Activator.instance().getEfpIndexerResult().getMessage();
+
+        ResourceServlet.setError(req.getSession(), success, message + efpIndexerResult);
         req.getSession().setAttribute("source", "upload");      
         req.getRequestDispatcher("resource?link=buffer").forward(req, resp);        
     }

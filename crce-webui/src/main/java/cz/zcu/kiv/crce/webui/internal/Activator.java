@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -17,7 +18,7 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public final class Activator extends DependencyActivatorBase {
-    
+
     private static volatile Activator m_instance;
 
     private volatile BundleContext m_context;           /* injected by dependency manager */
@@ -26,6 +27,10 @@ public final class Activator extends DependencyActivatorBase {
     private volatile LogService m_log;                  /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
+
+    /** This interface provides by simple way information
+     * about result of EFP indexing process in crce-efp-indexer module. */
+    private volatile EfpIndexerResultService m_efpIndexerResult;    /* injected by dependency manager */
 
     public static Activator instance() {
         return m_instance;
@@ -58,10 +63,17 @@ public final class Activator extends DependencyActivatorBase {
         return m_sessionRegister.getSessionData(sid).getBuffer();
     }
 
+    /**
+     * @return instance of EfpIndexerResultService, which provides info about EFP indexing process.
+     */
+    public EfpIndexerResultService getEfpIndexerResult() {
+    	return m_efpIndexerResult;
+    }
+
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         m_instance = this;
-        
+
         manager.add(createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
@@ -69,6 +81,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createServiceDependency().setService(EfpIndexerResultService.class).setRequired(false))
                 );
 
 //        final Test t1 = new Test();
