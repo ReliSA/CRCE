@@ -103,6 +103,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 
 		if (!indexer.indexerInitialization(resource)) {
 			initialLoadingException = true;
+			return;
 		}
 
 		foundedEFP = indexer.initTranscriptEFPtoOBR();
