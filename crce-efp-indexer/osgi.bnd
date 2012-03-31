@@ -5,22 +5,11 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Export-Package:\
-    cz.zcu.kiv.crce.efp.*
-
+	cz.zcu.kiv.crce.efp.*; \
 
 Embed-Dependency:\
-    *;groupId=!${project.groupId}|org.apache.felix
+	!cz.zcu.kiv.efps.*; \
+	*;groupId=!${project.groupId}|org.apache.felix
 
 Import-Package: \
-	!com.sun.jdmk.comm; \
-	!com.ibm.uvm.tools; \
-	!javax.swing.*; \
-	!com.thoughtworks.*; \
-	!groovyjarjarasm.*; \
-	!junit.*; \
-	!org.apache.bsf.*; \
-	!org.apache.commons.*; \
-	!org.apache.ivy.*; \
-	!org.apache.tools.*; \
-	\
 	*
