@@ -3,78 +3,6 @@
     <size type='long'>0</size>
     <category id='versioned'/>
     <capability name='EFP'>
-      <p n='lr-id' t='long' v='463'/>
-      <p n='efp-id' t='long' v='472'/>
-      <p n='value-type' v='EfpEnum'/>
-      <p n='type' v='SIMPLE'/>
-      <p n='lr-name' v='CashDesk'/>
-      <p n='assignment-type' v='NAMED'/>
-      <p n='parent-type' v='bundle'/>
-      <p n='efp-name' v='bar_code_type'/>
-      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.InventoryApplication'/>
-      <p n='gr-id' t='long' v='462'/>
-      <p n='gr-name' v='CoCoMe'/>
-      <p n='value-name' v='europe'/>
-      <p n='computed-value' v='enum {EAN-13, EAN-8, }'/>
-    </capability>
-    <capability name='EFP'>
-      <p n='efp-name' v='bar_code_type'/>
-      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.InventoryApplication'/>
-      <p n='gr-id' t='long' v='462'/>
-      <p n='gr-name' v='CoCoMe'/>
-      <p n='efp-id' t='long' v='472'/>
-      <p n='type' v='SIMPLE'/>
-      <p n='value-type' v='EfpEnum'/>
-      <p n='assignment-type' v='FORMULA'/>
-      <p n='parent-type' v='bundle'/>
-      <p n='formula' v='2345 +  abs(-5)'/>
-    </capability>
-    <capability name='EFP'>
-      <p n='lr-id' t='long' v='463'/>
-      <p n='efp-id' t='long' v='466'/>
-      <p n='value-type' v='EfpNumberInterval'/>
-      <p n='type' v='SIMPLE'/>
-      <p n='lr-name' v='CashDesk'/>
-      <p n='assignment-type' v='NAMED'/>
-      <p n='parent-type' v='package'/>
-      <p n='efp-name' v='response_time'/>
-      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
-      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
-      <p n='gr-id' t='long' v='462'/>
-      <p n='gr-name' v='CoCoMe'/>
-      <p n='value-name' v='veryLow'/>
-      <p n='computed-value' v='[0.0; 100.0]'/>
-    </capability>
-    <capability name='EFP'>
-      <p n='lr-id' t='long' v='464'/>
-      <p n='efp-id' t='long' v='466'/>
-      <p n='value-type' v='EfpNumberInterval'/>
-      <p n='type' v='SIMPLE'/>
-      <p n='lr-name' v='Store'/>
-      <p n='assignment-type' v='NAMED'/>
-      <p n='parent-type' v='package'/>
-      <p n='efp-name' v='response_time'/>
-      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
-      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
-      <p n='gr-id' t='long' v='462'/>
-      <p n='gr-name' v='CoCoMe'/>
-      <p n='value-name' v='high'/>
-      <p n='computed-value' v='[7500.0; 10000.0]'/>
-    </capability>
-    <capability name='EFP'>
-      <p n='efp-name' v='response_time'/>
-      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
-      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
-      <p n='gr-id' t='long' v='462'/>
-      <p n='gr-name' v='CoCoMe'/>
-      <p n='efp-id' t='long' v='466'/>
-      <p n='type' v='SIMPLE'/>
-      <p n='value-type' v='EfpNumberInterval'/>
-      <p n='assignment-type' v='FORMULA'/>
-      <p n='parent-type' v='package'/>
-      <p n='formula' v='2 *  PACKAGE.cz.zcu.kiv.osgi.example.inventory.inventorydata.persistenceif_response_time + PACKAGE.cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif_response_time'/>
-    </capability>
-    <capability name='EFP'>
       <p n='efp-name' v='bar_code_scanner_type'/>
       <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.cashdeskconnectorif'/>
       <p n='gr-id' t='long' v='462'/>
@@ -84,26 +12,98 @@
       <p n='efp-id' t='long' v='501'/>
       <p n='lr-name' v='CashDesk'/>
       <p n='type' v='DERIVED'/>
-      <p n='value-type' v='EfpBoolean'/>
+      <p n='value-type' v='Boolean'/>
       <p n='assignment-type' v='NAMED'/>
       <p n='parent-type' v='package'/>
+    </capability>
+    <capability name='EFP'>
+      <p n='lr-id' t='long' v='463'/>
+      <p n='efp-id' t='long' v='466'/>
+      <p n='value-type' v='NumberInterval'/>
+      <p n='type' v='SIMPLE'/>
+      <p n='lr-name' v='CashDesk'/>
+      <p n='assignment-type' v='NAMED'/>
+      <p n='parent-type' v='package'/>
+      <p n='efp-name' v='response_time'/>
+      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
+      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
+      <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='[0.0; 100.0]'/>
+      <p n='gr-name' v='CoCoMe'/>
+      <p n='value-name' v='veryLow'/>
+    </capability>
+    <capability name='EFP'>
+      <p n='lr-id' t='long' v='464'/>
+      <p n='efp-id' t='long' v='466'/>
+      <p n='value-type' v='NumberInterval'/>
+      <p n='type' v='SIMPLE'/>
+      <p n='lr-name' v='Store'/>
+      <p n='assignment-type' v='NAMED'/>
+      <p n='parent-type' v='package'/>
+      <p n='efp-name' v='response_time'/>
+      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
+      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
+      <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='[7500.0; 10000.0]'/>
+      <p n='gr-name' v='CoCoMe'/>
+      <p n='value-name' v='high'/>
+    </capability>
+    <capability name='EFP'>
+      <p n='efp-name' v='response_time'/>
+      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.storeif'/>
+      <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
+      <p n='gr-id' t='long' v='462'/>
+      <p n='gr-name' v='CoCoMe'/>
+      <p n='efp-id' t='long' v='466'/>
+      <p n='type' v='SIMPLE'/>
+      <p n='value-type' v='NumberInterval'/>
+      <p n='assignment-type' v='FORMULA'/>
+      <p n='parent-type' v='package'/>
+      <p n='formula' v='2 *  PACKAGE.cz.zcu.kiv.osgi.example.inventory.inventorydata.persistenceif_response_time + PACKAGE.cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif_response_time'/>
+    </capability>
+    <capability name='EFP'>
+      <p n='lr-id' t='long' v='463'/>
+      <p n='efp-id' t='long' v='472'/>
+      <p n='value-type' v='Enum'/>
+      <p n='type' v='SIMPLE'/>
+      <p n='lr-name' v='CashDesk'/>
+      <p n='assignment-type' v='NAMED'/>
+      <p n='parent-type' v='bundle'/>
+      <p n='efp-name' v='bar_code_type'/>
+      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.InventoryApplication'/>
+      <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='enum {EAN-13, EAN-8, }'/>
+      <p n='gr-name' v='CoCoMe'/>
+      <p n='value-name' v='europe'/>
+    </capability>
+    <capability name='EFP'>
+      <p n='efp-name' v='bar_code_type'/>
+      <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.InventoryApplication'/>
+      <p n='gr-id' t='long' v='462'/>
+      <p n='gr-name' v='CoCoMe'/>
+      <p n='efp-id' t='long' v='472'/>
+      <p n='type' v='SIMPLE'/>
+      <p n='value-type' v='Enum'/>
+      <p n='assignment-type' v='FORMULA'/>
+      <p n='parent-type' v='bundle'/>
+      <p n='formula' v='2345 +  abs(-5)'/>
     </capability>
     <capability name='EFP'>
       <p n='efp-name' v='express_mode_supported'/>
       <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.reportingif'/>
       <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='true'/>
       <p n='gr-name' v='CoCoMe'/>
       <p n='efp-id' t='long' v='473'/>
-      <p n='computed-value' v='true'/>
       <p n='type' v='SIMPLE'/>
-      <p n='value-type' v='EfpBoolean'/>
+      <p n='value-type' v='Boolean'/>
       <p n='assignment-type' v='DIRECT'/>
       <p n='parent-type' v='package'/>
     </capability>
     <capability name='EFP'>
       <p n='lr-id' t='long' v='463'/>
       <p n='efp-id' t='long' v='466'/>
-      <p n='value-type' v='EfpNumberInterval'/>
+      <p n='value-type' v='NumberInterval'/>
       <p n='type' v='SIMPLE'/>
       <p n='lr-name' v='CashDesk'/>
       <p n='assignment-type' v='NAMED'/>
@@ -112,14 +112,14 @@
       <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.reportingif'/>
       <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
       <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='[1000.0; 999999.0]'/>
       <p n='gr-name' v='CoCoMe'/>
       <p n='value-name' v='veryHigh'/>
-      <p n='computed-value' v='[1000.0; 999999.0]'/>
     </capability>
     <capability name='EFP'>
       <p n='lr-id' t='long' v='464'/>
       <p n='efp-id' t='long' v='466'/>
-      <p n='value-type' v='EfpNumberInterval'/>
+      <p n='value-type' v='NumberInterval'/>
       <p n='type' v='SIMPLE'/>
       <p n='lr-name' v='Store'/>
       <p n='assignment-type' v='NAMED'/>
@@ -128,9 +128,9 @@
       <p n='parent-name' v='cz.zcu.kiv.osgi.example.inventory.inventoryapplication.reportingif'/>
       <p n='gamma' v='UserGamma [function= second.low -  first.low]'/>
       <p n='gr-id' t='long' v='462'/>
+      <p n='value' v='[7500.0; 10000.0]'/>
       <p n='gr-name' v='CoCoMe'/>
       <p n='value-name' v='high'/>
-      <p n='computed-value' v='[7500.0; 10000.0]'/>
     </capability>
     <capability name='file'>
       <p n='original-version' t='version' v='1.0.0.SNAPSHOT'/>
@@ -138,10 +138,10 @@
       <p n='name' v='cz.zcu.kiv.osgi.example.inventory.InventoryApplication-1.0.0.SNAPSHOT.jar'/>
     </capability>
     <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.persistenceif)(parent-type=package)(efp-name=response_time)(assignment-type=NAMED))' extend='false' multiple='false' optional='false'/>
-    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=express_mode_supported)(assignment-type=DIRECT)(computed-value=false))' extend='false' multiple='false' optional='false'/>
-    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=NAMED)(value-name=veryHigh)(computed-value=[1000.0; 999999.0]))' extend='false' multiple='false' optional='false'/>
-    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=NAMED)(value-name=high)(computed-value=[7500.0; 10000.0]))' extend='false' multiple='false' optional='false'/>
-    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=DIRECT)(computed-value=[1.0; 2.0]))' extend='false' multiple='false' optional='false'/>
     <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.cashdesk.cashdeskapplication.saleregistredevent)(parent-type=package)(efp-name=bar_code_scanner_type)(assignment-type=NAMED)(value-name=universal))' extend='false' multiple='false' optional='false'/>
+    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=express_mode_supported)(assignment-type=DIRECT)(value=false))' extend='false' multiple='false' optional='false'/>
+    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=NAMED)(value-name=veryHigh)(value=[1000.0; 999999.0]))' extend='false' multiple='false' optional='false'/>
+    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=NAMED)(value-name=high)(value=[7500.0; 10000.0]))' extend='false' multiple='false' optional='false'/>
+    <require name='EFP' filter='(&amp;(parent-name=cz.zcu.kiv.osgi.example.inventory.inventorydata.storequeryif)(parent-type=package)(efp-name=response_time)(assignment-type=DIRECT)(value=[1.0; 2.0]))' extend='false' multiple='false' optional='false'/>
   </resource>
 </obr>

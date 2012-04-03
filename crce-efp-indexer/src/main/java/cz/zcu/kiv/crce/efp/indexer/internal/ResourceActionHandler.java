@@ -53,6 +53,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			final Buffer buffer, final String name) throws RevokedArtifactException {
 
 		if (!resource.hasCategory("osgi")) {
+			mEfpIndexer.setMessage("EFP metadata was not found in the artifact.");
 			return resource;
 		}
 
@@ -60,7 +61,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		foundedEFP = false;
 
 		try {
-			handleNewResource(resource, name);
+			handleNewResource(resource);
 
 			if (initialLoadingException) {
 				return resource;
@@ -74,7 +75,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 					mEfpIndexer.setMessage("All EFP metadata was not saved.");
 				}
 			} else {
-				mEfpIndexer.setMessage("EFP metadata was not found in bundle.");
+				mEfpIndexer.setMessage("EFP metadata was not found in the bundle.");
 			}
 
 		} catch (Exception e) {
@@ -95,9 +96,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * there is started indexing process.
 	 *
 	 * @param resource - Resource uploaded to buffer, which enters into indexing process.
-	 * @param artefactName - Name of resource file.
 	 */
-	private void handleNewResource(final Resource resource, final String artefactName) {
+	public void handleNewResource(final Resource resource) {
 
 		IndexerHandler indexer = new IndexerHandler(mLog, mEfpIndexer);
 
@@ -119,7 +119,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		try {
 			ResourceDAO rd = mPluginManager.getPlugin(ResourceDAO.class);
 			rd.save(resource);
-			mLog.log(LogService.LOG_INFO, "-- Resource was saved. --");
+			mLog.log(LogService.LOG_INFO, "Resource metadata was saved.");
 			return true;
 
 		} catch (IOException e) {
@@ -131,7 +131,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 		return false;
 	}
 
-	//--- Setter
+	//--- Setters
 
 	/**
 	 * @param mLog2 the mLog to set
@@ -139,5 +139,15 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	public final void setmLog(final LogService mLog2) {
 		this.mLog = mLog2;
 	}
+
+
+	/**
+	 * @param mEfpIndexer the mEfpIndexer to set
+	 */
+	public final void setmEfpIndexer(EfpIndexerResultService mEfpIndexer) {
+		this.mEfpIndexer = mEfpIndexer;
+	}
+	
+	
 
 }
