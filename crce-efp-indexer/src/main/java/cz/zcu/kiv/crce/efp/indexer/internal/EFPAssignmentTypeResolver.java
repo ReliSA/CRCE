@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.efps.assignment.types.Feature;
 import cz.zcu.kiv.efps.assignment.types.Feature.AssignmentSide;
 import cz.zcu.kiv.efps.assignment.values.EfpAssignedValue;
@@ -152,18 +151,13 @@ public class EFPAssignmentTypeResolver {
 			writer.addProperty("lr-id", lr.getId());
 		}
 
-		EfpValueType efpValueType;
+		if (efp.getType() == EFP.Type.DERIVED) {
+			return;
+		}
 
-		try {
-			efpValueType = eav.computeValue();
-			if (efpValueType == null) {
-				return;
-			}
+		EfpValueType efpValueType = eav.computeValue();
 
-		} catch (NullPointerException e) {
-			String infoMessage =  "EFP " + efp.getName() + " in feature " + feature.getName()
-					+ " has no computable result.";
-			container.getLogger().log(LogService.LOG_INFO, infoMessage);
+		if (efpValueType == null) {
 			return;
 		}
 
