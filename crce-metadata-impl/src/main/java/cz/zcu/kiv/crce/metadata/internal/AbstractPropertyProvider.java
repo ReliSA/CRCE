@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+
 import org.osgi.framework.Version;
 
 /**
@@ -18,7 +20,7 @@ import org.osgi.framework.Version;
  */
 public abstract class AbstractPropertyProvider<T extends PropertyProvider<T>> implements PropertyProvider<T> {
 
-    final Map<String, Property> m_map = new HashMap<String, Property>();
+    final Map<String, Property> m_map = new TreeMap<String, Property>();
     
     /**
      * Returns <code>this</code>. For generic casting purpose.

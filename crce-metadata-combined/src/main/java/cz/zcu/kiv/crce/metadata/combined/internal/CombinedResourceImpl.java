@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+
 import org.osgi.framework.Version;
 
 /**
@@ -248,7 +250,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public Property[] getProperties() {
-        Set<Property> set = new HashSet<Property>();
+        Set<Property> set = new TreeSet<Property>();
         set.addAll(Arrays.asList(m_writableResource.getProperties()));
         set.addAll(Arrays.asList(m_staticResource.getProperties()));
         return set.toArray(new Property[set.size()]);
