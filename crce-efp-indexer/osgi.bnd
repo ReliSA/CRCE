@@ -22,10 +22,20 @@ Import-Package: \
 	!javax.sql; \
 	!javax.xml; \
 	!jline; \
+	!jline.console; \
+	!jline.console.*; \
+	!org.apache.log; !org.apache.log4j; \
+	!org.apache.xerces.xni; !org.apache.xerces.xni.parser; \
+	!org.cyberneko.html; !org.cyberneko.html.filters; \
+	!org.eclipse.osgi.framework.adaptor; !org.eclipse.osgi.framework.internal.core; !org.eclipse.osgi.internal.loader; \
+	!org.objectweb.asm; !org.objectweb.asm.commons; \
 	!org.apache.aries.blueprint.annotation.service; \
 	!org.apache.aries.quiesce.manager; \
 	!org.apache.aries.quiesce.participant; \
 	!org.apache.avalon.framework.logger; \
 	!org.apache.commons.logging; \
+	!org.ops4j.pax.exam.options; !org.ops4j.pax.exam.spi; !org.ops4j.pax.exam.spi.reactors; \
+	!org.osgi.service.event; !org.osgi.service.framework; \
 	\
 	*
+

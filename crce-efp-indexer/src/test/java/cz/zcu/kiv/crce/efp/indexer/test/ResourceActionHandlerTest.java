@@ -24,7 +24,6 @@ import junit.framework.*;
 
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
-import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
 
 /**
  * Testing class for ResourceActionHandler class.

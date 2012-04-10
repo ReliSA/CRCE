@@ -11,7 +11,12 @@ import cz.zcu.kiv.efps.assignment.values.EfpAssignedValue.AssignmentType;
 import cz.zcu.kiv.efps.assignment.values.EfpFormulaValue;
 import cz.zcu.kiv.efps.assignment.values.EfpNamedValue;
 import cz.zcu.kiv.efps.types.datatypes.EfpValueType;
+import cz.zcu.kiv.efps.types.evaluator.LrConstraintEvaluator;
+import cz.zcu.kiv.efps.types.evaluator.LrDerivedValueEvaluator;
 import cz.zcu.kiv.efps.types.lr.LR;
+import cz.zcu.kiv.efps.types.lr.LrAssignment;
+import cz.zcu.kiv.efps.types.lr.LrAssignment.LrAssignmentType;
+import cz.zcu.kiv.efps.types.lr.LrDerivedAssignment;
 import cz.zcu.kiv.efps.types.properties.EFP;
 
 /**
@@ -151,20 +156,16 @@ public class EFPAssignmentTypeResolver {
 			writer.addProperty("lr-id", lr.getId());
 		}
 
-		/*
-		// This code block is possible to use with efpTypes module from CoSi project (http://www.assembla.com/spaces/show/cosi).  
-		// Code requires LrDerivedAssignment with String logicalFormula atribute like in:
-		// http://svn.assembla.com/svn/cosi/efps/efpTypes/trunk/src/main/java/cz/zcu/kiv/efps/types/lr/LrDerivedAssignment.java
 		LrAssignmentType lat = ((EfpNamedValue) eav).getLrAssignment().getAssignmentType();
 		
 		if (lat == LrAssignmentType.DERIVED){
-		
-		LrAssignment lrAssignment = ((EfpNamedValue) eav).getLrAssignment();
-		String logicalFormula = ((LrDerivedAssignment) lrAssignment).getLogicalFormula();
-		
-		writer.addProperty("logical-formula", logicalFormula);
-		}*/
-		
+			LrAssignment lrAssignment = ((EfpNamedValue) eav).getLrAssignment();
+			LrDerivedValueEvaluator evaluator = ((LrDerivedAssignment) lrAssignment).getEvaluator();
+			String logicalRule = ((LrConstraintEvaluator) evaluator).getLogicalRule();
+
+			writer.addProperty("logical-rule", logicalRule);
+		}
+
 		if (efp.getType() == EFP.Type.DERIVED) {
 			return;
 		}
