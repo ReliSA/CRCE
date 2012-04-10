@@ -1,12 +1,10 @@
 package cz.zcu.kiv.crce.efp.indexer.test.support;
 
-import java.util.Dictionary;
-
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
+import cz.zcu.kiv.crce.efp.indexer.internal.EfpIndexerResultServiceImpl;
 import cz.zcu.kiv.crce.efp.indexer.internal.ResourceActionHandler;
 
 public class DataContainerForTestingPurpose {
@@ -32,13 +30,15 @@ public class DataContainerForTestingPurpose {
 	/** Instance of tested class. */
 	private ResourceActionHandler rah = new ResourceActionHandler();
 	
+	/** Instance of EfpIndexerResultService is used during test process. */
+	private EfpIndexerResultService eirs = new EfpIndexerResultServiceImpl();
+
 	//--------------------
 	
 	/** Implemented interface of LogService used during test process. */
 	private LogService testLogService = new LogService() {
 
-		private int printedMessagesLevel = 3;
-		private int predchoziLevel=0;
+		private int printedMessagesLevel = 4;
 
 		@Override
 		public void log(final ServiceReference sr, final int level, final String message,
@@ -54,12 +54,7 @@ public class DataContainerForTestingPurpose {
 		@Override
 		public void log(final int level, final String message) {
 
-			if (level == 5) {
-				if (predchoziLevel == 4 || predchoziLevel == 1) {
-					System.out.print(message);
-				}
-				return;
-			} else if (printedMessagesLevel < level) {
+			if (printedMessagesLevel < level) {
 				return;
 			}
 
@@ -76,31 +71,10 @@ public class DataContainerForTestingPurpose {
 			break;
 			}
 
-			System.out.println("testLog: (" + levelS + "): " + message);
-
-			predchoziLevel=level;
+			System.out.println("crce-efp-indexer testLog: (" + levelS + "): " + message);
 		}
 	};
 
-	private EfpIndexerResultService ers = new EfpIndexerResultService() {
-
-		@Override
-		public void updated(Dictionary properties) throws ConfigurationException {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void setMessage(String message) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public String getMessage() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	};
-	
 	//==============
 	
 	/**
@@ -120,8 +94,8 @@ public class DataContainerForTestingPurpose {
 	/**
 	 * @return the ers
 	 */
-	public final EfpIndexerResultService getErs() {
-		return ers;
+	public final EfpIndexerResultService getEirs() {
+		return eirs;
 	}
 	
 }
