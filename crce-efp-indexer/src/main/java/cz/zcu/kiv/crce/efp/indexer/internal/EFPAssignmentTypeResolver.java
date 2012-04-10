@@ -151,6 +151,20 @@ public class EFPAssignmentTypeResolver {
 			writer.addProperty("lr-id", lr.getId());
 		}
 
+		/*
+		// This code block is possible to use with efpTypes module from CoSi project (http://www.assembla.com/spaces/show/cosi).  
+		// Code requires LrDerivedAssignment with String logicalFormula atribute like in:
+		// http://svn.assembla.com/svn/cosi/efps/efpTypes/trunk/src/main/java/cz/zcu/kiv/efps/types/lr/LrDerivedAssignment.java
+		LrAssignmentType lat = ((EfpNamedValue) eav).getLrAssignment().getAssignmentType();
+		
+		if (lat == LrAssignmentType.DERIVED){
+		
+		LrAssignment lrAssignment = ((EfpNamedValue) eav).getLrAssignment();
+		String logicalFormula = ((LrDerivedAssignment) lrAssignment).getLogicalFormula();
+		
+		writer.addProperty("logical-formula", logicalFormula);
+		}*/
+		
 		if (efp.getType() == EFP.Type.DERIVED) {
 			return;
 		}

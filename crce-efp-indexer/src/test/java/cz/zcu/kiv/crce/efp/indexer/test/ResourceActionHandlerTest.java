@@ -24,6 +24,7 @@ import junit.framework.*;
 
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
+import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
 
 /**
  * Testing class for ResourceActionHandler class.
@@ -32,9 +33,11 @@ public class ResourceActionHandlerTest extends TestCase {
 
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
+	//private volatile MetafileResourceDAO mao;
+	
 	
 	/**
-	 * Test of the handleNewResource(Resource resource, String artefactName) method.
+	 * Test of the handleNewResource(Resource resource) method.
 	 */
 		public void testHandleNewResource() {
 
@@ -258,6 +261,18 @@ public class ResourceActionHandlerTest extends TestCase {
 	}
 
 
+	
+	/*
+	 * Code from here to down is reused from MetafileResourceDAO class.
+	 * This code is used in this class only for temporary time 
+	 * till testing container will be working properly.
+	 * 
+	 * This implementation of ResourceDAO reads/writes metadata from/to a file,
+	 * whose name (URI path) is created by resource's URI path and '.meta' extension.
+	 * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+	 * 
+	 */
+	
 	/**
 	 * 
 	 * @param uri
@@ -265,6 +280,7 @@ public class ResourceActionHandlerTest extends TestCase {
 	 * @throws IOException
 	 */
 	public Resource getResource(URI uri) throws IOException {
+		
 		ResourceCreator resourceCreator = new ResourceCreatorImpl();
 		DataModelHelperExt dataModelHelper = new DataModelHelperExtImpl();
 
@@ -312,8 +328,5 @@ public class ResourceActionHandlerTest extends TestCase {
 
 		return metadataUri;
 	}
-
-	
-
 
 }

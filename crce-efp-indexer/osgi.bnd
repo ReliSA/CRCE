@@ -12,4 +12,20 @@ Embed-Dependency:\
 	*;groupId=!${project.groupId}|org.apache.felix
 
 Import-Package: \
+	!aQute.service.scripting; \
+	!com.google.common.collect; \
+	!javax.crypto; \
+	!javax.management; \
+	!javax.naming; \
+	!javax.net,javax.net.ssl; \
+	!javax.security; \
+	!javax.sql; \
+	!javax.xml; \
+	!jline; \
+	!org.apache.aries.blueprint.annotation.service; \
+	!org.apache.aries.quiesce.manager; \
+	!org.apache.aries.quiesce.participant; \
+	!org.apache.avalon.framework.logger; \
+	!org.apache.commons.logging; \
+	\
 	*
