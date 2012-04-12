@@ -5,7 +5,9 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Export-Package:\
-	cz.zcu.kiv.crce.efp.*; \
+	cz.zcu.kiv.crce.efp.indexer; \
+	cz.zcu.kiv.crce.efp.indexer.internal; \
+	cz.zcu.kiv.crce.efp.indexer.test.support; \
 
 Embed-Dependency:\
 	!cz.zcu.kiv.efps.*; \

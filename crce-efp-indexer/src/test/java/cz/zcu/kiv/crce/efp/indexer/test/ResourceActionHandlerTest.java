@@ -30,6 +30,7 @@ import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
  */
 public class ResourceActionHandlerTest extends TestCase {
 
+	/** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
 	//private volatile MetafileResourceDAO metaResDao; // Will be used with container.

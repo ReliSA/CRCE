@@ -9,19 +9,25 @@ import org.osgi.service.log.LogService;
 import cz.zcu.kiv.crce.efp.indexer.internal.IndexerHandler;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import junit.framework.TestCase;
 
-/**
- * Testing class for IndexerHandler class.
- */
-public class IndexerHandlerTest extends TestCase {
+public class ContainerTestIndexerHandler extends TestCase {
 	
-	/** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
+	private volatile ResourceCreator resCreator;
 	
-	/** Initial method for testing the indexerInitialization(Resource resource) method.	*/
+	public ContainerTestIndexerHandler(ResourceCreator resCreator) {
+		this.resCreator = resCreator;
+	}
+	
+	public ContainerTestIndexerHandler() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/** Test of the indexerInitialization(Resource resource) method.	*/
 	public void testIndexerInitialization(){
 
 		assertEquals(true, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_EFP));
@@ -41,7 +47,18 @@ public class IndexerHandlerTest extends TestCase {
 		File fil = new File(filePath);
 		String uriText = "file:" + fil.getAbsolutePath();
 
-		Resource resource = new ResourceCreatorImpl().createResource();
+		if(resCreator == null)
+			System.out.println("resCreator je null!");
+		else
+			System.out.println("resCreator NENI null!");
+
+		Resource resource = resCreator.createResource();
+		
+		if(resource == null)
+			System.out.println("resource je null!");
+		else
+			System.out.println("resource NENI null!");
+		
 		try {
 			resource.setUri(new URI(uriText));
 		} catch (URISyntaxException e) {

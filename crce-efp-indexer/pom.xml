@@ -148,6 +148,8 @@ Maybe some of them are not mandatory.
       <scope>test</scope>
     </dependency>
 
+
+
     <dependency>
       <groupId>org.ops4j.pax.runner</groupId>
       <artifactId>pax-runner-no-jcl</artifactId>
@@ -184,7 +186,6 @@ Maybe some of them are not mandatory.
     </dependency>
 
   </dependencies>
-
 </project>
 
 

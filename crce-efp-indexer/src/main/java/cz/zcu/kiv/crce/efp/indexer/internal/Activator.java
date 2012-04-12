@@ -55,7 +55,7 @@ public class Activator extends DependencyActivatorBase {
 				.setInterface(Plugin.class.getName(), null)
 				.setImplementation(ResourceActionHandler.class)
 				.add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-				.add(createServiceDependency().setService(LogService.class).setRequired(false))
+				.add(createServiceDependency().setRequired(false).setService(LogService.class))
 				.add(createServiceDependency().setRequired(false).setService(EfpIndexerResultService.class))
 				);
 	}
