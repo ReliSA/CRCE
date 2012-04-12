@@ -24,7 +24,6 @@ import junit.framework.*;
 
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
-import cz.zcu.kiv.crce.metadata.metafile.internal.MetafileResourceDAO;
 
 /**
  * Testing class for ResourceActionHandler class.
@@ -61,8 +60,8 @@ public class ResourceActionHandlerTest extends TestCase {
 		Resource resFromMeta = getResourceFromMetaUri(uriTextMeta);
 		// Resource which is created by methods of crce-metadata-metafile module.
 
-		displayResourceObrMetadata(resFromMeta);
-		displayResourceObrMetadata(res4Test);
+		//displayResourceObrMetadata(resFromMeta);
+		//displayResourceObrMetadata(res4Test);
 
 		compareRequirements(resFromMeta, res4Test);
 		compareCapabilities(resFromMeta, res4Test);
@@ -116,8 +115,7 @@ public class ResourceActionHandlerTest extends TestCase {
 				if (req.getFilter().equals(req2.getFilter()) == true) {
 					dctp.getTestLogService().log(LogService.LOG_DEBUG, "agree: " + i + " a " + i2);
 					dctp.getTestLogService().log(LogService.LOG_DEBUG, req.getFilter());
-					dctp.getTestLogService().log(LogService.LOG_DEBUG, req2.getFilter());
-					dctp.getTestLogService().log(LogService.LOG_DEBUG, "");
+					dctp.getTestLogService().log(LogService.LOG_DEBUG, req2.getFilter()+"\n");
 					match = true;
 					break;
 				}
@@ -156,7 +154,6 @@ public class ResourceActionHandlerTest extends TestCase {
 				if (compareCapaProperties(cap2, cap) == true){
 					dctp.getTestLogService().log(LogService.LOG_DEBUG, "agree: " + i + " a " + i2);
 					displayCapDataAt1Line(cap);
-					dctp.getTestLogService().log(LogService.LOG_DEBUG, "\n");
 					match = true;
 					break;
 				}
@@ -225,11 +222,14 @@ public class ResourceActionHandlerTest extends TestCase {
 	 * @param cap - Given Capability for displaying its Properties.
 	 */
 	private void displayCapDataAt1Line(final Capability cap) {
-		dctp.getTestLogService().log(LogService.LOG_DEBUG, "CAP=" + cap.getName());
+		StringBuilder sb = new StringBuilder();
+		sb.append("CAP=" + cap.getName());
+
 		Property [] propy = cap.getProperties();
 		for (Property prop : propy) {
-			dctp.getTestLogService().log(LogService.LOG_DEBUG, "\t" + prop.getName() + "=" + prop.getType() + "=" + prop.getValue());
+			sb.append("\t" + prop.getName() + "=" + prop.getType() + "=" + prop.getValue());
 		}
+		dctp.getTestLogService().log(LogService.LOG_DEBUG, sb.toString()+"\n");
 	}
 
 	/**

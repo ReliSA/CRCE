@@ -163,7 +163,7 @@ public class EFPAssignmentTypeResolver {
 			LrDerivedValueEvaluator evaluator = ((LrDerivedAssignment) lrAssignment).getEvaluator();
 			String logicalRule = ((LrConstraintEvaluator) evaluator).getLogicalRule();
 
-			writer.addProperty("logical-rule", logicalRule);
+			writer.addProperty("deriving-formula", logicalRule);
 		}
 
 		if (efp.getType() == EFP.Type.DERIVED) {
