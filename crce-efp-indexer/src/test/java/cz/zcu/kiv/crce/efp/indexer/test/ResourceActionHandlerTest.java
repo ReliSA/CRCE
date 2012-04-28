@@ -41,7 +41,7 @@ public class ResourceActionHandlerTest extends TestCase {
 		public void testHandleNewResource() {
 
 		dctp.getRah().setmLog(dctp.getTestLogService());
-		dctp.getRah().setmEfpIndexer(dctp.getEirs());
+		dctp.getRah().setmEfpIndexer(dctp.getMirs());
 
 		File fil = new File(dctp.PATH_TO_ARTIFACT_CORRESPONDING_TO_THE_META_FILE);
 		String uriText = "file:" + fil.getAbsolutePath();

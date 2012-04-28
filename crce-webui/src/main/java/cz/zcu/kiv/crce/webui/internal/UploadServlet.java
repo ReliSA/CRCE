@@ -119,15 +119,15 @@ public class UploadServlet extends HttpServlet {
 		} else {
 			success = false;
 		}
-		
+
 		String efpIndexerResult;
-		if(success){ 
+		if (success) {
 			message = "Upload was succesful.";
 			efpIndexerResult = "<BR>" + Activator.instance().getEfpIndexerResult().getMessage();
-		}
-		else{ 
+			Activator.instance().getEfpIndexerResult().resetMessageString();
+		} else {
 			message = "Upload failed.";
-			efpIndexerResult="";
+			efpIndexerResult = "";
 		}
 
 		ResourceServlet.setError(req.getSession(), success, message + efpIndexerResult);

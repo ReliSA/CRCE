@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.io.IOException;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -10,6 +9,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 
 import org.osgi.service.log.LogService;
 
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
@@ -33,8 +33,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	/** PluginManager injected by dependency manager. */
 	private volatile PluginManager mPluginManager;
 
-	/** EfpIndexerResultService injected by dependency manager. */
-	private volatile EfpIndexerResultService mEfpIndexer;
+	/** MetadataIndexingResultService injected by dependency manager. */
+	private volatile MetadataIndexingResultService mEfpIndexer;
 
 	/** Variable carries boolean information whether some error occurred
 	 * during loading list of features and EFP information from OSGi bundle.
@@ -53,7 +53,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			final Buffer buffer, final String name) throws RevokedArtifactException {
 
 		if (!resource.hasCategory("osgi")) {
-			mEfpIndexer.setMessage("EFP metadata was not found in the artifact.");
+			mEfpIndexer.addMessage("EFP metadata was not found in the artifact.");
 			return resource;
 		}
 
@@ -70,12 +70,12 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			if (foundedEFP) {
 
 				if (saveResourceOBR(resource)) { // Saving modified OBR metadata.
-					mEfpIndexer.setMessage("EFP metadata were succesfully saved.");
+					mEfpIndexer.addMessage("EFP metadata were succesfully saved.");
 				} else {
-					mEfpIndexer.setMessage("All EFP metadata was not saved.");
+					mEfpIndexer.addMessage("All EFP metadata was not saved.");
 				}
 			} else {
-				mEfpIndexer.setMessage("EFP metadata was not found in the bundle.");
+				mEfpIndexer.addMessage("EFP metadata was not found in the bundle.");
 			}
 
 		} catch (Exception e) {
@@ -83,7 +83,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
 			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
 
-			mEfpIndexer.setMessage("Unexpected error " + e.getClass().getName()
+			mEfpIndexer.addMessage("Unexpected error " + e.getClass().getName()
 					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
 		}
 
@@ -144,7 +144,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	/**
 	 * @param mEfpIndexer the mEfpIndexer to set
 	 */
-	public final void setmEfpIndexer(EfpIndexerResultService mEfpIndexer) {
+	public final void setmEfpIndexer(MetadataIndexingResultService mEfpIndexer) {
 		this.mEfpIndexer = mEfpIndexer;
 	}
 	

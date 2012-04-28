@@ -3,9 +3,9 @@ package cz.zcu.kiv.crce.efp.indexer.test.support;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
-import cz.zcu.kiv.crce.efp.indexer.internal.EfpIndexerResultServiceImpl;
 import cz.zcu.kiv.crce.efp.indexer.internal.ResourceActionHandler;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
+import cz.zcu.kiv.crce.plugin.internal.MetadataIndexingResultServiceImpl;
 
 public class DataContainerForTestingPurpose {
 
@@ -30,8 +30,8 @@ public class DataContainerForTestingPurpose {
 	/** Instance of tested class. */
 	private ResourceActionHandler rah = new ResourceActionHandler();
 	
-	/** Instance of EfpIndexerResultService is used during test process. */
-	private EfpIndexerResultService eirs = new EfpIndexerResultServiceImpl();
+	/** Instance of MetadataIndexingResultService is used during test process. */
+	private MetadataIndexingResultService mirs = new MetadataIndexingResultServiceImpl();
 
 	//--------------------
 	
@@ -94,8 +94,8 @@ public class DataContainerForTestingPurpose {
 	/**
 	 * @return the ers
 	 */
-	public final EfpIndexerResultService getEirs() {
-		return eirs;
+	public final MetadataIndexingResultService getMirs() {
+		return mirs;
 	}
 	
 }

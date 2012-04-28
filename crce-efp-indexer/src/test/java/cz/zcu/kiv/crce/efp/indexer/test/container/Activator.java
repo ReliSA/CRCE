@@ -6,8 +6,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 
 /**
  * Activator class for starting testing bundle.
@@ -20,7 +20,7 @@ public class Activator extends DependencyActivatorBase {
 
 
     private static volatile Activator m_instance;
-	private volatile EfpIndexerResultService mEfpIndexer;
+	private volatile MetadataIndexingResultService mEfpIndexer;
 	private volatile ResourceCreator resourceCreator;
     
     /** {@inheritDoc} */
@@ -33,7 +33,7 @@ public class Activator extends DependencyActivatorBase {
 
         manager.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setRequired(false).setService(EfpIndexerResultService.class))
+                .add(createServiceDependency().setRequired(false).setService(MetadataIndexingResultService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
                 );
 

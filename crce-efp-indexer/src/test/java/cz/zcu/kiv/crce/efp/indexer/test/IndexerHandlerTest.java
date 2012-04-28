@@ -48,7 +48,7 @@ public class IndexerHandlerTest extends TestCase {
 			dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
 		}
 
-		IndexerHandler indexer = new IndexerHandler(dctp.getTestLogService(), dctp.getEirs());
+		IndexerHandler indexer = new IndexerHandler(dctp.getTestLogService(), dctp.getMirs());
 
 		boolean result = indexer.indexerInitialization(resource); 
 

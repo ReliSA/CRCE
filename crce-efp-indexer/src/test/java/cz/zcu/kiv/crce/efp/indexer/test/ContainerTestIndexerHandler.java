@@ -13,6 +13,10 @@ import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import junit.framework.TestCase;
 
+/**
+ * Testing class which should be used in testing container because it requires dependency injection.
+ * This class is not finished. 
+ */
 public class ContainerTestIndexerHandler extends TestCase {
 	
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
@@ -65,7 +69,7 @@ public class ContainerTestIndexerHandler extends TestCase {
 			dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
 		}
 
-		IndexerHandler indexer = new IndexerHandler(dctp.getTestLogService(), dctp.getEirs());
+		IndexerHandler indexer = new IndexerHandler(dctp.getTestLogService(), dctp.getMirs());
 
 		boolean result = indexer.indexerInitialization(resource); 
 

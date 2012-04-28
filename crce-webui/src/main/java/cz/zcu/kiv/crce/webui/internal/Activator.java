@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.webui.internal;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -28,9 +28,9 @@ public final class Activator extends DependencyActivatorBase {
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
 
-    /** This interface provides by simple way information
+    /** MetadataIndexingResultService instance provides by simple way information
      * about result of EFP indexing process in crce-efp-indexer module. */
-    private volatile EfpIndexerResultService m_efpIndexerResult;    /* injected by dependency manager */
+    private volatile MetadataIndexingResultService m_efpIndexerResult;    /* injected by dependency manager */
 
     public static Activator instance() {
         return m_instance;
@@ -64,9 +64,9 @@ public final class Activator extends DependencyActivatorBase {
     }
 
     /**
-     * @return instance of EfpIndexerResultService, which provides info about EFP indexing process.
+     * @return instance of MetadataIndexingResultService provides info about EFP indexing process.
      */
-    public EfpIndexerResultService getEfpIndexerResult() {
+    public MetadataIndexingResultService getEfpIndexerResult() {
     	return m_efpIndexerResult;
     }
 
@@ -81,7 +81,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
-                .add(createServiceDependency().setService(EfpIndexerResultService.class).setRequired(false))
+                .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
                 );
 
 //        final Test t1 = new Test();

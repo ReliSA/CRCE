@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.efps.assignment.api.EfpAwareComponentLoader;
 import cz.zcu.kiv.efps.assignment.client.EfpAssignmentClient;
 import cz.zcu.kiv.efps.assignment.core.AssignmentRTException;
@@ -25,8 +25,8 @@ public class IndexerHandler {
 	/** Contains instances and variables with data for indexing purpose. */
 	private IndexerDataContainer container;
 
-	/** EfpIndexerResultService injected by dependency manager. */
-	private volatile EfpIndexerResultService mEfpIndexerResult;
+	/** MetadataIndexingResultService injected by dependency manager. */
+	private volatile MetadataIndexingResultService mEfpIndexerResult;
 
 	/** LogService injected by dependency manager. */
 	private volatile LogService mLog;
@@ -37,7 +37,7 @@ public class IndexerHandler {
 	 * @param mLog2 - LogService.
 	 * @param mEfpIndexer - Provides interface for presentation indexing result to user.
 	 */
-	public IndexerHandler(final LogService mLog2, final EfpIndexerResultService mEfpIndexer) {
+	public IndexerHandler(final LogService mLog2, final MetadataIndexingResultService mEfpIndexer) {
 		this.mLog = mLog2;
 		this.mEfpIndexerResult = mEfpIndexer;
 	}
@@ -87,14 +87,14 @@ public class IndexerHandler {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " is not valid OSGi bundle.";
 			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.setMessage(warningMessage);
+			mEfpIndexerResult.addMessage(warningMessage);
 			return false;
 
 		} catch (AssignmentRTException e) {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " contains unsupported EFP metadata version.";
 			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.setMessage(warningMessage);
+			mEfpIndexerResult.addMessage(warningMessage);
 			return false;
 		}
 

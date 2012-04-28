@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.efp.indexer.internal;
 
-import cz.zcu.kiv.crce.efp.indexer.EfpIndexerResultService;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
@@ -33,30 +33,17 @@ public class Activator extends DependencyActivatorBase {
     }
     */
 
-	/** This instance of EfpIndexerResultService implementation will be used in creating a service below. */
-	private EfpIndexerResultService efpIndexerResult = new EfpIndexerResultServiceImpl();
-
 	@Override
 	public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
 
-		/*m_instance = this;
-
-		manager.add(createComponent()
-                .setImplementation(this)
-                .add(createServiceDependency().setRequired(false).setService(EfpIndexerLogService.class))
-                );*/
-
-		manager.add(createComponent()
-				.setInterface(EfpIndexerResultService.class.getName(), null)
-				.setImplementation(efpIndexerResult)
-				);
+		/*m_instance = this;*/
 
 		manager.add(createComponent()
 				.setInterface(Plugin.class.getName(), null)
 				.setImplementation(ResourceActionHandler.class)
 				.add(createServiceDependency().setRequired(true).setService(PluginManager.class))
 				.add(createServiceDependency().setRequired(false).setService(LogService.class))
-				.add(createServiceDependency().setRequired(false).setService(EfpIndexerResultService.class))
+				.add(createServiceDependency().setRequired(false).setService(MetadataIndexingResultService.class))
 				);
 	}
 
