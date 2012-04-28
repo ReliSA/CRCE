@@ -17,7 +17,7 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 
 	/** Constructor of MetadataIndexingResultServiceImpl class. */
 	public MetadataIndexingResultServiceImpl() {
-		message = "IndexerLogService was initialized.";
+		message = "";
 		isEmpty = true;
 	}
 
@@ -55,7 +55,7 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 
 	@Override
 	public final void addMessage(final String nextMessage) {
-		this.message+=nextMessage;
+		this.message+=" "+nextMessage;
 		isEmpty = false;
 	}
 
