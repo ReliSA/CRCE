@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.plugin;
 
 import org.osgi.framework.Version;
-import org.osgi.service.cm.ManagedService;
 
 /**
  * Common plugin interface. Every plugin must implement it.
