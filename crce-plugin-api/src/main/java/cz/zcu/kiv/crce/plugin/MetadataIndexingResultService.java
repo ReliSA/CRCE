@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.plugin;
 
-import org.osgi.service.cm.ManagedService;
-
 /**
  * This interface provides by simple way information about result of metadata indexing process.
  *
@@ -16,7 +14,7 @@ import org.osgi.service.cm.ManagedService;
  * to others modules or to module with GUI. So target (crce-webui) module
  * can take out result information and display it on the website.
  */
-public interface MetadataIndexingResultService extends ManagedService{
+public interface MetadataIndexingResultService {
 
 	/**
 	 * Indexer module sets by this method information for user.

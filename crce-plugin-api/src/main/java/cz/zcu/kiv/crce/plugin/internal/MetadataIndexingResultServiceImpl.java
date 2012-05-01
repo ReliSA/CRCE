@@ -2,13 +2,14 @@ package cz.zcu.kiv.crce.plugin.internal;
 
 import java.util.Dictionary;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 
 
 /**
  * Implementation of MetadataIndexingResultService interface.
  */
-public class MetadataIndexingResultServiceImpl implements MetadataIndexingResultService {
+public class MetadataIndexingResultServiceImpl implements MetadataIndexingResultService, ManagedService {
 
 	/** This instance holds information about result of indexing process. */
 	private String message = null;
