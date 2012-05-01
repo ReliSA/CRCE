@@ -8,7 +8,7 @@ import org.osgi.service.cm.ManagedService;
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public interface Plugin extends Comparable<Plugin>, ManagedService {
+public interface Plugin extends Comparable<Plugin> {
 
     /**
      * Configuration property name for plugin ID.
