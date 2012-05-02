@@ -8,14 +8,18 @@ public class MetadataIndexingResultServiceImplTest extends TestCase{
 	public void testEfpIndexerResultServiceImpl(){
 		
 		MetadataIndexingResultServiceImpl mirs = new MetadataIndexingResultServiceImpl();
-		
-		assertNotNull(mirs.getMessage());	// Initial message can not be null.
+
+		assertEquals(true, mirs.isEmpty());
 		
 		String testingMessage = "This is a message for testing purpose.";
 		
-		mirs.setMessage(testingMessage);
+		mirs.addMessage(testingMessage);
 		
-		String resultMessage = mirs.getMessage();
+		assertEquals(false, mirs.isEmpty());
+		
+		assertNotNull(mirs.getMessages());	// Initial message can not be null.
+		
+		String resultMessage = (mirs.getMessages())[0];
 		
 		boolean result = testingMessage.equals(resultMessage);
 		assertEquals(true, result);			// TestingMessage and resultMessage must be same.
