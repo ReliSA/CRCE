@@ -1,8 +1,11 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 
 
@@ -12,66 +15,50 @@ import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 public class MetadataIndexingResultServiceImpl implements MetadataIndexingResultService, ManagedService {
 
 	/** This instance holds information about result of indexing process. */
-	private String message = null;
-
-	private boolean isEmpty;
+	private ArrayList<String> messages;
+	
 
 	/** Constructor of MetadataIndexingResultServiceImpl class. */
 	public MetadataIndexingResultServiceImpl() {
-		message = "";
-		isEmpty = true;
+		messages = new ArrayList<String>();
 	}
 
 	/**
 	 * Getting information.
 	 *
-	 * @return Information about indexing result for user.
+	 * @return Informations about indexing result for user.
 	 */
 	@Override
-	public final String getMessage() {
-		if(isEmpty){
-			return "";
-		}
-		else{
-			return message;
-		}
+	public final String[] getMessages() {
+		if (!isEmpty()) {
+			String[] stringArray = new String[messages.size()];
+			int index = 0;
+			for (String indexerMessage : messages) {
+				stringArray[index++] = indexerMessage;
+			}
+			return stringArray;
+		} else
+			return null;
 	}
 
 	/**
 	 * Setting information.
 	 *
-	 * @param message - Information about indexing result.
+	 * @param nextMessage - Information about indexing result.
 	 */
-	@Override
-	public final boolean setMessage(final String message) {
-		if(isEmpty){
-			this.message = message;
-			isEmpty = false;
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-
 	@Override
 	public final void addMessage(final String nextMessage) {
-		this.message+=" "+nextMessage;
-		isEmpty = false;
-	}
-
-	/**
-	 * @return the isEmpty
-	 */
-	@Override
-	public boolean isEmptyMessageString() {
-		return isEmpty;
+		messages.add(nextMessage);
 	}
 
 	@Override
-	public void resetMessageString() {
-		message = "";
-		isEmpty = true;
+	public final void resetMessages() {
+		messages.clear();
+	}
+	
+	@Override
+	public final boolean isEmpty() {
+		return messages.isEmpty();
 	}
 
 	@Override

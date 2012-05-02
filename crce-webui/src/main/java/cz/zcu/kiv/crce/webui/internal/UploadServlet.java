@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.webui.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
+import cz.zcu.kiv.crce.plugin.internal.MetadataIndexingResultServiceImpl;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import java.io.IOException;
@@ -120,17 +122,24 @@ public class UploadServlet extends HttpServlet {
 			success = false;
 		}
 
-		String efpIndexerResult;
+		String metadataIndexerResult = "";
 		if (success) {
 			message = "Upload was succesful.";
-			efpIndexerResult = "<BR>" + Activator.instance().getEfpIndexerResult().getMessage();
-			Activator.instance().getEfpIndexerResult().resetMessageString();
+
+			MetadataIndexingResultService indexerResult = Activator.instance().getMetadataIndexerResult();
+			if(!indexerResult.isEmpty()){
+				String [] MetadataIndexerMessages = indexerResult.getMessages();
+				for(String indexerMessage : MetadataIndexerMessages){
+					metadataIndexerResult += "<BR>" + indexerMessage;
+				}
+				indexerResult.resetMessages();
+			}
 		} else {
 			message = "Upload failed.";
-			efpIndexerResult = "";
+			metadataIndexerResult = "";
 		}
 
-		ResourceServlet.setError(req.getSession(), success, message + efpIndexerResult);
+		ResourceServlet.setError(req.getSession(), success, message + metadataIndexerResult);
 		req.getSession().setAttribute("source", "upload");      
 		req.getRequestDispatcher("resource?link=buffer").forward(req, resp);        
 	}

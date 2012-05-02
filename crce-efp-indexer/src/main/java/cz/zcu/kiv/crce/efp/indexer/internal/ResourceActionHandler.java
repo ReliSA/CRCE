@@ -46,6 +46,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 * If there is no EFP found so there is no reason to save resource metadata. */
 	private boolean foundedEFP;
 
+	/** Prefix for identification this module messages in MetadataIndexingResultService. */
+	private final String EFP_INDEXER_MODULE = "crce-efp-indexer: ";
 
 	@Override
 	// Indexing process starts in afterUploadToBuffer trigger.
@@ -53,7 +55,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			final Buffer buffer, final String name) throws RevokedArtifactException {
 
 		if (!resource.hasCategory("osgi")) {
-			mEfpIndexer.addMessage("EFP metadata was not found in the artifact.");
+			//mEfpIndexer.addMessage("EFP metadata was not found in the artifact.");
 			return resource;
 		}
 
@@ -70,12 +72,12 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			if (foundedEFP) {
 
 				if (saveResourceOBR(resource)) { // Saving modified OBR metadata.
-					mEfpIndexer.addMessage("EFP metadata were succesfully saved.");
+					mEfpIndexer.addMessage(EFP_INDEXER_MODULE+"EFP metadata were succesfully saved.");
 				} else {
-					mEfpIndexer.addMessage("All EFP metadata was not saved.");
+					mEfpIndexer.addMessage(EFP_INDEXER_MODULE+"All EFP metadata was not saved.");
 				}
 			} else {
-				mEfpIndexer.addMessage("EFP metadata was not found in the bundle.");
+				mEfpIndexer.addMessage(EFP_INDEXER_MODULE+"EFP metadata was not found in the bundle.");
 			}
 
 		} catch (Exception e) {
@@ -83,7 +85,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
 			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
 
-			mEfpIndexer.addMessage("Unexpected error " + e.getClass().getName()
+			mEfpIndexer.addMessage(EFP_INDEXER_MODULE+"Unexpected error " + e.getClass().getName()
 					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
 		}
 

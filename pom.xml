@@ -28,15 +28,17 @@
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
         <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
         <org.osgi.framework.system.packages.extra>
-        com.sun.*,javax.xml.*,com.sun.org.apache.xerces.internal.*,
-        javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,
-        javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,
-        javax.microedition.io,javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
-        javax.servlet.http,javax.servlet.jsp,javax.sql,
-        org.w3c.dom,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers,
-        org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,
-        com.sun.java_cup.internal,com.sun.xml.internal.bind.v2
-        </org.osgi.framework.system.packages.extra>
+          com.sun.*,com.sun.org.apache.xerces.internal.*,com.sun.java_cup.internal,
+          javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,
+          javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,
+          javax.microedition.io,javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
+          javax.servlet.jsp,javax.sql,
+          org.xml.sax.ext,org.xml.sax.helpers,
+          org.w3c.dom.xpath,sun.io,org.w3c.dom.ls, 
+
+          <!-- for crce-webui: -->javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
+          com.sun.xml.internal.bind.v2
+        </org.osgi.framework.system.packages.extra> 
     </properties>
 
     <packaging>pom</packaging>
