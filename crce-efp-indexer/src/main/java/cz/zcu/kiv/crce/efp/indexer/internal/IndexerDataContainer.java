@@ -31,6 +31,9 @@ public class IndexerDataContainer {
 	/** LogService injected by dependency manager into ResourceActionHandler. */
 	private volatile LogService logger;
 
+	/** Prefix string for identification this module messages in MetadataIndexingResultService. */
+	public static final String EFP_INDEXER_MODULE = "crce-efp-indexer: ";
+	
 	//------------------------------------------
 	// Getters and Setters
 

@@ -31,8 +31,6 @@ public class IndexerHandler {
 	/** LogService injected by dependency manager. */
 	private volatile LogService mLog;
 
-	/** Prefix for identification this module messages in MetadataIndexingResultService. */
-	private final String EFP_INDEXER_MODULE = "crce-efp-indexer: ";
 	
 	/**
 	 * IndexerHandler constructor.
@@ -90,14 +88,14 @@ public class IndexerHandler {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " is not valid OSGi bundle.";
 			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.addMessage(EFP_INDEXER_MODULE+warningMessage);
+			mEfpIndexerResult.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+warningMessage);
 			return false;
 
 		} catch (AssignmentRTException e) {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " contains unsupported EFP metadata version.";
 			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.addMessage(EFP_INDEXER_MODULE+warningMessage);
+			mEfpIndexerResult.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+warningMessage);
 			return false;
 		}
 
