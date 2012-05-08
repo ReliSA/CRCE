@@ -15,16 +15,21 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.ExamReactorStrategy;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.spi.reactors.AllConfinedStagedReactorFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 
 import cz.zcu.kiv.crce.efp.indexer.test.ContainerTestIndexerHandler;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
+
+//import javax.inject.Inject;
 
 /**
  * Class starts testing container.
@@ -32,6 +37,12 @@ import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(AllConfinedStagedReactorFactory.class)
 public class ContainerRunnerTest extends TestCase {
+
+	@Inject
+	private BundleContext bundleContext;
+
+	@Inject
+	private volatile MetadataIndexingResultService mMetadataIndexingResult;
 
 	private String systemPackages = 
 			"com.sun.*,javax.xml.*,com.sun.org.apache.xerces.internal.*,"
@@ -97,7 +108,6 @@ public class ContainerRunnerTest extends TestCase {
 														+ "org.osgi.framework.hooks.service,"
 														+ "org.slf4j,"
 														+ "org.osgi.service.log,"
-														+ "cz.zcu.kiv.crce.efp.indexer,"
 														+ "cz.zcu.kiv.crce.efp.indexer.internal,"
 														+ "junit.framework,"
 														+ "org.osgi.framework.wiring"
@@ -110,10 +120,27 @@ public class ContainerRunnerTest extends TestCase {
 				);
 	}
 
-	
+
 	@Test
-	//@SuppressWarnings("unchecked")
+	public void bundleContextShouldNotBeNull() throws Exception {
+		if(bundleContext == null)
+			System.out.println("============== bundleContext IS NULL");
+
+		assertNotNull(bundleContext);
+
+		if(mMetadataIndexingResult == null)
+			System.out.println("============== mMetadataIndexingResult IS NULL");
+
+		assertNotNull(mMetadataIndexingResult);
+	}
+
+
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void testMethod1() throws InvalidSyntaxException {
+
+		System.out.println("---------------------------");
 		assertEquals(true, true); // Jen pro otestovani, ze se jiz spousti metody s testy.
 	}
 }

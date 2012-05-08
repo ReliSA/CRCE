@@ -2,24 +2,18 @@ package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.io.IOException;
 
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import cz.zcu.kiv.efps.assignment.core.AssignmentRTException;
-import cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentRTException;
-import cz.zcu.kiv.efps.assignment.types.Feature;
-
 
 /**
  * ResourceActionHandler class ensures general tasks about efp-indexing process.
@@ -28,14 +22,8 @@ import cz.zcu.kiv.efps.assignment.types.Feature;
  */
 public class ResourceActionHandler extends AbstractActionHandler implements ActionHandler {
 
-	/** LogService injected by dependency manager. */
-	private volatile LogService mLog;
-
 	/** PluginManager injected by dependency manager. */
 	private volatile PluginManager mPluginManager;
-
-	/** MetadataIndexingResultService injected by dependency manager. */
-	private volatile MetadataIndexingResultService mEfpIndexer;
 
 	/** Variable carries boolean information whether some error occurred
 	 * during loading list of features and EFP information from OSGi bundle.
@@ -69,23 +57,17 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			}
 
 			if (foundedEFP) {
-
-				if (saveResourceOBR(resource)) { // Saving modified OBR metadata.
-					mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"EFP metadata were succesfully saved.");
-				} else {
-					mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"All EFP metadata was not saved.");
+				if (!saveResourceOBR(resource)) { // Saving modified OBR metadata.
+					logMessage("All EFP metadata was not saved.", IndexerDataContainer.NO_LOGSERVICE_MESSAGE);
 				}
 			} else {
-				mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"EFP metadata was not found in the bundle.");
+				logMessage("EFP metadata was not found in the bundle.", LogService.LOG_INFO);
 			}
 
 		} catch (Exception e) {
-			mLog.log(LogService.LOG_ERROR, "Unexpected error " + e.getClass().getName()
-					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
-			mLog.log(LogService.LOG_WARNING, "Maybe there was a resource with old EFP format verison!");
-
-			mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"Unexpected error " + e.getClass().getName()
-					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName());
+			String message = "Unexpected error " + e.getClass().getName()
+					+ " in module crce-efp-indexer during handling with a resource " + resource.getPresentationName();
+			logMessage(message, LogService.LOG_ERROR);
 		}
 
 		return resource;
@@ -98,9 +80,9 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 *
 	 * @param resource - Resource uploaded to buffer, which enters into indexing process.
 	 */
-	public void handleNewResource(final Resource resource) {
+	public final void handleNewResource(final Resource resource) {
 
-		IndexerHandler indexer = new IndexerHandler(mLog, mEfpIndexer);
+		IndexerHandler indexer = new IndexerHandler();
 
 		if (!indexer.indexerInitialization(resource)) {
 			initialLoadingException = true;
@@ -118,59 +100,52 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 	 */
 	private boolean saveResourceOBR(final Resource resource) {
 
-		if(!resourceRequirementFilterCheck(resource)){
+		if (!resourceRequirementFilterCheck(resource)) {
 			return false;
 		}
 
 		try {
 			ResourceDAO rd = mPluginManager.getPlugin(ResourceDAO.class);
 			rd.save(resource);
-			mLog.log(LogService.LOG_INFO, "Resource metadata was saved.");
+			logMessage("EFP metadata was succesfully saved.", LogService.LOG_INFO);
 			return true;
 
 		} catch (IOException e) {
-			mLog.log(LogService.LOG_ERROR, "IOException during saving process!");
-			mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"IOException during saving process!");
+			logMessage("IOException during saving process!", LogService.LOG_ERROR);
 			return false;
-		} 
+		}
 	}
 
 	/**
-	 * Method checks resource requirements for null filter value. 
+	 * Method checks resource requirements for null filter value.
 	 * Null filter would cause NPE during metadata saving process.
-	 * 
+	 *
 	 * @param resource - Resource instance for check.
-	 * @return - true if all requirements are fine, false if there is some filter null value occurrence.  
+	 * @return - true if all requirements are fine, false if there is some filter null value occurrence.
 	 */
-	public final boolean resourceRequirementFilterCheck(final Resource resource){
+	public final boolean resourceRequirementFilterCheck(final Resource resource) {
 		Requirement [] reqArray = resource.getRequirements();
-		for (Requirement req : reqArray){
-			if(req.getFilter() == null){
-				mLog.log(LogService.LOG_WARNING, "There is 'null' filter string in '"+req.getName()+"' requirement!");
-				mEfpIndexer.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+"There is 'null' filter string in '"+req.getName()+"' requirement!");
+		for (Requirement req : reqArray) {
+			if (req.getFilter() == null) {
+				String message = "There is 'null' filter string in '" + req.getName() + "' requirement!";
+				logMessage(message,LogService.LOG_WARNING);
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	//--- Setters
 
 	/**
-	 * @param mLog2 the mLog to set
+	 * Method provides logging of input message by both org.osgi.service.log.LogService and MetadataIndexingResultService.
+	 * 
+	 * @param message - information message
+	 * @param logServiceValue - message type value according to org.osgi.service.log.LogService. 
 	 */
-	public final void setmLog(final LogService mLog2) {
-		this.mLog = mLog2;
+	public static final void logMessage(String message, int logServiceValue) {
+		if(logServiceValue != 0){
+			Activator.instance().getLog().log(logServiceValue, message);
+		}
+		Activator.instance().getMetadataIndexerResult().addMessage(IndexerDataContainer.EFP_INDEXER_MODULE + message);
 	}
-
-
-	/**
-	 * @param mEfpIndexer the mEfpIndexer to set
-	 */
-	public final void setmEfpIndexer(MetadataIndexingResultService mEfpIndexer) {
-		this.mEfpIndexer = mEfpIndexer;
-	}
-	
-	
 
 }

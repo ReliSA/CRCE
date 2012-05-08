@@ -158,8 +158,7 @@ public class EFPToOBRTranscription {
 		} else {
 			valueType = wholeType.substring(lastDotIndex + 1);
 			// There is attempt to get only "EfpNumberInterval" value from example above.
-			final int EFP_PREFIX_LENGTH = 3;
-			valueType = valueType.substring(EFP_PREFIX_LENGTH);
+			valueType = valueType.substring(IndexerDataContainer.EFP_PREFIX_LENGTH);
 			// Removing "Efp" prefix from name of value type.
 			// example: EfpNumberInterval -> NumberInterval
 		}

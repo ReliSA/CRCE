@@ -157,8 +157,8 @@ public class EFPAssignmentTypeResolver {
 		}
 
 		LrAssignmentType lat = ((EfpNamedValue) eav).getLrAssignment().getAssignmentType();
-		
-		if (lat == LrAssignmentType.DERIVED){
+
+		if (lat == LrAssignmentType.DERIVED) {
 			LrAssignment lrAssignment = ((EfpNamedValue) eav).getLrAssignment();
 			LrDerivedValueEvaluator evaluator = ((LrDerivedAssignment) lrAssignment).getEvaluator();
 			String logicalRule = ((LrConstraintEvaluator) evaluator).getLogicalRule();

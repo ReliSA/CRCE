@@ -16,7 +16,6 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 
 	/** This instance holds information about result of indexing process. */
 	private ArrayList<String> messages;
-	
 
 	/** Constructor of MetadataIndexingResultServiceImpl class. */
 	public MetadataIndexingResultServiceImpl() {
@@ -24,9 +23,9 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 	}
 
 	/**
-	 * Getting information.
+	 * Getting metadata indexing result information.
 	 *
-	 * @return Informations about indexing result for user.
+	 * @return Information about indexing result in String array. Null value when there is no information.
 	 */
 	@Override
 	public final String[] getMessages() {
@@ -37,12 +36,13 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 				stringArray[index++] = indexerMessage;
 			}
 			return stringArray;
-		} else
+		} else {
 			return null;
+		}
 	}
 
 	/**
-	 * Setting information.
+	 * Setting information about indexing result.
 	 *
 	 * @param nextMessage - Information about indexing result.
 	 */
@@ -52,10 +52,10 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
 	}
 
 	@Override
-	public final void resetMessages() {
+	public final void removeAllMessages() {
 		messages.clear();
 	}
-	
+
 	@Override
 	public final boolean isEmpty() {
 		return messages.isEmpty();

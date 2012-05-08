@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 
 import org.osgi.service.log.LogService;
 
+import cz.zcu.kiv.crce.efp.indexer.internal.Activator;
 import cz.zcu.kiv.crce.efp.indexer.internal.IndexerHandler;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -29,15 +30,21 @@ public class IndexerHandlerTest extends TestCase {
 		assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_OLD_EFP_VERSION));
 		
 		assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_NON_OSGi));
+		
+		Activator.instance().getLog().log(LogService.LOG_INFO, "IndexerHandlerTest finished successfully!");
 	}
 
 	//==================================================
-	//		Auxiliary, untested methods:
+	//		Auxiliary methods with non test prefix:
 	//==================================================
 	
 	/** Supporting method for test of the indexerInitialization(Resource resource) method.	*/
 	public boolean getIndexerInitializationResult(String filePath){
 
+		Activator.activatorInstance = new Activator();
+		Activator.instance().setmLog(dctp.getTestLogService());
+		Activator.instance().setmMetadataIndexingResult(dctp.getMirs());
+		
 		File fil = new File(filePath);
 		String uriText = "file:" + fil.getAbsolutePath();
 
@@ -48,7 +55,7 @@ public class IndexerHandlerTest extends TestCase {
 			dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
 		}
 
-		IndexerHandler indexer = new IndexerHandler(dctp.getTestLogService(), dctp.getMirs());
+		IndexerHandler indexer = new IndexerHandler();
 
 		boolean result = indexer.indexerInitialization(resource); 
 

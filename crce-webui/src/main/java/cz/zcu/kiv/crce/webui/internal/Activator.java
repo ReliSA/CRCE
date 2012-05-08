@@ -29,7 +29,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
 
     /** MetadataIndexingResultService instance provides by simple way information
-     * about metadata indexing process result of crce-efp-indexer module. */
+     * about metadata indexing process result. */
     private volatile MetadataIndexingResultService m_metadataIndexingResult;    /* injected by dependency manager */
 
     public static Activator instance() {

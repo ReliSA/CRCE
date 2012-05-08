@@ -1,11 +1,12 @@
 #-----------------------------------------------------------------
 # Use this file to add customized Bnd instructions for the bundle
 #-----------------------------------------------------------------
+#	!org.osgi.service.event; !org.osgi.service.framework; \ 
+# org.ops4j.pax.exam.options; 		!javax.xml; \ 		!javax.security; \
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Export-Package:\
-	cz.zcu.kiv.crce.efp.indexer; \
 	cz.zcu.kiv.crce.efp.indexer.internal; \
 	cz.zcu.kiv.crce.efp.indexer.test.support; \
 
@@ -20,13 +21,10 @@ Import-Package: \
 	!javax.management; \
 	!javax.naming; \
 	!javax.net,javax.net.ssl; \
-	!javax.security; \
 	!javax.sql; \
-	!javax.xml; \
 	!jline; \
 	!jline.console; \
 	!jline.console.*; \
-	!org.apache.log; !org.apache.log4j; \
 	!org.apache.xerces.xni; !org.apache.xerces.xni.parser; \
 	!org.cyberneko.html; !org.cyberneko.html.filters; \
 	!org.eclipse.osgi.framework.adaptor; !org.eclipse.osgi.framework.internal.core; !org.eclipse.osgi.internal.loader; \
@@ -36,8 +34,10 @@ Import-Package: \
 	!org.apache.aries.quiesce.participant; \
 	!org.apache.avalon.framework.logger; \
 	!org.apache.commons.logging; \
-	!org.ops4j.pax.exam.options; !org.ops4j.pax.exam.spi; !org.ops4j.pax.exam.spi.reactors; \
-	!org.osgi.service.event; !org.osgi.service.framework; \
+	!org.apache.log; !org.apache.log4j; \
+	!org.ops4j.pax.exam.spi; !org.ops4j.pax.exam.spi.reactors; \
+	!org.osgi.service.framework; \
+	!org.slf4j.impl; \
 	\
 	*
 

@@ -21,9 +21,9 @@
         <bundle.symbolicName>${namespace}.efp.indexer</bundle.symbolicName>
         <bundle.namespace>${namespace}.efp.indexer</bundle.namespace>
 
-    	<paxexamversion>2.2.0</paxexamversion>
-    	<paxrunnerversion>1.7.4</paxrunnerversion>
-    	<felixversion>4.0.1</felixversion>
+        <paxexamversion>2.2.0</paxexamversion>
+        <paxrunnerversion>1.7.4</paxrunnerversion>
+        <felixversion>4.0.1</felixversion>
     </properties>
 
 
@@ -34,14 +34,14 @@
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
 
-	<dependency>
+        <dependency>
           <groupId>cz.zcu.kiv.crce</groupId>
           <artifactId>crce-efpAssignment</artifactId>
           <version>${project.version}</version>
-	  <scope>provided</scope>
+          <scope>provided</scope>
         </dependency>
 
-	<dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
@@ -89,26 +89,25 @@
       <version>${felixversion}</version>
     </dependency>
 
-
 <!-- 
 ===================================================
 Dependencies from this place to down are for test purposes.
 -->   
 
 <!-- 
-	<dependency>
-	    <groupId>junit</groupId>
+        <dependency>
+            <groupId>junit</groupId>
 
-	    <artifactId>junit</artifactId>
-	    <version>3.8.1</version>
-	    <scope>test</scope>
-	</dependency>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
 -->
 
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.bundlerepository</artifactId>
-	    <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
 <!-- 
@@ -123,7 +122,7 @@ Maybe some of them are not mandatory.
       <groupId>org.apache.felix</groupId>
       <artifactId>org.osgi.compendium</artifactId>
       <version>1.0.0</version>
-	<scope>test</scope>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -171,6 +170,17 @@ Maybe some of them are not mandatory.
       <scope>test</scope>
     </dependency>
 
+
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.3.0</version>
+        <scope>test</scope>
+    </dependency>
+ <!--  
+
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
@@ -178,15 +188,9 @@ Maybe some of them are not mandatory.
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>4.3.0</version>
-	<scope>test</scope>
-    </dependency>
+-->
+
+
 
   </dependencies>
 </project>
-
-
-

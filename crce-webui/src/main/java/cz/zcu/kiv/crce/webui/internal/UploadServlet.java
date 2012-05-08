@@ -127,12 +127,12 @@ public class UploadServlet extends HttpServlet {
 			message = "Upload was succesful.";
 
 			MetadataIndexingResultService indexerResult = Activator.instance().getMetadataIndexerResult();
-			if(!indexerResult.isEmpty()){
-				String [] MetadataIndexerMessages = indexerResult.getMessages();
-				for(String indexerMessage : MetadataIndexerMessages){
+			if (!indexerResult.isEmpty()) {
+				String[] metadataIndexerMessages = indexerResult.getMessages();
+				for (String indexerMessage : metadataIndexerMessages) {
 					metadataIndexerResult += "<BR>" + indexerMessage;
 				}
-				indexerResult.resetMessages();
+				indexerResult.removeAllMessages();
 			}
 		} else {
 			message = "Upload failed.";
@@ -140,8 +140,8 @@ public class UploadServlet extends HttpServlet {
 		}
 
 		ResourceServlet.setError(req.getSession(), success, message + metadataIndexerResult);
-		req.getSession().setAttribute("source", "upload");      
-		req.getRequestDispatcher("resource?link=buffer").forward(req, resp);        
+		req.getSession().setAttribute("source", "upload");
+		req.getRequestDispatcher("resource?link=buffer").forward(req, resp);
 	}
 
 	// send a response with the specified status code

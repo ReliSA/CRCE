@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import cz.zcu.kiv.crce.efp.indexer.internal.Activator;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataModelHelperExtImpl;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -34,14 +35,15 @@ public class ResourceActionHandlerTest extends TestCase {
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
 	//private volatile MetafileResourceDAO metaResDao; // Will be used with container.
-	
+
 	/**
 	 * Initial method for testing the handleNewResource(Resource resource) method.
 	 */
-		public void testHandleNewResource() {
+	public void testHandleNewResource() {
 
-		dctp.getRah().setmLog(dctp.getTestLogService());
-		dctp.getRah().setmEfpIndexer(dctp.getMirs());
+		Activator.activatorInstance = new Activator();
+		Activator.instance().setmLog(dctp.getTestLogService());
+		Activator.instance().setmMetadataIndexingResult(dctp.getMirs());
 
 		File fil = new File(dctp.PATH_TO_ARTIFACT_CORRESPONDING_TO_THE_META_FILE);
 		String uriText = "file:" + fil.getAbsolutePath();
@@ -52,7 +54,7 @@ public class ResourceActionHandlerTest extends TestCase {
 		} catch (URISyntaxException e) {
 			dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
 		}
-		
+
 		dctp.getRah().handleNewResource(res4Test);
 		// This is tested method.
 
@@ -66,11 +68,13 @@ public class ResourceActionHandlerTest extends TestCase {
 
 		compareRequirements(resFromMeta, res4Test);
 		compareCapabilities(resFromMeta, res4Test);
+
+		Activator.instance().getLog().log(LogService.LOG_INFO, "ResourceActionHandlerTest finished successfully!");
 	}
-	 
-	//========================================================================
-	//		Auxiliary, untested methods called from testHandleNewResource():
-	//========================================================================
+
+	//=================================================================================
+	//		Auxiliary methods with non test prefix called from testHandleNewResource():
+	//=================================================================================
 
 	/**
 	 * Methods handles with exceptions which can occur during calling getResource() method.
@@ -104,7 +108,7 @@ public class ResourceActionHandlerTest extends TestCase {
 		// Resources in testing process should have positive number of Requirements.
 		assertTrue(reqyMeta.length > 0);
 		assertTrue(reqy4Test.length > 0);
-		
+
 		int i = 0;
 		for (Requirement req : reqy4Test) {
 			i++;
@@ -143,7 +147,7 @@ public class ResourceActionHandlerTest extends TestCase {
 		// Resources in testing process should have positive number of Capabilities.
 		assertTrue(capyMeta.length > 0);
 		assertTrue(capy4Test.length > 0);
-		
+
 		int i = 0;
 		for (Capability cap : capy4Test) {
 			i++;
@@ -264,7 +268,7 @@ public class ResourceActionHandlerTest extends TestCase {
 		dctp.getTestLogService().log(LogService.LOG_DEBUG, reqy.length + "");
 	}
 
-	
+
 	/*
 	 * Code from here to down is reused from MetafileResourceDAO class.
 	 * This code is used in this class only for temporary time 
@@ -273,9 +277,8 @@ public class ResourceActionHandlerTest extends TestCase {
 	 * This implementation of ResourceDAO reads/writes metadata from/to a file,
 	 * whose name (URI path) is created by resource's URI path and '.meta' extension.
 	 * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
-	 * 
 	 */
-	
+
 	/**
 	 * Methods creates resource instance from given META file.
 	 * @param uri - URI address to META file.
@@ -283,7 +286,7 @@ public class ResourceActionHandlerTest extends TestCase {
 	 * @throws IOException
 	 */
 	public Resource getResource(URI uri) throws IOException {
-		
+
 		ResourceCreator resourceCreator = new ResourceCreatorImpl();
 		DataModelHelperExt dataModelHelper = new DataModelHelperExtImpl();
 

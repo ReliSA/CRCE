@@ -25,22 +25,14 @@ public class IndexerHandler {
 	/** Contains instances and variables with data for indexing purpose. */
 	private IndexerDataContainer container;
 
-	/** MetadataIndexingResultService injected by dependency manager. */
-	private volatile MetadataIndexingResultService mEfpIndexerResult;
-
 	/** LogService injected by dependency manager. */
 	private volatile LogService mLog;
 
-	
 	/**
 	 * IndexerHandler constructor.
-	 *
-	 * @param mLog2 - LogService.
-	 * @param mEfpIndexer - Provides interface for presentation indexing result to user.
 	 */
-	public IndexerHandler(final LogService mLog2, final MetadataIndexingResultService mEfpIndexer) {
-		this.mLog = mLog2;
-		this.mEfpIndexerResult = mEfpIndexer;
+	public IndexerHandler() {
+		mLog = Activator.instance().getLog();
 	}
 
 	/**
@@ -55,7 +47,6 @@ public class IndexerHandler {
 
 		container = new IndexerDataContainer();
 		container.setResource(resource);
-		container.setLogger(mLog);
 
 		mLog.log(LogService.LOG_INFO, "Initialising EfpAwareComponentLoader ...");
 		EfpAwareComponentLoader loader = EfpAssignmentClient.initialiseComponentLoader("cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentImpl");
@@ -65,37 +56,35 @@ public class IndexerHandler {
 		container.setAccessor(loader.loadForRead(resourceFilePath));
 		mLog.log(LogService.LOG_INFO, "ComponentEfpAccessor ok.");
 
-		if(loadFeaturesAndLR()){
+		if (loadFeaturesAndLR()) {
 			return true;
-		} else { 
+		} else {
 			return false;
 		}
 	}
 
-	
+
 	/**
 	 * Method for loading all features into list and loading list of LRs into array.
 	 *
 	 * @return boolean - Returns true in case that feature load process succeeded
 	 * or false in case that process failed.
 	 */
-	public boolean loadFeaturesAndLR() {
-		try{
+	public final boolean loadFeaturesAndLR() {
+		try {
 			container.setFeatureList(container.getAccessor().getAllFeatures());
 			mLog.log(LogService.LOG_INFO, "Feature list loaded.");
 
 		} catch (OSGiAssignmentRTException e) {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " is not valid OSGi bundle.";
-			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+warningMessage);
+			ResourceActionHandler.logMessage(warningMessage, LogService.LOG_WARNING);
 			return false;
 
 		} catch (AssignmentRTException e) {
 			String warningMessage = "The resource " + container.getResource().getPresentationName()
 					+ " contains unsupported EFP metadata version.";
-			mLog.log(LogService.LOG_WARNING, warningMessage);
-			mEfpIndexerResult.addMessage(IndexerDataContainer.EFP_INDEXER_MODULE+warningMessage);
+			ResourceActionHandler.logMessage(warningMessage, LogService.LOG_WARNING);
 			return false;
 		}
 
@@ -105,7 +94,7 @@ public class IndexerHandler {
 		return true;
 	}
 
-	
+
 	/**
 	 * Method extracts list of EFP from each feature. Next there is called individual feature processing.
 	 *
@@ -125,17 +114,17 @@ public class IndexerHandler {
 				foundedEFP = true;
 			}
 		}
-		
+
 		container.getAccessor().close(); // deleting temporary files
-		
+
 		return foundedEFP;
 	}
 
-
+	
 	/**
 	 * @return the container
 	 */
-	public final IndexerDataContainer getContainer() {
+	public IndexerDataContainer getContainer() {
 		return container;
 	}
 
