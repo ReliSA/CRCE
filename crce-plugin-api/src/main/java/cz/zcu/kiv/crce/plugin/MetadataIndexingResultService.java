@@ -16,29 +16,29 @@ package cz.zcu.kiv.crce.plugin;
  */
 public interface MetadataIndexingResultService {
 
-	/**
-	 * Indexer module sets by this method information for user.
-	 *
-	 * @param message - Information about metadata indexing result.
-	 */
-	void addMessage(String message);
+    /**
+     * Indexer module sets by this method information for user.
+     *
+     * @param message - Information about metadata indexing result.
+     */
+    void addMessage(String message);
 
-	/**
-	 * Target module can use this method for loading information about metadata indexing result.
-	 *
-	 * @return String array of information about metadata indexing results.
-	 */
-	String [] getMessages();
+    /**
+     * Target module can use this method for loading information about metadata indexing result.
+     *
+     * @return String array of information about metadata indexing results.
+     */
+    String [] getMessages();
 
-	/**
-	 * Method used by target module for removing of loaded messages.
-	 */
-	void removeAllMessages();
+    /**
+     * Method used by target module for removing of loaded messages.
+     */
+    void removeAllMessages();
 
-	/**
-	 * Method return boolean value whether there is any message or not. Used by target module.
-	 * @return True when message list is empty. False when is not empty.
-	 */
-	boolean isEmpty();
+    /**
+     * Method return boolean value whether there is any message or not. Used by target module.
+     * @return True when message list is empty. False when is not empty.
+     */
+    boolean isEmpty();
 
 }

@@ -15,18 +15,18 @@ import org.osgi.service.log.LogService;
 public class Activator extends DependencyActivatorBase {
 
     /** Static instance for access to methods of this class. */
-	public static volatile Activator activatorInstance;
+    public static volatile Activator activatorInstance;
 
-	/** LogService injected by dependency manager. */
+    /** LogService injected by dependency manager. */
     private volatile LogService mLog;
 
     /** MetadataIndexingResultService injected by dependency manager. */
     private volatile MetadataIndexingResultService mMetadataIndexingResult;    /* injected by dependency manager */
 
-	@Override
-	public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
+    @Override
+    public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
 
-		activatorInstance = this;
+        activatorInstance = this;
 
         manager.add(createComponent()
                 .setImplementation(this)
@@ -34,19 +34,19 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
                 );
 
-		manager.add(createComponent()
-				.setInterface(Plugin.class.getName(), null)
-				.setImplementation(ResourceActionHandler.class)
-				.add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-				.add(createServiceDependency().setService(LogService.class).setRequired(false))
-				);
-	}
+        manager.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(ResourceActionHandler.class)
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                );
+    }
 
-	@Override
-	public void destroy(final BundleContext context, final DependencyManager manager)
-			throws Exception {
-		// do nothing
-	}
+    @Override
+    public void destroy(final BundleContext context, final DependencyManager manager)
+            throws Exception {
+        // do nothing
+    }
 
 
     /**
@@ -68,21 +68,21 @@ public class Activator extends DependencyActivatorBase {
      * for setting messages about EFP metadata indexing process.
      */
     public final MetadataIndexingResultService getMetadataIndexerResult() {
-    	return mMetadataIndexingResult;
+        return mMetadataIndexingResult;
     }
 
-	/**
-	 * @param mLog the mLog to set
-	 */
-	public void setmLog(final LogService mLog) {
-		this.mLog = mLog;
-	}
+    /**
+     * @param mLog the mLog to set
+     */
+    public final void setmLog(final LogService mLog) {
+        this.mLog = mLog;
+    }
 
-	/**
-	 * @param mMetadataIndexingResult the mMetadataIndexingResult to set
-	 */
-	public void setmMetadataIndexingResult(final MetadataIndexingResultService mMetadataIndexingResult) {
-		this.mMetadataIndexingResult = mMetadataIndexingResult;
-	}
+    /**
+     * @param mMetadataIndexingResult the mMetadataIndexingResult to set
+     */
+    public final void setmMetadataIndexingResult(final MetadataIndexingResultService mMetadataIndexingResult) {
+        this.mMetadataIndexingResult = mMetadataIndexingResult;
+    }
 
 }
