@@ -6,24 +6,34 @@ import java.net.URISyntaxException;
 
 import org.osgi.service.log.LogService;
 
-import cz.zcu.kiv.crce.efp.indexer.internal.Activator;
 import cz.zcu.kiv.crce.efp.indexer.internal.IndexerHandler;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
-import cz.zcu.kiv.crce.plugin.internal.MetadataIndexingResultServiceImpl;
 import junit.framework.TestCase;
 
 /**
- * Testing class for IndexerHandler class.
+ * Testing class which should be used in testing container because it requires dependency injection.
+ * This class is not finished.
  */
-public class IndexerHandlerTest extends TestCase {
+public class ContainerTestIndexerHandler extends TestCase {
 
     /** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
     private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
+    /** For creating a new resource. */
+    private volatile ResourceCreator resCreator;
 
-    /** Initial method for testing the indexerInitialization(Resource resource) method. */
+    /**
+     * Constructor.
+     * @param resCreator For creating a new resource.
+     */
+    public ContainerTestIndexerHandler(final ResourceCreator resCreator) {
+        this.resCreator = resCreator;
+    }
+
+    /** Test of the indexerInitialization(Resource resource) method. */
     public final void testIndexerInitialization() {
 
         assertEquals(true, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_EFP));
@@ -31,30 +41,28 @@ public class IndexerHandlerTest extends TestCase {
         assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_OLD_EFP_VERSION));
 
         assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_NON_OSGi));
-
-        Activator.instance().getLog().log(LogService.LOG_INFO, "IndexerHandlerTest finished!");
     }
 
     //==================================================
-    //     Auxiliary methods with non test prefix:
+    //		Auxiliary methods with non test prefix:
     //==================================================
 
     /**
      * Supporting method for test of the indexerInitialization(Resource resource) method.
-     *
-     * @param filePath - File path to testing artifact.
-     * @return true if EFP metadata was loaded or false if this process failed
+     * @param filePath path to artifact file.
+     * @return success or fail
      */
     public final boolean getIndexerInitializationResult(final String filePath) {
-
-        Activator.activatorInstance = new Activator();
-        Activator.instance().setmLog(dctp.getTestLogService());
-        Activator.instance().setmMetadataIndexingResult(new MetadataIndexingResultServiceImpl());
 
         File fil = new File(filePath);
         String uriText = "file:" + fil.getAbsolutePath();
 
-        Resource resource = new ResourceCreatorImpl().createResource();
+        assertNotNull(resCreator);
+
+        Resource resource = resCreator.createResource();
+
+        assertNotNull(resource);
+
         try {
             resource.setUri(new URI(uriText));
         } catch (URISyntaxException e) {

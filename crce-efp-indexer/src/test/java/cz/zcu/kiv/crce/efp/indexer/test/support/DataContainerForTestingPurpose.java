@@ -11,10 +11,10 @@ public class DataContainerForTestingPurpose {
 
 	/** Path to jar file used in testing. */
 	public final String PATH_TO_NON_OSGi = "src/test/resources/non-OSGi.jar";
-	
+
 	/** Path to jar file used in testing. */
 	public final String PATH_TO_OSGI_WITHOUT_EFP = "src/test/resources/OSGi_without_EFP.jar";
-	
+
 	/** Path to jar file used in testing. */
 	public final String PATH_TO_OSGI_WITH_EFP = "src/test/resources/OSGi_with_EFP.jar";
 
@@ -23,18 +23,18 @@ public class DataContainerForTestingPurpose {
 
 	/** URI to meta file used in testing. */
 	public final String PATH_TO_META = "src/test/resources/res9131013352758009020.meta";
-	
+
 	/** URI to jar file used in testing. */
 	public final String PATH_TO_ARTIFACT_CORRESPONDING_TO_THE_META_FILE = "src/test/resources/res9131013352758009020.jar";
 
 	/** Instance of tested class. */
 	private ResourceActionHandler rah = new ResourceActionHandler();
-	
-	/** Instance of MetadataIndexingResultService is used during test process. */
-	private MetadataIndexingResultService mirs = new MetadataIndexingResultServiceImpl();
+
+	///** Instance of MetadataIndexingResultService is used during test process. */
+	//private MetadataIndexingResultService mirs = new MetadataIndexingResultServiceImpl();
 
 	//--------------------
-	
+
 	/** Implemented interface of LogService used during test process. */
 	private LogService testLogService = new LogService() {
 
@@ -94,8 +94,8 @@ public class DataContainerForTestingPurpose {
 	/**
 	 * @return the ers
 	 */
-	public final MetadataIndexingResultService getMirs() {
+	/*public final MetadataIndexingResultService getMirs() {
 		return mirs;
-	}
+	}*/
 	
 }

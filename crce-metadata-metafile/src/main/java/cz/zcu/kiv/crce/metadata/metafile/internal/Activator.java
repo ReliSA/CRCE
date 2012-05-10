@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -27,6 +28,14 @@ public class Activator extends DependencyActivatorBase {
         
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
+                .setImplementation(MetafileResourceDAO.class)
+                .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
+                .add(createServiceDependency().setRequired(false).setService(LogService.class))
+                .add(createServiceDependency().setService(DataModelHelperExt.class).setRequired(true))
+                );
+        
+        manager.add(createComponent()	
+                .setInterface(ResourceDAO.class.getName(), null)	// for crce-efp-indexer testing container
                 .setImplementation(MetafileResourceDAO.class)
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 .add(createServiceDependency().setRequired(false).setService(LogService.class))

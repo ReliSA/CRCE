@@ -8,6 +8,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 
 import org.osgi.service.log.LogService;
 
+import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
@@ -35,6 +36,12 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
      * If there is no EFP found so there is no reason to save resource metadata. */
     private boolean foundedEFP;
 
+    /** LogService injected by dependency manager. */
+    private volatile LogService mLog;
+
+    /** MetadataIndexingResultService injected by dependency manager. */
+    private volatile MetadataIndexingResultService mMetadataIndexingResult;
+
 
     @Override
     // Indexing process starts in afterUploadToBuffer trigger.
@@ -45,6 +52,8 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
             //mEfpIndexer.addMessage("EFP metadata was not found in the artifact.");
             return resource;
         }
+
+        setInjectedInstances();
 
         initialLoadingException = false;
         foundedEFP = false;
@@ -148,4 +157,17 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
         Activator.instance().getMetadataIndexerResult().addMessage(IndexerDataContainer.EFP_INDEXER_MODULE + message);
     }
 
+    /**
+     * This method sets instances injected by dependency manager back to instances in Activator class,
+     * which are used by ResourceActionHandler and IndexerHandler classes.
+     * This kind of solution is not good. Previously there was used commented (now non active) code in Activator class,
+     * which ensured proper dependency injection of these instances, but this piece of code caused
+     * problem with pax-exam test container. An effort to resolve this problem with pax-exam had a negative impact
+     * on the functionality of the test container. This solution is only temporary.
+     */
+    public final void setInjectedInstances() {
+        Activator.activatorInstance = new Activator();
+        Activator.instance().setmLog(mLog);
+        Activator.instance().setmMetadataIndexingResult(mMetadataIndexingResult);
+    }
 }

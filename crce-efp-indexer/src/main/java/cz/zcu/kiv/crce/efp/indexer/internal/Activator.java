@@ -28,17 +28,19 @@ public class Activator extends DependencyActivatorBase {
 
         activatorInstance = this;
 
+        /*
         manager.add(createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
-                );
+                );*/
 
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(ResourceActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
+                .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
                 );
     }
 

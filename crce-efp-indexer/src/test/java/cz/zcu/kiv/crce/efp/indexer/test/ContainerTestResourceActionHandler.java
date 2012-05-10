@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-import cz.zcu.kiv.crce.efp.indexer.internal.Activator;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataModelHelperExtImpl;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -23,31 +22,43 @@ import org.osgi.service.log.LogService;
 
 import junit.framework.TestCase;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
-import cz.zcu.kiv.crce.plugin.internal.MetadataIndexingResultServiceImpl;
 
 /**
  * Testing class for ResourceActionHandler class.
  */
-public class ResourceActionHandlerTest extends TestCase {
+public class ContainerTestResourceActionHandler extends TestCase {
 
     /** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
     private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
+
+    /** For creating resource from META file. */
+    private ResourceDAO resourceDao;
+
+    /** For creating a new resource. */
+    private volatile ResourceCreator resCreator;
+
+    /**
+     * Constructor.
+     * @param rdao For creating resource from META file.
+     * @param resCreator For creating a new resource.
+     */
+    public ContainerTestResourceActionHandler(final ResourceDAO rdao, final ResourceCreator resCreator) {
+        this.resourceDao = rdao;
+        this.resCreator = resCreator;
+    }
 
     /**
      * Initial method for testing the handleNewResource(Resource resource) method.
      */
     public final void testHandleNewResource() {
 
-        Activator.activatorInstance = new Activator();
-        Activator.instance().setmLog(dctp.getTestLogService());
-        Activator.instance().setmMetadataIndexingResult(new MetadataIndexingResultServiceImpl());
-
         File fil = new File(dctp.PATH_TO_ARTIFACT_CORRESPONDING_TO_THE_META_FILE);
         String uriText = "file:" + fil.getAbsolutePath();
 
-        Resource res4Test = new ResourceCreatorImpl().createResource();
+        Resource res4Test = resCreator.createResource();
         try {
             res4Test.setUri(new URI(uriText));
         } catch (URISyntaxException e) {
@@ -59,7 +70,22 @@ public class ResourceActionHandlerTest extends TestCase {
 
         File filMeta = new File(dctp.PATH_TO_META);
         String uriTextMeta = "file:" + filMeta.getAbsolutePath();
-        Resource resFromMeta = getResourceFromMetaUri(uriTextMeta);
+
+        Resource resFromMeta = null;
+        boolean success = false;
+        try {
+            resFromMeta = resourceDao.getResource(new URI(uriTextMeta));
+            success = true;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            dctp.getTestLogService().log(LogService.LOG_ERROR, "IOException during processing URI path to META file.");
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path to META file.");
+        } finally{
+            assertTrue(success);
+        }
+
         // Resource which is created by methods of crce-metadata-metafile module.
 
         //displayResourceObrMetadata(resFromMeta);
@@ -67,8 +93,6 @@ public class ResourceActionHandlerTest extends TestCase {
 
         compareRequirements(resFromMeta, res4Test);
         compareCapabilities(resFromMeta, res4Test);
-
-        Activator.instance().getLog().log(LogService.LOG_INFO, "ResourceActionHandlerTest finished!");
     }
 
     //=================================================================================
@@ -99,7 +123,7 @@ public class ResourceActionHandlerTest extends TestCase {
      * @param resFromMeta - Resource which was created from META file by crce-metadata-metafile module.
      * @param res4Test - Resource which was created by methods of crce-efp-indexer module.
      */
-    private void compareRequirements(final Resource resFromMeta, final Resource res4Test) {
+    public final void compareRequirements(final Resource resFromMeta, final Resource res4Test) {
         dctp.getTestLogService().log(LogService.LOG_DEBUG, "\n\ncompareRequirements:");
         Requirement [] reqyMeta = resFromMeta.getRequirements();
         Requirement [] reqy4Test = res4Test.getRequirements();
@@ -138,7 +162,7 @@ public class ResourceActionHandlerTest extends TestCase {
      * @param resFromMeta - Resource which was created from META file by crce-metadata-metafile module.
      * @param res4Test - Resource which was created by methods of crce-efp-indexer module.
      */
-    private void compareCapabilities(final Resource resFromMeta, final Resource res4Test) {
+    public final void compareCapabilities(final Resource resFromMeta, final Resource res4Test) {
         dctp.getTestLogService().log(LogService.LOG_DEBUG, "\n\ncompareCapabilities:");
         Capability [] capyMeta = resFromMeta.getCapabilities();
         Capability [] capy4Test = res4Test.getCapabilities();
@@ -184,7 +208,7 @@ public class ResourceActionHandlerTest extends TestCase {
         Property [] propy4Test = cap4Test.getProperties();
 
         ArrayList<Property> propListM = new ArrayList<Property>();
-        for (Property propM : propyMeta) {
+        for (Property propM : propyMeta){
             propListM.add(propM);
         }
 
@@ -225,7 +249,7 @@ public class ResourceActionHandlerTest extends TestCase {
      * Method is used in debug process.
      * @param cap - Given Capability for displaying its Properties.
      */
-    private void displayCapDataAt1Line(final Capability cap) {
+    private final void displayCapDataAt1Line(final Capability cap) {
         StringBuilder sb = new StringBuilder();
         sb.append("CAP=" + cap.getName());
 
@@ -241,7 +265,7 @@ public class ResourceActionHandlerTest extends TestCase {
      * Method is used in debug process.
      * @param res - given Resource.
      */
-    public final void displayResourceObrMetadata(final Resource res) {
+    public final void displayResourceObrMetadata(Resource res) {
 
         dctp.getTestLogService().log(LogService.LOG_DEBUG, "\nvysypData:");
 
@@ -284,7 +308,7 @@ public class ResourceActionHandlerTest extends TestCase {
      * @return Resource which is created from META file.
      * @throws IOException
      */
-    public final Resource getResource(final URI uri) throws IOException {
+    public final Resource getResource(URI uri) throws IOException {
 
         ResourceCreator resourceCreator = new ResourceCreatorImpl();
         DataModelHelperExt dataModelHelper = new DataModelHelperExtImpl();
@@ -312,7 +336,7 @@ public class ResourceActionHandlerTest extends TestCase {
         }
     }
 
-    /** METAFILE_EXTENSION. */
+    /** METAFILE_EXTENSION */
     public static final String METAFILE_EXTENSION = ".meta";
 
     /**
