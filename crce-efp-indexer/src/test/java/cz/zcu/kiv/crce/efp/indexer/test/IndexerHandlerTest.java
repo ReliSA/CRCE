@@ -19,54 +19,49 @@ import junit.framework.TestCase;
  */
 public class IndexerHandlerTest extends TestCase {
 
-    /** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
-    private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
+	/** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
+	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
 
-    /** Initial method for testing the indexerInitialization(Resource resource) method. */
-    public final void testIndexerInitialization() {
+	/** Initial method for testing the indexerInitialization(Resource resource) method. */
+	public final void testIndexerInitialization() {
 
-        assertEquals(true, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_EFP));
+		assertEquals(true, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_EFP));
 
-        assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_OLD_EFP_VERSION));
+		assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_OSGI_WITH_OLD_EFP_VERSION));
 
-        assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_NON_OSGi));
+		assertEquals(false, getIndexerInitializationResult(dctp.PATH_TO_NON_OSGi));
 
-        Activator.instance().getLog().log(LogService.LOG_INFO, "IndexerHandlerTest finished!");
-    }
+		Activator.instance().getLog().log(LogService.LOG_INFO, "IndexerHandlerTest finished!");
+	}
 
-    //==================================================
-    //     Auxiliary methods with non test prefix:
-    //==================================================
+	//==================================================
+	//     Auxiliary methods with non test prefix:
+	//==================================================
 
-    /**
-     * Supporting method for test of the indexerInitialization(Resource resource) method.
-     *
-     * @param filePath - File path to testing artifact.
-     * @return true if EFP metadata was loaded or false if this process failed
-     */
-    public final boolean getIndexerInitializationResult(final String filePath) {
+	/**
+	 * Supporting method for test of the indexerInitialization(Resource resource) method.
+	 *
+	 * @param filePath - File path to testing artifact.
+	 * @return true if EFP metadata was loaded or false if this process failed
+	 */
+	public final boolean getIndexerInitializationResult(final String filePath) {
 
-        Activator.activatorInstance = new Activator();
-        Activator.instance().setmLog(dctp.getTestLogService());
-        Activator.instance().setmMetadataIndexingResult(new MetadataIndexingResultServiceImpl());
+		Activator.activatorInstance = new Activator();
+		Activator.instance().setmLog(dctp.getTestLogService());
+		Activator.instance().setmMetadataIndexingResult(new MetadataIndexingResultServiceImpl());
 
-        File fil = new File(filePath);
-        String uriText = "file:" + fil.getAbsolutePath();
+		File fil = new File(filePath);
 
-        Resource resource = new ResourceCreatorImpl().createResource();
-        try {
-            resource.setUri(new URI(uriText));
-        } catch (URISyntaxException e) {
-            dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
-        }
+		Resource resource = new ResourceCreatorImpl().createResource();
+		resource.setUri(dctp.getUri(fil.getAbsolutePath()));
 
-        IndexerHandler indexer = new IndexerHandler();
+		IndexerHandler indexer = new IndexerHandler();
 
-        boolean result = indexer.indexerInitialization(resource);
+		boolean result = indexer.indexerInitialization(resource);
 
-        indexer.getContainer().getAccessor().close();
+		indexer.getContainer().getAccessor().close();
 
-        return result;
-    }
+		return result;
+	}
 }

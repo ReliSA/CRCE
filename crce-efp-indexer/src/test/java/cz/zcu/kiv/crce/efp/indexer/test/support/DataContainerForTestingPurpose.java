@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.efp.indexer.test.support;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
@@ -34,6 +37,27 @@ public class DataContainerForTestingPurpose {
 	//private MetadataIndexingResultService mirs = new MetadataIndexingResultServiceImpl();
 
 	//--------------------
+	
+	/**
+	 * Returns URI address format of given fileAbsolutePath.
+	 */
+	public URI getUri(String fileAbsolutePath){
+		String uriText = null;
+		if(System.getProperty("os.name").toString().startsWith("Windows")){
+			uriText = "file://localhost/" + fileAbsolutePath;
+			uriText = uriText.replace('\\', '/');
+		}else{
+			uriText = "file:" + fileAbsolutePath;
+		}
+		
+		URI uri = null;
+		try {
+			uri = new URI(uriText);
+		} catch (URISyntaxException e) {
+			testLogService.log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
+		}
+		return uri;
+	}
 
 	/** Implemented interface of LogService used during test process. */
 	private LogService testLogService = new LogService() {

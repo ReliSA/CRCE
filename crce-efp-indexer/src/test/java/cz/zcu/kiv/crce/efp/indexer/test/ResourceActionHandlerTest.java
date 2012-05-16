@@ -35,6 +35,8 @@ public class ResourceActionHandlerTest extends TestCase {
     /** Data container is used for storing paths to testing artifacts and some instances which are used during testing process.*/
     private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
+    //private volatile MetafileResourceDAO metaResDao; // Will be used with container.
+
     /**
      * Initial method for testing the handleNewResource(Resource resource) method.
      */
@@ -45,22 +47,22 @@ public class ResourceActionHandlerTest extends TestCase {
         Activator.instance().setmMetadataIndexingResult(new MetadataIndexingResultServiceImpl());
 
         File fil = new File(dctp.PATH_TO_ARTIFACT_CORRESPONDING_TO_THE_META_FILE);
-        String uriText = "file:" + fil.getAbsolutePath();
 
-        Resource res4Test = new ResourceCreatorImpl().createResource();
-        try {
-            res4Test.setUri(new URI(uriText));
-        } catch (URISyntaxException e) {
-            dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
-        }
+		Resource res4Test = new ResourceCreatorImpl().createResource();
+		res4Test.setUri(dctp.getUri(fil.getAbsolutePath()));
 
         dctp.getRah().handleNewResource(res4Test);
         // This is tested method.
 
         File filMeta = new File(dctp.PATH_TO_META);
-        String uriTextMeta = "file:" + filMeta.getAbsolutePath();
-        Resource resFromMeta = getResourceFromMetaUri(uriTextMeta);
-        // Resource which is created by methods of crce-metadata-metafile module.
+		
+        Resource resFromMeta = null;
+		try {
+			resFromMeta = getResource(dctp.getUri(filMeta.getAbsolutePath()));
+			// Resource which is created by methods of crce-metadata-metafile module.
+		} catch (IOException e) {
+			dctp.getTestLogService().log(LogService.LOG_ERROR, "IOException during processing URI path of input resource.");
+		}
 
         //displayResourceObrMetadata(resFromMeta);
         //displayResourceObrMetadata(res4Test);
@@ -74,25 +76,6 @@ public class ResourceActionHandlerTest extends TestCase {
     //=================================================================================
     //		Auxiliary methods with non test prefix called from testHandleNewResource():
     //=================================================================================
-
-    /**
-     * Methods handles with exceptions which can occur during calling getResource() method.
-     * @param uriText - String of URI address to META file.
-     * @return Resource which is created from META file.
-     */
-    public final Resource getResourceFromMetaUri(final String uriText) {
-
-        Resource res = null;
-        try {
-            res = getResource(new URI(uriText));
-        } catch (IOException e) {
-            dctp.getTestLogService().log(LogService.LOG_ERROR, "IOException during processing URI path of input resource.");
-        } catch (URISyntaxException e) {
-            dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
-        }
-
-        return res;
-    }
 
     /**
      * Method ensures comparing Requirement metadata of two given resources.

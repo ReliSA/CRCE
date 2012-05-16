@@ -54,20 +54,12 @@ public class ContainerTestIndexerHandler extends TestCase {
      */
     public final boolean getIndexerInitializationResult(final String filePath) {
 
-        File fil = new File(filePath);
-        String uriText = "file:" + fil.getAbsolutePath();
-
         assertNotNull(resCreator);
-
         Resource resource = resCreator.createResource();
-
         assertNotNull(resource);
-
-        try {
-            resource.setUri(new URI(uriText));
-        } catch (URISyntaxException e) {
-            dctp.getTestLogService().log(LogService.LOG_ERROR, "URISyntaxException during processing URI path of input resource.");
-        }
+        
+        File fil = new File(filePath);
+        resource.setUri(dctp.getUri(fil.getAbsolutePath()));
 
         IndexerHandler indexer = new IndexerHandler();
 
