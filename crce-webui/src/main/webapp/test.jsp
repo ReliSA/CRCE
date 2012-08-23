@@ -80,6 +80,7 @@
     	<li><a class="aktivni" href="index.html">Store</a></li>
         <li><a href="#">Search</a></li>
         <li><a href="#">Plugins</a></li>
+        <li><a href="#">Tags</a></li>
     </ul>
     
   	<div id="telo">

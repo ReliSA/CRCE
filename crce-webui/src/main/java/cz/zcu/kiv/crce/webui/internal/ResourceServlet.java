@@ -131,6 +131,12 @@ public class ResourceServlet extends HttpServlet {
 			return true;
 		}
 		
+		else if(link.equals("tags"))
+		{
+			
+			return true;
+		}
+		
 		else
 		{
 			link=null;

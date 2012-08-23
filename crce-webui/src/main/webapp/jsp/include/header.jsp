@@ -41,6 +41,9 @@
 			<c:when test="${param.plugins}">
 				<c:set scope="session" var="source" value="plugins"/>		
 			</c:when>
+			<c:when test="${param.tags}">
+				<c:set scope="session" var="source" value="tags"/>		
+			</c:when>
 		</c:choose>
 		
 		  	
@@ -67,6 +70,7 @@
 		    	<li><a <c:if test="${param.store}"> class="aktivni"</c:if> href="resource?link=store">Repository</a></li>
 		    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
 		    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
+		    	<li><a <c:if test="${param.tags}"> class="aktivni"</c:if> href="resource?link=tags">Tags</a></li>
 		    </ul>
 		    <div class="vyhledavani_h">
 			        <form method="post" action="resource">
