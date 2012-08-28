@@ -24,7 +24,7 @@
 	    
 	    <script type="text/javascript" src="js/plus_minus_form.js"></script>
 
-    	<title>Software components storage - ${param.title}</title>
+    	<title>CRCE - ${param.title}</title>
 	</head>
  
 	<body>
