@@ -6,15 +6,37 @@
 </jsp:include>
     
   	<div id="telo">
+   	
+  	<form action="resource?link=tags" method="post" target="_self">
+	<c:choose>
+		<c:when test="${sessionScope.showStoreTag == 'yes'}"> 
+	  		Store: <input type="checkbox" checked name="showStoreTag" value="yes">
+	  	</c:when>
+		<c:otherwise> 
+	  		Store: <input type="checkbox" name="showStoreTag" value="yes">
+	  	</c:otherwise>
+  	</c:choose>
+  	
+  	<c:choose>
+		<c:when test="${sessionScope.showBufferTag == 'yes'}"> 
+  			Buffer: <input type="checkbox" checked name="showBufferTag" value="yes" >
+  		</c:when>
+		<c:otherwise> 
+  			Buffer: <input type="checkbox" name="showBufferTag" value="yes" >
+  		</c:otherwise>
+  	</c:choose>		
+	
+	<input type="submit" name="showTagSubmit" value="Show Tags">
+	</form>
   	
 	<div class="vsechnykategorie">
 		<c:forEach items="${categoryList}" var="category">
-	  		<div class="kategorie">
+	  		<span class="kategorie">
 	  			<a class="" href="resource?link=tags&tag=${category.name}">
 					<span class="jmeno">${category.name}</span>
 					<span class="pocet">${category.count}</span>
 	  			</a>
-	  		</div>			
+	  		</span>			
 		</c:forEach>
 	</div>
 	

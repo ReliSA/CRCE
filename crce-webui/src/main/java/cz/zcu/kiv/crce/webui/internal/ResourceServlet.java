@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.webui.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -18,7 +19,6 @@ import org.osgi.service.log.LogService;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
-import org.osgi.framework.InvalidSyntaxException;
 
 public class ResourceServlet extends HttpServlet {
 
@@ -30,6 +30,32 @@ public class ResourceServlet extends HttpServlet {
 			
 			String source = (String )req.getSession().getAttribute("source");
 			Activator.instance().getLog().log(LogService.LOG_DEBUG, source);
+			
+		//if form was submit, set session parameters{
+			if (req.getParameter("showStoreTag") != null
+					&& req.getParameter("showStoreTag").equalsIgnoreCase("yes")) {
+				req.getSession().setAttribute("showStoreTag", "yes");
+				Activator.instance().getLog().log(LogService.LOG_INFO,
+						"showStoreTag session attribute set to yes");
+			} else {
+				req.getSession().setAttribute("showStoreTag", "no");
+				Activator.instance().getLog().log(LogService.LOG_INFO,
+						"showStoreTag session attribute set to no");
+			}
+			
+			if(req.getParameter("showBufferTag")!=null 
+					&& req.getParameter("showBufferTag").equalsIgnoreCase("yes")) {
+				req.getSession().setAttribute("showBufferTag", "yes");
+				Activator.instance().getLog().log(LogService.LOG_INFO, 
+						"showBufferTag session attribute set to yes");		
+			} else {
+				req.getSession().setAttribute("showBufferTag", "no");
+				Activator.instance().getLog().log(LogService.LOG_INFO, 
+						"showBufferTag session attribute set to no");
+			}
+
+
+			
 			if(source!= null && (source.equals("upload") || source.equals("commit")))
 			{
 				doGet(req,resp);
@@ -138,21 +164,15 @@ public class ResourceServlet extends HttpServlet {
 		
 		else if(link.equals("tags"))
 		{
-			Resource[] resources;
-			
-			if(filter==null) {
-				resources = Activator.instance().getStore().getRepository().getResources();
-			} else {
-				try {
-					resources = Activator.instance().getStore().getRepository().getResources(filter);
-				} catch (InvalidSyntaxException e) {
-					setError(session,false,errorMessage);
-					resources = Activator.instance().getStore().getRepository().getResources();
-				}
+			/*if(session.getAttribute("showStoreTag") == null) {
+				session.setAttribute("showStoreTag","yes");
 			}
-		
-			ArrayList<Category> categoryList = prepareCategoryList(resources);
+			if(session.getAttribute("showBufferTag") == null) {
+				session.setAttribute("showBufferTag","no");
+			}*/
 			
+			Resource[] resources = prepareResourceArray(req, filter);
+			ArrayList<Category> categoryList = prepareCategoryList(resources);
 			ArrayList<Resource> filteredResourceList;
 		
 			String selectedCategory;
@@ -179,9 +199,60 @@ public class ResourceServlet extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * Prepare resource array.
+	 * Resource array is created from store and buffer.
+	 * Store resources are added, if request parameter <code>store</code> is "yes".
+	 * Buffer resources are added, if request parameter <code>buffer</code> is "yes".
+	 * @param req request with parameters
+	 * @param filter possible filter of resources
+	 * @return array of resources
+	 */
+	private Resource[] prepareResourceArray(HttpServletRequest req, String filter) {
+		String errorMessage = filter+" is not a valid filter";
+		HttpSession session = req.getSession();
+		Resource[] storeResources, bufferResources, resources;
+		storeResources = new Resource[0];
+		bufferResources = new Resource[0];
+		
+		String sessStoreAtr = (String) session.getAttribute("showStoreTag");
+		String sessBufferAtr = (String) session.getAttribute("showBufferTag");
+		
+		if(sessStoreAtr != null && sessStoreAtr.equalsIgnoreCase("yes")) {
+			if(filter==null) {
+				storeResources = Activator.instance().getStore().getRepository().getResources();
+			} else {
+				try {
+					storeResources = Activator.instance().getStore().getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					setError(session,false,errorMessage);
+					storeResources = Activator.instance().getStore().getRepository().getResources();
+				}
+			}
+		}
+		
+		if(sessBufferAtr!= null && sessBufferAtr.equalsIgnoreCase("yes")) {
+			if(filter==null) {
+				bufferResources = Activator.instance().getBuffer(req).getRepository().getResources();
+			} else {
+				try {
+					bufferResources = Activator.instance().getBuffer(req).getRepository().getResources(filter);
+				} catch (InvalidSyntaxException e) {
+					setError(session,false,errorMessage);
+					bufferResources = Activator.instance().getBuffer(req).getRepository().getResources();
+				}
+			}
+		}
+
+		//merge two resources arrays
+		resources = Arrays.copyOf(storeResources, storeResources.length + bufferResources.length);
+		System.arraycopy(bufferResources, 0, resources, storeResources.length, bufferResources.length);
+		
+		return resources;
+	}
 
 	/**
-	 * Prepare list of ccategories (tags) that are on all resurces in the store.
+	 * Prepare list of categories (tags) that are on all resources in the store.
 	 * Category is represented by name and the number of occurrences.
 	 * @param resources - all resources from the store
 	 * @return array list of categories
@@ -194,7 +265,7 @@ public class ResourceServlet extends HttpServlet {
 			String[] categories = resource.getCategories();
 			for(String category : categories) {
 				if(categoryMap.containsKey(category)){
-					//category is allready contained, increase count
+					//category is already contained, increase count
 					categoryMap.put(category, new Integer(categoryMap.get(category).intValue() + 1));
 				} else {
 					//add new category
