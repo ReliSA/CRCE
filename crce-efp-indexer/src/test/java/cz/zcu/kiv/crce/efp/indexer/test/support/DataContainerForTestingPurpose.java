@@ -7,8 +7,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.efp.indexer.internal.ResourceActionHandler;
-import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
-import cz.zcu.kiv.crce.plugin.internal.MetadataIndexingResultServiceImpl;
 
 public class DataContainerForTestingPurpose {
 
@@ -59,7 +57,8 @@ public class DataContainerForTestingPurpose {
 		return uri;
 	}
 
-	/** Implemented interface of LogService used during test process. */
+	@SuppressWarnings("rawtypes")
+	/** Implemented interface of LogService used for testing purpose. */
 	private LogService testLogService = new LogService() {
 
 		private int printedMessagesLevel = 4;

@@ -1,16 +1,11 @@
 package cz.zcu.kiv.crce.efp.indexer.test;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.osgi.service.log.LogService;
 
 import cz.zcu.kiv.crce.efp.indexer.internal.IndexerHandler;
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
 import junit.framework.TestCase;
 
 /**
@@ -24,7 +19,7 @@ public class ContainerTestIndexerHandler extends TestCase {
 
     /** For creating a new resource. */
     private volatile ResourceCreator resCreator;
-
+    
     /**
      * Constructor.
      * @param resCreator For creating a new resource.

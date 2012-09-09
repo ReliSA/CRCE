@@ -8,7 +8,6 @@ import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemPackage;
-
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -152,11 +151,12 @@ public class ContainerRunnerTest extends TestCase {
      * Method sets used important instances by dependency injection.
      * @param bundleContext for access to services.
      */
-    public final void init(final BundleContext bundleContext){
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public final void init(final BundleContext bundleContext){
         dctp.getTestLogService().log(LogService.LOG_INFO, "INIT method ---------------------------");
         assertNotNull(bundleContext);
 
-        ServiceReference<?> serviceRef = bundleContext.getServiceReference("cz.zcu.kiv.crce.metadata.ResourceCreator");
+        ServiceReference serviceRef = bundleContext.getServiceReference("cz.zcu.kiv.crce.metadata.ResourceCreator");
         Bundle bundle = serviceRef.getBundle();
         resCreator = (ResourceCreator) bundle.getBundleContext().getService(serviceRef);
         assertNotNull(resCreator);

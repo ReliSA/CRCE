@@ -2,16 +2,10 @@ package cz.zcu.kiv.crce.efp.indexer.test;
 
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import cz.zcu.kiv.crce.efp.indexer.test.support.DataContainerForTestingPurpose;
-import cz.zcu.kiv.crce.efp.indexer.test.support.DataModelHelperExtImpl;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -23,8 +17,6 @@ import org.osgi.service.log.LogService;
 import junit.framework.TestCase;
 
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
-import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 
 /**
  * Testing class for ResourceActionHandler class.
@@ -35,10 +27,11 @@ public class ContainerTestResourceActionHandler extends TestCase {
 	private DataContainerForTestingPurpose dctp = new DataContainerForTestingPurpose();
 
 	/** For creating resource from META file. */
-	private ResourceDAO resourceDao;
+	private volatile ResourceDAO resourceDao;
 
 	/** For creating a new resource. */
 	private volatile ResourceCreator resCreator;
+	
 
 	/**
 	 * Constructor.
@@ -261,71 +254,5 @@ public class ContainerTestResourceActionHandler extends TestCase {
 		dctp.getTestLogService().log(LogService.LOG_DEBUG, reqy.length + "");
 	}
 
-
-	/*
-	 * Code from here to down is reused from MetafileResourceDAO class.
-	 * This code is used in this class only for temporary time
-	 * till testing container will be working properly.
-	 *
-	 * This implementation of ResourceDAO reads/writes metadata from/to a file,
-	 * whose name (URI path) is created by resource's URI path and '.meta' extension.
-	 * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
-	 */
-
-	/**
-	 * Methods creates resource instance from given META file.
-	 * @param uri - URI address to META file.
-	 * @return Resource which is created from META file.
-	 * @throws IOException
-	 */
-	public final Resource getResource(URI uri) throws IOException {
-
-		ResourceCreator resourceCreator = new ResourceCreatorImpl();
-		DataModelHelperExt dataModelHelper = new DataModelHelperExtImpl();
-
-		URI metadataUri = getMetafileUri(uri);
-
-		InputStreamReader reader;
-		try {
-			reader = new InputStreamReader(metadataUri.toURL().openStream());
-		} catch (MalformedURLException e) {
-			throw new IOException("Malformed URL in URI: " + metadataUri.toString(), e);
-		} catch (FileNotFoundException e) {
-			Resource resource = resourceCreator.createResource();
-			resource.setUri(uri);
-			return resource;
-		}
-
-		try {
-			return dataModelHelper.readMetadata(reader);
-		} catch (IOException e) {
-			throw new IOException("Can not read XML data", e);
-		} catch (Exception e) {
-			dctp.getTestLogService().log(LogService.LOG_ERROR, "Can not parse XML data (probably corrupted content): " + e.getMessage());
-			return resourceCreator.createResource();
-		}
-	}
-
-	/** METAFILE_EXTENSION */
-	public static final String METAFILE_EXTENSION = ".meta";
-
-	/**
-	 *
-	 * @param uri
-	 * @return
-	 */
-	private URI getMetafileUri(URI uri) {
-		URI metadataUri = uri;
-
-		if (!uri.toString().toLowerCase().endsWith(METAFILE_EXTENSION)) {
-			try {
-				metadataUri = new URI(uri.toString() + METAFILE_EXTENSION);
-			} catch (URISyntaxException ex) {
-				throw new IllegalArgumentException("Invalid URI syntax: " + uri.toString() + METAFILE_EXTENSION, ex);
-			}
-		}
-
-		return metadataUri;
-	}
 
 }
