@@ -1,17 +1,28 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.felix.dm.DependencyActivatorBase;
+import org.apache.felix.dm.DependencyManager;
+import org.apache.log4j.Logger;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.log.LogService;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
+//import org.ops4j.pax.logging.PaxLoggingService;
 
-import javax.servlet.http.HttpServletRequest;
-import org.apache.felix.dm.DependencyActivatorBase;
-import org.apache.felix.dm.DependencyManager;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 /**
  * Activator of this bundle
@@ -27,6 +38,8 @@ public final class Activator extends DependencyActivatorBase {
     private volatile LogService m_log;                  /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
+    //private volatile PaxLoggingService m_logger;
+    private org.slf4j.Logger m_slf4jLogger = LoggerFactory.getLogger( Activator.class );
 
     /** MetadataIndexingResultService instance provides by simple way information
      * about metadata indexing process result. */
@@ -48,8 +61,8 @@ public final class Activator extends DependencyActivatorBase {
     	return this.m_creator;
     }
     
-    public LogService getLog() {
-        return m_log;
+    public org.slf4j.Logger getLog() {
+        return m_slf4jLogger;
     }
     public Store getStore(){
     	return m_store;
@@ -70,6 +83,51 @@ public final class Activator extends DependencyActivatorBase {
     	return m_metadataIndexingResult;
     }
 
+    /**
+     * Updates Pax Logging configuration to a specifid conversion pattern.
+     *
+     * @param bundleContext bundle context
+     * @param pattern       layout conversion pattern
+     *
+     * @throws IOException - Re-thrown
+     */
+    private void updateConfiguration( BundleContext bundleContext,
+                                      final String pattern )
+        throws IOException
+    {
+        final ConfigurationAdmin configAdmin = getConfigurationAdmin( bundleContext );
+        final Configuration configuration = configAdmin.getConfiguration( "org.ops4j.pax.logging", null );
+
+        final Properties log4jProps = new Properties();
+        log4jProps.setProperty( "log4j.rootLogger", "INFO, CONSOLE" );
+        log4jProps.setProperty( "log4j.appender.CONSOLE", "org.apache.log4j.ConsoleAppender" );
+        log4jProps.setProperty( "log4j.appender.CONSOLE.layout", "org.apache.log4j.PatternLayout" );
+        log4jProps.setProperty( "log4j.appender.CONSOLE.layout.ConversionPattern", pattern );
+
+        configuration.update( log4jProps );
+    }
+
+    /**
+     * Gets Configuration Admin service from service registry.
+     *
+     * @param bundleContext bundle context
+     *
+     * @return configuration admin service
+     *
+     * @throws IllegalStateException - If no Configuration Admin service is available
+     */
+    private ConfigurationAdmin getConfigurationAdmin( final BundleContext bundleContext )
+    {
+        final ServiceReference ref = bundleContext.getServiceReference( ConfigurationAdmin.class.getName() );
+        if( ref == null )
+        {
+            throw new IllegalStateException( "Cannot find a configuration admin service" );
+        }
+        return (ConfigurationAdmin) bundleContext.getService( ref );
+    }
+
+
+    
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         m_instance = this;
@@ -83,7 +141,47 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
                 );
+        
+        //updateConfiguration(context, "%5p [%t] - %m%n");
 
+        //Logger log4jLogger = Logger.getLogger(Activator.class);
+        //System.out.println("LOG4J "+log4jLogger.toString());
+        //System.out.println(log4jLogger.isInfoEnabled());
+        //log4jLogger.info("log4j test");
+        //log4jLogger.error("log4j error test");
+        
+        m_slf4jLogger.info(  "Starting Example...    (slf4j)" );
+        m_slf4jLogger.error(  "Error test...    (slf4j)" );
+
+        
+        
+
+        //ServiceReference ref = context.getServiceReference( PaxLoggingService.class.getName() );
+        //PaxLoggingService service = (PaxLoggingService) context.getService( ref );
+        
+       /* if(m_logger != null) {
+        
+        System.out.println("Log level "+ m_logger.getLogLevel());
+        m_logger.log(1, "Pax logg hello"); 
+        } else {
+        	System.out.println("PaxLoggingService reference is null.");
+        }
+        
+        //m_logger.info( "MyActivator is started." );
+        */
+        /*ServiceReference ref = context.getServiceReference(LogService.class.getName());
+        if (ref != null)
+        {
+        	System.out.println("Reference to log service gained");
+            LogService log = (LogService) context.getService(ref);
+            m_log = log;
+            m_log.log(LogService.LOG_INFO, "Logger activated");
+            
+        } else {
+        	System.out.println("Reference to log service not gained.");
+        }*/ 
+
+        		
 //        final Test t1 = new Test();
 //        final Test t2 = new Test();
 //

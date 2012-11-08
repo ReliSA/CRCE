@@ -95,7 +95,7 @@ public class UploadServlet extends HttpServlet {
 			try {
 				fileItemsList = servletFileUpload.parseRequest(req);
 			} catch (FileUploadException e) {
-				Activator.instance().getLog().log(LogService.LOG_ERROR, "Exception handling request: " + req.getRequestURL(), e);
+				Activator.instance().getLog().error("Exception handling request: " + req.getRequestURL(), e);
 				sendResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				return;
 			}

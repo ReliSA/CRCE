@@ -29,28 +29,28 @@ public class ResourceServlet extends HttpServlet {
 			throws ServletException, IOException {
 			
 			String source = (String )req.getSession().getAttribute("source");
-			Activator.instance().getLog().log(LogService.LOG_DEBUG, source);
+			Activator.instance().getLog().debug(source);
 			
 		//if form was submit, set session parameters{
 			if (req.getParameter("showStoreTag") != null
 					&& req.getParameter("showStoreTag").equalsIgnoreCase("yes")) {
 				req.getSession().setAttribute("showStoreTag", "yes");
-				Activator.instance().getLog().log(LogService.LOG_INFO,
+				Activator.instance().getLog().info(
 						"showStoreTag session attribute set to yes");
 			} else {
 				req.getSession().setAttribute("showStoreTag", "no");
-				Activator.instance().getLog().log(LogService.LOG_INFO,
+				Activator.instance().getLog().info(
 						"showStoreTag session attribute set to no");
 			}
 			
 			if(req.getParameter("showBufferTag")!=null 
 					&& req.getParameter("showBufferTag").equalsIgnoreCase("yes")) {
 				req.getSession().setAttribute("showBufferTag", "yes");
-				Activator.instance().getLog().log(LogService.LOG_INFO, 
+				Activator.instance().getLog().info( 
 						"showBufferTag session attribute set to yes");		
 			} else {
 				req.getSession().setAttribute("showBufferTag", "no");
-				Activator.instance().getLog().log(LogService.LOG_INFO, 
+				Activator.instance().getLog().info( 
 						"showBufferTag session attribute set to no");
 			}
 
@@ -94,7 +94,7 @@ public class ResourceServlet extends HttpServlet {
 			}
 			else
 			{
-				Activator.instance().getLog().log(LogService.LOG_DEBUG, "Default forward");
+				Activator.instance().getLog().debug("Default forward");
 				req.getRequestDispatcher("resource?link=store").forward(req, resp);
 			}
 
@@ -118,6 +118,7 @@ public class ResourceServlet extends HttpServlet {
 	}
 	
 	private boolean fillSession(String link, HttpServletRequest req, String filter){
+		
 		String errorMessage = filter+" is not a valid filter";
 		HttpSession session = req.getSession();
 		cleanSession(session);
@@ -164,12 +165,6 @@ public class ResourceServlet extends HttpServlet {
 		
 		else if(link.equals("tags"))
 		{
-			/*if(session.getAttribute("showStoreTag") == null) {
-				session.setAttribute("showStoreTag","yes");
-			}
-			if(session.getAttribute("showBufferTag") == null) {
-				session.setAttribute("showBufferTag","no");
-			}*/
 			
 			Resource[] resources = prepareResourceArray(req, filter);
 			ArrayList<Category> categoryList = prepareCategoryList(resources);

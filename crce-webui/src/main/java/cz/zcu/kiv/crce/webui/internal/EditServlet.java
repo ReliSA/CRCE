@@ -384,7 +384,7 @@ public class EditServlet extends HttpServlet {
 				if(propertiesLengthBefore == capability.getProperties().length){
 					req.getSession().setAttribute("success", false);
 					req.getSession().setAttribute("message", "Cannot change property.");
-					Activator.instance().getLog().log(LogService.LOG_DEBUG, "Cannot change property.");
+					Activator.instance().getLog().debug("Cannot change property.");
 					continue;
 				}
 				

@@ -26,7 +26,7 @@
         <felix.fileinstall.poll>2000</felix.fileinstall.poll>
         <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
-        <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
+        <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
         <org.osgi.framework.system.packages.extra>
           com.sun.*,com.sun.org.apache.xerces.internal.*,com.sun.java_cup.internal,
           javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,

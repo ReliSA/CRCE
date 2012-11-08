@@ -87,7 +87,7 @@ public class RuntimeServlet extends HttpServlet {
 	
 	private boolean storeBufferAction(HttpServletRequest req){
 		String source = (String) req.getSession().getAttribute("source");
-		Activator.instance().getLog().log(LogService.LOG_DEBUG, source);
+		Activator.instance().getLog().info(source);
 		if(source!=null && (source.equals("buffer") || source.equals("store"))) return true;
 		else return false;
 	}

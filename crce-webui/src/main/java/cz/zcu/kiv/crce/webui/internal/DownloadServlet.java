@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -25,6 +26,7 @@ public class DownloadServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final int BUFSIZE = 128;
+	
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -69,7 +71,7 @@ public class DownloadServlet extends HttpServlet {
 				{
 					Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
 					Resource found = EditServlet.findResource(fileUri, array);
-					Activator.instance().getLog().log(LogService.LOG_DEBUG, "Found!"+found.getPresentationName());
+					Activator.instance().getLog().debug("Found!"+found.getPresentationName());
 					doDownload(req ,resp ,found);
 				}
 				else failed=true;

@@ -24,6 +24,7 @@ Import-Package: \
   org.osgi.framework, \
   org.osgi.service.log, \
   org.osgi.service.useradmin, \
+  org.ops4j.pax.logging, \
   org.xml.sax, \
   org.w3c.dom, \
   junit.framework;resolution:=optional, \
