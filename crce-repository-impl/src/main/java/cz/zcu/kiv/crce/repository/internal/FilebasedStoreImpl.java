@@ -23,6 +23,8 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Filebased implementation of <code>Store</code>.
@@ -32,7 +34,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     
     private volatile BundleContext m_context;
     private volatile PluginManager m_pluginManager;
-    private volatile LogService m_log;
+    
+    private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
     private WritableRepository m_repository;
     private File m_baseDir;
@@ -81,7 +84,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         try {
             m_repository = rd.getRepository(m_baseDir.toURI());
         } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "Could not get repository for URI: " + m_baseDir.toURI(), ex);
+            logger.error("Could not get repository for URI: " + m_baseDir.toURI(), ex);
             m_repository = m_pluginManager.getPlugin(ResourceCreator.class).createRepository(m_baseDir.toURI());
         }
     }
@@ -92,7 +95,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             return null;
         }
         if (tmp == null) {
-            m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore() returned null resource, using original");
+        	logger.error( "ActionHandler onPutToStore() returned null resource, using original");
         } else {
             resource = tmp;
         }
@@ -116,7 +119,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             return null;
         }
         if (tmp == null) {
-            m_log.log(LogService.LOG_ERROR, "ActionHandler onPutToStore returned null resource, using original");
+        	logger.error( "ActionHandler onPutToStore returned null resource, using original");
         } else {
             resource = tmp;
         }
@@ -152,7 +155,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
         Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (!m_repository.addResource(out)) {
-            m_log.log(LogService.LOG_WARNING, "Resource with the same symbolic name and version already exists in Store, but it has not been expected: " + targetFile.getPath());
+        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: " + targetFile.getPath());
             if (!targetFile.delete()) {
                 throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
             }
@@ -175,7 +178,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         
         if (!isInStore(resource)) {
             if (m_repository != null && m_repository.contains(resource)) {
-                m_log.log(LogService.LOG_WARNING, "Removing resource is not in store but it is in internal repository: " + resource.getId());
+            	logger.warn( "Removing resource is not in store but it is in internal repository: " + resource.getId());
                 m_repository.removeResource(resource);
             }
             m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
@@ -199,7 +202,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 loadRepository();
             }
             if (!m_repository.removeResource(resource)) {
-                m_log.log(LogService.LOG_WARNING, "Store's internal repository does not contain removing resource: " + resource.getId());
+            	logger.warn( "Store's internal repository does not contain removing resource: " + resource.getId());
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
@@ -228,7 +231,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 try {
                     executable.executeOnStore(res, store, properties);
                 } catch (Exception e) {
-                    m_log.log(LogService.LOG_ERROR, "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
+                	logger.error( "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
                 }
                 ah.afterExecuteInStore(res, executable, properties, store);
             }

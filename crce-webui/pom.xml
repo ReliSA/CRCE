@@ -117,14 +117,6 @@
             <artifactId>org.osgi.service.obr</artifactId>
         </dependency>
         
-       <dependency>
-        	<groupId>org.apache.felix</groupId>
-        	<artifactId>org.apache.felix.log</artifactId>
-        	<version>1.0.1</version>
-        	<type>bundle</type>
-        	<scope>compile</scope>
-        </dependency> 
-        
 <!--    <dependency>
       <groupId>org.ops4j.pax.web</groupId>
       <artifactId>pax-web-extender-whiteboard</artifactId>
@@ -186,8 +178,7 @@
         	<artifactId>pax-logging-api</artifactId>
         	<version>1.7.0</version>
         	<type>bundle</type>
-        </dependency>
-        
+        </dependency>        
         
         <dependency>
         	<groupId>org.ops4j.pax.logging</groupId>

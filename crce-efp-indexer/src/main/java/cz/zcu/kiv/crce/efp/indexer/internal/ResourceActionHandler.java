@@ -2,19 +2,21 @@ package cz.zcu.kiv.crce.efp.indexer.internal;
 
 import java.io.IOException;
 
+import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CaseFormat;
+
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-
-import org.osgi.service.log.LogService;
-
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
-import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
-
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
+import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 
 /**
  * ResourceActionHandler class ensures general tasks about efp-indexing process.
@@ -37,11 +39,12 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
     private boolean foundedEFP;
 
     /** LogService injected by dependency manager. */
-    private volatile LogService mLog;
+    //private volatile LogService mLog;
 
     /** MetadataIndexingResultService injected by dependency manager. */
     private volatile MetadataIndexingResultService mMetadataIndexingResult;
 
+    private static final Logger logger = LoggerFactory.getLogger(ResourceActionHandler.class);
 
     @Override
     // Indexing process starts in afterUploadToBuffer trigger.
@@ -145,14 +148,31 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
     }
 
     /**
-     * Method provides logging of input message by both org.osgi.service.log.LogService and MetadataIndexingResultService.
+     * Method provides logging of input message by both sl4j and MetadataIndexingResultService.
      *
      * @param message - information message
      * @param logServiceValue - message type value according to org.osgi.service.log.LogService.
      */
     public static final void logMessage(final String message, final int logServiceValue) {
         if (logServiceValue != 0) {
-            Activator.instance().getLog().log(logServiceValue, message);
+        	switch (logServiceValue) {
+			case LogService.LOG_ERROR:
+				logger.error(message);
+				break;
+			case LogService.LOG_WARNING: 
+				logger.warn(message);
+				break;
+			case LogService.LOG_INFO:
+				logger.info(message);
+				break;
+			case LogService.LOG_DEBUG:
+				logger.debug(message);
+				break;
+			default:
+				logger.info(message);
+				break;
+			}
+           
         }
         Activator.instance().getMetadataIndexerResult().addMessage(IndexerDataContainer.EFP_INDEXER_MODULE + message);
     }
@@ -167,7 +187,6 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
      */
     public final void setInjectedInstances() {
         Activator.activatorInstance = new Activator();
-        Activator.instance().setmLog(mLog);
         Activator.instance().setmMetadataIndexingResult(mMetadataIndexingResult);
     }
 }

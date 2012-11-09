@@ -1,15 +1,12 @@
 package cz.zcu.kiv.crce.repository.internal;
 
-import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.repository.SessionRegister;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
+
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -17,6 +14,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.repository.SessionRegister;
+import cz.zcu.kiv.crce.repository.Store;
 
 /**
  * Activator of this bundle.
@@ -28,10 +32,11 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     
     public static final String STORE_URI = "store.uri";
 
-    private volatile LogService m_log;              /* injected by dependency manager */
+    //private volatile LogService m_log;              /* injected by dependency manager */
     private volatile DependencyManager m_manager;   /* injected by dependency manager */
     private volatile BundleContext m_context;       /* injected by dependency manager */
     
+    private static final Logger logger = LoggerFactory.getLogger(Activator.class);
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
         
@@ -61,7 +66,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         }
 
         if (m_context.getServiceReference(Store.class.getName()) != null) {
-            m_log.log(LogService.LOG_WARNING, "Store URI reconfiguration on runtime is not supported");
+            logger.warn("Store URI reconfiguration on runtime is not supported");
             return;
         }
 

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Properties;
 import org.osgi.service.log.LogService;
 import org.osgi.service.obr.RepositoryAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import org.osgi.service.obr.Resource;
 
 /**
@@ -22,7 +24,8 @@ public class ObrStoreImpl implements Store {
     public static final String RESOURCE_METADATA_FILE_EXTENSION = ".metadata";
     
     private volatile RepositoryAdmin m_repositoryAdmin; /* will be injected by dependencymanager */
-    private volatile LogService m_log; /* will be injected by dependencymanager */
+    
+    private static final Logger logger = LoggerFactory.getLogger(ObrStoreImpl.class);
     
     private PluginManager m_pluginManager;
     private URL m_obrBase;

@@ -8,6 +8,8 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CRCE-EFP-Indexer activator class.
@@ -17,29 +19,21 @@ public class Activator extends DependencyActivatorBase {
     /** Static instance for access to methods of this class. */
     public static volatile Activator activatorInstance;
 
-    /** LogService injected by dependency manager. */
-    private volatile LogService mLog;
-
     /** MetadataIndexingResultService injected by dependency manager. */
     private volatile MetadataIndexingResultService mMetadataIndexingResult;    /* injected by dependency manager */
 
+    private static Logger m_log = LoggerFactory.getLogger(Activator.class);
+    
     @Override
     public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
 
         activatorInstance = this;
 
-        /*
-        manager.add(createComponent()
-                .setImplementation(this)
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
-                .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
-                );*/
 
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(ResourceActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
                 );
     }
@@ -59,10 +53,10 @@ public class Activator extends DependencyActivatorBase {
     }
 
     /**
-     * @return LogService instance is for logging of events.
+     * @return Logger
      */
-    public final LogService getLog() {
-        return mLog;
+    public final Logger getLog() {
+        return m_log;
     }
 
     /**
@@ -71,13 +65,6 @@ public class Activator extends DependencyActivatorBase {
      */
     public final MetadataIndexingResultService getMetadataIndexerResult() {
         return mMetadataIndexingResult;
-    }
-
-    /**
-     * @param mLog the mLog to set
-     */
-    public final void setmLog(final LogService mLog) {
-        this.mLog = mLog;
     }
 
     /**

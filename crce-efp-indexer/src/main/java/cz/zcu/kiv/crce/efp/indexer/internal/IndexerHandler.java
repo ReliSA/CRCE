@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.efps.assignment.api.EfpAwareComponentLoader;
@@ -25,14 +27,7 @@ public class IndexerHandler {
     private IndexerDataContainer container;
 
     /** LogService injected by dependency manager. */
-    private volatile LogService mLog;
-
-    /**
-     * IndexerHandler constructor.
-     */
-    public IndexerHandler() {
-        mLog = Activator.instance().getLog();
-    }
+    private static Logger logger = LoggerFactory.getLogger(IndexerHandler.class);
 
     /**
      * Method creates instance of the EFPIndexer class and tries to load features of OSGi resource.
@@ -42,18 +37,18 @@ public class IndexerHandler {
     public final boolean indexerInitialization(final Resource resource) {
 
         String resourceFilePath = resource.getUri().getPath(); // Path of resource artifact moved to the buffer.
-        mLog.log(LogService.LOG_DEBUG, "Resource path: " + resourceFilePath);
+        logger.debug("Resource path: " + resourceFilePath);
 
         container = new IndexerDataContainer();
         container.setResource(resource);
 
-        mLog.log(LogService.LOG_INFO, "Initialising EfpAwareComponentLoader ...");
+        logger.info("Initialising EfpAwareComponentLoader ...");
         EfpAwareComponentLoader loader = EfpAssignmentClient.initialiseComponentLoader("cz.zcu.kiv.efps.assignment.osgi.OSGiAssignmentImpl");
-        mLog.log(LogService.LOG_INFO, "EfpAwareComponentLoader ok.");
+        logger.info("EfpAwareComponentLoader ok.");
 
-        mLog.log(LogService.LOG_INFO, "Initialising ComponentEfpAccessor ...");
+        logger.info("Initialising ComponentEfpAccessor ...");
         container.setAccessor(loader.loadForRead(resourceFilePath));
-        mLog.log(LogService.LOG_INFO, "ComponentEfpAccessor ok.");
+        logger.info( "ComponentEfpAccessor ok.");
 
         if (loadFeaturesAndLR()) {
             return true;
@@ -72,7 +67,7 @@ public class IndexerHandler {
     public final boolean loadFeaturesAndLR() {
         try {
             container.setFeatureList(container.getAccessor().getAllFeatures());
-            mLog.log(LogService.LOG_INFO, "Feature list loaded.");
+            logger.info( "Feature list loaded.");
 
         } catch (OSGiAssignmentRTException e) {
             String warningMessage = "The resource " + container.getResource().getPresentationName()

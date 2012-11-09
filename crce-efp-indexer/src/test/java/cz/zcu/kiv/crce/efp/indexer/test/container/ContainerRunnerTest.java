@@ -22,6 +22,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.efp.indexer.internal.Activator;
 import cz.zcu.kiv.crce.efp.indexer.test.ContainerTestIndexerHandler;
@@ -96,6 +98,8 @@ public class ContainerRunnerTest extends TestCase {
 
     /** For creating resource from META file. */
     private ResourceDAO resourceDao;
+    
+    private static final Logger logger = LoggerFactory.getLogger(ContainerRunnerTest.class);
 
     @Test
     /**
@@ -122,7 +126,7 @@ public class ContainerRunnerTest extends TestCase {
         ContainerTestIndexerHandler ctih = new ContainerTestIndexerHandler(resCreator);
         ctih.testIndexerInitialization();
 
-        Activator.instance().getLog().log(LogService.LOG_INFO, "ContainerTestIndexerHandler finished!");
+        logger.info("ContainerTestIndexerHandler finished!");
     }
 
 
@@ -140,7 +144,7 @@ public class ContainerRunnerTest extends TestCase {
         ContainerTestResourceActionHandler ctrah = new ContainerTestResourceActionHandler(resourceDao, resCreator);
         ctrah.testHandleNewResource();
 
-        Activator.instance().getLog().log(LogService.LOG_INFO, "ContainerTestResourceActionHandler finished!");
+        logger.info( "ContainerTestResourceActionHandler finished!");
     }
 
     //==================================================
@@ -167,7 +171,7 @@ public class ContainerRunnerTest extends TestCase {
         assertNotNull(mirs);
 
         Activator.activatorInstance = new Activator();
-        Activator.instance().setmLog(dctp.getTestLogService());
+
         Activator.instance().setmMetadataIndexingResult(mirs);
 
         serviceRef = bundleContext.getServiceReference("cz.zcu.kiv.crce.metadata.dao.ResourceDAO");

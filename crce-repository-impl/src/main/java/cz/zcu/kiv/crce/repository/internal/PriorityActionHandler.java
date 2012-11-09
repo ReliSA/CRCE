@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Root implementation of <code>ActionHandler</code> which calls other
@@ -21,8 +23,10 @@ import org.osgi.service.log.LogService;
  */
 public class PriorityActionHandler extends AbstractPlugin implements ActionHandler {
 
-    private volatile LogService m_log;  /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
+    
+    private static final Logger logger = LoggerFactory.getLogger(PriorityActionHandler.class);
+   
     
     private static final Method BEFORE_BUFFER_UPLOAD;
     private static final Method ON_BUFFER_UPLOAD;
@@ -249,11 +253,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
                     try {
                         out = method.invoke(handler, args);
                     } catch (IllegalAccessException ex) {
-                        m_log.log(LogService.LOG_ERROR, "Unexpected IllegalAccessException", ex);
+                        logger.error("Unexpected IllegalAccessException", ex);
                     } catch (InvocationTargetException ex) {
                         exception = ex.getTargetException();
                     } catch (Exception e) {
-                        m_log.log(LogService.LOG_ERROR, "Unexpected exception on calling handler", e);
+                    	logger.error("Unexpected exception on calling handler", e);
                     }
                 }
             }

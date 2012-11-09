@@ -1,5 +1,10 @@
 package cz.zcu.kiv.crce.handler.versioning.internal;
 
+import org.osgi.framework.Version;
+import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -7,8 +12,6 @@ import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
-import org.osgi.framework.Version;
-import org.osgi.service.log.LogService;
 
 /**
  * This plugin adds the suffix to the version qualifier of the resource uploaded
@@ -23,7 +26,7 @@ import org.osgi.service.log.LogService;
  */
 public class IncreaseVersionActionHandler extends AbstractActionHandler implements ActionHandler {
 
-    private volatile LogService m_log;
+    private static final Logger logger = LoggerFactory.getLogger(IncreaseVersionActionHandler.class);
 
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
@@ -37,7 +40,7 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
         for (int i = 2; repository.contains(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
             if (resource.getVersion().equals(version)) {
-                m_log.log(LogService.LOG_WARNING, "Can not change resource's version but the version is not static: " + resource.getId() + ", version: " + resource.getVersion());
+                logger.warn("Can not change resource's version but the version is not static: " + resource.getId() + ", version: " + resource.getVersion());
                 return resource;
             }
         }
