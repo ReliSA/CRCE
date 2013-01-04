@@ -2,16 +2,16 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
-        <relativePath>../poms/compiled/</relativePath>
+        <relativePath>../poms/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
-        <artifactId>compiled-bundle-settings</artifactId>
+        <artifactId>shared-plugin-settings</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-efpAssignment</artifactId>
+    <artifactId>crce-efp-assignment</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -27,7 +27,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
-        
+
         <dependency>
           <groupId>cz.zcu.kiv.efps</groupId>
           <artifactId>efpAssignmentOSGi</artifactId>

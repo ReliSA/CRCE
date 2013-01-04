@@ -16,7 +16,7 @@
     <description>Component Repository supporting Compatibility Evaluation</description>
 
     <url>https://www.assembla.com/spaces/crce/</url>
-    
+
     <properties>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
@@ -28,17 +28,27 @@
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
         <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
         <org.osgi.framework.system.packages.extra>
+            javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
+        </org.osgi.framework.system.packages.extra>
+        <!--
+             The following packages are not imported by any bundle,
+             but they may be used by some efp assignment wrapped library, check it and remove them.
+
+             It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
+        -->
+
+<!--        <org.osgi.framework.system.packages.extra>
           com.sun.*,com.sun.org.apache.xerces.internal.*,com.sun.java_cup.internal,
-          javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,
-          javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,
-          javax.microedition.io,javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
+          javax.accessibility,javax.annotation,
+          javax.management,javax.management.modelmbean,javax.management.remote,
+          javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
           javax.servlet.jsp,javax.sql,
           org.xml.sax.ext,org.xml.sax.helpers,
-          org.w3c.dom.xpath,sun.io,org.w3c.dom.ls, 
+          org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,
 
-          <!-- for crce-webui: -->javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
+           for crce-webui: javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
           com.sun.xml.internal.bind.v2
-        </org.osgi.framework.system.packages.extra> 
+        </org.osgi.framework.system.packages.extra>-->
     </properties>
 
     <packaging>pom</packaging>
@@ -46,26 +56,26 @@
     <modules>
         <module>poms</module>
         <module>provision</module>
-        
+
 <!--        <module>crce-target</module>-->
-        
+
         <!-- API -->
         <module>crce-plugin-api</module>
         <module>crce-metadata-api</module>
         <module>crce-metadata-dao-api</module>
         <module>crce-repository-api</module>
         <module>crce-results-api</module>
-        
+
         <!-- API Implementation -->
         <module>crce-metadata-impl</module>
         <module>crce-repository-impl</module>
         <module>crce-results-impl</module>
-        
+
         <!-- Core Plugins -->
         <module>crce-metadata-indexer</module>
         <module>crce-metadata-metafile</module>
         <module>crce-metadata-combined</module>
-        
+
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-metadata-cosi-bundle</module>
@@ -73,15 +83,15 @@
 
         <!-- Libraries -->
         <module>crce-efpAssignment</module>
-        
+
         <!-- UI & Optional Plugins -->
         <module>crce-handler-versioning</module>
         <module>crce-webui</module>
-        
+
         <!-- Example Plugins -->
         <module>example-plugin</module>
     </modules>
-    
+
     <profiles>
       <profile>
         <id>target</id>
@@ -130,13 +140,13 @@
                         </goals>
                         <configuration>
                             <outputDirectory>conf</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>conf.default</directory>
                                 </resource>
                             </resources>
                             <overwrite>false</overwrite>
-                        </configuration>            
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -177,17 +187,6 @@
       		<id>sacco.maven.third-parties.repository</id>
       		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-third-parties-repository</url>
       	</repository>
-      
-      	<repository>
-      		<id>gson</id>
-      		<url>http://google-gson.googlecode.com/svn/mavenrepo</url>
-      		<snapshots>
-      			<enabled>true</enabled>
-      		</snapshots>
-      		<releases>
-      			<enabled>true</enabled>
-      		</releases>
-      	</repository>
 
         <repository>
             <id>central</id>
@@ -213,5 +212,5 @@
             <name>Jiří Kučera</name>
         </developer>
     </developers>
-    
+
 </project>
