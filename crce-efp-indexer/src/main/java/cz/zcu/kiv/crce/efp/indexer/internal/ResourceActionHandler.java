@@ -6,8 +6,6 @@ import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.CaseFormat;
-
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -159,7 +157,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 			case LogService.LOG_ERROR:
 				logger.error(message);
 				break;
-			case LogService.LOG_WARNING: 
+			case LogService.LOG_WARNING:
 				logger.warn(message);
 				break;
 			case LogService.LOG_INFO:
@@ -172,7 +170,7 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
 				logger.info(message);
 				break;
 			}
-           
+
         }
         Activator.instance().getMetadataIndexerResult().addMessage(IndexerDataContainer.EFP_INDEXER_MODULE + message);
     }

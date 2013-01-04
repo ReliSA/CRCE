@@ -98,7 +98,7 @@ public class ContainerRunnerTest extends TestCase {
 
     /** For creating resource from META file. */
     private ResourceDAO resourceDao;
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ContainerRunnerTest.class);
 
     @Test
