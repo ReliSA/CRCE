@@ -26,30 +26,30 @@ public class CombinedCreatorTest extends IntegrationTestBase {
 
     @Inject
     private BundleContext bundleContext;
-    
+
     private File dir;
     private ResourceDAO creator;
-    
+
     @Before
     public void setUp() throws InvalidSyntaxException {
         dir = Util.createTempDir();
-        
+
         Bundle[] bs = bundleContext.getBundles();
-        
+
         System.out.println("");
         for (Bundle b : bs ) {
             System.out.println(b.getSymbolicName() + ": " + b.getVersion());
         }
 
         System.out.println("");
-        
-            ServiceReference[] srs = bundleContext.getServiceReferences(null, null) ;
-            
+
+            ServiceReference[] srs = bundleContext.getServiceReferences((String) null, null) ;
+
             for (ServiceReference sr : srs) {
                 System.out.println("sr: " + sr + ", " + bundleContext.getService(sr).getClass().getName());
-                
+
             }
-            
+
             ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
             PluginManager pm = (PluginManager) bundleContext.getService(sr);
             creator = pm.getPlugin(ResourceDAO.class);
@@ -88,7 +88,7 @@ public class CombinedCreatorTest extends IntegrationTestBase {
         System.out.println("#################################################");
         System.out.println("#################################################");
         System.out.println("#################################################");
-        
+
             ServiceReference sr = bundleContext.getServiceReference(PluginManager.class.getName());
             PluginManager pm = (PluginManager) bundleContext.getService(sr);
             creator = pm.getPlugin(ResourceDAO.class);
@@ -97,18 +97,18 @@ public class CombinedCreatorTest extends IntegrationTestBase {
         assertNotNull(pm);
         assertNotNull(creator);
     }
-    
+
     @Test
     public void createBundleResource() throws Exception {
         File bundle = Util.prepareFile(dir, "bundle.jar");
 
         Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
-        
+
         String sn = resource.getSymbolicName();
         assert sn != null : "Symbolic name is null";
         assert "eu.kalwi.osgi.OSGi-Bundle1".equals(sn) : "Expected symbolic name: eu.kalwi.osgi.OSGi-Bundle1, found: " + sn;
-        
+
         String version = resource.getVersion().toString();
         assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
     }
@@ -127,14 +127,14 @@ public class CombinedCreatorTest extends IntegrationTestBase {
 
         String version = resource.getVersion().toString();
         assert "1.0.0.SNAPSHOT".equals(version) : "Expected version: 1.0.0.SNAPSHOT, found: " + version;
-        
+
 //        for (Capability c : meta.getResource().getCapabilities()) {
 //            if ("feature".equals(c.getName())) {
 //                String value = (String) c.getProperties().getResource("some.name");
 //                assert "some.value".equals(value) : "Expected value: some.value, found:" + value;
 //            }
 //        }
-        
+
         // TODO test for requirements
     }
 
@@ -143,7 +143,7 @@ public class CombinedCreatorTest extends IntegrationTestBase {
         File bundle = Util.prepareFile(dir, "other.txt");
 
         System.out.println("bundles URI: " + bundle.toURI() + ", exists: " + bundle.exists());
-        
+
         Resource resource = creator.getResource(bundle.toURI());
         assert resource != null : "Resource is null";
 
@@ -165,7 +165,7 @@ public class CombinedCreatorTest extends IntegrationTestBase {
 
         System.out.println("static sn: " + ((CombinedResource) resource).getStaticResource().getSymbolicName());
         System.out.println("writable sn: " + ((CombinedResource) resource).getWritableResource().getSymbolicName());
-        
+
         String sn = resource.getSymbolicName();
         assert sn != null : "Symbolic name is null";
         assert "other.resource".equals(sn) : "Expected symbolic name: other.resource, found: " + sn;
@@ -178,22 +178,22 @@ public class CombinedCreatorTest extends IntegrationTestBase {
 //    public void loadBundleCapabilities() throws Exception {
 //        fail("test not implemented");
 //    }
-//    
+//
 //    @Test
 //    public void loadOtherCapabilities() throws Exception {
 //        fail("test not implemented");
 //    }
-//    
+//
 //    @Test
 //    public void loadBundleRequirements() throws Exception {
 //        fail("test not implemented");
 //    }
-//    
+//
 //    @Test
 //    public void loadOtherRequirements() throws Exception {
 //        fail("test not implemented");
 //    }
-    
+
     // =========================================================================
-    
+
 }

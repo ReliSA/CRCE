@@ -20,14 +20,19 @@
     <properties>
         <bundle.symbolicName>${namespace}.efp.indexer</bundle.symbolicName>
         <bundle.namespace>${namespace}.efp.indexer</bundle.namespace>
+        <maven.test.skip>true</maven.test.skip>
 
         <paxexamversion>2.2.0</paxexamversion>
-        <paxrunnerversion>1.7.4</paxrunnerversion>
-        <felixversion>4.0.1</felixversion>
+        <paxrunnerversion>1.8.5</paxrunnerversion>
+        <felixversion>4.0.3</felixversion>
     </properties>
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -35,10 +40,10 @@
         </dependency>
 
         <dependency>
-          <groupId>cz.zcu.kiv.crce</groupId>
-          <artifactId>crce-efp-assignment</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-efp-assignment</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -89,19 +94,25 @@
             <version>${felixversion}</version>
         </dependency>
 
-<!--
-===================================================
-Dependencies from this place to down are for test purposes.
--->
-
-<!--
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
--->
+
+
+        <!--
+        ===================================================
+        Dependencies from this place to down are for test purposes.
+        -->
+
+        <!--
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                    <version>3.8.1</version>
+                    <scope>test</scope>
+                </dependency>
+        -->
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -109,81 +120,90 @@ Dependencies from this place to down are for test purposes.
             <scope>test</scope>
         </dependency>
 
-<!--
-===============================================
-Dependencies for testing container.
-Maybe some of them are not mandatory.
--->
+        <!--
+        ===============================================
+        Dependencies for testing container.
+        Maybe some of them are not mandatory.
+        -->
 
-    <!-- DS support -->
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <version>1.0.0</version>
-        <scope>test</scope>
-    </dependency>
+        <!-- DS support -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <!-- Pax Exam Dependencies -->
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-native</artifactId>
+            <version>${paxexamversion}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <!-- Pax Exam Dependencies -->
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-container-native</artifactId>
-      <version>${paxexamversion}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${paxexamversion}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-junit4</artifactId>
-      <version>${paxexamversion}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.runner</groupId>
+            <artifactId>pax-runner-no-jcl</artifactId>
+            <version>${paxrunnerversion}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.runner</groupId>
-      <artifactId>pax-runner-no-jcl</artifactId>
-      <version>${paxrunnerversion}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-assembly</artifactId>
+            <version>${paxexamversion}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-link-assembly</artifactId>
-      <version>${paxexamversion}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-testforge</artifactId>
+            <version>${paxexamversion}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-testforge</artifactId>
-      <version>${paxexamversion}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-results-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>crce-results-impl</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>crce-repository-impl</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 </project>

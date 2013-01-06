@@ -69,7 +69,12 @@ public class ContainerRunnerTest extends TestCase {
                 mavenBundle("org.apache.ace", "org.apache.ace.obr.metadata"),
                 mavenBundle("org.apache.ace", "org.apache.ace.obr.storage"),
                 mavenBundle("org.apache.felix", "org.apache.felix.shell"),
-                mavenBundle("org.apache.felix", "org.osgi.compendium"),
+                mavenBundle("org.osgi", "org.osgi.compendium"),
+                mavenBundle("org.slf4j", "slf4j-api"),
+                mavenBundle("ch.qos.logback", "logback-core"),
+                mavenBundle("ch.qos.logback", "logback-classic"),
+//                mavenBundle("org.codehaus.groovy", "groovy-all"),
+//                mavenBundle("org.codehaus.janino", "commons-compiler"),
 
                 //mavenBundle().groupId("log4j").artifactId("log4j").version("1.2.16"),
 
@@ -84,7 +89,7 @@ public class ContainerRunnerTest extends TestCase {
                 mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-metafile").version("1.0.0-SNAPSHOT"),
                 mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-dao-api").version("1.0.0-SNAPSHOT"),
                 mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-efp-indexer").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-efpAssignment").version("1.0.0-SNAPSHOT")
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-efp-assignment").version("1.0.0-SNAPSHOT")
                 );
     }
 

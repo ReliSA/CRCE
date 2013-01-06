@@ -31,6 +31,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -83,7 +85,7 @@ public class IntegrationTestBase {
      * </pre>
      */
     protected void configure(String pid, String... configuration) throws IOException {
-        Properties props = properties(configuration);
+        Dictionary<String, ?> props = properties(configuration);
         Configuration config = getConfiguration(pid);
         config.update(props);
     }
@@ -93,7 +95,7 @@ public class IntegrationTestBase {
      * @return The PID of newly created configuration.
      */
     protected String configureFactory(String factoryPid, String... configuration) throws IOException {
-        Properties props = properties(configuration);
+        Dictionary<String, ?> props = properties(configuration);
         Configuration config = createFactoryConfiguration(factoryPid);
         config.update(props);
         return config.getPid();
@@ -235,17 +237,20 @@ public class IntegrationTestBase {
             return result.toString();
         }
     };
-    
+
     /**
      * Creates a Properties object from a list of key-value pairs, e.g.
      * <pre>
      * properties("key", "value", "key2", "value2");
      * </pre>
+     * @param values
+     * @return
      */
-    public static Properties properties(String... values) {
-        Properties props = new Properties();
+    public static Dictionary<String, ?> properties(String... values) {
+        @SuppressWarnings("UseOfObsoleteCollectionType")
+        Dictionary<String, String> props = new Hashtable<>();
         for (int i = 0; i < values.length; i += 2) {
-            props.put(values[i], values[i+1]);
+            props.put(values[i], values[i + 1]);
         }
         return props;
     }

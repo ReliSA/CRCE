@@ -11,15 +11,21 @@ Embed-Dependency:\
     *;groupId=!${project.groupId}|org.apache.felix
 
 Import-Package: \
-	!com.sun.jdmk.comm; \
-	!com.ibm.uvm.tools; \
-	!javax.swing.*; \
-	!com.thoughtworks.*; \
-	!groovyjarjarasm.*; \
-	!junit.*; \
-	!org.apache.bsf.*; \
-	!org.apache.commons.*; \
-	!org.apache.ivy.*; \
-	!org.apache.tools.*; \
+	!com.sun.jdmk.comm, \
+	!com.ibm.uvm.tools, \
+	!javax.swing.*, \
+	!com.thoughtworks.*, \
+	!groovyjarjarasm.*, \
+	!junit.*, \
+	!org.apache.bsf.*, \
+	!org.apache.commons.*, \
+	!org.apache.ivy.*, \
+	!org.apache.tools.*, \
+        !javax.persistence, \
+        !jline, \
+        !org.fusesource.jansi, \
+        !sun.awt, \
+        !sun.java2d.pipe, \
+        !org.junit, \
 	\
 	*
