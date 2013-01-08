@@ -36,7 +36,7 @@ public class CombinedResourceImpl implements CombinedResource {
 
     @Override
     public String getId() {
-        return getSymbolicName() + "/" + getVersion();
+        return getSymbolicName() + "-" + getVersion();
     }
 
     @Override

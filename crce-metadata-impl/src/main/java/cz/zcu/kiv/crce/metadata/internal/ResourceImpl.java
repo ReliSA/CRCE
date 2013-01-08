@@ -173,7 +173,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
                 removed = m_repository.removeResource(this);
             }
             setProperty(SYMBOLIC_NAME, name);
-            setProperty(ID, name + "/" + getVersion());
+            setProperty(ID, name + "-" + getVersion());
             m_hash = 0;
             m_symbolicNameStatic = isStatic;
             if (removed && (m_repository = r) != null) {
@@ -196,7 +196,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
                 removed = m_repository.removeResource(this);
             }
             setProperty(VERSION, version);
-            setProperty(ID, getSymbolicName() + "/" + version);
+            setProperty(ID, getSymbolicName() + "-" + version);
             m_hash = 0;
             m_versionStatic = isStatic;
             if (removed && (m_repository = r) != null) {
@@ -337,7 +337,7 @@ public class ResourceImpl extends AbstractPropertyProvider<Resource> implements 
     
     @Override
     public String toString() {
-        return getSymbolicName() + "/" + getVersion().toString();
+        return getSymbolicName() + "-" + getVersion().toString();
     }
 
     @Override
