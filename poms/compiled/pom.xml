@@ -20,17 +20,6 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <!--
-             | example additional resource entries, useful when building Eclipse RCP applications
-            -->
-            <resource>
-                <directory>.</directory>
-                <includes>
-                    <include>plugin.xml</include>
-                    <include>plugin.properties</include>
-                    <include>icons/**</include>
-                </includes>
-            </resource>
         </resources>
 
         <plugins>

@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-  
+
     <parent>
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
@@ -25,11 +25,8 @@
 
     <build>
         <plugins>
-            
-                        
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
                 <configuration>
                     <packagingExcludes>WEB-INF/web.xml</packagingExcludes>
 <!--                    <warSourceExcludes>WEB-INF/lib/ace-*.jar,WEB-INF/lib/xpp3-1.1.4c.jar,WEB-INF/lib/gwt-dnd-2.6.5.jar</warSourceExcludes>-->
@@ -44,7 +41,7 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
-                
+
                 <executions>
                     <execution>
                         <id>bundle-manifest</id>
@@ -65,11 +62,11 @@
                         <supportedProjectType>war</supportedProjectType>
                     </supportedProjectTypes>
                     <instructions>
-                        
+
                     </instructions>
                 </configuration>
             </plugin>
-            
+
         </plugins>
     </build>
 
@@ -83,7 +80,7 @@
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
@@ -96,44 +93,20 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jsp-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.service.obr</artifactId>
         </dependency>
-        
-<!--    <dependency>
-      <groupId>org.ops4j.pax.web</groupId>
-      <artifactId>pax-web-extender-whiteboard</artifactId>
-      <version>0.8.1</version>
-      <scope>provided</scope>
-    </dependency>-->
-    
+
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.0</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
             <artifactId>ace-obr-storage</artifactId>
@@ -167,25 +140,39 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-dao-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        
-        <dependency>
         	<groupId>org.ops4j.pax.logging</groupId>
         	<artifactId>pax-logging-api</artifactId>
         	<version>1.7.0</version>
         	<type>bundle</type>
-        </dependency>        
-        
-        <dependency>
-        	<groupId>org.ops4j.pax.logging</groupId>
-        	<artifactId>pax-logging-service</artifactId>
-        	<version>1.7.0</version>
-        	<type>bundle</type>
+            <scope>provided</scope>
         </dependency>
+
+        <!-- CRCE dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-dao-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-plugin-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

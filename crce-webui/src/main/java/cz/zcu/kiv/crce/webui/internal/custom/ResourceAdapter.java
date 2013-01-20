@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.webui.custom;
+package cz.zcu.kiv.crce.webui.internal.custom;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
