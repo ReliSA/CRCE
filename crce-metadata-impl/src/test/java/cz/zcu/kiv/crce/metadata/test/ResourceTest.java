@@ -21,65 +21,65 @@ public class ResourceTest {
     public void setSymbolicName() throws Exception {
         resource.setSymbolicName("r1");
         assert "r1".equals(resource.getSymbolicName());
-        assert "r1/0.0.0".equals(resource.getId()) : "ID expected: r1/0.0.0, was: " + resource.getId();
+        assert "r1-0.0.0".equals(resource.getId()) : "ID expected: r1-0.0.0, was: " + resource.getId();
     }
 
     @Test
     public void setVersion() throws Exception {
         resource.setVersion("1.2.3");
         assert "1.2.3".equals(resource.getVersion().toString()) : "version expected: 1.2.3, was: " + resource.getVersion();
-        assert "null/1.2.3".equals(resource.getId()) : "ID expected: null/1.2.3, was: " + resource.getId();
+        assert "null-1.2.3".equals(resource.getId()) : "ID expected: null-1.2.3, was: " + resource.getId();
     }
     
     @Test
     public void changeSymbolicName() throws Exception {
         resource.setSymbolicName("r1");
         assert "r1".equals(resource.getSymbolicName());
-        assert "r1/0.0.0".equals(resource.getId()) : "ID expected: r1/0.0.0, was: " + resource.getId();
+        assert "r1-0.0.0".equals(resource.getId()) : "ID expected: r1-0.0.0, was: " + resource.getId();
         
         resource.setSymbolicName("r2");
         assert "r2".equals(resource.getSymbolicName());
-        assert "r2/0.0.0".equals(resource.getId()) : "ID expected: r2/0.0.0, was: " + resource.getId();
+        assert "r2-0.0.0".equals(resource.getId()) : "ID expected: r2-0.0.0, was: " + resource.getId();
 
         resource.setSymbolicName("r3", true);
         assert "r3".equals(resource.getSymbolicName());
-        assert "r3/0.0.0".equals(resource.getId()) : "ID expected: r3/0.0.0, was: " + resource.getId();
+        assert "r3-0.0.0".equals(resource.getId()) : "ID expected: r3-0.0.0, was: " + resource.getId();
         
         resource.setSymbolicName("r4");
         assert "r3".equals(resource.getSymbolicName());
-        assert "r3/0.0.0".equals(resource.getId()) : "ID expected: r3/0.0.0, was: " + resource.getId();
+        assert "r3-0.0.0".equals(resource.getId()) : "ID expected: r3-0.0.0, was: " + resource.getId();
     }
     
     @Test
     public void changeVersion() throws Exception {
         resource.setVersion("1.2.3");
         assert "1.2.3".equals(resource.getVersion().toString());
-        assert "null/1.2.3".equals(resource.getId()) : "ID expected: " + "null/1.2.3, was: " + resource.getId();
+        assert "null-1.2.3".equals(resource.getId()) : "ID expected: " + "null-1.2.3, was: " + resource.getId();
         
         resource.setVersion("4.5.6");
         assert "4.5.6".equals(resource.getVersion().toString());
-        assert "null/4.5.6".equals(resource.getId()) : "ID expected: " + "null/4.5.6, was: " + resource.getId();
+        assert "null-4.5.6".equals(resource.getId()) : "ID expected: " + "null-4.5.6, was: " + resource.getId();
         
         resource.setVersion("7.8.9", true);
         assert "7.8.9".equals(resource.getVersion().toString());
-        assert "null/7.8.9".equals(resource.getId()) : "ID expected: " + "null/7.8.9, was: " + resource.getId();
+        assert "null-7.8.9".equals(resource.getId()) : "ID expected: " + "null-7.8.9, was: " + resource.getId();
 
         resource.setVersion("10.11.12");
         assert "7.8.9".equals(resource.getVersion().toString());
-        assert "null/7.8.9".equals(resource.getId()) : "ID expected: " + "null/7.8.9, was: " + resource.getId();
+        assert "null-7.8.9".equals(resource.getId()) : "ID expected: " + "null-7.8.9, was: " + resource.getId();
     }
     
     @Test
     public void writable() throws Exception {
         resource.setVersion("1.0.0");
         resource.setSymbolicName("r1");
-        assert "r1/1.0.0".equals(resource.getId()) : "ID expected: " + "r1/1.0.0, was: " + resource.getId();
+        assert "r1-1.0.0".equals(resource.getId()) : "ID expected: " + "r1-1.0.0, was: " + resource.getId();
         
         resource.unsetWritable();
         
         resource.setVersion("2.0.0");
         resource.setSymbolicName("r2");
-        assert "r1/1.0.0".equals(resource.getId()) : "ID expected: " + "r1/1.0.0, was: " + resource.getId();
+        assert "r1-1.0.0".equals(resource.getId()) : "ID expected: " + "r1-1.0.0, was: " + resource.getId();
     }
 
     @Test
