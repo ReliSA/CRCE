@@ -15,12 +15,13 @@ Bundle-Activator: ${bundle.namespace}.internal.Activator
 Import-Package: \
   javax.servlet, \
   javax.servlet.http, \
-  javax.servlet.*, \
   org.osgi.framework, \
   org.osgi.service.log, \
   org.osgi.service.useradmin, \
   com.sun.jersey.spi.container.servlet, \
   *
+
+Export-Package: 
   
 Dynamic-ImportPackage: *
 
