@@ -6,10 +6,10 @@
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     
 
-  <!-- Default page to serve 
+  <!-- Default page to serve -->
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>-->
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
   
   <!-- Servlets -->
@@ -19,7 +19,7 @@
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
         <param-name>com.sun.jersey.config.property.packages</param-name>
-        <param-value>cz.zcu.kiv.crce.webui.internal.test</param-value>
+        <param-value>cz.zcu.kiv.crce.exampleplugin.internal.rest</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
 	</servlet> 

@@ -12,7 +12,7 @@ Bundle-Name: CRCE - Example Rest
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Export-Package: \
+Import-Package: \
   javax.servlet, \
   javax.servlet.http, \
   javax.servlet.*, \
