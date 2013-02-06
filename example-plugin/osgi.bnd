@@ -2,8 +2,30 @@
 # Use this file to add customized Bnd instructions for the bundle
 #-----------------------------------------------------------------
 
+Bundle-Version>: \
+  ${pom.version}
+
+Bundle-SymbolicName: \
+  ${bundle.symbolicName}
+  
+Bundle-Name: CRCE - Example Rest
+
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Embed-Dependency: 
+Export-Package: \
+  javax.servlet, \
+  javax.servlet.http, \
+  javax.servlet.*, \
+  org.osgi.framework, \
+  org.osgi.service.log, \
+  org.osgi.service.useradmin, \
+  com.sun.jersey.spi.container.servlet, \
+  *
+  
+Dynamic-ImportPackage: *
 
-Export-Package: 
+Bundle-ClassPath: .,WEB-INF/classes
+
+Web-ContextPath: crce-rest
+
+Webapp-Context: crce-rest
