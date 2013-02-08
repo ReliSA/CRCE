@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.exampleplugin.internal.rest.bean;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class MetadataBean {
 	
 	private String id;

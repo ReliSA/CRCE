@@ -7,6 +7,7 @@ import org.osgi.service.log.LogService;
 
 
 import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 
 public final class Activator extends DependencyActivatorBase{
@@ -41,11 +42,15 @@ public final class Activator extends DependencyActivatorBase{
 		m_instance = this;
 		
 		manager.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
-                .setImplementation(ExamplePlugin.class)
+                .setImplementation(this)
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 );
+		
+		if(m_store == null) {
+			System.out.println("----Store is null------");
+		}
+		
 		
 	}
 	

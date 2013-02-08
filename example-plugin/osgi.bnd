@@ -19,6 +19,7 @@ Import-Package: \
   org.osgi.service.log, \
   org.osgi.service.useradmin, \
   com.sun.jersey.spi.container.servlet, \
+  cz.zcu.kiv.crce.repository, \
   *
 
 Export-Package: 

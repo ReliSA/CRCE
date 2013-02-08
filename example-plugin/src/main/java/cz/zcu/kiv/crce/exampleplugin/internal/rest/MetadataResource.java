@@ -37,19 +37,37 @@ public class MetadataResource {
 	private MetadataBean metadataFromResource(Resource resource) {
 		MetadataBean newBean = new MetadataBean();
 		
+		System.out.println("Detected resource: " + resource.getId());
+		
 		newBean.setId(resource.getId());
 		newBean.setName(resource.getSymbolicName());
 		
 		return newBean;
 	}
 	
-    @GET
+    /*@GET
     @Produces({MediaType.APPLICATION_XML })
     public List<MetadataBean> findAll() {
     	Resource[] storeResources;
     	storeResources = Activator.instance().getStore().getRepository().getResources();
     	
         return createMetadataList(storeResources);
+
+    }*/
+    
+    @GET
+    @Produces({MediaType.TEXT_PLAIN })
+    public String findAll() {
+    	Resource[] storeResources;
+    	storeResources = Activator.instance().getStore().getRepository().getResources();
+    	
+        List<MetadataBean> resourcesMetadata = createMetadataList(storeResources);
+        
+        String output = "";
+        for(MetadataBean mb:resourcesMetadata) {
+        	output+=mb.getId()+"\n";
+        }
+        return output;
 
     }
  
