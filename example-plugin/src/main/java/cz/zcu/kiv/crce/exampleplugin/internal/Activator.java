@@ -47,11 +47,6 @@ public final class Activator extends DependencyActivatorBase{
                 .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 );
 		
-		if(m_store == null) {
-			System.out.println("----Store is null------");
-		}
-		
-		
 	}
 	
 
