@@ -20,18 +20,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public class MetadataResource {
 
     
-	private List<MetadataBean> createMetadataList(Resource[] resources) {
-		
-		List<MetadataBean> metadataList = new ArrayList<MetadataBean>();
-		
-		for(Resource res: resources) {
 
-			
-			metadataList.add(metadataFromResource(res));
-		}
-		
-		return metadataList;
-	}
 	
 	
 	private MetadataBean metadataFromResource(Resource resource) {
@@ -45,7 +34,19 @@ public class MetadataResource {
 		return newBean;
 	}
 	
-    /*@GET
+	private List<MetadataBean> createMetadataList(Resource[] resources) {
+
+		List<MetadataBean> metadataList = new ArrayList<MetadataBean>();
+
+		for (Resource res : resources) {
+
+			metadataList.add(metadataFromResource(res));
+		}
+
+		return metadataList;
+	}
+	
+    @GET
     @Produces({MediaType.APPLICATION_XML })
     public List<MetadataBean> findAll() {
     	Resource[] storeResources;
@@ -53,27 +54,13 @@ public class MetadataResource {
     	
         return createMetadataList(storeResources);
 
-    }*/
-    
-    @GET
-    @Produces({MediaType.TEXT_PLAIN })
-    public String findAll() {
-    	Resource[] storeResources;
-    	storeResources = Activator.instance().getStore().getRepository().getResources();
-    	
-        List<MetadataBean> resourcesMetadata = createMetadataList(storeResources);
-        
-        String output = "";
-        for(MetadataBean mb:resourcesMetadata) {
-        	output+=mb.getId()+"\n";
-        }
-        return output;
-
     }
+    
+
  
     @GET @Path("{id}")
     @Produces({MediaType.APPLICATION_XML })
-    public MetadataBean findById(@PathParam("id") String id) {
+    public MetadataBean getMetadataById(@PathParam("id") String id) {
     	try {
 			Resource[] storeResources;
 			String filter = "(id="+id+")";
