@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.internal.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.osgi.framework.InvalidSyntaxException;
 
@@ -20,7 +24,19 @@ import cz.zcu.kiv.crce.rest.internal.rest.bean.MetadataBean;
 public class MetadataResource {
 
     
+	private String createXML(MetadataBean metabean) throws JAXBException{
+		
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ClassLoader cl = cz.zcu.kiv.crce.rest.internal.rest.bean.ObjectFactory.class.getClassLoader();
+		JAXBContext jc = JAXBContext.newInstance("cz.zcu.kiv.crce.rest.internal.rest.bean", cl);
 
+		Marshaller m = jc.createMarshaller();
+		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		m.marshal(metabean, baos);
+		
+		return baos.toString();
+
+	}
 	
 	
 	private MetadataBean metadataFromResource(Resource resource) {
@@ -48,11 +64,22 @@ public class MetadataResource {
 	
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public List<MetadataBean> findAll() {
+    public String findAll() {
     	Resource[] storeResources;
     	storeResources = Activator.instance().getStore().getRepository().getResources();
     	
-        return createMetadataList(storeResources);
+    	
+    	try {
+			if(storeResources.length > 0) {
+				MetadataBean mb = metadataFromResource(storeResources[0]);
+				return createXML(mb);
+			} else {
+				return "<noresource></noresource>";
+			}
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			return "<error></error>";
+		}
 
     }
     
