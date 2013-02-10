@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.exampleplugin.internal;
+package cz.zcu.kiv.crce.rest.internal;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;

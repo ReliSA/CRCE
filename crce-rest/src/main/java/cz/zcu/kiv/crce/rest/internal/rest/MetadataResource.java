@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.exampleplugin.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.osgi.framework.InvalidSyntaxException;
 
-import cz.zcu.kiv.crce.exampleplugin.internal.Activator;
-import cz.zcu.kiv.crce.exampleplugin.internal.rest.bean.MetadataBean;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.rest.internal.Activator;
+import cz.zcu.kiv.crce.rest.internal.rest.bean.MetadataBean;
 
 
 @Path("/metadata")

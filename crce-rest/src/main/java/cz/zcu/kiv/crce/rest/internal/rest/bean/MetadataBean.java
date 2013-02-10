@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.exampleplugin.internal.rest.bean;
+package cz.zcu.kiv.crce.rest.internal.rest.bean;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

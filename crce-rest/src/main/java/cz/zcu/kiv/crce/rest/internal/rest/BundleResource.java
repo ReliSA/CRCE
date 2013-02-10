@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.exampleplugin.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -19,8 +19,8 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.osgi.framework.InvalidSyntaxException;
 
-import cz.zcu.kiv.crce.exampleplugin.internal.Activator;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.rest.internal.Activator;
 
 
 /**

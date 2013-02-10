@@ -13,7 +13,7 @@
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
         <param-name>com.sun.jersey.config.property.packages</param-name>
-        <param-value>cz.zcu.kiv.crce.exampleplugin.internal.rest</param-value>
+        <param-value>cz.zcu.kiv.crce.rest.internal.rest</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
 	</servlet> 

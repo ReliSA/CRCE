@@ -8,7 +8,7 @@ Bundle-Version>: \
 Bundle-SymbolicName: \
   ${bundle.symbolicName}
   
-Bundle-Name: CRCE - Example Rest
+Bundle-Name: CRCE - Rest
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
