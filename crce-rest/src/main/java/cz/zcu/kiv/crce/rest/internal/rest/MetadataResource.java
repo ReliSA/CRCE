@@ -17,14 +17,16 @@ import org.osgi.framework.InvalidSyntaxException;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.MetadataBean;
+import cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean;
+import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
+import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 
 
 @Path("/metadata")
 public class MetadataResource {
 
     
-	private String createXML(MetadataBean metabean) throws JAXBException{
+	private String createXML(RepositoryBean repositoryBean) throws JAXBException{
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ClassLoader cl = cz.zcu.kiv.crce.rest.internal.rest.bean.ObjectFactory.class.getClassLoader();
@@ -32,34 +34,27 @@ public class MetadataResource {
 
 		Marshaller m = jc.createMarshaller();
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		m.marshal(metabean, baos);
+		m.marshal(repositoryBean, baos);
 		
 		return baos.toString();
 
 	}
 	
 	
-	private MetadataBean metadataFromResource(Resource resource) {
-		MetadataBean newBean = new MetadataBean();
+	private RepositoryBean metadataFromResource(Resource[] resources) {
+ 
+		ConvertorToBeans conv = new ConvertorToBeans();
 		
-		System.out.println("Detected resource: " + resource.getId());
+		RepositoryBean repositoryBean = new RepositoryBean();
+		ArrayList<ResourceBean> resourceBeans = new ArrayList<>();
 		
-		newBean.setId(resource.getId());
-		newBean.setName(resource.getSymbolicName());
-		
-		return newBean;
-	}
-	
-	private List<MetadataBean> createMetadataList(Resource[] resources) {
-
-		List<MetadataBean> metadataList = new ArrayList<MetadataBean>();
-
-		for (Resource res : resources) {
-
-			metadataList.add(metadataFromResource(res));
+		for(Resource res: resources) {
+			resourceBeans.add(conv.convertResource(res));
 		}
+		
+		repositoryBean.setResources(resourceBeans);
 
-		return metadataList;
+		return repositoryBean;
 	}
 	
     @GET
@@ -71,8 +66,8 @@ public class MetadataResource {
     	
     	try {
 			if(storeResources.length > 0) {
-				MetadataBean mb = metadataFromResource(storeResources[0]);
-				return createXML(mb);
+				RepositoryBean repositoryBean = metadataFromResource(storeResources);
+				return createXML(repositoryBean);
 			} else {
 				return "<noresource></noresource>";
 			}
@@ -87,13 +82,13 @@ public class MetadataResource {
  
     @GET @Path("{id}")
     @Produces({MediaType.APPLICATION_XML })
-    public MetadataBean getMetadataById(@PathParam("id") String id) {
+    public String getMetadataById(@PathParam("id") String id) {
     	try {
 			Resource[] storeResources;
 			String filter = "(id="+id+")";
 			storeResources = Activator.instance().getStore().getRepository().getResources(filter);
 			
-			return metadataFromResource(storeResources[0]);
+			return "<notimplementedyet/>";
 			
 		} catch (InvalidSyntaxException e) {
 			e.printStackTrace();

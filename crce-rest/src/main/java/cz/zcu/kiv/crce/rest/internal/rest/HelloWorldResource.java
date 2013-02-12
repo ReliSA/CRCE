@@ -10,7 +10,6 @@ import javax.ws.rs.core.MediaType;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.MetadataBean;
 
 @Path("/helloworld")
 public class HelloWorldResource {
@@ -32,37 +31,14 @@ public class HelloWorldResource {
 		storeResources = Activator.instance().getStore().getRepository()
 				.getResources();
 
-		List<MetadataBean> resourcesMetadata = createMetadataList(storeResources);
+		
 
 		String output = "";
-		for (MetadataBean mb : resourcesMetadata) {
-			output += mb.getId() + "\n";
+		for (Resource res: storeResources) {
+			output += res.getId() + "\n";
 		}
 		return output;
 
-	}
-	           
-	private MetadataBean metadataFromResource(Resource resource) {
-		MetadataBean newBean = new MetadataBean();
-
-		System.out.println("Detected resource: " + resource.getId());
-
-		newBean.setId(resource.getId());
-		newBean.setName(resource.getSymbolicName());
-
-		return newBean;
-	}
-
-	private List<MetadataBean> createMetadataList(Resource[] resources) {
-
-		List<MetadataBean> metadataList = new ArrayList<MetadataBean>();
-
-		for (Resource res : resources) {
-
-			metadataList.add(metadataFromResource(res));
-		}
-
-		return metadataList;
 	}
 
 }

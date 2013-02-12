@@ -8,7 +8,7 @@ public class ObjectFactory {
 	public ObjectFactory() {
 	}
 	
-	public MetadataBean createMetadataBean() {
-		return new MetadataBean();
+	public RepositoryBean createrepositoryBean() {
+		return new RepositoryBean();
 	}
 }
