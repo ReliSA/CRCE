@@ -1,11 +1,13 @@
 package cz.zcu.kiv.crce.metadata;
 
 /**
- * Represents an OBR Capability.
+ * Represents an Capability.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Capability extends PropertyProvider<Capability> {
+public interface Capability extends AttributeProvider, DirectiveProvider {
 
-    String getName();
+    public String getNamespace();
+    
+    public Resource getResource();
 }

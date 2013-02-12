@@ -5,9 +5,9 @@ import java.net.URI;
 /**
  * Creates empty OBR entities.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface ResourceCreator {
+public interface ResourceFactory {
     
     /**
      * Creates an empty resource.
@@ -33,17 +33,17 @@ public interface ResourceCreator {
     
     /**
      * Creates an empty capability with given name.
-     * @param name Name of created capability.
+     * @param namespace Name of created capability.
      * @return An empty capability.
      */
-    Capability createCapability(String name);
+    Capability createCapability(String namespace);
     
     /**
      * Creates an empty requirement with given name.
-     * @param name Name of created requirement.
+     * @param namespace Name of created requirement.
      * @return An empty capability.
      */
-    Requirement createRequirement(String name);
+    Requirement createRequirement(String namespace);
 
     /**
      * TODO

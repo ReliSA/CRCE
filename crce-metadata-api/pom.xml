@@ -15,7 +15,7 @@
     <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Metadata API</name>
+    <name>CRCE - Incubator - Metadata API</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.api</bundle.symbolicName>

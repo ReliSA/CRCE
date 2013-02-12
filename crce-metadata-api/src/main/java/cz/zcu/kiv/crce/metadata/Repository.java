@@ -1,13 +1,15 @@
 package cz.zcu.kiv.crce.metadata;
 
 import java.net.URI;
+import java.util.List;
+
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * Represents a set of resources. Repository can be assigned to a physical URI
  * which resources are stored on, but it does not manage physical content.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Repository {
 
@@ -22,7 +24,7 @@ public interface Repository {
      * Return the resources for this repository.
      * @return 
      */
-    Resource[] getResources();
+    List<Resource> getResources();
 
     /**
      * 
@@ -30,14 +32,14 @@ public interface Repository {
      * @return
      * @throws InvalidSyntaxException  
      */
-    Resource[] getResources(String filter) throws InvalidSyntaxException;
+    List<Resource> getResources(String filter) throws InvalidSyntaxException;
     
     /**
      * 
      * @param requirements
      * @return 
      */
-    Resource[] getResources(Requirement[] requirements);
+    List<Resource> getResources(List<Requirement> requirements);
     
     /**
      * Return the name of this repository.

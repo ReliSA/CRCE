@@ -2,13 +2,17 @@ package cz.zcu.kiv.crce.metadata;
 
 /**
  * Object of this interface type can evaluate dependencies between added resources.
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ *
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Resolver {
+
+    public boolean isSatisfied(Capability capability);
+
+    // 
     
     void add(Resource resource);
-    
+
     void clean();
 
     Reason[] getUnsatisfiedRequirements();
