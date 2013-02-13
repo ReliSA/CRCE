@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.rest.internal.rest.bean;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 public abstract class ResourceProperty 
 {
 	private String namespace;
-	private ArrayList<AttributeBean> attributes;
+	private List<AttributeBean> attributes;
 
 	@XmlAttribute
 	public String getNamespace() {
@@ -20,11 +20,11 @@ public abstract class ResourceProperty
 	}
 	 
 	@XmlElement(name = "attribute")
-	public ArrayList<AttributeBean> getAttributes() {
+	public List<AttributeBean> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(ArrayList<AttributeBean> attributes) {
+	public void setAttributes(List<AttributeBean> attributes) {
 		this.attributes = attributes;
 	}
 	

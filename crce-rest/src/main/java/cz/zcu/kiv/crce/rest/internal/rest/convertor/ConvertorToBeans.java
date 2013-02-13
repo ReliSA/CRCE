@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.AttributeBean;
@@ -11,7 +12,7 @@ import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
 public class ConvertorToBeans {
 	
 	
-	private void addToAttribute(ArrayList<AttributeBean> attributes, String name, String type, String value) {
+	private void addToAttribute(List<AttributeBean> attributes, String name, String type, String value) {
 		
 		AttributeBean newAttributte = new AttributeBean();
 		
@@ -27,7 +28,7 @@ public class ConvertorToBeans {
 		
 		CapabilityBean osgiIdentity= new CapabilityBean();
 		osgiIdentity.setNamespace("osgi.identity");
-		ArrayList<AttributeBean> osgiIdentityAttrs = new ArrayList<AttributeBean>();
+		List<AttributeBean> osgiIdentityAttrs = new ArrayList<AttributeBean>();
 		
 		addToAttribute(osgiIdentityAttrs, "osgi.identity", null, resource.getSymbolicName());
 		addToAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
@@ -41,7 +42,7 @@ public class ConvertorToBeans {
 		
 		CapabilityBean osgiContent = new CapabilityBean();
 		osgiContent.setNamespace("osgi.content");
-		ArrayList<AttributeBean> attributes = new ArrayList<AttributeBean>();
+		List<AttributeBean> attributes = new ArrayList<AttributeBean>();
 		
 		addToAttribute(attributes, "osgi.content", null, "not implemented yet");
 		addToAttribute(attributes, "url", null, "not implemented yet");
@@ -62,8 +63,8 @@ public class ConvertorToBeans {
 		
 		newBean.setCrceId(resource.getId());
 		
-		ArrayList<CapabilityBean> caps = new ArrayList<CapabilityBean>();
-		ArrayList<RequirementBean> reqs = new ArrayList<RequirementBean>();	
+		List<CapabilityBean> caps = new ArrayList<CapabilityBean>();
+		List<RequirementBean> reqs = new ArrayList<RequirementBean>();	
 
 		
 		caps.add(getOsgiIdentity(resource));

@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -21,7 +22,11 @@ import cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 
-
+/**
+ * Server will provide a metadata information about resources in the repository.
+ * @author Jan Reznicek
+ *
+ */
 @Path("/metadata")
 public class MetadataResource {
 
@@ -46,7 +51,7 @@ public class MetadataResource {
 		ConvertorToBeans conv = new ConvertorToBeans();
 		
 		RepositoryBean repositoryBean = new RepositoryBean();
-		ArrayList<ResourceBean> resourceBeans = new ArrayList<>();
+		List<ResourceBean> resourceBeans = new ArrayList<>();
 		
 		for(Resource res: resources) {
 			resourceBeans.add(conv.convertResource(res));
@@ -57,42 +62,59 @@ public class MetadataResource {
 		return repositoryBean;
 	}
 	
+	/**
+	 * Returns xml with metadata of all resources in the store repository.
+	 * @return xml with metadata of all resources in the store repository
+	 */
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public String findAll() {
+    public Response findAll() {
     	Resource[] storeResources;
     	storeResources = Activator.instance().getStore().getRepository().getResources();
-    	
     	
     	try {
 			if(storeResources.length > 0) {
 				RepositoryBean repositoryBean = metadataFromResource(storeResources);
-				return createXML(repositoryBean);
+				return Response.ok(createXML(repositoryBean)).build();
 			} else {
-				return "<noresource></noresource>";
+				return Response.status(404).build();
 			}
 		} catch (JAXBException e) {
 			e.printStackTrace();
-			return "<error></error>";
+			return Response.serverError().build();
 		}
 
     }
     
 
- 
+    /**
+     * Return  xml with metadata of one resource, that is specified by id.
+     * @param id id of the resource
+     * @return xml with metadata about the resource
+     */
     @GET @Path("{id}")
     @Produces({MediaType.APPLICATION_XML })
-    public String getMetadataById(@PathParam("id") String id) {
+    public Response getMetadataById(@PathParam("id") String id) {
     	try {
 			Resource[] storeResources;
 			String filter = "(id="+id+")";
 			storeResources = Activator.instance().getStore().getRepository().getResources(filter);
 			
-			return "<notimplementedyet/>";
+	    	try {
+				if(storeResources.length > 0) {
+					RepositoryBean repositoryBean = metadataFromResource(storeResources);
+					return Response.ok(createXML(repositoryBean)).build();
+				} else {
+					return Response.status(404).build();
+				}
+			} catch (JAXBException e) {
+				e.printStackTrace();
+				return Response.serverError().build();
+			}
 			
 		} catch (InvalidSyntaxException e) {
 			e.printStackTrace();
-			return null;
+			return Response.status(400).build();
 		}    	
         
     }

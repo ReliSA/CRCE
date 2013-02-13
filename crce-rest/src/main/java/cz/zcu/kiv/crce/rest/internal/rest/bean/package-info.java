@@ -1,7 +1,7 @@
 @XmlSchema (		
    xmlns = {
-         @javax.xml.bind.annotation.XmlNs(prefix= "osgi", namespaceURI="http://www.osgi.org/xmlns/repository/v1.0.0"),
-         @javax.xml.bind.annotation.XmlNs(prefix = "crce", namespaceURI="TBD-CRCE-METADATA-XSD-URI")
+         @javax.xml.bind.annotation.XmlNs(prefix= "osgi", namespaceURI=cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean.OSGI_NAMESPACE),
+         @javax.xml.bind.annotation.XmlNs(prefix = "crce", namespaceURI=cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean.CRCE_NAMESPACE)
    },  
    elementFormDefault = XmlNsForm.UNQUALIFIED,
    attributeFormDefault = XmlNsForm.UNSET

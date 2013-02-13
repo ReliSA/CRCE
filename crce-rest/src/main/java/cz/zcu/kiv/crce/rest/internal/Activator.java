@@ -6,8 +6,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 
 
-import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 
 public final class Activator extends DependencyActivatorBase{

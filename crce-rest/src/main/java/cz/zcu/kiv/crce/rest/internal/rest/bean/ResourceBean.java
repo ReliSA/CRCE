@@ -1,40 +1,41 @@
 package cz.zcu.kiv.crce.rest.internal.rest.bean;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "resource")
 public class ResourceBean 
 { 	
-	private ArrayList<CapabilityBean> capabilities = new ArrayList<CapabilityBean>();	
-	private ArrayList<RequirementBean> requirements = new ArrayList<RequirementBean>();
+	private List<CapabilityBean> capabilities = new ArrayList<CapabilityBean>();	
+	private List<RequirementBean> requirements = new ArrayList<RequirementBean>();
 	private String crceId;
 	
 	@XmlElement(name = "capability")
-	public ArrayList<CapabilityBean> getCapabilities() 
+	public List<CapabilityBean> getCapabilities() 
 	{
 		return capabilities;
 	}
 
-	public void setCapabilities(ArrayList<CapabilityBean> capabilities) 
+	public void setCapabilities(List<CapabilityBean> capabilities) 
 	{
 		this.capabilities = capabilities;
 	}
 	
 	@XmlElement(name = "requirement")
-	public ArrayList<RequirementBean> getRequirements() {
+	public List<RequirementBean> getRequirements() {
 		return requirements;
 	}
 
-	public void setRequirements(ArrayList<RequirementBean> requirements) {
+	public void setRequirements(List<RequirementBean> requirements) {
 		this.requirements = requirements;
 	}
 	
 	
-	@XmlAttribute(namespace = "TBD-CRCE-METADATA-XSD-URI" , name = "id")
+	@XmlAttribute(namespace = RepositoryBean.CRCE_NAMESPACE , name = "id")
 	public String getCrceId() {
 		return crceId;
 	}
