@@ -72,6 +72,11 @@ public class BundleResource {
 	}
 	
 	
+	/**
+	 * Find bundle according LDAP filter in store repository and return him as output stream.
+	 * @param filter LDAP filter
+	 * @return bundle as output stream or null, if bundle was not found.
+	 */
 	private StreamingOutput bundlebyFilter(String filter) {
 		
 		System.out.println("Get bundle by filter: " + filter);
@@ -125,6 +130,7 @@ public class BundleResource {
 			
 			return Response.ok(output).header("content-disposition","attachment; filename = " + id + ".jar").build();
 		} else {
+			//bundle was not found in the store repository
 			return Response.status(404).build();
 		}
 

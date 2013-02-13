@@ -15,40 +15,32 @@ import cz.zcu.kiv.crce.rest.internal.rest.bean.CapabilityBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.RequirementBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
 
+/**
+ * Convert cz.zcu.kiv.crce.metadata.Resource to bean classes with JAXB annotations.
+ * These bean classes are ready to export metadata to xml.
+ * @author Jan Reznicek
+ *
+ */
 public class ConvertorToBeans {
 	
+
 	
-	private void addToAttribute(List<AttributeBean> attributes, String name, String type, String value) {
-		
-		AttributeBean newAttributte = new AttributeBean();
-		
-		if(name != null) newAttributte.setName(name);
-		if(type != null) newAttributte.setType(type);
-		if(value != null) newAttributte.setValue(value);
-		
-		attributes.add(newAttributte);
-				
-	}
-	
-	private CapabilityBean getOsgiIdentity(Resource resource) {
-		
-		CapabilityBean osgiIdentity= new CapabilityBean();
-		osgiIdentity.setNamespace("osgi.identity");
-		List<AttributeBean> osgiIdentityAttrs = new ArrayList<AttributeBean>();
-		
-		addToAttribute(osgiIdentityAttrs, "osgi.identity", null, resource.getSymbolicName());
-		addToAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
-		
-		osgiIdentity.setAttributes(osgiIdentityAttrs);
-		
-		return osgiIdentity;
-	}
-	
+	/**
+	 * Get original file name from resource or null, if name was not found.
+	 * @param resource resource
+	 * @return original file name of resource or null.
+	 */
 	private String getFileName(Resource resource) {
 		Capability[] caps = resource.getCapabilities("file");
 		
 		if (caps.length > 0) {
-			return caps[0].getPropertyString("name");
+			for(Capability cap:caps) {
+				String orgFileName = cap.getPropertyString("name");
+				if (orgFileName != null) {
+					return orgFileName;
+				}
+			}
+			return null;
 		} else {
 			return null;
 		}
@@ -56,10 +48,20 @@ public class ConvertorToBeans {
 	}
 	
 	//TODO - made get URI host independent
+	/**
+	 * Get URL of resource, that could be uset for REST action GET Bundle.
+	 * @param resource resource
+	 * @return URL of the resource
+	 */
 	private String getURL(Resource resource) {
 		return "http://localhost:8080/rest/bundle/" + resource.getId();
 	}
 	
+	/**
+	 * Get hexadecimal SHA-256 of file with resource or null, if error occurred during counting digest. 
+	 * @param resource
+	 * @return hexadecimal SHA-256 of file with resource or null
+	 */
 	private String getSHA(Resource resource) {
 		FileInputStream fis = null;
 		try {
@@ -75,7 +77,7 @@ public class ConvertorToBeans {
 			byte[] mdbytes = md.digest();
  
 			
-			//convert the byte to hex format method 1
+			//convert the byte to hex format
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < mdbytes.length; i++) {
 			  sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
@@ -97,6 +99,54 @@ public class ConvertorToBeans {
 		}
 	}
 	
+	/**
+	 * Add a new attribute to the list of attributes.
+	 * Attribute can contains name, type or value.
+	 * These tree are obligatory, if you don't want any of them, set parameter to null.
+	 * 
+	 * @param attributes list of attributes, new attribute will be add to this list.
+	 * @param name name or null
+	 * @param type type or null
+	 * @param value value or null
+	 */
+	private void addToAttribute(List<AttributeBean> attributes, String name, String type, String value) {
+		
+		AttributeBean newAttributte = new AttributeBean();
+		
+		if(name != null) newAttributte.setName(name);
+		if(type != null) newAttributte.setType(type);
+		if(value != null) newAttributte.setValue(value);
+		
+		attributes.add(newAttributte);
+				
+	}
+	
+	/**
+	 * Get CapabilityBean with osgi.identity.
+	 * @param resource resource
+	 * @return CapabilityBean with osgi.identity
+	 */
+	private CapabilityBean getOsgiIdentity(Resource resource) {
+		
+		CapabilityBean osgiIdentity= new CapabilityBean();
+		osgiIdentity.setNamespace("osgi.identity");
+		List<AttributeBean> osgiIdentityAttrs = new ArrayList<AttributeBean>();
+		
+		addToAttribute(osgiIdentityAttrs, "osgi.identity", null, resource.getSymbolicName());
+		addToAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
+		
+		osgiIdentity.setAttributes(osgiIdentityAttrs);
+		
+		return osgiIdentity;
+	}
+	
+
+	
+	/**
+	 * Get CapabilitiBean with osgi.content
+	 * @param resource resource 
+	 * @return CapabilitiBean with osgi.content
+	 */
 	private CapabilityBean getOsgiContent(Resource resource) {
 		
 		CapabilityBean osgiContent = new CapabilityBean();
@@ -116,6 +166,11 @@ public class ConvertorToBeans {
 		
 	}
 
+	/**
+	 * Convert {@link Resource} to {@link ResourceBean}.
+	 * @param resource resource
+	 * @return converted resource
+	 */
 	public ResourceBean convertResource(Resource resource) {
 		
 		ResourceBean newBean = new ResourceBean();
