@@ -1,5 +1,10 @@
 package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +60,50 @@ public class ConvertorToBeans {
 		return "http://localhost:8080/rest/bundle/" + resource.getId();
 	}
 	
+	private String getSHA(Resource resource) {
+		FileInputStream fis = null;
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			fis = new FileInputStream(new File(resource.getUri()));
+			
+			byte[] dataBytes = new byte[1024];
+ 
+			int nread = 0; 
+			while ((nread = fis.read(dataBytes)) != -1) {
+			  md.update(dataBytes, 0, nread);
+			};
+			byte[] mdbytes = md.digest();
+ 
+			
+			//convert the byte to hex format method 1
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < mdbytes.length; i++) {
+			  sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
+			}		    
+			
+			return sb.toString();
+			
+		} catch (NoSuchAlgorithmException | IOException e) {
+			e.printStackTrace();
+			return null;
+		} finally {
+			if(fis!=null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					//do nothing
+				}
+			}
+		}
+	}
+	
 	private CapabilityBean getOsgiContent(Resource resource) {
 		
 		CapabilityBean osgiContent = new CapabilityBean();
 		osgiContent.setNamespace("osgi.content");
 		List<AttributeBean> attributes = new ArrayList<AttributeBean>();
 		
-		addToAttribute(attributes, "osgi.content", null, "not implemented yet");
+		addToAttribute(attributes, "osgi.content", null, getSHA(resource));
 		addToAttribute(attributes, "url", null, getURL(resource));
 		addToAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
 		addToAttribute(attributes, "mime", null, "not implemented yet");
