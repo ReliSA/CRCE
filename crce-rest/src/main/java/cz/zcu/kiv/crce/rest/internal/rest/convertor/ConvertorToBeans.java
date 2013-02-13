@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.AttributeBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.CapabilityBean;
@@ -38,6 +39,22 @@ public class ConvertorToBeans {
 		return osgiIdentity;
 	}
 	
+	private String getFileName(Resource resource) {
+		Capability[] caps = resource.getCapabilities("file");
+		
+		if (caps.length > 0) {
+			return caps[0].getPropertyString("name");
+		} else {
+			return null;
+		}
+		
+	}
+	
+	//TODO - made get URI host independent
+	private String getURL(Resource resource) {
+		return "http://localhost:8080/rest/bundle/" + resource.getId();
+	}
+	
 	private CapabilityBean getOsgiContent(Resource resource) {
 		
 		CapabilityBean osgiContent = new CapabilityBean();
@@ -45,10 +62,10 @@ public class ConvertorToBeans {
 		List<AttributeBean> attributes = new ArrayList<AttributeBean>();
 		
 		addToAttribute(attributes, "osgi.content", null, "not implemented yet");
-		addToAttribute(attributes, "url", null, "not implemented yet");
+		addToAttribute(attributes, "url", null, getURL(resource));
 		addToAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
 		addToAttribute(attributes, "mime", null, "not implemented yet");
-		addToAttribute(attributes, "crce.original-file-name", null, resource.getPresentationName());
+		addToAttribute(attributes, "crce.original-file-name", null, getFileName(resource));
 		
 		osgiContent.setAttributes(attributes);
 		
