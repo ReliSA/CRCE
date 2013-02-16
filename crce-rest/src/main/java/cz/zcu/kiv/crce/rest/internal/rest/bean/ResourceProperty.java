@@ -9,6 +9,7 @@ public abstract class ResourceProperty
 {
 	private String namespace;
 	private List<AttributeBean> attributes;
+	private List<AttributeBean> directives;
 
 	@XmlAttribute
 	public String getNamespace() {
@@ -28,6 +29,16 @@ public abstract class ResourceProperty
 		this.attributes = attributes;
 	}
 	
+	
+	@XmlElement(name = "directive")
+	public List<AttributeBean> getDirectives() {
+		return directives;
+	}
+
+	public void setDirectives(List<AttributeBean> directives) {
+		this.directives = directives;
+	}
+
 	public void print()
 	{
 		System.out.println("Namespace: " + getNamespace());

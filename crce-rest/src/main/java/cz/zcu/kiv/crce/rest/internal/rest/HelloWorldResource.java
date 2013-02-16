@@ -5,6 +5,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 
@@ -37,12 +40,26 @@ public class HelloWorldResource {
 		Resource[] storeResources;
 		storeResources = Activator.instance().getStore().getRepository()
 				.getResources();
-
 		
 
 		String output = "";
 		for (Resource res: storeResources) {
 			output += res.getId() + "\n";
+			
+			Capability[] caps =  res.getCapabilities("package");
+			for(Capability cap: caps) {
+				Property[] props = cap.getProperties();
+				for(Property prop: props) {
+					output += "Pack cap: " + prop.getName() + " " + prop.getValue() +"\n";
+				}
+			}
+			Requirement[] reqs  = res.getRequirements("package");
+			for(Requirement req: reqs) {
+			
+				output += "Pack req: " + req.getName() + " " + req.getFilter() +"\n";
+
+			}
+			
 		}
 		return output;
 

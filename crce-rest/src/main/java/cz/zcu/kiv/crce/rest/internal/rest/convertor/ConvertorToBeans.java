@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.AttributeBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.CapabilityBean;
@@ -165,13 +167,96 @@ public class ConvertorToBeans {
 		
 		
 	}
+	
+	
 
+	//TODO : implement filterName filtration
+	/**
+	 * Add all capabilities with package wiring to the resource
+	 * 
+	 * @param capabilities
+	 *            list of capabilities of the resourceBean
+	 * @param resource
+	 *            resource
+	 * @param filterName
+	 *            if is not null, capabilities only with this name should be
+	 *            added to the list. If is null, all capabilities should be
+	 *            added to the list.
+	 */
+	private void addCapabilityWirings(List<CapabilityBean> capabilities, Resource resource, String filterName) {
+		Capability[] caps =  resource.getCapabilities("package");
+		for (Capability cap : caps) {
+
+			CapabilityBean newCapBean = new CapabilityBean();
+			List<AttributeBean> attributes = new ArrayList<AttributeBean>();
+			newCapBean.setNamespace("osgi.wiring.package");
+
+			// package attribute
+			Property packageProp = cap.getProperty("package");
+			if (packageProp != null) {
+				AttributeBean packAtr = new AttributeBean();
+				packAtr.setName("osgi.wiring.package");
+				packAtr.setValue(packageProp.getValue());
+				attributes.add(packAtr);
+			}
+
+			// version attribute
+			Property versionProp = cap.getProperty("version");
+			if (versionProp != null) {
+				AttributeBean versAtr = new AttributeBean();
+				versAtr.setName("version");
+				versAtr.setType("Version");
+				versAtr.setValue(versionProp.getValue());
+				attributes.add(versAtr);
+			}
+
+			newCapBean.setAttributes(attributes);
+			capabilities.add(newCapBean);
+
+		}
+	}
+	
+	//TODO : implement filterName filtration
+	/**
+	 * Add all requirements with package wiring to the resource
+	 * 
+	 * @param requirements
+	 *            list of requirements of the resourceBean
+	 * @param resource
+	 *            resource
+	 * @param filterName
+	 *            if is not null, requirements only with this name should be
+	 *            added to the list. If is null, all requirements should be
+	 *            added to the list.
+	 */
+	private void addRequirementWirings(List<RequirementBean> requirements, Resource resource, String filterName) {
+		
+		Requirement[] reqs  = resource.getRequirements("package");
+		for(Requirement req: reqs) {
+
+			RequirementBean newReqBean = new RequirementBean();
+			List<AttributeBean> directives = new ArrayList<AttributeBean>();
+			newReqBean.setNamespace("osgi.wiring.package");
+
+			AttributeBean dir = new AttributeBean();
+			dir.setName(req.getName());
+			dir.setValue(req.getFilter());
+			directives.add(dir);
+
+			newReqBean.setDirectives(directives);
+			requirements.add(newReqBean);
+
+		}
+	}
+	
+	
+	
 	/**
 	 * Convert {@link Resource} to {@link ResourceBean}.
 	 * @param resource resource
 	 * @return converted resource
 	 */
-	public ResourceBean convertResource(Resource resource) {
+	public ResourceBean convertResource(Resource resource, IncludeMetadata include) {
 		
 		ResourceBean newBean = new ResourceBean();
 		
@@ -180,9 +265,17 @@ public class ConvertorToBeans {
 		List<CapabilityBean> caps = new ArrayList<CapabilityBean>();
 		List<RequirementBean> reqs = new ArrayList<RequirementBean>();	
 
+		if(include.isIncludeCore()) {
+			caps.add(getOsgiIdentity(resource));
+			caps.add(getOsgiContent(resource));
+		}
 		
-		caps.add(getOsgiIdentity(resource));
-		caps.add(getOsgiContent(resource));		
+		if(include.isIncludeCaps()) {
+			addCapabilityWirings(caps, resource, include.getIncludeCapseByName());
+		}
+		if(include.isIncludeReqs()) {
+			addRequirementWirings(reqs, resource, include.getIncludeReqsByName());
+		}
 		
 		newBean.setCapabilities(caps);
 		newBean.setRequirements(reqs);

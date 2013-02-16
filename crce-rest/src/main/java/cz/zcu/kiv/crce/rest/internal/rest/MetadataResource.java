@@ -22,6 +22,7 @@ import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean;
 import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
+import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 
 /**
  * Server will provide a metadata information about resources in the repository.
@@ -56,7 +57,7 @@ public class MetadataResource {
 	 * @param resources array of resources
 	 * @return Object with metadata from array of resources, that is ready to XML export using JAXB. 
 	 */
-	private RepositoryBean metadataFromResources(Resource[] resources) {
+	private RepositoryBean metadataFromResources(Resource[] resources, IncludeMetadata include) {
  
 		ConvertorToBeans conv = new ConvertorToBeans();
 		
@@ -64,7 +65,7 @@ public class MetadataResource {
 		List<ResourceBean> resourceBeans = new ArrayList<>();
 		
 		for(Resource res: resources) {
-			resourceBeans.add(conv.convertResource(res));
+			resourceBeans.add(conv.convertResource(res, include));
 		}
 		
 		repositoryBean.setResources(resourceBeans);
@@ -81,8 +82,41 @@ public class MetadataResource {
 	 */
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public Response getMetadata(@QueryParam("filter") String filter) {
+    public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
     	Resource[] storeResources;
+    	
+    	IncludeMetadata include = new IncludeMetadata();
+    	
+    	if(core == null && cap == null && req == null && prop == null) {
+    		//include all
+    		include.setIncludeCore(true);
+    		include.setIncludeCaps(true);
+    		include.setIncludeReqs(true);
+    		include.setIncludeProps(true);
+    	} else {
+    		if(core != null) {
+    			include.setIncludeCore(true);
+    		}
+    		if(cap != null) {
+    			include.setIncludeCaps(true);
+    			if(cap.length() > 0) {
+    				include.setIncludeCapseByName(cap);
+    			}
+    		}
+    		if(req != null) {
+    			include.setIncludeReqs(true);
+    			if(req.length() > 0) {
+    				include.setIncludeReqsByName(req);
+    			}
+    		}
+    		if(prop != null) {
+    			include.setIncludeProps(true);
+    			if(prop.length() > 0) {
+    				include.setIncludePropsByName(prop);
+    			}
+    		}
+    	}   	
+    	
     	
     	try {
         	if(filter != null) {
@@ -92,7 +126,7 @@ public class MetadataResource {
         	}
     		
 			if(storeResources.length > 0) {
-				RepositoryBean repositoryBean = metadataFromResources(storeResources);
+				RepositoryBean repositoryBean = metadataFromResources(storeResources, include);
 				return Response.ok(createXML(repositoryBean)).build();
 			} else {
 				return Response.status(404).build();
@@ -116,7 +150,40 @@ public class MetadataResource {
      */
     @GET @Path("{id}")
     @Produces({MediaType.APPLICATION_XML })
-    public Response getMetadataById(@PathParam("id") String id) {
+    public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
+    	
+    	IncludeMetadata include = new IncludeMetadata();
+    	
+    	if(core == null && cap == null && req == null && prop == null) {
+    		//include all
+    		include.setIncludeCore(true);
+    		include.setIncludeCaps(true);
+    		include.setIncludeReqs(true);
+    		include.setIncludeProps(true);
+    	} else {
+    		if(core != null) {
+    			include.setIncludeCore(true);
+    		}
+    		if(cap != null) {
+    			include.setIncludeCaps(true);
+    			if(cap.length() > 0) {
+    				include.setIncludeCapseByName(cap);
+    			}
+    		}
+    		if(req != null) {
+    			include.setIncludeReqs(true);
+    			if(req.length() > 0) {
+    				include.setIncludeReqsByName(req);
+    			}
+    		}
+    		if(prop != null) {
+    			include.setIncludeProps(true);
+    			if(prop.length() > 0) {
+    				include.setIncludePropsByName(prop);
+    			}
+    		}
+    	}
+    	
     	try {
 			Resource[] storeResources;
 			String filter = "(id="+id+")";
@@ -124,7 +191,7 @@ public class MetadataResource {
 			
 	    	try {
 				if(storeResources.length > 0) {
-					RepositoryBean repositoryBean = metadataFromResources(storeResources);
+					RepositoryBean repositoryBean = metadataFromResources(storeResources, include);
 					return Response.ok(createXML(repositoryBean)).build();
 				} else {
 					//no resource was found
