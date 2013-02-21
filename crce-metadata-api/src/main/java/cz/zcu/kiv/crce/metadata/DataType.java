@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.metadata;
 
+import javax.annotation.Nonnull;
+
 /**
  *
  * @param <T> 
@@ -7,7 +9,9 @@ package cz.zcu.kiv.crce.metadata;
  */
 public interface DataType<T> {
 
+    @Nonnull
     public String getName();
 
+    @Nonnull
     public Class<T> getType();
 }

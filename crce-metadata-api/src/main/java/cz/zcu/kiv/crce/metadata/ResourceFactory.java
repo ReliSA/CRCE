@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.net.URI;
 
+import javax.annotation.Nonnull;
+
 /**
  * Creates empty OBR entities.
  * 
@@ -13,6 +15,7 @@ public interface ResourceFactory {
      * Creates an empty resource.
      * @return An empty resource.
      */
+    @Nonnull
     Resource createResource();
     
     /**
@@ -29,30 +32,36 @@ public interface ResourceFactory {
      * @param resource Resource to be clonned.
      * @return deep copy of resource.
      */
-    Resource createResource(Resource resource);
+    @Nonnull
+    Resource cloneResource(@Nonnull Resource resource);
     
     /**
      * Creates an empty capability with given name.
      * @param namespace Name of created capability.
      * @return An empty capability.
      */
-    Capability createCapability(String namespace);
+    @Nonnull
+    Capability cloneCapability(@Nonnull String namespace);
     
     /**
      * Creates an empty requirement with given name.
      * @param namespace Name of created requirement.
      * @return An empty capability.
      */
-    Requirement createRequirement(String namespace);
+    @Nonnull
+    Requirement createRequirement(@Nonnull String namespace);
 
     /**
      * TODO
      * @param uri 
      * @return 
      */
+    @Nonnull
     WritableRepository createRepository(URI uri);
 
     /**
+     * TODO see {@link Resolver} comment.
+     * 
      * Creates a resolver for the given repositories.
      * @param repository
      * @return 

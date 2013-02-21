@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.metadata;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Extends read-only <code>Repository</code> interface to support of modyfing
  * operations.
@@ -17,7 +20,7 @@ public interface WritableRepository extends Repository {
      * @param resource A resource to be added to the repository.
      * @return <code>true</code> if resource was added to the repository.
      */
-    public boolean addResource(Resource resource);
+    public boolean addResource(@Nonnull Resource resource);
     
     /**
      * Tries to add a resource to the repository. If repository already contains
@@ -36,7 +39,8 @@ public interface WritableRepository extends Repository {
      * @return Previously contained resource with the same symbolic name and
      * version.
      */
-    public Resource addResource(Resource resource, boolean force);
+    @Nullable
+    public Resource addResource(@Nonnull Resource resource, boolean force);
     
     /**
      * Removes the resource from repository and returns <code>true</code>, if the
@@ -47,6 +51,6 @@ public interface WritableRepository extends Repository {
      * @return <code>true</code>, if the repository contained the resource
      * before removing.
      */
-    public boolean removeResource(Resource resource);
+    public boolean removeResource(@Nonnull Resource resource);
 
 }

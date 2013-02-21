@@ -2,6 +2,9 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 /**
  * Resource represents an artifact and it's OBR metadata.
  * 
@@ -13,33 +16,43 @@ import java.util.List;
  */
 public interface Resource extends AttributeProvider {
 
-    Repository getRepository();
+    @CheckForNull
+    public Repository getRepository();
 
-    List<Capability> getCapabilities();
+    @Nonnull
+    public List<Capability> getCapabilities();
 
-    List<Capability> getCapabilities(String namespace);
+    @Nonnull
+    public List<Capability> getRootCapabilities();
 
-    List<Requirement> getRequirements();
+    @Nonnull
+    public List<Capability> getCapabilities(@Nonnull String namespace);
 
-    List<Requirement> getRequirements(String namespace);
+    @Nonnull
+    public List<Requirement> getRequirements();
+
+    @Nonnull
+    public List<Requirement> getRequirements(@Nonnull String namespace);
     
-    boolean hasCapability(Capability capability);
+    public boolean hasCapability(@Nonnull Capability capability);
 
-    boolean hasRequirement(Requirement requirement);
+    public boolean hasRequirement(@Nonnull Requirement requirement);
     
     /* --- setters --- */
 
-    void addCapability(Capability capability);
+    public void addCapability(@Nonnull Capability capability);
 
-    void addRequirement(Requirement requirement);
+    public void addRequirement(@Nonnull Requirement requirement);
 
-    void removeCapability(Capability capability);
+    public void removeCapability(@Nonnull Capability capability);
     
-    void removeRequirement(Requirement requirement);
+    public void removeRequirement(@Nonnull Requirement requirement);
     
-    Capability createCapability(String namespace);
+    @Nonnull
+    public Capability createCapability(@Nonnull String namespace);
 
-    Requirement createRequirement(String namespace);
+    @Nonnull
+    public Requirement createRequirement(@Nonnull String namespace);
 
-    void setRepository(WritableRepository repository);
+    public void setRepository(@Nonnull WritableRepository repository);
 }
