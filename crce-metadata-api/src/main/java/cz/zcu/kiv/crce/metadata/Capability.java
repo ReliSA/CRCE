@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Represents an Capability.
@@ -13,18 +14,20 @@ import javax.annotation.Nonnull;
 public interface Capability extends AttributeProvider, DirectiveProvider {
 
     @Nonnull
-    public String getNamespace();
+    String getNamespace();
 
     @CheckForNull
-    public Resource getResource();
+    Resource getResource();
 
     @CheckForNull
-    public Capability getParent();
-
-    public void addChild(@Nonnull Capability capability);
+    Capability getParent();
     
-    public void removeChild(@Nonnull Capability capability);
+    boolean setParent(@Nullable Capability parent);
+
+    boolean addChild(@Nonnull Capability capability);
+    
+    boolean removeChild(@Nonnull Capability capability);
     
     @Nonnull
-    public List<Capability> getChildren();
+    List<Capability> getChildren();
 }

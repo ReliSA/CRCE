@@ -20,7 +20,7 @@ public interface WritableRepository extends Repository {
      * @param resource A resource to be added to the repository.
      * @return <code>true</code> if resource was added to the repository.
      */
-    public boolean addResource(@Nonnull Resource resource);
+    boolean addResource(@Nonnull Resource resource);
     
     /**
      * Tries to add a resource to the repository. If repository already contains
@@ -40,7 +40,7 @@ public interface WritableRepository extends Repository {
      * version.
      */
     @Nullable
-    public Resource addResource(@Nonnull Resource resource, boolean force);
+    Resource addResource(@Nonnull Resource resource, boolean force);
     
     /**
      * Removes the resource from repository and returns <code>true</code>, if the
@@ -51,6 +51,6 @@ public interface WritableRepository extends Repository {
      * @return <code>true</code>, if the repository contained the resource
      * before removing.
      */
-    public boolean removeResource(@Nonnull Resource resource);
+    boolean removeResource(@Nonnull Resource resource);
 
 }

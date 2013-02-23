@@ -17,42 +17,42 @@ import javax.annotation.Nonnull;
 public interface Resource extends AttributeProvider {
 
     @CheckForNull
-    public Repository getRepository();
+    Repository getRepository();
 
     @Nonnull
-    public List<Capability> getCapabilities();
+    List<Capability> getCapabilities();
 
     @Nonnull
-    public List<Capability> getRootCapabilities();
+    List<Capability> getRootCapabilities();
 
     @Nonnull
-    public List<Capability> getCapabilities(@Nonnull String namespace);
+    List<Capability> getCapabilities(@Nonnull String namespace);
 
     @Nonnull
-    public List<Requirement> getRequirements();
+    List<Requirement> getRequirements();
 
     @Nonnull
-    public List<Requirement> getRequirements(@Nonnull String namespace);
+    List<Requirement> getRequirements(@Nonnull String namespace);
     
-    public boolean hasCapability(@Nonnull Capability capability);
+    boolean hasCapability(@Nonnull Capability capability);
 
-    public boolean hasRequirement(@Nonnull Requirement requirement);
+    boolean hasRequirement(@Nonnull Requirement requirement);
     
     /* --- setters --- */
 
-    public void addCapability(@Nonnull Capability capability);
+    void addCapability(@Nonnull Capability capability);
 
-    public void addRequirement(@Nonnull Requirement requirement);
+    void addRequirement(@Nonnull Requirement requirement);
 
-    public void removeCapability(@Nonnull Capability capability);
+    void removeCapability(@Nonnull Capability capability);
     
-    public void removeRequirement(@Nonnull Requirement requirement);
+    void removeRequirement(@Nonnull Requirement requirement);
     
     @Nonnull
-    public Capability createCapability(@Nonnull String namespace);
+    Capability createCapability(@Nonnull String namespace);
 
     @Nonnull
-    public Requirement createRequirement(@Nonnull String namespace);
+    Requirement createRequirement(@Nonnull String namespace);
 
-    public void setRepository(@Nonnull WritableRepository repository);
+    void setRepository(@Nonnull WritableRepository repository);
 }

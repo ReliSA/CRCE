@@ -12,12 +12,12 @@ import javax.annotation.Nonnull;
 public interface DirectiveProvider {
 
     @CheckForNull
-    public String getDirective(@Nonnull String name);
+    String getDirective(@Nonnull String name);
 
     @Nonnull
-    public Map<String, String> getDirectives();
+    Map<String, String> getDirectives();
 
-    public void setDirective(@Nonnull String name, @Nonnull String directive);
+    boolean setDirective(@Nonnull String name, @Nonnull String directive);
     
-    public void unsetDirective(@Nonnull String name);
+    boolean unsetDirective(@Nonnull String name);
 }

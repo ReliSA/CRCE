@@ -9,7 +9,7 @@ package cz.zcu.kiv.crce.metadata;
  */
 public interface Resolver {
 
-    public boolean isSatisfied(Capability capability);
+    boolean isSatisfied(Capability capability);
 
     // 
     

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Represents a requirement to a capability with the same name.
@@ -13,14 +14,20 @@ import javax.annotation.Nonnull;
 public interface Requirement extends AttributeProvider, DirectiveProvider {
 
     @Nonnull
-    public String getNamespace();
+    String getNamespace();
 
+    @CheckForNull
+    Resource getResource();
+    
+    @CheckForNull
+    Requirement getParent();
+    
+    boolean setParent(@Nullable Requirement parent);
+
+    boolean addChild(@Nonnull Requirement capability);
+    
+    boolean removeChild(@Nonnull Requirement capability);
+    
     @Nonnull
-    public List<Requirement> getChildren();
-    
-    @CheckForNull
-    public Requirement getParent();
-    
-    @CheckForNull
-    public Resource getResource();
+    List<Requirement> getChildren();
 }

@@ -10,8 +10,8 @@ import javax.annotation.Nonnull;
 public interface DataType<T> {
 
     @Nonnull
-    public String getName();
+    String getName();
 
     @Nonnull
-    public Class<T> getType();
+    Class<T> getType();
 }

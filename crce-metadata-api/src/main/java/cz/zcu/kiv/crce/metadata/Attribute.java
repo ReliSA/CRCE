@@ -10,11 +10,11 @@ import javax.annotation.Nonnull;
 public interface Attribute<T> {
 
     @Nonnull
-    public T getValue();
+    T getValue();
     
     @Nonnull
-    public String getStringValue();
+    String getStringValue();
     
     @Nonnull
-    public DataType<T> getDataType();
+    DataType<T> getDataType();
 }

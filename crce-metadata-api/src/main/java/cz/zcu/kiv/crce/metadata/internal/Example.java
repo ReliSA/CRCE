@@ -13,6 +13,7 @@ import cz.zcu.kiv.crce.metadata.SimpleDataType;
  * 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(value={"DLS_DEAD_LOCAL_STORE", "NP_ALWAYS_NULL"}, justification="Just a non-runnable example.")
 public class Example {
 
     private static final DataType<Long> ATTRIBUTE_A = new SimpleDataType<>("long.attribute", Long.class);
