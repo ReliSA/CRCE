@@ -14,23 +14,23 @@ import javax.annotation.Nonnull;
 public interface AttributeProvider {
 
     @CheckForNull
-    <T> Attribute<T> getAttribute(@Nonnull DataType<T> t);
+    <T> Attribute<T> getAttribute(@Nonnull AttributeType<T> t);
 
     @CheckForNull
-    <T> T getAttributeValue(@Nonnull DataType<T> attribute);
+    <T> T getAttributeValue(@Nonnull AttributeType<T> attribute);
     
     @CheckForNull
-    String getAttributeStringValue(@Nonnull String name);
+    <T> String getAttributeStringValue(@Nonnull AttributeType<T> attribute);
 
-    <T> boolean setAttribute(@Nonnull DataType<T> attribute, @Nonnull T value);
+    <T> boolean setAttribute(@Nonnull AttributeType<T> attribute, @Nonnull T value);
     
     <T> boolean setAttribute(@Nonnull Attribute<T> attribute);
 
     <T> boolean unsetAttribute(@Nonnull Attribute<T> attribute);
     
     @Nonnull
-    List<Attribute<?>> getAttributes();
+    List<? extends Attribute<?>> getAttributes();
 
     @Nonnull
-    Map<DataType<?>, Attribute<?>> getAttributesMap();
+    Map<AttributeType<?>, ? extends Attribute<?>> getAttributesMap();
 }

@@ -3,18 +3,14 @@ package cz.zcu.kiv.crce.metadata;
 import javax.annotation.Nonnull;
 
 /**
- * 
+ *
  * @param <T> 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Attribute<T> {
+public interface MatchingAttribute<T> extends Attribute<T> {
 
-    @Nonnull
-    T getValue();
+    void setOperator(@Nonnull Operator operator);
     
     @Nonnull
-    String getStringValue();
-    
-    @Nonnull
-    AttributeType<T> getAttributeType();
+    Operator getOperator();
 }

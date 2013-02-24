@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
  * @param <T> 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface DataType<T> {
+public interface AttributeType<T> {
 
     @Nonnull
     String getName();

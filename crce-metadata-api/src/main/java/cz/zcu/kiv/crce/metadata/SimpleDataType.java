@@ -5,7 +5,7 @@ package cz.zcu.kiv.crce.metadata;
  * @param <T> Data type of property.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class SimpleDataType<T> implements DataType<T> {
+public class SimpleDataType<T> implements AttributeType<T> {
 
     private String name;
     private Class<T> type;

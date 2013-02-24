@@ -10,6 +10,10 @@ import org.osgi.framework.InvalidSyntaxException;
  * Represents a set of resources. Repository can be assigned to a physical URI
  * which resources are stored on, but it does not manage physical content.
  * 
+ * TODO Repository (and WritableRepository) would be either merged with RepositoryDAO and ResourceDAO,
+ * or leaved as just a repository descriptor without possibility to manipulate with resources,
+ * or placed to independent API as a service layer.
+ * 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Repository {
