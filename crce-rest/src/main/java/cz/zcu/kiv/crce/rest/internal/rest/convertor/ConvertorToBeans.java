@@ -5,17 +5,18 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.AttributeBean;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.CapabilityBean;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.RequirementBean;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Tattribute;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Tcapability;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Tdirective;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Trequirement;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
 
 /**
  * Convert cz.zcu.kiv.crce.metadata.Resource to bean classes with JAXB annotations.
@@ -102,42 +103,41 @@ public class ConvertorToBeans {
 	}
 	
 	/**
-	 * Add a new attribute to the list of attributes.
+	 * Add a new attribute to the list of objects.
 	 * Attribute can contains name, type or value.
 	 * These tree are obligatory, if you don't want any of them, set parameter to null.
 	 * 
-	 * @param attributes list of attributes, new attribute will be add to this list.
+	 * @param list list of objects (attributtes, capabilities, directives)
 	 * @param name name or null
 	 * @param type type or null
 	 * @param value value or null
 	 */
-	private void addToAttribute(List<AttributeBean> attributes, String name, String type, String value) {
+	private void addAttribute(List<Object> list, String name, String type, String value) {
 		
-		AttributeBean newAttributte = new AttributeBean();
+		Tattribute newAttributte = new Tattribute();
 		
 		if(name != null) newAttributte.setName(name);
 		if(type != null) newAttributte.setType(type);
 		if(value != null) newAttributte.setValue(value);
 		
-		attributes.add(newAttributte);
+		list.add(newAttributte);
 				
 	}
 	
 	/**
 	 * Get CapabilityBean with osgi.identity.
 	 * @param resource resource
-	 * @return CapabilityBean with osgi.identity
+	 * @return capability with osgi.identity
 	 */
-	private CapabilityBean getOsgiIdentity(Resource resource) {
+	private Tcapability getOsgiIdentity(Resource resource) {
 		
-		CapabilityBean osgiIdentity= new CapabilityBean();
+		Tcapability osgiIdentity= new Tcapability();
 		osgiIdentity.setNamespace("osgi.identity");
-		List<AttributeBean> osgiIdentityAttrs = new ArrayList<AttributeBean>();
+		List<Object> osgiIdentityAttrs = osgiIdentity.getDirectiveOrAttributeOrCapability();
 		
-		addToAttribute(osgiIdentityAttrs, "osgi.identity", null, resource.getSymbolicName());
-		addToAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
+		addAttribute(osgiIdentityAttrs, "name", null, resource.getSymbolicName());
+		addAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
 		
-		osgiIdentity.setAttributes(osgiIdentityAttrs);
 		
 		return osgiIdentity;
 	}
@@ -147,21 +147,20 @@ public class ConvertorToBeans {
 	/**
 	 * Get CapabilitiBean with osgi.content
 	 * @param resource resource 
-	 * @return CapabilitiBean with osgi.content
+	 * @return capability with osgi.content
 	 */
-	private CapabilityBean getOsgiContent(Resource resource) {
+	private Tcapability getOsgiContent(Resource resource) {
 		
-		CapabilityBean osgiContent = new CapabilityBean();
+		Tcapability osgiContent = new Tcapability();
 		osgiContent.setNamespace("osgi.content");
-		List<AttributeBean> attributes = new ArrayList<AttributeBean>();
+		List<Object> attributes = osgiContent.getDirectiveOrAttributeOrCapability();
 		
-		addToAttribute(attributes, "osgi.content", null, getSHA(resource));
-		addToAttribute(attributes, "url", null, getURL(resource));
-		addToAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
-		addToAttribute(attributes, "mime", null, "not implemented yet");
-		addToAttribute(attributes, "crce.original-file-name", null, getFileName(resource));
+		addAttribute(attributes, "hash", null, getSHA(resource));
+		addAttribute(attributes, "url", null, getURL(resource));
+		addAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
+		addAttribute(attributes, "mime", null, "not implemented yet");
+		addAttribute(attributes, "crce.original-file-name", null, getFileName(resource));
 		
-		osgiContent.setAttributes(attributes);
 		
 		return osgiContent;
 		
@@ -183,19 +182,19 @@ public class ConvertorToBeans {
 	 *            added to the list. If is null, all capabilities should be
 	 *            added to the list.
 	 */
-	private void addCapabilityWirings(List<CapabilityBean> capabilities, Resource resource, String filterName) {
+	private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource, String filterName) {
 		Capability[] caps =  resource.getCapabilities("package");
 		for (Capability cap : caps) {
 
-			CapabilityBean newCapBean = new CapabilityBean();
-			List<AttributeBean> attributes = new ArrayList<AttributeBean>();
+			Tcapability newCapBean = new Tcapability();
+			List<Object> attributes = newCapBean.getDirectiveOrAttributeOrCapability();
 			newCapBean.setNamespace("osgi.wiring.package");
 
 			// package attribute
 			Property packageProp = cap.getProperty("package");
 			if (packageProp != null) {
-				AttributeBean packAtr = new AttributeBean();
-				packAtr.setName("osgi.wiring.package");
+				Tattribute packAtr = new Tattribute();
+				packAtr.setName("name");
 				packAtr.setValue(packageProp.getValue());
 				attributes.add(packAtr);
 			}
@@ -203,14 +202,13 @@ public class ConvertorToBeans {
 			// version attribute
 			Property versionProp = cap.getProperty("version");
 			if (versionProp != null) {
-				AttributeBean versAtr = new AttributeBean();
+				Tattribute versAtr = new Tattribute();
 				versAtr.setName("version");
 				versAtr.setType("Version");
 				versAtr.setValue(versionProp.getValue());
 				attributes.add(versAtr);
 			}
 
-			newCapBean.setAttributes(attributes);
 			capabilities.add(newCapBean);
 
 		}
@@ -229,21 +227,20 @@ public class ConvertorToBeans {
 	 *            added to the list. If is null, all requirements should be
 	 *            added to the list.
 	 */
-	private void addRequirementWirings(List<RequirementBean> requirements, Resource resource, String filterName) {
+	private void addRequirementWirings(List<Trequirement> requirements, Resource resource, String filterName) {
 		
 		Requirement[] reqs  = resource.getRequirements("package");
 		for(Requirement req: reqs) {
 
-			RequirementBean newReqBean = new RequirementBean();
-			List<AttributeBean> directives = new ArrayList<AttributeBean>();
+			Trequirement newReqBean = new Trequirement();
+			List<Object> directives = newReqBean.getDirectiveOrAttributeOrRequirement();
 			newReqBean.setNamespace("osgi.wiring.package");
 
-			AttributeBean dir = new AttributeBean();
-			dir.setName(req.getName());
+			Tdirective dir = new Tdirective();
+			dir.setName("filter");
 			dir.setValue(req.getFilter());
 			directives.add(dir);
 
-			newReqBean.setDirectives(directives);
 			requirements.add(newReqBean);
 
 		}
@@ -256,14 +253,14 @@ public class ConvertorToBeans {
 	 * @param resource resource
 	 * @return converted resource
 	 */
-	public ResourceBean convertResource(Resource resource, IncludeMetadata include) {
+	public Tresource convertResource(Resource resource, IncludeMetadata include) {
 		
-		ResourceBean newBean = new ResourceBean();
+		Tresource newResource = new Tresource();
 		
-		newBean.setCrceId(resource.getId());
+		newResource.setId(resource.getId());
 		
-		List<CapabilityBean> caps = new ArrayList<CapabilityBean>();
-		List<RequirementBean> reqs = new ArrayList<RequirementBean>();	
+		List<Tcapability> caps = newResource.getCapability();
+		List<Trequirement> reqs = newResource.getRequirement();
 
 		if(include.isIncludeCore()) {
 			caps.add(getOsgiIdentity(resource));
@@ -277,9 +274,26 @@ public class ConvertorToBeans {
 			addRequirementWirings(reqs, resource, include.getIncludeReqsByName());
 		}
 		
-		newBean.setCapabilities(caps);
-		newBean.setRequirements(reqs);
 		
-		return newBean;
+		return newResource;
 	}
+	
+	/**
+	 * Prepare RepositoryBean, that will contains metadata from array of resources.
+	 * @param resources array of resources
+	 * @return Object with metadata from array of resources, that is ready to XML export using JAXB. 
+	 */
+	public Trepository convertRepository(Resource[] resources, IncludeMetadata include) {
+ 
+		
+		Trepository repositoryBean = new Trepository();
+		List<Tresource> resourceBeans = repositoryBean.getResource();
+		
+		for(Resource res: resources) {
+			resourceBeans.add(convertResource(res, include));
+		}
+
+		return repositoryBean;
+	}
+
 }

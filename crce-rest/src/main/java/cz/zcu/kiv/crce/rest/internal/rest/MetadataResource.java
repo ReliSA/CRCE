@@ -1,9 +1,5 @@
 package cz.zcu.kiv.crce.rest.internal.rest;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -11,18 +7,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.osgi.framework.InvalidSyntaxException;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.RepositoryBean;
-import cz.zcu.kiv.crce.rest.internal.rest.bean.ResourceBean;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
+import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
 
 /**
  * Server will provide a metadata information about resources in the repository.
@@ -32,46 +25,7 @@ import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 @Path("/metadata")
 public class MetadataResource {
 
-    /**
-     * Create XML String from repository.
-     * @param repositoryBean repository contains metadata about resources
-     * @return XML String with exported metadata
-     * @throws JAXBException XML export failed
-     */
-	private String createXML(RepositoryBean repositoryBean) throws JAXBException{
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ClassLoader cl = cz.zcu.kiv.crce.rest.internal.rest.bean.ObjectFactory.class.getClassLoader();
-		JAXBContext jc = JAXBContext.newInstance("cz.zcu.kiv.crce.rest.internal.rest.bean", cl);
-
-		Marshaller m = jc.createMarshaller();
-		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		m.marshal(repositoryBean, baos);
-		
-		return baos.toString();
-
-	}
-	
-	/**
-	 * Prepare RepositoryBean, that will contains metadata from array of resources.
-	 * @param resources array of resources
-	 * @return Object with metadata from array of resources, that is ready to XML export using JAXB. 
-	 */
-	private RepositoryBean metadataFromResources(Resource[] resources, IncludeMetadata include) {
- 
-		ConvertorToBeans conv = new ConvertorToBeans();
-		
-		RepositoryBean repositoryBean = new RepositoryBean();
-		List<ResourceBean> resourceBeans = new ArrayList<>();
-		
-		for(Resource res: resources) {
-			resourceBeans.add(conv.convertResource(res, include));
-		}
-		
-		repositoryBean.setResources(resourceBeans);
-
-		return repositoryBean;
-	}
+    
 	
 	/**
 	 * Returns XML with metadata of resources from the store repository.
@@ -126,8 +80,9 @@ public class MetadataResource {
         	}
     		
 			if(storeResources.length > 0) {
-				RepositoryBean repositoryBean = metadataFromResources(storeResources, include);
-				return Response.ok(createXML(repositoryBean)).build();
+				ConvertorToBeans conv = new ConvertorToBeans();
+				Trepository repository = conv.convertRepository(storeResources, include);
+				return Response.ok(MetadataCreator.createXML(repository)).build();
 			} else {
 				return Response.status(404).build();
 			}
@@ -191,8 +146,9 @@ public class MetadataResource {
 			
 	    	try {
 				if(storeResources.length > 0) {
-					RepositoryBean repositoryBean = metadataFromResources(storeResources, include);
-					return Response.ok(createXML(repositoryBean)).build();
+					ConvertorToBeans conv = new ConvertorToBeans();
+					Trepository repository = conv.convertRepository(storeResources, include);
+					return Response.ok(MetadataCreator.createXML(repository)).build();
 				} else {
 					//no resource was found
 					return Response.status(404).build();
