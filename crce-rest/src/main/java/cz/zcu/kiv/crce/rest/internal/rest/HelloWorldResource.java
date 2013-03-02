@@ -1,9 +1,12 @@
 package cz.zcu.kiv.crce.rest.internal.rest;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -63,6 +66,18 @@ public class HelloWorldResource {
 		}
 		return output;
 
+	}
+	
+	@POST
+	@Path("/post")
+	@Consumes(MediaType.APPLICATION_XML)
+	public Response createTrackInJSON(String track) {
+ 
+		String result = "Post with repository accepted : " + track;
+		System.out.println(result);
+		
+		return Response.status(201).entity(result).build();
+ 
 	}
 
 }

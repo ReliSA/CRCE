@@ -7,10 +7,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
 
-public class MetadataCreator {
+public class Utils {
 	
 	/**
      * Create XML String from repository.
@@ -34,6 +35,28 @@ public class MetadataCreator {
 		
 		return baos.toString();
 
+	}
+	
+	/**
+	 * Select from array of resources the one with highest version
+	 * @param storeResources array of resources
+	 * @return resource with highest version
+	 */
+	public static Resource resourceWithHighestVersion(Resource[] storeResources) {		
+		
+		
+		if(storeResources.length < 1) {
+			return null;
+		}
+		Resource resourceWithHighestVersion = storeResources[0];
+		
+		for(Resource res: storeResources) {
+			if(resourceWithHighestVersion.getVersion().compareTo(res.getVersion()) < 0) {
+				resourceWithHighestVersion = res;
+			}
+		}
+		
+		return resourceWithHighestVersion;
 	}
 	
 

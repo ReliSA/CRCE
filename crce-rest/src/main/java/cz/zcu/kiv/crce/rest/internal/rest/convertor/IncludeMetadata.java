@@ -21,6 +21,9 @@ public class IncludeMetadata {
 	private boolean includeProps;
 	private String includePropsByName;
 	
+	/**
+	 * At default, including of each part of metadata is set to false.
+	 */
 	public IncludeMetadata() {
 		includeCore = false;
 		
@@ -77,6 +80,15 @@ public class IncludeMetadata {
 	public void setIncludePropsByName(String includePropsByName) {
 		this.includePropsByName = includePropsByName;
 	}
-	
+	/**
+	 * Include all parts of metadata.
+	 */
+	public void includeAll() {
+		includeCore = true;
+		includeCaps = true;		
+		includeReqs = true;		
+		includeProps = true;
+
+	}
 	
 }

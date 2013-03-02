@@ -93,7 +93,7 @@ public class BundleResource {
 			Resource resource;
 			
 			if(storeResources.length > 1) {
-				resource = resourceWithHighestVersion(storeResources);
+				resource = Utils.resourceWithHighestVersion(storeResources);
 			} else {
 				resource = storeResources[0];
 			}
@@ -175,28 +175,6 @@ public class BundleResource {
 			//bundle was not found
 			return Response.status(404).build();
 		}
-	}
-	
-	/**
-	 * Select from array of resources the one with highest version
-	 * @param storeResources array of resources
-	 * @return resource with highest version
-	 */
-	private Resource resourceWithHighestVersion(Resource[] storeResources) {		
-		
-		
-		if(storeResources.length < 1) {
-			return null;
-		}
-		Resource resourceWithHighestVersion = storeResources[0];
-		
-		for(Resource res: storeResources) {
-			if(resourceWithHighestVersion.getVersion().compareTo(res.getVersion()) < 0) {
-				resourceWithHighestVersion = res;
-			}
-		}
-		
-		return resourceWithHighestVersion;
 	}
 
 

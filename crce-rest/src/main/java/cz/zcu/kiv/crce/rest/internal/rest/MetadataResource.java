@@ -43,10 +43,7 @@ public class MetadataResource {
     	
     	if(core == null && cap == null && req == null && prop == null) {
     		//include all
-    		include.setIncludeCore(true);
-    		include.setIncludeCaps(true);
-    		include.setIncludeReqs(true);
-    		include.setIncludeProps(true);
+    		include.includeAll();
     	} else {
     		if(core != null) {
     			include.setIncludeCore(true);
@@ -82,7 +79,7 @@ public class MetadataResource {
 			if(storeResources.length > 0) {
 				ConvertorToBeans conv = new ConvertorToBeans();
 				Trepository repository = conv.convertRepository(storeResources, include);
-				return Response.ok(MetadataCreator.createXML(repository)).build();
+				return Response.ok(Utils.createXML(repository)).build();
 			} else {
 				return Response.status(404).build();
 			}
@@ -111,10 +108,7 @@ public class MetadataResource {
     	
     	if(core == null && cap == null && req == null && prop == null) {
     		//include all
-    		include.setIncludeCore(true);
-    		include.setIncludeCaps(true);
-    		include.setIncludeReqs(true);
-    		include.setIncludeProps(true);
+    		include.includeAll();
     	} else {
     		if(core != null) {
     			include.setIncludeCore(true);
@@ -148,7 +142,7 @@ public class MetadataResource {
 				if(storeResources.length > 0) {
 					ConvertorToBeans conv = new ConvertorToBeans();
 					Trepository repository = conv.convertRepository(storeResources, include);
-					return Response.ok(MetadataCreator.createXML(repository)).build();
+					return Response.ok(Utils.createXML(repository)).build();
 				} else {
 					//no resource was found
 					return Response.status(404).build();
