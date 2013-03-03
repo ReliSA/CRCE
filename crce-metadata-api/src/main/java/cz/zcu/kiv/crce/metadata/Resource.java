@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
  * 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Resource extends AttributeProvider {
+public interface Resource {
 
     @CheckForNull
     Repository getRepository();

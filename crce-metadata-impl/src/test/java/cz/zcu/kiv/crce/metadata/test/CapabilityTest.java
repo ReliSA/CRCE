@@ -1,13 +1,18 @@
 package cz.zcu.kiv.crce.metadata.test;
 
+import static org.junit.Assert.*;
+
+
+import org.junit.Before;
+import org.junit.Test;
+
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.metadata.Type;
-import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;
-import cz.zcu.kiv.crce.metadata.internal.ResourceCreatorImpl;
-import java.util.HashSet;
-import java.util.Set;
-import org.junit.*;
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
 
 /**
  *
@@ -15,101 +20,112 @@ import org.junit.*;
  */
 public class CapabilityTest {
     
-    private ResourceCreator rc;
+    private ResourceFactory factory;
+    
+    private final AttributeType<String> ATTR_P1 = new SimpleAttributeType<>("p1", String.class);
+    private final AttributeType<Long> ATTR_P2 = new SimpleAttributeType<>("p2", Long.class);
+    private final AttributeType<String> ATTR_P3 = new SimpleAttributeType<>("p3", String.class);
     
     @Before
     public void before(){
-        rc = new ResourceCreatorImpl();
+        factory = new ResourceFactoryImpl();
     }
     
     @Test
-    public void testChain() throws Exception {
-        Capability c = rc.createCapability("a").setProperty("p1", "1").setProperty("p2", 2);
+    public void testSetAttribute() throws Exception {
+        Capability c = factory.createCapability("a");
+        c.setAttribute(ATTR_P1, "1");
+        c.setAttribute(ATTR_P2, 2L);
         
-        assert "a".equals(c.getName());
-        assert "1".equals(c.getProperty("p1").getConvertedValue());
-        assert 2  == (Long) c.getProperty("p2").getConvertedValue();
+        assertEquals("a", c.getNamespace());
+        assertEquals("1", c.getAttributeValue(ATTR_P1));
+        assertEquals(2L, (long) c.getAttributeValue(ATTR_P2));
     }
 
     @Test
-    public void unsetProperty() throws Exception {
-        Capability c = rc.createCapability("a").setProperty("p1", "1").setProperty("p2", 2);
+    public void testUnsetAttribute() throws Exception {
+        Capability c = factory.createCapability("a");
+        c.setAttribute(ATTR_P1, "1");
+        c.setAttribute(ATTR_P2, 2L);
         
-        assert c.getProperty("p1") != null;
-        assert c.getProperty("p2") != null;
+        assertNotNull(c.getAttribute(ATTR_P1));
+        assertNotNull(c.getAttribute(ATTR_P2));
         
-        c.unsetProperty("p1");
+        c.unsetAttribute(ATTR_P1);
         
-        assert c.getProperty("p1") == null;
-        assert c.getProperty("p2") != null;
+        assertNull(c.getAttribute(ATTR_P1));
+        assertNotNull(c.getAttribute(ATTR_P2));
         
-        c.unsetProperty("p2");
+        Attribute<Long> attribute = c.getAttribute(ATTR_P2);
         
-        assert c.getProperty("p1") == null;
-        assert c.getProperty("p2") == null;
+        assertNotNull(attribute);
+        
+        c.unsetAttribute(attribute);
+        
+        assertNull(c.getAttribute(ATTR_P1));
+        assertNull(c.getAttribute(ATTR_P2));
     }
     
     @Test
-    public void uniqueProperties() throws Exception {
-        Capability c1 = rc.createCapability("a");
+    public void testUniqueAttributes() throws Exception {
+        Capability c1 = factory.createCapability("a");
         
-        c1.setProperty("a", "a");
-        assert c1.getProperties().length == 1;
+        c1.setAttribute(ATTR_P1, "a");
+        assertEquals(1, c1.getAttributes().size());
         
-        c1.setProperty("a", "a");
-        assert c1.getProperties().length == 1;
+        c1.setAttribute(ATTR_P1, "a");
+        assertEquals(1, c1.getAttributes().size());
         
-        c1.setProperty("a", "b");
-        assert c1.getProperties().length == 1;
+        c1.setAttribute(ATTR_P1, "b");
+        assertEquals(1, c1.getAttributes().size());
 
-        c1.setProperty("b", "a");
-        assert c1.getProperties().length == 2;
+        c1.setAttribute(ATTR_P3, "a");
+        assertEquals(2, c1.getAttributes().size());
     }
     
     @Test
     public void equals() throws Exception {
-        Capability c1 = rc.createCapability("a");
-        Capability c2 = rc.createCapability("a");
+        Capability c1 = factory.createCapability("a");
+        Capability c2 = factory.createCapability("a");
         
-        assert c1.equals(c2);
+        assertEquals(c1, c2);
         
-        c1.setProperty("p1", "v1");
-        assert !c1.equals(c2);
+        c1.setAttribute(ATTR_P1, "v1");
+        assertNotEquals(c1, c2);
         
-        c2.setProperty(new PropertyImpl("p1", Type.STRING, "v1"));
-        assert c1.equals(c2);
+        
+        c2.setAttribute(ATTR_P1, "v1");
+        assertEquals(c1, c2);
     }
     
     
     @Test
-    public void equalsNames() {
-        Capability c1 = rc.createCapability("cap");
-        Capability c2 = rc.createCapability("cap");
-        Capability c3 = rc.createCapability("cap3");
+    public void testEqualNamespaces() {
+        Capability c1 = factory.createCapability("cap");
+        Capability c2 = factory.createCapability("cap");
+        Capability c3 = factory.createCapability("cap3");
         
-        assert c1.equals(c2);
-        assert !c1.equals(c3);
-        assert !c2.equals(c3);
+        assertEquals(c1, c2);
+        assertNotEquals(c1, c3);
+        assertNotEquals(c2, c3);
     }
     
     @Test
-    public void hashSetContains() throws Exception {
-        Capability c1 = rc.createCapability("a");
-        Capability c2 = rc.createCapability("a");
+    public void testHashSetContains() throws Exception {
+        Capability c1 = factory.createCapability("a");
+        Capability c2 = factory.createCapability("a");
         
-        Set<Capability> set = new HashSet<Capability>();
+        assertNotNull(c1);
+        assertNotNull(c2);
         
-        set.add(c1);
+        assertEquals(c1.hashCode(), c2.hashCode());
         
-        assert set.contains(c1);
-        assert set.contains(c2);
+        c1.setAttribute(ATTR_P1, "p1");
         
-        c1.setProperty("p1", "p1");
-        assert set.contains(c1);
-        assert !set.contains(c2);
+        assertNotEquals(c1.hashCode(), c2.hashCode());
 
-        c2.setProperty("p1", "p1");
-        assert set.contains(c1);
-        assert set.contains(c2);
+        c2.setAttribute(ATTR_P1, "p1");
+        
+        assertEquals(c1.hashCode(), c2.hashCode());
     }
 }

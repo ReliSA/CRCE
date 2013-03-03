@@ -1,124 +1,109 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import cz.zcu.kiv.crce.metadata.Capability;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.MatchingAttribute;
+import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import java.util.regex.Pattern;
-import org.apache.felix.utils.filter.FilterImpl;
-import org.osgi.framework.InvalidSyntaxException;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
 
 /**
  * Implementation of Requirement interface.
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public class RequirementImpl implements Requirement {
+public class RequirementImpl extends AbstractEntityBase implements Requirement {
 
-    private static final Pattern REMOVE_LT = Pattern.compile("\\(([^<>=~()]*)<([^*=]([^\\\\\\*\\(\\)]|\\\\|\\*|\\(|\\))*)\\)");
-    private static final Pattern REMOVE_GT = Pattern.compile("\\(([^<>=~()]*)>([^*=]([^\\\\\\*\\(\\)]|\\\\|\\*|\\(|\\))*)\\)");
-    private static final Pattern REMOVE_NV = Pattern.compile("\\(version>=0.0.0\\)");
-    private String m_name;
-    private boolean m_multiple = false;
-    private boolean m_optional = false;
-    private boolean m_extend = false;
-    private String m_comment = "";
-    private FilterImpl m_filter = null;
-    private boolean m_writable = true;
+    private String namespace = null;
+    private Resource resource = null;
+    private Requirement parent = null;
+    private List<Requirement> nestedRequirements = new ArrayList<>();
 
-    public RequirementImpl(String name) {
-        m_name = name.intern();
-    }
-
-    @Override
-    public String getName() {
-        return m_name;
-    }
-
-    @Override
-    public String getFilter() {
-        return m_filter.toString();
-    }
-
-    @Override
-    public boolean isMultiple() {
-        return m_multiple;
-    }
-
-    @Override
-    public boolean isOptional() {
-        return m_optional;
-    }
-
-    @Override
-    public boolean isExtend() {
-        return m_extend;
-    }
-
-    @Override
-    public String getComment() {
-        return m_comment;
-    }
-
-    @Override
-    public synchronized Requirement setFilter(String filter) {
-        if (isWritable()) {
-            try {
-                String nf = REMOVE_LT.matcher(filter).replaceAll("(!($1>=$2))");
-                nf = REMOVE_GT.matcher(nf).replaceAll("(!($1<=$2))");
-                nf = REMOVE_NV.matcher(nf).replaceAll("");
-                m_filter = FilterImpl.newInstance(nf, true);
-            } catch (InvalidSyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return this;
-    }
-
-    @Override
-    public synchronized Requirement setMultiple(boolean multiple) {
-        if (isWritable()) {
-            m_multiple = multiple;
-        }
-        return this;
-    }
-
-    @Override
-    public synchronized Requirement setOptional(boolean optional) {
-        if (isWritable()) {
-            m_optional = optional;
-        }
-        return this;
-    }
-
-    @Override
-    public synchronized Requirement setExtend(boolean extend) {
-        if (isWritable()) {
-            m_extend = extend;
-        }
-        return this;
-    }
-
-    @Override
-    public synchronized Requirement setComment(String comment) {
-        if (isWritable()) {
-            m_comment = comment;
-        }
-        return this;
-    }
-
-    @Override
-    public synchronized boolean isWritable() {
-        return m_writable;
-    }
-
-    @Override
-    public boolean isSatisfied(Capability capability) {
-        if (capability instanceof CapabilityImpl) {
-            return m_name.equals(capability.getName())
-                    && m_filter.matchCase(((CapabilityImpl) capability).m_map)
-                    && (m_filter.toString().indexOf("(mandatory:<*") >= 0 || ((CapabilityImpl) capability).m_map.get("mandatory:") == null);
-        }
-        throw new UnsupportedOperationException("Other implementation of Metadata API is not supported");
+    public RequirementImpl(String namespace) {
+        this.namespace = namespace.intern();
     }
     
+    @Override
+    public String getNamespace() {
+        return namespace;
+    }
+
+    @Override
+    public Resource getResource() {
+        return resource;
+    }
+
+    @Override
+    public Requirement getParent() {
+        return parent;
+    }
+
+    @Override
+    public boolean setParent(Requirement parent) {
+        this.parent = parent;
+        return true;
+    }
+
+    @Override
+    public synchronized boolean addNestedRequirement(Requirement requirement) {
+        return nestedRequirements.add(requirement);
+    }
+
+    @Override
+    public synchronized boolean removeNestedRequirement(Requirement requirement) {
+        return nestedRequirements.remove(requirement);
+    }
+
+    @Override
+    public synchronized List<Requirement> getNestedRequirements() {
+        return Collections.unmodifiableList(nestedRequirements);
+    }
+
+    @Override
+    public synchronized <T> MatchingAttribute<T> getAttribute(AttributeType<T> type) {
+        return (MatchingAttribute<T>) super.getAttribute(type);
+    }
+
+    @Override
+    public synchronized <T> boolean setAttribute(AttributeType<T> type, T value, Operator operator) {
+        return super.setAttribute(new MatchingAttributeImpl<>(type, value, operator));
+    }
+
+    @Override
+    public synchronized <T> boolean setAttribute(Attribute<T> attribute, Operator operator) {
+        return super.setAttribute(new MatchingAttributeImpl<>(attribute.getAttributeType(), attribute.getValue(), operator));
+    }
+
+    @Override
+    public synchronized <T> boolean setAttribute(String name, Class<T> type, T value, Operator operator) {
+        AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
+        Attribute<T> attribute = new MatchingAttributeImpl<>(attributeType, value, operator);
+        return super.setAttribute(attribute);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public synchronized List<MatchingAttribute<?>> getAttributes() {
+        return Collections.unmodifiableList((List<MatchingAttribute<?>>) super.getAttributes());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public synchronized Map<String, MatchingAttribute<?>> getAttributesMap() {
+        return (Map<String, MatchingAttribute<?>>) super.getAttributesMap();
+    }
+
+    @Override
+    public synchronized Operator getAttributeOperator(AttributeType<?> type) {
+        return ((MatchingAttribute<?>) super.getAttribute(type)).getOperator();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -128,29 +113,28 @@ public class RequirementImpl implements Requirement {
             return false;
         }
         final RequirementImpl other = (RequirementImpl) obj;
-        if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
+        if (!Objects.equals(this.namespace, other.namespace)) {
             return false;
         }
-        if (this.m_multiple != other.m_multiple) {
+        if (!Objects.equals(this.resource, other.resource)) {
             return false;
         }
-        if (this.m_optional != other.m_optional) {
+        if (!Objects.equals(this.parent, other.parent)) {
             return false;
         }
-        if (this.m_extend != other.m_extend) {
+        if (!Objects.equals(this.nestedRequirements, other.nestedRequirements)) {
             return false;
         }
-        if ((this.m_filter == null) ? (other.m_filter != null) : !this.m_filter.equals(other.m_filter)) {
-            return false;
-        }
-        return true;
+        return super.equals(obj);
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 23 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
-        return hash;
+        hash = 97 * hash + Objects.hashCode(this.namespace);
+        hash = 97 * hash + Objects.hashCode(this.resource);
+        hash = 97 * hash + Objects.hashCode(this.parent);
+        hash = 97 * hash + Objects.hashCode(this.nestedRequirements);
+        return 97 * hash + super.hashCode();
     }
-    
 }

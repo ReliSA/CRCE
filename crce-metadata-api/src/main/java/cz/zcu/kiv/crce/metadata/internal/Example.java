@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.MatchingAttribute;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.SimpleDataType;
+import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
 
 /**
  * Not working demonstration of API usage.
@@ -18,8 +18,8 @@ import cz.zcu.kiv.crce.metadata.SimpleDataType;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value={"DLS_DEAD_LOCAL_STORE", "NP_ALWAYS_NULL"}, justification="Just a non-runnable example.")
 public class Example {
 
-    private static final AttributeType<Long> ATTRIBUTE_A = new SimpleDataType<>("long.attribute", Long.class);
-    private static final AttributeType<Double> ATTRIBUTE_B = new SimpleDataType<>("double.attribute", Double.class);
+    private static final AttributeType<Long> ATTRIBUTE_A = new SimpleAttributeType<>("long.attribute", Long.class);
+    private static final AttributeType<Double> ATTRIBUTE_B = new SimpleAttributeType<>("double.attribute", Double.class);
 
     
     @SuppressWarnings({"null", "ConstantConditions"})
@@ -48,8 +48,8 @@ public class Example {
             Attribute<?> attribute1 = capability.getAttribute(attr.getAttributeType());
         }
         // map of attributes - unknown data types
-        Map<AttributeType<?>, ? extends Attribute<?>> map = capability.getAttributesMap();
-        Attribute attribute2 = map.get(ATTRIBUTE_A);
+        Map<String, ? extends Attribute<?>> map = capability.getAttributesMap();
+        Attribute attribute2 = map.get(ATTRIBUTE_A.getName());
         Object value2 = attribute2.getValue();
         
         // a similar for requirements

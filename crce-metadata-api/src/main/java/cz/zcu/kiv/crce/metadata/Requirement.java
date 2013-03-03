@@ -33,9 +33,13 @@ public interface Requirement extends AttributeProvider, DirectiveProvider {
     List<Requirement> getNestedRequirements();
 
     @CheckForNull
-    <T> MatchingAttribute<T> getAttribute(@Nonnull AttributeType<T> t);
+    <T> MatchingAttribute<T> getAttribute(@Nonnull AttributeType<T> type);
     
-    <T> boolean setAttribute(@Nonnull AttributeType<T> attribute, @CheckForNull T value, @Nonnull Operator operator);
+    <T> boolean setAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value, @Nonnull Operator operator);
+    
+    <T> boolean setAttribute(@Nonnull Attribute<T> attribute, @Nonnull Operator operator);
+    
+    <T> boolean setAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
     
     @Nonnull
     @Override
@@ -43,7 +47,7 @@ public interface Requirement extends AttributeProvider, DirectiveProvider {
 
     @Nonnull
     @Override
-    Map<AttributeType<?>, MatchingAttribute<?>> getAttributesMap();
+    Map<String, MatchingAttribute<?>> getAttributesMap();
 
-    Operator getAttributeOperator(@Nonnull AttributeType<?> attribute);
+    Operator getAttributeOperator(@Nonnull AttributeType<?> type);
 }

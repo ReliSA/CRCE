@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.net.URI;
 
 import javax.annotation.Nonnull;
 
@@ -50,21 +49,7 @@ public interface ResourceFactory {
      */
     @Nonnull
     Requirement createRequirement(@Nonnull String namespace);
-
-    /**
-     * TODO
-     * @param uri 
-     * @return 
-     */
+    
     @Nonnull
-    WritableRepository createRepository(URI uri);
-
-    /**
-     * TODO see {@link Resolver} comment.
-     * 
-     * Creates a resolver for the given repositories.
-     * @param repository
-     * @return 
-     */
-    Resolver createResolver(Repository... repository);
+    Capability createCapability(@Nonnull String namespace);
 }
