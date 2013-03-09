@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.test;
 
+import java.util.List;
 import static org.junit.Assert.*;
 
 
@@ -127,5 +128,36 @@ public class CapabilityTest {
         c2.setAttribute(ATTR_P1, "p1");
         
         assertEquals(c1.hashCode(), c2.hashCode());
+    }
+    
+    @Test
+    public void testHierarchy() {
+        Capability root = factory.createCapability("a");
+        
+        Capability child1 = factory.createCapability("a.b");
+        child1.setAttribute("key", String.class, "child1");
+        
+        Capability child2 = factory.createCapability("a.b");
+        child2.setAttribute("key", String.class, "child2");
+        
+        Capability child3 = factory.createCapability("a.c");
+        
+        root.addChild(child1);
+        root.addChild(child1);
+        root.addChild(child2);
+        root.addChild(child2);
+        root.addChild(child3);
+        root.addChild(child3);
+        
+        List<Capability> children = root.getChildren();
+        assertEquals(3, children.size());
+        
+        assertTrue(children.contains(child1));
+        assertTrue(children.contains(child2));
+        assertTrue(children.contains(child3));
+        
+        for (Capability child : children) {
+            assertEquals(root, child.getParent());
+        }
     }
 }

@@ -47,7 +47,11 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
 
     @Override
     public synchronized boolean addChild(Capability capability) {
-        return children.add(capability);
+        if (!children.contains(capability)) {
+            capability.setParent(this);
+            return children.add(capability);
+        }
+        return false;
     }
 
     @Override

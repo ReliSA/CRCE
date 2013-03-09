@@ -48,11 +48,5 @@ public interface Resource {
     
     void removeRequirement(@Nonnull Requirement requirement);
     
-    @Nonnull
-    Capability createCapability(@Nonnull String namespace);
-
-    @Nonnull
-    Requirement createRequirement(@Nonnull String namespace);
-
     void setRepository(@Nonnull WritableRepository repository);
 }
