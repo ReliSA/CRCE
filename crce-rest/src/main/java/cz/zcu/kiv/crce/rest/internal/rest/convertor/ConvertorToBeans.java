@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -214,6 +216,110 @@ public class ConvertorToBeans {
 		}
 	}
 	
+	/**
+	 * Get name of operation from string before character '='.
+	 * There are 3 supported operations:
+	 * 
+	 * <ul>
+	 * <li> '>' (full >=) - greater-than
+	 * <li> '<' (full <=) - lower than
+	 * <li> null (full =) - equal
+ 	 * </ul>
+	 * 
+	 * @param operation ">", "<" or null (null mean =)
+	 * @return name of operation
+	 */
+	private String operationToString(String operation) {
+		if(operation==null) return "equal";
+		else {
+			switch (operation) {
+			case ">":
+				return "greater-than";
+			case "<":
+				return "lower-than";
+			default:
+				return null;
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * Parse filter in of osgi requirement wirings.
+	 * Filter look like this: (&(osgi.wiring.package=cz.zcu.kiv.obcc.example.carpark.arrivals)(version&gt;=1.0.0))
+	 * From this string should be parsed name  (string after 'osgi.wiring.package=' of after 'package='),
+	 * and version with operation (version 1.0.0, operation greater-than).
+	 * Version with operation can be present multiple time
+	 * 
+	 * @param filter filter string
+	 * @return array of string. Name is always first in this array. 
+	 * Its followed by version and operation, that can be present more than one (or can't be present).
+	 * If parsing failed, empty array is returned.
+	 */
+	private String[] parseFilter(String filter) {
+		//System.out.println("Parse filter : " + filter);
+		Pattern filterPattern = Pattern.compile("\\(&(amp;)?\\((osgi.wiring.)?package=\\s*(.+?)\\s*\\)(\\(version\\s*(.+?)\\s*\\))?\\)");
+		
+		
+		Matcher matcher =filterPattern.matcher(filter);
+		if (matcher.matches()) {
+			String name = matcher.group(3);
+			//System.out.println("Parsed name:  " +  name);
+			
+			try {
+				String versions = matcher.group(4);
+				versions = versions.replaceAll("&gt;", ">");
+				versions = versions.replaceAll("&lt;", "<");
+				//System.out.println("Parsing versios: " + versions);
+				String[] version = versions.split("[\\(\\)]");
+				
+				int versioncount = 0;
+				for(String ver:version) {
+					if(ver.length()>0) {
+						//System.out.println("Parsed version: " + ver);
+						versioncount++;
+					}
+				}
+				
+				String[] result = new String[1+2*versioncount];
+				result[0] = name;
+				
+				int i = 1;
+				for(String ver:version) {
+					if(ver.length()>0) {
+						Pattern versionPattern = Pattern.compile("version(.)?=(.*)");
+						Matcher versionMatcher =versionPattern.matcher(ver);
+						if(versionMatcher.matches()) {
+							String op = versionMatcher.group(1);
+							String vers = versionMatcher.group(2);
+							result[i++] = vers;
+							result[i++] = operationToString(op);
+							
+							
+						} else {
+							//System.out.println("Version cant be parsed from filter");
+							String[] nameArray = {name};
+							return nameArray;
+						}
+					}
+				}
+				
+				return result;
+				
+				
+			} catch (NullPointerException e) {
+				//System.out.println("Parsed filter has no version");
+				String[] nameArray = {name};
+				return nameArray;
+			}
+			
+		} else {
+			System.out.println("Osgi wiring requirement filter dont match the pattern and can't be parsed.");
+			return new String[0];
+		}
+	}
+	
 	//TODO : implement filterName filtration
 	/**
 	 * Add all requirements with package wiring to the resource
@@ -233,15 +339,27 @@ public class ConvertorToBeans {
 		for(Requirement req: reqs) {
 
 			Trequirement newReqBean = new Trequirement();
-			List<Object> directives = newReqBean.getDirectiveOrAttributeOrRequirement();
+			List<Object> atrDirReq = newReqBean.getDirectiveOrAttributeOrRequirement();
 			newReqBean.setNamespace("osgi.wiring.package");
 
 			Tdirective dir = new Tdirective();
 			dir.setName("filter");
 			dir.setValue(req.getFilter());
-			directives.add(dir);
+			atrDirReq.add(dir);
 
 			requirements.add(newReqBean);
+			
+			try {
+				String[] parsedFilter = parseFilter(req.getFilter());
+				addAttribute(atrDirReq, "name", null, parsedFilter[0]);
+				
+				for(int i = 1; i < parsedFilter.length; i+=2){
+					addAttribute(atrDirReq, "version", parsedFilter[i+1], parsedFilter[i]);
+				}
+				
+			} catch (Exception e) {
+				System.out.println("Exception during parsing wiring requirement filter.");
+			}
 
 		}
 	}
@@ -291,6 +409,13 @@ public class ConvertorToBeans {
 		
 		for(Resource res: resources) {
 			resourceBeans.add(convertResource(res, include));
+		}
+		
+		try {
+			parseFilter("(&amp;(osgi.wiring.package=org.eclipse.gemini.blueprint.blueprint.container)(version&gt;=1.0.0.RELEASE)(version&lt;=1.0.0.RELEASE))");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return repositoryBean;
