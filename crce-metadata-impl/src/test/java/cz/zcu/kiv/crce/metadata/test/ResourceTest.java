@@ -7,9 +7,14 @@ import java.util.List;
 import org.junit.*;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+
+// TODO test of properties
+// TODO test of removing entities
 
 /**
  *
@@ -130,5 +135,55 @@ public class ResourceTest {
         assertTrue(capabilities.contains(root));
         assertTrue(capabilities.contains(child1));
         assertTrue(capabilities.contains(child2));
+    }
+    
+    @Test
+    public void testRequirement() {
+        Resource resource = factory.createResource();
+        
+        Requirement req = factory.createRequirement("a");
+        
+        resource.addRequirement(req);
+        assertTrue(resource.hasRequirement(req));
+        
+        req.setAttribute("atr", String.class, "val", Operator.GREATER);
+        assertTrue(resource.hasRequirement(req));
+        
+        List<Requirement> requirements = resource.getRequirements("a");
+        assertTrue(requirements.contains(req));
+
+        Requirement req2 = factory.createRequirement("a");
+        assertFalse(requirements.contains(req2));
+        
+        requirements = resource.getRequirements("b");
+        assertFalse(requirements.contains(req));
+    }
+
+    @Test
+    public void testNestedRequirementByNest() {
+        Resource resource = factory.createResource();
+        
+        Requirement nest = factory.createRequirement("a");
+        Requirement nested = factory.createRequirement("a");
+        nest.addNestedRequirement(nested);
+        
+        resource.addRequirement(nest);
+        
+        assertTrue(resource.hasRequirement(nest));
+        assertFalse(resource.hasRequirement(nested));
+    }
+    
+    @Test
+    public void testNestedRequirementByNested() {
+        Resource resource = factory.createResource();
+        
+        Requirement nest = factory.createRequirement("a");
+        Requirement nested = factory.createRequirement("a");
+        nest.addNestedRequirement(nested);
+        
+        resource.addRequirement(nested);
+        
+        assertTrue(resource.hasRequirement(nest));
+        assertFalse(resource.hasRequirement(nested));
     }
 }

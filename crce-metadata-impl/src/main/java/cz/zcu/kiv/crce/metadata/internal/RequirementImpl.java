@@ -52,7 +52,11 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
 
     @Override
     public synchronized boolean addNestedRequirement(Requirement requirement) {
-        return nestedRequirements.add(requirement);
+        if (!nestedRequirements.contains(requirement)) {
+            requirement.setParent(this);
+            return nestedRequirements.add(requirement);
+        }
+        return false;
     }
 
     @Override

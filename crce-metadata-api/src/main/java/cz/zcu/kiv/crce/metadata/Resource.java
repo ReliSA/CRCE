@@ -23,10 +23,13 @@ public interface Resource {
     List<Capability> getCapabilities();
 
     @Nonnull
+    List<Capability> getCapabilities(@Nonnull String namespace);
+
+    @Nonnull
     List<Capability> getRootCapabilities();
 
     @Nonnull
-    List<Capability> getCapabilities(@Nonnull String namespace);
+    List<Capability> getRootCapabilities(@Nonnull String namespace);
 
     @Nonnull
     List<Requirement> getRequirements();
@@ -34,19 +37,31 @@ public interface Resource {
     @Nonnull
     List<Requirement> getRequirements(@Nonnull String namespace);
     
+    @Nonnull
+    List<Property> getProperties();
+    
+    @Nonnull
+    List<Property> getProperties(@Nonnull String namespace);
+    
     boolean hasCapability(@Nonnull Capability capability);
 
     boolean hasRequirement(@Nonnull Requirement requirement);
+    
+    boolean hasProperty(@Nonnull Property property);
     
     /* --- setters --- */
 
     void addCapability(@Nonnull Capability capability);
 
     void addRequirement(@Nonnull Requirement requirement);
+    
+    void addProperty(@Nonnull Property property);
 
     void removeCapability(@Nonnull Capability capability);
     
     void removeRequirement(@Nonnull Requirement requirement);
+    
+    void removeProperty(@Nonnull Property property);
     
     void setRepository(@Nonnull WritableRepository repository);
 }

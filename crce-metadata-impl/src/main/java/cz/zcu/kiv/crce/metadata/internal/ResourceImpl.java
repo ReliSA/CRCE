@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -20,18 +21,24 @@ import cz.zcu.kiv.crce.metadata.Resource;
  */
 public class ResourceImpl extends AbstractEntityBase implements Resource {
 
+    private Repository repository = null;
+    /*
+     * All maps:
+     * Key: namespace, value: list of entities.
+     */
     private Map<String, List<Capability>> allCapabilities = new HashMap<>();
     private Map<String, List<Capability>> rootCapabilities = new HashMap<>();
     private Map<String, List<Requirement>> allRequirements = new HashMap<>();
+    private Map<String, List<Property>> allProperties = new HashMap<>();
     
     @Override
     public Repository getRepository() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return repository;
     }
 
     @Override
     public void setRepository(WritableRepository repository) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.repository = repository;
     }
     
     @Override
@@ -50,6 +57,15 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
             result.addAll(capabilities);
         }
         return result;
+    }
+
+    @Override
+    public List<Capability> getRootCapabilities(String namespace) {
+        List<Capability> capabilities = rootCapabilities.get(namespace);
+        if (capabilities == null) {
+            capabilities = Collections.emptyList();
+        }
+        return capabilities;
     }
 
     @Override
@@ -124,12 +140,14 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
 
     @Override
     public void addRequirement(Requirement requirement) {
-        List<Requirement> requirements = allRequirements.get(requirement.getNamespace());
+        Requirement root = getRootRequirement(requirement);
+        
+        List<Requirement> requirements = allRequirements.get(root.getNamespace());
         if (requirements == null) {
             requirements = new ArrayList<>();
-            allRequirements.put(requirement.getNamespace(), requirements);
+            allRequirements.put(root.getNamespace(), requirements);
         }
-        requirements.add(requirement);
+        requirements.add(root);
     }
 
     @Override
@@ -140,6 +158,53 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         }
     }
 
+    @Override
+    public List<Property> getProperties() {
+        List<Property> result = new ArrayList<>();
+        for (List<Property> properties : allProperties.values()) {
+            result.addAll(properties);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Property> getProperties(String namespace) {
+        List<Property> result = allProperties.get(namespace);
+        if (result == null) {
+            result = Collections.emptyList();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean hasProperty(Property property) {
+        List<Property> requirements = allProperties.get(property.getNamespace());
+        if (requirements != null) {
+            return requirements.contains(property);
+        }
+        return false;
+    }
+
+    @Override
+    public void addProperty(Property property) {
+        Property root = getRootProperty(property);
+        
+        List<Property> properties = allProperties.get(root.getNamespace());
+        if (properties == null) {
+            properties = new ArrayList<>();
+            allProperties.put(root.getNamespace(), properties);
+        }
+        properties.add(root);
+    }
+
+    @Override
+    public void removeProperty(Property property) {
+        List<Property> properties = allProperties.get(property.getNamespace());
+        if (properties != null) {
+            properties.remove(property);
+        }
+    }
+    
     @SuppressWarnings({"null", "ConstantConditions"})
     private Capability getRootCapability(@Nonnull Capability capability) {
         Capability root = capability;
@@ -149,6 +214,24 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         return root;
     }
     
+    @SuppressWarnings({"null", "ConstantConditions"})
+    private Requirement getRootRequirement(@Nonnull Requirement requirement) {
+        Requirement root = requirement;
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+        return root;
+    }
+
+    @SuppressWarnings({"null", "ConstantConditions"})
+    private Property getRootProperty(@Nonnull Property requirement) {
+        Property root = requirement;
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+        return root;
+    }
+
     private void putCapabilityToMap(@Nonnull Capability capability, @Nonnull Map<String, List<Capability>> map) {
         List<Capability> capabilities = map.get(capability.getNamespace());
         if (capabilities == null) {

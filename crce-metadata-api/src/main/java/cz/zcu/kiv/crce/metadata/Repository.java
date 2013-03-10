@@ -1,17 +1,15 @@
 package cz.zcu.kiv.crce.metadata;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.annotation.Nonnull;
-import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * Represents a set of resources. Repository can be assigned to a physical URI
  * which resources are stored on, but it does not manage physical content.
  * 
  * TODO Repository (and WritableRepository) would be either merged with RepositoryDAO and ResourceDAO,
- * or leaved as just a repository descriptor without possibility to manipulate with resources,
+ * or leaved as just a repository descriptor without possibility to manipulate with resources (preferred),
  * or placed to independent API as a service layer.
  * 
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
@@ -29,53 +27,11 @@ public interface Repository {
     URI getURI();
 
     /**
-     * Return the resources for this repository.
-     * @return 
-     */
-    @Nonnull
-    List<Resource> getResources();
-
-    /**
-     * TODO Use other way than OSGi/LDAP filter to get resources.
-     * @param filter
-     * @return
-     * @throws InvalidSyntaxException  
-     */
-    @Nonnull
-    List<Resource> getResources(@Nonnull String filter) throws InvalidSyntaxException;
-    
-    /**
-     * 
-     * @param requirements
-     * @return 
-     */
-    @Nonnull
-    List<Resource> getResources(@Nonnull List<Requirement> requirements);
-    
-    /**
-     * Return the name of this repository.
-     * 
-     * TODO PENDING This may be a generic attribute.
-     * 
-     * @return a non-null name
-     */
-    @Nonnull
-    String getName();
-
-    /**
      * Return the last modification date of this repository
      * 
      * TODO PENDING This may be a generic attribute.
      * 
      * @return the last modification date
      */
-    long getLastModified();
-
-    /**
-     * TODO
-     * @param resource
-     * @return 
-     */
-    boolean contains(@Nonnull Resource resource);
-
+    long getIncrement();
 }
