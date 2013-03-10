@@ -108,6 +108,7 @@
                 <configuration>
                     <provision>
                         <param>--platform=felix</param>
+			<param>--javaHome=/usr/lib/jvm/java-7-oracle</param>
                         <param>--repositories=http://repo1.maven.org/maven2,http://repository.ops4j.org/maven2,http://subversion.assembla.com/svn/crce/third-parties,http://subversion.assembla.com/svn/crce/releases,http://subversion.assembla.com/svn/crce/snapshots</param>
                     </provision>
                 </configuration>
