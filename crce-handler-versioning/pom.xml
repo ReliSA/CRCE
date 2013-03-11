@@ -60,19 +60,6 @@
             <scope>provided</scope>
         </dependency>
         
-    	<dependency>
-      		<groupId>org.ops4j.pax.logging</groupId>
-       		<artifactId>pax-logging-api</artifactId>
-       		<version>1.7.0</version>
-       		<type>bundle</type>
-    	</dependency>        
-        
-    	<dependency>
-       		<groupId>org.ops4j.pax.logging</groupId>
-       		<artifactId>pax-logging-service</artifactId>
-       		<version>1.7.0</version>
-       		<type>bundle</type>
-    	</dependency>
     </dependencies>
 
 </project>

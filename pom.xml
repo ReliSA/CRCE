@@ -26,7 +26,7 @@
         <felix.fileinstall.poll>2000</felix.fileinstall.poll>
         <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
-        <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level> <!-- DEBUG, INFO, WARN, ERROR-->
+        <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
         <org.osgi.framework.system.packages.extra>
             javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
         </org.osgi.framework.system.packages.extra>
@@ -85,7 +85,7 @@
         <module>crce-efpAssignment</module>
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-versioning</module>
+        <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
         <module>crce-rest</module>
     </modules>
@@ -108,7 +108,6 @@
                 <configuration>
                     <provision>
                         <param>--platform=felix</param>
-			<param>--javaHome=/usr/lib/jvm/java-7-oracle</param>
                         <param>--repositories=http://repo1.maven.org/maven2,http://repository.ops4j.org/maven2,http://subversion.assembla.com/svn/crce/third-parties,http://subversion.assembla.com/svn/crce/releases,http://subversion.assembla.com/svn/crce/snapshots</param>
                     </provision>
                 </configuration>

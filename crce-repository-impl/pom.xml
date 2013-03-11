@@ -23,6 +23,9 @@
     </properties>
 
     <dependencies>
+        
+        <!-- Felix -->
+        
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.service.obr</artifactId>
@@ -31,6 +34,20 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
+        
+        <!-- 3rd party dependencies -->
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+        </dependency>
+        
+        <!-- Project dependencies -->
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
@@ -55,30 +72,15 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-        </dependency>
-        
+
+        <!-- Test dependencies -->
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         
-        <dependency>
-      		<groupId>org.ops4j.pax.logging</groupId>
-       		<artifactId>pax-logging-api</artifactId>
-       		<version>1.7.0</version>
-       		<type>bundle</type>
-    	</dependency>        
-        
-    	<dependency>
-       		<groupId>org.ops4j.pax.logging</groupId>
-       		<artifactId>pax-logging-service</artifactId>
-       		<version>1.7.0</version>
-       		<type>bundle</type>
-    	</dependency>
     </dependencies>
 
 </project>

@@ -51,16 +51,19 @@
             <artifactId>pax-web-spi</artifactId>
         </dependency>
 
-        <!-- TODO replace the following logging artifacts by slf4j: -->
+        <!-- === LOGGING === -->
+        
         <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-api</artifactId>
-            <version>1.6.2</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ops4j.pax.logging</groupId>
-            <artifactId>pax-logging-service</artifactId>
-            <version>1.6.2</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
 
         <!-- === FELIX === -->
@@ -133,7 +136,7 @@
 
         <!-- === JaCC / OBCC === -->
 
-        <dependency>
+<!--        <dependency>
             <groupId>cz.zcu.kiv.jacc</groupId>
             <artifactId>types-cmp</artifactId>
         </dependency>
@@ -161,7 +164,7 @@
         <dependency>
             <groupId>cz.zcu.kiv.osgi</groupId>
             <artifactId>version-generator</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>asm</groupId>

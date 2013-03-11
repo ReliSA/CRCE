@@ -72,6 +72,9 @@
 
 
     <dependencies>
+        
+        <!-- OSGi -->
+        
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
@@ -81,9 +84,22 @@
             <artifactId>org.osgi.compendium</artifactId>
         </dependency>
 
+        <!-- Felix -->
+        
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.service.obr</artifactId>
+        </dependency>
+        
+        <!-- 3rd party dependencies -->
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -93,12 +109,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jsp-api</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.service.obr</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
@@ -135,19 +145,9 @@
             <type>bundle</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>org.ops4j.pax.logging</groupId>
-        	<artifactId>pax-logging-api</artifactId>
-        	<version>1.7.0</version>
-        	<type>bundle</type>
-            <scope>provided</scope>
-        </dependency>
 
-        <!-- CRCE dependencies -->
+        <!-- Project dependencies -->
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-api</artifactId>
@@ -173,6 +173,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Test dependencies -->
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
