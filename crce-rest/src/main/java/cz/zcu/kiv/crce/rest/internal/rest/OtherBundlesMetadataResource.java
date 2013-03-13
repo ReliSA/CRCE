@@ -33,15 +33,21 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
 /**
  * Server provide metadata about other bundles (repository contents diff).
  * 
- * When the client asks CRCE to provide bundle metadata of those bundles which it does not know about
- * and sends a list of bundle identifiers (= those bundles it knows about)
- * and optionally sends a filter criteria specifying which subset of metadata it is interested in
-
- * Then CRCE sends that (subset of) metadata only for the following bundles currently available in repository in "stored" state:
- * are not in the list sent by client ("new bundles")
- * are in the list but have been removed from the repository ("deleted bundles" - just a list of bundle identifiers).
+ * When the client asks CRCE to provide bundle metadata of those bundles which
+ * it does not know about and sends a list of bundle identifiers (= those
+ * bundles it knows about) and optionally sends a filter criteria specifying
+ * which subset of metadata it is interested in
+ * 
+ * Then CRCE sends that (subset of) metadata only for the following bundles
+ * currently available in repository in "stored" state:
+ * <ul>
+ * <li>are not in the list sent by client ("new bundles")
+ * <li>are in the list but have been removed from the repository
+ * ("deleted bundles" - just a list of bundle identifiers).
+ * </ul>
+ * 
  * @author Jan Reznicek
- *
+ * 
  */
 @Path("/other_bundles_metadata")
 public class OtherBundlesMetadataResource extends ResourceParent{	
@@ -151,10 +157,11 @@ public class OtherBundlesMetadataResource extends ResourceParent{
 	private List<Tresource> findDeletedResources(List<Tresource> clientResources, Set<String> storeIdSet) {
 		
 		List<Tresource> deletedResources = new ArrayList<Tresource>();
+		ConvertorToBeans conv = new ConvertorToBeans();
 		
 		for(Tresource res: clientResources) {
 			if(!storeIdSet.contains(res.getId())){
-				deletedResources.add(res);
+				deletedResources.add(conv.getDeletedResource(res.getId()));
 			}
 		}
 		
@@ -171,7 +178,7 @@ public class OtherBundlesMetadataResource extends ResourceParent{
 	 * </ul>
 	 * 
 	 * @param clientBundles
-	 * @return
+	 * @return repositoty with other bundles
 	 */
 	private Trepository findOtherBundles(Trepository clientBundles) {
 		
@@ -195,13 +202,25 @@ public class OtherBundlesMetadataResource extends ResourceParent{
 		return repository;
 	}
 	
+
+	
+	/**
+	 * Server provide metadata about other bundles (repository contents diff).
+	 * Response contains bundles, that:
+	 * <ul>
+     *  <li> are not in the list sent by client, but all in storage ("new bundles")
+     *  <li> are in the list but have been removed from the repository ("deleted bundles" - just a list of bundle identifiers).
+	 * </ul>
+	 * @param knownBundles XML with information about bundles, that client knows.
+	 * @return XML with difference between knownBundles and state of server.
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response otherBundles(String konwnBundles) {		
+	public Response otherBundles(String knownBundles) {		
 		requestId++;
 		log.debug("Request ({}) - Post other bundles request was received.", requestId);
 		try {
-			Trepository clientBundles = unmarshalXML(konwnBundles);
+			Trepository clientBundles = unmarshalXML(knownBundles);
 			Trepository otherBundles = findOtherBundles(clientBundles);
 			
 			Response response = Response.ok(createXML(otherBundles)).build();

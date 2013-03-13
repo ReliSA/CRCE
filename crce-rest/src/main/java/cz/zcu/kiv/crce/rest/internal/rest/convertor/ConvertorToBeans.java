@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,7 +95,7 @@ public class ConvertorToBeans {
 			return sb.toString();
 			
 		} catch (NoSuchAlgorithmException | IOException e) {
-			e.printStackTrace();
+			log.warn(e.getMessage(),e);
 			return null;
 		} finally {
 			if(fis!=null) {
@@ -130,11 +131,11 @@ public class ConvertorToBeans {
 	}
 	
 	/**
-	 * Get CapabilityBean with osgi.identity.
+	 * Returns capability with osgi.identity.
 	 * @param resource resource
 	 * @return capability with osgi.identity
 	 */
-	private Tcapability getOsgiIdentity(Resource resource) {
+	private Tcapability prepareOsgiIdentity(Resource resource) {
 		
 		Tcapability osgiIdentity= new Tcapability();
 		osgiIdentity.setNamespace("osgi.identity");
@@ -150,11 +151,11 @@ public class ConvertorToBeans {
 
 	
 	/**
-	 * Get CapabilitiBean with osgi.content
+	 * Returns capability with osgi.content
 	 * @param resource resource 
 	 * @return capability with osgi.content
 	 */
-	private Tcapability getOsgiContent(Resource resource) {
+	private Tcapability prepareOsgiContent(Resource resource) {
 		
 		Tcapability osgiContent = new Tcapability();
 		osgiContent.setNamespace("osgi.content");
@@ -169,6 +170,41 @@ public class ConvertorToBeans {
 		
 		return osgiContent;
 		
+	}
+	
+	/**
+	 * Create from array of strings result string, where are string separated by one comma ','.
+	 * @param categories array of strings
+	 * @return result string
+	 */
+	private String categoriesToString(String[] categories) {
+		
+		String catArrayToStr = Arrays.toString(categories); 
+		
+		String categoryStr = catArrayToStr.substring(1, catArrayToStr.length()-1).replaceAll(" ", "");
+		
+		log.info("Category To string: {}", categoryStr);
+		
+		return categoryStr;
+	}
+	
+	
+	/**
+	 * Returns capability with crce.identity
+	 * @param resource resource 
+	 * @return capability with crce.identity
+	 */
+	private Tcapability prepareCrceIdentity(Resource resource) {
+		
+		Tcapability crceIdentity = new Tcapability();
+		crceIdentity.setNamespace("crce.identity");
+		List<Object> attributes = crceIdentity.getDirectiveOrAttributeOrCapability();
+		
+		addAttribute(attributes, "name", null, resource.getId());
+		addAttribute(attributes, "crce.categories", "List<String>", categoriesToString(resource.getCategories()));
+		addAttribute(attributes, "crce.status", null, "stored");
+		
+		return crceIdentity;
 		
 	}
 	
@@ -384,8 +420,9 @@ public class ConvertorToBeans {
 		List<Trequirement> reqs = newResource.getRequirement();
 
 		if(include.isIncludeCore()) {
-			caps.add(getOsgiIdentity(resource));
-			caps.add(getOsgiContent(resource));
+			caps.add(prepareOsgiIdentity(resource));
+			caps.add(prepareOsgiContent(resource));
+			caps.add(prepareCrceIdentity(resource));
 		}
 		
 		if(include.isIncludeCaps()) {
@@ -415,6 +452,32 @@ public class ConvertorToBeans {
 		}
 
 		return repositoryBean;
+	}
+	
+	/**
+	 * Get Tresource with information about deleted resource.
+	 * This Tresource contains only id and capability crce.identity with 
+	 * attribute crce.status, that is deleted
+	 * @param id the resource id
+	 * @return information about deleted resource
+	 */
+	public Tresource getDeletedResource(String id) {
+		Tresource resource = new Tresource();
+		
+		resource.setId(id);
+		
+		List<Tcapability> caps = resource.getCapability();		
+		
+		Tcapability crceIdentity = new Tcapability();
+		crceIdentity.setNamespace("crce.identity");
+		List<Object> attributes = crceIdentity.getDirectiveOrAttributeOrCapability();		
+		addAttribute(attributes, "name", null, resource.getId());
+		addAttribute(attributes, "crce.status", null, "deleted");
+		
+		caps.add(crceIdentity);
+		
+		return resource;
+		
 	}
 
 }
