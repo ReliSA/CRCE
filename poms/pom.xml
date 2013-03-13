@@ -22,6 +22,7 @@
         <version.org.apache.ace>0.8.0-SNAPSHOT</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
         <version.org.slf4j>1.7.2</version.org.slf4j>
+        <version.com.sun.jersey>1.17</version.com.sun.jersey>
     </properties>
 
     <modules>
@@ -317,6 +318,24 @@
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
+                        
+            <!-- Jersey -->
+            
+        	<dependency>
+    			<groupId>com.sun.jersey</groupId>
+    			<artifactId>jersey-server</artifactId>
+    			<version>${version.com.sun.jersey}</version>
+	  		</dependency>
+	    	<dependency>
+      			<groupId>com.sun.jersey</groupId>
+      			<artifactId>jersey-servlet</artifactId>
+      			<version>${version.com.sun.jersey}</version>      
+	 		</dependency>	 
+	 		<dependency>
+    			<groupId>com.sun.jersey</groupId>
+    			<artifactId>jersey-json</artifactId>
+    			<version>${version.com.sun.jersey}</version>
+			</dependency>
 
             <!-- Other 3rd party dependencies -->
 

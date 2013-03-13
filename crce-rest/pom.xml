@@ -67,7 +67,10 @@
     </build>
   
   <dependencies>
-          <dependency>
+  
+  		<!-- Felix -->
+  		
+        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
@@ -76,10 +79,7 @@
             <artifactId>org.apache.felix.bundlerepository</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
+		 <!-- Project dependencies -->
         
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -100,24 +100,32 @@
             <scope>provided</scope>
         </dependency>       
 
+
+		 <!-- 3rd party dependencies -->		
         
-        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <dependency>
     		<groupId>com.sun.jersey</groupId>
     		<artifactId>jersey-server</artifactId>
-    		<version>1.17</version>
 	  	</dependency>
 	    <dependency>
       		<groupId>com.sun.jersey</groupId>
       		<artifactId>jersey-servlet</artifactId>
-      		<version>1.17</version>      
 	 	</dependency>	 
 	 	<dependency>
     		<groupId>com.sun.jersey</groupId>
     		<artifactId>jersey-json</artifactId>
-    		<version>1.17</version>
 		</dependency>
-		
+		<dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        
+         <!-- Test dependencies -->		
+        		
 		<dependency>
 	    	<groupId>junit</groupId>
 	    	<artifactId>junit</artifactId>
