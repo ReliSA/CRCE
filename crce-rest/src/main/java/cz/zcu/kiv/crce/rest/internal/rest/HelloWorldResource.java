@@ -8,6 +8,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -21,7 +24,9 @@ import cz.zcu.kiv.crce.rest.internal.Activator;
  *
  */
 @Path("/helloworld")
-public class HelloWorldResource {
+public class HelloWorldResource extends ResourceParent{
+	
+	private final Logger log = LoggerFactory.getLogger(HelloWorldResource.class);
 	
 	// The Java method will process HTTP GET requests
 	@GET
@@ -29,6 +34,8 @@ public class HelloWorldResource {
 	// type "text/plain"
 	@Produces("text/plain")
 	public String getClichedMessage() {
+		requestId++;
+		log.debug("Request ({}) - Hello world.", requestId);
 		// Return some cliched textual content
 		return "Hello World";
 	}
@@ -40,6 +47,8 @@ public class HelloWorldResource {
 	@GET @Path("/bundles")
 	@Produces({ MediaType.TEXT_PLAIN })
 	public String getResources() {
+		requestId++;
+		log.debug("Request ({}) - Get resources as text.", requestId);
 		Resource[] storeResources;
 		storeResources = Activator.instance().getStore().getRepository()
 				.getResources();
@@ -71,10 +80,11 @@ public class HelloWorldResource {
 	@POST
 	@Path("/post")
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response createTrackInJSON(String track) {
- 
-		String result = "Post with repository accepted : " + track;
-		System.out.println(result);
+	public Response testPost(String requestXml) {
+		requestId++;
+		log.debug("Request ({}) - Test post.", requestId);
+		String result = "Post with repository accepted : " + requestXml;
+		log.info("Request ({}) - Test post result: ", requestId, result);
 		
 		return Response.status(201).entity(result).build();
  

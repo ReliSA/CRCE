@@ -17,10 +17,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.osgi.framework.InvalidSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.rest.internal.Activator;
 
 
 /**
@@ -29,7 +29,9 @@ import cz.zcu.kiv.crce.rest.internal.Activator;
  *
  */
 @Path("/bundle")
-public class BundleResource {
+public class BundleResource extends ResourceParent{
+	
+	private final Logger log = LoggerFactory.getLogger(BundleResource.class);
 	
 	/**
 	 * size of buffer between input an output stream for a bundle
@@ -40,7 +42,7 @@ public class BundleResource {
 	 * Create output stream from bundle
 	 * @param resourceFile file with bundle
  	 * @return output stream with bundle
-	 * @throws WebApplicationException 
+	 * @throws WebApplicationException exception during converting bundle to output stream
 	 */
 	private StreamingOutput getBundleAsStream(final File resourceFile) throws WebApplicationException {
 		return new StreamingOutput() {
@@ -58,8 +60,14 @@ public class BundleResource {
 					}
 					resourceOutput.flush();
 				} catch (Exception e) {
-					throw new WebApplicationException(e);
-				} finally {
+
+					log.warn("Request ({}) - Converting bundle to output stream failed.", requestId);
+			
+					throw new WebApplicationException(e, 500);
+				} 
+				
+				
+				finally {
 					if (resourceInput != null) {
 						resourceInput.close();
 					}
@@ -75,41 +83,19 @@ public class BundleResource {
 	/**
 	 * Find bundle according LDAP filter in store repository and return him as output stream.
 	 * @param filter LDAP filter
-	 * @return bundle as output stream or null, if bundle was not found.
+	 * @return bundle as output stream
+	 * @throws WebApplicationException some exception, contains html error status
 	 */
-	private StreamingOutput bundlebyFilter(String filter) {
-		
-		System.out.println("Get bundle by filter: " + filter);
-		
-		try {
-			Resource[] storeResources;
-			storeResources = Activator.instance().getStore().getRepository().getResources(filter);
-			
-			if(storeResources.length < 1) {
-				System.out.println("Resource was not found.");
-				return null;
-			}
-			
-			Resource resource;
-			
-			if(storeResources.length > 1) {
-				resource = Utils.resourceWithHighestVersion(storeResources);
-			} else {
-				resource = storeResources[0];
-			}
-			
-			final File resourceFile = new File(resource.getUri());
-			
-			return getBundleAsStream(resourceFile);
-			
+	private StreamingOutput bundlebyFilterAsStream(String filter) throws WebApplicationException {
 
-		} catch (InvalidSyntaxException e) {
-			e.printStackTrace();
-			return null;
-		} catch (WebApplicationException e) {
-			e.printStackTrace();
-			return null;
-		}
+		log.debug("Request ({}) - Get bundle by filter: {}", requestId, filter);
+
+		Resource resource = findSingleBundleByFilterWithHighestVersion(filter);
+
+		final File resourceFile = new File(resource.getUri());
+
+		return getBundleAsStream(resourceFile);
+
 	}
 	
 	/**
@@ -121,19 +107,24 @@ public class BundleResource {
 	@GET @Path("{id}")
 	@Produces({MediaType.APPLICATION_OCTET_STREAM})
 	public Response getBundle(@PathParam("id") String id) {
-	    
+		requestId++;
+		log.debug("Request ({}) - Get bundle by id request was received.", requestId );
+		
 		String filter = "(id="+id+")";
 		
-		StreamingOutput output = bundlebyFilter(filter);
-		
-		if(output != null) {
-			
-			return Response.ok(output).header("content-disposition","attachment; filename = " + id + ".jar").build();
-		} else {
-			//bundle was not found in the store repository
-			return Response.status(404).build();
-		}
+		try {
+			StreamingOutput output = bundlebyFilterAsStream(filter);
 
+			Response response = Response.ok(output).header("content-disposition",
+							"attachment; filename = " + id + ".jar").build();
+			
+			log.debug("Request ({}) - Response was successfully created.",requestId);
+			
+			return response;
+
+		} catch (WebApplicationException e) {
+			return e.getResponse();
+		}
 		
 	}
 	
@@ -147,33 +138,39 @@ public class BundleResource {
 	@GET
 	@Produces({MediaType.APPLICATION_OCTET_STREAM})
 	public Response getBundlebyNameAndVersion(@QueryParam("name") String name, @QueryParam("version") String version) {
+		requestId++;
+		log.debug("Request ({}) - Get bundle by name and version request was received.", requestId );
+		
 		StreamingOutput output = null;
 
+		
+		String filter;
+		
 		if ((name != null) & (version != null)) {
-			String filter = "(&(symbolicname=" + name + ")(version=" + version + "))";
-
-			output = bundlebyFilter(filter);
-
+			filter = "(&(symbolicname=" + name + ")(version=" + version + "))";
+			
 		} else if ((name != null) & (version == null)) {
-
-			String filter = "(symbolicname=" + name + ")";
-
-			output = bundlebyFilter(filter);
+			filter = "(symbolicname=" + name + ")";
 
 		} else {
-			//wrong request
+			log.debug(
+					"Request ({}) - Wrong request, name of requested bundle has to be set.",
+					requestId);
 			return Response.status(400).build();
 		}
-
-		if (output != null) {
-
-			return Response
-					.ok(output)
-					.header("content-disposition",
-							"attachment; filename = " + name + ".jar").build();
-		} else {
-			//bundle was not found
-			return Response.status(404).build();
+		
+		
+		try {
+			output = bundlebyFilterAsStream(filter);
+			
+			Response response = Response.ok(output).header("content-disposition",
+					"attachment; filename = " + name + ".jar").build();
+			log.debug("Request ({}) - Response was successfully created.", requestId);
+			
+			return response;
+		
+		} catch (WebApplicationException e) {
+			return e.getResponse();
 		}
 	}
 

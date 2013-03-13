@@ -5,11 +5,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 
 import org.osgi.framework.InvalidSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
@@ -23,8 +25,9 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
  *
  */
 @Path("/metadata")
-public class MetadataResource {
-
+public class MetadataResource extends ResourceParent{
+	
+	private final Logger log = LoggerFactory.getLogger(MetadataResource.class);
     
 	
 	/**
@@ -37,6 +40,9 @@ public class MetadataResource {
     @GET
     @Produces({MediaType.APPLICATION_XML })
     public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
+    	requestId++;
+    	log.debug("Request ({}) - Get metadata request was received.", requestId);
+    	
     	Resource[] storeResources;
     	
     	IncludeMetadata include = new IncludeMetadata();
@@ -66,7 +72,7 @@ public class MetadataResource {
     				include.setIncludePropsByName(prop);
     			}
     		}
-    	}   	
+    	}    	
     	
     	
     	try {
@@ -79,16 +85,19 @@ public class MetadataResource {
 			if(storeResources.length > 0) {
 				ConvertorToBeans conv = new ConvertorToBeans();
 				Trepository repository = conv.convertRepository(storeResources, include);
-				return Response.ok(Utils.createXML(repository)).build();
-			} else {
+				Response response = Response.ok(createXML(repository)).build();				
+				log.debug("Request ({}) - Response was successfully created.", requestId);
+				return response;
+			} else {				
+				log.debug("Request ({}) - No resource was found.", requestId);
 				return Response.status(404).build();
 			}
-		} catch (JAXBException e) {
-			e.printStackTrace();
-			return Response.serverError().build();
+		} catch (WebApplicationException e) {			
+			return e.getResponse();
+			
 		} catch (InvalidSyntaxException e) {
-			//Invalid syntax
-			e.printStackTrace();
+			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", requestId);
+			log.debug(e.getMessage(), e);
 			return Response.status(400).build();
 		}
 
@@ -103,6 +112,8 @@ public class MetadataResource {
     @GET @Path("{id}")
     @Produces({MediaType.APPLICATION_XML })
     public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
+    	requestId++;
+    	log.debug("Request ({}) - Get metadata request for resource with id {} was received.",requestId ,id);
     	
     	IncludeMetadata include = new IncludeMetadata();
     	
@@ -142,20 +153,21 @@ public class MetadataResource {
 				if(storeResources.length > 0) {
 					ConvertorToBeans conv = new ConvertorToBeans();
 					Trepository repository = conv.convertRepository(storeResources, include);
-					return Response.ok(Utils.createXML(repository)).build();
+					Response response = Response.ok(createXML(repository)).build();
+					log.debug("Request ({}) - Response was successfully created.", requestId);
+					return response;
 				} else {
-					//no resource was found
+					log.debug("Request ({}) - No resource was found.", requestId);
 					return Response.status(404).build();
 				}
-			} catch (JAXBException e) {
-				//xml export of resource metadata failed
-				e.printStackTrace();				
-				return Response.serverError().build();
+			} catch (WebApplicationException e) {
+				
+				return e.getResponse();
 			}
 			
 		} catch (InvalidSyntaxException e) {
-			//Invalid syntax of request
-			e.printStackTrace();
+			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", requestId);
+			log.debug(e.getMessage(), e);
 			return Response.status(400).build();
 		}    	
         

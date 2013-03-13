@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -27,8 +30,8 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
  *
  */
 public class ConvertorToBeans {
-	
-
+		
+	private final Logger log = LoggerFactory.getLogger(ConvertorToBeans.class);
 	
 	/**
 	 * Get original file name from resource or null, if name was not found.
@@ -315,7 +318,7 @@ public class ConvertorToBeans {
 			}
 			
 		} else {
-			System.out.println("Osgi wiring requirement filter dont match the pattern and can't be parsed.");
+			log.warn("Osgi wiring requirement filter dont match the pattern and can't be parsed.");
 			return new String[0];
 		}
 	}
@@ -358,7 +361,7 @@ public class ConvertorToBeans {
 				}
 				
 			} catch (Exception e) {
-				System.out.println("Exception during parsing wiring requirement filter.");
+				log.warn("Exception during parsing wiring requirement filter.");
 			}
 
 		}
@@ -409,13 +412,6 @@ public class ConvertorToBeans {
 		
 		for(Resource res: resources) {
 			resourceBeans.add(convertResource(res, include));
-		}
-		
-		try {
-			parseFilter("(&amp;(osgi.wiring.package=org.eclipse.gemini.blueprint.blueprint.container)(version&gt;=1.0.0.RELEASE)(version&lt;=1.0.0.RELEASE))");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		return repositoryBean;

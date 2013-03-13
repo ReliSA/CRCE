@@ -11,12 +11,16 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
@@ -40,35 +44,47 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
  *
  */
 @Path("/other_bundles_metadata")
-public class OtherBundlesMetadataResource {
+public class OtherBundlesMetadataResource extends ResourceParent{	
 	
+	private final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
+	
+	private static final String DEF_ENCODING = "UTF-8";
 	
 	/**
      * Create XML String from repository.
      * @param repositoryBean repository contains metadata about resources
      * @return XML String with exported metadata
-     * @throws JAXBException XML export failed
-     * @throws UnsupportedEncodingException unsupported encoding
+     * @throws WebApplicationException unmarshal of xml failed.
      */
-	public Trepository createXML(String repository) throws JAXBException,
-			UnsupportedEncodingException {
+	public Trepository unmarshalXML(String repository) throws WebApplicationException {
 
-		ClassLoader cl = ObjectFactory.class.getClassLoader();
-		JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class
-				.getPackage().getName(), cl);
+		try {
+			ClassLoader cl = ObjectFactory.class.getClassLoader();
+			JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class
+					.getPackage().getName(), cl);
 
-		Unmarshaller unmarshaller = jc.createUnmarshaller();
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-		InputStream repositoryStream = new ByteArrayInputStream(
-				repository.getBytes("UTF-8"));
-		Object obj = unmarshaller.unmarshal(repositoryStream);
+			InputStream repositoryStream = new ByteArrayInputStream(
+					repository.getBytes(DEF_ENCODING));
+			Object obj = unmarshaller.unmarshal(repositoryStream);
 
-		JAXBElement<?> jxbE = (JAXBElement<?>) obj;
+			JAXBElement<?> jxbE = (JAXBElement<?>) obj;
 
-		Trepository rep = (Trepository) jxbE.getValue();
+			Trepository rep = (Trepository) jxbE.getValue();
 
-
-		return rep;
+			return rep;
+			
+		} catch (UnsupportedEncodingException e) {
+			log.warn("Request ({}) - Unsuported encoding {}", requestId, DEF_ENCODING);
+			log.debug(e.getMessage(), e);			
+			throw new WebApplicationException(500);
+			
+		} catch (JAXBException e) {
+			log.info("Request ({}) - Post request XML unmarshal failed.", requestId);
+			log.debug(e.getMessage(), e);	
+			throw new WebApplicationException(400);
+		}
 
 	}
 	
@@ -181,23 +197,22 @@ public class OtherBundlesMetadataResource {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response otherBundles(String konwnBundles) {
+	public Response otherBundles(String konwnBundles) {		
+		requestId++;
+		log.debug("Request ({}) - Post other bundles request was received.", requestId);
 		try {
-			Trepository clientBundles = createXML(konwnBundles);
+			Trepository clientBundles = unmarshalXML(konwnBundles);
 			Trepository otherBundles = findOtherBundles(clientBundles);
 			
-			return Response.ok(Utils.createXML(otherBundles)).build();
+			Response response = Response.ok(createXML(otherBundles)).build();
+			log.debug("Request ({}) - Response was successfully created.", requestId);
+			return response;
 			
 			
-		} catch (JAXBException e) {
-			// invalid syntax answer
-			e.printStackTrace();
-			return Response.status(400).build();
-		} catch (UnsupportedEncodingException e) {
-			// invalid syntax answer
-			e.printStackTrace();
-			return Response.status(400).build();
-		}
+		} catch (WebApplicationException e) {
+			
+			return e.getResponse();
+		} 
 		
 
 	}

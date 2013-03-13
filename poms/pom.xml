@@ -319,22 +319,24 @@
                 <scope>provided</scope>
             </dependency>
                         
-            <!-- Jersey -->
-            
+            <!-- Jersey -->            
         	<dependency>
     			<groupId>com.sun.jersey</groupId>
     			<artifactId>jersey-server</artifactId>
     			<version>${version.com.sun.jersey}</version>
+    			<scope>provided</scope>
 	  		</dependency>
 	    	<dependency>
       			<groupId>com.sun.jersey</groupId>
       			<artifactId>jersey-servlet</artifactId>
-      			<version>${version.com.sun.jersey}</version>      
+      			<version>${version.com.sun.jersey}</version>  
+      			<scope>provided</scope>    
 	 		</dependency>	 
 	 		<dependency>
     			<groupId>com.sun.jersey</groupId>
     			<artifactId>jersey-json</artifactId>
     			<version>${version.com.sun.jersey}</version>
+    			<scope>provided</scope>
 			</dependency>
 
             <!-- Other 3rd party dependencies -->
