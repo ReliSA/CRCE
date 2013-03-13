@@ -264,7 +264,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
      * @param isOptional
      */
     private void setRequirementProperties(Requirement req, String requirementName, String value, String name, String type, VersionRange versionRange, ExtraFunc extrafunc, boolean isOptional) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder filter = new StringBuilder();
 
         boolean isNamePresent = false;
         boolean isExtrafuncPresent = false;
@@ -285,55 +285,57 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
         }
 
         if (isNamePresent || isTypePresent || isExtrafuncPresent || isVersionrangePresent) {
-            sb.append("(&");
+            filter.append("(&");
         }
-        sb.append("(").append(requirementName).append("=");
-        sb.append(value);
-        sb.append(")");
+        filter.append("(").append(requirementName).append("=");
+        filter.append(value);
+        filter.append(")");
 
         if (isNamePresent) {
-            sb.append("(name=");
-            sb.append(name);
-            sb.append(")");
+            filter.append("(name=");
+            filter.append(name);
+            filter.append(")");
         }
 
         if (isTypePresent) {
-            sb.append("(type=");
-            sb.append(type);
-            sb.append(")");
+            filter.append("(type=");
+            filter.append(type);
+            filter.append(")");
         }
 
         if (isVersionrangePresent) {
-            appendVersion(sb, versionRange);
+            appendVersion(filter, versionRange);
         }
 
         if (isExtrafuncPresent) {
-            sb.append("(extrafunc=");
-            sb.append(extrafunc);
-            sb.append(")");
+            filter.append("(extrafunc=");
+            filter.append(extrafunc);
+            filter.append(")");
         }
 
         if (isNamePresent || isTypePresent || isExtrafuncPresent || isVersionrangePresent) {
-            sb.append(")");
+            filter.append(")");
         }
 
-        req.setFilter(sb.toString());
+        req.setFilter(filter.toString());
 
-        String comment = BundleMetadata.REQUIRE_TYPES + ": " + value;
+        StringBuilder comment = new StringBuilder();
+        
+        comment.append(BundleMetadata.REQUIRE_TYPES).append(": ").append(value);
         if (isNamePresent) {
-            comment += ";name=\"" + name + "\"";
+            comment.append(";name=\"").append(name).append("\"");
         }
         if (isTypePresent) {
-            comment += ";type=\"" + type + "\"";
+            comment.append(";type=\"").append(type).append("\"");
         }
         if (isVersionrangePresent) {
-            comment += ";versionrange=\"" + versionRange + "\"";
+            comment.append(";versionrange=\"").append(versionRange).append("\"");
         }
         if (isExtrafuncPresent) {
-            comment += ";extrafunc=\"" + extrafunc + "\"";
+            comment.append(";extrafunc=\"").append(extrafunc).append("\"");
         }
 
-        req.setComment(comment);
+        req.setComment(comment.toString());
         req.setExtend(false);
         req.setMultiple(false);
         req.setOptional(isOptional);
@@ -344,7 +346,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
      * @param filter
      * @param version
      */
-    private void appendVersion(StringBuffer filter, VersionRange version) {
+    private void appendVersion(StringBuilder filter, VersionRange version) {
         Version emptyVersion = new Version("0.0.0");
         Version infinityVersion = new Version(Integer.MAX_VALUE + "." + Integer.MAX_VALUE + "." + Integer.MAX_VALUE);
 
