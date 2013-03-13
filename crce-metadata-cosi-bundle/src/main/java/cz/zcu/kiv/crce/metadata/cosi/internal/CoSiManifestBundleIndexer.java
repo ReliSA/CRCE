@@ -1,5 +1,16 @@
 package cz.zcu.kiv.crce.metadata.cosi.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.cosi.core.bundlemetadata.BundleMetadata;
 import cz.zcu.kiv.cosi.core.bundlemetadata.ManifestComplexHeader;
 import cz.zcu.kiv.cosi.core.bundlemetadata.ProvidingNamedTypeHeaderEntry;
@@ -16,25 +27,17 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
-import org.osgi.service.log.LogService;
 
 /**
  * implementation of <code>ResourceIndexer</code> which provides support for
  * indexing CoSi components metadata.
  * @author Natalia Rubinova
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
 
-    private volatile LogService m_log;             /* injected by dependency manager */
-
+    private static final Logger logger = LoggerFactory.getLogger(CoSiManifestBundleIndexer.class);
+    
     @Override
     public String[] index(final InputStream input, Resource resource) {
         BundleMetadata m_bundleMetadata;
@@ -45,13 +48,13 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
             } else {
                 return new String[0];
             }
-        } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "I/O error on indexing resource: " + resource.getId(), ex);
+        } catch (IOException e) {
+            logger.error("I/O error on indexing resource: {}", resource.getId(), e);
             return new String[0];
         } catch (VersionFormatException e) {
             return new String[0];
         } catch (Exception e) {
-            m_log.log(LogService.LOG_ERROR, "Unknown exception on indexing by CoSi indexer: " + resource.getId(), e);
+            logger.error("Unknown exception on indexing by CoSi indexer: {}", resource.getId(), e);
             return new String[0];
         }
 
@@ -174,15 +177,15 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
      */
     private void setCapabilityProperties(Capability cap, String capName, String value, String name, String type, Version version, ExtraFunc extrafunc) {
 
-        if (capName != null && !capName.toString().equals("")) {
+        if (capName != null && !capName.toString().isEmpty()) {
             cap.setProperty(capName, value);
         }
 
-        if (name != null && !name.toString().equals("")) {
+        if (name != null && !name.toString().isEmpty()) {
             cap.setProperty("name", name);
         }
 
-        if (type != null && !type.toString().equals("")) {
+        if (type != null && !type.toString().isEmpty()) {
             cap.setProperty("type", type);
         }
 
@@ -190,7 +193,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
             cap.setProperty("version", convertCoSiToOSGiVersion(version));
         }
 
-        if (extrafunc != null && !extrafunc.toString().equals("")) {
+        if (extrafunc != null && !extrafunc.toString().isEmpty()) {
             cap.setProperty("extrafunc", extrafunc.toString());
         }
     }
@@ -268,13 +271,13 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
         boolean isVersionrangePresent = false;
         boolean isTypePresent = false;
 
-        if (name != null && !name.equals("")) {
+        if (name != null && !name.isEmpty()) {
             isNamePresent = true;
         }
-        if (type != null && !type.equals("")) {
+        if (type != null && !type.isEmpty()) {
             isTypePresent = true;
         }
-        if (extrafunc != null && !extrafunc.toString().equals("")) {
+        if (extrafunc != null && !extrafunc.toString().isEmpty()) {
             isExtrafuncPresent = true;
         }
         if (versionRange != null && !versionRange.toString().equals("[0.0.0,infinity)")) {
@@ -306,7 +309,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
 
         if (isExtrafuncPresent) {
             sb.append("(extrafunc=");
-            sb.append(extrafunc.toString());
+            sb.append(extrafunc);
             sb.append(")");
         }
 
@@ -324,10 +327,10 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
             comment += ";type=\"" + type + "\"";
         }
         if (isVersionrangePresent) {
-            comment += ";versionrange=\"" + versionRange.toString() + "\"";
+            comment += ";versionrange=\"" + versionRange + "\"";
         }
         if (isExtrafuncPresent) {
-            comment += ";extrafunc=\"" + extrafunc.toString() + "\"";
+            comment += ";extrafunc=\"" + extrafunc + "\"";
         }
 
         req.setComment(comment);
@@ -421,7 +424,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
 
             } catch (Throwable e) {
 
-                m_log.log(LogService.LOG_ERROR, "I/O error ", e);
+                logger.error("I/O error {}", e.getMessage() , e);
 
             } finally {
                 try {
@@ -433,7 +436,7 @@ public class CoSiManifestBundleIndexer extends AbstractResourceIndexer {
                         is.close();
                     }
                 } catch (Throwable e) {
-                    m_log.log(LogService.LOG_ERROR, "I/O error ", e);
+                    logger.error("I/O error {}", e.getMessage(), e);
                 }
             }
         }

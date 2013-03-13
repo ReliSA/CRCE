@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.cosi.core.bundlemetadata.extrafunc.ExtraFunc;
 import cz.zcu.kiv.cosi.core.bundlemetadata.extrafunc.ExtraFuncEnum;
 import cz.zcu.kiv.cosi.core.bundlemetadata.extrafunc.ExtraFuncEnumEntry;
@@ -80,6 +83,8 @@ import cz.zcu.kiv.cosi.core.extrafuncregistryservice.ExtrafuncRegistryService;
 
 public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExtraFuncRegistryServiceImpl.class);
+    
 	/*
 	 * Extrafunc registry.
 	 */
@@ -97,7 +102,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 
 	/**
 	 * Loads Extra Functional registry from P_url.
-	 */
+     * 
+     * @throws IOException 
+     */
 	public void loadRegistryFromURL(URL P_url) throws IOException {
 		_fillRegistryLines(P_url.openStream());
 	}
@@ -118,12 +125,14 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	 */
 	public boolean checkExtraFuncMatch(ExtraFunc P_lhsExtraFunc, ExtraFunc P_rhsExtraFunc) {
 		// no required attributes - nothing to check
-		if (P_lhsExtraFunc.isEmpty()) 
-			return true;
+		if (P_lhsExtraFunc.isEmpty()) {
+            return true;
+        }
 		
 		// no provided attributes but we have required - error
-		if (P_rhsExtraFunc.isEmpty() && !P_lhsExtraFunc.isEmpty())
-			return false;
+		if (P_rhsExtraFunc.isEmpty() && !P_lhsExtraFunc.isEmpty()) {
+            return false;
+        }
 		
 		HashMap<ScopedToken,ExtraFuncType> F_providedExtraFuncAttributes = P_rhsExtraFunc.getAttributes();
 		HashMap<ScopedToken,ExtraFuncType> F_requiredExtraFuncAttributes = P_lhsExtraFunc.getAttributes();
@@ -135,7 +144,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 			if (F_providedAttribute != null) {
 				ExtraFuncType F_requiredAttribute = F_requiredExtraFuncAttributes.get(F_requiredKey);
 				if (!F_providedAttribute.fulfil(F_requiredAttribute)) {
-					log("Error: Required and provided extra-functional attributes don't match.");
+					logger.warn("Required and provided extra-functional attributes don't match.");
 					F_ret = false;
 				}
 			}
@@ -155,25 +164,29 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	 */
 	private boolean checkTypeMatches(String Ps_type, String Ps_valueType, ExtraFuncType P_value) {
 		if (!P_value.getType().equals(Ps_type) && !P_value.getType().equals(Ps_valueType)) {
-			log("Error: value type "+P_value.getType() + " doesn't match registry type "+Ps_type + " " + (!Ps_valueType.equals("") ? "or " +Ps_valueType : "")  + ".");
+			logger.warn("Value type {} doesn't match registry type {}{}.",
+                    P_value.getType(), Ps_type, (!"".equals(Ps_valueType) ? " or " + Ps_valueType : ""));
 			return false;
 		}
-		else {
-			if (P_value.getType().equals(ExtraFuncType.ENUM)) {
-				// check valueType
-				ExtraFuncEnum F_value = (ExtraFuncEnum) P_value;
-				if (!F_value.getValueType().equals(Ps_valueType)) {
-					log("Error: enum items type "+F_value.getValueType()+" doesn't match registry type "+Ps_valueType);
-				}
-				
-			}
-			else if (P_value.getType().equals(ExtraFuncType.INTERVAL)) {
-				ExtraFuncInterval F_value = (ExtraFuncInterval) P_value;
-				if (!F_value.getValueType().equals(Ps_valueType)) {
-					log("Error: enum items type "+F_value.getValueType()+" doesn't match registry type "+Ps_valueType);
-				}
-			}
-		}
+        else {
+            switch (P_value.getType()) {
+                case ExtraFuncType.ENUM: {
+                    // check valueType
+                    ExtraFuncEnum F_value = (ExtraFuncEnum) P_value;
+                    if (!F_value.getValueType().equals(Ps_valueType)) {
+                        logger.warn("Enum items type {} doesn't match registry type {}.", F_value.getValueType(), Ps_valueType);
+                    }
+                    break;
+                }
+                case ExtraFuncType.INTERVAL: {
+                    ExtraFuncInterval F_value = (ExtraFuncInterval) P_value;
+                    if (!F_value.getValueType().equals(Ps_valueType)) {
+                        logger.warn("Enum items type {} doesn't match registry type {}.", F_value.getValueType(), Ps_valueType);
+                    }
+                    break;
+                }
+            }
+        }
 		return true;
 		
 	}
@@ -183,8 +196,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	 * @see ExtrafuncRegistryService#checkExtraFuncValid(cz.zcu.kiv.cosi.core.bundlemetadata.extrafunc.ExtraFunc) 
 	 */
 	public boolean checkExtraFuncValid(ExtraFunc P_extrafunc) {
-		HashMap<ScopedToken, ExtraFuncType> F_extrafunc = P_extrafunc
-				.getAttributes();
+		HashMap<ScopedToken, ExtraFuncType> F_extrafunc = P_extrafunc.getAttributes();
 	
 		boolean F_retval = true;
 		// for each scoped token
@@ -196,7 +208,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 			
 			// check if value is in registry
 			if (F_registryValue == null) {
-				log("Error: ExtraFunc property not found:" + token.getValue());
+				logger.warn("ExtraFunc property not found: {}", token.getValue());
 				F_retval = false;
 				continue;
 			} else { // it is in registry
@@ -214,9 +226,8 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 				// no constrains and value has tokens
 				if (F_constraints == null) {
 					if (type.equals(ExtraFuncType.INTERVAL)) {
-						if (((ExtraFuncInterval) F_value).getValueType()
-								.equals(ExtraFuncType.TOKEN)) {
-							log("Error: Interval needs constraints if contains tokens.");
+						if (((ExtraFuncInterval) F_value).getValueType().equals(ExtraFuncType.TOKEN)) {
+							logger.warn("Interval needs constraints if contains tokens.");
 							F_retval = false;
 							continue;
 						}
@@ -228,7 +239,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 						}
 						
 						if (!F_value.getType().equals(type)) {
-							log("Error: value must be Enum or "+valuetype + " to match registry.");
+							logger.warn("Value must be Enum or {} to match registry.", valuetype);
 							F_retval = false;
 							continue;
 						}
@@ -236,7 +247,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 						
 						if (((ExtraFuncEnum) F_value).getValueType().equals(
 								ExtraFuncType.TOKEN)) {
-							log("Error: Enum needs constraints if contains tokens.");
+							logger.warn("Enum needs constraints if contains tokens.");
 							F_retval = false;
 							continue;
 						}
@@ -246,16 +257,18 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 				}
 
 				if (type.equals(ExtraFuncType.TOKEN)) {
-					if (!_checkToken((Token) F_value, F_constraints))
-						F_retval = false;
+					if (!_checkToken((Token) F_value, F_constraints)) {
+                        F_retval = false;
+                    }
 					continue;
 				}
 	
 				if (type.equals(ExtraFuncType.INTEGER)
 						|| type.equals(ExtraFuncType.FLOAT)) {
 					if (!_checkNumber((ExtraFuncSimpleType) F_value,
-							F_constraints))
-						F_retval = false;
+							F_constraints)) {
+                        F_retval = false;
+                    }
 					continue;
 				}
 	
@@ -309,8 +322,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	 */
 	private void checkRegistry() throws Exception {
 		// not set
-		if (registry == null)
-			throw new RuntimeException("ExtraFunc Registry is not set.");
+		if (registry == null) {
+            throw new RuntimeException("ExtraFunc Registry is not set.");
+        }
 	
 		// for all registry lines
 		for (ScopedToken token : registry.keySet()) {
@@ -323,10 +337,10 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 			if (F_constraints == null) {
 				if (F_type.equals(ExtraFuncType.TOKEN)
 						|| F_type.equals(ExtraFuncType.MAP)) {
-					throw new RuntimeException("Type " + F_type
-							+ " needs constraints.");
-				} else
-					continue;
+					throw new RuntimeException("Type " + F_type + " needs constraints.");
+				} else {
+                    continue;
+                }
 			}
 	
 			// check constraint type
@@ -334,8 +348,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 				if (!F_constraints.getType().equals(ExtraFuncType.ENUM)) {
 					throw new RuntimeException("Error: Bad constraint type: "
 							+ F_constraints.getType());
-				} else
-					continue;
+				} else {
+                    continue;
+                }
 			}
 	
 			// check constraint type for INTEGER, FLOAT and STRING
@@ -349,8 +364,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 							"Error: Bad constraint type for "+F_type+": "
 									+ F_constraints.getType()
 									+ ". Only interval and enum allowed.");
-				} else
-					continue;
+				} else {
+                    continue;
+                }
 			}
 	
 			// check constraint type for MAP
@@ -361,8 +377,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 							"Error: Bad constraint type for map: "
 									+ F_constraints.getType()
 									+ ". Only map allowed.");
-				} else
-					continue;
+				} else {
+                    continue;
+                }
 			}
 	
 			// check constraint type for enum
@@ -373,8 +390,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 							"Error: Bad constraint type for enum: "
 									+ F_constraints.getType()
 									+ ". Only enum allowed.");
-				} else
-					continue;
+				} else {
+                    continue;
+                }
 			}
 	
 			// check constraint type for interval
@@ -385,8 +403,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 							"Error: Bad constraint type for interval: "
 									+ F_constraints.getType()
 									+ ". Only enum allowed.");
-				} else
-					continue;
+				} else {
+                    continue;
+                }
 			}
 		}
 	}
@@ -395,7 +414,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	 * Loads registry from extrafuncregistry file.
 	 * @throws IOException if error occurs
 	 */
-	private final void loadRegistry() throws IOException {
+	private void loadRegistry() throws IOException {
 		InputStream F_input = this.getClass().getResourceAsStream(
 				"extrafuncregistry");
 		_fillRegistryLines(F_input);
@@ -403,33 +422,25 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 
 
 	/*
-	 * Prints message to stdout.
-	 * TODO logging for container
-	 */
-	private static void log(String logmessage) {
-//		System.out.println(logmessage);
-	}
-
-	/*
 	 * Checks if String value fulfills the constraints.   
 	 */
 	private boolean _checkString(ExtraFuncSimpleType P_value,
 			ExtraFuncType P_constraints) {
 		boolean F_retval = true;
-		if (P_constraints.getType().equals(ExtraFuncType.ENUM)) {
-			if (!((ExtraFuncEnum) P_constraints).contains(P_value)) {
-				F_retval = false;
-				log("Error: Value not allowed: "
-						+ P_value.getValue().toString());
-			}
-
-		} else if (P_constraints.getType().equals(ExtraFuncType.INTERVAL)) {
-			if (!((ExtraFuncInterval) P_constraints).fitsWithinRange(P_value)) {
-				F_retval = false;
-				log("Error: Value does not fit in interval: "
-						+ P_value.getValue().toString());
-			}
-		}
+        switch (P_constraints.getType()) {
+            case ExtraFuncType.ENUM:
+                if (!((ExtraFuncEnum) P_constraints).contains(P_value)) {
+                    F_retval = false;
+                    logger.warn("Value not allowed: {}", P_value.getValue());
+                }
+                break;
+            case ExtraFuncType.INTERVAL:
+                if (!((ExtraFuncInterval) P_constraints).fitsWithinRange(P_value)) {
+                    F_retval = false;
+                    logger.warn("Value does not fit in interval: {}", P_value.getValue());
+                }
+                break;
+        }
 
 		return F_retval;
 	}
@@ -468,7 +479,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 		for (ExtraFuncEnumEntry enumEntry : P_value.getValue()) {
 			if (!F_enum.contains(enumEntry.getValue())) {
 				F_retval = false;
-				log("Error: Unregistered enum value: " + enumEntry.getValue());
+				logger.warn("Unregistered enum value: {}", enumEntry.getValue());
 			}
 		}
 
@@ -486,24 +497,26 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 		ExtraFuncEnumEntry F_ceilingValue = null;
 		ExtraFuncEnumEntry F_averageValue = null;
 		
-		if (P_value.getFloorValue() != null)
-			F_floorValue = (ExtraFuncEnumEntry) P_value
-				.getFloorValue().getValue();
+		if (P_value.getFloorValue() != null) {
+            F_floorValue = (ExtraFuncEnumEntry) P_value
+                .getFloorValue().getValue();
+        }
 		
-		if (P_value.getCeilingValue() != null)
-			F_ceilingValue = (ExtraFuncEnumEntry) P_value
-				.getCeilingValue().getValue();
+		if (P_value.getCeilingValue() != null) {
+            F_ceilingValue = (ExtraFuncEnumEntry) P_value
+                .getCeilingValue().getValue();
+        }
 		
-		if (P_value.getAverageValue() != null)
-			F_averageValue = (ExtraFuncEnumEntry) P_value.getAverageValue()
-					.getValue();
+		if (P_value.getAverageValue() != null) {
+            F_averageValue = (ExtraFuncEnumEntry) P_value.getAverageValue()
+                    .getValue();
+        }
 
 		// check if token values are registered
 		if (F_floorValue != null) {
 			if (!F_enum.contains(F_floorValue.getValue())) {
 				F_retval = false;
-				log("Error: Unregistered interval value: "
-						+ P_value.getFloorValue().getValue().toString());
+				logger.warn("Unregistered interval value: {}", P_value.getFloorValue().getValue());
 			} else {
 				F_floorValue
 						.setPosition(F_enum.get(F_floorValue).getPosition());
@@ -513,28 +526,24 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 		if (F_ceilingValue != null) {
 			if (!F_enum.contains(F_ceilingValue.getValue())) {
 				F_retval = false;
-				log("Error: Unregistered interval value: "
-						+ P_value.getCeilingValue().getValue().toString());
+				logger.warn("Unregistered interval value: {}", P_value.getCeilingValue().getValue());
 			} else {
 				F_ceilingValue.setPosition(F_enum.get(F_ceilingValue)
 						.getPosition());
 			}
 		}
 
-		if ((P_value.getAverageValue() != null)
-				&& !F_enum.contains(F_averageValue.getValue())) {
-			log("Error: Unregistered interval value: "
-					+ P_value.getAverageValue().getValue().toString());
+		if (F_averageValue == null || (P_value.getAverageValue() != null && !F_enum.contains(F_averageValue.getValue()))) {
+			logger.warn("Unregistered interval value: {}", P_value.getAverageValue().getValue());
 			F_retval = false;
 		} else if (P_value.getAverageValue() != null) {
-			F_averageValue
-					.setPosition(F_enum.get(F_averageValue).getPosition());
+			F_averageValue.setPosition(F_enum.get(F_averageValue).getPosition());
 		}
 
 		try {
 			P_value.forceCheck();
 		} catch (RuntimeException e) {
-			log("Error: " + e.getMessage());
+			logger.error(e.getMessage(), e);
 			F_retval = false;
 		}
 		// set positions according to registry
@@ -549,7 +558,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 		if (((ExtraFuncEnum) P_constraints).contains(P_value)) {
 			return true;
 		} else {
-			log("Error: Token " + P_value.getValue() + " not in registry.");
+			logger.warn("Token {} not in registry.", P_value.getValue());
 			return false;
 		}
 	}
@@ -557,26 +566,29 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 	/*
 	 * Checks if Number (float, integer) value fulfills the constraints.   
 	 */
-	private boolean _checkNumber(ExtraFuncSimpleType P_value,
-			ExtraFuncType P_constraints) {
+    private boolean _checkNumber(ExtraFuncSimpleType P_value, ExtraFuncType P_constraints) {
+        switch (P_constraints.getType()) {
+            case ExtraFuncType.INTERVAL: {
+                ExtraFuncInterval F_interval = (ExtraFuncInterval) P_constraints;
+                boolean F_retval = F_interval
+                        .fitsWithinRange(P_value);
+                if (F_retval == false) {
+                    logger.warn("{} is not allowed value.", P_value.getValue());
+                }
+                return F_retval;
+            }
+            case ExtraFuncType.ENUM: {
+                ExtraFuncEnum F_enum = (ExtraFuncEnum) P_constraints;
+                boolean F_retval = F_enum.contains(P_value);
+                if (F_retval == false) {
+                    logger.warn("{} is not allowed value.", P_value.getValue());
+                }
+                return F_retval;
+            }
+        }
 
-		if (P_constraints.getType().equals(ExtraFuncType.INTERVAL)) {
-			ExtraFuncInterval F_interval = (ExtraFuncInterval) P_constraints;
-			boolean F_retval = F_interval
-					.fitsWithinRange((ExtraFuncSimpleType) P_value);
-			if (F_retval == false)
-				log("Error: " + P_value.getValue() + " is not allowed value.");
-			return F_retval;
-		} else if (P_constraints.getType().equals(ExtraFuncType.ENUM)) {
-			ExtraFuncEnum F_enum = (ExtraFuncEnum) P_constraints;
-			boolean F_retval = F_enum.contains(P_value);
-			if (F_retval == false)
-				log("Error: " + P_value.getValue() + " is not allowed value.");
-			return F_retval;
-		}
-
-		return false;
-	}
+        return false;
+    }
 
 	/*
 	 * Reads registry file lines into the registryLines map.
@@ -585,7 +597,7 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 			throws IOException {
 		BufferedReader F_reader = new BufferedReader(new InputStreamReader(
 				P_registryInput));
-		registryLines = new HashMap<String, String>();
+		registryLines = new HashMap<>();
 
 		String Fs_value = null;
 		String Fs_key = null;
@@ -594,8 +606,9 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
 
 			if (Fs_nextLine.length() == 0 || Fs_nextLine.startsWith("#")) {
 				continue;
-			} else
-				Fs_nextLine = Fs_nextLine.trim();
+			} else {
+                Fs_nextLine = Fs_nextLine.trim();
+            }
 
 			int Fi_doubleDotIndex = Fs_nextLine.indexOf(":");
 			if (Fi_doubleDotIndex > 0) {
