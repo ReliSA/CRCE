@@ -26,7 +26,6 @@ public class IndexerHandler {
     /** Contains instances and variables with data for indexing purpose. */
     private IndexerDataContainer container;
 
-    /** LogService injected by dependency manager. */
     private static Logger logger = LoggerFactory.getLogger(IndexerHandler.class);
 
     /**
@@ -37,7 +36,7 @@ public class IndexerHandler {
     public final boolean indexerInitialization(final Resource resource) {
 
         String resourceFilePath = resource.getUri().getPath(); // Path of resource artifact moved to the buffer.
-        logger.debug("Resource path: " + resourceFilePath);
+        logger.debug("Resource path: {}", resourceFilePath);
 
         container = new IndexerDataContainer();
         container.setResource(resource);

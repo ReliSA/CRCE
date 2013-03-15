@@ -30,6 +30,11 @@
         </dependency>
         
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        
+        <dependency>
             <groupId>net.sf.kxml</groupId>
             <artifactId>kxml2</artifactId>
             <scope>provided</scope>

@@ -7,9 +7,6 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * CRCE-EFP-Indexer activator class.
@@ -22,8 +19,6 @@ public class Activator extends DependencyActivatorBase {
     /** MetadataIndexingResultService injected by dependency manager. */
     private volatile MetadataIndexingResultService mMetadataIndexingResult;    /* injected by dependency manager */
 
-    private static Logger m_log = LoggerFactory.getLogger(Activator.class);
-    
     @Override
     public final void init(final BundleContext context, final DependencyManager manager) throws Exception {
 
@@ -50,13 +45,6 @@ public class Activator extends DependencyActivatorBase {
      */
     public static Activator instance() {
         return activatorInstance;
-    }
-
-    /**
-     * @return Logger
-     */
-    public final Logger getLog() {
-        return m_log;
     }
 
     /**

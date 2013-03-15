@@ -27,12 +27,14 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>cz.zcu.kiv.osgi</groupId>
             <artifactId>version-generator</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-            <type>bundle</type>
         </dependency>
 
         <dependency>

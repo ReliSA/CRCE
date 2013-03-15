@@ -6,11 +6,17 @@ import org.apache.ace.obr.storage.BundleStore;
 import org.osgi.service.obr.Repository;
 import org.osgi.service.obr.RepositoryAdmin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author kalwi
  */
 public class Test {
+    
+    private static final Logger logger = LoggerFactory.getLogger(Test.class);
+    
 //    private volatile Stack m_stack;
     
     private volatile RepositoryAdmin m_ra;
@@ -30,17 +36,17 @@ public class Test {
 //            System.out.println("m_ra: " + m_ra.getClass());
             m_ra.addRepository(new URL(url));
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Test error", ex);
         }
     }
     
     public void print() {
-        System.out.println("\n*** this is test " + id);
+        logger.info("\n*** this is test {}", id);
+        
         for (Repository r: m_ra.listRepositories()) {
-            System.out.println("repo: " + r.getURL());
+            logger.info("repo: {}", r.getURL());
         }
-        System.out.println("");
-        System.out.println("m_vbs: " + m_vbs.getClass());
-        System.out.println("end of test " + id);
+        logger.info("m_vbs: {}", m_vbs.getClass());
+        logger.info("end of test {}", id);
     }
 }

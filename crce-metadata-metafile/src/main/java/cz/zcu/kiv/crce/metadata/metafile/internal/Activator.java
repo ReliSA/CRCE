@@ -9,7 +9,6 @@ import org.apache.ace.obr.metadata.MetadataGenerator;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 /**
  * Activator of this bundle.
@@ -30,7 +29,6 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(MetafileResourceDAO.class)
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setService(DataModelHelperExt.class).setRequired(true))
                 );
         
@@ -38,7 +36,6 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(ResourceDAO.class.getName(), null)	// for crce-efp-indexer testing container
                 .setImplementation(MetafileResourceDAO.class)
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setService(DataModelHelperExt.class).setRequired(true))
                 );
         
@@ -49,7 +46,6 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(repositoryDAO)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceCreator.class))
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setRequired(false).setService(DataModelHelperExt.class))
                 );
         

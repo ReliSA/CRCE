@@ -5,7 +5,6 @@ import org.apache.felix.bundlerepository.RepositoryAdmin;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 /**
  * Activator of this bundle.
@@ -19,7 +18,6 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(OsgiManifestBundleIndexer.class)
                 .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 );
     }
 

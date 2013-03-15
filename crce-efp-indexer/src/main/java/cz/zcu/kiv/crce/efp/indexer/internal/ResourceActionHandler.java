@@ -36,9 +36,6 @@ public class ResourceActionHandler extends AbstractActionHandler implements Acti
      * If there is no EFP found so there is no reason to save resource metadata. */
     private boolean foundedEFP;
 
-    /** LogService injected by dependency manager. */
-    //private volatile LogService mLog;
-
     /** MetadataIndexingResultService injected by dependency manager. */
     private volatile MetadataIndexingResultService mMetadataIndexingResult;
 

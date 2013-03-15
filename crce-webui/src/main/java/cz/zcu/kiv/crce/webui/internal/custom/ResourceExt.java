@@ -27,7 +27,9 @@ public class ResourceExt extends ResourceWrap {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Resource) return this.getUri().equals(((Resource)obj).getUri());
+		if(obj instanceof Resource) {
+            return this.getUri().equals(((Resource)obj).getUri());
+        }
 		return super.equals(obj);
 	}
 

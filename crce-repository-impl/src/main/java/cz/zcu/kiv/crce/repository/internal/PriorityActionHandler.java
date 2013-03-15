@@ -1,5 +1,13 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -8,13 +16,6 @@ import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Properties;
-import org.osgi.service.log.LogService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Root implementation of <code>ActionHandler</code> which calls other

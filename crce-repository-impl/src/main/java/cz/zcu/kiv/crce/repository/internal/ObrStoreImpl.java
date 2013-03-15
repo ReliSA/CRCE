@@ -1,19 +1,20 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Properties;
+
+import org.osgi.service.obr.RepositoryAdmin;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.Properties;
-import org.osgi.service.log.LogService;
-import org.osgi.service.obr.RepositoryAdmin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-//import org.osgi.service.obr.Resource;
 
 /**
  * Implementation of <code>Store</code> which can connect to remote OBR repository.
@@ -115,7 +116,7 @@ public class ObrStoreImpl implements Store {
 //            try {
 //                resource.setMetadataURL(new URL(url));
 //            } catch (MalformedURLException e) {
-//                m_log.log(LogService.LOG_WARNING, "Could not add metadata URL to ResourceExt: " + url, e);
+//                logger.warn("Could not add metadata URL to ResourceExt: " + url, e);
 //            }
             
 //            resources[i] = resource;

@@ -6,7 +6,6 @@ import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
 
 /**
  * Activator of this bundle.
@@ -21,13 +20,11 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(VersioningActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(VersionService.class))
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
         
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(IncreaseVersionActionHandler.class)
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
     }
 

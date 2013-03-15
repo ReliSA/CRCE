@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.handler.versioning.internal;
 
 import org.osgi.framework.Version;
-import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class IncreaseVersionActionHandler extends AbstractActionHandler implemen
         for (int i = 2; repository.contains(resource); i++) {
             resource.setVersion(new Version(version.getMajor(), version.getMinor(), version.getMicro(), version.getQualifier() + "_" + i));
             if (resource.getVersion().equals(version)) {
-                logger.warn("Can not change resource's version but the version is not static: " + resource.getId() + ", version: " + resource.getVersion());
+                logger.warn("Can not change resource's version but the version is not static: {}, version: {}", resource.getId(), resource.getVersion());
                 return resource;
             }
         }

@@ -1,10 +1,5 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.Type;
-import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -12,8 +7,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.zip.ZipException;
+
 import org.apache.felix.bundlerepository.RepositoryAdmin;
-import org.osgi.service.log.LogService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 
 /**
  * implementation of <code>ResourceIndexer</code> which provides support for
@@ -21,9 +25,10 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(OsgiManifestBundleIndexer.class);
+    
     private volatile RepositoryAdmin m_repoAdmin;  /* injected by dependency manager */
-    private volatile LogService m_log;             /* injected by dependency manager */
 
     @Override
     public String[] index(final InputStream input, Resource resource) {
@@ -50,11 +55,11 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         } catch (MalformedURLException e) {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (ZipException e) {
-            m_log.log(LogService.LOG_WARNING, "Zip file is corrupted");
+            logger.warn("Zip file is corrupted: {}", resource.getId(), e);
             resource.addCategory("corrupted");
             return new String[] {"corrupted"};
         } catch (IOException ex) {
-            m_log.log(LogService.LOG_ERROR, "I/O error on indexing resource: " + resource.getId(), ex);
+            logger.error("I/O error on indexing resource: {}", resource.getId(), ex);
             return new String[0];
         } catch (IllegalArgumentException e) {
             // not a bundle

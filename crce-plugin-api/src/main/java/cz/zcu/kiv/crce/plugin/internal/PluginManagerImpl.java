@@ -1,16 +1,19 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
-import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.log.LogService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
  * Implementation of <code>PluginManager</code>.
@@ -18,8 +21,9 @@ import org.osgi.service.log.LogService;
  */
 public class PluginManagerImpl implements PluginManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(PluginManagerImpl.class);
+    
     private static final String ROOT_CLASS = "java.lang.Object";
-    private volatile LogService m_log; /* injected by dependency manager */
     private volatile EventAdmin m_eventAdmin; /* injected by dependency manager */
 
     /**
@@ -27,7 +31,7 @@ public class PluginManagerImpl implements PluginManager {
      * The key to outer map is a plugin type, value is inner map.
      * The key to inner map is a keyword associated to a set of plugins.
      */
-    private final Map<Class, Map<String, Set<Plugin>>> m_plugins = new HashMap<Class, Map<String, Set<Plugin>>>();
+    private final Map<Class<?>, Map<String, Set<Plugin>>> m_plugins = new HashMap<>();
 
     @Override
     public synchronized Plugin[] getPlugins() {
@@ -64,7 +68,7 @@ public class PluginManagerImpl implements PluginManager {
             return (T[]) java.lang.reflect.Array.newInstance(type, 0);
         }
 
-        Set<Plugin> out = new HashSet<Plugin>();
+        Set<Plugin> out = new HashSet<>();
         for (String keyword : keywords) {
             Set<Plugin> set = map.get(keyword);
             if (set != null) {
@@ -92,7 +96,7 @@ public class PluginManagerImpl implements PluginManager {
         if (set == null || set.isEmpty()) {
             return null;
         }
-        Set<Plugin> sorted = new TreeSet<Plugin>(set);
+        Set<Plugin> sorted = new TreeSet<>(set);
         @SuppressWarnings("unchecked")
         T t = (T) sorted.iterator().next();
         return t;
@@ -103,12 +107,12 @@ public class PluginManagerImpl implements PluginManager {
      * @param plugin 
      */
     synchronized void register(Plugin plugin) {
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         addRecursive(plugin.getClass(), plugin, types);
 
-        m_log.log(LogService.LOG_INFO, "Plugin registered: " + plugin.getPluginId());
+        logger.info("Plugin registered: {}", plugin.getPluginId());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(PROPERTY_PLUGIN_ID, plugin.getPluginId());
         properties.put(PROPERTY_PLUGIN_VERSION, plugin.getPluginVersion().toString());
         properties.put(PROPERTY_PLUGIN_PRIORITY, plugin.getPluginPriority());
@@ -124,12 +128,12 @@ public class PluginManagerImpl implements PluginManager {
      * @param plugin 
      */
     synchronized void unregister(Plugin plugin) {
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         removeRecursive(plugin.getClass(), plugin, types);
         
-        m_log.log(LogService.LOG_INFO, "Plugin unregistered: " + plugin.getPluginId());
+        logger.info("Plugin unregistered: {}", plugin.getPluginId());
         
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(PROPERTY_PLUGIN_ID, plugin.getPluginId());
         properties.put(PROPERTY_PLUGIN_VERSION, plugin.getPluginVersion().toString());
         properties.put(PROPERTY_PLUGIN_PRIORITY, plugin.getPluginPriority());
@@ -140,11 +144,11 @@ public class PluginManagerImpl implements PluginManager {
         m_eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
     }
 
-    private void removeRecursive(Class clazz, Plugin plugin, Set<String> types) {
+    private void removeRecursive(Class<?> clazz, Plugin plugin, Set<String> types) {
         if (ROOT_CLASS.equals(clazz.getName())) {
             return;
         }
-        for (Class iface : clazz.getInterfaces()) {
+        for (Class<?> iface : clazz.getInterfaces()) {
             types.add(clazz.getName());
             Map<String, Set<Plugin>> map = m_plugins.get(iface);
             if (map == null) {
@@ -169,11 +173,11 @@ public class PluginManagerImpl implements PluginManager {
         removeRecursive(clazz.getSuperclass(), plugin, types);
     }
 
-    private void addRecursive(Class clazz, Plugin plugin, Set<String> types) {
+    private void addRecursive(Class<?> clazz, Plugin plugin, Set<String> types) {
         if (ROOT_CLASS.equals(clazz.getName())) {
             return;
         }
-        for (Class iface : clazz.getInterfaces()) {
+        for (Class<?> iface : clazz.getInterfaces()) {
             types.add(iface.getName());
             if (plugin.getPluginKeywords().length == 0) {
                 add(iface, plugin, NO_KEYWORDS);
@@ -187,15 +191,15 @@ public class PluginManagerImpl implements PluginManager {
         addRecursive(clazz.getSuperclass(), plugin, types);
     }
 
-    private void add(Class iface, Plugin plugin, String keyword) {
+    private void add(Class<?> iface, Plugin plugin, String keyword) {
         Map<String, Set<Plugin>> map = m_plugins.get(iface);
         if (map == null) {
-            map = new HashMap<String, Set<Plugin>>();
+            map = new HashMap<>();
             m_plugins.put(iface, map);
         }
         Set<Plugin> set = map.get(keyword);
         if (set == null) {
-            set = new HashSet<Plugin>();
+            set = new HashSet<>();
             map.put(keyword, set);
         }
         set.add(plugin);
@@ -205,7 +209,7 @@ public class PluginManagerImpl implements PluginManager {
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Plugins:\n");
-        for (Class clazz : m_plugins.keySet()) {
+        for (Class<?> clazz : m_plugins.keySet()) {
             sb.append("  ").append(clazz.getName()).append(":\n");
             Map<String, Set<Plugin>> map = m_plugins.get(clazz);
             for (String keyword : map.keySet()) {

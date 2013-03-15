@@ -1,15 +1,16 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.felix.dm.DependencyManager;
+
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionData;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.felix.dm.DependencyManager;
-import org.osgi.service.log.LogService;
 
 /**
  * Implementation of <code>SessionFactory.</code>
@@ -19,7 +20,7 @@ public class SessionFactoryImpl implements SessionRegister {
 
     private volatile DependencyManager m_dependencyManager; /* injected by dependency manager */
     
-    private final Map<String, SessionDataImpl> m_sessions = new HashMap<String, SessionDataImpl>();
+    private final Map<String, SessionDataImpl> m_sessions = new HashMap<>();
 
     @Override
     public void registerSession(String sessionId) {
@@ -35,7 +36,6 @@ public class SessionFactoryImpl implements SessionRegister {
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(m_dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
-                        .add(m_dependencyManager.createServiceDependency().setService(LogService.class).setRequired(false))
                         .add(m_dependencyManager.createServiceDependency().setService(ResourceCreator.class).setRequired(true));
                 
                 m_dependencyManager.add(sd.m_bufferComponent);

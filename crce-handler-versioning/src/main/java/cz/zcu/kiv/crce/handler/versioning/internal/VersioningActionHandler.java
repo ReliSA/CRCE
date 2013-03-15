@@ -1,5 +1,15 @@
 package cz.zcu.kiv.crce.handler.versioning.internal;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -12,13 +22,6 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.osgi.service.log.LogService;
 
 /**
  * Implementation of <code>ActionHandler</code> which compares commited OSGi
@@ -27,12 +30,13 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
     
     private static final String CATEGORY_VERSIONED = "versioned";
 
     private volatile VersionService m_versionService;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
-    private volatile LogService m_log;                  /* injected by dependency manager */
 
     private int BUFFER_SIZE = 8 * 1024;
 
@@ -88,16 +92,16 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     m_versionService.updateVersion(source, new File(resource.getUri()));
                     category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
-                    m_log.log(LogService.LOG_ERROR, "Could not update version due to I/O error", ex);
+                    logger.error("Could not update version due to I/O error", ex);
                     category = null;
-                } catch (VersionGeneratorException ex) {
-                    m_log.log(LogService.LOG_WARNING, "Could not update version (VersionGeneratorException): " + ex.getMessage());
+                } catch (VersionGeneratorException e) {
+                    logger.warn("Could not update version (VersionGeneratorException): {}", e.getMessage());
                     category = "non-versionable";
-                } catch (BundlesIncomparableException ex) {
-                    m_log.log(LogService.LOG_WARNING, "Could not update version (incomparable bundles): " + ex.getMessage());
+                } catch (BundlesIncomparableException e) {
+                    logger.warn("Could not update version (incomparable bundles): {}", e.getMessage());
                     category = "non-versionable";
                 } catch (Exception e) {
-                    m_log.log(LogService.LOG_ERROR, "Could not update version (unknown error)", e);
+                    logger.error("Could not update version (unknown error)", e);
                     category = null;
                 }
 
@@ -105,8 +109,8 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
                 try {
                     resource = creator.getResource(resource.getUri());   // reload changed resource
-                } catch (IOException ex) {
-                    m_log.log(LogService.LOG_ERROR, "Could not reload changed resource", ex);
+                } catch (IOException e) {
+                    logger.error("Could not reload changed resource", e);
                 }
             }
 

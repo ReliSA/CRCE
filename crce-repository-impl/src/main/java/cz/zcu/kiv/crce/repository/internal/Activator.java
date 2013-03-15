@@ -13,7 +13,7 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.log.LogService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     
     public static final String STORE_URI = "store.uri";
 
-    //private volatile LogService m_log;              /* injected by dependency manager */
     private volatile DependencyManager m_manager;   /* injected by dependency manager */
     private volatile BundleContext m_context;       /* injected by dependency manager */
     
@@ -42,7 +41,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         dm.add(createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createConfigurationDependency().setPid(PID))
                 );
 
@@ -55,7 +53,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(PriorityActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 );
     }
 
@@ -96,8 +93,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 store = createComponent()
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new FilebasedStoreImpl(file))
-                        .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                        .add(createServiceDependency().setRequired(false).setService(LogService.class));
+                        .add(createServiceDependency().setRequired(true).setService(PluginManager.class));
             } catch (IOException e) {
                 throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
             }

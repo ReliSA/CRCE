@@ -8,7 +8,6 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.log.LogService;
 
 /**
  *
@@ -28,7 +27,6 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(PluginManager.class.getName(), null)
                 .setImplementation(pm)
-                .add(createServiceDependency().setRequired(false).setService(LogService.class))
                 .add(createServiceDependency().setRequired(true).setService(EventAdmin.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("register", "unregister").setService(Plugin.class))
                 );

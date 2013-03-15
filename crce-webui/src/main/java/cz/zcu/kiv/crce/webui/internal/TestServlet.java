@@ -9,48 +9,42 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author kalwi
  */
 public class TestServlet extends HttpServlet implements ManagedService {
+
+    private static final long serialVersionUID = -5870408422415688046L;
     
-    private static final long serialVersionUID = -5870408422415688046L; // TODO regenerate
+    private static final Logger logger = LoggerFactory.getLogger(TestServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
-        PrintWriter out = resp.getWriter();
-        
-        ServletContext cx = this.getServletContext();
-        
-        out.println("Hello, world!");
+        try (PrintWriter out = resp.getWriter()) {
+            ServletContext cx = this.getServletContext();
 
-        Enumeration e = cx.getInitParameterNames();
+            out.println("Hello, world!");
 
-        while (e.hasMoreElements()) {
-            String element = (String) e.nextElement();
-            out.println(element + ": " + cx.getInitParameter(element));
+            Enumeration e = cx.getInitParameterNames();
+
+            while (e.hasMoreElements()) {
+                String element = (String) e.nextElement();
+                out.println(element + ": " + cx.getInitParameter(element));
+            }
         }
-        
-        
-        out.close();
-        
-//        try {
-//            forwardTo("/index.jsp", req, resp);
-//        } catch (Exception e) {
-//            System.out.println("***********");
-//            e.printStackTrace();
-//        }
-        
+
     }
 
     @Override
     public void updated(Dictionary dctnr) throws ConfigurationException {
-        System.out.println("servlet updated");
+        logger.info("Test servlet updated.");
     }
-
 }

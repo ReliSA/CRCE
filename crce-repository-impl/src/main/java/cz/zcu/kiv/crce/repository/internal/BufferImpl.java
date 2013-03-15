@@ -1,5 +1,26 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
@@ -13,25 +34,6 @@ import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
-import org.osgi.service.log.LogService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Filebased implementation of <code>Buffer</code>.
@@ -42,7 +44,6 @@ public class BufferImpl implements Buffer, EventHandler {
 
     private volatile BundleContext m_context;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager; /* injected by dependency manager */
-    //private volatile LogService m_log;  /* injected by dependency manager */
     private volatile Store m_store;     /* injected by dependency manager */
     private volatile ResourceCreator m_resourceCreator;     /* injected by dependency manager */
     
@@ -89,12 +90,12 @@ public class BufferImpl implements Buffer, EventHandler {
         for (File file : m_baseDir.listFiles()) {
             if (!file.delete()) {
                 file.deleteOnExit();
-                logger.warn("Can not delete file from destroyed buffer, deleteOnExit was set: " + file);
+                logger.warn("Can not delete file from destroyed buffer, deleteOnExit was set: {}", file);
             }
         }
         if (!m_baseDir.delete()) {
             m_baseDir.deleteOnExit();
-            logger.warn("Can not delete file from destroyed buffer's base dir, deleteOnExit was set: " + m_baseDir);
+            logger.warn("Can not delete file from destroyed buffer's base dir, deleteOnExit was set: {}", m_baseDir);
         }
     }
     
@@ -119,7 +120,7 @@ public class BufferImpl implements Buffer, EventHandler {
         try {
             m_repository = rd.getRepository(m_baseDir.toURI());
         } catch (IOException ex) {
-        	logger.error("Could not get repository for URI: " + m_baseDir.toURI(), ex);
+        	logger.error("Could not get repository for URI: {}", m_baseDir.toURI(), ex);
             m_repository = m_pluginManager.getPlugin(ResourceCreator.class).createRepository(m_baseDir.toURI());
         }
     }
@@ -130,20 +131,12 @@ public class BufferImpl implements Buffer, EventHandler {
         if (name2 == null || artifact == null || "".equals(name2)) {
             throw new RevokedArtifactException("No file name was given on uploading to buffer");
         }
-        FileOutputStream output = null;
-        File file = null;
-        try {
-            file = File.createTempFile("res", ".tmp", m_baseDir);
-            output = new FileOutputStream(file);
+        
+        File file = File.createTempFile("res", ".tmp", m_baseDir);
+        try (FileOutputStream output = new FileOutputStream(file)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int count = artifact.read(buffer); count != -1; count = artifact.read(buffer)) {
                 output.write(buffer, 0, count);
-            }
-
-        } finally {
-            if (output != null) {
-                output.flush();
-                output.close();
             }
         }
         
@@ -163,7 +156,7 @@ public class BufferImpl implements Buffer, EventHandler {
             tmp = m_pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
         } catch (RevokedArtifactException e) {
             if (!file.delete()) {
-            	logger.error( "Can not delete file of revoked artifact: " + file.getPath());
+            	logger.error( "Can not delete file of revoked artifact: {}", file.getPath());
             }
             throw e;
         }
@@ -194,7 +187,7 @@ public class BufferImpl implements Buffer, EventHandler {
         
         if (!isInBuffer(resource)) {
             if (m_repository != null && m_repository.contains(resource)) {
-            	logger.warn( "Resource to be removed is not in buffer but it is in internal repository: " + resource.getId() + ", cleaning up");
+            	logger.warn( "Resource to be removed is not in buffer but it is in internal repository: {}, cleaning up", resource.getId());
                 m_repository.removeResource(resource);
             }
             return false;
@@ -217,7 +210,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 loadRepository();
             }
             if (!m_repository.removeResource(resource)) {
-            	logger.warn("Buffer's internal repository does not contain removing resource: " + resource.getId());
+            	logger.warn("Buffer's internal repository does not contain removing resource: {}", resource.getId());
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
@@ -231,9 +224,9 @@ public class BufferImpl implements Buffer, EventHandler {
     public synchronized List<Resource> commit(boolean move) throws IOException {
         List<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(Arrays.asList(m_repository.getResources()), this, m_store);
         
-        List<Resource> commited = new ArrayList<Resource>();
-        List<Resource> resourcesToRemove = new ArrayList<Resource>();
-        Map<String, String[]> toRemoveNonrenamed = new HashMap<String, String[]>(); // K: new ID, V: old sn, old ver
+        List<Resource> commited = new ArrayList<>();
+        List<Resource> resourcesToRemove = new ArrayList<>();
+        Map<String, String[]> toRemoveNonrenamed = new HashMap<>(); // K: new ID, V: old sn, old ver
         ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         
         // put resources to store
@@ -245,7 +238,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     putResource = ((FilebasedStoreImpl) m_store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
                 } catch (RevokedArtifactException ex) {
-                	logger.info( "Resource can not be commited, it was revoked by store: " + resource.getId());
+                	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId());
                     continue;
                 }
                 commited.add(putResource);
@@ -257,7 +250,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 try {
                     putResource = m_store.put(resource);
                 } catch (RevokedArtifactException ex) {
-                	logger.info( "Resource can not be commited, it was revoked by store: " + resource.getId(), ex);
+                	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }
                 commited.add(putResource);
@@ -276,7 +269,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 File resourceFile = new File(resource.getUri());
                 if (resourceFile.exists()) {
                     if (!resourceFile.delete()) {
-                    	logger.error( "Can not delete artifact from buffer: " + resource.getUri());
+                    	logger.error( "Can not delete artifact from buffer: {}", resource.getUri());
                         continue;
                     }
                 }
@@ -292,7 +285,7 @@ public class BufferImpl implements Buffer, EventHandler {
                         fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
                         fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
                         if (!m_repository.removeResource(fake)) {
-                        	logger.warn( "Buffer's internal repository does not contain removing resource: " + resource.getId());
+                        	logger.warn( "Buffer's internal repository does not contain removing resource: {}", resource.getId());
                         }
                     }
                     m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
@@ -304,7 +297,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
                     fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
                     if (!m_repository.removeResource(fake)) {
-                    	logger.warn("Buffer's internal repository does not contain removing resource: " + resource.getId());
+                    	logger.warn("Buffer's internal repository does not contain removing resource: {}", resource.getId());
                     }
                 }
             }
@@ -337,7 +330,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 try {
                     executable.executeOnBuffer(res, m_store, buffer, properties);
                 } catch (Exception e) {
-                	logger.error( "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
+                	logger.error( "Executable plugin threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
                 }
                 ah.afterExecuteInBuffer(res, executable, properties, buffer);
             }

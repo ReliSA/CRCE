@@ -1,5 +1,16 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
@@ -9,17 +20,8 @@ import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Comparator;
 import org.apache.ace.obr.metadata.MetadataGenerator;
 import org.codehaus.plexus.util.FileUtils;
-
-import org.osgi.service.log.LogService;
 
 /**
  * Implementation of <code>ResourceDAO</code> which provides support for
@@ -27,13 +29,14 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements MetadataGenerator, RepositoryDAO {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(MetafileRepositoryDAO.class);
+    
     private static final String INDEX_FILENAME = "repository";
     private static final String INDEX_EXTENSION = ".xml";
     
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
     private volatile ResourceCreator m_resourceCreator; /* injected by dependency manager */
-    private volatile LogService m_log;                  /* injected by dependency manager */
     private volatile DataModelHelperExt m_helper;       /* injected by dependency manager */
 
     @Override
@@ -122,7 +125,7 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
         try {
             tempIndex = File.createTempFile("repo", INDEX_EXTENSION, directory);
         } catch (IOException e) {
-            m_log.log(LogService.LOG_ERROR, "Unable to create temporary file for new repository index", e);
+            logger.error("Unable to create temporary file for new repository index.", e);
             throw e;
         }
         
@@ -149,12 +152,12 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
                 }
             }
             if (!success) {
-                m_log.log(LogService.LOG_ERROR, "Unable to move new repository index to it's final location");
+                logger.error("Unable to move new repository index to it's final location");
                 throw new IOException("Could not move temporary index file (" + tempIndex.getAbsolutePath() + ") to it's final location (" + index.getAbsolutePath() + ")");
             }
 
         } catch (InterruptedException e) {
-            m_log.log(LogService.LOG_ERROR, "Waiting for next attempt to move temporary repository index failed", e);
+            logger.error("Waiting for next attempt to move temporary repository index failed", e);
         }
     }
 
@@ -170,10 +173,10 @@ public class MetafileRepositoryDAO extends AbstractRepositoryDAO implements Meta
                 try {
                     resource = rdao.getResource(artifact.toURI());
                 } catch (IOException e) {
-                    m_log.log(LogService.LOG_ERROR, "Can not index resource " + artifact.getAbsolutePath(), e);
+                    logger.error("Can not index resource {}.", artifact.getAbsolutePath(), e);
                     return;
                 } catch (NullPointerException e) {
-                    m_log.log(LogService.LOG_WARNING, "No resourceDAO found, try it later");
+                    logger.warn("No resourceDAO found, try it later.");
                     return;
                 }
 

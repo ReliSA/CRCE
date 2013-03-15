@@ -14,129 +14,125 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.osgi.service.log.LogService;
 import org.slf4j.Logger;
-
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 public class DownloadServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static final int BUFSIZE = 128;
-	
+    private static final long serialVersionUID = 6399102910617353070L;
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-	throws ServletException, IOException {
-		boolean success;
-		String message;
-		Resource[] buffer = (Resource [])req.getSession().getAttribute("buffer");
-		List<Resource> list = Activator.instance().getBuffer(req).commit(true);
-		if(list.size()==buffer.length) {
-			success=true;
-			message="All resources commited succesfully";
-		}
-		else {
-			success=false;
-			message="Not all resources commited succesfully";
-		}
-		req.getSession().setAttribute("source","commit");
-		ResourceServlet.setError(req.getSession(), success, message);
-		req.getRequestDispatcher("resource?link=store").forward(req, resp);
-	}
+    private static final Logger logger = LoggerFactory.getLogger(DownloadServlet.class);
+    
+    private static final int BUFSIZE = 128;
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-	throws ServletException, IOException {
-		boolean failed = false;
-		String message;
-		if (req.getParameter("uri") != null)
-		{
-			String link = (String) req.getSession().getAttribute("source");
-			String uri = (String) req.getParameter("uri");
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        boolean success;
+        String message;
+        Resource[] buffer = (Resource[]) req.getSession().getAttribute("buffer");
+        List<Resource> list = Activator.instance().getBuffer(req).commit(true);
+        if (list.size() == buffer.length) {
+            success = true;
+            message = "All resources commited succesfully";
+        } else {
+            success = false;
+            message = "Not all resources commited succesfully";
+        }
+        req.getSession().setAttribute("source", "commit");
+        ResourceServlet.setError(req.getSession(), success, message);
+        req.getRequestDispatcher("resource?link=store").forward(req, resp);
+    }
 
-			try {
-				URI fileUri = new URI(uri);
-				if(link.equals("store"))
-				{
-					Resource[] array = Activator.instance().getStore().getRepository().getResources();
-					Resource found = EditServlet.findResource(fileUri,array);
-					doDownload(req ,resp ,found);
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        boolean failed = false;
+        String message;
+        if (req.getParameter("uri") != null) {
+            String link = (String) req.getSession().getAttribute("source");
+            String uri = (String) req.getParameter("uri");
 
-				}
-				else if(link.equals("buffer"))
-				{
-					Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
-					Resource found = EditServlet.findResource(fileUri, array);
-					Activator.instance().getLog().debug("Found!"+found.getPresentationName());
-					doDownload(req ,resp ,found);
-				}
-				else failed=true;
+            try {
+                URI fileUri = new URI(uri);
+                if (link.equals("store")) {
+                    Resource[] array = Activator.instance().getStore().getRepository().getResources();
+                    Resource found = EditServlet.findResource(fileUri, array);
+                    doDownload(req, resp, found);
 
-			} 
-			catch (Exception e) {
-				failed = true;
-				e.printStackTrace();
-			}
-		} 
-		else {
-			failed = true;
-		}
-		
-		if(failed) message="Download failed"; 
-		else message="Download succesfull";
-		ResourceServlet.setError(req.getSession(), !failed, message);
-		
-	}
+                } else if (link.equals("buffer")) {
+                    Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
+                    Resource found = EditServlet.findResource(fileUri, array);
+                    logger.debug("Found!" + found.getPresentationName());
+                    doDownload(req, resp, found);
+                } else {
+                    failed = true;
+                }
 
+            } catch (Exception e) {
+                failed = true;
+                e.printStackTrace();
+            }
+        } else {
+            failed = true;
+        }
 
+        if (failed) {
+            message = "Download failed";
+        } else {
+            message = "Download succesfull";
+        }
+        ResourceServlet.setError(req.getSession(), !failed, message);
 
-	private void doDownload( HttpServletRequest req, HttpServletResponse resp,
-			Resource found ) throws IOException {
+    }
 
-		File                f        = new File(found.getRelativeUri());
-		int                 length   = 0;
-		ServletOutputStream op       = resp.getOutputStream();
-		ServletContext      context  = getServletConfig().getServletContext();
-		String              mimetype = context.getMimeType(found.getRelativeUri().toString());
+    private void doDownload(HttpServletRequest req, HttpServletResponse resp,
+            Resource found) throws IOException {
 
-		//
-		//  Set the response and go!
-		//
-		//
-		resp.setContentType( (mimetype != null) ? mimetype : "application/octet-stream" );
-		resp.setContentLength( (int)f.length() );
-		resp.setHeader( "Content-Disposition", "attachment; filename=\"" + found.getSymbolicName() + chooseCategory(found.getCategories()) + "\"" );
+        File f = new File(found.getRelativeUri());
+        int length = 0;
+        ServletOutputStream op = resp.getOutputStream();
+        ServletContext context = getServletConfig().getServletContext();
+        String mimetype = context.getMimeType(found.getRelativeUri().toString());
 
-		//
-		//  Stream to the requester.
-		//
-		byte[] bbuf = new byte[BUFSIZE];
-		DataInputStream in = new DataInputStream(new FileInputStream(f));
+        //
+        //  Set the response and go!
+        //
+        //
+        resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+        resp.setContentLength((int) f.length());
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + found.getSymbolicName() + chooseCategory(found.getCategories()) + "\"");
 
-		while ((in != null) && ((length = in.read(bbuf)) != -1))
-		{
-			op.write(bbuf,0,length);
-		}
+        //
+        //  Stream to the requester.
+        //
+        byte[] bbuf = new byte[BUFSIZE];
+        DataInputStream in = new DataInputStream(new FileInputStream(f));
 
-		in.close();
-		op.flush();
-		op.close();
-	}
-	
-	private String chooseCategory(String[] strings) {
-		String suffix = ""; 
-		for (String string : strings) {
-			if(string.equals("jpeg")) return ".jpg";
-			if(string.equals("zip")) suffix = ".zip";
-			if(	string.equals("osgi")
-				|| string.equals("cosi")) return ".jar";
-			
-		}
-		return suffix;
-	}
+        while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+            op.write(bbuf, 0, length);
+        }
 
+        in.close();
+        op.flush();
+        op.close();
+    }
+
+    private String chooseCategory(String[] strings) {
+        String suffix = "";
+        for (String string : strings) {
+            if (string.equals("jpeg")) {
+                return ".jpg";
+            }
+            if (string.equals("zip")) {
+                suffix = ".zip";
+            }
+            if (string.equals("osgi") || string.equals("cosi")) {
+                return ".jar";
+            }
+
+        }
+        return suffix;
+    }
 }

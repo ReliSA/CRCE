@@ -1,9 +1,5 @@
 package cz.zcu.kiv.crce.metadata.metafile.internal;
 
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
-import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -15,7 +11,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.osgi.service.log.LogService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
+import cz.zcu.kiv.crce.metadata.metafile.DataModelHelperExt;
 
 /**
  * This implementation of ResourceDAO reads/writes metadata from/to a file,
@@ -24,12 +26,13 @@ import org.osgi.service.log.LogService;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class MetafileResourceDAO extends AbstractResourceDAO {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(MetafileResourceDAO.class);
+    
     public static final String METAFILE_EXTENSION = ".meta";
     
     private volatile ResourceCreator m_resourceCreator;
     private volatile DataModelHelperExt m_dataModelHelper;
-    private volatile LogService m_log;
 
     @Override
     public void save(Resource resource) throws IOException {
@@ -82,7 +85,7 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         } catch (IOException e) {
             throw new IOException("Can not read XML data", e);
         } catch (Exception e) {
-            m_log.log(LogService.LOG_ERROR, "Can not parse XML data (probably corrupted content): " + e.getMessage());
+            logger.error("Can not parse XML data (probably corrupted content): {}", e.getMessage());
             return m_resourceCreator.createResource();
         }
     }
@@ -92,18 +95,18 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         URI metadataUri = getMetafileUri(resource.getUri());
         String scheme = metadataUri.getScheme();
         if ("file".equals(scheme)) {
-            File resourceFile = new File(metadataUri);
-            if (resourceFile.exists() && !resourceFile.delete()) {
-                m_log.log(LogService.LOG_WARNING, "Can not delete metadata file " + metadataUri + ", it will be deleted later");
-                resourceFile.deleteOnExit();
-            }
+                File resourceFile = new File(metadataUri);
+                if (resourceFile.exists() && !resourceFile.delete()) {
+                    logger.warn("Can not delete metadata file {}, it will be deleted later.", metadataUri);
+                    resourceFile.deleteOnExit();
+                }
         } else if ("http".equals(scheme)) {
-            HttpURLConnection httpCon = (HttpURLConnection) metadataUri.toURL().openConnection();
-            httpCon.setDoOutput(true);
-            httpCon.setRequestMethod("DELETE");
-            httpCon.connect();
+                HttpURLConnection httpCon = (HttpURLConnection) metadataUri.toURL().openConnection();
+                httpCon.setDoOutput(true);
+                httpCon.setRequestMethod("DELETE");
+                httpCon.connect();
         } else {
-            throw new UnsupportedOperationException("Removing metadata for scheme of given URI is not supported: " + scheme);
+                throw new UnsupportedOperationException("Removing metadata for scheme of given URI is not supported: " + scheme);
         }
     }
     

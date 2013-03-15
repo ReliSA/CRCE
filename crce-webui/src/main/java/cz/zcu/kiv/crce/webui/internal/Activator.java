@@ -6,8 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
+
 import org.osgi.framework.BundleContext;
-import org.osgi.service.log.LogService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,8 @@ import cz.zcu.kiv.crce.repository.Store;
  */
 public final class Activator extends DependencyActivatorBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(Activator.class);
+
     private static volatile Activator m_instance;
 
     private volatile BundleContext m_context;           /* injected by dependency manager */
@@ -32,8 +35,6 @@ public final class Activator extends DependencyActivatorBase {
     private volatile SessionRegister m_sessionRegister;   /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
-
-    private Logger m_logger = LoggerFactory.getLogger( Activator.class );
 
     /** MetadataIndexingResultService instance provides by simple way information
      * about metadata indexing process result. */
@@ -55,9 +56,6 @@ public final class Activator extends DependencyActivatorBase {
     	return this.m_creator;
     }
     
-    public Logger getLog() {
-        return m_logger;
-    }
     public Store getStore(){
     	return m_store;
     }
@@ -86,7 +84,6 @@ public final class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
-                .add(createServiceDependency().setService(LogService.class).setRequired(false))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
@@ -94,8 +91,7 @@ public final class Activator extends DependencyActivatorBase {
                 );
         
        
-        m_logger.debug("Webui activator is inited.");
-
+        logger.debug("Webui activator initialized.");
     }
 
     @Override

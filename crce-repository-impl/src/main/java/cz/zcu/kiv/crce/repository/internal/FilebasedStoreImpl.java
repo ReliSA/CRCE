@@ -1,5 +1,21 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Dictionary;
+import java.util.List;
+import java.util.Properties;
+
+import org.codehaus.plexus.util.FileUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
@@ -11,20 +27,6 @@ import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Properties;
-import org.codehaus.plexus.util.FileUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
-import org.osgi.service.log.LogService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Filebased implementation of <code>Store</code>.
@@ -155,7 +157,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
         Resource out = resourceDao.moveResource(resource, targetFile.toURI());
         if (!m_repository.addResource(out)) {
-        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: " + targetFile.getPath());
+        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
             if (!targetFile.delete()) {
                 throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
             }
@@ -178,7 +180,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         
         if (!isInStore(resource)) {
             if (m_repository != null && m_repository.contains(resource)) {
-            	logger.warn( "Removing resource is not in store but it is in internal repository: " + resource.getId());
+            	logger.warn( "Removing resource is not in store but it is in internal repository: {}", resource.getId());
                 m_repository.removeResource(resource);
             }
             m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
@@ -202,7 +204,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 loadRepository();
             }
             if (!m_repository.removeResource(resource)) {
-            	logger.warn( "Store's internal repository does not contain removing resource: " + resource.getId());
+            	logger.warn( "Store's internal repository does not contain removing resource: {}", resource.getId());
             }
             m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
@@ -231,7 +233,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 try {
                     executable.executeOnStore(res, store, properties);
                 } catch (Exception e) {
-                	logger.error( "Executable plugin threw an exception while executed in buffer: " + executable.getPluginDescription(), e);
+                	logger.error( "Executable plugin threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
                 }
                 ah.afterExecuteInStore(res, executable, properties, store);
             }
