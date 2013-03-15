@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -26,7 +26,7 @@ import cz.zcu.kiv.crce.rest.internal.Activator;
 @Path("/helloworld")
 public class HelloWorldResource extends ResourceParent{
 	
-	private final Logger log = LoggerFactory.getLogger(HelloWorldResource.class);
+	private static final Logger log = LoggerFactory.getLogger(HelloWorldResource.class);
 	
 	// The Java method will process HTTP GET requests
 	@GET

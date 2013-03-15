@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
+import cz.zcu.kiv.crce.rest.internal.rest.PostOtherBundlesMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.ObjectFactory;
@@ -50,9 +52,9 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
  * 
  */
 @Path("/other_bundles_metadata")
-public class OtherBundlesMetadataResource extends ResourceParent{	
+public class OtherBundlesMetadataResource extends ResourceParent implements PostOtherBundlesMetadata {	
 	
-	private final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
+	private static final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
 	
 	private static final String DEF_ENCODING = "UTF-8";
 	
@@ -205,17 +207,11 @@ public class OtherBundlesMetadataResource extends ResourceParent{
 
 	
 	/**
-	 * Server provide metadata about other bundles (repository contents diff).
-	 * Response contains bundles, that:
-	 * <ul>
-     *  <li> are not in the list sent by client, but all in storage ("new bundles")
-     *  <li> are in the list but have been removed from the repository ("deleted bundles" - just a list of bundle identifiers).
-	 * </ul>
-	 * @param knownBundles XML with information about bundles, that client knows.
-	 * @return XML with difference between knownBundles and state of server.
+	 * {@inheritDoc}
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
+	@Produces({MediaType.APPLICATION_XML })
 	public Response otherBundles(String knownBundles) {		
 		requestId++;
 		log.debug("Request ({}) - Post other bundles request was received.", requestId);

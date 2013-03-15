@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
+import cz.zcu.kiv.crce.rest.internal.rest.GetMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
@@ -25,18 +26,14 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
  *
  */
 @Path("/metadata")
-public class MetadataResource extends ResourceParent{
+public class MetadataResource extends ResourceParent implements GetMetadata{
 	
-	private final Logger log = LoggerFactory.getLogger(MetadataResource.class);
+	private static final Logger log = LoggerFactory.getLogger(MetadataResource.class);
     
 	
 	/**
-	 * Returns XML with metadata of resources from the store repository.
-	 * If the request is without filter query parameter, return all resources.
-	 * If the request have filter parameter, return resources that met the filter.
-	 * @param filter obligatory LDAP filter
-	 * @return XML with metadata of resources from the store repository
-	 */
+	  * {@inheritDoc}
+	  */
     @GET
     @Produces({MediaType.APPLICATION_XML })
     public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
@@ -104,13 +101,12 @@ public class MetadataResource extends ResourceParent{
     }
     
 
-    /**
-     * Return  xml with metadata of one resource, that is specified by id.
-     * @param id id of the resource
-     * @return xml with metadata about the resource
-     */
-    @GET @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML })
+	/**
+	 * {@inheritDoc}
+	 */
+	@GET
+	@Path("{id}")
+	@Produces({ MediaType.APPLICATION_XML })
     public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
     	requestId++;
     	log.debug("Request ({}) - Get metadata request for resource with id {} was received.",requestId ,id);

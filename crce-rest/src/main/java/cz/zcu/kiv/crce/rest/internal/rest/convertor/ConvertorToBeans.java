@@ -32,7 +32,7 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
  */
 public class ConvertorToBeans {
 		
-	private final Logger log = LoggerFactory.getLogger(ConvertorToBeans.class);
+	private static final Logger log = LoggerFactory.getLogger(ConvertorToBeans.class);
 	
 	/**
 	 * Get original file name from resource or null, if name was not found.

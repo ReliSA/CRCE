@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.rest.internal.rest.GetBundle;
 
 
 /**
@@ -29,9 +30,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  */
 @Path("/bundle")
-public class BundleResource extends ResourceParent{
+public class BundleResource extends ResourceParent implements GetBundle {
 	
-	private final Logger log = LoggerFactory.getLogger(BundleResource.class);
+	private static final Logger log = LoggerFactory.getLogger(BundleResource.class);
 	
 	/**
 	 * size of buffer between input an output stream for a bundle
@@ -106,7 +107,7 @@ public class BundleResource extends ResourceParent{
 	 */
 	@GET @Path("{id}")
 	@Produces({MediaType.APPLICATION_OCTET_STREAM})
-	public Response getBundle(@PathParam("id") String id) {
+	public Response getBundleById(@PathParam("id") String id) {
 		requestId++;
 		log.debug("Request ({}) - Get bundle by id request was received.", requestId );
 		

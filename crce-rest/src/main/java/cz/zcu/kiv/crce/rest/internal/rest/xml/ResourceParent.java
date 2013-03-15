@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import java.io.ByteArrayOutputStream;
 
@@ -22,7 +22,7 @@ public class ResourceParent {
 	
 	protected static int requestId = 0;
 	
-	private final Logger log = LoggerFactory.getLogger(ResourceParent.class);
+	private static final Logger log = LoggerFactory.getLogger(ResourceParent.class);
 	
 	/**
      * Create XML String from repository.

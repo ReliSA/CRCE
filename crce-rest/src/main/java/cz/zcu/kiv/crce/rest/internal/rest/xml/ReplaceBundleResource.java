@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest;
+package cz.zcu.kiv.crce.rest.internal.rest.xml;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,14 +14,15 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
+import cz.zcu.kiv.crce.rest.internal.rest.GetReplaceBundle;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
 
 @Path("/replace_bundle")
-public class ReplaceBundleResource extends ResourceParent{
+public class ReplaceBundleResource extends ResourceParent implements GetReplaceBundle {
 	
-	private final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
+	private static final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
 	
 	/**
 	 * Find symbolic name of resource determined by id;
