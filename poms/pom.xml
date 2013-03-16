@@ -21,8 +21,8 @@
         <namespace>cz.zcu.kiv.crce</namespace>
         <version.org.apache.ace>0.8.0-SNAPSHOT</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
-        <version.org.slf4j>1.7.2</version.org.slf4j>
         <version.com.sun.jersey>1.17</version.com.sun.jersey>
+        <version.org.ops4j.pax.web>3.0.0.M1</version.org.ops4j.pax.web>
     </properties>
 
     <modules>
@@ -105,22 +105,22 @@
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-extender-war</artifactId>
-                <version>3.0.0.M1</version>
+                <version>${version.org.ops4j.pax.web}</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-jetty-bundle</artifactId>
-                <version>3.0.0.M1</version>
+                <version>${version.org.ops4j.pax.web}</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-jsp</artifactId>
-                <version>3.0.0.M1</version>
+                <version>${version.org.ops4j.pax.web}</version>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-spi</artifactId>
-                <version>3.0.0.M1</version>
+                <version>${version.org.ops4j.pax.web}</version>
             </dependency>
 
             <!-- === LOGGING === -->

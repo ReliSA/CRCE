@@ -49,6 +49,7 @@
            for crce-webui: javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
           com.sun.xml.internal.bind.v2
         </org.osgi.framework.system.packages.extra>-->
+        <version.org.slf4j>1.7.3</version.org.slf4j>
     </properties>
 
     <packaging>pom</packaging>
@@ -109,6 +110,15 @@
                     <provision>
                         <param>--platform=felix</param>
                         <param>--repositories=http://repo1.maven.org/maven2,http://repository.ops4j.org/maven2,http://subversion.assembla.com/svn/crce/third-parties,http://subversion.assembla.com/svn/crce/releases,http://subversion.assembla.com/svn/crce/snapshots</param>
+                        <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
+                        <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:ch.qos.logback/logback-core@1</param>
+                        <param>mvn:ch.qos.logback/logback-classic@1</param>
                     </provision>
                 </configuration>
             </plugin>
@@ -162,6 +172,12 @@
     </distributionManagement>
 
     <repositories>
+        <!-- Central repository - must be listed first as a default repo for downloading artifacts -->
+        <repository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        
         <!-- sacco repo -->
       	<repository>
       		<id>sacco.maven.repository</id>
@@ -176,10 +192,6 @@
       		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-third-parties-repository</url>
       	</repository>
 
-        <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
         <repository>
             <id>crce.maven.repository.releases</id>
             <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
