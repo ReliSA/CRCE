@@ -25,28 +25,33 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
     }
 
     @Override
-    public synchronized String getNamespace() {
+    public String getNamespace() {
         return namespace;
     }
 
     @Override
-    public synchronized Resource getResource() {
+    public Resource getResource() {
         return resource;
     }
 
     @Override
-    public synchronized Capability getParent() {
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
+
+    @Override
+    public Capability getParent() {
         return parent;
     }
 
     @Override
-    public synchronized boolean setParent(Capability parent) {
+    public boolean setParent(Capability parent) {
         this.parent = parent;
         return true;
     }
 
     @Override
-    public synchronized boolean addChild(Capability capability) {
+    public boolean addChild(Capability capability) {
         if (!children.contains(capability)) {
             capability.setParent(this);
             return children.add(capability);
@@ -55,17 +60,17 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
     }
 
     @Override
-    public synchronized boolean removeChild(Capability capability) {
+    public boolean removeChild(Capability capability) {
         return children.remove(capability);
     }
 
     @Override
-    public synchronized List<Capability> getChildren() {
+    public List<Capability> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
     @Override
-    public synchronized boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
@@ -89,7 +94,7 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
     }
 
     @Override
-    public synchronized int hashCode() {
+    public int hashCode() {
         int hash = 3;
         hash = 97 * hash + Objects.hashCode(this.namespace);
         hash = 97 * hash + Objects.hashCode(this.resource);

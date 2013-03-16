@@ -40,6 +40,11 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
     }
 
     @Override
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
+
+    @Override
     public Requirement getParent() {
         return parent;
     }
@@ -51,7 +56,7 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
     }
 
     @Override
-    public synchronized boolean addNestedRequirement(Requirement requirement) {
+    public boolean addNestedRequirement(Requirement requirement) {
         if (!nestedRequirements.contains(requirement)) {
             requirement.setParent(this);
             return nestedRequirements.add(requirement);
@@ -60,32 +65,32 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
     }
 
     @Override
-    public synchronized boolean removeNestedRequirement(Requirement requirement) {
+    public boolean removeNestedRequirement(Requirement requirement) {
         return nestedRequirements.remove(requirement);
     }
 
     @Override
-    public synchronized List<Requirement> getNestedRequirements() {
+    public List<Requirement> getNestedRequirements() {
         return Collections.unmodifiableList(nestedRequirements);
     }
 
     @Override
-    public synchronized <T> MatchingAttribute<T> getAttribute(AttributeType<T> type) {
+    public <T> MatchingAttribute<T> getAttribute(AttributeType<T> type) {
         return (MatchingAttribute<T>) super.getAttribute(type);
     }
 
     @Override
-    public synchronized <T> boolean setAttribute(AttributeType<T> type, T value, Operator operator) {
+    public <T> boolean setAttribute(AttributeType<T> type, T value, Operator operator) {
         return super.setAttribute(new MatchingAttributeImpl<>(type, value, operator));
     }
 
     @Override
-    public synchronized <T> boolean setAttribute(Attribute<T> attribute, Operator operator) {
+    public <T> boolean setAttribute(Attribute<T> attribute, Operator operator) {
         return super.setAttribute(new MatchingAttributeImpl<>(attribute.getAttributeType(), attribute.getValue(), operator));
     }
 
     @Override
-    public synchronized <T> boolean setAttribute(String name, Class<T> type, T value, Operator operator) {
+    public <T> boolean setAttribute(String name, Class<T> type, T value, Operator operator) {
         AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
         Attribute<T> attribute = new MatchingAttributeImpl<>(attributeType, value, operator);
         return super.setAttribute(attribute);
@@ -93,19 +98,23 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized List<MatchingAttribute<?>> getAttributes() {
+    public List<MatchingAttribute<?>> getAttributes() {
         return Collections.unmodifiableList((List<MatchingAttribute<?>>) super.getAttributes());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized Map<String, MatchingAttribute<?>> getAttributesMap() {
+    public Map<String, MatchingAttribute<?>> getAttributesMap() {
         return (Map<String, MatchingAttribute<?>>) super.getAttributesMap();
     }
 
     @Override
-    public synchronized Operator getAttributeOperator(AttributeType<?> type) {
-        return ((MatchingAttribute<?>) super.getAttribute(type)).getOperator();
+    public Operator getAttributeOperator(AttributeType<?> type) {
+        Attribute<?> attribute = super.getAttribute(type);
+        if (attribute != null) {
+            return ((MatchingAttribute<?>) attribute).getOperator();
+        }
+        return Operator.EQUAL;
     }
 
     @Override

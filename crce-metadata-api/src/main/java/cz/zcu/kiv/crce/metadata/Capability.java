@@ -18,6 +18,8 @@ public interface Capability extends AttributeProvider, DirectiveProvider {
 
     @CheckForNull
     Resource getResource();
+    
+    void setResource(@Nullable Resource resource);
 
     @CheckForNull
     Capability getParent();

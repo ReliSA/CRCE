@@ -20,6 +20,8 @@ public interface Requirement extends AttributeProvider, DirectiveProvider {
     @CheckForNull
     Resource getResource();
     
+    void setResource(@Nullable Resource resource);
+    
     @CheckForNull
     Requirement getParent();
     
@@ -49,5 +51,6 @@ public interface Requirement extends AttributeProvider, DirectiveProvider {
     @Override
     Map<String, MatchingAttribute<?>> getAttributesMap();
 
+    @Nonnull
     Operator getAttributeOperator(@Nonnull AttributeType<?> type);
 }

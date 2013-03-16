@@ -18,6 +18,10 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
     private Resource resource = null;
     private Property parent = null;
     private List<Property> children = new ArrayList<>();
+
+    public PropertyImpl(String namespace) {
+        this.namespace = namespace;
+    }
     
     @Override
     public String getNamespace() {
@@ -27,6 +31,11 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
     @Override
     public Resource getResource() {
         return resource;
+    }
+
+    @Override
+    public void setResource(Resource resource) {
+        this.resource = resource;
     }
 
     @Override

@@ -16,6 +16,9 @@ import javax.annotation.Nonnull;
  */
 public interface Resource {
 
+    @Nonnull
+    String getId();
+    
     @CheckForNull
     Repository getRepository();
 
@@ -51,6 +54,8 @@ public interface Resource {
     
     /* --- setters --- */
 
+    void setId(@Nonnull String id);
+    
     void addCapability(@Nonnull Capability capability);
 
     void addRequirement(@Nonnull Requirement requirement);

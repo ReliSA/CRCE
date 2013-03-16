@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -13,21 +14,27 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
  */
 public class AttributeImpl<T> implements Attribute<T> {
 
-    private T value;
+    private T value = null;
     private AttributeType<T> type;
 
-    public AttributeImpl(@Nonnull AttributeType<T> type, @Nonnull T value) {
+    public AttributeImpl(@Nonnull AttributeType<T> type, @Nullable T value) {
         this.value = value;
         this.type = type;
     }
 
     @Override
     public T getValue() {
+        if (value == null) {
+            throw new IllegalStateException("Value is null for " + type.getName());
+        }
         return value;
     }
 
     @Override
     public String getStringValue() {
+        if (value == null) {
+            throw new IllegalStateException("Value is null for " + type.getName());
+        }
         return String.valueOf(value);
     }
 
@@ -52,7 +59,7 @@ public class AttributeImpl<T> implements Attribute<T> {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final AttributeImpl other = (AttributeImpl) obj;
+        final AttributeImpl<?> other = (AttributeImpl) obj;
         if (!Objects.equals(this.value, other.value)) {
             return false;
         }

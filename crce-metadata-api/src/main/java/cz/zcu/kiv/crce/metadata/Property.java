@@ -17,6 +17,8 @@ public interface Property {
 
     @CheckForNull
     Resource getResource();
+    
+    void setResource(@Nullable Resource resource);
 
     @CheckForNull
     Property getParent();

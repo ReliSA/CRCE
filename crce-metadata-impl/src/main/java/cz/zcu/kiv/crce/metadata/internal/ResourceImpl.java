@@ -14,6 +14,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Implementation of <code>Resource</code> interface.
@@ -21,6 +22,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  */
 public class ResourceImpl extends AbstractEntityBase implements Resource {
 
+    private String id;
     private Repository repository = null;
     /*
      * All maps:
@@ -30,6 +32,16 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     private Map<String, List<Capability>> rootCapabilities = new HashMap<>();
     private Map<String, List<Requirement>> allRequirements = new HashMap<>();
     private Map<String, List<Property>> allProperties = new HashMap<>();
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
     
     @Override
     public Repository getRepository() {
@@ -205,6 +217,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         }
     }
     
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
     @SuppressWarnings({"null", "ConstantConditions"})
     private Capability getRootCapability(@Nonnull Capability capability) {
         Capability root = capability;
@@ -213,7 +226,8 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         }
         return root;
     }
-    
+
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
     @SuppressWarnings({"null", "ConstantConditions"})
     private Requirement getRootRequirement(@Nonnull Requirement requirement) {
         Requirement root = requirement;
@@ -223,6 +237,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         return root;
     }
 
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
     @SuppressWarnings({"null", "ConstantConditions"})
     private Property getRootProperty(@Nonnull Property requirement) {
         Property root = requirement;

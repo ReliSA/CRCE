@@ -28,7 +28,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
 
     @Override
     public <T> String getAttributeStringValue(AttributeType<T> type) {
-        Attribute attribute = attributesMap.get(type.getName());
+        Attribute<?> attribute = attributesMap.get(type.getName());
         if (attribute != null) {
             return attribute.getStringValue();
         }
@@ -68,9 +68,9 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Attribute<T> getAttribute(AttributeType<T> type) {
-        Attribute attribute = attributesMap.get(type.getName());
+        Attribute<?> attribute = attributesMap.get(type.getName());
         if (attribute != null) {
-            return attribute;
+            return (Attribute<T>) attribute;
         }
         return null;
     }
@@ -88,7 +88,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getAttributeValue(AttributeType<T> type) {
-        Attribute attribute = attributesMap.get(type.getName());
+        Attribute<?> attribute = attributesMap.get(type.getName());
         if (attribute != null) {
             return (T) attribute.getValue();
         }

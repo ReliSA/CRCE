@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.MatchingAttribute;
 import cz.zcu.kiv.crce.metadata.Operator;
@@ -14,7 +15,7 @@ public class MatchingAttributeImpl<T> extends AttributeImpl<T> implements Matchi
 
     private Operator operator;
 
-    public MatchingAttributeImpl(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator) {
+    public MatchingAttributeImpl(@Nonnull AttributeType<T> type, @Nullable T value, @Nonnull Operator operator) {
         super(type, value);
         this.operator = operator;
     }
