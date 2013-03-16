@@ -9,7 +9,12 @@ import java.lang.reflect.Method;
 import org.junit.Test;
 
 
-
+/**
+ * 
+ * Test parser of requirement filter, that is part of {@link ConvertorToBeans}.
+ * @author Jan Reznicek
+ *
+ */
 public class FilterParserTest {
 	
 	private static final String FILTER1 = "(&(package=cz.zcu.kiv.example)(version>=2.0.1))";
