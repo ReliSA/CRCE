@@ -1,11 +1,12 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
-import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.util.Properties;
+
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractExecutable extends AbstractPlugin implements Executable {
 
@@ -18,5 +19,4 @@ public abstract class AbstractExecutable extends AbstractPlugin implements Execu
     public Properties getProperties() {
         return new Properties();
     }
-
 }

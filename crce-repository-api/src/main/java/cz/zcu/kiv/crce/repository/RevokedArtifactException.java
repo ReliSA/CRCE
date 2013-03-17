@@ -1,13 +1,17 @@
 package cz.zcu.kiv.crce.repository;
 
+import javax.annotation.Nonnull;
+
 /**
- * Throwed if artifact put into the Buffer or Store is revoked and can not be
- * stored.
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * Throwed if artifact put into the Buffer or Store is revoked and can not be stored.
+ *
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RevokedArtifactException extends Exception {
-    public RevokedArtifactException(String reason) {
+
+    private static final long serialVersionUID = 3732119005799739933L;
+
+    public RevokedArtifactException(@Nonnull String reason) {
         super(reason);
     }
 }

@@ -1,10 +1,13 @@
 package cz.zcu.kiv.crce.repository;
 
+import javax.annotation.Nonnull;
+
 /**
  * This interface defines a session-dependend data for instances of Buffer.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface SessionData {
 
-    public Buffer getBuffer();
+    @Nonnull
+    Buffer getBuffer();
 }
