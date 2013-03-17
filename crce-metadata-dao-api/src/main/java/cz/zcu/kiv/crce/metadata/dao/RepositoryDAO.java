@@ -1,15 +1,17 @@
 package cz.zcu.kiv.crce.metadata.dao;
 
+import java.io.IOException;
+import java.net.URI;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.plugin.Plugin;
-import java.io.IOException;
-import java.net.URI;
 
 /**
  * This type of plugin defines DAO class for reading and storing the metadata of
  * a repository.
  * 
+ * PENDING this interface probably won't be needed.
  * 
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */

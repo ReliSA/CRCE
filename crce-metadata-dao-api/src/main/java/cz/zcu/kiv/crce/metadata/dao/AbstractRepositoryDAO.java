@@ -1,9 +1,11 @@
 package cz.zcu.kiv.crce.metadata.dao;
 
+import java.io.IOException;
+
+import org.osgi.service.cm.ManagedService;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
-import java.io.IOException;
-import org.osgi.service.cm.ManagedService;
 
 /**
  * This class can be extended by implementations of <code>RepositoryDAO</code>.

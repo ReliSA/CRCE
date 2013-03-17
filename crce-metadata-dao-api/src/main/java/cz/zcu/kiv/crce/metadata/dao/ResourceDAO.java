@@ -1,9 +1,12 @@
 package cz.zcu.kiv.crce.metadata.dao;
 
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.IOException;
 import java.net.URI;
+
+import javax.annotation.Nonnull;
+
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.Plugin;
 
 /**
  * Plugin implementing this class manages retrieving and storing metadata of an
@@ -25,7 +28,7 @@ public interface ResourceDAO extends Plugin {
      * @return
      * @throws IOException  
      */
-    Resource loadResource(URI uri) throws IOException;
+    Resource loadResource(@Nonnull URI uri) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.
@@ -33,14 +36,14 @@ public interface ResourceDAO extends Plugin {
      * @param resource
      * @throws IOException 
      */
-    void saveResource(Resource resource) throws IOException;
+    void saveResource(@Nonnull Resource resource) throws IOException;
     
     /**
      * Removes metadata of <code>Resource</code>.
-     * @param resource
+     * @param uri
      * @throws IOException  
      */
-    void deleteResource(Resource resource) throws IOException;
+    void deleteResource(@Nonnull URI uri) throws IOException;
     
     /**
      * Moves (reassignes) the <code>Resource</code> to the artifact with the

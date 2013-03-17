@@ -1,8 +1,10 @@
 package cz.zcu.kiv.crce.metadata.dao;
 
+import java.io.IOException;
+import java.net.URI;
+
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
-import java.io.IOException;
 
 /**
  * This class can be extended by implementations of <code>ResourceDAO</code>.
@@ -18,7 +20,7 @@ public abstract class AbstractResourceDAO extends AbstractPlugin implements Reso
     }
 
     @Override
-    public void deleteResource(Resource resource) throws IOException {
+    public void deleteResource(URI uri) throws IOException {
         // do nothing
     }
 }
