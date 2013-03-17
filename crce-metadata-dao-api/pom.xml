@@ -4,7 +4,6 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
         <artifactId>compiled-bundle-settings</artifactId>
         <version>1.0.0-SNAPSHOT</version>
@@ -12,10 +11,10 @@
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-metadata-dao-api</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Metadata DAO API</name>
+    <name>CRCE - Incubator - Metadata DAO API</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.dao.api</bundle.symbolicName>
@@ -36,7 +35,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

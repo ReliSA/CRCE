@@ -25,17 +25,7 @@ public interface ResourceDAO extends Plugin {
      * @return
      * @throws IOException  
      */
-    public Resource getResource(URI uri) throws IOException;
-
-    /**
-     * Moves (reassignes) the <code>Resource</code> to the artifact with the
-     * given URI.
-     * 
-     * @param resource
-     * @param artifact URI of artifact.
-     * @return 
-     */
-    public Resource moveResource(Resource resource, URI artifact);
+    Resource loadResource(URI uri) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.
@@ -43,13 +33,24 @@ public interface ResourceDAO extends Plugin {
      * @param resource
      * @throws IOException 
      */
-    public void save(Resource resource) throws IOException;
-
+    void saveResource(Resource resource) throws IOException;
+    
     /**
      * Removes metadata of <code>Resource</code>.
      * @param resource
      * @throws IOException  
      */
-    public void remove(Resource resource) throws IOException;
+    void deleteResource(Resource resource) throws IOException;
     
+    /**
+     * Moves (reassignes) the <code>Resource</code> to the artifact with the
+     * given URI.
+     * 
+     * PENDING will be needed?
+     * 
+     * @param resource
+     * @param artifact URI of artifact.
+     * @return 
+     */
+    Resource moveResource(Resource resource, URI artifact);
 }
