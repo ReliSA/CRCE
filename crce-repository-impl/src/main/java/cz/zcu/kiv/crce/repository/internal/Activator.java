@@ -27,18 +27,18 @@ import cz.zcu.kiv.crce.repository.Store;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase implements ManagedService {
-    
+
     public static final String PID = "cz.zcu.kiv.crce.repository";
-    
+
     public static final String STORE_URI = "store.uri";
 
     private volatile DependencyManager m_manager;   /* injected by dependency manager */
     private volatile BundleContext m_context;       /* injected by dependency manager */
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
-        
+
         dm.add(createComponent()
                 .setImplementation(this)
                 .add(createConfigurationDependency().setPid(PID))
@@ -48,7 +48,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .setInterface(SessionRegister.class.getName(), null)
                 .setImplementation(SessionFactoryImpl.class)
                 );
-        
+
         dm.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(PriorityActionHandler.class)
@@ -57,7 +57,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     }
 
     @Override
-    public void updated(Dictionary dict) throws ConfigurationException {
+    public void updated(Dictionary<String, ?> dict) throws ConfigurationException {
         if (dict == null) {
             return;
         }

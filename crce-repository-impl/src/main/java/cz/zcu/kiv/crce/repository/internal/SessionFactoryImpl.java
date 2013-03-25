@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.felix.dm.DependencyManager;
 
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionData;
@@ -19,7 +19,7 @@ import cz.zcu.kiv.crce.repository.Store;
 public class SessionFactoryImpl implements SessionRegister {
 
     private volatile DependencyManager m_dependencyManager; /* injected by dependency manager */
-    
+
     private final Map<String, SessionDataImpl> m_sessions = new HashMap<>();
 
     @Override
@@ -28,16 +28,16 @@ public class SessionFactoryImpl implements SessionRegister {
             if (!m_sessions.containsKey(sessionId)) {
                 SessionDataImpl sd = new SessionDataImpl();
                 BufferImpl buffer = new BufferImpl(sessionId);
-                
+
                 sd.m_buffer = buffer;
-                
+
                 sd.m_bufferComponent = m_dependencyManager.createComponent()
                         .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
                         .setImplementation(buffer)
                         .add(m_dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(m_dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
-                        .add(m_dependencyManager.createServiceDependency().setService(ResourceCreator.class).setRequired(true));
-                
+                        .add(m_dependencyManager.createServiceDependency().setService(ResourceFactory.class).setRequired(true));
+
                 m_dependencyManager.add(sd.m_bufferComponent);
                 m_sessions.put(sessionId, sd);
             }

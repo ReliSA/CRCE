@@ -7,23 +7,22 @@ import org.osgi.framework.BundleContext;
 
 /**
  * Bundle's activator.
- * 
+ *
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
+
         manager.add(createComponent()
                 .setInterface(ResourceFactory.class.getName(), null)
-                .setImplementation(ResourceFactoryImpl.class)
-                .add(createServiceDependency().setRequired(true).setService(org.apache.felix.bundlerepository.RepositoryAdmin.class))
-                );
+                .setImplementation(ResourceFactoryImpl.class));
     }
 
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
-        // nothing to do 
+        // nothing to do
     }
 
 }
