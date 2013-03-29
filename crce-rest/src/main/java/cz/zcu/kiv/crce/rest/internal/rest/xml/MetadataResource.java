@@ -6,8 +6,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
@@ -36,7 +38,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 	  */
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
+    public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop, @Context UriInfo ui) {
     	requestId++;
     	log.debug("Request ({}) - Get metadata request was received.", requestId);
     	
@@ -81,7 +83,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
     		
 			if(storeResources.length > 0) {
 				ConvertorToBeans conv = new ConvertorToBeans();
-				Trepository repository = conv.convertRepository(storeResources, include);
+				Trepository repository = conv.convertRepository(storeResources, include, ui);
 				Response response = Response.ok(createXML(repository)).build();				
 				log.debug("Request ({}) - Response was successfully created.", requestId);
 				return response;
@@ -107,7 +109,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 	@GET
 	@Path("{id}")
 	@Produces({ MediaType.APPLICATION_XML })
-    public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop) {
+    public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop, @Context UriInfo ui) {
     	requestId++;
     	log.debug("Request ({}) - Get metadata request for resource with id {} was received.",requestId ,id);
     	
@@ -148,7 +150,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 	    	try {
 				if(storeResources.length > 0) {
 					ConvertorToBeans conv = new ConvertorToBeans();
-					Trepository repository = conv.convertRepository(storeResources, include);
+					Trepository repository = conv.convertRepository(storeResources, include, ui);
 					Response response = Response.ok(createXML(repository)).build();
 					log.debug("Request ({}) - Response was successfully created.", requestId);
 					return response;

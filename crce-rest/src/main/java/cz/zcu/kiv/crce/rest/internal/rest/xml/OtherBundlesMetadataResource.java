@@ -13,8 +13,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -180,9 +182,10 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	 * </ul>
 	 * 
 	 * @param clientBundles
+	 * @param ui contextual info about URI
 	 * @return repositoty with other bundles
 	 */
-	private Trepository findOtherBundles(Trepository clientBundles) {
+	private Trepository findOtherBundles(Trepository clientBundles, UriInfo ui) {
 		
 		Resource[] storeResources = Activator.instance().getStore().getRepository().getResources();
 
@@ -196,7 +199,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 		ConvertorToBeans conv = new ConvertorToBeans();
 		IncludeMetadata include = new IncludeMetadata();
 		include.includeAll();
-		Trepository repository = conv.convertRepository(newResources.toArray(new Resource[0]), include);
+		Trepository repository = conv.convertRepository(newResources.toArray(new Resource[0]), include, ui);
 
 		//add deleted resources
 		repository.getResource().addAll(deletedResources);	 
@@ -212,12 +215,12 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces({MediaType.APPLICATION_XML })
-	public Response otherBundles(String knownBundles) {		
+	public Response otherBundles(String knownBundles, @Context UriInfo ui) {		
 		requestId++;
 		log.debug("Request ({}) - Post other bundles request was received.", requestId);
 		try {
 			Trepository clientBundles = unmarshalXML(knownBundles);
-			Trepository otherBundles = findOtherBundles(clientBundles);
+			Trepository otherBundles = findOtherBundles(clientBundles, ui);
 			
 			Response response = Response.ok(createXML(otherBundles)).build();
 			log.debug("Request ({}) - Response was successfully created.", requestId);

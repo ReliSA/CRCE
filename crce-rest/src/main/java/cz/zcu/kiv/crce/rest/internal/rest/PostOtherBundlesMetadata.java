@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.rest;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Server provide metadata about other bundles (repository contents diff).
@@ -34,7 +35,8 @@ public interface PostOtherBundlesMetadata {
 	 * 
 	 * 
 	 * @param knownBundles XML with information about bundles, that client knows.
+	 * @param ui contextual info about URI
 	 * @return Response with difference between knownBundles and state of server.
 	 */
-	public Response otherBundles(String knownBundles);
+	public Response otherBundles(String knownBundles, UriInfo ui);
 }

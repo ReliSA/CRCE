@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.rest;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * Server will provide a metadata information about resources in the repository.
@@ -22,9 +23,10 @@ public interface GetMetadata {
 	 * @param cap all capabilities
 	 * @param req all requirement
 	 * @param prop all properties
+	 * @param ui contextual info about URI
 	 * @return Response with metadata of resources from the store repository, or error with html status.
 	 */
-	public Response getMetadata(String filter, String core, String cap,String req, String prop);
+	public Response getMetadata(String filter, String core, String cap,String req, String prop, UriInfo ui);
 	
 	
 	/**
@@ -37,7 +39,8 @@ public interface GetMetadata {
 	 * @param cap all capabilities
 	 * @param req all requirement
 	 * @param prop all properties
+	 * @param ui contextual info about URI
 	 * @return Response with metadata of resource from repository with the id, or error with html status.
 	 */
-	public Response getMetadataById(String id, String core, String cap, String req, String prop);
+	public Response getMetadataById(String id, String core, String cap, String req, String prop, UriInfo ui);
 }

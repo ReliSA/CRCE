@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.UriInfo;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,14 +58,15 @@ public class ConvertorToBeans {
 		
 	}
 	
-	//TODO - made get URI host independent
 	/**
 	 * Get URL of resource, that could be uset for REST action GET Bundle.
 	 * @param resource resource
+	 * @param ui contextual info about URI
 	 * @return URL of the resource
 	 */
-	private String getURL(Resource resource) {
-		return "http://localhost:8080/rest/bundle/" + resource.getId();
+	private String getURL(Resource resource, UriInfo ui) {
+		String url = ui.getBaseUri().toString();
+		return url + "bundle/" + resource.getId();
 	}
 	
 	/**
@@ -153,16 +156,17 @@ public class ConvertorToBeans {
 	/**
 	 * Returns capability with osgi.content
 	 * @param resource resource 
+	 * @param ui contextual info about URI
 	 * @return capability with osgi.content
 	 */
-	private Tcapability prepareOsgiContent(Resource resource) {
+	private Tcapability prepareOsgiContent(Resource resource, UriInfo ui) {
 		
 		Tcapability osgiContent = new Tcapability();
 		osgiContent.setNamespace("osgi.content");
 		List<Object> attributes = osgiContent.getDirectiveOrAttributeOrCapability();
 		
 		addAttribute(attributes, "hash", null, getSHA(resource));
-		addAttribute(attributes, "url", null, getURL(resource));
+		addAttribute(attributes, "url", null, getURL(resource, ui));
 		addAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
 		addAttribute(attributes, "mime", null, "not implemented yet");
 		addAttribute(attributes, "crce.original-file-name", null, getFileName(resource));
@@ -408,9 +412,11 @@ public class ConvertorToBeans {
 	/**
 	 * Convert {@link Resource} to {@link ResourceBean}.
 	 * @param resource resource
+	 * @param include what part of metadata should be included
+	 * @param ui contextual info about URI
 	 * @return converted resource
 	 */
-	public Tresource convertResource(Resource resource, IncludeMetadata include) {
+	public Tresource convertResource(Resource resource, IncludeMetadata include, UriInfo ui) {
 		
 		Tresource newResource = new Tresource();
 		
@@ -421,7 +427,7 @@ public class ConvertorToBeans {
 
 		if(include.isIncludeCore()) {
 			caps.add(prepareOsgiIdentity(resource));
-			caps.add(prepareOsgiContent(resource));
+			caps.add(prepareOsgiContent(resource, ui));
 			caps.add(prepareCrceIdentity(resource));
 		}
 		
@@ -439,16 +445,18 @@ public class ConvertorToBeans {
 	/**
 	 * Prepare RepositoryBean, that will contains metadata from array of resources.
 	 * @param resources array of resources
+	 * @param include what part of metadata should be included
+	 * @param ui contextual info about URI
 	 * @return Object with metadata from array of resources, that is ready to XML export using JAXB. 
 	 */
-	public Trepository convertRepository(Resource[] resources, IncludeMetadata include) {
+	public Trepository convertRepository(Resource[] resources, IncludeMetadata include, UriInfo ui) {
  
 		
 		Trepository repositoryBean = new Trepository();
 		List<Tresource> resourceBeans = repositoryBean.getResource();
 		
 		for(Resource res: resources) {
-			resourceBeans.add(convertResource(res, include));
+			resourceBeans.add(convertResource(res, include, ui));
 		}
 
 		return repositoryBean;

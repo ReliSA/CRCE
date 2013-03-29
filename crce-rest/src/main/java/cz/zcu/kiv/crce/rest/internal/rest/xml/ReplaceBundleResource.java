@@ -5,8 +5,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
@@ -92,7 +94,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 */
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public Response replaceBundle(@QueryParam("id") String id) {
+    public Response replaceBundle(@QueryParam("id") String id, @Context UriInfo ui) {
     	requestId++;
     	log.debug("Request ({}) - Get replace bundle request was received.", requestId);
     	
@@ -114,7 +116,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 		    	include.includeAll();
 		    		
 		    	ConvertorToBeans convertor = new ConvertorToBeans();
-				Trepository repositoryBean = convertor.convertRepository(resourcesToReturn, include);
+				Trepository repositoryBean = convertor.convertRepository(resourcesToReturn, include, ui);
 				
 				Response response = Response.ok(createXML(repositoryBean)).build();
 				log.debug("Request ({}) - Response was successfully created.", requestId);
