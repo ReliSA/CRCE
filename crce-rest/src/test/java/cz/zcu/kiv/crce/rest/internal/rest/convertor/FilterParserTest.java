@@ -3,9 +3,6 @@ package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.junit.Test;
 
 
@@ -29,29 +26,18 @@ public class FilterParserTest {
 	public void testFilterParser1() {		
 		
 		try {
-			ConvertorToBeans conv = new ConvertorToBeans();
-			Method method = ConvertorToBeans.class.getDeclaredMethod("parseFilter", String.class);
-			method.setAccessible(true);
-			String[] result =  (String[])method.invoke(conv, FILTER1);
+			FilterParser filterParser = new FilterParser();			
+			
+			String[] result =  filterParser.parseFilter(FILTER1);
 			
 			 assertTrue("Result lenght",result.length == 3);
 			 assertTrue("Name","cz.zcu.kiv.example".equals(result[0]));
 			 assertTrue("Version","2.0.1".equals(result[1]));
 			 assertTrue("Operation","greater-than".equals(result[2]));
-		} catch (NoSuchMethodException e) {			
-			e.printStackTrace();
-			fail();
+
 		} catch (SecurityException e) {
 			e.printStackTrace();
-			fail();
-		} catch (IllegalAccessException e) {			
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			fail();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail();
+			fail();;
 		} 
  
 	}
@@ -60,32 +46,24 @@ public class FilterParserTest {
 	public void testFilterParser2() {		
 
 		try {
-			ConvertorToBeans conv = new ConvertorToBeans();
-			Method method = ConvertorToBeans.class.getDeclaredMethod("parseFilter", String.class);
-			method.setAccessible(true);
-			String[] result =  (String[])method.invoke(conv, FILTER2);
+			FilterParser filterParser = new FilterParser();			
 			
+			String[] result =  filterParser.parseFilter(FILTER2);			
 			
 			 assertTrue("Result lenght",result.length == 3);
 			 assertTrue("Name","cz.zcu.kiv.obcc.example.carpark.arrivals".equals(result[0]));
 			 assertTrue("Version","1.0.0".equals(result[1]));
 			 assertTrue("Operation","greater-than".equals(result[2]));
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			fail();
+
 		} catch (SecurityException e) {
 			e.printStackTrace();
 			fail();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			fail();
+
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			fail();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail();
-		} 
+		}
+
  
 	}
 	
@@ -93,34 +71,25 @@ public class FilterParserTest {
 	public void testFilterParser3() {		
 		
 		try {
-			ConvertorToBeans conv = new ConvertorToBeans();
-			Method method = ConvertorToBeans.class.getDeclaredMethod("parseFilter", String.class);
-			method.setAccessible(true);
-			String[] result =  (String[])method.invoke(conv, FILTER3);
+			FilterParser filterParser = new FilterParser();			
 			
+			String[] result =  filterParser.parseFilter(FILTER3);				
 			
 			 assertTrue("Result lenght",result.length == 5);
 			 assertTrue("Name","cz.zcu.kiv.obcc.example.container".equals(result[0]));
 			 assertTrue("Version","1.0.0.RELEASE".equals(result[1]));
 			 assertTrue("Operation","greater-than".equals(result[2])); 
 			 assertTrue("Version2","1.0.0.RELEASE".equals(result[3]));
-			 assertTrue("Operation2","lower-than".equals(result[4]));
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			fail();
+			 assertTrue("Operation2","less-than".equals(result[4]));
+
 		} catch (SecurityException e) {
-			e.printStackTrace();
-			fail();
-		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 			fail();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			fail();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail();
-		} 
+		}
+
  
 	}
 }
