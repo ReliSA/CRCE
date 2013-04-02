@@ -34,6 +34,8 @@ public class ConvertorToBeans {
 		
 	private static final Logger log = LoggerFactory.getLogger(ConvertorToBeans.class);
 	
+	public static final String DEFAULT_HOST = "http://localhost:8080/rest/";
+	
 	/**
 	 * Get original file name from resource or null, if name was not found.
 	 * @param resource resource
@@ -63,6 +65,9 @@ public class ConvertorToBeans {
 	 * @return URL of the resource
 	 */
 	private String getURL(Resource resource, UriInfo ui) {
+		if(ui == null) {
+			return DEFAULT_HOST + "bundle/" + resource.getId();
+		}
 		String url = ui.getBaseUri().toString();
 		return url + "bundle/" + resource.getId();
 	}

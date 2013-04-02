@@ -58,7 +58,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	
 	private static final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
 	
-	private static final String DEF_ENCODING = "UTF-8";
+	
 	
 	/**
      * Create XML String from repository.

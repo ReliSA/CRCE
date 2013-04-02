@@ -22,6 +22,8 @@ public class ResourceParent {
 	
 	protected static int requestId = 0;
 	
+	protected static final String DEF_ENCODING = "UTF-8";
+	
 	private static final Logger log = LoggerFactory.getLogger(ResourceParent.class);
 	
 	/**
@@ -168,6 +170,5 @@ public class ResourceParent {
 			throw new WebApplicationException(400);
 		} 
 	}
-	
 	
 }

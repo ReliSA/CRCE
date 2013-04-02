@@ -45,7 +45,7 @@ public class FilterParser {
 			case "=":
 				return "equal";
 			case "<":
-				return "less-than";
+				return "less-equal";
 			case ">":
 				return "greater-equal";
 			case "<>":
