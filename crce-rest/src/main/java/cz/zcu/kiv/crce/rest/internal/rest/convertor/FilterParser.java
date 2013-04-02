@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.rest.internal.rest.structures.VersionDemand;
+
 /**
  * Parser of requirement filter.
  * 
@@ -39,17 +41,17 @@ public class FilterParser {
 		else {
 			switch (operation) {
 			case ">=":
-				return "greater-than";
+				return VersionDemand.GREATER_EQUEAL;
 			case "<=":
-				return "less-than";
+				return VersionDemand.LESS_EQUEAL;
 			case "=":
-				return "equal";
+				return VersionDemand.EQUEAL;
 			case "<":
-				return "less-equal";
+				return VersionDemand.LESS_THAN;
 			case ">":
-				return "greater-equal";
+				return VersionDemand.GREATER_THAN;
 			case "<>":
-				return "not-equal";
+				return VersionDemand.NOT_EQUEAL;
 			default:
 				throw new UnsupportedOperationException("Unssuported operation(" + operation + ") during parsing filter in a requirement.");
 			}

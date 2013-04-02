@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +22,13 @@ import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
 
-@Path("/replace_bundle")
+@Path("/replace-bundle")
 public class ReplaceBundleResource extends ResourceParent implements GetReplaceBundle {
 	
 	private static final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
+	
+	public static final String UPDATE_OP = "update";
+	public static final String DOWNGRADE_OP = "downgrade";
 	
 	/**
 	 * Find symbolic name of resource determined by id;
@@ -67,7 +71,14 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 							.getRepository().getResources(filter);
 
 					if (storeResources.length > 0) {
-						return proposedName;
+						String proposedVersion = id.substring(proposedSeparatorIndex);
+						try {							
+							new Version(proposedVersion);
+							
+							return proposedName;
+						} catch (IllegalArgumentException  e) {
+							log.debug("Request ({}) - Symbolic name separation - {}/{} separation do not work - wrong version", requestId, proposedName, proposedVersion);
+						}
 					}
 
 					proposedSeparatorIndex = id.indexOf('-',
@@ -86,6 +97,34 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 		
 	}
 	
+	/**
+	 * Return resource, that could replace client bundle.
+	 * Kind of returned resource depends on operation op.
+	 * 
+	 * @param op operation
+	 * @param filter filter to all bundles with same name as client bundle.
+	 * @return resource, that could replace client bundle.
+	 * @throws WebApplicationException unsupported operation
+	 */
+	private Resource findResourceToReturn(String op, String filter) throws WebApplicationException {
+		Resource resourceToReturn = null;
+		
+		if(op!= null) {
+			if(op.equals(DOWNGRADE_OP)) {
+				resourceToReturn = findSingleBundleByFilterWithLowestVersion(filter);
+			} else if(op.equals(UPDATE_OP)) {
+				resourceToReturn = findSingleBundleByFilterWithHighestVersion(filter);
+			} else {
+				log.warn("Request ({}) - Unsupported operation (op) : {}.", requestId, op);
+				throw new WebApplicationException(300);
+			}
+		} else {
+			resourceToReturn = findSingleBundleByFilterWithHighestVersion(filter);
+		}
+		
+		return resourceToReturn;
+	}
+	
 	
 	/**
 	 * In current version return resource with same name as in id and highest possible version.
@@ -94,7 +133,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 */
     @GET
     @Produces({MediaType.APPLICATION_XML })
-    public Response replaceBundle(@QueryParam("id") String id, @Context UriInfo ui) {
+    public Response replaceBundle(@QueryParam("id") String id, @QueryParam("op") String op, @Context UriInfo ui) {
     	requestId++;
     	log.debug("Request ({}) - Get replace bundle request was received.", requestId);
     	
@@ -107,8 +146,9 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 				
 				
 				String filter = "(symbolicName=" + symbolicName + ")";
-
-				Resource resourceToReturn = findSingleBundleByFilterWithHighestVersion(filter);
+				
+				Resource resourceToReturn = findResourceToReturn(op, filter);
+				
 				Resource[] resourcesToReturn = new Resource[]{resourceToReturn};
 				
 		    	IncludeMetadata include = new IncludeMetadata();

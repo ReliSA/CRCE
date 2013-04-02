@@ -18,7 +18,14 @@ import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
 
-public class ResourceParent {
+/**
+ * Parent class for all resource classes, that implements REST operation.
+ * This class contains common methods, that all offsprings can use.
+ * 
+ * @author Jan Reznicek
+ *
+ */
+public abstract class ResourceParent {
 	
 	protected static int requestId = 0;
 	
@@ -87,6 +94,31 @@ public class ResourceParent {
 	
 	
 	/**
+	 * Select from array of resources the one with lowest version
+	 * @param storeResources array of resources
+	 * @return resource with highest version
+	 */
+	protected Resource resourceWithLowestVersion(Resource[] storeResources) {		
+		
+		
+		if(storeResources.length < 1) {
+			return null;
+		}
+		Resource resourceWithLowestVersion = storeResources[0];
+		
+		for(Resource res: storeResources) {
+			if(resourceWithLowestVersion.getVersion().compareTo(res.getVersion()) > 0) {
+				resourceWithLowestVersion = res;
+			}
+		}
+		
+		log.debug("Request ({}) - Bundle with lowest version is: {}.", requestId, resourceWithLowestVersion.getId());
+		
+		return resourceWithLowestVersion;
+	}
+	
+	
+	/**
 	 * Find a single bundle in repository by LDAP filter.
 	 * If are more bundle found, return first of them.
 	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found. 
@@ -137,6 +169,43 @@ public class ResourceParent {
 			if(storeResources.length > 1) {
 				log.debug("Request ({}) - More bundles was found, the one with highest version will be selected.", requestId);
 				resource = resourceWithHighestVersion(storeResources);
+			} else {
+				log.debug("Request ({}) - The requested bundle was found.", requestId);
+				resource = storeResources[0];
+			}
+			
+			return resource;
+			
+		} catch (InvalidSyntaxException e) {
+			log.debug("Request ({}) - Bad syntax of LDAP filter", requestId);
+			throw new WebApplicationException(400);
+		} 
+	}
+	
+	/**
+	 * Find a single bundle in repository by LDAP filter.
+	 * If are more bundle found, return the one with the lowest version.
+	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found. 
+	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request. 
+	 * @param filter LDAP filter
+	 * @return founded bundle.
+	 * @throws WebApplicationException
+	 */
+	protected Resource findSingleBundleByFilterWithLowestVersion(String filter) throws WebApplicationException {
+		try {
+			Resource[] storeResources;
+			storeResources = Activator.instance().getStore().getRepository().getResources(filter);
+			
+			if(storeResources.length < 1) {
+				log.debug("Request ({}) - Requested bundle was not found in the repository.", requestId );
+				throw new WebApplicationException(404);
+			}
+			
+			Resource resource;
+			
+			if(storeResources.length > 1) {
+				log.debug("Request ({}) - More bundles was found, the one with highest version will be selected.", requestId);
+				resource = resourceWithLowestVersion(storeResources);
 			} else {
 				log.debug("Request ({}) - The requested bundle was found.", requestId);
 				resource = storeResources[0];

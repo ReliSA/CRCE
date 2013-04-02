@@ -14,9 +14,9 @@ import javax.ws.rs.core.UriInfo;
  * Then CRCE sends that (subset of) metadata only for the following bundles
  * currently available in repository in "stored" state:
  * <ul>
- * <li>are not in the list sent by client ("new bundles")
+ * <li>are not in the list sent by client ("new bundles")</li>
  * <li>are in the list but have been removed from the repository
- * ("deleted bundles" - just a list of bundle identifiers).
+ * ("deleted bundles" - just a list of bundle identifiers).</li>
  * </ul>
  * 
  * @author Jan Reznicek

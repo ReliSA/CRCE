@@ -33,7 +33,7 @@ public class FilterParserTest {
 			 assertTrue("Result lenght",result.length == 3);
 			 assertTrue("Name","cz.zcu.kiv.example".equals(result[0]));
 			 assertTrue("Version","2.0.1".equals(result[1]));
-			 assertTrue("Operation","greater-than".equals(result[2]));
+			 assertTrue("Operation","greater-equeals".equals(result[2]));
 
 		} catch (SecurityException e) {
 			e.printStackTrace();
@@ -53,7 +53,7 @@ public class FilterParserTest {
 			 assertTrue("Result lenght",result.length == 3);
 			 assertTrue("Name","cz.zcu.kiv.obcc.example.carpark.arrivals".equals(result[0]));
 			 assertTrue("Version","1.0.0".equals(result[1]));
-			 assertTrue("Operation","greater-than".equals(result[2]));
+			 assertTrue("Operation","greater-equeals".equals(result[2]));
 
 		} catch (SecurityException e) {
 			e.printStackTrace();
@@ -78,9 +78,9 @@ public class FilterParserTest {
 			 assertTrue("Result lenght",result.length == 5);
 			 assertTrue("Name","cz.zcu.kiv.obcc.example.container".equals(result[0]));
 			 assertTrue("Version","1.0.0.RELEASE".equals(result[1]));
-			 assertTrue("Operation","greater-than".equals(result[2])); 
+			 assertTrue("Operation","greater-equeals".equals(result[2])); 
 			 assertTrue("Version2","1.0.0.RELEASE".equals(result[3]));
-			 assertTrue("Operation2","less-than".equals(result[4]));
+			 assertTrue("Operation2","less-equeals".equals(result[4]));
 
 		} catch (SecurityException e) {
 			e.printStackTrace();

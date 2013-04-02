@@ -2,6 +2,15 @@ package cz.zcu.kiv.crce.rest.internal.rest.structures;
 
 import org.osgi.framework.Version;
 
+/**
+ * Representation one of requirement's version demands.
+ * In metadata, version demand is version attribute inside osgi.wiring.package requirement.
+ * 
+ * Example im metadata: <attribute name='version' value='1.0.0' op='greater-than' />
+ * 
+ * @author Jan reznicek
+ *
+ */
 public class VersionDemand {
 	
 	public static final String GREATER_THAN = "greater-than";
@@ -13,6 +22,7 @@ public class VersionDemand {
 	
 	private Version version;
 	private String operation;
+	
 	public Version getVersion() {
 		return version;
 	}

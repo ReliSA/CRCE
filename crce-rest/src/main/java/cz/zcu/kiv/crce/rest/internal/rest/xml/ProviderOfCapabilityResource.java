@@ -202,16 +202,16 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 			if(compareVersions == 0) return true;
 			break;
 		case VersionDemand.GREATER_THAN:
-			if(compareVersions >= 0) return true;
-			break;
-		case VersionDemand.LESS_THAN:
-			if(compareVersions <= 0) return true;
-			break;
-		case VersionDemand.GREATER_EQUEAL:
 			if(compareVersions > 0) return true;
 			break;
-		case VersionDemand.LESS_EQUEAL:
+		case VersionDemand.LESS_THAN:
 			if(compareVersions < 0) return true;
+			break;
+		case VersionDemand.GREATER_EQUEAL:
+			if(compareVersions >= 0) return true;
+			break;
+		case VersionDemand.LESS_EQUEAL:
+			if(compareVersions <= 0) return true;
 			break;
 		case VersionDemand.NOT_EQUEAL:
 			if(compareVersions != 0) return true;

@@ -53,7 +53,7 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
  * @author Jan Reznicek
  * 
  */
-@Path("/other_bundles_metadata")
+@Path("/other-bundles-metadata")
 public class OtherBundlesMetadataResource extends ResourceParent implements PostOtherBundlesMetadata {	
 	
 	private static final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
