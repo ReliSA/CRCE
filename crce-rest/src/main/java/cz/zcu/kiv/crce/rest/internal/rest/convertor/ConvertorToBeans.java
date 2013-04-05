@@ -123,14 +123,16 @@ public class ConvertorToBeans {
 	 * @param name name or null
 	 * @param type type or null
 	 * @param value value or null
+	 * @param op operation or null
 	 */
-	private void addAttribute(List<Object> list, String name, String type, String value) {
+	private void addAttribute(List<Object> list, String name, String type, String value, String op) {
 		
 		Tattribute newAttributte = new Tattribute();
 		
 		if(name != null) newAttributte.setName(name);
 		if(type != null) newAttributte.setType(type);
 		if(value != null) newAttributte.setValue(value);
+		if(op != null) newAttributte.setOp(op);
 		
 		list.add(newAttributte);
 				
@@ -147,8 +149,8 @@ public class ConvertorToBeans {
 		osgiIdentity.setNamespace("osgi.identity");
 		List<Object> osgiIdentityAttrs = osgiIdentity.getDirectiveOrAttributeOrCapability();
 		
-		addAttribute(osgiIdentityAttrs, "name", null, resource.getSymbolicName());
-		addAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString());
+		addAttribute(osgiIdentityAttrs, "name", null, resource.getSymbolicName(), null);
+		addAttribute(osgiIdentityAttrs, "version", "Version", resource.getVersion().toString(), null);
 		
 		
 		return osgiIdentity;
@@ -168,11 +170,11 @@ public class ConvertorToBeans {
 		osgiContent.setNamespace("osgi.content");
 		List<Object> attributes = osgiContent.getDirectiveOrAttributeOrCapability();
 		
-		addAttribute(attributes, "hash", null, getSHA(resource));
-		addAttribute(attributes, "url", null, getURL(resource, ui));
-		addAttribute(attributes, "size", "Long", Long.toString(resource.getSize()));
-		addAttribute(attributes, "mime", null, "not implemented yet");
-		addAttribute(attributes, "crce.original-file-name", null, getFileName(resource));
+		addAttribute(attributes, "hash", null, getSHA(resource), null);
+		addAttribute(attributes, "url", null, getURL(resource, ui), null);
+		addAttribute(attributes, "size", "Long", Long.toString(resource.getSize()), null);
+		addAttribute(attributes, "mime", null, "not implemented yet", null);
+		addAttribute(attributes, "crce.original-file-name", null, getFileName(resource), null);
 		
 		
 		return osgiContent;
@@ -207,9 +209,9 @@ public class ConvertorToBeans {
 		crceIdentity.setNamespace("crce.identity");
 		List<Object> attributes = crceIdentity.getDirectiveOrAttributeOrCapability();
 		
-		addAttribute(attributes, "name", null, resource.getId());
-		addAttribute(attributes, "crce.categories", "List<String>", categoriesToString(resource.getCategories()));
-		addAttribute(attributes, "crce.status", null, "stored");
+		addAttribute(attributes, "name", null, resource.getId(), null);
+		addAttribute(attributes, "crce.categories", "List<String>", categoriesToString(resource.getCategories()), null);
+		addAttribute(attributes, "crce.status", null, "stored", null);
 		
 		return crceIdentity;
 		
@@ -299,10 +301,10 @@ public class ConvertorToBeans {
 				
 				String[] parsedFilter = filterParser.parseFilter(req.getFilter());
 				name = parsedFilter[0];
-				addAttribute(atrDirReq, "name", null, name);
+				addAttribute(atrDirReq, "name", null, name, null);
 				
 				for(int i = 1; i < parsedFilter.length; i+=2){
-					addAttribute(atrDirReq, "version", parsedFilter[i+1], parsedFilter[i]);
+					addAttribute(atrDirReq, "version", null ,parsedFilter[i], parsedFilter[i+1]);
 				}
 				
 			} catch (Exception e) {
@@ -374,13 +376,13 @@ public class ConvertorToBeans {
 	}
 	
 	/**
-	 * Get Tresource with information about deleted resource.
+	 * Get Tresource with unknown crce.status.
 	 * This Tresource contains only id and capability crce.identity with 
-	 * attribute crce.status, that is deleted
+	 * attribute crce.status, that is "unknown"
 	 * @param id the resource id
-	 * @return information about deleted resource
+	 * @return information about unknown resource
 	 */
-	public Tresource getDeletedResource(String id) {
+	public Tresource getResourceWithUnknownStatus(String id) {
 		Tresource resource = new Tresource();
 		
 		resource.setId(id);
@@ -390,8 +392,8 @@ public class ConvertorToBeans {
 		Tcapability crceIdentity = new Tcapability();
 		crceIdentity.setNamespace("crce.identity");
 		List<Object> attributes = crceIdentity.getDirectiveOrAttributeOrCapability();		
-		addAttribute(attributes, "name", null, resource.getId());
-		addAttribute(attributes, "crce.status", null, "deleted");
+		addAttribute(attributes, "name", null, resource.getId(), null);
+		addAttribute(attributes, "crce.status", null, "unknown", null);
 		
 		caps.add(crceIdentity);
 		

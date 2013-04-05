@@ -158,18 +158,18 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	 * @param storeIdSet set of id of bundles in the store
 	 * @return list of bundles, that have was deleted from store.
 	 */
-	private List<Tresource> findDeletedResources(List<Tresource> clientResources, Set<String> storeIdSet) {
+	private List<Tresource> determineUnknownResources(List<Tresource> clientResources, Set<String> storeIdSet) {
 		
-		List<Tresource> deletedResources = new ArrayList<Tresource>();
+		List<Tresource> unknownResources = new ArrayList<Tresource>();
 		ConvertorToBeans conv = new ConvertorToBeans();
 		
 		for(Tresource res: clientResources) {
 			if(!storeIdSet.contains(res.getId())){
-				deletedResources.add(conv.getDeletedResource(res.getId()));
+				unknownResources.add(conv.getResourceWithUnknownStatus(res.getId()));
 			}
 		}
 		
-		return deletedResources;
+		return unknownResources;
 	}
 	
 	
@@ -193,7 +193,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 		Set<String> storeIdSet = createIdSet(storeResources);
 
 		List<Resource> newResources = findNewResources(storeResources,clientBundlesIdSet);
-		List<Tresource> deletedResources = findDeletedResources(clientBundles.getResource(), storeIdSet);
+		List<Tresource> unknownResources = determineUnknownResources(clientBundles.getResource(), storeIdSet);
 
 		//convert new resources to repository
 		ConvertorToBeans conv = new ConvertorToBeans();
@@ -201,8 +201,8 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 		include.includeAll();
 		Trepository repository = conv.convertRepository(newResources.toArray(new Resource[0]), include, ui);
 
-		//add deleted resources
-		repository.getResource().addAll(deletedResources);	 
+		//add unknown resources
+		repository.getResource().addAll(unknownResources);	 
 		
 		return repository;
 	}

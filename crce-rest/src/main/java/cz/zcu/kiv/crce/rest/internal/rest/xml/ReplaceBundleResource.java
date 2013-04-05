@@ -10,13 +10,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.rest.GetReplaceBundle;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.ConvertorToBeans;
 import cz.zcu.kiv.crce.rest.internal.rest.convertor.IncludeMetadata;
@@ -27,74 +24,90 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	
 	private static final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
 	
-	public static final String UPDATE_OP = "update";
+	public static final String UPGRADE_OP = "upgrade";
 	public static final String DOWNGRADE_OP = "downgrade";
+	public static final String LOWER_OP = "lower";
+	public static final String HIGHER_OP = "higher";
+	public static final String ANY_OP =  "any";
 	
 	/**
-	 * Find symbolic name of resource determined by id;
-	 * Try to find resource in repository by id. 
-	 * If resource is found, return symbolic name from that resource.
-	 * Else try to split id to name and return it.
+	 * Find resource in repository by its id.
 	 * @param id  id of resource
-	 * @return symbolic name of resource
-	 * @throws WebApplicationException the name was not found.
+	 * @return the resource
+	 * @throws WebApplicationException the resource was not found.
 	 */
-	private String findSymbolicName(String id) throws WebApplicationException{
+	private Resource findResource(String id) throws WebApplicationException {
+
+		String filter = "(id=" + id + ")";
+
+		return findSingleBundleByFilter(filter);
+
+	}
+	
+	/**
+	 * Find resource with nearest lower version from clientResource
+	 * @param resourcesWithSameName all resources with same names as clientResource
+	 * @param clientResource resource from client request
+	 * @return nearest lower resource
+	 * @throws WebApplicationException
+	 */
+	private Resource nearestLowerResource(Resource[] resourcesWithSameName, Resource clientResource) throws WebApplicationException{
+		if(resourcesWithSameName.length < 1) {
+			//should not occurred, at least client resource should be present
+			throw new WebApplicationException(404);
+		}
+		Resource lowerRes = resourceWithLowestVersion(resourcesWithSameName);
 		
-		try {
-			Resource[] storeResources;
-			String searchedName = null;
-			String filter = "(id=" + id + ")";
-			storeResources = Activator.instance().getStore().getRepository()
-					.getResources(filter);
-
-			if (storeResources.length > 0) {
-				//if same resource is in repository, return its name
-				searchedName = storeResources[0].getSymbolicName();
-				return searchedName;
-			} else {
-				
-				/*resource is not found in repository by id
-				 * Try to separate symbolic name of resource from id by char '-'.
-				 * Resources with proposed name are founded in repository.
-				 * If no resource is found, new proposed name is proposed by next index of char '-'
-				 * This cycle is repeated until proposed name is found or there are no left chars '-' in the id;
-				 * */
-				
-				int proposedSeparatorIndex = id.indexOf('-');
-				String proposedName;
-
-				while (proposedSeparatorIndex >= 0) {
-					proposedName = id.substring(0, proposedSeparatorIndex);
-					filter = "(symbolicName=" + proposedName + ")";
-					storeResources = Activator.instance().getStore()
-							.getRepository().getResources(filter);
-
-					if (storeResources.length > 0) {
-						String proposedVersion = id.substring(proposedSeparatorIndex);
-						try {							
-							new Version(proposedVersion);
-							
-							return proposedName;
-						} catch (IllegalArgumentException  e) {
-							log.debug("Request ({}) - Symbolic name separation - {}/{} separation do not work - wrong version", requestId, proposedName, proposedVersion);
-						}
-					}
-
-					proposedSeparatorIndex = id.indexOf('-',
-							proposedSeparatorIndex);
-				}
-
-				log.info("Request ({}) - Symbolic name can not be determined or in repository is not a resource with that name.", requestId);
-				throw new WebApplicationException(404);
-
-			}
-		} catch (InvalidSyntaxException e) {
-			log.warn("Request ({}) - Wrong LDAP filter.", requestId);
-			log.warn(e.getMessage(),e);
-			throw new WebApplicationException(500);
+		if(lowerRes.getId().equals(clientResource.getId())) {
+			log.info("Request ({}) - Nearist lower - in repository is no resource " +
+					"with lower version than resource from client request ({})."
+					, requestId, clientResource.getId());
+			//throw new WebApplicationException(404);
 		}
 		
+		for(Resource res: resourcesWithSameName) {
+			//find lowest from all resources higher than clientResource
+			if(res.getVersion().compareTo(clientResource.getVersion())<0 && res.getVersion().compareTo(lowerRes.getVersion())>0) {
+				lowerRes = res;
+			}
+		}
+		
+		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", requestId, lowerRes.getId());
+		
+		return lowerRes;
+	}
+	
+	/**
+	 * Find resource with nearest higher version from clientResource
+	 * @param resourcesWithSameName all resources with same names as clientResource
+	 * @param clientResource resource from client request
+	 * @return nearest higher resource
+	 * @throws WebApplicationException
+	 */
+	private Resource nearestHigherResource(Resource[] resourcesWithSameName, Resource clientResource) throws WebApplicationException{
+		if(resourcesWithSameName.length < 1) {
+			//should not occurred, at least client resource should be present
+			throw new WebApplicationException(404);
+		}
+		Resource higherRes = resourceWithHighestVersion(resourcesWithSameName);
+		
+		if(higherRes.getId().equals(clientResource.getId())) {
+			log.info("Request ({}) - Nearist higher - in repository is no resource " +
+					"with higher version than resource from client request ({})."
+					, requestId, clientResource.getId());
+			//throw new WebApplicationException(404);
+		}
+		
+		for(Resource res: resourcesWithSameName) {
+			//find lowest from all resources higher than clientResource
+			if(res.getVersion().compareTo(clientResource.getVersion())>0 && res.getVersion().compareTo(higherRes.getVersion())<0) {
+				higherRes = res;
+			}
+		}
+		
+		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", requestId, higherRes.getId());
+		
+		return higherRes;
 	}
 	
 	/**
@@ -106,20 +119,40 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 * @return resource, that could replace client bundle.
 	 * @throws WebApplicationException unsupported operation
 	 */
-	private Resource findResourceToReturn(String op, String filter) throws WebApplicationException {
+	private Resource findResourceToReturn(String op, Resource clientResource) throws WebApplicationException {
 		Resource resourceToReturn = null;
+		String nameFilter = "(symbolicName=" + clientResource.getSymbolicName() + ")";
+		Resource[] resourcesWithSameName = findBundlesByFilter(nameFilter);
 		
 		if(op!= null) {
-			if(op.equals(DOWNGRADE_OP)) {
-				resourceToReturn = findSingleBundleByFilterWithLowestVersion(filter);
-			} else if(op.equals(UPDATE_OP)) {
-				resourceToReturn = findSingleBundleByFilterWithHighestVersion(filter);
-			} else {
+			switch (op) {
+			case DOWNGRADE_OP:
+				resourceToReturn = findSingleBundleByFilterWithLowestVersion(nameFilter);
+				break;
+			case UPGRADE_OP:
+				resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
+				break;
+			case LOWER_OP:				
+				resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
+				break;
+			case HIGHER_OP:
+				resourceToReturn = nearestHigherResource(resourcesWithSameName, clientResource);
+				break;
+			case ANY_OP:
+				//use highest (if there is no higher, use nearest lowest)
+				resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
+				if(resourceToReturn.getId().equals(clientResource.getId())) {
+					resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
+				}
+				break;
+			default:
 				log.warn("Request ({}) - Unsupported operation (op) : {}.", requestId, op);
 				throw new WebApplicationException(300);
 			}
+			
+
 		} else {
-			resourceToReturn = findSingleBundleByFilterWithHighestVersion(filter);
+			resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
 		}
 		
 		return resourceToReturn;
@@ -142,17 +175,13 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 				log.debug("Request ({}) -  Replace bundle with id: {}", requestId, id);
 				
 				
-				String symbolicName = findSymbolicName(id);
+				Resource clientResource = findResource(id);				
 				
-				
-				String filter = "(symbolicName=" + symbolicName + ")";
-				
-				Resource resourceToReturn = findResourceToReturn(op, filter);
+				Resource resourceToReturn = findResourceToReturn(op, clientResource);
 				
 				Resource[] resourcesToReturn = new Resource[]{resourceToReturn};
 				
 		    	IncludeMetadata include = new IncludeMetadata();
-		    	//include all
 		    	include.includeAll();
 		    		
 		    	ConvertorToBeans convertor = new ConvertorToBeans();

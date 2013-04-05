@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -19,9 +20,13 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Tresource;
 public class ConvertorToBeansTest {
 	
 	private static final String TEST_ID_1 = "testid-1.0.0";
-	private static final String EXPECTED_DELETED_STATUS = "deleted";
+	private static final String EXPECTED_UNKNOWN_STATUS = "unknown";
 	private static final String CRCE_ID_CAP = "crce.identity";
 	private static final String CRCE_STATUS = "crce.status";
+	
+
+	
+	
 	
 	
 	public Tcapability getCapability(List<Tcapability> caps, String namespace) {
@@ -51,14 +56,14 @@ public class ConvertorToBeansTest {
 	}
 	
 	/**
-	 * Test {@link ConvertorToBeans#getDeletedResource(String)}.
+	 * Test {@link ConvertorToBeans#getResourceWithUnknownStatus(String)}.
 	 */
 	@Test
-	public void testGetDeletedResource() {
+	public void testGetResourceWithUnknownStatus() {
 		
 		ConvertorToBeans conv = new ConvertorToBeans();
 		
-		Tresource res = conv.getDeletedResource(TEST_ID_1);
+		Tresource res = conv.getResourceWithUnknownStatus(TEST_ID_1);
 		
 		assertTrue("Wrong id", TEST_ID_1.equals(res.getId()));
 		
@@ -68,8 +73,10 @@ public class ConvertorToBeansTest {
 		
 		Tattribute crceStatusAtr = getAttribute(crceIdentityCap.getDirectiveOrAttributeOrCapability(), CRCE_STATUS);
 		
-		assertTrue("Wrong status (" + crceStatusAtr.getValue() + "), expected status is: " + EXPECTED_DELETED_STATUS, EXPECTED_DELETED_STATUS.equals(crceStatusAtr.getValue()));
+		assertTrue("Wrong status (" + crceStatusAtr.getValue() + "), expected status is: " + EXPECTED_UNKNOWN_STATUS, EXPECTED_UNKNOWN_STATUS.equals(crceStatusAtr.getValue()));
 		
 	}
 
 }
+
+
