@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.webui.internal.custom;
 
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.webui.internal.legacy.Capability;
+import cz.zcu.kiv.crce.webui.internal.legacy.Requirement;
 
 public class RequirementAdapter implements Requirement{
 

@@ -12,7 +12,7 @@ import cz.zcu.kiv.crce.metadata.AttributeProvider;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.DirectiveProvider;
-import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Abstract implementatio of
@@ -24,7 +24,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
 
     protected final Map<String, Attribute<?>> attributesMap = new HashMap<>();
     protected final Map<String, String> directivesMap = new HashMap<>();
-    
+
 
     @Override
     public <T> String getAttributeStringValue(AttributeType<T> type) {
@@ -48,7 +48,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     }
 
     @Override
-    public <T> boolean unsetAttribute(Attribute<T> attribute) {
+    public <T> boolean removeAttribute(Attribute<T> attribute) {
         return attributesMap.remove(attribute.getAttributeType().getName()) != null;
     }
 
@@ -61,8 +61,13 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     }
 
     @Override
-    public <T> boolean unsetAttribute(AttributeType<T> type) {
+    public <T> boolean removeAttribute(AttributeType<T> type) {
         return attributesMap.remove(type.getName()) != null;
+    }
+
+    @Override
+    public <T> boolean removeAttribute(String name) {
+        return attributesMap.remove(name) != null;
     }
 
     @Override
@@ -84,7 +89,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     public Map<String, ? extends Attribute<?>> getAttributesMap() {
         return Collections.unmodifiableMap(attributesMap);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getAttributeValue(AttributeType<T> type) {
@@ -115,7 +120,7 @@ public class AbstractEntityBase implements AttributeProvider, DirectiveProvider 
     public boolean unsetDirective(String name) {
         return directivesMap.remove(name) != null;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 3;

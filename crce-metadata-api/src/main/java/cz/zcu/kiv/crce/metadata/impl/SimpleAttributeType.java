@@ -1,9 +1,10 @@
-package cz.zcu.kiv.crce.metadata;
+package cz.zcu.kiv.crce.metadata.impl;
 
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import java.util.Objects;
 
 /**
- * 
+ *
  * @param <T> Data type of property.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
@@ -43,16 +44,13 @@ public class SimpleAttributeType<T> implements AttributeType<T> {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof AttributeType)) {
             return false;
         }
-        final SimpleAttributeType other = (SimpleAttributeType) obj;
-        if (!Objects.equals(this.name, other.name)) {
+        final AttributeType<?> other = (AttributeType) obj;
+        if (!Objects.equals(this.name, other.getName())) {
             return false;
         }
-        if (!Objects.equals(this.type, other.type)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.type, other.getType());
     }
 }

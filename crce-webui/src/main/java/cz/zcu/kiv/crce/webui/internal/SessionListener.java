@@ -5,7 +5,7 @@ import javax.servlet.http.HttpSessionListener;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SessionListener implements HttpSessionListener {
 

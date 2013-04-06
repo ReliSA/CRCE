@@ -32,18 +32,18 @@ public class UploadServlet extends HttpServlet {
     private static final long serialVersionUID = -7359560802937893940L;
 
     private static final Logger logger = LoggerFactory.getLogger(UploadServlet.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean failed = false;
 
         if (req.getParameter("uri") != null) {
             Buffer buffer = Activator.instance().getBuffer(req);
-            Resource[] array = buffer.getRepository().getResources();
+            List<Resource> resources = buffer.getResources();
             String uriParam = req.getParameter("uri");
             try {
                 URI uri = new URI(uriParam);
-                Resource found = EditServlet.findResource(uri, array);
+                Resource found = EditServlet.findResource(uri, resources);
                 buffer.commit(true); //TODO! Bad API -> Resources should be committed one by one
             } catch (URISyntaxException e) {
                 logger.error("Invalid URI syntax", e);
@@ -98,7 +98,7 @@ public class UploadServlet extends HttpServlet {
         String message;
         if (ServletFileUpload.isMultipartContent(req)) {
             ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
-            List fileItemsList;
+            List<?> fileItemsList;
             try {
                 fileItemsList = servletFileUpload.parseRequest(req);
             } catch (FileUploadException e) {

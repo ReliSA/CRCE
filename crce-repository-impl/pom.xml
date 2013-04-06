@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
@@ -23,9 +23,9 @@
     </properties>
 
     <dependencies>
-        
+
         <!-- Felix -->
-        
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.osgi.service.obr</artifactId>
@@ -34,9 +34,9 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
-        
+
         <!-- 3rd party dependencies -->
-        
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -45,9 +45,9 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
         </dependency>
-        
+
         <!-- Project dependencies -->
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -80,7 +80,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
 </project>

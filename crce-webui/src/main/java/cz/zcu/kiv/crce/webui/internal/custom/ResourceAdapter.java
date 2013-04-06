@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.webui.internal.custom;
 
-import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -9,11 +7,11 @@ import java.util.Set;
 
 import org.osgi.framework.Version;
 
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.webui.internal.legacy.Capability;
+import cz.zcu.kiv.crce.webui.internal.legacy.Property;
+import cz.zcu.kiv.crce.webui.internal.legacy.Requirement;
+import cz.zcu.kiv.crce.webui.internal.legacy.Resource;
+import cz.zcu.kiv.crce.webui.internal.legacy.Type;
 
 public class ResourceAdapter implements Resource {
 
@@ -194,61 +192,61 @@ public class ResourceAdapter implements Resource {
 	@Override
 	public void setSymbolicName(String name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setSymbolicName(String name, boolean isStatic) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setPresentationName(String name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setVersion(Version version) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setVersion(Version version, boolean isStatic) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setVersion(String version) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setVersion(String version, boolean isStatic) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void addCategory(String category) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void addCapability(Capability capability) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void addRequirement(Requirement requirement) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -266,31 +264,31 @@ public class ResourceAdapter implements Resource {
 	@Override
 	public void unsetCategory(String category) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unsetCapability(Capability capability) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void unsetRequirement(Requirement requirement) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setSize(long size) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void setUri(URI uri) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -302,7 +300,7 @@ public class ResourceAdapter implements Resource {
 	@Override
 	public void unsetWritable() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -323,15 +321,14 @@ public class ResourceAdapter implements Resource {
 		return null;
 	}
 
-    @Override
-    public Repository getRepository() {
-		// TODO Auto-generated method stub
-		return null;
-    }
-
-    @Override
-    public void setRepository(WritableRepository repository) {
-		// TODO Auto-generated method stub
-    }
-
+//    @Override
+//    public Repository getRepository() {
+//		// TODO Auto-generated method stub
+//		return null;
+//    }
+//
+//    @Override
+//    public void setRepository(WritableRepository repository) {
+//		// TODO Auto-generated method stub
+//    }
 }

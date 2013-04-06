@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -16,14 +17,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 
 public class DownloadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 6399102910617353070L;
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadServlet.class);
-    
+
     private static final int BUFSIZE = 128;
 
     @Override
@@ -46,33 +49,43 @@ public class DownloadServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean failed = false;
         String message;
         if (req.getParameter("uri") != null) {
             String link = (String) req.getSession().getAttribute("source");
-            String uri = (String) req.getParameter("uri");
-
+            String uri = req.getParameter("uri");
             try {
                 URI fileUri = new URI(uri);
-                if (link.equals("store")) {
-                    Resource[] array = Activator.instance().getStore().getRepository().getResources();
-                    Resource found = EditServlet.findResource(fileUri, array);
-                    doDownload(req, resp, found);
-
-                } else if (link.equals("buffer")) {
-                    Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
-                    Resource found = EditServlet.findResource(fileUri, array);
-                    logger.debug("Found!" + found.getPresentationName());
-                    doDownload(req, resp, found);
+                if (link != null) {
+                    switch (link) {
+                        case "store": {
+                            List<Resource> resources = Activator.instance().getStore().getResources();
+                            Resource found = EditServlet.findResource(fileUri, resources);
+                            doDownload(req, resp, found);
+                            break;
+                        }
+                        case "buffer": {
+                            List<Resource> resources = Activator.instance().getBuffer(req).getResources();
+                            Resource found = EditServlet.findResource(fileUri, resources);
+                            logger.debug("Found!" + LegacyMetadataHelper.getPresentationName(found));
+                            doDownload(req, resp, found);
+                            break;
+                        }
+                        default:
+                            failed = true;
+                            break;
+                    }
                 } else {
                     failed = true;
                 }
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 failed = true;
-                e.printStackTrace();
+                logger.error("Failed to download resource: {}", uri, e);
+            } catch (URISyntaxException e) {
+                failed = true;
+                logger.error("Failed to download resource, invalid URI: {}", uri, e);
             }
         } else {
             failed = true;
@@ -90,36 +103,34 @@ public class DownloadServlet extends HttpServlet {
     private void doDownload(HttpServletRequest req, HttpServletResponse resp,
             Resource found) throws IOException {
 
-        File f = new File(found.getRelativeUri());
+        File f = new File(LegacyMetadataHelper.getRelativeUri(found));
         int length = 0;
-        ServletOutputStream op = resp.getOutputStream();
-        ServletContext context = getServletConfig().getServletContext();
-        String mimetype = context.getMimeType(found.getRelativeUri().toString());
+        try (ServletOutputStream op = resp.getOutputStream()) {
+            ServletContext context = getServletConfig().getServletContext();
+            String mimetype = context.getMimeType(LegacyMetadataHelper.getRelativeUri(found).toString());
 
-        //
-        //  Set the response and go!
-        //
-        //
-        resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
-        resp.setContentLength((int) f.length());
-        resp.setHeader("Content-Disposition", "attachment; filename=\"" + found.getSymbolicName() + chooseCategory(found.getCategories()) + "\"");
+            //
+            //  Set the response and go!
+            //
+            //
+            resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+            resp.setContentLength((int) f.length());
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + LegacyMetadataHelper.getSymbolicName(found) + chooseCategory(LegacyMetadataHelper.getCategories(found)) + "\"");
 
-        //
-        //  Stream to the requester.
-        //
-        byte[] bbuf = new byte[BUFSIZE];
-        DataInputStream in = new DataInputStream(new FileInputStream(f));
-
-        while ((in != null) && ((length = in.read(bbuf)) != -1)) {
-            op.write(bbuf, 0, length);
+            //
+            //  Stream to the requester.
+            //
+            byte[] bbuf = new byte[BUFSIZE];
+            try (DataInputStream in = new DataInputStream(new FileInputStream(f))) {
+                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                    op.write(bbuf, 0, length);
+                }
+                op.flush();
+            }
         }
-
-        in.close();
-        op.flush();
-        op.close();
     }
 
-    private String chooseCategory(String[] strings) {
+    private String chooseCategory(List<String> strings) {
         String suffix = "";
         for (String string : strings) {
             if (string.equals("jpeg")) {

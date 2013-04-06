@@ -18,20 +18,22 @@ public interface AttributeProvider {
 
     @CheckForNull
     <T> T getAttributeValue(@Nonnull AttributeType<T> type);
-    
+
     @CheckForNull
     <T> String getAttributeStringValue(@Nonnull AttributeType<T> type);
 
     <T> boolean setAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
-    
+
     <T> boolean setAttribute(@Nonnull Attribute<T> attribute);
-    
+
     <T> boolean setAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
 
-    <T> boolean unsetAttribute(@Nonnull Attribute<T> attribute);
-    
-    <T> boolean unsetAttribute(@Nonnull AttributeType<T> type);
-    
+    <T> boolean removeAttribute(@Nonnull Attribute<T> attribute);
+
+    <T> boolean removeAttribute(@Nonnull AttributeType<T> type);
+
+    <T> boolean removeAttribute(@Nonnull String name);
+
     @Nonnull
     List<? extends Attribute<?>> getAttributes();
 

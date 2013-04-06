@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.MatchingAttribute;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Not working demonstration of API usage.

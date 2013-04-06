@@ -8,6 +8,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 
@@ -45,6 +46,15 @@ public interface Store {
      */
     @Nonnull
     Repository getRepository();
+
+    /**
+     * Returns list of resources stored in the Store.
+     * @return list of stored resources.
+     */
+    @Nonnull
+    List<Resource> getResources();
+
+    List<Resource> getResources(Requirement requirement);
 
     /**
      * TODO analyze requirements for this method:

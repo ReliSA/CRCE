@@ -13,7 +13,7 @@ import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  *
@@ -52,7 +52,7 @@ public class CapabilityTest {
         assertNotNull(c.getAttribute(ATTR_P1));
         assertNotNull(c.getAttribute(ATTR_P2));
         
-        c.unsetAttribute(ATTR_P1);
+        c.removeAttribute(ATTR_P1);
         
         assertNull(c.getAttribute(ATTR_P1));
         assertNotNull(c.getAttribute(ATTR_P2));
@@ -61,7 +61,7 @@ public class CapabilityTest {
         
         assertNotNull(attribute);
         
-        c.unsetAttribute(attribute);
+        c.removeAttribute(attribute);
         
         assertNull(c.getAttribute(ATTR_P1));
         assertNull(c.getAttribute(ATTR_P2));

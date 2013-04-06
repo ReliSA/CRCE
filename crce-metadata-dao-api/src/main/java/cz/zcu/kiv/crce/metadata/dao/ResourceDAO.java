@@ -8,7 +8,6 @@ import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.plugin.Plugin;
 
 /**
  * Plugin implementing this class manages retrieving and storing metadata of an
@@ -20,7 +19,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
-public interface ResourceDAO extends Plugin {
+public interface ResourceDAO {
 
     /**
      * Returns <code>Resource</code> object for the given resource. Returns

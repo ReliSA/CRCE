@@ -9,7 +9,7 @@ import org.junit.*;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.internal.AttributeImpl;
 
 /**

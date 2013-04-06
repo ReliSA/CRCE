@@ -12,7 +12,7 @@ import cz.zcu.kiv.crce.metadata.MatchingAttribute;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Implementation of Requirement interface.
@@ -23,12 +23,12 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
     private String namespace = null;
     private Resource resource = null;
     private Requirement parent = null;
-    private List<Requirement> nestedRequirements = new ArrayList<>();
+    private final List<Requirement> nestedRequirements = new ArrayList<>();
 
     public RequirementImpl(String namespace) {
         this.namespace = namespace.intern();
     }
-    
+
     @Override
     public String getNamespace() {
         return namespace;
@@ -140,7 +140,7 @@ public class RequirementImpl extends AbstractEntityBase implements Requirement {
         }
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 3;

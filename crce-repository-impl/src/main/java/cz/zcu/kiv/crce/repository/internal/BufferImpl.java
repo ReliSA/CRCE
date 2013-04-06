@@ -22,10 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -354,6 +355,16 @@ public class BufferImpl implements Buffer, EventHandler {
 
     Dictionary getSessionProperties() {
         return m_sessionProperties;
+    }
+
+    @Override
+    public List<Resource> getResources() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private boolean isInBuffer(Resource resource) {

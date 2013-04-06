@@ -12,10 +12,10 @@
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-plugin-api</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin API</name>
+    <name>CRCE - Incubator - Plugin API</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.plugin</bundle.symbolicName>

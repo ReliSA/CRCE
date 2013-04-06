@@ -1,30 +1,31 @@
 package cz.zcu.kiv.crce.webui.internal;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.zcu.kiv.crce.metadata.Reason;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.Resolver;
+//import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
+//import cz.zcu.kiv.crce.metadata.ResourceCreator;
 
 public class CheckServlet extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(CheckServlet.class);
 
     private static final long serialVersionUID = -6116518932972052481L;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Resource[] res = chooseFrom(req);
+        List<Resource> res = chooseFrom(req);
         if (res == null) {
             req.getRequestDispatcher("resource").forward(req, resp);
         } else {
@@ -36,7 +37,7 @@ public class CheckServlet extends HttpServlet {
 
     }
 
-    private Resource[] chooseFrom(HttpServletRequest req) {
+    private List<Resource> chooseFrom(HttpServletRequest req) {
         String source = (String) req.getSession().getAttribute("source");
         if (source == null) {
             return null;
@@ -49,30 +50,32 @@ public class CheckServlet extends HttpServlet {
         }
     }
 
-    private Resource[] doCheck(Repository repository) {
-        Resource[] resources = repository.getResources();
-        Resource[] cloned = new Resource[resources.length];
-        System.arraycopy(resources, 0, cloned, 0, resources.length);
-        ArrayList<Resource> ext = new ArrayList<>();
-        HashMap<URI, Resource> extMap = new HashMap<>();
-        ResourceCreator rc = Activator.instance().getCreator();
-        Resolver resolver = rc.createResolver(repository);
-        for (Resource r : cloned) {
-            resolver.add(r);
-            r.getUri();
-            extMap.put(r.getUri(), new ResourceExt(r));
-            ext.add(new ResourceExt(r));
-        }
-        if (!resolver.resolve()) {
-            for (Reason r : resolver.getUnsatisfiedRequirements()) {
-                if (extMap.containsKey(r.getResource().getUri())) {
-                    extMap.get(r.getResource().getUri()).addRequirement(r.getRequirement());
-                }
-
-            }
-            return extMap.values().toArray(new Resource[extMap.values().size()]);
-        } else {
-            return resources;
-        }
+    private List<Resource> doCheck(Repository repository) {
+        logger.warn("Resolver is not designed yet in new Metadata API, returning empty list of resources.");
+//        Resource[] resources = repository.getResources();
+//        Resource[] cloned = new Resource[resources.length];
+//        System.arraycopy(resources, 0, cloned, 0, resources.length);
+//        ArrayList<Resource> ext = new ArrayList<>();
+//        HashMap<URI, Resource> extMap = new HashMap<>();
+//        ResourceCreator rc = Activator.instance().getCreator();
+//        Resolver resolver = rc.createResolver(repository);
+//        for (Resource r : cloned) {
+//            resolver.add(r);
+//            r.getUri();
+//            extMap.put(r.getUri(), new ResourceExt(r));
+//            ext.add(new ResourceExt(r));
+//        }
+//        if (!resolver.resolve()) {
+//            for (Reason r : resolver.getUnsatisfiedRequirements()) {
+//                if (extMap.containsKey(r.getResource().getUri())) {
+//                    extMap.get(r.getResource().getUri()).addRequirement(r.getRequirement());
+//                }
+//
+//            }
+//            return extMap.values().toArray(new Resource[extMap.values().size()]);
+//        } else {
+//            return resources;
+//        }
+        return Collections.emptyList();
     }
 }

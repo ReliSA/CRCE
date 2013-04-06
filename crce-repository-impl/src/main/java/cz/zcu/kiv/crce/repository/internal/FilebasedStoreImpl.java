@@ -17,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 //import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 //import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -240,6 +242,16 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 ah.afterExecuteInStore(res, executable, properties, store);
             }
         }).start();
+    }
+
+    @Override
+    public List<Resource> getResources() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private boolean isInStore(Resource resource) {
