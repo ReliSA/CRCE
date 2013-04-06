@@ -38,7 +38,7 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
 /**
  * Filebased implementation of <code>Buffer</code>.
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class BufferImpl implements Buffer, EventHandler {
 

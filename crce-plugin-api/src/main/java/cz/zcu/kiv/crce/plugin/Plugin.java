@@ -1,11 +1,12 @@
 package cz.zcu.kiv.crce.plugin;
 
+import java.util.List;
 import org.osgi.framework.Version;
 
 /**
  * Common plugin interface. Every plugin must implement it.
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ *
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Plugin extends Comparable<Plugin> {
 
@@ -36,7 +37,7 @@ public interface Plugin extends Comparable<Plugin> {
      * punctuation.
      */
     public static final String CFG_DESCRIPTION = "plugin.description";
-    
+
     /**
      * This value can be set to a plugin priority configuration property as
      * a maximal possible value.
@@ -50,14 +51,14 @@ public interface Plugin extends Comparable<Plugin> {
 
     /**
      * Returns the plugin unique identification.
-     * 
+     *
      * @return the plugin indentification.
      */
     public String getPluginId();
 
     /**
      * Returns the version of plugin.
-     * 
+     *
      * @return the version of plugin.
      */
     public Version getPluginVersion();
@@ -65,14 +66,14 @@ public interface Plugin extends Comparable<Plugin> {
     /**
      * Returns plugin priority. If more plugins of the same type are present,
      * the one with the highest priority will be used.
-     * 
+     *
      * @return the priority of plugin.
      */
     public int getPluginPriority();
 
     /**
      * Returns the human-readable description of plugin.
-     * 
+     *
      * @return the human-readable description of plugin.
      */
     public String getPluginDescription();
@@ -80,11 +81,11 @@ public interface Plugin extends Comparable<Plugin> {
     /**
      * Returns an optional array of plugin keywords or zero-length array if no
      * keyword is specified.
-     * 
+     *
      * <p>Keywords can be used to more precise specifying of plugin(s) returned
      * by <code>PluginManager</code>.
-     * 
+     *
      * @return an array of keywords.
      */
-    public String[] getPluginKeywords();
+    public List<String> getPluginKeywords();
 }

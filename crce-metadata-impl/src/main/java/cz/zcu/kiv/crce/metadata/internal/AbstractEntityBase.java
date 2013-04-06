@@ -18,7 +18,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  * Abstract implementatio of
  * <code>PropertyProvider</code> interface. It serves to provide unique implementation of providing Properties.
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class AbstractEntityBase implements AttributeProvider, DirectiveProvider {
 

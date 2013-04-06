@@ -11,7 +11,7 @@ import org.osgi.framework.Version;
  *
  * <p>Resource have capabilities, requirements, properties and categories.
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Resource extends PropertyProvider<Resource> {
 

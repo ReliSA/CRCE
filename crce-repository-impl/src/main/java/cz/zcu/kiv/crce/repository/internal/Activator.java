@@ -24,7 +24,7 @@ import cz.zcu.kiv.crce.repository.Store;
 
 /**
  * Activator of this bundle.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase implements ManagedService {
 

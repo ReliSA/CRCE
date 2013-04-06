@@ -1,10 +1,12 @@
 package cz.zcu.kiv.crce.plugin;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -18,17 +20,18 @@ import org.osgi.service.event.EventAdmin;
  * This abstract class implements all methods of <code>Plugin</code> interface.
  * It can be extended of any plugin - it's recommended to keep unified
  * behaviour of plugins.
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ *
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
 
     private volatile BundleContext m_context;
-    private Dictionary properties = new Properties();
+    @SuppressWarnings("UseOfObsoleteCollectionType")
+    private Dictionary<String, ?> properties = new java.util.Hashtable<>();
     private String id = this.getClass().getName();
     private Version version = new Version("0.0.0");
     private int priority = 0;
-    private String[] keywords = new String[0];
+    private List<String> keywords = Collections.emptyList();
     private String description = "Abstract plugin";
 
     @Override
@@ -52,7 +55,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
     }
 
     @Override
-    public String[] getPluginKeywords() {
+    public List<String> getPluginKeywords() {
         return keywords;
     }
 
@@ -83,10 +86,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
         if (this.version.compareTo(other.version) != 0) {
             return false;
         }
-        if (this.priority != other.priority) {
-            return false;
-        }
-        return true;
+        return this.priority == other.priority;
     }
 
     @Override
@@ -113,12 +113,12 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
             priority = 0;
         }
         if (properties.get(CFG_KEYWORDS) == null) {
-            keywords = new String[0];
+            keywords = Collections.emptyList();
         }
     }
 
     @Override
-    public void updated(Dictionary properties) throws ConfigurationException {
+    public void updated(Dictionary<String, ? > properties) throws ConfigurationException {
         if (properties != null) {
             try {
                 String value;
@@ -145,12 +145,15 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                     try {
                         priority = Integer.parseInt(value);
                     } catch (NumberFormatException e) {
-                        if (PRIORITY_MAX_VALUE.equals(value.trim().toUpperCase())) {
-                            priority = Integer.MAX_VALUE;
-                        } else if (PRIORITY_MIN_VALUE.equals(value.trim().toUpperCase())) {
-                            priority = Integer.MIN_VALUE;
-                        } else {
-                            throw new ConfigurationException(CFG_PRIORITY, "Priority must be an integer", e);
+                        switch (value.trim().toUpperCase()) {
+                            case PRIORITY_MAX_VALUE:
+                                priority = Integer.MAX_VALUE;
+                                break;
+                            case PRIORITY_MIN_VALUE:
+                                priority = Integer.MIN_VALUE;
+                                break;
+                            default:
+                                throw new ConfigurationException(CFG_PRIORITY, "Priority must be an integer", e);
                         }
                     }
                 }
@@ -158,13 +161,10 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                 // configure KEYWORDS
                 if ((value = (String) properties.get(CFG_KEYWORDS)) != null) {
                     if ("".equals(value.trim())) {
-                        keywords = new String[0];
+                        keywords = Collections.emptyList();
                     } else {
                         String[] split = value.split(",");
-                        keywords = new String[split.length];
-                        for (int i = 0; i < keywords.length; i++) {
-                            keywords[i] = split[i].trim();
-                        }
+                        keywords = Arrays.asList(split);
                     }
                 }
 
@@ -174,26 +174,26 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                 }
 
             } finally {
-                ServiceReference ref = m_context.getServiceReference(EventAdmin.class.getName());
+                ServiceReference<EventAdmin> ref = m_context.getServiceReference(EventAdmin.class);
                 if (ref != null) {
-                    EventAdmin eventAdmin = (EventAdmin) m_context.getService(ref);
+                    EventAdmin eventAdmin = m_context.getService(ref);
 
-                    Map<String, Object> props = new HashMap<String, Object>();
-                    
+                    Map<String, Object> props = new HashMap<>();
+
                     props.put(PluginManager.PROPERTY_PLUGIN_ID, id);
                     props.put(PluginManager.PROPERTY_PLUGIN_VERSION, version.toString());
                     props.put(PluginManager.PROPERTY_PLUGIN_PRIORITY, priority);
                     props.put(PluginManager.PROPERTY_PLUGIN_DESCRIPTION, description);
                     props.put(PluginManager.PROPERTY_PLUGIN_KEYWORDS, keywords.toString());
-                    
-                    Set<String> types = new HashSet<String>();
 
-                    for (Class cl = this.getClass(); cl != Object.class; cl = cl.getSuperclass()) {
-                        for (Class iface : cl.getInterfaces()) {
+                    Set<String> types = new HashSet<>();
+
+                    for (Class<?> cl = this.getClass(); cl != Object.class; cl = cl.getSuperclass()) {
+                        for (Class<?> iface : cl.getInterfaces()) {
                             types.add(iface.getName());
                         }
                     }
-                    
+
                     props.put(PluginManager.PROPERTY_PLUGIN_TYPES, types.toString());
 
                     eventAdmin.sendEvent(new Event(PluginManager.TOPIC_PLUGIN_CONFIGURED, props));

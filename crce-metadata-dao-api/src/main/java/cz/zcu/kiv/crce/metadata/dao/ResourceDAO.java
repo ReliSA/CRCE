@@ -17,7 +17,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * manipulate and manage metadata resource while uploading artifacts, retrieving
  * them, copying etc.
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface ResourceDAO {
 

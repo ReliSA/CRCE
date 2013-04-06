@@ -13,7 +13,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
  * 
  * PENDING this interface probably won't be needed.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface RepositoryDAO extends Plugin {
 

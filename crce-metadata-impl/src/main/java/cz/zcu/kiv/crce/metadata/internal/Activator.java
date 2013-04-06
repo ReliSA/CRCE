@@ -8,7 +8,7 @@ import org.osgi.framework.BundleContext;
 /**
  * Bundle's activator.
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase {
 

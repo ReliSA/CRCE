@@ -31,7 +31,7 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
 
 /**
  * Filebased implementation of <code>Store</code>.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class FilebasedStoreImpl implements Store, EventHandler {
 

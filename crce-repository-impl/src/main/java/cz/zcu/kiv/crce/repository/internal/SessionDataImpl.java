@@ -6,7 +6,7 @@ import org.apache.felix.dm.Component;
 
 /**
  * Implementation of <code>SessionData</code>
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SessionDataImpl implements SessionData {
 

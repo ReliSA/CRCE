@@ -12,10 +12,10 @@
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-metadata-indexer</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - Static Metadata Indexer</name>
+    <name>CRCE - Indexer - Plugin - Static Metadata Indexer</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>

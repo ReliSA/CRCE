@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 /**
  * A property that can be set to a Resource or a Capability.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Property {
 

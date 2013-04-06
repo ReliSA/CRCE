@@ -14,7 +14,7 @@ import cz.zcu.kiv.crce.repository.Store;
 
 /**
  * Implementation of <code>SessionFactory.</code>
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SessionFactoryImpl implements SessionRegister {
 

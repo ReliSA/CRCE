@@ -16,7 +16,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Implementation of Requirement interface.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RequirementImpl extends AbstractEntityBase implements Requirement {
 

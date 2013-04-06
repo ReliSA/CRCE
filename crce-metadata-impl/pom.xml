@@ -20,7 +20,6 @@
     <properties>
         <bundle.symbolicName>${namespace}.metadata.impl</bundle.symbolicName>
         <bundle.namespace>${namespace}.metadata</bundle.namespace>
-        <netbeans.hint.displayName>${project.name} - ${project.version}</netbeans.hint.displayName>
     </properties>
 
     <build>

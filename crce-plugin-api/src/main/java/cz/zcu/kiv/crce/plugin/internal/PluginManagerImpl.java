@@ -28,7 +28,7 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
  * Implementation of <code>PluginManager</code>.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class PluginManagerImpl implements PluginManager {
 
@@ -167,7 +167,7 @@ public class PluginManagerImpl implements PluginManager {
                 continue;
             }
             Set<? extends Plugin> set;
-            if (plugin.getPluginKeywords().length == 0) {
+            if (plugin.getPluginKeywords().isEmpty()) {
                 if ((set = map.get(NO_KEYWORDS)) != null) {
                     set.remove(plugin);
                 }
@@ -191,7 +191,7 @@ public class PluginManagerImpl implements PluginManager {
         }
         for (Class<?> iface : clazz.getInterfaces()) {
             types.add(iface.getName());
-            if (plugin.getPluginKeywords().length == 0) {
+            if (plugin.getPluginKeywords().isEmpty()) {
                 add(iface, plugin, NO_KEYWORDS);
             } else {
                 for (String keyword : plugin.getPluginKeywords()) {

@@ -20,7 +20,7 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
 /**
  * Implementation of <code>Store</code> which can connect to remote OBR repository.
  * Not implemented yet.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ObrStoreImpl implements Store {
     public static final String RESOURCE_METADATA_FILE_EXTENSION = ".metadata";

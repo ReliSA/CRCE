@@ -7,7 +7,7 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 
 /**
  * Implementation of <code>ResourceCreator</code> interface.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceFactoryImpl implements ResourceFactory {
 

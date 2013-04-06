@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.osgi.framework.Version;
 
-import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
@@ -43,6 +42,10 @@ public class LegacyMetadataHelper {
         assert !capabilities.isEmpty();
 
         return capabilities.get(0).getAttributeValue(CRCE_URI);
+    }
+
+    public static void setUri(ResourceFactory factory, @Nonnull Resource resource, URI uri) {
+        getSingleCapability(factory, resource, NS__CRCE_IDENTITY).setAttribute(CRCE_URI, uri);
     }
 
     public static void setFileName(ResourceFactory factory, Resource resource, String fileName) {
@@ -142,6 +145,10 @@ public class LegacyMetadataHelper {
                 capabilitiesList.remove(category);
             }
         }
+    }
+
+    public static void setSize(ResourceFactory factory, Resource resource, long size) {
+        getSingleCapability(factory, resource, NS__CRCE_IDENTITY).setAttribute(CRCE_SIZE, size);
     }
 
     public static long getSize(Resource resource) {
