@@ -12,10 +12,10 @@
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-metadata-osgi-bundle</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - OSGi Manifest Indexer</name>
+    <name>CRCE - Incubator - Plugin - OSGi Manifest Indexer</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.osgi</bundle.symbolicName>

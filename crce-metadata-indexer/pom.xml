@@ -2,7 +2,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
@@ -15,7 +15,7 @@
     <version>1.0.0-incubator-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Indexer - Plugin - Static Metadata Indexer</name>
+    <name>CRCE - Incubator - Plugin - Static Metadata Indexer</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>
@@ -27,7 +27,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>

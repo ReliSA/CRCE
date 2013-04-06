@@ -6,6 +6,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.zip.ZipException;
 
 import org.apache.felix.bundlerepository.RepositoryAdmin;
@@ -16,8 +19,9 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.Type;
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
+import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 
 /**
  * implementation of <code>ResourceIndexer</code> which provides support for
@@ -25,16 +29,18 @@ import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(OsgiManifestBundleIndexer.class);
-    
-    private volatile RepositoryAdmin m_repoAdmin;  /* injected by dependency manager */
+
+    private volatile RepositoryAdmin repositoryAdmin;  /* injected by dependency manager */
+    private volatile ResourceFactory resourceFactory;  /* injected by dependency manager */
 
     @Override
-    public String[] index(final InputStream input, Resource resource) {
+    @SuppressWarnings("unchecked")
+    public List<String> index(final InputStream input, Resource resource) {
 
         org.apache.felix.bundlerepository.Resource fres;
-        
+
         try {
             URLStreamHandler handler = new URLStreamHandler()  {
                 @Override
@@ -51,56 +57,63 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
                 }
             };
-            fres = m_repoAdmin.getHelper().createResource(new URL("none", "none", 0, "none", handler));
+            fres = repositoryAdmin.getHelper().createResource(new URL("none", "none", 0, "none", handler));
         } catch (MalformedURLException e) {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (ZipException e) {
             logger.warn("Zip file is corrupted: {}", resource.getId(), e);
-            resource.addCategory("corrupted");
-            return new String[] {"corrupted"};
+            LegacyMetadataHelper.addCategory(resourceFactory, resource, "corrupted");
+            return Collections.singletonList("corrupted");
         } catch (IOException ex) {
             logger.error("I/O error on indexing resource: {}", resource.getId(), ex);
-            return new String[0];
+            return Collections.emptyList();
         } catch (IllegalArgumentException e) {
             // not a bundle
-            return new String[0];
+            return Collections.emptyList();
         }
 
         if (fres == null) {
-            return new String[0];
+            return Collections.emptyList();
         }
-        
-        resource.setSymbolicName(fres.getSymbolicName(), true);
-        resource.setVersion(fres.getVersion(), true);
-        resource.setPresentationName(fres.getPresentationName());
+
+        LegacyMetadataHelper.setSymbolicName(resourceFactory, resource, fres.getSymbolicName());
+        LegacyMetadataHelper.setVersion(resourceFactory, resource, fres.getVersion());
+        LegacyMetadataHelper.setPresentationName(resourceFactory, resource, fres.getPresentationName());
         // size is not set
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
-            Capability cap = resource.createCapability(fcap.getName());
+            Capability cap = resourceFactory.createCapability(fcap.getName());
             for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {
-                cap.setProperty(fprop.getName(), fprop.getValue(), Type.getValue(fprop.getType()));
+                ObrType type = ObrType.getValue(fprop.getType());
+                cap.setAttribute(fprop.getName(), (Class<Object>) type.getTypeClass(), ObrType.propertyValueFromString(type, fprop.getType()));
             }
+            resource.addCapability(cap);
         }
         for (org.apache.felix.bundlerepository.Requirement freq : fres.getRequirements()) {
-            Requirement req = resource.createRequirement(freq.getName());
-            req.setComment(freq.getComment());
-            req.setExtend(freq.isExtend());
-            req.setFilter(freq.getFilter());
-            req.setMultiple(freq.isMultiple());
-            req.setOptional(freq.isOptional());
+            Requirement req = resourceFactory.createRequirement(freq.getName());
+
+            req.setDirective("comment", freq.getComment());
+            req.setDirective("extend", String.valueOf(freq.isExtend()));
+            req.setDirective("filter", freq.getFilter());
+            req.setDirective("multiple", String.valueOf(freq.isMultiple()));
+            req.setDirective("optional", String.valueOf(freq.isOptional()));
+
+            resource.addRequirement(req);
         }
 
         for (String category : fres.getCategories()) {
-            resource.addCategory(category);
+            LegacyMetadataHelper.addCategory(resourceFactory, resource, category);
         }
 
         // TODO properties, if necessary
-        resource.addCategory("osgi");
-        
-        return new String[] {"osgi"};
+        LegacyMetadataHelper.addCategory(resourceFactory, resource, "osgi");
+
+        return Collections.singletonList("osgi");
     }
 
     @Override
-    public String[] getProvidedCategories() {
-        return new String[] {"osgi", "corrupted"};
+    public List<String> getProvidedCategories() {
+        List<String> result = new ArrayList<>();
+        Collections.addAll(result, "osgi", "corrupted");
+        return result;
     }
 }
