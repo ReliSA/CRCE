@@ -89,6 +89,8 @@
         <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
         <module>crce-rest</module>
+
+	<module>crce-integration-tests</module>
     </modules>
 
     <profiles>

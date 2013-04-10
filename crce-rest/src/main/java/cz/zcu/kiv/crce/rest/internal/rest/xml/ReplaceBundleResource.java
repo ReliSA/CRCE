@@ -26,8 +26,8 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	
 	public static final String UPGRADE_OP = "upgrade";
 	public static final String DOWNGRADE_OP = "downgrade";
-	public static final String LOWER_OP = "lower";
-	public static final String HIGHER_OP = "higher";
+	public static final String LOWEST_OP = "lowest";
+	public static final String HIGHEST_OP = "highest";
 	public static final String ANY_OP =  "any";
 	
 	/**
@@ -114,6 +114,16 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 * Return resource, that could replace client bundle.
 	 * Kind of returned resource depends on operation op.
 	 * 
+	 * Operations:
+	 * <ul>
+	 * <li>upgrade (Default)- nearest higher version </li>
+	 * <li>downgrade - nearest lower</li>
+	 * <li>highest - highest version</li>
+	 * <li>lowest - lowest version</li>
+	 * <li>any - different than version from client</li>
+	 * </ul>
+	 * If no wanted version if available (ex no higher in upgrade op), resource from client is returned to client.
+	 * 
 	 * @param op operation
 	 * @param filter filter to all bundles with same name as client bundle.
 	 * @return resource, that could replace client bundle.
@@ -126,20 +136,20 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 		
 		if(op!= null) {
 			switch (op) {
-			case DOWNGRADE_OP:
+			case LOWEST_OP:
 				resourceToReturn = findSingleBundleByFilterWithLowestVersion(nameFilter);
 				break;
-			case UPGRADE_OP:
+			case HIGHEST_OP:
 				resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
 				break;
-			case LOWER_OP:				
+			case DOWNGRADE_OP:				
 				resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
 				break;
-			case HIGHER_OP:
+			case UPGRADE_OP:
 				resourceToReturn = nearestHigherResource(resourcesWithSameName, clientResource);
 				break;
 			case ANY_OP:
-				//use highest (if there is no higher, use nearest lowest)
+				//use highest (if there is no higher, use nearest lower)
 				resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
 				if(resourceToReturn.getId().equals(clientResource.getId())) {
 					resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
@@ -152,7 +162,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 			
 
 		} else {
-			resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
+			resourceToReturn = nearestHigherResource(resourcesWithSameName, clientResource);
 		}
 		
 		return resourceToReturn;

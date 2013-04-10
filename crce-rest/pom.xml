@@ -29,6 +29,7 @@
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
+                    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
 
@@ -98,7 +99,7 @@
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>       
+        </dependency>    
 
 
 		 <!-- 3rd party dependencies -->		
