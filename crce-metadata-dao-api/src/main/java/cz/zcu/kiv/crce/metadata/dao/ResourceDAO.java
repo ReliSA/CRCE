@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -31,7 +30,7 @@ public interface ResourceDAO {
      */
     Resource loadResource(@Nonnull URI uri) throws IOException;
 
-    List<Resource> loadResources(@Nonnull Repository repository) throws IOException;
+    List<Resource> loadResources(@Nonnull URI uri) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.

@@ -10,11 +10,11 @@ import org.apache.felix.dm.Component;
  */
 public class SessionDataImpl implements SessionData {
 
-    Component m_bufferComponent;
-    Buffer m_buffer;
+    Component bufferComponent;
+    Buffer buffer;
 
     @Override
     public Buffer getBuffer() {
-        return m_buffer;
+        return buffer;
     }
 }

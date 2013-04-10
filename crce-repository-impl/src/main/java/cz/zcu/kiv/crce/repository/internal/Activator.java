@@ -17,6 +17,7 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -36,6 +37,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     private volatile BundleContext m_context;       /* injected by dependency manager */
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
+
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
 
@@ -46,7 +48,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         dm.add(createComponent()
                 .setInterface(SessionRegister.class.getName(), null)
-                .setImplementation(SessionFactoryImpl.class)
+                .setImplementation(SessionRegisterImpl.class)
                 );
 
         dm.add(createComponent()
@@ -58,7 +60,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void updated(Dictionary<String, ?> dict) throws ConfigurationException {
+        logger.debug("Updating Repository Activator configuration: {}", dict);
+
         if (dict == null) {
+            logger.warn("Repository configuration is empty!");
             return;
         }
 
@@ -82,6 +87,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             file = new File(path);
         }
 
+        logger.debug("Repository Store URI: {}, file: {}", uri, file);
+
         Component store;
 
         if (file != null) {
@@ -93,7 +100,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 store = createComponent()
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new FilebasedStoreImpl(file))
-                        .add(createServiceDependency().setRequired(true).setService(PluginManager.class));
+                        .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                        .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class));
             } catch (IOException e) {
                 throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
             }
@@ -109,6 +117,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         } else {
             throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
         }
+
+        logger.debug("Registering Repository Store: {}", store);
 
         m_manager.add(store);
 

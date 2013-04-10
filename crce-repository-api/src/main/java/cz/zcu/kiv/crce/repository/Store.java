@@ -7,7 +7,6 @@ import java.util.Properties;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -39,13 +38,6 @@ public interface Store {
      * @throws IOException
      */
     boolean remove(@Nonnull Resource resource) throws IOException;
-
-    /**
-     * Returns resources stored in buffer.
-     * @return array of resources.
-     */
-    @Nonnull
-    Repository getRepository();
 
     /**
      * Returns list of resources stored in the Store.

@@ -42,15 +42,15 @@ public class CheckServlet extends HttpServlet {
         if (source == null) {
             return null;
         } else if (source.equals("buffer")) {
-            return doCheck(Activator.instance().getBuffer(req).getRepository());
+            return doCheck(Activator.instance().getBuffer(req).getResources());
         } else if (source.equals("store")) {
-            return doCheck(Activator.instance().getStore().getRepository());
+            return doCheck(Activator.instance().getStore().getResources());
         } else {
             return null;
         }
     }
 
-    private List<Resource> doCheck(Repository repository) {
+    private List<Resource> doCheck(List<Resource> resources) {
         logger.warn("Resolver is not designed yet in new Metadata API, returning empty list of resources.");
 //        Resource[] resources = repository.getResources();
 //        Resource[] cloned = new Resource[resources.length];

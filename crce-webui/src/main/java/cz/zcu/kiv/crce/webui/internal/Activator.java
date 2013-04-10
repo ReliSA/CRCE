@@ -26,7 +26,7 @@ import cz.zcu.kiv.crce.repository.Store;
 public final class Activator extends DependencyActivatorBase {
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
-    private static volatile Activator m_instance;
+    private static volatile Activator instance;
 
     private volatile BundleContext context;           /* injected by dependency manager */
     private volatile ResourceFactory resourceFactory;
@@ -42,14 +42,20 @@ public final class Activator extends DependencyActivatorBase {
 
 
     public static Activator instance() {
-        return m_instance;
+        if (instance == null) {
+            throw new IllegalStateException("Activator instance is null.");
+        }
+        return instance;
     }
 
     public PluginManager getPluginManager() {
         return pluginManager;
     }
 
-    public SessionRegister getSessionFactory() {
+    public SessionRegister getSessionRegister() {
+        if (sessionRegister == null) {
+            throw new IllegalStateException("sessionRegister is null.");
+        }
         return sessionRegister;
     }
 
@@ -83,7 +89,7 @@ public final class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-        m_instance = this;
+        instance = this;
 
         manager.add(createComponent()
                 .setImplementation(this)

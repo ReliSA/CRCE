@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,6 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
@@ -42,23 +41,23 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
  */
 public class BufferImpl implements Buffer, EventHandler {
 
-    private volatile BundleContext m_context;       /* injected by dependency manager */
-    private volatile PluginManager m_pluginManager; /* injected by dependency manager */
-    private volatile Store m_store;                 /* injected by dependency manager */
-    private volatile ResourceFactory m_resourceFactory;     /* injected by dependency manager */
-    private volatile ResourceDAO m_ResourceDAO;
+    private volatile BundleContext context;       /* injected by dependency manager */
+    private volatile PluginManager pluginManager; /* injected by dependency manager */
+    private volatile Store store;                 /* injected by dependency manager */
+    private volatile ResourceFactory resourceFactory;     /* injected by dependency manager */
+    private volatile ResourceDAO resourceDAO;
 
     private final int BUFFER_SIZE = 8 * 1024;
-    private final Properties m_sessionProperties;
+    private final Properties sessionProperties;
 
-    private File m_baseDir;
+    private File baseDir;
 //    private Repository m_repository;
 
     private static final Logger logger = LoggerFactory.getLogger(BufferImpl.class);
 
     public BufferImpl(String sessionId) {
-        m_sessionProperties = new Properties();
-        m_sessionProperties.put(SessionRegister.SERVICE_SESSION_ID, sessionId);
+        sessionProperties = new Properties();
+        sessionProperties.put(SessionRegister.SERVICE_SESSION_ID, sessionId);
     }
 
     /*
@@ -69,16 +68,16 @@ public class BufferImpl implements Buffer, EventHandler {
         Dictionary<String, String> props = new java.util.Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
-        m_context.registerService(EventHandler.class.getName(), this, props);
+        context.registerService(EventHandler.class.getName(), this, props);
 
-        m_baseDir = m_context.getDataFile(m_sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
-        if (!m_baseDir.exists()) {
-            m_baseDir.mkdirs();
-        } else if (!m_baseDir.isDirectory()) {
-            throw new IllegalStateException("Base directory is not a directory: " + m_baseDir);
+        baseDir = context.getDataFile(sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
+        if (!baseDir.exists()) {
+            baseDir.mkdirs();
+        } else if (!baseDir.isDirectory()) {
+            throw new IllegalStateException("Base directory is not a directory: " + baseDir);
         }
-        if (!m_baseDir.exists()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
+        if (!baseDir.exists()) {
+            throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
 
     }
@@ -88,15 +87,15 @@ public class BufferImpl implements Buffer, EventHandler {
      */
     synchronized void stop() {
 //        m_repository = null;
-        for (File file : m_baseDir.listFiles()) {
+        for (File file : baseDir.listFiles()) {
             if (!file.delete()) {
                 file.deleteOnExit();
                 logger.warn("Can not delete file from destroyed buffer, deleteOnExit was set: {}", file);
             }
         }
-        if (!m_baseDir.delete()) {
-            m_baseDir.deleteOnExit();
-            logger.warn("Can not delete file from destroyed buffer's base dir, deleteOnExit was set: {}", m_baseDir);
+        if (!baseDir.delete()) {
+            baseDir.deleteOnExit();
+            logger.warn("Can not delete file from destroyed buffer's base dir, deleteOnExit was set: {}", baseDir);
         }
     }
 
@@ -133,12 +132,12 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
-        String name2 = m_pluginManager.getPlugin(ActionHandler.class).beforeUploadToBuffer(name, this);
+        String name2 = pluginManager.getPlugin(ActionHandler.class).beforeUploadToBuffer(name, this);
         if (name2 == null || artifact == null || "".equals(name2)) {
             throw new RevokedArtifactException("No file name was given on uploading to buffer");
         }
 
-        File file = File.createTempFile("res", ".tmp", m_baseDir);
+        File file = File.createTempFile("res", ".tmp", baseDir);
         try (FileOutputStream output = new FileOutputStream(file)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             for (int count = artifact.read(buffer); count != -1; count = artifact.read(buffer)) {
@@ -148,20 +147,20 @@ public class BufferImpl implements Buffer, EventHandler {
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
-        Resource resource = m_ResourceDAO.loadResource(file.toURI());
+        Resource resource = resourceDAO.loadResource(file.toURI());
 
         // TODO alternatively can be moved to some plugin
-        LegacyMetadataHelper.setFileName(m_resourceFactory, resource, name2);
-        LegacyMetadataHelper.setSymbolicName(m_resourceFactory, resource, name2);
+        LegacyMetadataHelper.setFileName(resourceFactory, resource, name2);
+        LegacyMetadataHelper.setSymbolicName(resourceFactory, resource, name2);
 
         String presentationName = LegacyMetadataHelper.getPresentationName(resource);
         if (presentationName == null || "".equals(presentationName.trim())) {
-            LegacyMetadataHelper.setPresentationName(m_resourceFactory, resource, name2);
+            LegacyMetadataHelper.setPresentationName(resourceFactory, resource, name2);
         }
 
         Resource tmp;
         try {
-            tmp = m_pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
+            tmp = pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
         } catch (RevokedArtifactException e) {
             if (!file.delete()) {
             	logger.error( "Can not delete file of revoked artifact: {}", file.getPath());
@@ -182,16 +181,16 @@ public class BufferImpl implements Buffer, EventHandler {
 //            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in buffer: " + resource.getId());
 //        }
 
-        m_ResourceDAO.saveResource(resource);
+        resourceDAO.saveResource(resource);
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
 
-        return m_pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
+        return pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
     }
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
-        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
+        resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
 
         if (!isInBuffer(resource)) {
             // TODO is this logic correct with new API?
@@ -210,7 +209,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
-            m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+            resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
         } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -224,15 +223,15 @@ public class BufferImpl implements Buffer, EventHandler {
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
 
-        m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromBuffer(resource, this);
+        pluginManager.getPlugin(ActionHandler.class).afterDeleteFromBuffer(resource, this);
 
         return true;
     }
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
-
-        List<Resource> resourcesToCommit = m_pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(m_ResourceDAO.loadResources(getRepository()), this, m_store);
+        List<Resource> resources = resourceDAO.loadResources(baseDir.toURI());
+        List<Resource> resourcesToCommit = pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(resources, this, store);
 
         List<Resource> commited = new ArrayList<>();
         List<Resource> resourcesToRemove = new ArrayList<>();
@@ -240,12 +239,12 @@ public class BufferImpl implements Buffer, EventHandler {
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         // put resources to store
-        if (move && (m_store instanceof FilebasedStoreImpl)) {
+        if (move && (store instanceof FilebasedStoreImpl)) {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
                 try {
                     String[] old = new String[] {LegacyMetadataHelper.getSymbolicName(resource), LegacyMetadataHelper.getVersion(resource).toString()};
-                    putResource = ((FilebasedStoreImpl) m_store).move(resource);
+                    putResource = ((FilebasedStoreImpl) store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
                 } catch (RevokedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId());
@@ -258,7 +257,7 @@ public class BufferImpl implements Buffer, EventHandler {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
                 try {
-                    putResource = m_store.put(resource);
+                    putResource = store.put(resource);
                 } catch (RevokedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
@@ -284,7 +283,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     }
                 }
                 try {
-                    m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+                    resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
                 } catch (IOException e) {
                     // once the artifact file was removed, the resource has to be removed
                     // from the repository even in case of exception on removing metadata
@@ -314,7 +313,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
 
-        m_pluginManager.getPlugin(ActionHandler.class).afterBufferCommit(commited, this, m_store);
+        pluginManager.getPlugin(ActionHandler.class).afterBufferCommit(commited, this, store);
 
         return commited;
     }
@@ -325,17 +324,8 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     @Override
-    public Repository getRepository() {
-        throw new UnsupportedOperationException("Not supported yet.");
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
-//        return m_repository;
-    }
-
-    @Override
     public synchronized void execute(List<Resource> resources, final Executable executable, final Properties properties) {
-        final ActionHandler ah = m_pluginManager.getPlugin(ActionHandler.class);
+        final ActionHandler ah = pluginManager.getPlugin(ActionHandler.class);
         final List<Resource> res = ah.beforeExecuteInBuffer(resources, executable, properties, this);
         final Buffer buffer = this;
 
@@ -344,7 +334,7 @@ public class BufferImpl implements Buffer, EventHandler {
             @Override
             public void run() {
                 try {
-                    executable.executeOnBuffer(res, m_store, buffer, properties);
+                    executable.executeOnBuffer(res, store, buffer, properties);
                 } catch (Exception e) {
                 	logger.error( "Executable plugin threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
                 }
@@ -354,12 +344,17 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     Dictionary getSessionProperties() {
-        return m_sessionProperties;
+        return sessionProperties;
     }
 
     @Override
     public List<Resource> getResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return resourceDAO.loadResources(baseDir.toURI());
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -372,6 +367,6 @@ public class BufferImpl implements Buffer, EventHandler {
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return new File(uri).getPath().startsWith(m_baseDir.getAbsolutePath());
+        return new File(uri).getPath().startsWith(baseDir.getAbsolutePath());
     }
 }

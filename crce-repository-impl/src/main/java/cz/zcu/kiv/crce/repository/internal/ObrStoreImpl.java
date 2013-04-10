@@ -10,7 +10,6 @@ import org.osgi.service.obr.RepositoryAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -128,11 +127,6 @@ public class ObrStoreImpl implements Store {
 
     @Override
     public boolean remove(Resource resource) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Repository getRepository() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

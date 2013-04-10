@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.repository.internal;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
@@ -16,7 +17,6 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -35,25 +35,25 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
  */
 public class FilebasedStoreImpl implements Store, EventHandler {
 
-    private volatile BundleContext m_context;
-    private volatile PluginManager m_pluginManager;
-    private volatile ResourceDAO m_ResourceDAO;
+    private volatile BundleContext context;
+    private volatile PluginManager pluginManager;
+    private volatile ResourceDAO resourceDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
 //    private WritableRepository m_repository;
-    private File m_baseDir;
+    private final File baseDir;
 
 
     public FilebasedStoreImpl(File baseDir) throws IOException {
-        m_baseDir = baseDir;
-        if (!m_baseDir.exists()) {
-            m_baseDir.mkdirs();
-        } else if (!m_baseDir.isDirectory()) {
-            throw new IOException("Base directory is not a directory: " + m_baseDir);
+        this.baseDir = baseDir;
+        if (!baseDir.exists()) {
+            baseDir.mkdirs();
+        } else if (!baseDir.isDirectory()) {
+            throw new IOException("Base directory is not a directory: " + baseDir);
         }
-        if (!m_baseDir.exists()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
+        if (!baseDir.exists()) {
+            throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
     }
 
@@ -65,7 +65,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         Dictionary<String, String> props = new java.util.Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
-        m_context.registerService(EventHandler.class.getName(), this, props);
+        context.registerService(EventHandler.class.getName(), this, props);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //    }
 
     public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
+        Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
@@ -107,7 +107,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        if (m_ResourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
@@ -119,7 +119,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     @Override
     public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
+        Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
@@ -131,13 +131,13 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        if (m_ResourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
-            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putFile(resource, false), this);
+            return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putFile(resource, false), this);
         } else {
-            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putAnother(resource, false), this);
+            return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putAnother(resource, false), this);
         }
     }
 
@@ -149,7 +149,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        File targetFile = File.createTempFile("res", "", m_baseDir);
+        File targetFile = File.createTempFile("res", "", baseDir);
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
@@ -158,7 +158,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             FileUtils.copyFile(sourceFile, targetFile);
         }
-        Resource out = m_ResourceDAO.moveResource(resource, targetFile.toURI());
+        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
 //        if (!m_repository.addResource(out)) {
 //        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
 //            if (!targetFile.delete()) {
@@ -166,7 +166,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //            }
 //            return null;
 //        }
-        m_ResourceDAO.saveResource(out); // TODO is saving necessary after move? define exact contract
+        resourceDAO.saveResource(out); // TODO is saving necessary after move? define exact contract
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
 
@@ -179,14 +179,14 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
-        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
+        resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
 
         if (!isInStore(resource)) {
-            if (m_ResourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+            if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
             	logger.warn( "Removing resource is not in store but it is in internal repository: {}", resource.getId());
-                m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+                resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
             }
-            m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+            pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
             return false;
         }
 
@@ -198,7 +198,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
         try {
-            m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+            resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
         } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -211,22 +211,13 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //            }
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
-        m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+        pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
         return true;
     }
 
     @Override
-    public Repository getRepository() {
-        throw new UnsupportedOperationException("Not supported yet.");
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
-//        return m_repository;
-    }
-
-    @Override
     public synchronized void execute(List<Resource> resources, final Executable executable, final Properties properties) {
-        final ActionHandler ah = m_pluginManager.getPlugin(ActionHandler.class);
+        final ActionHandler ah = pluginManager.getPlugin(ActionHandler.class);
         final List<Resource> res = ah.beforeExecuteInStore(resources, executable, properties, this);
         final Store store = this;
 
@@ -246,7 +237,12 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     @Override
     public List<Resource> getResources() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return resourceDAO.loadResources(baseDir.toURI());
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return Collections.emptyList();
     }
 
     @Override
@@ -259,6 +255,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return new File(uri).getPath().startsWith(m_baseDir.getAbsolutePath());
+        return new File(uri).getPath().startsWith(baseDir.getAbsolutePath());
+    }
+
+    @Override
+    public String toString() {
+        return "FilebasedStoreImpl{" + "baseDir=" + baseDir + '}';
     }
 }
