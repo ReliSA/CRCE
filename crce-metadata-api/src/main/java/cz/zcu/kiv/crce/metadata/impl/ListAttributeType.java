@@ -9,6 +9,8 @@ import java.util.Objects;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ListAttributeType implements AttributeType<List<String>> {
+    
+    private static final long serialVersionUID = -8744638498345181727L;
 
     private final String name;
     private final Class<List<String>> type;

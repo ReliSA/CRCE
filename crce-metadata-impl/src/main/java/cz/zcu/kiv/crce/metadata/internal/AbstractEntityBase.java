@@ -20,7 +20,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class AbstractEntityBase implements AttributeProvider, DirectiveProvider {
+public abstract class AbstractEntityBase implements AttributeProvider, DirectiveProvider {
 
     protected final Map<String, Attribute<?>> attributesMap = new HashMap<>();
     protected final Map<String, String> directivesMap = new HashMap<>();

@@ -26,9 +26,9 @@ import cz.zcu.kiv.crce.repository.Store;
 public final class Activator extends DependencyActivatorBase {
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
+
     private static volatile Activator instance;
 
-    private volatile BundleContext context;           /* injected by dependency manager */
     private volatile ResourceFactory resourceFactory;
     private volatile ResourceDAO resourceDAO;
     private volatile PluginManager pluginManager;     /* injected by dependency manager */
@@ -87,6 +87,7 @@ public final class Activator extends DependencyActivatorBase {
         return m_metadataIndexingResult;
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         instance = this;

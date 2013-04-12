@@ -23,10 +23,10 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
 
     private static final int BUFFER_LENGTH = 8;
 
-    private static final String PNG = new String(new byte[]  {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47,
-                                                        (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A});
-    private static final String JPEG = new String(new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF});
-    private static final String ZIP = new String(new byte[]  {(byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04});
+    private static final byte[] PNG = new byte[]  {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47,
+                                                        (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A};
+    private static final byte[] JPEG = new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+    private static final byte[] ZIP = new byte[]  {(byte) 0x50, (byte) 0x4B, (byte) 0x03, (byte) 0x04};
 
     private static final Logger logger = LoggerFactory.getLogger(FileTypeResourceIndexer.class);
 
@@ -36,7 +36,7 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
     public List<String> index(InputStream input, Resource resource) {
         byte[] buffer = new byte[BUFFER_LENGTH];
 
-        int read = 0;
+        int read;
         try {
             read = input.read(buffer);
             input.close(); // TODO close input stream by its creator.
@@ -49,15 +49,13 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
             return Collections.emptyList();
         }
 
-        String str = new String(buffer);
-
-        if (str.startsWith(ZIP)) {
+        if (startsWith(buffer, ZIP)) {
             LegacyMetadataHelper.addCategory(resourceFactory, resource, "zip");
             return Collections.singletonList("zip");
-        } else if (str.startsWith(JPEG)) {
+        } else if (startsWith(buffer, JPEG)) {
             LegacyMetadataHelper.addCategory(resourceFactory, resource, "jpeg");
             return Collections.singletonList("jpeg");
-        } else if (str.startsWith(PNG)) {
+        } else if (startsWith(buffer, PNG)) {
             LegacyMetadataHelper.addCategory(resourceFactory, resource, "png");
             return Collections.singletonList("png");
         }
@@ -69,7 +67,7 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+            data[i / 2] = (byte) (Character.digit(s.charAt(i), 16) << 4
                     + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
@@ -82,4 +80,16 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
         return result;
     }
 
+    private boolean startsWith(byte[] source, byte[] match) {
+        if (match.length > source.length) {
+            return false;
+        }
+
+        for (int i = 0; i < match.length; i++) {
+            if (source[i] != match[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

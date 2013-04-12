@@ -10,16 +10,18 @@ import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Implementation of metadata <code>Capability</code> interface.
- * 
+ *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class CapabilityImpl extends AbstractEntityBase implements Capability {
+    
+    private static final long serialVersionUID = -813453152194473221L;
 
     private String namespace = null;
     private Resource resource = null;
     private Capability parent = null;
     private List<Capability> children = new ArrayList<>();
-    
+
     public CapabilityImpl(String namespace) {
         this.namespace = namespace.intern();
     }

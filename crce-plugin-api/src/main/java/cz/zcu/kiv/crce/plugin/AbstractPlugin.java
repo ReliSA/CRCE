@@ -25,7 +25,9 @@ import org.osgi.service.event.EventAdmin;
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
 
-    private volatile BundleContext m_context;
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
+    private volatile BundleContext context;
+
     @SuppressWarnings("UseOfObsoleteCollectionType")
     private Dictionary<String, ?> properties = new java.util.Hashtable<>();
     private String id = this.getClass().getName();
@@ -68,7 +70,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
             return this.getPluginId().compareTo(o.getPluginId());
         }
 
-        return (thisVal < anotherVal ? 1 : -1);
+        return thisVal < anotherVal ? 1 : -1;
     }
 
     @Override
@@ -80,7 +82,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
             return false;
         }
         final AbstractPlugin other = (AbstractPlugin) obj;
-        if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
+        if (this.id == null ? other.id != null : !this.id.equals(other.id)) {
             return false;
         }
         if (this.version.compareTo(other.version) != 0) {
@@ -104,7 +106,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
             id = getClass().getName();
         }
         if (properties.get(CFG_VERSION) == null) {
-            version = m_context.getBundle().getVersion();
+            version = context.getBundle().getVersion();
         }
         if (properties.get(CFG_DESCRIPTION) == null) {
             description = "Implementation of: " + getClass().getName();
@@ -174,9 +176,9 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
                 }
 
             } finally {
-                ServiceReference<EventAdmin> ref = m_context.getServiceReference(EventAdmin.class);
+                ServiceReference<EventAdmin> ref = context.getServiceReference(EventAdmin.class);
                 if (ref != null) {
-                    EventAdmin eventAdmin = m_context.getService(ref);
+                    EventAdmin eventAdmin = context.getService(ref);
 
                     Map<String, Object> props = new HashMap<>();
 

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -55,7 +56,12 @@ public class RuntimeServlet extends HttpServlet {
             ResourceServlet.cleanSession(session);
             session.setAttribute("resources", toTest);
             List<Executable> testPlugins = Activator.instance().getPluginManager().getPlugins(Executable.class);
-            session.setAttribute("tests", testPlugins);
+            // Executable is not Serializable so this workaround is needed
+            List<String> testPluginIds = new ArrayList<>(testPlugins.size());
+            for (Executable executable : testPlugins) {
+                testPluginIds.add(executable.getPluginId());
+            }
+            session.setAttribute("tests", testPluginIds);
             return true;
         }
     }

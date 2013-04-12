@@ -13,6 +13,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class PropertyImpl extends AbstractEntityBase implements Property {
+    
+    private static final long serialVersionUID = -7003533524061344584L;
 
     private String namespace = null;
     private Resource resource = null;
@@ -22,7 +24,7 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
     public PropertyImpl(String namespace) {
         this.namespace = namespace;
     }
-    
+
     @Override
     public String getNamespace() {
         return namespace;
@@ -91,7 +93,7 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
         }
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 3;

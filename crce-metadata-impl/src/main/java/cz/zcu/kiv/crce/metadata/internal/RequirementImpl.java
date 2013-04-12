@@ -19,6 +19,8 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RequirementImpl extends AbstractEntityBase implements Requirement {
+    
+    private static final long serialVersionUID = -2992854704112505654L;
 
     private String namespace = null;
     private Resource resource = null;

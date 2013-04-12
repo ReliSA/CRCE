@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.metadata.Repository;
 //import cz.zcu.kiv.crce.metadata.Resolver;
 import cz.zcu.kiv.crce.metadata.Resource;
 //import cz.zcu.kiv.crce.metadata.ResourceCreator;
@@ -51,7 +50,7 @@ public class CheckServlet extends HttpServlet {
     }
 
     private List<Resource> doCheck(List<Resource> resources) {
-        logger.warn("Resolver is not designed yet in new Metadata API, returning empty list of resources.");
+        logger.warn("Resolver is not designed yet in new Metadata API, returning empty list of resources. Checked resource: {}", resources);
 //        Resource[] resources = repository.getResources();
 //        Resource[] cloned = new Resource[resources.length];
 //        System.arraycopy(resources, 0, cloned, 0, resources.length);

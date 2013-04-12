@@ -2,8 +2,6 @@ package cz.zcu.kiv.crce.webui.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +16,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
@@ -39,15 +36,15 @@ public class UploadServlet extends HttpServlet {
 
         if (req.getParameter("uri") != null) {
             Buffer buffer = Activator.instance().getBuffer(req);
-            List<Resource> resources = buffer.getResources();
-            String uriParam = req.getParameter("uri");
+//            List<Resource> resources = buffer.getResources();
+//            String uriParam = req.getParameter("uri");
             try {
-                URI uri = new URI(uriParam);
-                Resource found = EditServlet.findResource(uri, resources);
+//                URI uri = new URI(uriParam);
+//                Resource found = EditServlet.findResource(uri, resources);
                 buffer.commit(true); //TODO! Bad API -> Resources should be committed one by one
-            } catch (URISyntaxException e) {
-                logger.error("Invalid URI syntax", e);
-                failed = true;
+//            } catch (URISyntaxException e) {
+//                logger.error("Invalid URI syntax", e);
+//                failed = true;
             } catch (IOException e) {
                 logger.error("Could not commit", e);
                 failed = true;
@@ -110,9 +107,7 @@ public class UploadServlet extends HttpServlet {
             for (Object o : fileItemsList) {
                 FileItem fi = (FileItem) o;
 
-                if (fi.isFormField()) {
-                    // do nothing
-                } else {
+                if (!fi.isFormField()) {
                     String fileName = fi.getName();
                     try (InputStream is = fi.getInputStream()) {
                         try {
@@ -129,8 +124,7 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-
-        String metadataIndexerResult = "";
+        StringBuilder metadataIndexerResult = new StringBuilder();
         if (success) {
             message = "Upload was succesful.";
 
@@ -138,13 +132,12 @@ public class UploadServlet extends HttpServlet {
             if (!indexerResult.isEmpty()) {
                 String[] metadataIndexerMessages = indexerResult.getMessages();
                 for (String indexerMessage : metadataIndexerMessages) {
-                    metadataIndexerResult += "<BR>" + indexerMessage;
+                    metadataIndexerResult.append("<BR>").append(indexerMessage);
                 }
                 indexerResult.removeAllMessages();
             }
         } else {
             message = "Upload failed.";
-            metadataIndexerResult = "";
         }
 
         ResourceServlet.setError(req.getSession(), success, message + metadataIndexerResult);

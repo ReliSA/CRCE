@@ -13,6 +13,8 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class AttributeImpl<T> implements Attribute<T> {
+    
+    private static final long serialVersionUID = 3231029096691170916L;
 
     private T value = null;
     private AttributeType<T> type;

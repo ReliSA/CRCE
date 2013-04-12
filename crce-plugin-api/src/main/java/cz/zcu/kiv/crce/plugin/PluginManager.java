@@ -9,18 +9,18 @@ import java.util.List;
  */
 public interface PluginManager {
 
-    public static final String NO_KEYWORDS = "";
+    String NO_KEYWORDS = "";
 
-    public static final String TOPIC_PLUGIN_REGISTERED = PluginManager.class.getName().replace(".", "/") + "/REGISTERED";
-    public static final String TOPIC_PLUGIN_UNREGISTERED = PluginManager.class.getName().replace(".", "/") + "/UNREGISTERED";
-    public static final String TOPIC_PLUGIN_CONFIGURED = PluginManager.class.getName().replace(".", "/") + "/CONFIGURED";
+    String TOPIC_PLUGIN_REGISTERED = PluginManager.class.getName().replace(".", "/") + "/REGISTERED";
+    String TOPIC_PLUGIN_UNREGISTERED = PluginManager.class.getName().replace(".", "/") + "/UNREGISTERED";
+    String TOPIC_PLUGIN_CONFIGURED = PluginManager.class.getName().replace(".", "/") + "/CONFIGURED";
 
-    public static final String PROPERTY_PLUGIN_ID = "id";
-    public static final String PROPERTY_PLUGIN_VERSION = "version";
-    public static final String PROPERTY_PLUGIN_PRIORITY = "priority";
-    public static final String PROPERTY_PLUGIN_DESCRIPTION = "description";
-    public static final String PROPERTY_PLUGIN_KEYWORDS = "keywords";
-    public static final String PROPERTY_PLUGIN_TYPES = "types";
+    String PROPERTY_PLUGIN_ID = "id";
+    String PROPERTY_PLUGIN_VERSION = "version";
+    String PROPERTY_PLUGIN_PRIORITY = "priority";
+    String PROPERTY_PLUGIN_DESCRIPTION = "description";
+    String PROPERTY_PLUGIN_KEYWORDS = "keywords";
+    String PROPERTY_PLUGIN_TYPES = "types";
 
     /**
      * Returns all registered plugins ordered by their priority.

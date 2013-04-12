@@ -100,8 +100,7 @@ public class DownloadServlet extends HttpServlet {
 
     }
 
-    private void doDownload(HttpServletRequest req, HttpServletResponse resp,
-            Resource found) throws IOException {
+    private void doDownload(HttpServletRequest req, HttpServletResponse resp, Resource found) throws IOException { // NOPMD req would be used in the future
 
         File f = new File(LegacyMetadataHelper.getRelativeUri(found));
         int length = 0;
@@ -122,7 +121,7 @@ public class DownloadServlet extends HttpServlet {
             //
             byte[] bbuf = new byte[BUFSIZE];
             try (DataInputStream in = new DataInputStream(new FileInputStream(f))) {
-                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                while (in != null && (length = in.read(bbuf)) != -1) {
                     op.write(bbuf, 0, length);
                 }
                 op.flush();

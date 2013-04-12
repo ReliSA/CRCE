@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import org.osgi.framework.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -29,15 +31,15 @@ abstract class ResourceWrap extends ResourceAdapter {
     }
 
     @Override
-    public cz.zcu.kiv.crce.webui.internal.legacy.Property[] getProperties() {
-        cz.zcu.kiv.crce.webui.internal.legacy.Property[] properties;
+    public Property[] getProperties() {
+        Property[] properties;
         List<Capability> crceCapabilities = resource.getCapabilities(LegacyMetadataHelper.NS__CRCE_IDENTITY);
         List<Capability> osgiCapabilities = resource.getCapabilities(LegacyMetadataHelper.NS__OSGI_IDENTITY);
 
         int crceSize = crceCapabilities.size() > 0 ? crceCapabilities.get(0).getAttributes().size() : 0;
         int osgiSize = osgiCapabilities.size() > 0 ? osgiCapabilities.get(0).getAttributes().size() : 0;
 
-        properties = new cz.zcu.kiv.crce.webui.internal.legacy.Property[crceSize + osgiSize];
+        properties = new Property[crceSize + osgiSize];
         int i = 0;
         if (crceSize > 0) {
             for (Attribute<?> atr : crceCapabilities.get(0).getAttributes()) {
@@ -118,7 +120,7 @@ abstract class ResourceWrap extends ResourceAdapter {
         return LegacyMetadataHelper.getSize(resource);
     }
 
-    private class PropertyImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Property {
+    private static class PropertyImpl implements Property {
 
         private final Attribute<?> attribute;
 
@@ -152,7 +154,7 @@ abstract class ResourceWrap extends ResourceAdapter {
         }
     }
 
-    private class CapabilityImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Capability {
+    private static class CapabilityImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Capability {
 
         private final Capability capability;
 
@@ -258,11 +260,11 @@ abstract class ResourceWrap extends ResourceAdapter {
         }
     }
 
-    private class RequirementImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Requirement {
+    private static class RequirementImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Requirement {
 
         private final Requirement requirement;
 
-        public RequirementImpl(Requirement requirement) {
+        public RequirementImpl(@Nonnull Requirement requirement) {
             this.requirement = requirement;
         }
 
@@ -278,17 +280,17 @@ abstract class ResourceWrap extends ResourceAdapter {
 
         @Override
         public boolean isMultiple() {
-            return Boolean.getBoolean(requirement.getDirective("multiple"));
+            return Boolean.valueOf(requirement.getDirective("multiple"));
         }
 
         @Override
         public boolean isOptional() {
-            return Boolean.getBoolean(requirement.getDirective("optional"));
+            return Boolean.valueOf(requirement.getDirective("optional"));
         }
 
         @Override
         public boolean isExtend() {
-            return Boolean.getBoolean(requirement.getDirective("extend"));
+            return Boolean.valueOf(requirement.getDirective("extend"));
         }
 
         @Override

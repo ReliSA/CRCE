@@ -48,7 +48,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     public FilebasedStoreImpl(File baseDir) throws IOException {
         this.baseDir = baseDir;
         if (!baseDir.exists()) {
-            baseDir.mkdirs();
+            if (!baseDir.mkdirs()) {
+                logger.error("Could not create store directory {}", baseDir);
+            }
         } else if (!baseDir.isDirectory()) {
             throw new IOException("Base directory is not a directory: " + baseDir);
         }
@@ -174,7 +176,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     private Resource putAnother(Resource resource, boolean move) {
-        throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: " + resource.getId() + ": " + LegacyMetadataHelper.getUri(resource));
+        throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: "
+                + resource.getId() + ": " + LegacyMetadataHelper.getUri(resource) + ", move: " + move);
     }
 
     @Override
@@ -197,9 +200,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-        try {
+//        try {
             resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
-        } finally {
+//        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
             // to keep consistency of repository with stored artifact files
@@ -210,7 +213,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //            	logger.warn( "Store's internal repository does not contain removing resource: {}", resource.getId());
 //            }
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
-        }
+//        }
         pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
         return true;
     }

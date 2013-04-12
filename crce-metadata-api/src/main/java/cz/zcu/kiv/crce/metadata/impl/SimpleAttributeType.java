@@ -9,6 +9,8 @@ import java.util.Objects;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SimpleAttributeType<T> implements AttributeType<T> {
+    
+    private static final long serialVersionUID = 3314060433636463265L;
 
     private String name;
     private Class<T> type;

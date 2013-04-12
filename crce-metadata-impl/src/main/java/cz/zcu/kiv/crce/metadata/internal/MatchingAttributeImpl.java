@@ -12,6 +12,8 @@ import cz.zcu.kiv.crce.metadata.Operator;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class MatchingAttributeImpl<T> extends AttributeImpl<T> implements MatchingAttribute<T> {
+    
+    private static final long serialVersionUID = 8660396699262675300L;
 
     private Operator operator;
 
@@ -44,7 +46,7 @@ public class MatchingAttributeImpl<T> extends AttributeImpl<T> implements Matchi
         }
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 3;

@@ -21,6 +21,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceImpl extends AbstractEntityBase implements Resource {
+    
+    private static final long serialVersionUID = 2594634894045505360L;
 
     private String id;
     private Repository repository = null;
@@ -42,7 +44,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     @Override
     public Repository getRepository() {
         return repository;
@@ -52,7 +54,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     public void setRepository(WritableRepository repository) {
         this.repository = repository;
     }
-    
+
     @Override
     public List<Capability> getCapabilities() {
         List<Capability> result = new ArrayList<>();
@@ -103,10 +105,10 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         // add to map of roots
         Capability root = getRootCapability(capability);
         putCapabilityToMap(root, rootCapabilities);
-        
+
         // add to map of all
         putCapabilityToMap(root, allCapabilities);
-        
+
         addChildrenToMap(root.getChildren(), allCapabilities);
     }
 
@@ -116,7 +118,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         if (roots != null) {
             roots.remove(capability);
         }
-        
+
         List<Capability> all = allCapabilities.get(capability.getNamespace());
         if (all != null) {
             all.remove(capability);
@@ -153,7 +155,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     @Override
     public void addRequirement(Requirement requirement) {
         Requirement root = getRootRequirement(requirement);
-        
+
         List<Requirement> requirements = allRequirements.get(root.getNamespace());
         if (requirements == null) {
             requirements = new ArrayList<>();
@@ -200,7 +202,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     @Override
     public void addProperty(Property property) {
         Property root = getRootProperty(property);
-        
+
         List<Property> properties = allProperties.get(root.getNamespace());
         if (properties == null) {
             properties = new ArrayList<>();
@@ -216,7 +218,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
             properties.remove(property);
         }
     }
-    
+
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
     @SuppressWarnings({"null", "ConstantConditions"})
     private Capability getRootCapability(@Nonnull Capability capability) {
@@ -257,7 +259,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
             capabilities.add(capability);
         }
     }
-    
+
     private void addChildrenToMap(@Nonnull List<Capability> list, @Nonnull Map<String, List<Capability>> map) {
         for (Capability capability : list) {
             putCapabilityToMap(capability, map);

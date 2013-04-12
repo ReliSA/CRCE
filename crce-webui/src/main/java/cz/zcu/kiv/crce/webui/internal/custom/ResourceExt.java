@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.webui.internal.custom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 public class ResourceExt extends ResourceWrap {
@@ -35,5 +34,10 @@ public class ResourceExt extends ResourceWrap {
             return this.getUri().equals(((cz.zcu.kiv.crce.webui.internal.legacy.Resource) obj).getUri());
         }
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return resource.hashCode();
     }
 }

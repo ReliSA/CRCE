@@ -88,7 +88,7 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
 
             BEFORE_STORE_EXECUTE = ActionHandler.class.getMethod("beforeExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
             AFTER_STORE_EXECUTE = ActionHandler.class.getMethod("afterExecuteInStore", List.class, Executable.class, Properties.class, Store.class);
-        } catch (Exception ex) {
+        } catch (NoSuchMethodException ex) {
             throw new IllegalStateException("Can not create method: " + ex.getMessage(), ex);
         }
     }

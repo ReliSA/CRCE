@@ -1,13 +1,6 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
-import static cz.zcu.kiv.crce.plugin.PluginManager.NO_KEYWORDS;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_DESCRIPTION;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_ID;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_KEYWORDS;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_PRIORITY;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_TYPES;
-import static cz.zcu.kiv.crce.plugin.PluginManager.PROPERTY_PLUGIN_VERSION;
-import static cz.zcu.kiv.crce.plugin.PluginManager.TOPIC_PLUGIN_REGISTERED;
+import static cz.zcu.kiv.crce.plugin.PluginManager.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,14 +28,14 @@ public class PluginManagerImpl implements PluginManager {
     private static final Logger logger = LoggerFactory.getLogger(PluginManagerImpl.class);
 
     private static final String ROOT_CLASS = "java.lang.Object";
-    private volatile EventAdmin m_eventAdmin; /* injected by dependency manager */
+    private volatile EventAdmin eventAdmin; /* injected by dependency manager */
 
     /**
      * Map of maps containing sets of plugins associated with a keyword.
      * The key to outer map is a plugin type, value is inner map.
      * The key to inner map is a keyword associated to a set of plugins.
      */
-    private final Map<Class<?>, Map<String, Set<? extends Plugin>>> m_plugins = new HashMap<>();
+    private final Map<Class<?>, Map<String, Set<? extends Plugin>>> plugins = new HashMap<>();
 
     @Override
     public synchronized List<Plugin> getPlugins() {
@@ -74,7 +67,7 @@ public class PluginManagerImpl implements PluginManager {
         if (keywords == null || keywords.length == 0) {
             keywords = new String[]{null};
         }
-        Map<String, Set<? extends Plugin>> map = m_plugins.get(type);
+        Map<String, Set<? extends Plugin>> map = plugins.get(type);
         if (map == null) {
             return Collections.emptyList();
         }
@@ -100,7 +93,7 @@ public class PluginManagerImpl implements PluginManager {
 
     @Override
     public synchronized <T extends Plugin> T getPlugin(Class<T> type, String keyword) {
-        Map<String, Set<? extends Plugin>> map = m_plugins.get(type);
+        Map<String, Set<? extends Plugin>> map = plugins.get(type);
         if (map == null) {
             return null;
         }
@@ -132,7 +125,7 @@ public class PluginManagerImpl implements PluginManager {
         properties.put(PROPERTY_PLUGIN_KEYWORDS, plugin.getPluginKeywords().toString());
         properties.put(PROPERTY_PLUGIN_TYPES, types.toString());
 
-        m_eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
+        eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
     }
 
     /**
@@ -153,7 +146,7 @@ public class PluginManagerImpl implements PluginManager {
         properties.put(PROPERTY_PLUGIN_KEYWORDS, plugin.getPluginKeywords().toString());
         properties.put(PROPERTY_PLUGIN_TYPES, types.toString());
 
-        m_eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
+        eventAdmin.sendEvent(new Event(TOPIC_PLUGIN_REGISTERED, properties));
     }
 
     private void removeRecursive(Class<?> clazz, Plugin plugin, Set<String> types) {
@@ -162,7 +155,7 @@ public class PluginManagerImpl implements PluginManager {
         }
         for (Class<?> iface : clazz.getInterfaces()) {
             types.add(clazz.getName());
-            Map<String, Set<? extends Plugin>> map = m_plugins.get(iface);
+            Map<String, Set<? extends Plugin>> map = plugins.get(iface);
             if (map == null) {
                 continue;
             }
@@ -205,10 +198,10 @@ public class PluginManagerImpl implements PluginManager {
 
     @SuppressWarnings("unchecked")
     private void add(Class<?> iface, Plugin plugin, String keyword) {
-        Map<String, Set<? extends Plugin>> map = m_plugins.get(iface);
+        Map<String, Set<? extends Plugin>> map = plugins.get(iface);
         if (map == null) {
             map = new HashMap<>();
-            m_plugins.put(iface, map);
+            plugins.put(iface, map);
         }
         Set<? extends Plugin> set = map.get(keyword);
         if (set == null) {
@@ -222,12 +215,13 @@ public class PluginManagerImpl implements PluginManager {
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Plugins:\n");
-        for (Class<?> clazz : m_plugins.keySet()) {
+        for (Class<?> clazz : plugins.keySet()) {
             sb.append("  ").append(clazz.getName()).append(":\n");
-            Map<String, Set<? extends Plugin>> map = m_plugins.get(clazz);
-            for (String keyword : map.keySet()) {
+            Map<String, Set<? extends Plugin>> map = plugins.get(clazz);
+            for (Map.Entry<String, Set<? extends Plugin>> entry : map.entrySet()) {
+                String keyword = entry.getKey();
                 sb.append("    ").append(keyword == null ? "[null]" : (NO_KEYWORDS.equals(keyword)) ? "[none]" : keyword).append(":\n");
-                for (Plugin plugin : map.get(keyword)) {
+                for (Plugin plugin : entry.getValue()) {
                     sb.append("      ").append(plugin.getPluginId()).append("\n");
                 }
             }

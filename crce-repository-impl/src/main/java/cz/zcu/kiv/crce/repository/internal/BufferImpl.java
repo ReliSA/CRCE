@@ -72,14 +72,16 @@ public class BufferImpl implements Buffer, EventHandler {
 
         baseDir = context.getDataFile(sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
         if (!baseDir.exists()) {
-            baseDir.mkdirs();
+            if (!baseDir.mkdirs()) {
+                logger.error("Could not create buffer directory {}, session: {}",
+                        baseDir, sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
+            }
         } else if (!baseDir.isDirectory()) {
             throw new IllegalStateException("Base directory is not a directory: " + baseDir);
         }
         if (!baseDir.exists()) {
             throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
-
     }
 
     /*
@@ -102,17 +104,17 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public void handleEvent(final Event event) {
-        final Object lock = this;
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                synchronized (lock) {
+//        final Object lock = this;
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                synchronized (lock) {
 //                    m_repository = null;
-                }
-            }
-        }).start();
-    }
+//                }
+//            }
+//        }).start();
+//    }
 
 //    private synchronized void loadRepository() {
 //        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
@@ -123,7 +125,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //        	logger.error("Could not get repository for URI: {}", m_baseDir.toURI(), ex);
 //            m_repository = m_pluginManager.getPlugin(ResourceFactory.class).createRepository(m_baseDir.toURI());
 //        }
-//    }
+    }
 
     @Override
     public Resource put(Resource resource) throws IOException, RevokedArtifactException {
@@ -208,9 +210,9 @@ public class BufferImpl implements Buffer, EventHandler {
         }
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-        try {
+//        try {
             resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
-        } finally {
+//        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
             // to keep consistency of repository with stored artifact files
@@ -221,7 +223,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //            	logger.warn("Buffer's internal repository does not contain removing resource: {}", resource.getId());
 //            }
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
-        }
+//        }
 
         pluginManager.getPlugin(ActionHandler.class).afterDeleteFromBuffer(resource, this);
 
@@ -239,7 +241,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         // put resources to store
-        if (move && (store instanceof FilebasedStoreImpl)) {
+        if (move && store instanceof FilebasedStoreImpl) {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
                 try {
@@ -276,11 +278,9 @@ public class BufferImpl implements Buffer, EventHandler {
 //            }
             for (Resource resource : resourcesToRemove) {
                 File resourceFile = new File(LegacyMetadataHelper.getUri(resource));
-                if (resourceFile.exists()) {
-                    if (!resourceFile.delete()) {
-                    	logger.error( "Can not delete artifact from buffer: {}", LegacyMetadataHelper.getUri(resource));
-                        continue;
-                    }
+                if (resourceFile.exists() && !resourceFile.delete()) {
+                    logger.error( "Can not delete artifact from buffer: {}", LegacyMetadataHelper.getUri(resource));
+                    continue;
                 }
                 try {
                     resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));

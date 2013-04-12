@@ -14,23 +14,23 @@ import org.slf4j.LoggerFactory;
  * @author kalwi
  */
 public class Test {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Test.class);
-    
+
 //    private volatile Stack m_stack;
-    
+
     private volatile RepositoryAdmin m_ra;
     private volatile BundleStore m_vbs;
-    
+
     private static int sid = 0;
     private int id;
-    
-    
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Just a testing servlet.")
     public Test() {
         id = sid++;
-        
+
     }
-    
+
     public void add(String url) {
         try {
 //            System.out.println("m_ra: " + m_ra.getClass());
@@ -39,10 +39,10 @@ public class Test {
             logger.error("Test error", ex);
         }
     }
-    
+
     public void print() {
         logger.info("\n*** this is test {}", id);
-        
+
         for (Repository r: m_ra.listRepositories()) {
             logger.info("repo: {}", r.getURL());
         }

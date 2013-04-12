@@ -10,6 +10,8 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class GenericAttributeType implements AttributeType<Object> {
+    
+    private static final long serialVersionUID = -4513168310428826310L;
 
     private String name;
     private Class<?> type;

@@ -135,7 +135,7 @@ public class EditServlet extends HttpServlet {
         }
     }
 
-    private boolean saveResourceProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveResourceProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -175,7 +175,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean saveProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         String id;
         if (parameters.containsKey("uri") && parameters.containsKey("capabilityId")) {
@@ -276,8 +276,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addRequirementForm(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addRequirementForm(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -309,17 +308,17 @@ public class EditServlet extends HttpServlet {
                 name = ((String[]) parameters.get("name"))[0];
                 filter = ((String[]) parameters.get("filter"))[0];
                 if (parameters.containsKey("multiple")) {
-                    multiple = (((String[]) parameters.get("multiple"))[0]).equals("on");
+                    multiple = ((String[]) parameters.get("multiple"))[0].equals("on");
                 }
                 if (parameters.containsKey("optional")) {
-                    optional = (((String[]) parameters.get("optional"))[0]).equals("on");
+                    optional = ((String[]) parameters.get("optional"))[0].equals("on");
                 }
                 if (parameters.containsKey("extend")) {
-                    extend = (((String[]) parameters.get("extend"))[0]).equals("on");
+                    extend = ((String[]) parameters.get("extend"))[0].equals("on");
                 }
                 String comment = null;
                 if (parameters.containsKey("comment")) {
-                    comment = (((String[]) parameters.get("comment"))[0]);
+                    comment = ((String[]) parameters.get("comment"))[0];
                 }
                 int lengthBefore = resource.getRequirements().size();
                 requir = Activator.instance().getResourceFactory().createRequirement(name);
@@ -358,7 +357,7 @@ public class EditServlet extends HttpServlet {
 
     }
 
-    private boolean saveCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         int capabilityId = -1;
         String uri;
         if (parameters.containsKey("uri") && parameters.containsKey("capabilityId")) {
@@ -424,7 +423,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean saveRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -464,16 +463,16 @@ public class EditServlet extends HttpServlet {
                     filter = ((String[]) parameters.get("filter_" + (i + 1)))[0];
 
                     if (parameters.containsKey("multiple_" + (i + 1))) {
-                        multiple = (((String[]) parameters.get("multiple_" + (i + 1)))[0]).equals("on");
+                        multiple = ((String[]) parameters.get("multiple_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("optional_" + (i + 1))) {
-                        optional = (((String[]) parameters.get("optional_" + (i + 1)))[0]).equals("on");
+                        optional = ((String[]) parameters.get("optional_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("extend_" + (i + 1))) {
-                        extend = (((String[]) parameters.get("extend_" + (i + 1)))[0]).equals("on");
+                        extend = ((String[]) parameters.get("extend_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("comment_" + (i + 1))) {
-                        comment = (((String[]) parameters.get("comment_" + (i + 1)))[0]);
+                        comment = ((String[]) parameters.get("comment_" + (i + 1)))[0];
                     }
 //					requirBefore = requirements[i];
                     requirLengthBefore = requirements.size();
@@ -516,7 +515,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String category = null;
         String uri = null;
         if (parameters.containsKey("category")
@@ -545,9 +544,8 @@ public class EditServlet extends HttpServlet {
             int categoriesLengthBefore = LegacyMetadataHelper.getCategories(resource).size();
             LegacyMetadataHelper.addCategory(Activator.instance().getResourceFactory(), resource, category);
 
-//			Zjištění zda kategorie byla odstraněna.
-            if (categoriesLengthBefore < LegacyMetadataHelper.getCategories(resource).size()) {
-            } else {
+            // check that category was really added
+            if (categoriesLengthBefore >= LegacyMetadataHelper.getCategories(resource).size()) {
                 req.getSession().setAttribute("success", false);
                 req.getSession().setAttribute("message", "Cannot add category.");
             }
@@ -575,7 +573,7 @@ public class EditServlet extends HttpServlet {
         boolean success = false;
         Map<?, ?> parameters = (Map<?, ?>) req.getParameterMap();
 
-        String type = null;;
+        String type = null;
         if (parameters.containsKey("type")) {
             type = ((String[]) parameters.get("type"))[0];
         }
@@ -670,7 +668,7 @@ public class EditServlet extends HttpServlet {
         }
     }
 
-    private boolean editProperties(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean editProperties(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
@@ -702,7 +700,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCapabilityProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCapabilityProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
@@ -736,7 +734,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addRequirement(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addRequirement(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
@@ -770,7 +768,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean editRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean editRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
@@ -805,7 +803,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
@@ -841,8 +839,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean editCapabilities(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
+    private boolean editCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
 
@@ -890,7 +887,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCategories(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCategories(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
@@ -959,8 +956,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean deleteCategory(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean deleteCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String category = null;
         String uri = null;
         if (parameters.containsKey("category")
@@ -1030,7 +1026,7 @@ public class EditServlet extends HttpServlet {
                 List<Resource> array = Activator.instance().getBuffer(req).getResources();
                 Resource found = findResource(fileUri, array);
                 if (!Activator.instance().getBuffer(req).remove(found)) {
-                    // TODO
+                    logger.warn("Buffer didn't contain removed resource: {}", found);
                 }
             } else {
                 return false;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -69,7 +69,7 @@ public class ResourceServlet extends HttpServlet {
 
         String link = null;
 
-        if (req.getParameter("link") != null && req.getParameter("link") instanceof String) {
+        if (req.getParameter("link") != null) {
             link = req.getParameter("link");
         }
 
@@ -133,7 +133,11 @@ public class ResourceServlet extends HttpServlet {
                     logger.warn("Filtering plugins with new Metadata API is not supported yet, returning all plugins.");
 //                    plugins = Activator.instance().getPluginManager().getPlugins(Plugin.class, filter);
                 }
-                session.setAttribute("plugins", plugins);
+                List<cz.zcu.kiv.crce.webui.internal.custom.Plugin> pluginWrappers = new ArrayList<>(plugins.size());
+                for (Plugin plugin : plugins) {
+                    pluginWrappers.add(new cz.zcu.kiv.crce.webui.internal.custom.Plugin(plugin));
+                }
+                session.setAttribute("plugins", pluginWrappers);
                 return true;
 
             case "store":
@@ -157,7 +161,7 @@ public class ResourceServlet extends HttpServlet {
                 ArrayList<Resource> filteredResourceList;
 
                 String selectedCategory;
-                if (req.getParameter("tag") != null && req.getParameter("tag") instanceof String) {
+                if (req.getParameter("tag") != null) {
                     selectedCategory = req.getParameter("tag");
 
                     filteredResourceList = filterResurces(selectedCategory, resources);
@@ -247,21 +251,20 @@ public class ResourceServlet extends HttpServlet {
             for (String category : categories) {
                 if (categoryMap.containsKey(category)) {
                     //category is already contained, increase count
-                    categoryMap.put(category, new Integer(categoryMap.get(category).intValue() + 1));
+                    categoryMap.put(category, Integer.valueOf(categoryMap.get(category).intValue() + 1));
                 } else {
                     //add new category
-                    categoryMap.put(category, new Integer(1));
+                    categoryMap.put(category, 1);
                 }
             }
         }
 
         ArrayList<Category> categoryList = new ArrayList<>();
-        Set<String> categorySet = categoryMap.keySet();
 
-        /*Get categories from map to list*/
-        for (String category : categorySet) {
-            Category newCategory = new Category(category);
-            newCategory.setCount(categoryMap.get(category));
+        //Get categories from map to list
+        for (Map.Entry<String, Integer> entry : categoryMap.entrySet()) {
+            Category newCategory = new Category(entry.getKey());
+            newCategory.setCount(entry.getValue());
             categoryList.add(newCategory);
         }
 

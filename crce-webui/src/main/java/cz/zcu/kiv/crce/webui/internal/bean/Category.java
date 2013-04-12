@@ -18,7 +18,7 @@ public class Category implements Serializable, Comparable<Category>{
 	 * Number of occurences of category in the store.
 	 */
 	private int count;
-	
+
 	public Category(String name) {
 		this.name = name;
 		count = 1;
@@ -36,23 +36,28 @@ public class Category implements Serializable, Comparable<Category>{
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)	{
 		if(this == obj) return true;
-		if((obj == null) || (obj.getClass() != this.getClass())) return false;
-		
+		if(obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
 		Category otherCat = (Category)obj;
-		if (otherCat.getName().equals(this.getName())) return true;
-		else return false;
+		if (otherCat.getName().equals(this.getName())) {
+            return true;
+        }
+		else {
+            return false;
+        }
     }
-	
+
 	@Override
 	public int hashCode() {
-		
-		return name.hashCode();		
+
+		return name.hashCode();
 	}
-	
+
 	public int compareTo(Category cat) {
 	return this.getName().compareTo(cat.getName());
 	}
