@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
-import cz.zcu.kiv.osgi.versionGenerator.exceptions.VersionGeneratorException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 
 /**
@@ -40,6 +40,38 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
     private int BUFFER_SIZE = 8 * 1024;
 
+    
+    private File fileFromStream(InputStream bundleAsStream) throws IOException {
+    	OutputStream output = null;
+        File bundleFile;
+        try {
+            bundleFile = File.createTempFile("source", ".jar");
+            output = new FileOutputStream(bundleFile);
+            byte[] readBuffer = new byte[BUFFER_SIZE];
+            for (int count = bundleAsStream.read(readBuffer); count != -1; count = bundleAsStream.read(readBuffer)) {
+                output.write(readBuffer, 0, count);
+            }
+        } finally {
+            try {
+                bundleAsStream.close();
+            } catch (IOException e) {
+                // nothing to do
+            }
+            if (output != null) {
+                try {
+                    output.flush();
+                    output.close();
+                } catch (IOException e) {
+                    // nothing to do
+                }
+            }
+        }
+        
+        
+        return bundleFile;
+    }
+    
+    
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
         if (resource == null || !resource.hasCategory("osgi")) {
@@ -62,40 +94,23 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 category = CATEGORY_VERSIONED;
                 resource.addCategory("initial-version");
             } else {
+            	InputStream versionedBudnleIs = null;
                 try {
-                    InputStream in = new FileInputStream(new File(cand.getUri()));
-                    OutputStream output = null;
-                    File source;
-                    try {
-                        source = File.createTempFile("source", ".jar");
-                        output = new FileOutputStream(source);
-                        byte[] readBuffer = new byte[BUFFER_SIZE];
-                        for (int count = in.read(readBuffer); count != -1; count = in.read(readBuffer)) {
-                            output.write(readBuffer, 0, count);
-                        }
-                    } finally {
-                        try {
-                            in.close();
-                        } catch (IOException e) {
-                            // nothing to do
-                        }
-                        if (output != null) {
-                            try {
-                                output.flush();
-                                output.close();
-                            } catch (IOException e) {
-                                // nothing to do
-                            }
-                        }
-                    }
+                    InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
+                    
+                    InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
 
-                    m_versionService.updateVersion(source, new File(resource.getUri()));
+                    
+                    versionedBudnleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, new HashMap<String, String>());
+                    
+                    //m_versionService.updateVersion(source, new File(resource.getUri()));
+                    
                     category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
                     logger.error("Could not update version due to I/O error", ex);
                     category = null;
-                } catch (VersionGeneratorException e) {
-                    logger.warn("Could not update version (VersionGeneratorException): {}", e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Could not update version (Not osgi bundle): {}", e.getMessage());
                     category = "non-versionable";
                 } catch (BundlesIncomparableException e) {
                     logger.warn("Could not update version (incomparable bundles): {}", e.getMessage());
@@ -104,11 +119,14 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     logger.error("Could not update version (unknown error)", e);
                     category = null;
                 }
+                
 
                 ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
 
                 try {
-                    resource = creator.getResource(resource.getUri());   // reload changed resource
+                	File versionedBundleFile = fileFromStream(versionedBudnleIs);
+                	
+                    resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
                 }
