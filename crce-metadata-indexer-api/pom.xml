@@ -11,14 +11,14 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-metadata-osgi-bundle</artifactId>
+    <artifactId>crce-metadata-indexer-api</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - OSGi Manifest Indexer</name>
+    <name>CRCE - Plugin - Metadata Indexer API</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.metadata.osgi</bundle.symbolicName>
-        <bundle.namespace>${namespace}.metadata.osgi</bundle.namespace>
+        <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>
+        <bundle.namespace>${namespace}.metadata.indexer</bundle.namespace>
     </properties>
 
     <dependencies>
@@ -26,21 +26,6 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.bundlerepository</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>net.sf.kxml</groupId>
-            <artifactId>kxml2</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -48,16 +33,9 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

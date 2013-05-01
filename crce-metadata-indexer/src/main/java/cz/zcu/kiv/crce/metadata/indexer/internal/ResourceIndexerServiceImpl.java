@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.metadata.indexer.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,39 +14,42 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
-import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
  * Implementation of <code>ResourceDAO</code> which provides indexing of artifacts
  * with indexers to a static (read-only) metadata representation.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class FileIndexingResourceDAO extends AbstractResourceDAO {
+public class ResourceIndexerServiceImpl implements ResourceIndexerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileIndexingResourceDAO.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourceIndexerServiceImpl.class);
 
     private volatile PluginManager pluginManager;
     private volatile ResourceFactory resourceFactory; /* injected by dependency manager */
 
     @Override
-    public Resource loadResource(URI uri) throws IOException {
-        Resource resource = resourceFactory.createResource();
+    public Resource indexResource(File file) throws IOException {
+        logger.debug("Indexing file {}", file);
 
-        URL url = uri.toURL();
+        Resource resource = resourceFactory.createResource();
 
         // TODO - may be optimized for remote protocols by copying resource to local file and opening local url
 
         Set<String> usedKeywords = new HashSet<>();
         Set<String> keywords = new HashSet<>();
+        Set<String> newKeywords = new HashSet<>();
         Set<ResourceIndexer> usedIndexers = new HashSet<>();
 
         keywords.add(PluginManager.NO_KEYWORDS);
 
         while (!keywords.isEmpty()) {
-            for (String keyword : keywords) {
-                keywords.remove(keyword);
+            Iterator<String> it = keywords.iterator();
+            while (it.hasNext()) {
+                String keyword = it.next();
+                it.remove();
                 if (usedKeywords.contains(keyword)) {
                     continue;
                 }
@@ -56,41 +58,26 @@ public class FileIndexingResourceDAO extends AbstractResourceDAO {
                     if (usedIndexers.contains(indexer)) {
                         continue;
                     }
-                    List<String> newKeywords = indexer.index(url.openStream(), resource);
-                    keywords.addAll(newKeywords);
+                    try (FileInputStream fis = new FileInputStream(file)) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Using indexer: {}", indexer.getPluginId());
+                        }
+                        newKeywords.addAll(indexer.index(fis, resource));
+//                        List<String> newKeywords = indexer.index(fis, resource);
+//                        keywords.addAll(newKeywords);
+                    }
                     usedIndexers.add(indexer);
                 }
                 usedKeywords.add(keyword);
             }
+            keywords.addAll(newKeywords);
+            newKeywords = new HashSet<>();
         }
 
-        if ("file".equals(url.getProtocol())) {
-            File f = new File(uri);
-            LegacyMetadataHelper.setSize(resourceFactory, resource, f.length());
-        }
+        LegacyMetadataHelper.setSize(resourceFactory, resource, file.length());
 
-        LegacyMetadataHelper.setUri(resourceFactory, resource, uri);
+        LegacyMetadataHelper.setUri(resourceFactory, resource, file.toURI()); // TODO move to Store logic
 
         return resource;
-
-    }
-
-    @Override
-    public Resource moveResource(Resource resource, URI uri) {
-        Resource out = resourceFactory.cloneResource(resource);
-        LegacyMetadataHelper.setUri(resourceFactory, out, uri);
-        return out;
-    }
-
-    @Override
-    public List<Resource> loadResources(URI uri) throws IOException {
-        logger.warn("Method loadResources is not planned for resource indexer after a refactoring, returning empty list.");
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean existsResource(URI uri) throws IOException {
-        logger.warn("Method existsResource is not planned for resource indexer after a refactoring, returning false.");
-        return false;
     }
 }

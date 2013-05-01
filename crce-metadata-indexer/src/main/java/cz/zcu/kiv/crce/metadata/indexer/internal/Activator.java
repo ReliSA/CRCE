@@ -5,8 +5,8 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
@@ -19,8 +19,8 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext context, final DependencyManager manager) throws Exception {
         manager.add(createComponent()
-                .setInterface(ResourceDAO.class.getName(), null)
-                .setImplementation(FileIndexingResourceDAO.class)
+                .setInterface(ResourceIndexerService.class.getName(), null)
+                .setImplementation(ResourceIndexerServiceImpl.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))

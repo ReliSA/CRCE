@@ -17,7 +17,9 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -84,6 +86,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 file = new File(uri);
             }
         } catch (URISyntaxException ex) {
+            // TODO verify this usecase and correctness
             file = new File(path);
         }
 
@@ -101,7 +104,9 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new FilebasedStoreImpl(file))
                         .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                        .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class));
+                        .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
+                        .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
+                        .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
             } catch (IOException e) {
                 throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
             }

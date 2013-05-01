@@ -22,6 +22,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
+import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
 
 public class ResourceServlet extends HttpServlet {
 
@@ -83,7 +84,7 @@ public class ResourceServlet extends HttpServlet {
             }
 
         } catch (ServletException e) {
-            logger.warn("Can't forward: {}", e.getMessage());
+            logger.warn("Can't forward: {}", e);
         } catch (IOException e) {
             logger.error("Can't forward", e);
         }
@@ -110,18 +111,22 @@ public class ResourceServlet extends HttpServlet {
         }
         switch (link) {
             case "buffer":
-                List<Resource> buffer;
+                List<Resource> bufferResources;
                 if (filter == null) {
-                    buffer = Activator.instance().getBuffer(req).getResources();
+                    bufferResources = Activator.instance().getBuffer(req).getResources();
                 } else {
                     try {
-                        buffer = Activator.instance().getBuffer(req).getResources(filter);
+                        bufferResources = Activator.instance().getBuffer(req).getResources(filter);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        buffer = Activator.instance().getBuffer(req).getResources();
+                        bufferResources = Activator.instance().getBuffer(req).getResources();
                     }
                 }
-                session.setAttribute("buffer", buffer);
+                List<ResourceExt> bufferResourcesExt = new ArrayList<>(bufferResources.size());
+                for (Resource resource : bufferResources) {
+                    bufferResourcesExt.add(new ResourceExt(resource));
+                }
+                session.setAttribute("buffer", bufferResourcesExt);
                 return true;
 
             case "plugins":
@@ -141,30 +146,34 @@ public class ResourceServlet extends HttpServlet {
                 return true;
 
             case "store":
-                List<Resource> store;
+                List<Resource> storeResources;
                 if (filter == null) {
-                    store = Activator.instance().getStore().getResources();
+                    storeResources = Activator.instance().getStore().getResources();
                 } else {
                     try {
-                        store = Activator.instance().getStore().getResources(filter);
+                        storeResources = Activator.instance().getStore().getResources(filter);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        store = Activator.instance().getStore().getResources();
+                        storeResources = Activator.instance().getStore().getResources();
                     }
                 }
-                session.setAttribute("store", store);
+                List<ResourceExt> storeResourcesExt = new ArrayList<>(storeResources.size());
+                for (Resource resource : storeResources) {
+                    storeResourcesExt.add(new ResourceExt(resource));
+                }
+                session.setAttribute("store", storeResourcesExt);
                 return true;
 
             case "tags":
                 List<Resource> resources = prepareResources(req, filter);
                 ArrayList<Category> categoryList = prepareCategoryList(resources);
-                ArrayList<Resource> filteredResourceList;
+                ArrayList<ResourceExt> filteredResourceList;
 
                 String selectedCategory;
                 if (req.getParameter("tag") != null) {
                     selectedCategory = req.getParameter("tag");
 
-                    filteredResourceList = filterResurces(selectedCategory, resources);
+                    filteredResourceList = filterResources(selectedCategory, resources);
 
                 } else {
                     filteredResourceList = null;
@@ -283,13 +292,13 @@ public class ResourceServlet extends HttpServlet {
      * @param resources resources
      * @return filtered resources list
      */
-    private ArrayList<Resource> filterResurces(String filterCategory, List<Resource> resources) {
-        ArrayList<Resource> filteredResourceList = new ArrayList<>();
+    private ArrayList<ResourceExt> filterResources(String filterCategory, List<Resource> resources) {
+        ArrayList<ResourceExt> filteredResourceList = new ArrayList<>();
         for (Resource resource : resources) {
             List<String> categories = LegacyMetadataHelper.getCategories(resource);
             for (String category : categories) {
                 if (category.equals(filterCategory)) {
-                    filteredResourceList.add(resource);
+                    filteredResourceList.add(new ResourceExt(resource));
                     break;
                 }
             }

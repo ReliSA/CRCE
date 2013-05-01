@@ -34,7 +34,7 @@ public class LegacyMetadataHelper {
 
     public static final AttributeType<String> OSGI_SYMBOLIC_NAME = new SimpleAttributeType<>("name", String.class);
     public static final AttributeType<String> OSGI_PRESENTATION_NAME = new SimpleAttributeType<>("presentation-name", String.class);
-    public static final AttributeType<Version> OSGI_VERSION = new SimpleAttributeType<>("presentation-name", Version.class);
+    public static final AttributeType<Version> OSGI_VERSION = new SimpleAttributeType<>("version", Version.class);
 
     public static URI getUri(@Nonnull Resource resource) {
         List<Capability> capabilities = resource.getCapabilities(NS__CRCE_IDENTITY);

@@ -26,7 +26,7 @@ import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 /**
  * implementation of <code>ResourceIndexer</code> which provides support for
  * indexing OSGi components metadata. It uses Apache OBR internaly.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
@@ -84,7 +84,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             Capability cap = resourceFactory.createCapability(fcap.getName());
             for (org.apache.felix.bundlerepository.Property fprop : fcap.getProperties()) {
                 ObrType type = ObrType.getValue(fprop.getType());
-                cap.setAttribute(fprop.getName(), (Class<Object>) type.getTypeClass(), ObrType.propertyValueFromString(type, fprop.getType()));
+                cap.setAttribute(fprop.getName(), (Class<Object>) type.getTypeClass(), ObrType.propertyValueFromString(type, fprop.getValue()));
             }
             resource.addCapability(cap);
         }

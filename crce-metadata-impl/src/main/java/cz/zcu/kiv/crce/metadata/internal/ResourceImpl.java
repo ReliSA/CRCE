@@ -9,7 +9,6 @@ import java.util.HashMap;
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.WritableRepository;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -21,7 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceImpl extends AbstractEntityBase implements Resource {
-    
+
     private static final long serialVersionUID = 2594634894045505360L;
 
     private String id;
@@ -51,7 +50,7 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
     }
 
     @Override
-    public void setRepository(WritableRepository repository) {
+    public void setRepository(Repository repository) {
         this.repository = repository;
     }
 

@@ -16,7 +16,7 @@ public enum Type {
     LONG("long", Long.class),
     DOUBLE("double", Double.class),
 //    URL("url", String.class),
-//    URI("uri", String.class),
+    URI("uri", String.class), // TODO URI is not supported type yet (PENDING)
 //    SET("set", List.class);
     LIST("list", List.class);
 

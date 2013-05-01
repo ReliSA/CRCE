@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import java.net.URI;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
@@ -36,6 +38,11 @@ public class ResourceFactoryImpl implements ResourceFactory {
         return new CapabilityImpl(namespace);
     }
 
+    @Override
+    public Repository createRepository(URI uri) {
+        return new RepositoryImpl(uri);
+    }
+
 
 //    @Override
 //    public Capability createCapability(String name) {
@@ -58,7 +65,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
 //    @Override
 //    public Resource createResource(Resource resource) {
 //        ResourceImpl out = new ResourceImpl();
-//        
+//
 //        out.setId(resource.getId());
 //        out.setPresentationName(resource.getPresentationName());
 //        if (resource.getRepository() instanceof WritableRepository) {
@@ -72,7 +79,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
 //        out.setSymbolicName(resource.getSymbolicName());
 //        out.setUri(resource.getUri());
 //        out.setVersion(resource.getVersion());
-//        
+//
 //        for (Property_ property : resource.getAttributes()) {
 //            out.setProperty(new PropertyImpl2(property.getName(), property.getType(), property.getValue()));
 //        }

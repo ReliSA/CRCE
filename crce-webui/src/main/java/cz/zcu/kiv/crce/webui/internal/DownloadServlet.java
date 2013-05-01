@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
 
 public class DownloadServlet extends HttpServlet {
 
@@ -34,9 +35,10 @@ public class DownloadServlet extends HttpServlet {
             throws ServletException, IOException {
         boolean success;
         String message;
-        Resource[] buffer = (Resource[]) req.getSession().getAttribute("buffer");
+        @SuppressWarnings("unchecked")
+        List<ResourceExt> buffer = (List<ResourceExt>) req.getSession().getAttribute("buffer");
         List<Resource> list = Activator.instance().getBuffer(req).commit(true);
-        if (list.size() == buffer.length) {
+        if (list.size() == buffer.size()) {
             success = true;
             message = "All resources commited succesfully";
         } else {

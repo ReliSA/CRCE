@@ -7,6 +7,7 @@ import org.apache.felix.dm.DependencyManager;
 
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionData;
@@ -38,7 +39,8 @@ public class SessionRegisterImpl implements SessionRegister {
                         .add(dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(ResourceFactory.class).setRequired(true))
-                        .add(dependencyManager.createServiceDependency().setService(ResourceDAO.class).setRequired(true));
+                        .add(dependencyManager.createServiceDependency().setService(ResourceDAO.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(ResourceIndexerService.class).setRequired(true));
 
                 dependencyManager.add(sd.bufferComponent);
                 sessions.put(sessionId, sd);

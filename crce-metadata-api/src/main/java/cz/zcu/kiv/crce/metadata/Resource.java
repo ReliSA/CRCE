@@ -69,5 +69,5 @@ public interface Resource extends Serializable {
 
     void removeProperty(@Nonnull Property property);
 
-    void setRepository(@Nonnull WritableRepository repository);
+    void setRepository(@Nonnull Repository repository);
 }

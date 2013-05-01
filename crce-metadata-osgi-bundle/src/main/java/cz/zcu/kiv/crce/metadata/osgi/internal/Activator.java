@@ -6,9 +6,11 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
+
 /**
  * Activator of this bundle.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class Activator extends DependencyActivatorBase {
 
@@ -18,12 +20,13 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(OsgiManifestBundleIndexer.class)
                 .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
                 );
     }
 
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
-        
+
     }
-    
+
 }

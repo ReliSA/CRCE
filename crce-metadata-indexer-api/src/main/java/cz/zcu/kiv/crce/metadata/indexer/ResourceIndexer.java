@@ -27,18 +27,6 @@ import cz.zcu.kiv.crce.plugin.Plugin;
  */
 public interface ResourceIndexer extends Plugin {
 
-//    /**
-//     * Indexes artifact data from given <code>InputStream</code> and stores
-//     * results into new <code>Resource</code> instance.
-//     *
-//     * <p> If indexer can't index artifact content, an empty resource (with no
-//     * capabilities, requirements or categories) is returned.
-//     *
-//     * @param input
-//     * @return
-//     */
-//    Resource index(InputStream input);
-
     /**
      * Indexes data from given <code>InputStream</code> and stores results into
      * given <code>Resource</code> object. Returns an array of categories set to

@@ -21,10 +21,12 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -45,13 +47,14 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile PluginManager pluginManager; /* injected by dependency manager */
     private volatile Store store;                 /* injected by dependency manager */
     private volatile ResourceFactory resourceFactory;     /* injected by dependency manager */
-    private volatile ResourceDAO resourceDAO;
+    private volatile ResourceDAO resourceDAO;     /* injected by dependency manager */
+    private volatile ResourceIndexerService resourceIndexerService; /* injected by dependency manager */
 
     private final int BUFFER_SIZE = 8 * 1024;
     private final Properties sessionProperties;
 
     private File baseDir;
-//    private Repository m_repository;
+    private Repository repository;
 
     private static final Logger logger = LoggerFactory.getLogger(BufferImpl.class);
 
@@ -82,6 +85,7 @@ public class BufferImpl implements Buffer, EventHandler {
         if (!baseDir.exists()) {
             throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
+        repository = resourceFactory.createRepository(baseDir.toURI());
     }
 
     /*
@@ -150,6 +154,10 @@ public class BufferImpl implements Buffer, EventHandler {
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         Resource resource = resourceDAO.loadResource(file.toURI());
+        if (resource == null) {
+            resource = resourceIndexerService.indexResource(file);
+        }
+        resource.setRepository(repository);
 
         // TODO alternatively can be moved to some plugin
         LegacyMetadataHelper.setFileName(resourceFactory, resource, name2);
