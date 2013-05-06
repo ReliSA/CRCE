@@ -309,7 +309,7 @@ public class ConvertorToBeans {
 					addAttribute(atrDirReq, "version", null ,parsedFilter[i], parsedFilter[i+1]);
 				}
 				
-			} catch (Exception e) {
+			} catch (RuntimeException e) {
 				log.warn("Exception during parsing wiring requirement filter.");
 			}
 			

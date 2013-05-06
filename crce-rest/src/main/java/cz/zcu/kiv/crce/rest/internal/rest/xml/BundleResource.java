@@ -62,9 +62,9 @@ public class BundleResource extends ResourceParent implements GetBundle {
 						resourceOutput.write(buffer, 0, bytesRead);
 					}
 					resourceOutput.flush();
-				} catch (Exception e) {
+				} catch (RuntimeException e) {
 
-					log.warn("Request ({}) - Converting bundle to output stream failed.", requestId);
+					log.warn("Request ({}) - Converting bundle to output stream failed.", getRequestId());
 			
 					throw new WebApplicationException(e, 500);
 				} 
@@ -130,7 +130,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	 */
 	private Response responseByFilter(String filter) throws WebApplicationException {
 
-		log.debug("Request ({}) - Get bundle by filter: {}", requestId, filter);
+		log.debug("Request ({}) - Get bundle by filter: {}", getRequestId(), filter);
 
 		Resource resource = findSingleBundleByFilterWithHighestVersion(filter);
 
@@ -156,15 +156,15 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	@GET @Path("{id}")
 	@Produces({MediaType.APPLICATION_OCTET_STREAM})
 	public Response getBundleById(@PathParam("id") String id) {
-		requestId++;
-		log.debug("Request ({}) - Get bundle by id request was received.", requestId );
+		newRequest();
+		log.debug("Request ({}) - Get bundle by id request was received.", getRequestId());
 		
 		String filter = "(id="+id+")";
 		
 		try {
 			Response response = responseByFilter(filter);
 			
-			log.debug("Request ({}) - Response was successfully created.",requestId);
+			log.debug("Request ({}) - Response was successfully created.",getRequestId());
 			
 			return response;
 
@@ -183,22 +183,22 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	 */
 	@GET
 	public Response getBundlebyNameAndVersion(@QueryParam("name") String name, @QueryParam("version") String version) {
-		requestId++;
-		log.debug("Request ({}) - Get bundle by name and version request was received.", requestId );
+		newRequest();
+		log.debug("Request ({}) - Get bundle by name and version request was received.", getRequestId());
 
 		
 		String filter;
 		
-		if ((name != null) & (version != null)) {
+		if ((name != null) && (version != null)) {
 			filter = "(&(symbolicname=" + name + ")(version=" + version + "))";
 			
-		} else if ((name != null) & (version == null)) {
+		} else if ((name != null) && (version == null)) {
 			filter = "(symbolicname=" + name + ")";
 
 		} else {
 			log.debug(
 					"Request ({}) - Wrong request, name of requested bundle has to be set.",
-					requestId);
+					getRequestId());
 			return Response.status(400).build();
 		}
 		
@@ -206,7 +206,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		try {
 			
 			Response response = responseByFilter(filter);
-			log.debug("Request ({}) - Response was successfully created.", requestId);
+			log.debug("Request ({}) - Response was successfully created.", getRequestId());
 			
 			return response;
 		

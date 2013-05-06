@@ -61,7 +61,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 		if(lowerRes.getId().equals(clientResource.getId())) {
 			log.info("Request ({}) - Nearist lower - in repository is no resource " +
 					"with lower version than resource from client request ({})."
-					, requestId, clientResource.getId());
+					, getRequestId(), clientResource.getId());
 			//throw new WebApplicationException(404);
 		}
 		
@@ -72,7 +72,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 			}
 		}
 		
-		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", requestId, lowerRes.getId());
+		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", getRequestId(), lowerRes.getId());
 		
 		return lowerRes;
 	}
@@ -94,7 +94,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 		if(higherRes.getId().equals(clientResource.getId())) {
 			log.info("Request ({}) - Nearist higher - in repository is no resource " +
 					"with higher version than resource from client request ({})."
-					, requestId, clientResource.getId());
+					, getRequestId(), clientResource.getId());
 			//throw new WebApplicationException(404);
 		}
 		
@@ -105,7 +105,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 			}
 		}
 		
-		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", requestId, higherRes.getId());
+		log.debug("Request ({}) - Bundle with nearest lower version is: {}.", getRequestId(), higherRes.getId());
 		
 		return higherRes;
 	}
@@ -156,7 +156,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 				}
 				break;
 			default:
-				log.warn("Request ({}) - Unsupported operation (op) : {}.", requestId, op);
+				log.warn("Request ({}) - Unsupported operation (op) : {}.", getRequestId(), op);
 				throw new WebApplicationException(300);
 			}
 			
@@ -177,12 +177,12 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
     @GET
     @Produces({MediaType.APPLICATION_XML })
     public Response replaceBundle(@QueryParam("id") String id, @QueryParam("op") String op, @Context UriInfo ui) {
-    	requestId++;
-    	log.debug("Request ({}) - Get replace bundle request was received.", requestId);
+    	newRequest();
+    	log.debug("Request ({}) - Get replace bundle request was received.", getRequestId());
     	
 
     		try {
-				log.debug("Request ({}) -  Replace bundle with id: {}", requestId, id);
+				log.debug("Request ({}) -  Replace bundle with id: {}", getRequestId(), id);
 				
 				
 				Resource clientResource = findResource(id);				
@@ -198,7 +198,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 				Trepository repositoryBean = convertor.convertRepository(resourcesToReturn, include, ui);
 				
 				Response response = Response.ok(createXML(repositoryBean)).build();
-				log.debug("Request ({}) - Response was successfully created.", requestId);
+				log.debug("Request ({}) - Response was successfully created.", getRequestId());
 				return response;
 				
 			} catch (WebApplicationException e) {

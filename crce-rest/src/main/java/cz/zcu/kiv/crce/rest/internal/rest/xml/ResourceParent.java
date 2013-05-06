@@ -27,7 +27,10 @@ import cz.zcu.kiv.crce.rest.internal.rest.generated.Trepository;
  */
 public abstract class ResourceParent {
 	
-	protected static int requestId = 0;
+	/**
+	 * Id of actual HTTP request
+	 */
+	private int requestId = 0;
 	
 	protected static final String DEF_ENCODING = "UTF-8";
 	
@@ -240,4 +243,19 @@ public abstract class ResourceParent {
 		} 
 	}
 	
+	/**
+	 * Indicate that new request came to server.
+	 * Id of new request is determined.
+	 */
+	protected void newRequest() {
+		requestId++;
+	}
+	
+	/**
+	 * Get id of actual request
+	 * @return id of actual request.
+	 */
+	protected int getRequestId() {
+		return requestId;
+	}
 }

@@ -39,8 +39,8 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
     @GET
     @Produces({MediaType.APPLICATION_XML })
     public Response getMetadata(@QueryParam("filter") String filter, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop, @Context UriInfo ui) {
-    	requestId++;
-    	log.debug("Request ({}) - Get metadata request was received.", requestId);
+    	newRequest();
+    	log.debug("Request ({}) - Get metadata request was received.", getRequestId());
     	
     	Resource[] storeResources;
     	
@@ -85,17 +85,17 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 				ConvertorToBeans conv = new ConvertorToBeans();
 				Trepository repository = conv.convertRepository(storeResources, include, ui);
 				Response response = Response.ok(createXML(repository)).build();				
-				log.debug("Request ({}) - Response was successfully created.", requestId);
+				log.debug("Request ({}) - Response was successfully created.", getRequestId());
 				return response;
 			} else {				
-				log.debug("Request ({}) - No resource was found.", requestId);
+				log.debug("Request ({}) - No resource was found.", getRequestId());
 				return Response.status(404).build();
 			}
 		} catch (WebApplicationException e) {			
 			return e.getResponse();
 			
 		} catch (InvalidSyntaxException e) {
-			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", requestId);
+			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", getRequestId());
 			log.debug(e.getMessage(), e);
 			return Response.status(400).build();
 		}
@@ -110,8 +110,8 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 	@Path("{id}")
 	@Produces({ MediaType.APPLICATION_XML })
     public Response getMetadataById(@PathParam("id") String id, @QueryParam("core") String core, @QueryParam("cap") String cap, @QueryParam("req") String req, @QueryParam("prop") String prop, @Context UriInfo ui) {
-    	requestId++;
-    	log.debug("Request ({}) - Get metadata request for resource with id {} was received.",requestId ,id);
+    	newRequest();
+    	log.debug("Request ({}) - Get metadata request for resource with id {} was received.",getRequestId() ,id);
     	
     	IncludeMetadata include = new IncludeMetadata();
     	
@@ -152,10 +152,10 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 					ConvertorToBeans conv = new ConvertorToBeans();
 					Trepository repository = conv.convertRepository(storeResources, include, ui);
 					Response response = Response.ok(createXML(repository)).build();
-					log.debug("Request ({}) - Response was successfully created.", requestId);
+					log.debug("Request ({}) - Response was successfully created.", getRequestId());
 					return response;
 				} else {
-					log.debug("Request ({}) - No resource was found.", requestId);
+					log.debug("Request ({}) - No resource was found.", getRequestId());
 					return Response.status(404).build();
 				}
 			} catch (WebApplicationException e) {
@@ -164,7 +164,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
 			}
 			
 		} catch (InvalidSyntaxException e) {
-			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", requestId);
+			log.warn("Request ({}) - Invalid syntax of request LDAP filter.", getRequestId());
 			log.debug(e.getMessage(), e);
 			return Response.status(400).build();
 		}    	

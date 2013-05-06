@@ -82,27 +82,27 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 			return req;
 			
 		} catch (UnsupportedEncodingException e) {
-			log.warn("Request ({}) - Unsuported encoding {}", requestId, DEF_ENCODING);
+			log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
 			log.debug(e.getMessage(), e);			
 			throw new WebApplicationException(500);
 			
 		} catch (JAXBException e) {
-			log.info("Request ({}) - Post request XML unmarshal failed.", requestId);
+			log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
 			log.debug(e.getMessage(), e);	
 			throw new WebApplicationException(400);
 			
 		} catch (ParserConfigurationException e) {
-			log.warn("Request ({}) - ParserConfigurationException during unmarshal", requestId);
+			log.warn("Request ({}) - ParserConfigurationException during unmarshal", getRequestId());
 			log.debug(e.getMessage(),e);
 			throw new WebApplicationException(500);
 			
 		} catch (IOException e) {
-			log.warn("Request ({}) - IOException during unmarshal", requestId);
+			log.warn("Request ({}) - IOException during unmarshal", getRequestId());
 			log.debug(e.getMessage(),e);
 			throw new WebApplicationException(500);
 			
 		} catch (SAXException e) {
-			log.info("Request ({}) - XMLParser exception during unmarshal - {}", requestId, e.getMessage());
+			log.info("Request ({}) - XMLParser exception during unmarshal - {}", getRequestId(), e.getMessage());
 			log.debug(e.getMessage(),e);
 			throw new WebApplicationException(400);
 		}
@@ -137,7 +137,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	private Resource[] matchingResources(Trequirement requirement) {
 		String reqName = getRequirementName(requirement);
 		if(reqName == null) {
-			log.info("Request ({}) - No name found in the input requierment.", requestId);
+			log.info("Request ({}) - No name found in the input requierment.", getRequestId());
 			throw new WebApplicationException(400);
 		}
 		
@@ -148,7 +148,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	
 		for(Resource res: allResources) {
 			if(checkIfMatchRequirement(res, reqName, requirement)) {
-				log.debug("Request ({}) - Matching resource found - {}", requestId , res.getId());
+				log.debug("Request ({}) - Matching resource found - {}", getRequestId() , res.getId());
 				matchingResources.add(res);
 			}
 		}
@@ -177,7 +177,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 						verDemand.setOperation(atr.getType());
 						versionDemandsList.add(verDemand);
 					} else {
-						log.warn("Request ({}) - Requirement version attribute has not set value or type and will be skipped", requestId);
+						log.warn("Request ({}) - Requirement version attribute has not set value or type and will be skipped", getRequestId());
 					}
 				}
 			}
@@ -304,17 +304,17 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces({MediaType.APPLICATION_XML })
 	public Response providerOfCapability(String requirement) {
-		requestId++;
-		log.debug("Request ({}) - Provider of capability request was received.", requestId);
-		log.debug("Request ({}) - Requirement received: {}", requestId, requirement);
+		newRequest();
+		log.debug("Request ({}) - Provider of capability request was received.", getRequestId());
+		log.debug("Request ({}) - Requirement received: {}", getRequestId(), requirement);
 		try {
 			Trequirement req = unmarshalRequirent(requirement);
-			log.debug("Request ({}) - Requirement was unmashaled.", requestId);
+			log.debug("Request ({}) - Requirement was unmashaled.", getRequestId());
 			
 			Trepository repositoryBean = findProviders(req);
 
 			Response response = Response.ok(createXML(repositoryBean)).build();
-			log.debug("Request ({}) - Response was successfully created.", requestId);
+			log.debug("Request ({}) - Response was successfully created.", getRequestId());
 			return response;
 		} catch (WebApplicationException e) {
 			

@@ -86,12 +86,12 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 			return rep;
 			
 		} catch (UnsupportedEncodingException e) {
-			log.warn("Request ({}) - Unsuported encoding {}", requestId, DEF_ENCODING);
+			log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
 			log.debug(e.getMessage(), e);			
 			throw new WebApplicationException(500);
 			
 		} catch (JAXBException e) {
-			log.info("Request ({}) - Post request XML unmarshal failed.", requestId);
+			log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
 			log.debug(e.getMessage(), e);	
 			throw new WebApplicationException(400);
 		}
@@ -199,7 +199,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 		ConvertorToBeans conv = new ConvertorToBeans();
 		IncludeMetadata include = new IncludeMetadata();
 		include.includeAll();
-		Trepository repository = conv.convertRepository(newResources.toArray(new Resource[0]), include, ui);
+		Trepository repository = conv.convertRepository(newResources.toArray(new Resource[newResources.size()]), include, ui);
 
 		//add unknown resources
 		repository.getResource().addAll(unknownResources);	 
@@ -216,14 +216,14 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	@Consumes(MediaType.APPLICATION_XML)
 	@Produces({MediaType.APPLICATION_XML })
 	public Response otherBundles(String knownBundles, @Context UriInfo ui) {		
-		requestId++;
-		log.debug("Request ({}) - Post other bundles request was received.", requestId);
+		newRequest();
+		log.debug("Request ({}) - Post other bundles request was received.", getRequestId());
 		try {
 			Trepository clientBundles = unmarshalXML(knownBundles);
 			Trepository otherBundles = findOtherBundles(clientBundles, ui);
 			
 			Response response = Response.ok(createXML(otherBundles)).build();
-			log.debug("Request ({}) - Response was successfully created.", requestId);
+			log.debug("Request ({}) - Response was successfully created.", getRequestId());
 			return response;
 			
 			
