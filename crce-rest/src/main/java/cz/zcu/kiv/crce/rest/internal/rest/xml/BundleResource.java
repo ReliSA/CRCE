@@ -154,7 +154,6 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	 * @return bundle or error response
 	 */
 	@GET @Path("{id}")
-	@Produces({MediaType.APPLICATION_OCTET_STREAM})
 	public Response getBundleById(@PathParam("id") String id) {
 		newRequest();
 		log.debug("Request ({}) - Get bundle by id request was received.", getRequestId());
