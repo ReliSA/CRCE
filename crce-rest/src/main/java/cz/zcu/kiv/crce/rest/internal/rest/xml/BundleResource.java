@@ -20,8 +20,10 @@ import javax.ws.rs.core.StreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.rest.GetBundle;
+import cz.zcu.kiv.crce.rest.internal.rest.convertor.MimeTypeSelector;
 
 
 /**
@@ -80,14 +82,53 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		};
 	}
 	
+	/**
+	 * Create file name of resource.
+	 * Used for resources, whose original file name is unknown.
+	 * 
+	 * @param resource resource
+	 * @return file name of resource
+	 */
+	private String createFileName(Resource resource) {
+		String id = resource.getId();
+		
+		if(resource.hasCategory("osgi")) {
+			return id + ".jar";
+		} if(resource.hasCategory("zip")) {
+			return id + ".zip";
+		} else return id;
+	}
 	
 	/**
+	 * Get file name from resource.
+	 * If original file name is unknown, create name from resource id.
+	 * @param resource resource
+	 * @return resource file name
+	 */
+	private String getFileName(Resource resource) {
+		Capability[] caps = resource.getCapabilities("file");
+		
+		if (caps.length > 0) {
+			for(Capability cap:caps) {
+				String orgFileName = cap.getPropertyString("name");
+				if (orgFileName != null) {
+					return orgFileName;
+				}
+			}
+			return createFileName(resource);
+		} else {
+			return createFileName(resource);
+		}
+	}
+	
+	/**
+	 * Create response with bundle by filter.
 	 * Find bundle according LDAP filter in store repository and return him as output stream.
 	 * @param filter LDAP filter
 	 * @return bundle as output stream
 	 * @throws WebApplicationException some exception, contains html error status
 	 */
-	private StreamingOutput bundlebyFilterAsStream(String filter) throws WebApplicationException {
+	private Response responseByFilter(String filter) throws WebApplicationException {
 
 		log.debug("Request ({}) - Get bundle by filter: {}", requestId, filter);
 
@@ -95,7 +136,14 @@ public class BundleResource extends ResourceParent implements GetBundle {
 
 		final File resourceFile = new File(resource.getUri());
 
-		return getBundleAsStream(resourceFile);
+		StreamingOutput output = getBundleAsStream(resourceFile);
+		
+		MimeTypeSelector mimeTypeSelector = new MimeTypeSelector();
+		
+		Response response = Response.ok(output).type(mimeTypeSelector.selectMimeType(resource)).header("content-disposition",
+				"attachment; filename = " + getFileName(resource)).build();
+		
+		return response;
 
 	}
 	
@@ -114,10 +162,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		String filter = "(id="+id+")";
 		
 		try {
-			StreamingOutput output = bundlebyFilterAsStream(filter);
-
-			Response response = Response.ok(output).header("content-disposition",
-							"attachment; filename = " + id + ".jar").build();
+			Response response = responseByFilter(filter);
 			
 			log.debug("Request ({}) - Response was successfully created.",requestId);
 			
@@ -137,12 +182,9 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	 * @return bundle or error response
 	 */
 	@GET
-	@Produces({MediaType.APPLICATION_OCTET_STREAM})
 	public Response getBundlebyNameAndVersion(@QueryParam("name") String name, @QueryParam("version") String version) {
 		requestId++;
 		log.debug("Request ({}) - Get bundle by name and version request was received.", requestId );
-		
-		StreamingOutput output = null;
 
 		
 		String filter;
@@ -162,10 +204,8 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		
 		
 		try {
-			output = bundlebyFilterAsStream(filter);
 			
-			Response response = Response.ok(output).header("content-disposition",
-					"attachment; filename = " + name + ".jar").build();
+			Response response = responseByFilter(filter);
 			log.debug("Request ({}) - Response was successfully created.", requestId);
 			
 			return response;

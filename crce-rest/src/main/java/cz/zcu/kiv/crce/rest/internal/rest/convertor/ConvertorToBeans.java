@@ -170,10 +170,12 @@ public class ConvertorToBeans {
 		osgiContent.setNamespace("osgi.content");
 		List<Object> attributes = osgiContent.getDirectiveOrAttributeOrCapability();
 		
+		MimeTypeSelector mimeTypeSelector = new MimeTypeSelector();
+		
 		addAttribute(attributes, "hash", null, getSHA(resource), null);
 		addAttribute(attributes, "url", null, getURL(resource, ui), null);
 		addAttribute(attributes, "size", "Long", Long.toString(resource.getSize()), null);
-		addAttribute(attributes, "mime", null, "not implemented yet", null);
+		addAttribute(attributes, "mime", null, mimeTypeSelector.selectMimeType(resource), null);
 		addAttribute(attributes, "crce.original-file-name", null, getFileName(resource), null);
 		
 		
