@@ -56,19 +56,19 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
     		if(cap != null) {
     			include.setIncludeCaps(true);
     			if(cap.length() > 0) {
-    				include.setIncludeCapseByName(cap);
+    				include.setIncludeCapByName(cap);
     			}
     		}
     		if(req != null) {
     			include.setIncludeReqs(true);
     			if(req.length() > 0) {
-    				include.setIncludeReqsByName(req);
+    				include.setIncludeReqByName(req);
     			}
     		}
     		if(prop != null) {
     			include.setIncludeProps(true);
     			if(prop.length() > 0) {
-    				include.setIncludePropsByName(prop);
+    				include.setIncludePropByName(prop);
     			}
     		}
     	}    	
@@ -125,19 +125,19 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
     		if(cap != null) {
     			include.setIncludeCaps(true);
     			if(cap.length() > 0) {
-    				include.setIncludeCapseByName(cap);
+    				include.setIncludeCapByName(cap);
     			}
     		}
     		if(req != null) {
     			include.setIncludeReqs(true);
     			if(req.length() > 0) {
-    				include.setIncludeReqsByName(req);
+    				include.setIncludeReqByName(req);
     			}
     		}
     		if(prop != null) {
     			include.setIncludeProps(true);
     			if(prop.length() > 0) {
-    				include.setIncludePropsByName(prop);
+    				include.setIncludePropByName(prop);
     			}
     		}
     	}

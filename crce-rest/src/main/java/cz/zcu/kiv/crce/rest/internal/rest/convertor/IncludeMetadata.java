@@ -4,7 +4,8 @@ package cz.zcu.kiv.crce.rest.internal.rest.convertor;
 /**
  * Filter criteria for GET Metadata operation.
  * 
- * Filter criteria determines, which parts of XML with metedata should be generated. 
+ * Filter criteria determines, which parts of XML with metedata should be included. 
+ * 
  *  
  * @author Jan Reznicek
  *
@@ -13,13 +14,13 @@ public class IncludeMetadata {
 	private boolean includeCore;
 	
 	private boolean includeCaps;
-	private String includeCapseByName;
+	private String includeCapByName;
 	
 	private boolean includeReqs;
-	private String includeReqsByName;
+	private String includeReqByName;
 	
 	private boolean includeProps;
-	private String includePropsByName;
+	private String includePropByName;
 	
 	/**
 	 * At default, including of each part of metadata is set to false.
@@ -28,13 +29,13 @@ public class IncludeMetadata {
 		includeCore = false;
 		
 		includeCaps = false;
-		includeCapseByName = null;
+		includeCapByName = null;
 		
 		includeReqs = false;
-		includeReqsByName = null;
+		includeReqByName = null;
 		
 		includeProps = false;
-		includeReqsByName = null;
+		includePropByName = null;
 	}
 	
 	
@@ -50,11 +51,11 @@ public class IncludeMetadata {
 	public void setIncludeCaps(boolean includeCaps) {
 		this.includeCaps = includeCaps;
 	}
-	public String getIncludeCapseByName() {
-		return includeCapseByName;
+	public String getIncludeCapByName() {
+		return includeCapByName;
 	}
-	public void setIncludeCapseByName(String includeCapseByName) {
-		this.includeCapseByName = includeCapseByName;
+	public void setIncludeCapByName(String includeCapByName) {
+		this.includeCapByName = includeCapByName;
 	}
 	public boolean isIncludeReqs() {
 		return includeReqs;
@@ -62,11 +63,11 @@ public class IncludeMetadata {
 	public void setIncludeReqs(boolean includeReqs) {
 		this.includeReqs = includeReqs;
 	}
-	public String getIncludeReqsByName() {
-		return includeReqsByName;
+	public String getIncludeReqByName() {
+		return includeReqByName;
 	}
-	public void setIncludeReqsByName(String includeReqsByName) {
-		this.includeReqsByName = includeReqsByName;
+	public void setIncludeReqByName(String includeReqByName) {
+		this.includeReqByName = includeReqByName;
 	}
 	public boolean isIncludeProps() {
 		return includeProps;
@@ -74,11 +75,11 @@ public class IncludeMetadata {
 	public void setIncludeProps(boolean includeProps) {
 		this.includeProps = includeProps;
 	}
-	public String getIncludePropsByName() {
-		return includePropsByName;
+	public String getIncludePropByName() {
+		return includePropByName;
 	}
-	public void setIncludePropsByName(String includePropsByName) {
-		this.includePropsByName = includePropsByName;
+	public void setIncludePropByName(String includePropByName) {
+		this.includePropByName = includePropByName;
 	}
 	/**
 	 * Include all parts of metadata.
@@ -89,6 +90,72 @@ public class IncludeMetadata {
 		includeReqs = true;		
 		includeProps = true;
 
+	}
+	
+	/**
+	 * Determine, if capability metadata should be included.
+	 * @param capName name of capability
+	 * @return boolean, if capability metadata should be included.
+	 */
+	public boolean shloudIncludeCap(String capName) {
+		if(includeCore) {
+			if(capName.endsWith(".content")  || capName.endsWith(".identity")) {
+				//core capability
+				return true;
+			}
+		}
+		
+		if(includeCaps && includeCapByName==null) {
+			//all capabilities are included
+			return true;
+		}
+		
+		if(includeCaps && includeCapByName.equals(capName)) {
+			//capability of this name should be included
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Determine, if requirement metadata should be included.
+	 * @param reqName name of requirement
+	 * @return boolean, if requirement metadata should be included.
+	 */
+	public boolean shloudIncludeReq(String reqName) {
+		
+		if(includeReqs && includeReqByName==null) {
+			//all requirements are included
+			return true;
+		}
+		
+		if(includeReqs && includeReqByName.equals(reqName)) {
+			//requirement of this name should be included
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Determine, if property metadata should be included.
+	 * @param propName name of property
+	 * @return boolean, if property metadata should be included.
+	 */
+	public boolean shloudIncludeProp(String propName) {
+		
+		if(includeProps && includePropByName==null) {
+			//all property are included
+			return true;
+		}
+		
+		if(includeProps && includePropByName.equals(propName)) {
+			//property of this name should be included
+			return true;
+		}
+		
+		return false;
 	}
 	
 }

@@ -34,6 +34,11 @@ public class ConvertorToBeans {
 		
 	private static final Logger log = LoggerFactory.getLogger(ConvertorToBeans.class);
 	
+	public static final String OSGI_IDENTITY_CAP_NAME = "osgi.identity";
+	public static final String OSGI_CONTENT_CAP_NAME = "osgi.content";
+	public static final String CRCE_IDENTITY_CAP_NAME = "crce.identity";
+	public static final String OSGI_WIRING_NAME = "osgi.wiring.package";
+	
 	public static final String DEFAULT_HOST = "http://localhost:8080/rest/";
 	
 	/**
@@ -146,7 +151,7 @@ public class ConvertorToBeans {
 	private Tcapability prepareOsgiIdentity(Resource resource) {
 		
 		Tcapability osgiIdentity= new Tcapability();
-		osgiIdentity.setNamespace("osgi.identity");
+		osgiIdentity.setNamespace(OSGI_IDENTITY_CAP_NAME);
 		List<Object> osgiIdentityAttrs = osgiIdentity.getDirectiveOrAttributeOrCapability();
 		
 		addAttribute(osgiIdentityAttrs, "name", null, resource.getSymbolicName(), null);
@@ -167,7 +172,7 @@ public class ConvertorToBeans {
 	private Tcapability prepareOsgiContent(Resource resource, UriInfo ui) {
 		
 		Tcapability osgiContent = new Tcapability();
-		osgiContent.setNamespace("osgi.content");
+		osgiContent.setNamespace(OSGI_CONTENT_CAP_NAME);
 		List<Object> attributes = osgiContent.getDirectiveOrAttributeOrCapability();
 		
 		MimeTypeSelector mimeTypeSelector = new MimeTypeSelector();
@@ -208,7 +213,7 @@ public class ConvertorToBeans {
 	private Tcapability prepareCrceIdentity(Resource resource) {
 		
 		Tcapability crceIdentity = new Tcapability();
-		crceIdentity.setNamespace("crce.identity");
+		crceIdentity.setNamespace(CRCE_IDENTITY_CAP_NAME);
 		List<Object> attributes = crceIdentity.getDirectiveOrAttributeOrCapability();
 		
 		addAttribute(attributes, "name", null, resource.getId(), null);
@@ -228,18 +233,14 @@ public class ConvertorToBeans {
 	 *            list of capabilities of the resourceBean
 	 * @param resource
 	 *            resource
-	 * @param filterName
-	 *            if is not null, capabilities only with this name should be
-	 *            added to the list. If is null, all capabilities should be
-	 *            added to the list.
 	 */
-	private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource, String filterName) {
+	private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource) {
 		Capability[] caps =  resource.getCapabilities("package");
 		for (Capability cap : caps) {
 
 			Tcapability newCapBean = new Tcapability();
 			List<Object> attributes = newCapBean.getDirectiveOrAttributeOrCapability();
-			newCapBean.setNamespace("osgi.wiring.package");
+			newCapBean.setNamespace(OSGI_WIRING_NAME);
 
 			// package attribute
 			Property packageProp = cap.getProperty("package");
@@ -260,11 +261,7 @@ public class ConvertorToBeans {
 				attributes.add(versAtr);
 			}
 			
-			if(filterName!=null && !filterName.equals(packageProp.getValue())) {
-				log.info("Capability " + packageProp.getValue() + " was filtred by filtername " + filterName);
-			} else {				
-				capabilities.add(newCapBean);
-			}
+			capabilities.add(newCapBean);
 
 		}
 	}
@@ -278,19 +275,15 @@ public class ConvertorToBeans {
 	 *            list of requirements of the resourceBean
 	 * @param resource
 	 *            resource
-	 * @param filterName
-	 *            if is not null, requirements only with this name should be
-	 *            added to the list. If is null, all requirements should be
-	 *            added to the list.
 	 */
-	private void addRequirementWirings(List<Trequirement> requirements, Resource resource, String filterName) {
+	private void addRequirementWirings(List<Trequirement> requirements, Resource resource) {
 		
 		Requirement[] reqs  = resource.getRequirements("package");
 		for(Requirement req: reqs) {
 
 			Trequirement newReqBean = new Trequirement();
 			List<Object> atrDirReq = newReqBean.getDirectiveOrAttributeOrRequirement();
-			newReqBean.setNamespace("osgi.wiring.package");
+			newReqBean.setNamespace(OSGI_WIRING_NAME);
 
 			Tdirective dir = new Tdirective();
 			dir.setName("filter");
@@ -313,11 +306,8 @@ public class ConvertorToBeans {
 				log.warn("Exception during parsing wiring requirement filter.");
 			}
 			
-			if(name!=null && filterName!=null && !filterName.equals(name)) {
-				log.info("Requirement " + name + " was filtred by filtername " + filterName);
-			} else {				
-				requirements.add(newReqBean);
-			}
+			
+			requirements.add(newReqBean);
 
 		}
 	}
@@ -340,17 +330,24 @@ public class ConvertorToBeans {
 		List<Tcapability> caps = newResource.getCapability();
 		List<Trequirement> reqs = newResource.getRequirement();
 
-		if(include.isIncludeCore()) {
+		//core capabilities
+		if(include.shloudIncludeCap(OSGI_IDENTITY_CAP_NAME)) {
 			caps.add(prepareOsgiIdentity(resource));
+		}
+		if(include.shloudIncludeCap(OSGI_CONTENT_CAP_NAME)) {
 			caps.add(prepareOsgiContent(resource, ui));
+		}
+		if(include.shloudIncludeCap(CRCE_IDENTITY_CAP_NAME)) {
 			caps.add(prepareCrceIdentity(resource));
 		}
+			
 		
-		if(include.isIncludeCaps()) {
-			addCapabilityWirings(caps, resource, include.getIncludeCapseByName());
+		//wirings
+		if(include.shloudIncludeCap(OSGI_WIRING_NAME)) {
+			addCapabilityWirings(caps, resource);
 		}
-		if(include.isIncludeReqs()) {
-			addRequirementWirings(reqs, resource, include.getIncludeReqsByName());
+		if(include.shloudIncludeReq(OSGI_WIRING_NAME)) {
+			addRequirementWirings(reqs, resource);
 		}
 		
 		
