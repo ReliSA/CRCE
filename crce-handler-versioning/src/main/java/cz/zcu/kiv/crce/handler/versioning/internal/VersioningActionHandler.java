@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,21 +75,26 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
     
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
-        if (resource == null || !resource.hasCategory("osgi")) {
+    	
+    	if (resource == null || !resource.hasCategory("osgi")) {
             return resource;
         }
         if (!resource.hasCategory(CATEGORY_VERSIONED)) {
 
             Resource cand = null;
 
-            // TODO improve (by using store.getRepository().getResources(someFilter))
-            for (Resource i : store.getRepository().getResources()) {
-                if (i.getSymbolicName().equals(resource.getSymbolicName())) {
-                    if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
-                        cand = i;
-                    }
-                }
-            }
+            try {
+				String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
+				for (Resource i : store.getRepository().getResources(filter)) {
+				        if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
+				            cand = i;
+				        }
+				}
+			} catch (InvalidSyntaxException e1) {
+				logger.error("Could not find base bundle, invalid syndax error", e1);
+			}
+            
+            
             String category = null;
             if (cand == null) {
                 category = CATEGORY_VERSIONED;
@@ -99,11 +105,13 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
                     
                     InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
+                    
+                    HashMap<String, String> options = new HashMap<String, String>();
+                    
+                    options.put("keep-micro-if-identical", "false");
 
-                    
-                    versionedBudnleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, new HashMap<String, String>());
-                    
-                    //m_versionService.updateVersion(source, new File(resource.getUri()));
+                    System.out.println("Versioning begins");
+                    versionedBudnleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
                     
                     category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
@@ -127,6 +135,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 	File versionedBundleFile = fileFromStream(versionedBudnleIs);
                 	
                     resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
+                    
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
                 }
