@@ -86,11 +86,12 @@
         <module>crce-efpAssignment</module>
 
         <!-- UI & Optional Plugins -->
-        <!--<module>crce-handler-versioning</module>-->
+        <module>crce-handler-versioning</module>
         <module>crce-webui</module>
         <module>crce-rest</module>
 
-	<module>crce-integration-tests</module>
+	<!-- integration tests are not finished yet -->
+        <!--<module>crce-integration-tests</module>-->
     </modules>
 
     <profiles>

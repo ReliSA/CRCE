@@ -29,6 +29,7 @@ import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
  * bundle to existing bundles with the same symbolic name and sets a new version
  * based on comparison.
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jan Reznicek
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
 
@@ -41,7 +42,12 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
     private int BUFFER_SIZE = 8 * 1024;
 
-    
+    /**
+     * Create file from bundle in form of InputSteam.
+     * @param bundleAsStream bundle as InputStream
+     * @return file with bundle
+     * @throws IOException reading from stream or creation of file or write to file failed
+     */
     private File fileFromStream(InputStream bundleAsStream) throws IOException {
     	OutputStream output = null;
         File bundleFile;
@@ -72,7 +78,11 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
         return bundleFile;
     }
     
-    
+    /**
+     * Create version of the OSGi bundle, before is committed to the Store.
+     * Before resource is committed to the Store, check if the resource is unversioned OSGi bundle.
+     * If resource is OSGi bundle, generate its version based on difference from previous bundle with same name in repository.
+     */
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
     	
@@ -80,7 +90,9 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             return resource;
         }
         if (!resource.hasCategory(CATEGORY_VERSIONED)) {
-
+        	
+        	/*candidate for base resource is selected as bundle with same symbolic name 
+        	  and highest version in repository.*/
             Resource cand = null;
 
             try {
@@ -102,15 +114,16 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             } else {
             	InputStream versionedBudnleIs = null;
                 try {
+                	//candidate = base bundle for version generation
                     InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
                     
                     InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
                     
                     HashMap<String, String> options = new HashMap<String, String>();
                     
+                    //micro part of version is generated too
                     options.put("keep-micro-if-identical", "false");
 
-                    System.out.println("Versioning begins");
                     versionedBudnleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
                     
                     category = CATEGORY_VERSIONED;
@@ -132,6 +145,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
 
                 try {
+                	//create resource from file with bundle with generated version
                 	File versionedBundleFile = fileFromStream(versionedBudnleIs);
                 	
                     resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
@@ -149,6 +163,10 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
         return resource;
     }
 
+    /**
+     * Save an original file name and version to metadata (as resource capability) when resource is uploaded to Buffer.
+     * Activate only for unversioned osgi resources
+     */
     @Override
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
         if (!resource.hasCategory("osgi")) {

@@ -39,6 +39,11 @@ public class ConvertorToBeans {
 	public static final String CRCE_IDENTITY_CAP_NAME = "crce.identity";
 	public static final String OSGI_WIRING_NAME = "osgi.wiring.package";
 	
+	/**
+	 * Default host, should not be needed, information is gained from request context.
+	 * But is there for sure
+	 * TODO: add default rest host to CRCE config file
+	 */
 	public static final String DEFAULT_HOST = "http://localhost:8080/rest/";
 	
 	/**
