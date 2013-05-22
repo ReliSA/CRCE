@@ -24,9 +24,12 @@ public interface AttributeProvider {
 
     <T> boolean setAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
 
-    <T> boolean setAttribute(@Nonnull Attribute<T> attribute);
+    <T> boolean setAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
 
+    // TODO is this method AttributeType implementation-safe?
     <T> boolean setAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
+
+    <T> boolean setAttribute(@Nonnull Attribute<T> attribute);
 
     <T> boolean removeAttribute(@Nonnull Attribute<T> attribute);
 

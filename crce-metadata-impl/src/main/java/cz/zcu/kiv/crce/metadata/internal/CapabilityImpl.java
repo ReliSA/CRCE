@@ -14,7 +14,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class CapabilityImpl extends AbstractEntityBase implements Capability {
-    
+
     private static final long serialVersionUID = -813453152194473221L;
 
     private String namespace = null;
@@ -54,11 +54,12 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
 
     @Override
     public boolean addChild(Capability capability) {
-        if (!children.contains(capability)) {
-            capability.setParent(this);
+        // commented way would be a performance problem
+//        if (!children.contains(capability)) {
+//            capability.setParent(this);
             return children.add(capability);
-        }
-        return false;
+//        }
+//        return false;
     }
 
     @Override
@@ -97,11 +98,11 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
 
     @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = super.hashCode();
         hash = 97 * hash + Objects.hashCode(this.namespace);
         hash = 97 * hash + Objects.hashCode(this.resource);
         hash = 97 * hash + Objects.hashCode(this.parent);
         hash = 97 * hash + Objects.hashCode(this.children);
-        return 97 * hash + super.hashCode();
+        return hash;
     }
 }

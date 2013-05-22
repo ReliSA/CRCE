@@ -13,7 +13,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class PropertyImpl extends AbstractEntityBase implements Property {
-    
+
     private static final long serialVersionUID = -7003533524061344584L;
 
     private String namespace = null;
@@ -53,11 +53,12 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
 
     @Override
     public boolean addChild(Property property) {
-        if (!children.contains(property)) {
-            property.setParent(this);
+        // commented way would be a performance problem
+//        if (!children.contains(property)) {
+//            property.setParent(this);
             return children.add(property);
-        }
-        return false;
+//        }
+//        return false;
     }
 
     @Override
@@ -96,11 +97,11 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
 
     @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = super.hashCode();
         hash = 97 * hash + Objects.hashCode(this.namespace);
         hash = 97 * hash + Objects.hashCode(this.resource);
         hash = 97 * hash + Objects.hashCode(this.parent);
         hash = 97 * hash + Objects.hashCode(this.children);
-        return 97 * hash + super.hashCode();
+        return hash;
     }
 }

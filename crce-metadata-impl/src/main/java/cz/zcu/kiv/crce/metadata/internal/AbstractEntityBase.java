@@ -12,6 +12,7 @@ import cz.zcu.kiv.crce.metadata.AttributeProvider;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.DirectiveProvider;
+import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
@@ -20,10 +21,9 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public abstract class AbstractEntityBase implements AttributeProvider, DirectiveProvider {
+public abstract class AbstractEntityBase extends AbstractDirectiveProvider implements AttributeProvider, DirectiveProvider {
 
     protected final Map<String, Attribute<?>> attributesMap = new HashMap<>();
-    protected final Map<String, String> directivesMap = new HashMap<>();
 
 
     @Override
@@ -50,6 +50,12 @@ public abstract class AbstractEntityBase implements AttributeProvider, Directive
     @Override
     public <T> boolean removeAttribute(Attribute<T> attribute) {
         return attributesMap.remove(attribute.getAttributeType().getName()) != null;
+    }
+
+    @Override
+    public <T> boolean setAttribute(AttributeType<T> type, T value, Operator operator) {
+        attributesMap.put(type.getName(), new AttributeImpl<>(type, value, operator));
+        return true;
     }
 
     @Override
@@ -101,31 +107,9 @@ public abstract class AbstractEntityBase implements AttributeProvider, Directive
     }
 
     @Override
-    public String getDirective(String name) {
-        return directivesMap.get(name);
-    }
-
-    @Override
-    public Map<String, String> getDirectives() {
-        return Collections.unmodifiableMap(directivesMap);
-    }
-
-    @Override
-    public boolean setDirective(String name, String directive) {
-        directivesMap.put(name, directive);
-        return true;
-    }
-
-    @Override
-    public boolean unsetDirective(String name) {
-        return directivesMap.remove(name) != null;
-    }
-
-    @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = super.hashCode();
         hash = 97 * hash + Objects.hashCode(this.attributesMap);
-        hash = 97 * hash + Objects.hashCode(this.directivesMap);
         return hash;
     }
 
@@ -142,9 +126,6 @@ public abstract class AbstractEntityBase implements AttributeProvider, Directive
         if (!Objects.equals(this.attributesMap, other.attributesMap)) {
             return false;
         }
-        if (!Objects.equals(this.directivesMap, other.directivesMap)) {
-            return false;
-        }
-        return true;
+        return super.equals(obj);
     }
 }

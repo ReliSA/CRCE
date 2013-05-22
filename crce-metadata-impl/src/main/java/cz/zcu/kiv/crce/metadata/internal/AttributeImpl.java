@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.Operator;
 
 /**
  *
@@ -13,15 +14,21 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class AttributeImpl<T> implements Attribute<T> {
-    
+
     private static final long serialVersionUID = 3231029096691170916L;
 
-    private T value = null;
+    private T value;
     private AttributeType<T> type;
+    private Operator operator;
 
-    public AttributeImpl(@Nonnull AttributeType<T> type, @Nullable T value) {
+    public AttributeImpl(AttributeType<T> type, T value, Operator operator) {
         this.value = value;
         this.type = type;
+        this.operator = operator;
+    }
+
+    public AttributeImpl(@Nonnull AttributeType<T> type, @Nullable T value) {
+        this(type, value, Operator.EQUAL);
     }
 
     @Override
@@ -50,6 +57,7 @@ public class AttributeImpl<T> implements Attribute<T> {
         int hash = 3;
         hash = 97 * hash + Objects.hashCode(this.value);
         hash = 97 * hash + Objects.hashCode(this.type);
+        hash = 97 * hash + (this.operator != null ? this.operator.hashCode() : 0);
         return hash;
     }
 
@@ -68,6 +76,19 @@ public class AttributeImpl<T> implements Attribute<T> {
         if (!Objects.equals(this.type, other.type)) {
             return false;
         }
+        if (this.operator != other.operator) {
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public void setOperator(Operator operator) {
+        this.operator = operator;
+    }
+
+    @Override
+    public Operator getOperator() {
+        return operator;
     }
 }

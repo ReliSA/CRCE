@@ -118,8 +118,15 @@ public class ResourceTest {
         Capability child2 = factory.createCapability("a.b");
         child2.setAttribute("key", String.class, "child2");
 
+        // checking of presence of added child is commented because of possible performance decrease
         root.addChild(child1);
+        // with the check enabled, this would not be necessary
+        child1.setParent(root);
+
         root.addChild(child2);
+        // with the check enabled, this would not be necessary
+        child2.setParent(root);
+
         resource.addCapability(child1);
 
         assertTrue(resource.hasCapability(root));
@@ -136,25 +143,25 @@ public class ResourceTest {
         assertTrue(capabilities.contains(child1));
         assertTrue(capabilities.contains(child2));
     }
-    
+
     @Test
     public void testRequirement() {
         Resource resource = factory.createResource();
-        
+
         Requirement req = factory.createRequirement("a");
-        
+
         resource.addRequirement(req);
         assertTrue(resource.hasRequirement(req));
-        
+
         req.setAttribute("atr", String.class, "val", Operator.GREATER);
         assertTrue(resource.hasRequirement(req));
-        
+
         List<Requirement> requirements = resource.getRequirements("a");
         assertTrue(requirements.contains(req));
 
         Requirement req2 = factory.createRequirement("a");
         assertFalse(requirements.contains(req2));
-        
+
         requirements = resource.getRequirements("b");
         assertFalse(requirements.contains(req));
     }
@@ -162,27 +169,32 @@ public class ResourceTest {
     @Test
     public void testNestedRequirementByNest() {
         Resource resource = factory.createResource();
-        
+
         Requirement nest = factory.createRequirement("a");
         Requirement nested = factory.createRequirement("a");
         nest.addNestedRequirement(nested);
-        
+
         resource.addRequirement(nest);
-        
+
         assertTrue(resource.hasRequirement(nest));
         assertFalse(resource.hasRequirement(nested));
     }
-    
+
     @Test
     public void testNestedRequirementByNested() {
         Resource resource = factory.createResource();
-        
+
         Requirement nest = factory.createRequirement("a");
         Requirement nested = factory.createRequirement("a");
         nest.addNestedRequirement(nested);
-        
+
+        // checking of presence of added child is commented because of possible performance decrease
+
+        // with the check enabled, this would not be necessary
+        nested.setParent(nest);
+
         resource.addRequirement(nested);
-        
+
         assertTrue(resource.hasRequirement(nest));
         assertFalse(resource.hasRequirement(nested));
     }

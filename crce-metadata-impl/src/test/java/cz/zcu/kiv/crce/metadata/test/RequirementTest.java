@@ -38,13 +38,13 @@ public class RequirementTest {
 
     @Test
     public void testEqualAttributes() {
-        r1.setAttribute("atr1", String.class, "value");
+        r1.setAttribute("atr1", String.class, "value", Operator.EQUAL);
         assert !r1.equals(r2);
 
-        r2.setAttribute("atr1", String.class, "value");
+        r2.setAttribute("atr1", String.class, "value", Operator.EQUAL);
         assert r1.equals(r2);
     }
-    
+
     @Test
     public void testAttributesWithOperator() {
         r1.setAttribute("atr1", String.class, "value", Operator.GREATER);
@@ -52,7 +52,7 @@ public class RequirementTest {
 
         r2.setAttribute("atr1", String.class, "value", Operator.GREATER);
         assertEquals(r1, r2);
-        
+
         r1.setAttribute("atr1", String.class, "value", Operator.LESS);
         r1.equals(r2);
         System.out.println("eq: " + r1.equals(r2));
@@ -62,7 +62,7 @@ public class RequirementTest {
     @Test
     public void testDirectives() {
         r1.setDirective("optional", "true");
-        
+
         assertNotEquals(r1, r2);
 
         r2.setDirective("optional", "true");
@@ -73,7 +73,7 @@ public class RequirementTest {
 
         assertEquals("true", r1.getDirective("optional"));
         assertEquals("false", r1.getDirective("multiple"));
-        
+
         assertNull(r1.getDirective("unknown"));
     }
 
