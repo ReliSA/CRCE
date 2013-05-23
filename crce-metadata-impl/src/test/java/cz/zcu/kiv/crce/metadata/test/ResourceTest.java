@@ -172,7 +172,7 @@ public class ResourceTest {
 
         Requirement nest = factory.createRequirement("a");
         Requirement nested = factory.createRequirement("a");
-        nest.addNestedRequirement(nested);
+        nest.addChild(nested);
 
         resource.addRequirement(nest);
 
@@ -186,7 +186,7 @@ public class ResourceTest {
 
         Requirement nest = factory.createRequirement("a");
         Requirement nested = factory.createRequirement("a");
-        nest.addNestedRequirement(nested);
+        nest.addChild(nested);
 
         // checking of presence of added child is commented because of possible performance decrease
 

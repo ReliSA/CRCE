@@ -23,25 +23,24 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
 
     private static final long serialVersionUID = 2594634894045505360L;
 
-    private String id;
+    private final String id;
     private Repository repository = null;
     /*
      * All maps:
      * Key: namespace, value: list of entities.
      */
-    private Map<String, List<Capability>> allCapabilities = new HashMap<>();
-    private Map<String, List<Capability>> rootCapabilities = new HashMap<>();
-    private Map<String, List<Requirement>> allRequirements = new HashMap<>();
-    private Map<String, List<Property>> allProperties = new HashMap<>();
+    private final Map<String, List<Capability>> allCapabilities = new HashMap<>();
+    private final Map<String, List<Capability>> rootCapabilities = new HashMap<>();
+    private final Map<String, List<Requirement>> allRequirements = new HashMap<>();
+    private final Map<String, List<Property>> allProperties = new HashMap<>();
+
+    public ResourceImpl(@Nonnull String id) {
+        this.id = id;
+    }
 
     @Override
     public String getId() {
         return id;
-    }
-
-    @Override
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override

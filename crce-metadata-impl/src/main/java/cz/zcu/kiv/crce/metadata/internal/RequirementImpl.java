@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Operator;
@@ -22,14 +23,22 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
 
     private static final long serialVersionUID = -2992854704112505654L;
 
+    private final String id;
+    private final List<Requirement> children = new ArrayList<>();
+    protected final Map<String, List<Attribute<?>>> attributesMap = new HashMap<>();
+
     private String namespace = null;
     private Resource resource = null;
     private Requirement parent = null;
-    private final List<Requirement> nestedRequirements = new ArrayList<>();
-    protected final Map<String, List<Attribute<?>>> attributesMap = new HashMap<>();
 
-    public RequirementImpl(String namespace) {
+    public RequirementImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace.intern();
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -59,23 +68,23 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
     }
 
     @Override
-    public boolean addNestedRequirement(Requirement requirement) {
+    public boolean addChild(Requirement requirement) {
         // commented way would be a performance problem
-//        if (!nestedRequirements.contains(requirement)) {
+//        if (!children.contains(requirement)) {
 //            requirement.setParent(this);
-            return nestedRequirements.add(requirement);
+            return children.add(requirement);
 //        }
 //        return false;
     }
 
     @Override
-    public boolean removeNestedRequirement(Requirement requirement) {
-        return nestedRequirements.remove(requirement);
+    public boolean removeChild(Requirement requirement) {
+        return children.remove(requirement);
     }
 
     @Override
-    public List<Requirement> getNestedRequirements() {
-        return Collections.unmodifiableList(nestedRequirements);
+    public List<Requirement> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     @Override
@@ -132,7 +141,7 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
         if (!Objects.equals(this.parent, other.parent)) {
             return false;
         }
-        if (!Objects.equals(this.nestedRequirements, other.nestedRequirements)) {
+        if (!Objects.equals(this.children, other.children)) {
             return false;
         }
         if (!Objects.equals(this.attributesMap, other.attributesMap)) {
@@ -147,7 +156,7 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
         hash = 97 * hash + Objects.hashCode(this.namespace);
         hash = 97 * hash + Objects.hashCode(this.resource);
         hash = 97 * hash + Objects.hashCode(this.parent);
-        hash = 97 * hash + Objects.hashCode(this.nestedRequirements);
+        hash = 97 * hash + Objects.hashCode(this.children);
         hash = 97 * hash + Objects.hashCode(this.attributesMap);
         return hash;
     }

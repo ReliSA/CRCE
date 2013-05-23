@@ -12,11 +12,45 @@ import javax.annotation.Nonnull;
 public interface ResourceFactory {
 
     /**
-     * Creates an empty resource.
+     * Creates an empty resource with generated unique ID.
      * @return An empty resource.
      */
     @Nonnull
     Resource createResource();
+
+    /**
+     * Creates an empty resource with the given ID.
+     * @param id Unique identifier.
+     * @return An empty resource.
+     */
+    @Nonnull
+    Resource createResource(@Nonnull String id);
+
+    /**
+     * Creates an empty requirement with given name.
+     * @param namespace Name of created requirement.
+     * @return An empty capability.
+     */
+    @Nonnull
+    Requirement createRequirement(@Nonnull String namespace);
+
+    /**
+     * Creates an empty requirement with given name.
+     * @param namespace Name of created requirement.
+     * @param id
+     * @return An empty capability.
+     */
+    @Nonnull
+    Requirement createRequirement(@Nonnull String namespace, @Nonnull String id);
+
+    @Nonnull
+    Capability createCapability(@Nonnull String namespace);
+
+    @Nonnull
+    Capability createCapability(@Nonnull String namespace, @Nonnull String id);
+
+    @Nonnull
+    Repository createRepository(@Nonnull URI uri);
 
     /**
      * Clone the given resource and return it's deep copy.
@@ -42,18 +76,4 @@ public interface ResourceFactory {
      */
     @Nonnull
     Capability cloneCapability(@Nonnull String namespace);
-
-    /**
-     * Creates an empty requirement with given name.
-     * @param namespace Name of created requirement.
-     * @return An empty capability.
-     */
-    @Nonnull
-    Requirement createRequirement(@Nonnull String namespace);
-
-    @Nonnull
-    Capability createCapability(@Nonnull String namespace);
-
-    @Nonnull
-    Repository createRepository(@Nonnull URI uri);
 }

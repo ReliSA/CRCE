@@ -54,9 +54,7 @@ public interface Resource extends Serializable {
     boolean hasProperty(@Nonnull Property property);
 
     /* --- setters --- */
-
-    void setId(@Nonnull String id);
-
+    
     void addCapability(@Nonnull Capability capability);
 
     void addRequirement(@Nonnull Requirement requirement);

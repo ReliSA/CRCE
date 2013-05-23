@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import java.net.URI;
+import java.util.UUID;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -15,8 +17,39 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
     @Override
     public Resource createResource() {
-        return new ResourceImpl();
+        return createResource(generateId());
     }
+
+    @Override
+    public Requirement createRequirement(String namespace) {
+        return createRequirement(namespace, generateId());
+    }
+
+    @Override
+    public Capability createCapability(String namespace) {
+        return createCapability(namespace, generateId());
+    }
+
+    @Override
+    public Resource createResource(String id) {
+        return new ResourceImpl(id);
+    }
+
+    @Override
+    public Requirement createRequirement(String namespace, String id) {
+        return new RequirementImpl(namespace, id);
+    }
+
+    @Override
+    public Capability createCapability(String namespace, String id) {
+        return new CapabilityImpl(namespace, id);
+    }
+
+    @Override
+    public Repository createRepository(URI uri) {
+        return new RepositoryImpl(uri);
+    }
+
 
     @Override
     public Resource cloneResource(Resource resource) {
@@ -28,21 +61,9 @@ public class ResourceFactoryImpl implements ResourceFactory {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public Requirement createRequirement(String namespace) {
-        return new RequirementImpl(namespace);
+    private String generateId() {
+        return UUID.randomUUID().toString();
     }
-
-    @Override
-    public Capability createCapability(String namespace) {
-        return new CapabilityImpl(namespace);
-    }
-
-    @Override
-    public Repository createRepository(URI uri) {
-        return new RepositoryImpl(uri);
-    }
-
 
 //    @Override
 //    public Capability createCapability(String name) {

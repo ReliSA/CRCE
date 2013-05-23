@@ -15,6 +15,9 @@ import javax.annotation.Nullable;
 public interface Capability extends AttributeProvider, DirectiveProvider, Serializable {
 
     @Nonnull
+    String getId();
+
+    @Nonnull
     String getNamespace();
 
     @CheckForNull

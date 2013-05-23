@@ -15,6 +15,9 @@ import javax.annotation.Nullable;
 public interface Requirement extends DirectiveProvider, Serializable {
 
     @Nonnull
+    String getId();
+
+    @Nonnull
     String getNamespace();
 
     @CheckForNull
@@ -27,12 +30,12 @@ public interface Requirement extends DirectiveProvider, Serializable {
 
     boolean setParent(@Nullable Requirement parent);
 
-    boolean addNestedRequirement(@Nonnull Requirement requirement);
+    boolean addChild(@Nonnull Requirement requirement);
 
-    boolean removeNestedRequirement(@Nonnull Requirement requirement);
+    boolean removeChild(@Nonnull Requirement requirement);
 
     @Nonnull
-    List<Requirement> getNestedRequirements();
+    List<Requirement> getChildren();
 
     @CheckForNull
     <T> Attribute<T> getAttribute(@Nonnull AttributeType<T> type);

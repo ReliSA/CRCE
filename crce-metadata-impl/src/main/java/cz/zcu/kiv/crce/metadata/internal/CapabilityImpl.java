@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -17,13 +18,21 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
 
     private static final long serialVersionUID = -813453152194473221L;
 
+    private final String id;
+    private final List<Capability> children = new ArrayList<>();
+
     private String namespace = null;
     private Resource resource = null;
     private Capability parent = null;
-    private List<Capability> children = new ArrayList<>();
 
-    public CapabilityImpl(String namespace) {
+    public CapabilityImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace.intern();
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override

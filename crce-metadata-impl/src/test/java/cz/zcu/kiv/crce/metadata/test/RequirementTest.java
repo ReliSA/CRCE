@@ -24,9 +24,9 @@ public class RequirementTest {
     @Before
     public void before() {
         rc = new ResourceFactoryImpl();
-        r1 = new RequirementImpl("req");
-        r2 = new RequirementImpl("req");
-        r3 = new RequirementImpl("req3");
+        r1 = new RequirementImpl("req", "a");
+        r2 = new RequirementImpl("req", "b");
+        r3 = new RequirementImpl("req3", "c");
     }
 
     @Test
