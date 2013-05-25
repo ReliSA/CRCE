@@ -104,19 +104,19 @@
 
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-httplistener</artifactId>
+            <artifactId>org.apache.ace.httplistener</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-storage</artifactId>
+            <artifactId>org.apache.ace.obr.storage</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-servlet</artifactId>
+            <artifactId>org.apache.ace.obr.servlet</artifactId>
         </dependency>
         <dependency><!-- TODO temporary provision - in 1.0.0 provided by crce-metadata-metafile -->
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-metadata</artifactId>
+            <artifactId>org.apache.ace.obr.metadata</artifactId>
         </dependency>
 
         <!--        <dependency>
@@ -193,6 +193,12 @@
         <dependency>
             <groupId>de.twentyeleven.skysail</groupId>
             <artifactId>org.json-osgi</artifactId>
+        </dependency>
+        <dependency> <!-- Required by pax-web-extender-war -->
+            <groupId>org.apache.xbean</groupId>
+            <artifactId>xbean-finder</artifactId>
+            <version>3.13</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

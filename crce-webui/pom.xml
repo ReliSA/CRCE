@@ -118,7 +118,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-storage</artifactId>
+            <artifactId>org.apache.ace.obr.storage</artifactId>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
@@ -144,7 +144,7 @@
             <type>bundle</type>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>

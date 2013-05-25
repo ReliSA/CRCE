@@ -19,11 +19,11 @@
 
     <properties>
         <namespace>cz.zcu.kiv.crce</namespace>
-        <version.org.apache.ace>0.8.0-SNAPSHOT</version.org.apache.ace>
+        <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
         <version.com.sun.jersey>1.17</version.com.sun.jersey>
-        <version.org.ops4j.pax.web>3.0.0.M1</version.org.ops4j.pax.web>
-        <version.org.apache.felix.dependencymanager>3.0.0</version.org.apache.felix.dependencymanager>
+        <version.org.ops4j.pax.web>3.0.0</version.org.ops4j.pax.web>
+        <version.org.apache.felix.dependencymanager>3.1.0</version.org.apache.felix.dependencymanager>
     </properties>
 
     <modules>
@@ -117,21 +117,25 @@
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-extender-war</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-jetty-bundle</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-jsp</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-spi</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- === LOGGING === -->
@@ -173,13 +177,13 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.0.9</version>
+                <version>1.0.13</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.0.9</version>
+                <version>1.0.13</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -200,14 +204,20 @@
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.shell</artifactId>
-                <version>${version.org.apache.felix.dependencymanager}</version>
+                <version>3.0.1</version><!-- 3.1.0 version is not available yet -->
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
                 <version>${version.org.apache.felix.dependencymanager}</version>
-                <scope>provided</scope>
+                <scope>compile</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>biz.aQute</groupId>
+                        <artifactId>bndlib</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
@@ -319,25 +329,25 @@
             <!-- Apache ACE -->
             <dependency>
                 <groupId>org.apache.ace</groupId>
-                <artifactId>ace-httplistener</artifactId>
+                <artifactId>org.apache.ace.httplistener</artifactId>
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.ace</groupId>
-                <artifactId>ace-obr-metadata</artifactId>
+                <artifactId>org.apache.ace.obr.metadata</artifactId>
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.ace</groupId>
-                <artifactId>ace-obr-storage</artifactId>
+                <artifactId>org.apache.ace.obr.storage</artifactId>
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.ace</groupId>
-                <artifactId>ace-obr-servlet</artifactId>
+                <artifactId>org.apache.ace.obr.servlet</artifactId>
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
@@ -367,7 +377,7 @@
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
-                <version>3.0.9</version>
+                <version>3.0.10</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
