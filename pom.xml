@@ -64,6 +64,7 @@
         <module>crce-plugin-api</module>
         <module>crce-metadata-api</module>
         <module>crce-metadata-dao-api</module>
+        <module>crce-metadata-service-api</module>
         <module>crce-repository-api</module>
         <!--<module>crce-results-api</module>-->
 
@@ -178,7 +179,7 @@
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
         </repository>
-        
+
         <!-- sacco repo -->
       	<repository>
       		<id>sacco.maven.repository</id>
