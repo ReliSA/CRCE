@@ -71,6 +71,7 @@
         <!-- API Implementation -->
         <module>crce-metadata-impl</module>
         <module>crce-metadata-dao-impl</module>
+        <module>crce-metadata-service-impl</module>
         <module>crce-repository-impl</module>
         <!--<module>crce-results-impl</module>-->
 

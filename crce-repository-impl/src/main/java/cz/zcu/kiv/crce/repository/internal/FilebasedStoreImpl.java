@@ -24,6 +24,7 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
@@ -41,6 +42,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile ResourceDAO resourceDAO;
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile ResourceFactory resourceFactory;
+    private volatile MetadataService metadataService; // NOPMD
 
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 

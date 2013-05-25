@@ -11,27 +11,51 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-repository-impl</artifactId>
+    <artifactId>crce-metadata-service-impl</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Repository Implementation</name>
+    <name>CRCE - Metadata Service Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository.impl</bundle.symbolicName>
-        <bundle.namespace>${namespace}.repository</bundle.namespace>
+        <bundle.symbolicName>${namespace}.metadata.service.impl</bundle.symbolicName>
+        <bundle.namespace>${namespace}.metadata.service</bundle.namespace>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>scan</goal>
+                        </goals>
+                        <configuration>
+                            <log>info</log>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
 
         <!-- Felix -->
 
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.service.obr</artifactId>
+            <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.dependencymanager</artifactId>
+            <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
         </dependency>
 
         <!-- 3rd party dependencies -->
@@ -41,8 +65,14 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Project dependencies -->
@@ -59,39 +89,13 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-dao-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- Test dependencies -->
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

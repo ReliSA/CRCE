@@ -14,13 +14,18 @@ import cz.zcu.kiv.crce.metadata.Resource;
  */
 public interface MetadataService {
 
+    @Nonnull
     String getPresentationName(@Nonnull Resource resource);
 
+    @Nonnull
     String getPresentationName(@Nonnull Capability capability);
 
+    @Nonnull
     String getPresentationName(@Nonnull Requirement requirement);
 
+    @Nonnull
     String getPresentationName(@Nonnull Property property);
 
+    @Nonnull
     String getPresentationName(@Nonnull Attribute<?> attribute);
 }

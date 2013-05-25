@@ -211,6 +211,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.runtime</artifactId>
+                <version>${version.org.apache.felix.dependencymanager}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.configadmin</artifactId>
                 <version>1.6.0</version>
                 <scope>provided</scope>

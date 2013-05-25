@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -104,6 +105,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .setInterface(Store.class.getName(), null)
                         .setImplementation(new FilebasedStoreImpl(file))
                         .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                        .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                         .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
                         .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
                         .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
