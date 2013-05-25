@@ -37,15 +37,15 @@ public interface Requirement extends DirectiveProvider, Serializable {
     @Nonnull
     List<Requirement> getChildren();
 
-    @CheckForNull
-    <T> Attribute<T> getAttribute(@Nonnull AttributeType<T> type);
+    @Nonnull
+    <T> List<Attribute<T>> getAttributes(@Nonnull AttributeType<T> type);
 
-    <T> boolean setAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value);
+    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value);
 
-    <T> boolean setAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value, @Nonnull Operator operator);
+    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value, @Nonnull Operator operator);
 
     // TODO is this method AttributeType implementation-safe?
-    <T> boolean setAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
+    <T> boolean addAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
 
-    <T> boolean setAttribute(@Nonnull Attribute<T> attribute);
+    <T> boolean addAttribute(@Nonnull Attribute<T> attribute);
 }

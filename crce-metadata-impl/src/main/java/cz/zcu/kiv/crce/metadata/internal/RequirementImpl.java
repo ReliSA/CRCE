@@ -88,24 +88,24 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
     }
 
     @Override
-    public <T> boolean setAttribute(AttributeType<T> type, T value) {
-        return setAttribute(type, value, Operator.EQUAL);
+    public <T> boolean addAttribute(AttributeType<T> type, T value) {
+        return addAttribute(type, value, Operator.EQUAL);
     }
 
     @Override
-    public <T> boolean setAttribute(AttributeType<T> type, T value, Operator operator) {
+    public <T> boolean addAttribute(AttributeType<T> type, T value, Operator operator) {
         Attribute<T> attribute = new AttributeImpl<>(type, value, operator != null ? operator : Operator.EQUAL);
-        return setAttribute(attribute);
+        return addAttribute(attribute);
     }
 
     @Override
-    public <T> boolean setAttribute(String name, Class<T> type, T value, Operator operator) {
+    public <T> boolean addAttribute(String name, Class<T> type, T value, Operator operator) {
         AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
-        return setAttribute(attributeType, value, operator);
+        return addAttribute(attributeType, value, operator);
     }
 
     @Override
-    public <T> boolean setAttribute(Attribute<T> attribute) {
+    public <T> boolean addAttribute(Attribute<T> attribute) {
         AttributeType<T> type = attribute.getAttributeType();
         List<Attribute<?>> attributes = attributesMap.get(type.getName());
         if (attributes == null) {
@@ -119,8 +119,13 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
     }
 
     @Override
-    public <T> Attribute<T> getAttribute(AttributeType<T> type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @SuppressWarnings("unchecked")
+    public <T> List<Attribute<T>> getAttributes(AttributeType<T> type) {
+        List<Attribute<?>> attributes = attributesMap.get(type.getName());
+        if (attributes == null) {
+            return Collections.emptyList();
+        }
+        return (List<Attribute<T>>) (List) attributes;
     }
 
     @Override

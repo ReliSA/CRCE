@@ -153,7 +153,7 @@ public class ResourceTest {
         resource.addRequirement(req);
         assertTrue(resource.hasRequirement(req));
 
-        req.setAttribute("atr", String.class, "val", Operator.GREATER);
+        req.addAttribute("atr", String.class, "val", Operator.GREATER);
         assertTrue(resource.hasRequirement(req));
 
         List<Requirement> requirements = resource.getRequirements("a");

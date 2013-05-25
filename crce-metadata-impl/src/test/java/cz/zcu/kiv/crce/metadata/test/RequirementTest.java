@@ -38,22 +38,22 @@ public class RequirementTest {
 
     @Test
     public void testEqualAttributes() {
-        r1.setAttribute("atr1", String.class, "value", Operator.EQUAL);
+        r1.addAttribute("atr1", String.class, "value", Operator.EQUAL);
         assert !r1.equals(r2);
 
-        r2.setAttribute("atr1", String.class, "value", Operator.EQUAL);
+        r2.addAttribute("atr1", String.class, "value", Operator.EQUAL);
         assert r1.equals(r2);
     }
 
     @Test
     public void testAttributesWithOperator() {
-        r1.setAttribute("atr1", String.class, "value", Operator.GREATER);
+        r1.addAttribute("atr1", String.class, "value", Operator.GREATER);
         assertNotEquals(r1, r2);
 
-        r2.setAttribute("atr1", String.class, "value", Operator.GREATER);
+        r2.addAttribute("atr1", String.class, "value", Operator.GREATER);
         assertEquals(r1, r2);
 
-        r1.setAttribute("atr1", String.class, "value", Operator.LESS);
+        r1.addAttribute("atr1", String.class, "value", Operator.LESS);
         r1.equals(r2);
         System.out.println("eq: " + r1.equals(r2));
         assertNotEquals(r1, r2);

@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import java.util.List;
 import java.util.Map;
 
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -54,10 +55,10 @@ public class Example {
         // a similar for requirements
         Requirement requirement = null;
 
-        Attribute<Double> attribute3 = requirement.getAttribute(ATTRIBUTE_B);
+        List<Attribute<Double>> attribute3 = requirement.getAttributes(ATTRIBUTE_B);
 
-        Operator operator = attribute3.getOperator();
-        attribute3.setOperator(Operator.EQUAL);
+        Operator operator = attribute3.get(0).getOperator();
+        attribute3.get(0).setOperator(Operator.EQUAL);
 
         // etc.
 
