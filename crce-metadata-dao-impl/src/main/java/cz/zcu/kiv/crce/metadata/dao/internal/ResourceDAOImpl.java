@@ -35,8 +35,8 @@ public class ResourceDAOImpl implements ResourceDAO {
     }
 
     @Override
-    public synchronized List<Resource> loadResources(URI uri) throws IOException {
-        Map<URI, Resource> resources = repositories.get(uri);
+    public synchronized List<Resource> loadResources(Repository repository) throws IOException {
+        Map<URI, Resource> resources = repositories.get(repository.getURI());
         if (resources != null) {
             return Collections.unmodifiableList(new ArrayList<>(resources.values()));
         }
@@ -75,6 +75,12 @@ public class ResourceDAOImpl implements ResourceDAO {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean existsResource(URI uri, Repository repository) throws IOException {
+        Map<URI, Resource> resources = repositories.get(repository.getURI());
+        return resources.containsKey(uri);
     }
 
     @Override

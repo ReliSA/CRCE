@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -30,7 +31,7 @@ public interface ResourceDAO {
      */
     Resource loadResource(@Nonnull URI uri) throws IOException;
 
-    List<Resource> loadResources(@Nonnull URI uri) throws IOException;
+    List<Resource> loadResources(@Nonnull Repository repository) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.
@@ -48,6 +49,8 @@ public interface ResourceDAO {
     void deleteResource(@Nonnull URI uri) throws IOException;
 
     boolean existsResource(@Nonnull URI uri) throws IOException;
+
+    boolean existsResource(@Nonnull URI uri, @Nonnull Repository repository) throws IOException;
 
     /**
      * Moves (reassignes) the <code>Resource</code> to the artifact with the

@@ -78,7 +78,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     /*
      * Called by dependency manager.
      */
-    void start() {
+    synchronized void start() {
         repository = resourceFactory.createRepository(baseDir.toURI());
 
         final Object lock = this;
@@ -133,7 +133,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
@@ -157,7 +157,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
@@ -168,15 +168,18 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(resource, this);
     }
 
-    private Resource putFileResource(Resource resource, boolean move) throws IOException, RevokedArtifactException {
+    private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RevokedArtifactException {
         File sourceFile = new File(LegacyMetadataHelper.getUri(resource));
         if (!sourceFile.exists()) {
             throw new RevokedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
+        resource.setRepository(repository);
+
 //        if (m_repository == null) {
 //            loadRepository();
 //        }
-        File targetFile = File.createTempFile("res", "", baseDir);
+//        File targetFile = File.createTempFile("res", "", baseDir);
+        File targetFile = new File(baseDir, resource.getId());
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
@@ -185,7 +188,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             FileUtils.copyFile(sourceFile, targetFile);
         }
-        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
+//        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
+        LegacyMetadataHelper.setUri(resourceFactory, resource, targetFile.toURI());
 //        if (!m_repository.addResource(out)) {
 //        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
 //            if (!targetFile.delete()) {
@@ -193,11 +197,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //            }
 //            return null;
 //        }
-        resourceDAO.saveResource(out); // TODO is saving necessary after move? define exact contract
+        resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
 
-        return out;
+        return resource;
     }
 
     private Resource putNonFileResource(Resource resource, boolean move) {
@@ -264,9 +268,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     @Override
-    public List<Resource> getResources() {
+    public synchronized List<Resource> getResources() {
         try {
-            return resourceDAO.loadResources(baseDir.toURI());
+            return resourceDAO.loadResources(repository);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }

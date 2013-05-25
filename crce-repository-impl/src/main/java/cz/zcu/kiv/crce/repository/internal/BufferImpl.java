@@ -240,7 +240,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
-        List<Resource> resources = resourceDAO.loadResources(baseDir.toURI());
+        List<Resource> resources = resourceDAO.loadResources(repository);
         List<Resource> resourcesToCommit = pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(resources, this, store);
 
         List<Resource> commited = new ArrayList<>();
@@ -257,7 +257,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     putResource = ((FilebasedStoreImpl) store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
                 } catch (RevokedArtifactException ex) {
-                	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId());
+                	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }
                 commited.add(putResource);
@@ -358,7 +358,7 @@ public class BufferImpl implements Buffer, EventHandler {
     @Override
     public List<Resource> getResources() {
         try {
-            return resourceDAO.loadResources(baseDir.toURI());
+            return resourceDAO.loadResources(repository);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
