@@ -243,55 +243,54 @@ public class BufferImpl implements Buffer, EventHandler {
         List<Resource> resources = resourceDAO.loadResources(repository);
         List<Resource> resourcesToCommit = pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(resources, this, store);
 
-        List<Resource> commited = new ArrayList<>();
-        List<Resource> resourcesToRemove = new ArrayList<>();
+        List<Resource> commitedResources = new ArrayList<>();
+        List<URI> resourcesToRemove = new ArrayList<>();
         Map<String, String[]> toRemoveNonrenamed = new HashMap<>(); // K: new ID, V: old sn, old ver
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         // put resources to store
         if (move && store instanceof FilebasedStoreImpl) {
             for (Resource resource : resourcesToCommit) {
-                Resource putResource;
+                Resource commitedResource;
                 try {
+                    URI uri = LegacyMetadataHelper.getUri(resource);
                     String[] old = new String[] {LegacyMetadataHelper.getSymbolicName(resource), LegacyMetadataHelper.getVersion(resource).toString()};
-                    putResource = ((FilebasedStoreImpl) store).move(resource);
+                    commitedResource = ((FilebasedStoreImpl) store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
+                    resourcesToRemove.add(uri);
                 } catch (RevokedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }
-                commited.add(putResource);
-                resourcesToRemove.add(resource);
+                commitedResources.add(commitedResource);
             }
         } else {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
+                URI uri = LegacyMetadataHelper.getUri(resource);
                 try {
                     putResource = store.put(resource);
                 } catch (RevokedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }
-                commited.add(putResource);
+                commitedResources.add(putResource);
                 if (move) {
-                    resourcesToRemove.add(resource);
+                    resourcesToRemove.add(uri);
                 }
             }
         }
 
         // remove resources from buffer
         if (move) {
-//            if (m_repository == null) {
-//                loadRepository();
-//            }
-            for (Resource resource : resourcesToRemove) {
-                File resourceFile = new File(LegacyMetadataHelper.getUri(resource));
+            for (URI resource : resourcesToRemove) {
+                File resourceFile = new File(resource);
                 if (resourceFile.exists() && !resourceFile.delete()) {
-                    logger.error( "Can not delete artifact from buffer: {}", LegacyMetadataHelper.getUri(resource));
+                    logger.error( "Can not delete artifact from buffer: {}", resource);
                     continue;
                 }
                 try {
-                    resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+                    resourceDAO.deleteResource(resource);
                 } catch (IOException e) {
                     // once the artifact file was removed, the resource has to be removed
                     // from the repository even in case of exception on removing metadata
@@ -321,9 +320,9 @@ public class BufferImpl implements Buffer, EventHandler {
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }
 
-        pluginManager.getPlugin(ActionHandler.class).afterBufferCommit(commited, this, store);
+        pluginManager.getPlugin(ActionHandler.class).afterBufferCommit(commitedResources, this, store);
 
-        return commited;
+        return commitedResources;
     }
 
     @Override

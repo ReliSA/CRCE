@@ -130,9 +130,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             resource = tmp;
         }
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
+        
         if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
@@ -154,9 +152,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             resource = tmp;
         }
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
+
         if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
@@ -175,13 +171,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
         resource.setRepository(repository);
 
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
-//        File targetFile = File.createTempFile("res", "", baseDir);
         File targetFile = new File(baseDir, resource.getId());
-
-//        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         if (move) {
             FileUtils.moveFile(sourceFile, targetFile);
