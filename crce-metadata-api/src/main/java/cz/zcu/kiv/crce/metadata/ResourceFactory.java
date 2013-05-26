@@ -71,9 +71,15 @@ public interface ResourceFactory {
 
     /**
      * Creates an empty capability with given name.
-     * @param namespace Name of created capability.
+     * @param capability Cloned capability.
      * @return An empty capability.
      */
     @Nonnull
-    Capability cloneCapability(@Nonnull String namespace);
+    Capability cloneCapability(@Nonnull Capability capability);
+
+    @Nonnull
+    Requirement cloneRequirement(@Nonnull Requirement requirement);
+
+    @Nonnull
+    Property cloneRequirement(@Nonnull Property property);
 }

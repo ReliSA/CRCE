@@ -1,16 +1,25 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.UUID;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 
 /**
- * Implementation of <code>ResourceCreator</code> interface.
+ * Implementation of
+ * <code>ResourceCreator</code> interface.
+ *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceFactoryImpl implements ResourceFactory {
@@ -50,15 +59,24 @@ public class ResourceFactoryImpl implements ResourceFactory {
         return new RepositoryImpl(uri);
     }
 
-
     @Override
     public Resource cloneResource(Resource resource) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return clone(resource);
     }
 
     @Override
-    public Capability cloneCapability(String namespace) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Capability cloneCapability(Capability capability) {
+        return clone(capability);
+    }
+
+    @Override
+    public Requirement cloneRequirement(Requirement requirement) {
+        return clone(requirement);
+    }
+
+    @Override
+    public Property cloneRequirement(Property property) {
+        return clone(property);
     }
 
     private String generateId() {
@@ -69,20 +87,17 @@ public class ResourceFactoryImpl implements ResourceFactory {
 //    public Capability createCapability(String name) {
 //        return new CapabilityImpl(name);
 //    }
-
 //    @Override
 //    public Requirement createRequirement(String name) {
 //        return new RequirementImpl(name);
 //    }
-
 //    @Override
 //    public WritableRepository createRepository(URI uri) {
 //        return new RepositoryImpl(uri);
 //    }
-
-    /**
-     * This implementation does not copy isWritable flag.
-     */
+//    /**
+//     * This implementation does not copy isWritable flag.
+//     */
 //    @Override
 //    public Resource createResource(Resource resource) {
 //        ResourceImpl out = new ResourceImpl();
@@ -126,4 +141,26 @@ public class ResourceFactoryImpl implements ResourceFactory {
 //        return out;
 //    }
 
+    /**
+     * Experimental cloning method.
+     *
+     * @param <T>
+     * @param object
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends Serializable> T clone(T object) {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            try (ObjectOutputStream objOut = new ObjectOutputStream(byteArrayOutputStream)) {
+                objOut.writeObject(object);
+            }
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            return (T) new ObjectInputStream(byteArrayInputStream).readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
