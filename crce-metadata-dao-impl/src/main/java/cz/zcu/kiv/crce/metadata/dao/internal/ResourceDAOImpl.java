@@ -11,13 +11,15 @@ import java.util.Map;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceDAOImpl implements ResourceDAO {
+
+    private volatile MetadataService metadataService;
 
     Map<URI, Map<URI, Resource>> repositories = new HashMap<>();
 
@@ -55,7 +57,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             resources = new HashMap<>();
             repositories.put(repositoryUri, resources);
         }
-        resources.put(LegacyMetadataHelper.getUri(resource), resource);
+        resources.put(metadataService.getUri(resource), resource);
     }
 
     @Override

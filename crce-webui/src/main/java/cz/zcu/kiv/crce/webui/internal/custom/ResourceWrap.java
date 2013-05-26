@@ -17,6 +17,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.webui.internal.legacy.Property;
 import cz.zcu.kiv.crce.webui.internal.legacy.Type;
 
@@ -25,15 +26,17 @@ abstract class ResourceWrap extends ResourceAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ResourceWrap.class);
 
     protected Resource resource;
+    private final MetadataService metadataService;
 
-    protected ResourceWrap(Resource r) {
+    protected ResourceWrap(Resource r, MetadataService metadataService) {
         this.resource = r;
+        this.metadataService = metadataService;
     }
 
     @Override
     public Property[] getProperties() {
         Property[] properties;
-        List<Capability> crceCapabilities = resource.getCapabilities(LegacyMetadataHelper.NS__CRCE_IDENTITY);
+        List<Capability> crceCapabilities = resource.getCapabilities(metadataService.getIdentityNamespace());
         List<Capability> osgiCapabilities = resource.getCapabilities(LegacyMetadataHelper.NS__OSGI_IDENTITY);
 
         int crceSize = crceCapabilities.size() > 0 ? crceCapabilities.get(0).getAttributes().size() : 0;
@@ -71,7 +74,7 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public String[] getCategories() {
-        return LegacyMetadataHelper.getCategories(resource).toArray(new String[0]);
+        return metadataService.getCategories(resource).toArray(new String[0]);
     }
 
     @Override
@@ -102,22 +105,22 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public String getPresentationName() {
-        return LegacyMetadataHelper.getPresentationName(resource);
+        return metadataService.getPresentationName(resource);
     }
 
     @Override
     public URI getUri() {
-        return LegacyMetadataHelper.getUri(resource);
+        return metadataService.getUri(resource);
     }
 
     @Override
     public URI getRelativeUri() {
-        return LegacyMetadataHelper.getRelativeUri(resource);
+        return metadataService.getRelativeUri(resource);
     }
 
     @Override
     public long getSize() {
-        return LegacyMetadataHelper.getSize(resource);
+        return metadataService.getSize(resource);
     }
 
     private static class PropertyImpl implements Property {

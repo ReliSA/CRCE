@@ -14,7 +14,7 @@
     <artifactId>crce-metadata-indexer</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - Static Metadata Indexer</name>
+    <name>CRCE - Plugin - Metadata Indexer</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>
@@ -30,6 +30,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

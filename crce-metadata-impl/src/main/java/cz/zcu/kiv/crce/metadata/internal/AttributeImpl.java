@@ -83,11 +83,6 @@ public class AttributeImpl<T> implements Attribute<T> {
     }
 
     @Override
-    public void setOperator(Operator operator) {
-        this.operator = operator;
-    }
-
-    @Override
     public Operator getOperator() {
         return operator;
     }

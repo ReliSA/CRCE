@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.metadata.service.internal;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -18,9 +21,11 @@ import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -35,6 +40,10 @@ public class MetadataServiceImpl implements MetadataService {
 
     public static final String NAMESPACE__CRCE_IDENTITY = "crce.identity";
     public static final AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
+    public static final AttributeType<URI> ATTRIBUTE__URI = new SimpleAttributeType<>("uri", URI.class);
+    public static final AttributeType<String> ATTRIBUTE__FILE_NAME = new SimpleAttributeType<>("file-name", String.class);
+    public static final AttributeType<Long> ATTRIBUTE__SIZE = new SimpleAttributeType<>("size", Long.class);
+    public static final AttributeType<List<String>> ATTRIBUTE__CATEGORIES = new ListAttributeType("categories");
 
 
     @ServiceDependency
@@ -43,6 +52,11 @@ public class MetadataServiceImpl implements MetadataService {
     @Start
     public void activate() {
         logger.info("CRCE MetadataService started.");
+    }
+
+    @Override
+    public String getIdentityNamespace() {
+        return NAMESPACE__CRCE_IDENTITY;
     }
 
     @Override
@@ -58,6 +72,11 @@ public class MetadataServiceImpl implements MetadataService {
             name =  "unknown-name:" + resource.getId();
         }
         return name;
+    }
+
+    @Override
+    public void setPresentationName(Resource resource, String name) {
+        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__NAME, name);
     }
 
     @Override
@@ -123,6 +142,92 @@ public class MetadataServiceImpl implements MetadataService {
         return attribute.getAttributeType().getName();
     }
 
+    @Override
+    public URI getUri(Resource resource) {
+        URI uri = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__URI);
+        if (uri == null) {
+            throw new IllegalStateException("URI is null, resource: " + resource.getId());
+        }
+        return uri;
+    }
+
+    @Override
+    public URI getRelativeUri(Resource resource) {
+        URI absolute = getUri(resource);
+        Repository repository = resource.getRepository();
+        if (repository != null) {
+            URI repositoryUri = repository.getURI();
+            return repositoryUri.relativize(absolute);
+        }
+        return absolute;
+    }
+
+    @Override
+    public void setUri(Resource resource, URI uri) {
+        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__URI, uri);
+    }
+
+    @Override
+    public String getFileName(Resource resource) {
+        String fileName = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__FILE_NAME);
+        if (fileName == null) {
+            throw new IllegalStateException("File name attribute is null");
+        }
+        return fileName;
+    }
+
+    @Override
+    public void setFileName(Resource resource, String fileName) {
+        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__FILE_NAME, fileName);
+    }
+
+    @Override
+    public long getSize(Resource resource) {
+        Long size = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__SIZE);
+        if (size == null) {
+            throw new IllegalStateException("Size attribute is null"); // -1 would be optionally returned
+        }
+        return size;
+    }
+
+    @Override
+    public void setSize(Resource resource, long size) {
+        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__SIZE, size);
+    }
+
+    @Override
+    public List<String> getCategories(Resource resource) {
+        List<String> categories = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
+        if (categories == null) {
+            return Collections.emptyList();
+        }
+        return categories;
+    }
+
+    @Override
+    public void addCategory(Resource resource, String category) {
+        Capability identity = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY);
+        List<String> categories = identity.getAttributeValue(ATTRIBUTE__CATEGORIES);
+        if (categories == null) {
+            categories = new ArrayList<>();
+            identity.setAttribute(ATTRIBUTE__CATEGORIES, categories);
+        }
+        if (!categories.contains(category)) {
+            categories.add(category);
+        }
+    }
+
+    @Override
+    public void removeCategory(Resource resource, String category) {
+        List<String> categories = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
+        if (categories != null && !categories.isEmpty()) {
+            categories.remove(category);
+        }
+    }
+
+    // ---
+
+    @Nonnull
     private Capability getSingleCapability(@Nonnull Resource resource, @Nonnull String namespace) {
         List<Capability> capabilities = resource.getCapabilities(namespace);
 
@@ -135,7 +240,9 @@ public class MetadataServiceImpl implements MetadataService {
         } else {
             capability = capabilities.get(0);
         }
-        return capability;
 
+        assert capability != null;
+
+        return capability;
     }
 }

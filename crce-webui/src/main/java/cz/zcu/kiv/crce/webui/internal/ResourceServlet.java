@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
 import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
@@ -124,7 +123,7 @@ public class ResourceServlet extends HttpServlet {
                 }
                 List<ResourceExt> bufferResourcesExt = new ArrayList<>(bufferResources.size());
                 for (Resource resource : bufferResources) {
-                    bufferResourcesExt.add(new ResourceExt(resource));
+                    bufferResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                 }
                 session.setAttribute("buffer", bufferResourcesExt);
                 return true;
@@ -159,7 +158,7 @@ public class ResourceServlet extends HttpServlet {
                 }
                 List<ResourceExt> storeResourcesExt = new ArrayList<>(storeResources.size());
                 for (Resource resource : storeResources) {
-                    storeResourcesExt.add(new ResourceExt(resource));
+                    storeResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                 }
                 session.setAttribute("store", storeResourcesExt);
                 return true;
@@ -256,7 +255,7 @@ public class ResourceServlet extends HttpServlet {
         HashMap<String, Integer> categoryMap = new HashMap<>();
 
         for (Resource resource : resources) {
-            List<String> categories = LegacyMetadataHelper.getCategories(resource);
+            List<String> categories = Activator.instance().getMetadataService().getCategories(resource);
             for (String category : categories) {
                 if (categoryMap.containsKey(category)) {
                     //category is already contained, increase count
@@ -295,10 +294,10 @@ public class ResourceServlet extends HttpServlet {
     private ArrayList<ResourceExt> filterResources(String filterCategory, List<Resource> resources) {
         ArrayList<ResourceExt> filteredResourceList = new ArrayList<>();
         for (Resource resource : resources) {
-            List<String> categories = LegacyMetadataHelper.getCategories(resource);
+            List<String> categories = Activator.instance().getMetadataService().getCategories(resource);
             for (String category : categories) {
                 if (category.equals(filterCategory)) {
-                    filteredResourceList.add(new ResourceExt(resource));
+                    filteredResourceList.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                     break;
                 }
             }

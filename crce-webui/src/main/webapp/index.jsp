@@ -72,12 +72,12 @@
                     out.println("<table>");
                     out.println("<tr><td>Symbolic name:</td><td>" + LegacyMetadataHelper.getSymbolicName(res) + "</td></tr>");
                     out.println("<tr><td>Version:</td><td>" + LegacyMetadataHelper.getVersion(res) + "</td></tr>");
-                    out.println("<tr><td>Presentation name:</td><td>" + LegacyMetadataHelper.getPresentationName(res) + "</td></tr>");
-                    out.println("<tr><td>Size:</td><td>" + LegacyMetadataHelper.getSize(res) + "</td></tr>");
-                    out.println("<tr><td>URI:</td><td>" + LegacyMetadataHelper.getUri(res).normalize() + "</td></tr>");
+                    out.println("<tr><td>Presentation name:</td><td>" + Activator.instance().getMetadataService().getPresentationName(res) + "</td></tr>");
+                    out.println("<tr><td>Size:</td><td>" + Activator.instance().getMetadataService().getSize(res) + "</td></tr>");
+                    out.println("<tr><td>URI:</td><td>" + Activator.instance().getMetadataService().getUri(res).normalize() + "</td></tr>");
                     out.print("<tr><td>Categories:</td><td>");
                     boolean first = true;
-                    for (String category : LegacyMetadataHelper.getCategories(res)) {
+                    for (String category : Activator.instance().getMetadataService().getCategories(res)) {
                         if (first) {
                             first = false;
                         } else {

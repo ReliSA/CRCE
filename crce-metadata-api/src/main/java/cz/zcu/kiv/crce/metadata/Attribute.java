@@ -18,8 +18,6 @@ public interface Attribute<T> extends Serializable {
 
     @Nonnull
     AttributeType<T> getAttributeType();
-    
-    void setOperator(@Nonnull Operator operator);
 
     @Nonnull
     Operator getOperator();

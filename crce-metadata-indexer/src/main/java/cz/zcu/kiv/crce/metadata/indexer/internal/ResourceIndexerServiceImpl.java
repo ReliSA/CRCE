@@ -11,11 +11,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
@@ -29,6 +29,7 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
 
     private volatile PluginManager pluginManager;
     private volatile ResourceFactory resourceFactory; /* injected by dependency manager */
+    private volatile MetadataService metadataService;
 
     @Override
     public Resource indexResource(File file) throws IOException {
@@ -74,9 +75,9 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
             newKeywords = new HashSet<>();
         }
 
-        LegacyMetadataHelper.setSize(resourceFactory, resource, file.length());
+        metadataService.setSize(resource, file.length());
 
-        LegacyMetadataHelper.setUri(resourceFactory, resource, file.toURI()); // TODO move to Store logic
+        metadataService.setUri(resource, file.toURI()); // TODO move to Store logic
 
         return resource;
     }

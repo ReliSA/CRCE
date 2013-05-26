@@ -70,7 +70,7 @@ public class DownloadServlet extends HttpServlet {
                         case "buffer": {
                             List<Resource> resources = Activator.instance().getBuffer(req).getResources();
                             Resource found = EditServlet.findResource(fileUri, resources);
-                            logger.debug("Found!" + LegacyMetadataHelper.getPresentationName(found));
+                            logger.debug("Found!" + Activator.instance().getMetadataService().getPresentationName(found));
                             doDownload(req, resp, found);
                             break;
                         }
@@ -104,11 +104,11 @@ public class DownloadServlet extends HttpServlet {
 
     private void doDownload(HttpServletRequest req, HttpServletResponse resp, Resource found) throws IOException { // NOPMD req would be used in the future
 
-        File f = new File(LegacyMetadataHelper.getRelativeUri(found));
+        File f = new File(Activator.instance().getMetadataService().getRelativeUri(found));
         int length = 0;
         try (ServletOutputStream op = resp.getOutputStream()) {
             ServletContext context = getServletConfig().getServletContext();
-            String mimetype = context.getMimeType(LegacyMetadataHelper.getRelativeUri(found).toString());
+            String mimetype = context.getMimeType(Activator.instance().getMetadataService().getRelativeUri(found).toString());
 
             //
             //  Set the response and go!
@@ -116,7 +116,8 @@ public class DownloadServlet extends HttpServlet {
             //
             resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
             resp.setContentLength((int) f.length());
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + LegacyMetadataHelper.getSymbolicName(found) + chooseCategory(LegacyMetadataHelper.getCategories(found)) + "\"");
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + LegacyMetadataHelper.getSymbolicName(found)
+                    + chooseCategory(Activator.instance().getMetadataService().getCategories(found)) + "\"");
 
             //
             //  Stream to the requester.

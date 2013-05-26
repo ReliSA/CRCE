@@ -9,10 +9,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  * A samle implementation of <code>ResourceIndexer</code> which can determine
@@ -30,7 +29,7 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
 
     private static final Logger logger = LoggerFactory.getLogger(FileTypeResourceIndexer.class);
 
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataService metadataService;
 
     @Override
     public List<String> index(InputStream input, Resource resource) {
@@ -50,13 +49,13 @@ public class FileTypeResourceIndexer extends AbstractResourceIndexer {
         }
 
         if (startsWith(buffer, ZIP)) {
-            LegacyMetadataHelper.addCategory(resourceFactory, resource, "zip");
+            metadataService.addCategory(resource, "zip");
             return Collections.singletonList("zip");
         } else if (startsWith(buffer, JPEG)) {
-            LegacyMetadataHelper.addCategory(resourceFactory, resource, "jpeg");
+            metadataService.addCategory(resource, "jpeg");
             return Collections.singletonList("jpeg");
         } else if (startsWith(buffer, PNG)) {
-            LegacyMetadataHelper.addCategory(resourceFactory, resource, "png");
+            metadataService.addCategory(resource, "png");
             return Collections.singletonList("png");
         }
 

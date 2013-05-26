@@ -22,6 +22,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  * implementation of <code>ResourceIndexer</code> which provides support for
@@ -34,6 +35,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     private volatile RepositoryAdmin repositoryAdmin;  /* injected by dependency manager */
     private volatile ResourceFactory resourceFactory;  /* injected by dependency manager */
+    private volatile MetadataService metadataService;  /* injected by dependency manager */
 
     @Override
     @SuppressWarnings("unchecked")
@@ -62,7 +64,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             throw new IllegalStateException("Unexpected MalformedURLException", e);
         } catch (ZipException e) {
             logger.warn("Zip file is corrupted: {}", resource.getId(), e);
-            LegacyMetadataHelper.addCategory(resourceFactory, resource, "corrupted");
+            metadataService.addCategory(resource, "corrupted");
             return Collections.singletonList("corrupted");
         } catch (IOException ex) {
             logger.error("I/O error on indexing resource: {}", resource.getId(), ex);
@@ -78,7 +80,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
         LegacyMetadataHelper.setSymbolicName(resourceFactory, resource, fres.getSymbolicName());
         LegacyMetadataHelper.setVersion(resourceFactory, resource, fres.getVersion());
-        LegacyMetadataHelper.setPresentationName(resourceFactory, resource, fres.getPresentationName());
+        metadataService.setPresentationName(resource, fres.getPresentationName());
         // size is not set
         for (org.apache.felix.bundlerepository.Capability fcap : fres.getCapabilities()) {
             Capability cap = resourceFactory.createCapability(fcap.getName());
@@ -101,11 +103,11 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
 
         for (String category : fres.getCategories()) {
-            LegacyMetadataHelper.addCategory(resourceFactory, resource, category);
+            metadataService.addCategory(resource, category);
         }
 
         // TODO properties, if necessary
-        LegacyMetadataHelper.addCategory(resourceFactory, resource, "osgi");
+        metadataService.addCategory(resource, "osgi");
 
         return Collections.singletonList("osgi");
     }

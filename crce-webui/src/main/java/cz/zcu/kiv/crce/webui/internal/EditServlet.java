@@ -541,11 +541,11 @@ public class EditServlet extends HttpServlet {
             Resource resource = findResource(resURI, array);
 
 
-            int categoriesLengthBefore = LegacyMetadataHelper.getCategories(resource).size();
-            LegacyMetadataHelper.addCategory(Activator.instance().getResourceFactory(), resource, category);
+            int categoriesLengthBefore = Activator.instance().getMetadataService().getCategories(resource).size();
+            Activator.instance().getMetadataService().addCategory(resource, category);
 
             // check that category was really added
-            if (categoriesLengthBefore >= LegacyMetadataHelper.getCategories(resource).size()) {
+            if (categoriesLengthBefore >= Activator.instance().getMetadataService().getCategories(resource).size()) {
                 req.getSession().setAttribute("success", false);
                 req.getSession().setAttribute("message", "Cannot add category.");
             }
@@ -981,11 +981,11 @@ public class EditServlet extends HttpServlet {
 
             Resource resource = findResource(resURI, array);
 
-            int categoriesLengthBefore = LegacyMetadataHelper.getCategories(resource).size();
-            LegacyMetadataHelper.removeCategory(resource, category);
+            int categoriesLengthBefore = Activator.instance().getMetadataService().getCategories(resource).size();
+            Activator.instance().getMetadataService().removeCategory(resource, category);
 
 //			Zjištění zda kategorie byla odstraněna.
-            if (categoriesLengthBefore == LegacyMetadataHelper.getCategories(resource).size()) {
+            if (categoriesLengthBefore == Activator.instance().getMetadataService().getCategories(resource).size()) {
                 return false;
             }
 
@@ -1053,7 +1053,7 @@ public class EditServlet extends HttpServlet {
     public static Resource findResource(URI uri, List<Resource> array) throws FileNotFoundException {
         Resource found = null;
         for (Resource r : array) {
-            if (LegacyMetadataHelper.getUri(r).equals(uri)) {
+            if (Activator.instance().getMetadataService().getUri(r).equals(uri)) {
                 found = r;
                 break;
             }

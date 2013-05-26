@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -34,6 +35,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile PluginManager pluginManager;     /* injected by dependency manager */
     private volatile SessionRegister sessionRegister;   /* injected by dependency manager */
     private volatile Store store;                  	/* injected by dependency manager */
+    private volatile MetadataService metadataService;
 
     /**
      * MetadataIndexingResultService instance provides by simple way information about metadata indexing process result.
@@ -80,6 +82,10 @@ public final class Activator extends DependencyActivatorBase {
         return sessionRegister.getSessionData(sid).getBuffer();
     }
 
+    public MetadataService getMetadataService() {
+        return metadataService;
+    }
+
     /**
      * @return instance of MetadataIndexingResultService provides info about metadata indexing process.
      */
@@ -98,6 +104,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false)));
 
 

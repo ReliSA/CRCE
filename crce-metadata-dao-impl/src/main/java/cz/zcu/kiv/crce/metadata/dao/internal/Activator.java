@@ -5,6 +5,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  *
@@ -14,10 +15,11 @@ public class Activator extends DependencyActivatorBase {
 
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-        
+
         manager.add(createComponent()
                 .setInterface(ResourceDAO.class.getName(), null)
-                .setImplementation(ResourceDAOImpl.class));
+                .setImplementation(ResourceDAOImpl.class)
+                .add(createServiceDependency().setRequired(true).setService(MetadataService.class)));
 
     }
 

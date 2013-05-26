@@ -23,7 +23,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
@@ -130,11 +129,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             resource = tmp;
         }
-        
-        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
+
+        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
-        if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
+        if ("file".equals(metadataService.getUri(resource).getScheme())) {
             return putFileResource(resource, true);
         } else {
             return putNonFileResource(resource, true);
@@ -153,10 +152,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             resource = tmp;
         }
 
-        if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource), repository)) {
+        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
             throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
-        if ("file".equals(LegacyMetadataHelper.getUri(resource).getScheme())) {
+        if ("file".equals(metadataService.getUri(resource).getScheme())) {
             resource = putFileResource(resource, false);
         } else {
             resource = putNonFileResource(resource, false);
@@ -165,7 +164,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RevokedArtifactException {
-        File sourceFile = new File(LegacyMetadataHelper.getUri(resource));
+        File sourceFile = new File(metadataService.getUri(resource));
         if (!sourceFile.exists()) {
             throw new RevokedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
@@ -179,7 +178,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             FileUtils.copyFile(sourceFile, targetFile);
         }
 //        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
-        LegacyMetadataHelper.setUri(resourceFactory, resource, targetFile.toURI());
+        metadataService.setUri(resource, targetFile.toURI());
 //        if (!m_repository.addResource(out)) {
 //        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
 //            if (!targetFile.delete()) {
@@ -196,7 +195,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     private Resource putNonFileResource(Resource resource, boolean move) {
         throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: "
-                + resource.getId() + ": " + LegacyMetadataHelper.getUri(resource) + ", move: " + move);
+                + resource.getId() + ": " + metadataService.getUri(resource) + ", move: " + move);
     }
 
     @Override
@@ -204,23 +203,23 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
 
         if (!isInStore(resource)) {
-            if (resourceDAO.existsResource(LegacyMetadataHelper.getUri(resource))) {
+            if (resourceDAO.existsResource(metadataService.getUri(resource))) {
             	logger.warn( "Removing resource is not in store but it is in internal repository: {}", resource.getId());
-                resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+                resourceDAO.deleteResource(metadataService.getUri(resource));
             }
             pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
             return false;
         }
 
         // if URI scheme is not 'file', it is detected in previous isInStore() check
-        File file = new File(LegacyMetadataHelper.getUri(resource));
+        File file = new File(metadataService.getUri(resource));
         if (!file.delete()) {
-            throw new IOException("Can not delete artifact file from store: " + LegacyMetadataHelper.getUri(resource));
+            throw new IOException("Can not delete artifact file from store: " + metadataService.getUri(resource));
         }
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 //        try {
-            resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+            resourceDAO.deleteResource(metadataService.getUri(resource));
 //        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -273,7 +272,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     private boolean isInStore(Resource resource) {
-        URI uri = LegacyMetadataHelper.getUri(resource).normalize();
+        URI uri = metadataService.getUri(resource).normalize();
         if (!"file".equals(uri.getScheme())) {
             return false;
         }

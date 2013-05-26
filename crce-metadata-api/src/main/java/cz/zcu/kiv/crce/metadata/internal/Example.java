@@ -58,7 +58,6 @@ public class Example {
         List<Attribute<Double>> attribute3 = requirement.getAttributes(ATTRIBUTE_B);
 
         Operator operator = attribute3.get(0).getOperator();
-        attribute3.get(0).setOperator(Operator.EQUAL);
 
         // etc.
 

@@ -28,6 +28,7 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -49,6 +50,7 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile ResourceFactory resourceFactory;     /* injected by dependency manager */
     private volatile ResourceDAO resourceDAO;     /* injected by dependency manager */
     private volatile ResourceIndexerService resourceIndexerService; /* injected by dependency manager */
+    private volatile MetadataService metadataService;
 
     private final int BUFFER_SIZE = 8 * 1024;
     private final Properties sessionProperties;
@@ -151,8 +153,6 @@ public class BufferImpl implements Buffer, EventHandler {
             }
         }
 
-//        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-
         Resource resource = resourceDAO.loadResource(file.toURI());
         if (resource == null) {
             resource = resourceIndexerService.indexResource(file);
@@ -160,12 +160,12 @@ public class BufferImpl implements Buffer, EventHandler {
         resource.setRepository(repository);
 
         // TODO alternatively can be moved to some plugin
-        LegacyMetadataHelper.setFileName(resourceFactory, resource, name2);
+        metadataService.setFileName(resource, name2);
         LegacyMetadataHelper.setSymbolicName(resourceFactory, resource, name2);
 
-        String presentationName = LegacyMetadataHelper.getPresentationName(resource);
-        if (presentationName == null || "".equals(presentationName.trim())) {
-            LegacyMetadataHelper.setPresentationName(resourceFactory, resource, name2);
+        String presentationName = metadataService.getPresentationName(resource);
+        if (presentationName.trim().isEmpty()) {
+            metadataService.setPresentationName(resource, name2);
         }
 
         Resource tmp;
@@ -184,16 +184,7 @@ public class BufferImpl implements Buffer, EventHandler {
             resource = tmp;
         }
 
-//        if (m_repository == null) {
-//            loadRepository();
-//        }
-//        if (!m_repository.addResource(resource)) {
-//            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in buffer: " + resource.getId());
-//        }
-
         resourceDAO.saveResource(resource);
-
-//        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
 
         return pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
     }
@@ -212,14 +203,14 @@ public class BufferImpl implements Buffer, EventHandler {
         }
 
         // if URI scheme is not 'file', it is detected in previous isInBuffer() check
-        File file = new File(LegacyMetadataHelper.getUri(resource));
+        File file = new File(metadataService.getUri(resource));
         if (!file.delete()) {
-            throw new IOException("Can not delete artifact file from buffer: " + LegacyMetadataHelper.getUri(resource));
+            throw new IOException("Can not delete artifact file from buffer: " + metadataService.getUri(resource));
         }
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 //        try {
-            resourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
+            resourceDAO.deleteResource(metadataService.getUri(resource));
 //        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -253,7 +244,7 @@ public class BufferImpl implements Buffer, EventHandler {
             for (Resource resource : resourcesToCommit) {
                 Resource commitedResource;
                 try {
-                    URI uri = LegacyMetadataHelper.getUri(resource);
+                    URI uri = metadataService.getUri(resource);
                     String[] old = new String[] {LegacyMetadataHelper.getSymbolicName(resource), LegacyMetadataHelper.getVersion(resource).toString()};
                     commitedResource = ((FilebasedStoreImpl) store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
@@ -267,7 +258,7 @@ public class BufferImpl implements Buffer, EventHandler {
         } else {
             for (Resource resource : resourcesToCommit) {
                 Resource putResource;
-                URI uri = LegacyMetadataHelper.getUri(resource);
+                URI uri = metadataService.getUri(resource);
                 try {
                     putResource = store.put(resource);
                 } catch (RevokedArtifactException ex) {
@@ -370,7 +361,7 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     private boolean isInBuffer(Resource resource) {
-        URI uri = LegacyMetadataHelper.getUri(resource).normalize();
+        URI uri = metadataService.getUri(resource).normalize();
         if (!"file".equals(uri.getScheme())) {
             return false;
         }

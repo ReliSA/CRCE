@@ -2,7 +2,9 @@ package cz.zcu.kiv.crce.webui.internal.custom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 public class ResourceExt extends ResourceWrap {
 
@@ -10,8 +12,8 @@ public class ResourceExt extends ResourceWrap {
 
     private boolean satisfied;
 
-    public ResourceExt(Resource r) {
-        super(r);
+    public ResourceExt(Resource r, MetadataService metadataService) {
+        super(r, metadataService);
         this.satisfied = true;
     }
 

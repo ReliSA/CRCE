@@ -7,6 +7,7 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  * Activator of this bundle.
@@ -21,6 +22,7 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(OsgiManifestBundleIndexer.class)
                 .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 );
     }
 
