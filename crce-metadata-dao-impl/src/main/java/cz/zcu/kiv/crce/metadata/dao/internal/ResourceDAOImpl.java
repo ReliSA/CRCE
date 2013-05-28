@@ -86,11 +86,6 @@ public class ResourceDAOImpl implements ResourceDAO {
     }
 
     @Override
-    public synchronized Resource moveResource(Resource resource, URI artifact) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public String toString() {
         return "Persisted repositories and resources:\r\n" + repositories.toString();
     }

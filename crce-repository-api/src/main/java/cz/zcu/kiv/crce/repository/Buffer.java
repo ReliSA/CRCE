@@ -22,9 +22,10 @@ public interface Buffer extends Store {
      * @param resource Uploaded resource.
      * @return
      * @throws IOException
-     * @throws RevokedArtifactException
+     * @throws RefusedArtifactException
      */
-    Resource put(@Nonnull String name, @Nonnull InputStream resource) throws IOException, RevokedArtifactException;
+    @Nonnull
+    Resource put(@Nonnull String name, @Nonnull InputStream resource) throws IOException, RefusedArtifactException;
 
     /**
      * Commits uploaded resources to the configured store.
@@ -45,7 +46,7 @@ public interface Buffer extends Store {
      * <p>If <code>move</code> is <code>true</code> then resources will be removed
      * from the buffer. Returned list constains resources successfully commited
      * to the store.
-     * 
+     *
      * @param resources
      * @param move
      * @return

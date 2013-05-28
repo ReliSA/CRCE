@@ -2,6 +2,9 @@ package cz.zcu.kiv.crce.plugin;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Plugin manager is responsible to register, unregister and provide plugins.
  *
@@ -27,6 +30,7 @@ public interface PluginManager {
      *
      * @return an array containing all registered plugins.
      */
+    @Nonnull
     List<Plugin> getPlugins();
 
     /**
@@ -47,7 +51,8 @@ public interface PluginManager {
      * plugins in returned array.
      * @return the array with plugins of given type.
      */
-    <T extends Plugin> List<T> getPlugins(Class<T> type);
+    @Nonnull
+    <T extends Plugin> List<T> getPlugins(@Nonnull Class<T> type);
 
 
         // TODO is the following necessary? should be inclusive or exclusive regarding keywords?
@@ -86,7 +91,8 @@ public interface PluginManager {
      * @param keyword a keyword specifying the selection of plugins.
      * @return the array with plugins of specified type and with given keyword.
      */
-    <T extends Plugin> List<T> getPlugins(Class<T> type, String keyword);
+    @Nonnull
+    <T extends Plugin> List<T> getPlugins(@Nonnull Class<T> type, @Nullable String keyword);
 
     /**
      * Returns an instance of preferred plugin implementation of specified type.
@@ -99,7 +105,8 @@ public interface PluginManager {
      * returned plugin.
      * @return the instance of plugin.
      */
-    <T extends Plugin> T getPlugin(Class<T> type);
+    @Nonnull
+    <T extends Plugin> T getPlugin(@Nonnull Class<T> type);
 
     /**
      * Returns an instance of preferred plugin implementation of specified type
@@ -114,6 +121,6 @@ public interface PluginManager {
      * @param keyword a keyword specifying the selection of plugins.
      * @return the instance of plugin.
      */
-    <T extends Plugin> T getPlugin(Class<T> type, String keyword);
-
+    @Nonnull
+    <T extends Plugin> T getPlugin(@Nonnull Class<T> type, @Nullable String keyword);
 }

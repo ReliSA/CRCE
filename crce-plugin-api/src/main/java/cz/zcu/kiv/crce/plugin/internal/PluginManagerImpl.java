@@ -2,6 +2,9 @@ package cz.zcu.kiv.crce.plugin.internal;
 
 import static cz.zcu.kiv.crce.plugin.PluginManager.*;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,16 +99,28 @@ public class PluginManagerImpl implements PluginManager {
     public synchronized <T extends Plugin> T getPlugin(Class<T> type, String keyword) {
         Map<String, Set<? extends Plugin>> map = plugins.get(type);
         if (map == null) {
-            return null;
+            return getProxy(type);
         }
         Set<? extends Plugin> set = map.get(keyword);
         if (set == null || set.isEmpty()) {
-            return null;
+            return getProxy(type);
         }
         Set<Plugin> sorted = new TreeSet<>(set);
         @SuppressWarnings("unchecked")
         T t = (T) sorted.iterator().next();
         return t;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T getProxy(Class<T> type) {
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type}, new InvocationHandler() {
+
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+
+        });
     }
 
     /**

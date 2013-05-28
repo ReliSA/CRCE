@@ -7,7 +7,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 /**
  * This interface defines an executable handler of various events which can
@@ -20,7 +20,7 @@ import cz.zcu.kiv.crce.repository.RevokedArtifactException;
  */
 public interface ActionHandler extends Plugin {
 
-    String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException;
+    String beforeUploadToBuffer(String name, Buffer buffer) throws RefusedArtifactException;
 
     /**
      * Invoked when an artifact is uploaded into upload buffer.
@@ -29,11 +29,11 @@ public interface ActionHandler extends Plugin {
      * @param name
      * @param buffer
      * @return
-     * @throws RevokedArtifactException
+     * @throws RefusedArtifactException
      */
-    Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
+    Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException;
 
-    Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException;
+    Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException;
 
 
     Resource beforeDownloadFromBuffer(Resource resource, Buffer buffer);
@@ -63,7 +63,7 @@ public interface ActionHandler extends Plugin {
     List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store);
 
 
-    Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException;
+    Resource beforePutToStore(Resource resource, Store store) throws RefusedArtifactException;
 
     /**
      * Invoked when resource is commited from buffer to repository.
@@ -71,9 +71,9 @@ public interface ActionHandler extends Plugin {
      * @param resource
      * @param store
      * @return
-     * @throws RevokedArtifactException
+     * @throws RefusedArtifactException
      */
-    Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException;
+    Resource afterPutToStore(Resource resource, Store store) throws RefusedArtifactException;
 
 
     Resource beforeDownloadFromStore(Resource resource, Store store);

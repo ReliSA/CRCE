@@ -25,7 +25,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -119,7 +119,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //        }
 //    }
 
-    public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
+    public synchronized Resource move(Resource resource) throws IOException, RefusedArtifactException {
         Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
@@ -131,7 +131,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
 
         if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
-            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
+            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(metadataService.getUri(resource).getScheme())) {
             return putFileResource(resource, true);
@@ -141,7 +141,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     @Override
-    public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
+    public synchronized Resource put(Resource resource) throws IOException, RefusedArtifactException {
         Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
@@ -153,7 +153,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
 
         if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
-            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
+            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(metadataService.getUri(resource).getScheme())) {
             resource = putFileResource(resource, false);
@@ -163,10 +163,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(resource, this);
     }
 
-    private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RevokedArtifactException {
+    private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RefusedArtifactException {
         File sourceFile = new File(metadataService.getUri(resource));
         if (!sourceFile.exists()) {
-            throw new RevokedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
+            throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
         resource.setRepository(repository);
 

@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.metadata.indexer;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -20,5 +21,6 @@ public interface ResourceIndexerService {
      * @return Metadata resource.
      * @throws IOException If indexing fails on I/O error.
      */
-    Resource indexResource(File resource) throws IOException;
+    @Nonnull
+    Resource indexResource(@Nonnull File resource) throws IOException;
 }

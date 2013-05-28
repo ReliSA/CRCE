@@ -29,7 +29,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -134,15 +134,15 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     @Override
-    public Resource put(Resource resource) throws IOException, RevokedArtifactException {
+    public Resource put(Resource resource) throws IOException, RefusedArtifactException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public synchronized Resource put(String name, InputStream artifact) throws IOException, RevokedArtifactException {
+    public synchronized Resource put(String name, InputStream artifact) throws IOException, RefusedArtifactException {
         String name2 = pluginManager.getPlugin(ActionHandler.class).beforeUploadToBuffer(name, this);
         if (name2 == null || artifact == null || "".equals(name2)) {
-            throw new RevokedArtifactException("No file name was given on uploading to buffer");
+            throw new RefusedArtifactException("No file name was given on uploading to buffer");
         }
 
         File file = File.createTempFile("res", ".tmp", baseDir);
@@ -171,7 +171,7 @@ public class BufferImpl implements Buffer, EventHandler {
         Resource tmp;
         try {
             tmp = pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
-        } catch (RevokedArtifactException e) {
+        } catch (RefusedArtifactException e) {
             if (!file.delete()) {
             	logger.error( "Can not delete file of revoked artifact: {}", file.getPath());
             }
@@ -249,7 +249,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     commitedResource = ((FilebasedStoreImpl) store).move(resource);
                     toRemoveNonrenamed.put(resource.getId(), old);
                     resourcesToRemove.add(uri);
-                } catch (RevokedArtifactException ex) {
+                } catch (RefusedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }
@@ -261,7 +261,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 URI uri = metadataService.getUri(resource);
                 try {
                     putResource = store.put(resource);
-                } catch (RevokedArtifactException ex) {
+                } catch (RefusedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
                 }

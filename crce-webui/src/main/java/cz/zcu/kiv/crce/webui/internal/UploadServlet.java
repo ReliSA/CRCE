@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 /**
  *
@@ -111,10 +111,8 @@ public class UploadServlet extends HttpServlet {
                     String fileName = fi.getName();
                     try (InputStream is = fi.getInputStream()) {
                         try {
-                            if (Activator.instance().getBuffer(req).put(fileName, is) == null) {
-                                success = false;
-                            }
-                        } catch (RevokedArtifactException ex) {
+                            Activator.instance().getBuffer(req).put(fileName, is);
+                        } catch (RefusedArtifactException ex) {
                             logger.warn("Artifact revoked: ", ex.getMessage());
                             success = false;
                         }

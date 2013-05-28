@@ -28,6 +28,17 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>

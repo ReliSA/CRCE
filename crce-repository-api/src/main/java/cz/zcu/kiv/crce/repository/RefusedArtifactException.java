@@ -7,11 +7,11 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class RevokedArtifactException extends Exception {
+public class RefusedArtifactException extends Exception {
 
     private static final long serialVersionUID = 3732119005799739933L;
 
-    public RevokedArtifactException(@Nonnull String reason) {
+    public RefusedArtifactException(@Nonnull String reason) {
         super(reason);
     }
 }

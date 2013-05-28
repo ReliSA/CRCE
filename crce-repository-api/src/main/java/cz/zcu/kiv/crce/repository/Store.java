@@ -23,9 +23,10 @@ public interface Store {
      * @param resource
      * @return
      * @throws IOException
-     * @throws RevokedArtifactException
+     * @throws RefusedArtifactException
      */
-    Resource put(@Nonnull Resource resource) throws IOException, RevokedArtifactException;
+    @Nonnull
+    Resource put(@Nonnull Resource resource) throws IOException, RefusedArtifactException;
 
     /**
      * Removes the resource from this buffer and returns <code>true</code>, if
@@ -46,6 +47,7 @@ public interface Store {
     @Nonnull
     List<Resource> getResources();
 
+    @Nonnull
     List<Resource> getResources(Requirement requirement);
 
     /**

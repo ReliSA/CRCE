@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.plugin;
 
 import java.util.List;
+
+import javax.annotation.Nonnull;
 import org.osgi.framework.Version;
 
 /**
@@ -54,6 +56,7 @@ public interface Plugin extends Comparable<Plugin> {
      *
      * @return the plugin indentification.
      */
+    @Nonnull
     String getPluginId();
 
     /**
@@ -61,6 +64,7 @@ public interface Plugin extends Comparable<Plugin> {
      *
      * @return the version of plugin.
      */
+    @Nonnull
     Version getPluginVersion();
 
     /**
@@ -76,6 +80,7 @@ public interface Plugin extends Comparable<Plugin> {
      *
      * @return the human-readable description of plugin.
      */
+    @Nonnull
     String getPluginDescription();
 
     /**
@@ -87,5 +92,6 @@ public interface Plugin extends Comparable<Plugin> {
      *
      * @return an array of keywords.
      */
+    @Nonnull
     List<String> getPluginKeywords();
 }

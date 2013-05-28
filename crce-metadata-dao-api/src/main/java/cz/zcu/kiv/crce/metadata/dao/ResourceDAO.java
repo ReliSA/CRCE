@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Repository;
@@ -29,8 +30,10 @@ public interface ResourceDAO {
      * @return
      * @throws IOException
      */
+    @CheckForNull
     Resource loadResource(@Nonnull URI uri) throws IOException;
 
+    @Nonnull
     List<Resource> loadResources(@Nonnull Repository repository) throws IOException;
 
     /**
@@ -51,16 +54,4 @@ public interface ResourceDAO {
     boolean existsResource(@Nonnull URI uri) throws IOException;
 
     boolean existsResource(@Nonnull URI uri, @Nonnull Repository repository) throws IOException;
-
-    /**
-     * Moves (reassignes) the <code>Resource</code> to the artifact with the
-     * given URI.
-     *
-     * PENDING will be needed?
-     *
-     * @param resource
-     * @param artifact URI of artifact.
-     * @return
-     */
-    Resource moveResource(Resource resource, URI artifact);
 }

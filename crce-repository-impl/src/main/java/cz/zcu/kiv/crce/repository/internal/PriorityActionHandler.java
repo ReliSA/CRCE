@@ -13,7 +13,7 @@ import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 
@@ -94,11 +94,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RefusedArtifactException {
         Object[] out = execute(BEFORE_BUFFER_UPLOAD, new Object[]{name, buffer});
         if (out[1] != null) {
-            if (out[1] instanceof RevokedArtifactException) {
-                throw (RevokedArtifactException) out[1];
+            if (out[1] instanceof RefusedArtifactException) {
+                throw (RefusedArtifactException) out[1];
             } else {
                 throw new IllegalStateException("beforeUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
@@ -107,11 +107,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
         Object[] out = execute(ON_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
         if (out[1] != null) {
-            if (out[1] instanceof RevokedArtifactException) {
-                throw (RevokedArtifactException) out[1];
+            if (out[1] instanceof RefusedArtifactException) {
+                throw (RefusedArtifactException) out[1];
             } else {
                 throw new IllegalStateException("onUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
@@ -120,11 +120,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
         Object[] out = execute(AFTER_BUFFER_UPLOAD, new Object[]{resource, buffer, name});
         if (out[1] != null) {
-            if (out[1] instanceof RevokedArtifactException) {
-                throw (RevokedArtifactException) out[1];
+            if (out[1] instanceof RefusedArtifactException) {
+                throw (RefusedArtifactException) out[1];
             } else {
                 throw new IllegalStateException("afterUploadToBuffer threw unexpected exception", (Throwable) out[1]);
             }
@@ -177,11 +177,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource beforePutToStore(Resource resource, Store repository) throws RevokedArtifactException {
+    public Resource beforePutToStore(Resource resource, Store repository) throws RefusedArtifactException {
         Object[] out = execute(BEFORE_STORE_PUT, new Object[]{resource, repository});
         if (out[1] != null) {
-            if (out[1] instanceof RevokedArtifactException) {
-                throw (RevokedArtifactException) out[1];
+            if (out[1] instanceof RefusedArtifactException) {
+                throw (RefusedArtifactException) out[1];
             } else {
                 throw new IllegalStateException("beforePutToStore threw unexpected exception", (Throwable) out[1]);
             }
@@ -190,11 +190,11 @@ public class PriorityActionHandler extends AbstractPlugin implements ActionHandl
     }
 
     @Override
-    public Resource afterPutToStore(Resource resource, Store repository) throws RevokedArtifactException {
+    public Resource afterPutToStore(Resource resource, Store repository) throws RefusedArtifactException {
         Object[] out = execute(AFTER_STORE_PUT, new Object[]{resource, repository});
         if (out[1] != null) {
-            if (out[1] instanceof RevokedArtifactException) {
-                throw (RevokedArtifactException) out[1];
+            if (out[1] instanceof RefusedArtifactException) {
+                throw (RefusedArtifactException) out[1];
             } else {
                 throw new IllegalStateException("afterPutToStore threw unexpected exception", (Throwable) out[1]);
             }
