@@ -7,9 +7,9 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /**
- * Resource represents an artifact and it's OBR metadata.
+ * Resource represents an artifact and it's metadata.
  *
- * <p>An unique identificator of a resource is it's symbolic name and version.
+ * <p>An unique identificator of a resource is ID.
  *
  * <p>Resource have capabilities, requirements, properties and categories.
  *
@@ -54,14 +54,27 @@ public interface Resource extends Serializable {
     boolean hasProperty(@Nonnull Property property);
 
     /* --- setters --- */
-    
+
+    /**
+     * Adds the given capability to the list of all capabilities.
+     * <p>Note: This method doesn add the capability to the list of root capabilities.
+     * @param capability Capability to be added.
+     */
     void addCapability(@Nonnull Capability capability);
+
+    /**
+     * Adds the given capability to the list of root capabilities.
+     * @param capability Capability to be added.
+     */
+    void addRootCapability(@Nonnull Capability capability);
 
     void addRequirement(@Nonnull Requirement requirement);
 
     void addProperty(@Nonnull Property property);
 
     void removeCapability(@Nonnull Capability capability);
+
+    void removeRootCapability(@Nonnull Capability capability);
 
     void removeRequirement(@Nonnull Requirement requirement);
 

@@ -59,4 +59,30 @@ public interface MetadataService {
     void addCategory(@Nonnull Resource resource, @Nonnull String category);
 
     void removeCategory(@Nonnull Resource resource, @Nonnull String category);
+
+    /**
+     * Safely adds the given capability to the resource including capability children.
+     * @param resource
+     * @param capability
+     */
+    void addRootCapability(@Nonnull Resource resource, @Nonnull Capability capability);
+
+    /**
+     * Safely removes capability from the resource including capability children.
+     * @param resource
+     * @param capability
+     */
+    void removeCapability(@Nonnull Resource resource, @Nonnull Capability capability);
+
+    /**
+     * Safely adds the given child capability into children of the parent one including
+     * fixing of references to the parent resource.
+     * @param parent
+     * @param child
+     */
+    void addChild(@Nonnull Capability parent, @Nonnull Capability child);
+
+    void addRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
+
+    void removeRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
 }

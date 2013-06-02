@@ -225,6 +225,117 @@ public class MetadataServiceImpl implements MetadataService {
         }
     }
 
+    @Override
+    public void addRootCapability(Resource resource, Capability capability) {
+        Capability parent = capability.getParent();
+        if (parent != null && !capability.equals(parent)) {
+            throw new IllegalStateException("The capability " + capability.getId()
+                    + " can't be added as a root capability. It is a child of " + parent.getId());
+        }
+
+        List<Capability> rootCapabilities = resource.getRootCapabilities(capability.getNamespace());
+        if (!rootCapabilities.contains(capability)) {
+            resource.addRootCapability(capability);
+        }
+
+        addCapabilityTree(resource, capability);
+    }
+
+    private void addCapabilityTree(@Nonnull Resource resource, @Nonnull Capability capability) {
+        Resource old = capability.getResource();
+        if (old != null && !old.equals(resource)) {
+            old.removeCapability(capability);
+            old.removeRootCapability(capability);
+        }
+
+        capability.setResource(resource);
+        List<Capability> capabilities = resource.getCapabilities(capability.getNamespace());
+        if (!capabilities.contains(capability)) {
+            resource.addCapability(capability);
+        }
+
+        for (Capability child : capability.getChildren()) {
+            assert capability.equals(child.getParent());
+            addCapabilityTree(resource, capability);
+        }
+    }
+
+    @Override
+    public void removeCapability(Resource resource, Capability capability) {
+        resource.removeCapability(capability);
+        resource.removeRootCapability(capability);
+
+        capability.setResource(null);
+
+        for (Capability child : capability.getChildren()) {
+            removeCapability(resource, child);
+        }
+    }
+
+    @Override
+    public void addChild(Capability parent, Capability child) {
+        if (!parent.getChildren().contains(child)) {
+            parent.addChild(child);
+            child.setParent(parent);
+            Resource resource = parent.getResource();
+            if (resource != null) {
+                addChildTree(resource, child);
+            }
+        }
+    }
+
+    private void addChildTree(@Nonnull Resource resource, @Nonnull Capability capability) {
+        if (!resource.getCapabilities(capability.getNamespace()).contains(capability)) {
+            resource.addCapability(capability);
+        }
+        capability.setResource(resource);
+        for (Capability child : capability.getChildren()) {
+            addChildTree(resource, child);
+        }
+    }
+
+    @Override
+    public void addRequirement(Resource resource, Requirement requirement) {
+        Requirement parent = requirement.getParent();
+        if (parent != null && !requirement.equals(parent)) {
+            throw new IllegalStateException("The requirement " + requirement.getId()
+                    + " can't be added to the resource. It is a child of " + parent.getId());
+        }
+
+        Resource old = requirement.getResource();
+        if (old != null && !old.equals(resource)) {
+            old.removeRequirement(requirement);
+        }
+
+        List<Requirement> requirements = resource.getRequirements(requirement.getNamespace());
+        if (!requirements.contains(requirement)) {
+            requirements.add(requirement);
+        }
+
+        addRequirementTree(resource, requirement);
+    }
+
+    private void addRequirementTree(@Nonnull Resource resource, @Nonnull Requirement requirement) {
+        requirement.setResource(resource);
+
+        for (Requirement child : requirement.getChildren()) {
+            addRequirementTree(resource, child);
+        }
+    }
+
+    @Override
+    public void removeRequirement(Resource resource, Requirement requirement) {
+        resource.removeRequirement(requirement);
+        removeRequirementTree(requirement);
+    }
+
+    private void removeRequirementTree(@Nonnull Requirement requirement) {
+        requirement.setResource(null);
+        for (Requirement child : requirement.getChildren()) {
+            removeRequirementTree(child);
+        }
+    }
+
     // ---
 
     @Nonnull

@@ -63,12 +63,7 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
 
     @Override
     public boolean addChild(Capability capability) {
-        // commented way would be a performance problem
-//        if (!children.contains(capability)) {
-//            capability.setParent(this);
-            return children.add(capability);
-//        }
-//        return false;
+        return children.add(capability);
     }
 
     @Override

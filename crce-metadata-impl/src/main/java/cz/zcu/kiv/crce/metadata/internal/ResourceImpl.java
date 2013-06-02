@@ -13,7 +13,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Implementation of <code>Resource</code> interface.
@@ -100,24 +99,35 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
 
     @Override
     public void addCapability(Capability capability) {
-        // add to map of roots
-        Capability root = getRootCapability(capability);
-        putCapabilityToMap(root, rootCapabilities);
+        List<Capability> capabilities = allCapabilities.get(capability.getNamespace());
+        if (capabilities == null) {
+            capabilities = new ArrayList<>();
+            allCapabilities.put(capability.getNamespace(), capabilities);
+        }
+        capabilities.add(capability);
+    }
 
-        // add to map of all
-        putCapabilityToMap(root, allCapabilities);
-
-        addChildrenToMap(root.getChildren(), allCapabilities);
+    @Override
+    public void addRootCapability(Capability capability) {
+        List<Capability> capabilities = rootCapabilities.get(capability.getNamespace());
+        if (capabilities == null) {
+            capabilities = new ArrayList<>();
+            rootCapabilities.put(capability.getNamespace(), capabilities);
+        }
+        capabilities.add(capability);
     }
 
     @Override
     public void removeCapability(Capability capability) {
-        List<Capability> roots = rootCapabilities.get(capability.getNamespace());
+        List<Capability> roots = allCapabilities.get(capability.getNamespace());
         if (roots != null) {
             roots.remove(capability);
         }
+    }
 
-        List<Capability> all = allCapabilities.get(capability.getNamespace());
+    @Override
+    public void removeRootCapability(Capability capability) {
+        List<Capability> all = rootCapabilities.get(capability.getNamespace());
         if (all != null) {
             all.remove(capability);
         }
@@ -152,14 +162,12 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
 
     @Override
     public void addRequirement(Requirement requirement) {
-        Requirement root = getRootRequirement(requirement);
-
-        List<Requirement> requirements = allRequirements.get(root.getNamespace());
+        List<Requirement> requirements = allRequirements.get(requirement.getNamespace());
         if (requirements == null) {
             requirements = new ArrayList<>();
-            allRequirements.put(root.getNamespace(), requirements);
+            allRequirements.put(requirement.getNamespace(), requirements);
         }
-        requirements.add(root);
+        requirements.add(requirement);
     }
 
     @Override
@@ -199,14 +207,12 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
 
     @Override
     public void addProperty(Property property) {
-        Property root = getRootProperty(property);
-
-        List<Property> properties = allProperties.get(root.getNamespace());
+        List<Property> properties = allProperties.get(property.getNamespace());
         if (properties == null) {
             properties = new ArrayList<>();
-            allProperties.put(root.getNamespace(), properties);
+            allProperties.put(property.getNamespace(), properties);
         }
-        properties.add(root);
+        properties.add(property);
     }
 
     @Override
@@ -214,54 +220,6 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         List<Property> properties = allProperties.get(property.getNamespace());
         if (properties != null) {
             properties.remove(property);
-        }
-    }
-
-    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
-    @SuppressWarnings({"null", "ConstantConditions"})
-    private Capability getRootCapability(@Nonnull Capability capability) {
-        Capability root = capability;
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
-    }
-
-    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
-    @SuppressWarnings({"null", "ConstantConditions"})
-    private Requirement getRootRequirement(@Nonnull Requirement requirement) {
-        Requirement root = requirement;
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
-    }
-
-    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Won't be null")
-    @SuppressWarnings({"null", "ConstantConditions"})
-    private Property getRootProperty(@Nonnull Property requirement) {
-        Property root = requirement;
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
-    }
-
-    private void putCapabilityToMap(@Nonnull Capability capability, @Nonnull Map<String, List<Capability>> map) {
-        List<Capability> capabilities = map.get(capability.getNamespace());
-        if (capabilities == null) {
-            capabilities = new ArrayList<>();
-            map.put(capability.getNamespace(), capabilities);
-        }
-        if (!capabilities.contains(capability)) {
-            capabilities.add(capability);
-        }
-    }
-
-    private void addChildrenToMap(@Nonnull List<Capability> list, @Nonnull Map<String, List<Capability>> map) {
-        for (Capability capability : list) {
-            putCapabilityToMap(capability, map);
-            addChildrenToMap(capability.getChildren(), map);
         }
     }
 }
