@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -85,28 +86,13 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
             return false;
         }
         final CapabilityImpl other = (CapabilityImpl) obj;
-        if (!Objects.equals(this.namespace, other.namespace)) {
-            return false;
-        }
-        if (!Objects.equals(this.resource, other.resource)) {
-            return false;
-        }
-        if (!Objects.equals(this.parent, other.parent)) {
-            return false;
-        }
-        if (!Objects.equals(this.children, other.children)) {
-            return false;
-        }
-        return super.equals(obj);
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 97 * hash + Objects.hashCode(this.namespace);
-        hash = 97 * hash + Objects.hashCode(this.resource);
-        hash = 97 * hash + Objects.hashCode(this.parent);
-        hash = 97 * hash + Objects.hashCode(this.children);
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
 }

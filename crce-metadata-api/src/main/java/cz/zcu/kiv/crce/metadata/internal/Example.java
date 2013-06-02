@@ -48,7 +48,7 @@ public class Example {
             Attribute<?> attribute1 = capability.getAttribute(attr.getAttributeType());
         }
         // map of attributes - unknown data types
-        Map<String, ? extends Attribute<?>> map = capability.getAttributesMap();
+        Map<String, Attribute<?>> map = capability.getAttributesMap();
         Attribute<?> attribute2 = map.get(ATTRIBUTE_A.getName());
         Object value2 = attribute2.getValue();
 

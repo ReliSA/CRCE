@@ -14,6 +14,9 @@ import javax.annotation.Nullable;
 public interface Property extends Serializable {
 
     @Nonnull
+    String getId();
+    
+    @Nonnull
     String getNamespace();
 
     @CheckForNull

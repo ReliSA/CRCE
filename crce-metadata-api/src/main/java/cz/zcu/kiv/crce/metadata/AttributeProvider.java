@@ -38,8 +38,8 @@ public interface AttributeProvider {
     <T> boolean removeAttribute(@Nonnull String name);
 
     @Nonnull
-    List<? extends Attribute<?>> getAttributes();
+    List<Attribute<?>> getAttributes();
 
     @Nonnull
-    Map<String, ? extends Attribute<?>> getAttributesMap();
+    Map<String, Attribute<?>> getAttributesMap();
 }

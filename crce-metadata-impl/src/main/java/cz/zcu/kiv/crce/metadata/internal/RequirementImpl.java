@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Operator;
@@ -69,12 +70,7 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
 
     @Override
     public boolean addChild(Requirement requirement) {
-        // commented way would be a performance problem
-//        if (!children.contains(requirement)) {
-//            requirement.setParent(this);
-            return children.add(requirement);
-//        }
-//        return false;
+        return children.add(requirement);
     }
 
     @Override
@@ -119,6 +115,15 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
     }
 
     @Override
+    public List<Attribute<?>> getAttributes() {
+        List<Attribute<?>> result = new ArrayList<>();
+        for (List<Attribute<?>> list : attributesMap.values()) {
+            result.addAll(list);
+        }
+        return result;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<Attribute<T>> getAttributes(AttributeType<T> type) {
         List<Attribute<?>> attributes = attributesMap.get(type.getName());
@@ -137,32 +142,13 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
             return false;
         }
         final RequirementImpl other = (RequirementImpl) obj;
-        if (!Objects.equals(this.namespace, other.namespace)) {
-            return false;
-        }
-        if (!Objects.equals(this.resource, other.resource)) {
-            return false;
-        }
-        if (!Objects.equals(this.parent, other.parent)) {
-            return false;
-        }
-        if (!Objects.equals(this.children, other.children)) {
-            return false;
-        }
-        if (!Objects.equals(this.attributesMap, other.attributesMap)) {
-            return false;
-        }
-        return super.equals(obj);
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 97 * hash + Objects.hashCode(this.namespace);
-        hash = 97 * hash + Objects.hashCode(this.resource);
-        hash = 97 * hash + Objects.hashCode(this.parent);
-        hash = 97 * hash + Objects.hashCode(this.children);
-        hash = 97 * hash + Objects.hashCode(this.attributesMap);
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.id);
         return hash;
     }
 }

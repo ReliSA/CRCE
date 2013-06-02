@@ -38,6 +38,9 @@ public interface Requirement extends DirectiveProvider, Serializable {
     List<Requirement> getChildren();
 
     @Nonnull
+    List<Attribute<?>> getAttributes();
+
+    @Nonnull
     <T> List<Attribute<T>> getAttributes(@Nonnull AttributeType<T> type);
 
     <T> boolean addAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value);

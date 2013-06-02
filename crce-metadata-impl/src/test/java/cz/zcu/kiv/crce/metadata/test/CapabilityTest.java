@@ -84,51 +84,51 @@ public class CapabilityTest {
         assertEquals(2, c1.getAttributes().size());
     }
 
-    @Test
-    public void equals() throws Exception {
-        Capability c1 = factory.createCapability("a");
-        Capability c2 = factory.createCapability("a");
+//    @Test
+//    public void equals() throws Exception {
+//        Capability c1 = factory.createCapability("a");
+//        Capability c2 = factory.createCapability("a");
+//
+//        assertEquals(c1, c2);
+//
+//        c1.setAttribute(ATTR_P1, "v1");
+//        assertNotEquals(c1, c2);
+//
+//
+//        c2.setAttribute(ATTR_P1, "v1");
+//        assertEquals(c1, c2);
+//    }
 
-        assertEquals(c1, c2);
 
-        c1.setAttribute(ATTR_P1, "v1");
-        assertNotEquals(c1, c2);
+//    @Test
+//    public void testEqualNamespaces() {
+//        Capability c1 = factory.createCapability("cap");
+//        Capability c2 = factory.createCapability("cap");
+//        Capability c3 = factory.createCapability("cap3");
+//
+//        assertEquals(c1, c2);
+//        assertNotEquals(c1, c3);
+//        assertNotEquals(c2, c3);
+//    }
 
-
-        c2.setAttribute(ATTR_P1, "v1");
-        assertEquals(c1, c2);
-    }
-
-
-    @Test
-    public void testEqualNamespaces() {
-        Capability c1 = factory.createCapability("cap");
-        Capability c2 = factory.createCapability("cap");
-        Capability c3 = factory.createCapability("cap3");
-
-        assertEquals(c1, c2);
-        assertNotEquals(c1, c3);
-        assertNotEquals(c2, c3);
-    }
-
-    @Test
-    public void testHashSetContains() throws Exception {
-        Capability c1 = factory.createCapability("a");
-        Capability c2 = factory.createCapability("a");
-
-        assertNotNull(c1);
-        assertNotNull(c2);
-
-        assertEquals(c1.hashCode(), c2.hashCode());
-
-        c1.setAttribute(ATTR_P1, "p1");
-
-        assertNotEquals(c1.hashCode(), c2.hashCode());
-
-        c2.setAttribute(ATTR_P1, "p1");
-
-        assertEquals(c1.hashCode(), c2.hashCode());
-    }
+//    @Test
+//    public void testHashSetContains() throws Exception {
+//        Capability c1 = factory.createCapability("a");
+//        Capability c2 = factory.createCapability("a");
+//
+//        assertNotNull(c1);
+//        assertNotNull(c2);
+//
+//        assertEquals(c1.hashCode(), c2.hashCode());
+//
+//        c1.setAttribute(ATTR_P1, "p1");
+//
+//        assertNotEquals(c1.hashCode(), c2.hashCode());
+//
+//        c2.setAttribute(ATTR_P1, "p1");
+//
+//        assertEquals(c1.hashCode(), c2.hashCode());
+//    }
 
     @Test
     public void testHierarchy() {

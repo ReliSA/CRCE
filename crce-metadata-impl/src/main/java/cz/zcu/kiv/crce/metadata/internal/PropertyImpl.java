@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -16,13 +18,20 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
 
     private static final long serialVersionUID = -7003533524061344584L;
 
+    private final String id;
     private String namespace = null;
     private Resource resource = null;
     private Property parent = null;
-    private List<Property> children = new ArrayList<>();
+    private final List<Property> children = new ArrayList<>();
 
-    public PropertyImpl(String namespace) {
+    public PropertyImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace;
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -53,12 +62,7 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
 
     @Override
     public boolean addChild(Property property) {
-        // commented way would be a performance problem
-//        if (!children.contains(property)) {
-//            property.setParent(this);
-            return children.add(property);
-//        }
-//        return false;
+        return children.add(property);
     }
 
     @Override
@@ -80,28 +84,13 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
             return false;
         }
         final PropertyImpl other = (PropertyImpl) obj;
-        if (!Objects.equals(this.namespace, other.namespace)) {
-            return false;
-        }
-        if (!Objects.equals(this.resource, other.resource)) {
-            return false;
-        }
-        if (!Objects.equals(this.parent, other.parent)) {
-            return false;
-        }
-        if (!Objects.equals(this.children, other.children)) {
-            return false;
-        }
-        return super.equals(obj);
+        return Objects.equals(this.id, other.id);
     }
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 97 * hash + Objects.hashCode(this.namespace);
-        hash = 97 * hash + Objects.hashCode(this.resource);
-        hash = 97 * hash + Objects.hashCode(this.parent);
-        hash = 97 * hash + Objects.hashCode(this.children);
+        int hash = 7;
+        hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
     }
 }

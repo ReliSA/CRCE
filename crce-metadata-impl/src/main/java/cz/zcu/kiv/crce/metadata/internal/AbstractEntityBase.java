@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeProvider;
@@ -87,12 +86,12 @@ public abstract class AbstractEntityBase extends AbstractDirectiveProvider imple
     }
 
     @Override
-    public List<? extends Attribute<?>> getAttributes() {
+    public List<Attribute<?>> getAttributes() {
         return Collections.unmodifiableList(new ArrayList<>(attributesMap.values()));
     }
 
     @Override
-    public Map<String, ? extends Attribute<?>> getAttributesMap() {
+    public Map<String, Attribute<?>> getAttributesMap() {
         return Collections.unmodifiableMap(attributesMap);
     }
 
@@ -104,28 +103,5 @@ public abstract class AbstractEntityBase extends AbstractDirectiveProvider imple
             return (T) attribute.getValue();
         }
         return null;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = super.hashCode();
-        hash = 97 * hash + Objects.hashCode(this.attributesMap);
-        return hash;
-    }
-
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final AbstractEntityBase other = (AbstractEntityBase) obj;
-        if (!Objects.equals(this.attributesMap, other.attributesMap)) {
-            return false;
-        }
-        return super.equals(obj);
     }
 }
