@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
@@ -29,53 +30,53 @@ public class RequirementTest {
         r3 = new RequirementImpl("req3", "c");
     }
 
-//    @Test
-//    public void equalsName() {
-//        assertEquals(r1, r2);
-//        assertNotEquals(r1, r3);
-//        assertNotEquals(r2, r3);
-//    }
+    @Test
+    public void equalsName() {
+        assertTrue(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+        assertFalse(r1.equalsTo(r3, EqualityLevel.SHALLOW_NO_KEY));
+        assertFalse(r2.equalsTo(r3, EqualityLevel.SHALLOW_NO_KEY));
+    }
 
-//    @Test
-//    public void testEqualAttributes() {
-//        r1.addAttribute("atr1", String.class, "value", Operator.EQUAL);
-//        assert !r1.equals(r2);
-//
-//        r2.addAttribute("atr1", String.class, "value", Operator.EQUAL);
-//        assert r1.equals(r2);
-//    }
+    @Test
+    public void testEqualAttributes() {
+        r1.addAttribute("atr1", String.class, "value", Operator.EQUAL);
+        assert !r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY);
 
-//    @Test
-//    public void testAttributesWithOperator() {
-//        r1.addAttribute("atr1", String.class, "value", Operator.GREATER);
-//        assertNotEquals(r1, r2);
-//
-//        r2.addAttribute("atr1", String.class, "value", Operator.GREATER);
-//        assertEquals(r1, r2);
-//
-//        r1.addAttribute("atr1", String.class, "value", Operator.LESS);
-//        r1.equals(r2);
-//        System.out.println("eq: " + r1.equals(r2));
-//        assertNotEquals(r1, r2);
-//    }
+        r2.addAttribute("atr1", String.class, "value", Operator.EQUAL);
+        assert r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY);
+    }
 
-//    @Test
-//    public void testDirectives() {
-//        r1.setDirective("optional", "true");
-//
-//        assertNotEquals(r1, r2);
-//
-//        r2.setDirective("optional", "true");
-//        assertEquals(r1, r2);
-//
-//        r1.setDirective("multiple", "false");
-//        assertNotEquals(r1, r2);
-//
-//        assertEquals("true", r1.getDirective("optional"));
-//        assertEquals("false", r1.getDirective("multiple"));
-//
-//        assertNull(r1.getDirective("unknown"));
-//    }
+    @Test
+    public void testAttributesWithOperator() {
+        r1.addAttribute("atr1", String.class, "value", Operator.GREATER);
+        assertFalse(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+
+        r2.addAttribute("atr1", String.class, "value", Operator.GREATER);
+        assertTrue(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+
+        r1.addAttribute("atr1", String.class, "value", Operator.LESS);
+        r1.equals(r2);
+        System.out.println("eq: " + r1.equals(r2));
+        assertFalse(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+    }
+
+    @Test
+    public void testDirectives() {
+        r1.setDirective("optional", "true");
+
+        assertFalse(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+
+        r2.setDirective("optional", "true");
+        assertTrue(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+
+        r1.setDirective("multiple", "false");
+        assertFalse(r1.equalsTo(r2, EqualityLevel.SHALLOW_NO_KEY));
+
+        assertEquals("true", r1.getDirective("optional"));
+        assertEquals("false", r1.getDirective("multiple"));
+
+        assertNull(r1.getDirective("unknown"));
+    }
 
 //    @Test
 //    public void equals() {
