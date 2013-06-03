@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Capability extends AttributeProvider, DirectiveProvider, Serializable {
+public interface Capability extends AttributeProvider, DirectiveProvider, EqualityComparable<Capability>, Serializable {
 
     @Nonnull
     String getId();

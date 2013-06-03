@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Resource extends Serializable {
+public interface Resource extends EqualityComparable<Resource>, Serializable {
 
     @Nonnull
     String getId();

@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -19,7 +20,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * Implementation of <code>Resource</code> interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class ResourceImpl extends AbstractEntityBase implements Resource {
+public class ResourceImpl implements Resource {
 
     private static final long serialVersionUID = 2594634894045505360L;
 
@@ -229,11 +230,11 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (getClass() == obj.getClass() || obj instanceof Resource) {
+            final Resource other = (Resource) obj;
+            return Objects.equals(this.id, other.getId());
         }
-        final ResourceImpl other = (ResourceImpl) obj;
-        return Objects.equals(this.id, other.id);
+        return false;
     }
 
     @Override
@@ -241,5 +242,49 @@ public class ResourceImpl extends AbstractEntityBase implements Resource {
         int hash = 5;
         hash = 79 * hash + Objects.hashCode(this.id);
         return hash;
+    }
+
+    @Override
+    public boolean equalsTo(Resource other, EqualityLevel level) {
+        if (other == null) {
+            return false;
+        }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
+
+            case SHALLOW_NO_KEY:
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                return Util.equalsTo(this, other, EqualityLevel.KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getRequirements(), other.getRequirements(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getRequirements(), other.getRequirements(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+
+             default:
+                return equalsTo(other, EqualityLevel.KEY);
+       }
     }
 }

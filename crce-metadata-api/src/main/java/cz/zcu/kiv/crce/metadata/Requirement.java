@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -12,7 +13,7 @@ import javax.annotation.Nullable;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Requirement extends DirectiveProvider, Serializable {
+public interface Requirement extends DirectiveProvider, EqualityComparable<Requirement>, Serializable {
 
     @Nonnull
     String getId();
@@ -39,6 +40,9 @@ public interface Requirement extends DirectiveProvider, Serializable {
 
     @Nonnull
     List<Attribute<?>> getAttributes();
+
+    @Nonnull
+    Map<String, List<Attribute<?>>> getAttributesMap();
 
     @Nonnull
     <T> List<Attribute<T>> getAttributes(@Nonnull AttributeType<T> type);

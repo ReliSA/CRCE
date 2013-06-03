@@ -8,6 +8,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -82,11 +83,11 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (getClass() == obj.getClass() || obj instanceof Capability) {
+            final Capability other = (Capability) obj;
+            return Objects.equals(this.id, other.getId());
         }
-        final CapabilityImpl other = (CapabilityImpl) obj;
-        return Objects.equals(this.id, other.id);
+        return false;
     }
 
     @Override
@@ -94,5 +95,67 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
         int hash = 7;
         hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
+    }
+
+    @Override
+    public boolean equalsTo(Capability other, EqualityLevel level) {
+        if (other == null) {
+            return false;
+        }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
+
+            case SHALLOW_NO_KEY:
+                if (!Objects.equals(this.namespace, other.getNamespace())) {
+                    return false;
+                }
+                if (!Objects.equals(this.attributesMap, other.getAttributesMap())) {
+                    return false;
+                }
+                if (!Objects.equals(this.directivesMap, other.getDirectives())) {
+                    return false;
+                }
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.KEY)) {
+                    return false;
+                }
+                return this.equalsTo(other, EqualityLevel.SHALLOW_NO_KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+
+            default:
+                return equalsTo(other, EqualityLevel.KEY);
+        }
     }
 }

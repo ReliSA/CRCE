@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -124,6 +125,11 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
     }
 
     @Override
+    public Map<String, List<Attribute<?>>> getAttributesMap() {
+        return Collections.unmodifiableMap(attributesMap);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<Attribute<T>> getAttributes(AttributeType<T> type) {
         List<Attribute<?>> attributes = attributesMap.get(type.getName());
@@ -138,11 +144,11 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
+        if (getClass() == obj.getClass() || obj instanceof Requirement) {
+            final Requirement other = (Requirement) obj;
+            return Objects.equals(this.id, other.getId());
         }
-        final RequirementImpl other = (RequirementImpl) obj;
-        return Objects.equals(this.id, other.id);
+        return false;
     }
 
     @Override
@@ -150,5 +156,68 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
         int hash = 7;
         hash = 53 * hash + Objects.hashCode(this.id);
         return hash;
+    }
+
+    @Override
+    public boolean equalsTo(Requirement other, EqualityLevel level) {
+        if (other == null) {
+            return false;
+        }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
+
+            case SHALLOW_NO_KEY:
+                if (!Objects.equals(this.namespace, other.getNamespace())) {
+                    return false;
+                }
+                if (!Objects.equals(this.attributesMap, other.getAttributesMap())) {
+                    return false;
+                }
+                if (!Objects.equals(this.directivesMap, other.getDirectives())) {
+                    return false;
+                }
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                if (!this.equalsTo(other, EqualityLevel.KEY)) {
+                    return false;
+                }
+                return this.equalsTo(other, EqualityLevel.SHALLOW_NO_KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+                
+            default:
+                return equalsTo(other, EqualityLevel.KEY);
+        }
+
     }
 }

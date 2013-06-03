@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
 import java.net.URI;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
@@ -30,4 +31,25 @@ public class RepositoryImpl implements Repository {
         return -1;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + Objects.hashCode(this.uri);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RepositoryImpl other = (RepositoryImpl) obj;
+        if (!Objects.equals(this.uri, other.uri)) {
+            return false;
+        }
+        return true;
+    }
 }
