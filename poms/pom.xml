@@ -23,6 +23,8 @@
         <version.org.osgi>4.3.1</version.org.osgi>
         <version.com.sun.jersey>1.17</version.com.sun.jersey>
         <version.org.ops4j.pax.web>3.0.0.M1</version.org.ops4j.pax.web>
+        <version.jdk>1.7</version.jdk>
+        <version.maven>3.0.4</version.maven>
     </properties>
 
     <modules>
@@ -53,10 +55,33 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.2</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>${version.jdk}</version>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>${version.maven}</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
@@ -101,7 +126,7 @@
             </dependency>
 
             <!-- PAX-WEB -->
-            
+
             <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-extender-war</artifactId>
@@ -157,7 +182,7 @@
                 <version>${version.org.slf4j}</version>
                 <scope>provided</scope>
             </dependency>
-            
+
             <!-- Implementation -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -173,7 +198,7 @@
             </dependency>
 
             <!-- === APACHE FELIX === -->
-            
+
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.eventadmin</artifactId>
@@ -318,8 +343,8 @@
                 <version>${version.org.apache.ace}</version>
                 <scope>provided</scope>
             </dependency>
-                        
-            <!-- Jersey -->            
+
+            <!-- Jersey -->
         	<dependency>
     			<groupId>com.sun.jersey</groupId>
     			<artifactId>jersey-server</artifactId>
@@ -329,9 +354,9 @@
 	    	<dependency>
       			<groupId>com.sun.jersey</groupId>
       			<artifactId>jersey-servlet</artifactId>
-      			<version>${version.com.sun.jersey}</version>  
-      			<scope>provided</scope>    
-	 		</dependency>	 
+      			<version>${version.com.sun.jersey}</version>
+      			<scope>provided</scope>
+	 		</dependency>
 	 		<dependency>
     			<groupId>com.sun.jersey</groupId>
     			<artifactId>jersey-json</artifactId>
