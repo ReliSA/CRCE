@@ -49,6 +49,10 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
      * @throws IOException reading from stream or creation of file or write to file failed
      */
     private File fileFromStream(InputStream bundleAsStream) throws IOException {
+    	
+    	if (null == bundleAsStream)
+    		throw new IllegalArgumentException("'null' passed as input stream");
+    	
     	OutputStream output = null;
         File bundleFile;
         try {
@@ -152,6 +156,9 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
+                } catch (Exception e) {
+                	logger.error("Resource handling error", e);
+                	throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
                 }
             }
 
