@@ -156,6 +156,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
+                    throw new RevokedArtifactException("I/O error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
                 } catch (Exception e) {
                 	logger.error("Resource handling error", e);
                 	throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
