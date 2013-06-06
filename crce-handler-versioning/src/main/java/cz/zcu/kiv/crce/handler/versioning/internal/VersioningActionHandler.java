@@ -112,7 +112,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 category = CATEGORY_VERSIONED;
                 resource.addCategory("initial-version");
             } else {
-            	InputStream versionedBudnleIs = null;
+            	InputStream versionedBundleIs = null;
                 try {
                 	//candidate = base bundle for version generation
                     InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
@@ -124,7 +124,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     //micro part of version is generated too
                     options.put("keep-micro-if-identical", "false");
 
-                    versionedBudnleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
+                    versionedBundleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
                     
                     category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
@@ -146,7 +146,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
                 try {
                 	//create resource from file with bundle with generated version
-                	File versionedBundleFile = fileFromStream(versionedBudnleIs);
+                	File versionedBundleFile = fileFromStream(versionedBundleIs);
                 	
                     resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
                     
