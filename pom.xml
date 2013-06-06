@@ -90,8 +90,8 @@
         <module>crce-webui</module>
         <module>crce-rest</module>
 
-	<!-- integration tests are not finished yet -->
-        <!--<module>crce-integration-tests</module>-->
+ 	<!-- integration tests are not finished yet -->
+<!--	<module>crce-integration-tests</module> -->
     </modules>
 
     <profiles>
