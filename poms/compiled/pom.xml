@@ -25,6 +25,10 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
             <plugin>
@@ -56,7 +60,7 @@
                     <linkXref>false</linkXref>
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
-                    <targetJdk>1.7</targetJdk>
+                    <targetJdk>${version.jdk}</targetJdk>
                 </configuration>
                 <executions>
                     <execution>

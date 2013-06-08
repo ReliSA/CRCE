@@ -19,6 +19,8 @@
 
     <properties>
         <namespace>cz.zcu.kiv.crce</namespace>
+        <version.jdk>1.7</version.jdk>
+        <version.maven>3.0.4</version.maven>
         <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
         <version.com.sun.jersey>1.17</version.com.sun.jersey>
@@ -52,12 +54,35 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.0</version>
+                    <version>3.1</version>
                     <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.2</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>${version.jdk}</version>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>${version.maven}</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
