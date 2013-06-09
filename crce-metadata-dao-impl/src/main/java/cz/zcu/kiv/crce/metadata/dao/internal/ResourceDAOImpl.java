@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.dao.internal;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.Set;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -56,18 +59,16 @@ public class ResourceDAOImpl implements ResourceDAO {
     @Override
     public synchronized void saveResource(Resource resource) throws IOException {
 
+        // TODO: check internal_id, autoincrement ??
+        
         String conf = "data/mybatis-config.xml";
         InputStream inputStream = Resources.getResourceAsStream(conf);
         SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
         SqlSessionFactory factory = builder.build(inputStream);
-        
-        // RESOURCE VALUES - int internal_ID, varchar id
-        String resourceID = resource.getId();
-        //String resourceVersion = resource.getVersion().toString(); // Missing in the database, not needed?
 
         SqlSession session = factory.openSession();
         try {
-            session.insert("org.apache.ibatis.Mapper.insertResource", resourceID);
+            session.insert("org.apache.ibatis.Mapper.insertResource", resource.getId());
             session.commit();
         } finally {
             session.close();
@@ -75,42 +76,60 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         // CAPABILITY
         for (Capability c : resource.getCapabilities()) {
-            c.getName();
-            for (Property p : c.getProperties()) {
-                p.getName();
-                p.getType();
-                p.getValue();
+            // save to capability
+            c.getId();
+            c.getNamespace();
+            resource.getId();
+
+            // cap_attribute
+            for (Attribute<?> a : c.getAttributes()) {
+                // save to cap_attribute, where the hell is attribute name ?!?
+                a.getAttributeType();
+                // a.getValue();
+                a.getStringValue();
+                a.getOperator();
+            }
+
+            // cap_directive
+            Map<String, String> d = c.getDirectives();
+            Set<String> k = d.keySet();
+            Collection<String> v = d.values();
+
+            String[] names = k.toArray(new String[k.size()]);
+            String[] values = v.toArray(new String[v.size()]);
+
+            for (int i = 0; i < k.size(); i++) {
+                // save names[i] and values[i] to cap_directive
             }
         }
 
         // REQUIREMENT
         for (Requirement r : resource.getRequirements()) {
-            r.getName();
-            r.getComment();
-            r.getFilter();
-        }
-        
-        /*
-        
-        // CAPABILITY VALUES - int internal_ID, varchar id, varchar namespace, int capability_id, int resource_id
-        //CAP_ATTRIBUTE - int internal_ID, varchar name, varchar type, varchar value, varchar operator, int capability_id
-        //CAP_DIRECTIVE - int internal_ID, varchar name, varchar value, int capability_id
-        String[] capabilitiesNames = new String[resourceCapabilities.length];
-        //Property[] capabilitiesProperty = new Property[resourceCapabilities.length];
-        for (int i = 0; i < resourceCapabilities.length; i++) {
-            capabilitiesNames[i] = resourceCapabilities[i].getName();
-        }
+            r.getId();
+            r.getNamespace();
+            resource.getId();
 
-        // REQUIREMENT VALUES - int internal_ID, varchar namespace, int requirement_id, int resource_id
-        //REQ_ATTRIBUTE - int internal_ID, varchar name, varchar type, varchar value, varchar operator, int requirement_id
-        //REQ_DIRECTIVE - int internal_ID, varchar name, varchar value, int requirement_id
-        String[] requirementsNames = new String[resourceRequirements.length];
-        for (int i = 0; i < resourceRequirements.length; i++) {
-            requirementsNames[i] = resourceRequirements[i].getName();
-            // getComment - not needed?
+            // req_attribute
+            for (Attribute<?> a : r.getAttributes()) {
+                // save to req_attribute, where the hell is attribute name ?!?
+                a.getAttributeType();
+                // a.getValue();
+                a.getStringValue();
+                a.getOperator();
+            }
+
+            // req_directive 
+            Map<String, String> d = r.getDirectives();
+            Set<String> k = d.keySet();
+            Collection<String> v = d.values();
+
+            String[] names = k.toArray(new String[k.size()]);
+            String[] values = v.toArray(new String[v.size()]);
+
+            for (int i = 0; i < k.size(); i++) {
+                // save names[i] and values[i] to req_directive 
+            }
         }
-        
-        */
     }
 
     @Override
