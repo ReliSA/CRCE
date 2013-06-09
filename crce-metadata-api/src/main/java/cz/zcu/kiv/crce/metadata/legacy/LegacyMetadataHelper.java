@@ -66,6 +66,8 @@ public class LegacyMetadataHelper {
         if (capabilities.isEmpty()) {
             capability = factory.createCapability(namespace);
             resource.addCapability(capability);
+            resource.addRootCapability(capability);
+            capability.setResource(resource);
         } else {
             capability = capabilities.get(0);
         }

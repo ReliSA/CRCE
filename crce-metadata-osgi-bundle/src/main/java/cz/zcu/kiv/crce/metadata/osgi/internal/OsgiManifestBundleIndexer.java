@@ -89,6 +89,8 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
                 cap.setAttribute(fprop.getName(), (Class<Object>) type.getTypeClass(), ObrType.propertyValueFromString(type, fprop.getValue()));
             }
             resource.addCapability(cap);
+            resource.addRootCapability(cap);
+            cap.setResource(resource);
         }
         for (org.apache.felix.bundlerepository.Requirement freq : fres.getRequirements()) {
             Requirement req = resourceFactory.createRequirement(freq.getName());

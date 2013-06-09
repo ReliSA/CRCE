@@ -347,7 +347,9 @@ public class MetadataServiceImpl implements MetadataService {
         Capability capability;
         if (capabilities.isEmpty()) {
             capability = resourceFactory.createCapability(namespace);
+            capability.setResource(resource);
             resource.addCapability(capability);
+            resource.addRootCapability(capability);
         } else {
             capability = capabilities.get(0);
         }
