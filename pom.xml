@@ -66,6 +66,7 @@
         <module>crce-metadata-dao-api</module>
         <module>crce-metadata-service-api</module>
         <module>crce-repository-api</module>
+        <module>crce-metadata-indexer-api</module>
         <!--<module>crce-results-api</module>-->
 
         <!-- API Implementation -->
@@ -92,6 +93,7 @@
         <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
         <!--<module>crce-rest</module>-->
+        <module>crce-metadata-metaDB</module>
     </modules>
 
     <profiles>

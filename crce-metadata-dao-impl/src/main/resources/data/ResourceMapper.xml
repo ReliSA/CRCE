@@ -1,0 +1,71 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.apache.ibatis.Mapper">
+
+        <resultMap type="org.apache.ibatis.Mapper.Resource" id="resourcemap">
+		<id column="id" property="id"/>
+	</resultMap>
+	<select id="getResource" parameterType="int" resultMap="resourcemap">
+		select id 
+                from resource
+                where internal_id = #{id}
+	</select>
+        
+	<select id="getResources" resultMap="resourcemap">
+		select *
+                from resource
+	</select>
+    	
+        <delete id="deleteResource" parameterType="int">
+            DELETE FROM RESOURCE WHERE INTERNAL_ID = #{id}
+        </delete>
+       
+	<insert id="insertResource" parameterType="org.apache.ibatis.Mapper.Resource">
+	    insert into resource (id) values (
+	    	#{id}
+	    )
+	</insert>
+        
+        <insert id="insertRequirement" parameterType="org.apache.ibatis.Mapper.Requirement">
+	    insert into resource (id, namespace, requirement_id, resource_id) values (
+	    	#{id}, #{namespace}, #{requirement_id}, #{resource_id}
+	    )
+	</insert>
+	
+        <insert id="insertReq_directive" parameterType="org.apache.ibatis.Mapper.Requirement">
+	    insert into resource (value, name, requirement_id) values (
+	    	#{value}, #{name}, #{requirement_id}
+	    )
+	</insert>
+        
+        <insert id="insertReq_attribute" parameterType="org.apache.ibatis.Mapper.Requirement">
+	    insert into resource (name, type, value, operator, requirement_id) values (
+	    	#{name}, #{type}, #{value}, #{operator}, #{requirement_id}
+	    )
+	</insert>
+        
+        <insert id="insertCapability" parameterType="org.apache.ibatis.Mapper.Capability">
+	    insert into resource (id, namespace, capability_id, resource_id) values (
+	    	#{id}, #{namespace}, #{requirement_id}, #{capability_id}
+	    )
+	</insert>
+	
+        <insert id="insertCap_directive" parameterType="org.apache.ibatis.Mapper.Capability">
+	    insert into resource (value, name, capability_id) values (
+	    	#{value}, #{name}, #{capability_id}
+	    )
+	</insert>
+        
+        <insert id="insertCap_attribute" parameterType="org.apache.ibatis.Mapper.Capability">
+	    insert into resource (name, type, value, operator, capability_id) values (
+	    	#{name}, #{type}, #{value}, #{operator}, #{capability_id}
+	    )
+	</insert>
+
+</mapper>
