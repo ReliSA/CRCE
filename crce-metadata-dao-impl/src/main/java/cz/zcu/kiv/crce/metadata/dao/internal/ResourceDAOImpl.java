@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.metadata.dao.internal;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Property;
+//import cz.zcu.kiv.crce.metadata.Property;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
