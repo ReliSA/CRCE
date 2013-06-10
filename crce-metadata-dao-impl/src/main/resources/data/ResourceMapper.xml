@@ -11,15 +11,42 @@
         <resultMap type="org.apache.ibatis.Mapper.Resource" id="resourcemap">
 		<id column="id" property="id"/>
 	</resultMap>
-	<select id="getResource" parameterType="int" resultMap="resourcemap">
+	<select id="getResource" parameterType="String" resultMap="resourcemap">
 		select id 
                 from resource
-                where internal_id = #{id}
+                where id = #{id}
 	</select>
         
 	<select id="getResources" resultMap="resourcemap">
 		select *
                 from resource
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.ResourceID" id="resourcemap2">
+		<id column="internal_id" property="id"/>
+	</resultMap>
+	<select id="getResourceID" parameterType="String" resultMap="resourcemap2">
+		select internal_id
+                from resource
+                where id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.CapabilityID" id="resourcemap3">
+		<id column="internal_id" property="id"/>
+	</resultMap>
+	<select id="getCapabilityID" parameterType="String" resultMap="resourcemap3">
+		select internal_id
+                from capability
+                where id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.RequirementID" id="resourcemap4">
+		<id column="internal_id" property="id"/>
+	</resultMap>
+	<select id="getRequirementID" parameterType="String" resultMap="resourcemap4">
+		select internal_id
+                from requirement
+                where id = #{id}
 	</select>
     	
         <delete id="deleteResource" parameterType="int">
@@ -33,8 +60,8 @@
 	</insert>
         
         <insert id="insertRequirement" parameterType="org.apache.ibatis.Mapper.Requirement">
-	    insert into resource (id, namespace, requirement_id, resource_id) values (
-	    	#{id}, #{namespace}, #{requirement_id}, #{resource_id}
+	    insert into resource (id, namespace, resource_id) values (
+	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
@@ -51,8 +78,8 @@
 	</insert>
         
         <insert id="insertCapability" parameterType="org.apache.ibatis.Mapper.Capability">
-	    insert into resource (id, namespace, capability_id, resource_id) values (
-	    	#{id}, #{namespace}, #{requirement_id}, #{capability_id}
+	    insert into resource (id, namespace, resource_id) values (
+	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
