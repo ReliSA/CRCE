@@ -32,7 +32,7 @@
 	</select>
         
         <resultMap type="org.apache.ibatis.Mapper.CapabilityID" id="resourcemap3">
-		<id column="internal_id" property="id"/>
+		<id column="internal_id" property="internal_id"/>
 	</resultMap>
 	<select id="getCapabilityID" parameterType="String" resultMap="resourcemap3">
 		select internal_id
@@ -41,14 +41,86 @@
 	</select>
         
         <resultMap type="org.apache.ibatis.Mapper.RequirementID" id="resourcemap4">
-		<id column="internal_id" property="id"/>
+		<id column="internal_id" property="internal_id"/>
 	</resultMap>
 	<select id="getRequirementID" parameterType="String" resultMap="resourcemap4">
 		select internal_id
                 from requirement
                 where id = #{id}
 	</select>
-    	
+        
+        <resultMap type="org.apache.ibatis.Mapper.Capability" id="resourcemap4">
+		<id column="internal_id" property="internal_id"/>
+                <id column="id" property="id"/>
+                <id column="namespace" property="namespace"/>
+                <id column="capability_id" property="capability_id"/>
+	</resultMap>
+	<select id="getCapability" parameterType="int" resultMap="resourcemap4">
+		select internal_id, id, namespace, requirement_id
+                from capability
+                where resource_id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.CapabilityDirective" id="resourcemap5">
+		<id column="internal_id" property="internal_id"/>
+                <id column="name" property="name"/>
+                <id column="value" property="value"/>
+	</resultMap>
+	<select id="getCapabilityDirective" parameterType="int" resultMap="resourcemap5">
+		select internal_id, name, value
+                from cap_directive
+                where capability_id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.CapabilityAttribute" id="resourcemap6">
+		<id column="internal_id" property="internal_id"/>
+                <id column="type" property="type"/>
+                <id column="name" property="name"/>
+                <id column="value" property="value"/>
+                <id column="operator" property="operator"/>
+	</resultMap>
+	<select id="getCapabilityAttribute" parameterType="int" resultMap="resourcemap6">
+		select internal_id, type, name, value, operator
+                from cap_attribute
+                where capability_id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.Requirement" id="resourcemap7">
+		<id column="internal_id" property="internal_id"/>
+                <id column="id" property="id"/>
+                <id column="namespace" property="namespace"/>
+                <id column="requirement_id" property="requirement_id"/>
+	</resultMap>
+	<select id="getRequirement" parameterType="int" resultMap="resourcemap7">
+		select internal_id, id, namespace, requirement_id
+                from requirement
+                where resource_id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.RequirementDirective" id="resourcemap8">
+		<id column="internal_id" property="internal_id"/>
+                <id column="name" property="name"/>
+                <id column="value" property="value"/>
+	</resultMap>
+	<select id="getRequirementDirective" parameterType="int" resultMap="resourcemap8">
+		select internal_id, name, value
+                from req_directive
+                where requirement_id = #{id}
+	</select>
+        
+        <resultMap type="org.apache.ibatis.Mapper.RequirementAttribute" id="resourcemap9">
+		<id column="internal_id" property="internal_id"/>
+                <id column="type" property="type"/>
+                <id column="name" property="name"/>
+                <id column="value" property="value"/>
+                <id column="operator" property="operator"/>
+	</resultMap>
+	<select id="getRequirementAttribute" parameterType="int" resultMap="resourcemap9">
+		select internal_id, type, name, value, operator
+                from req_attribute
+                where requirement_id = #{id}
+	</select>
+           	
         <delete id="deleteResource" parameterType="int">
             DELETE FROM RESOURCE WHERE INTERNAL_ID = #{id}
         </delete>

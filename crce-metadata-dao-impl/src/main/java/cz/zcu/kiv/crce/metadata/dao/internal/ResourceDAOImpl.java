@@ -39,14 +39,33 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
-        for (Map<URI, Resource> resources : repositories.values()) {
-            if (resources != null) {
-                Resource resource = resources.get(uri);
-                if (resource != null) {
-                    return resource;
-                }
+        
+        Resource resource = loadResource(uri);
+
+        if (resource != null) {
+            String conf = "data/mybatis-config.xml";
+            InputStream inputStream = Resources.getResourceAsStream(conf);
+            SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+            SqlSessionFactory factory = builder.build(inputStream);
+        
+            String resourceID = resource.getId();   // TODO - check if i can do that
+            
+            // Load capability
+            try (SqlSession session = factory.openSession()) {
+            List <String> selectedCapability = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
+            Capability cap; // TODO fill capability and requirements and then resource.add...
+           // cap.; selectedCapability.get(0);
+            session.close();
             }
+            
+            
+            
+            // Load requirements
+        
+        return resource;
+ 
         }
+        
         return null;
     }
 
