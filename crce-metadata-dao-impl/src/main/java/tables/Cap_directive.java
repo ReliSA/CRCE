@@ -1,9 +1,12 @@
-
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package tables;
 
 /**
  *
- * @author Cihlář
+ * @author cihlator
  */
 public class Cap_directive {
     // private int internal id; // not needed
@@ -34,5 +37,6 @@ public class Cap_directive {
     public void setCapability_id(int capability_id) {
         this.capability_id = capability_id;
     }
+    
     
 }
