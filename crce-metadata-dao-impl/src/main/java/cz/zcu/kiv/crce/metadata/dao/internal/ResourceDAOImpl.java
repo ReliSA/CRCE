@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.metadata.dao.internal;
 
-import cz.zcu.kiv.crce.metadata.Attribute;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 //import cz.zcu.kiv.crce.metadata.Property;
 import java.io.IOException;
@@ -39,37 +39,95 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
-     /*   
-        Resource resource = loadResource(uri);
-
-        if (resource != null) {
+       
+        //Resource resource = loadResource(uri);
+        String resourceID = uri.toString();
+        
+        if (resourceID != null) {
+            Resource resource = null;
+            
             String conf = "data/mybatis-config.xml";
             InputStream inputStream = Resources.getResourceAsStream(conf);
             SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
             SqlSessionFactory factory = builder.build(inputStream);
-        
-            String resourceID = resource.getId();   // TODO - check if i can do that
-            
+                            
             // Load capability
+            Capability cap = null;         
             try (SqlSession session = factory.openSession()) {
             List <String> selectedCapability = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
-            session.close();
-            Capability cap; // TODO fill capability and requirements and then resource.add...
-            String internal_id = selectedCapability.get(0);
-            String id = selectedCapability.get(1);
-            String namespace = selectedCapability.get(2);
+            session.close();          
+            //String capInternal_id = selectedCapability.get(0);
+            String cap_id = selectedCapability.get(1);
+            String capabilityNamespace = selectedCapability.get(2);
             String capability_id = selectedCapability.get(3);
+            //TODO save cap_id and namespace
             
-        
+            SqlSession session2 = factory.openSession();
+            List <String> selectedCapDirective = session2.selectList("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
+            session2.close();
+            String capDirName = selectedCapDirective.get(1);
+            String capDirValue = selectedCapDirective.get(2);
+            
+            cap.setDirective(capDirName, capDirValue);
+            
+            SqlSession session3 = factory.openSession();
+            List <String> selectedCapAttribute = session3.selectList("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
+            session3.close();
+            String capAttribute_type = selectedCapAttribute.get(1);
+            String capAttribute_name = selectedCapAttribute.get(2);
+            String capAttribute_value = selectedCapAttribute.get(3);
+            //String capAttribute_operator = selectedCapAttribute.get(4); // TODO unfinished
+                     
+            AttributeImpl cap_att = new AttributeImpl();
+            cap_att.setAttributeType(capAttribute_type);
+            cap_att.setNonNormalizedValue(capAttribute_name); // TODO check
+            cap_att.setValue(capAttribute_value);
+            //cap_att.setName();  // TODO check QNAME
+            
+            cap.setAttribute(cap_att);
+            resource.addCapability(cap);
             }
             
- 
             // Load requirements
+            Requirement req = null;
+            List <String> selectedRequirement;
+            try (SqlSession session = factory.openSession()) {
+                selectedRequirement = session.selectList("org.apache.ibatis.Mapper.getRequirement", resourceID);             
+                String req_id = selectedRequirement.get(1);
+                String requirementNamespace = selectedRequirement.get(2);
+                String requirement_id = selectedRequirement.get(3);
+                // TODO save namespace and req_id
+                
+                SqlSession session2 = factory.openSession();
+                List <String> selectedreqDirective = session2.selectList("org.apache.ibatis.Mapper.getRequirementDirective", requirement_id);
+                session2.close();
+                String reqDirName = selectedreqDirective.get(1);
+                String reqDirValue = selectedreqDirective.get(2);
+
+                req.setDirective(reqDirName, reqDirValue);
+
+                SqlSession session3 = factory.openSession();
+                List <String> selectedreqAttribute = session3.selectList("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
+                session3.close();
+                String reqAttribute_type = selectedreqAttribute.get(1);
+                String reqAttribute_name = selectedreqAttribute.get(2);
+                String reqAttribute_value = selectedreqAttribute.get(3);
+                //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished          
+                
+                AttributeImpl req_att = new AttributeImpl();
+                req_att.setAttributeType(reqAttribute_type);
+                req_att.setNonNormalizedValue(reqAttribute_name); // TODO check
+                req_att.setValue(reqAttribute_value);
+                //req_att.setName();  // TODO check QNAME
+                
+                req.addAttribute(req_att);
+                resource.addRequirement(req);
+            }
       
         return resource;
  
         }
-          */
+          
         return null;
     }
 
