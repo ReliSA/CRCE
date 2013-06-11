@@ -39,7 +39,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
-        /*
+     /*   
         Resource resource = loadResource(uri);
 
         if (resource != null) {
@@ -48,24 +48,28 @@ public class ResourceDAOImpl implements ResourceDAO {
             SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
             SqlSessionFactory factory = builder.build(inputStream);
         
-        //    String resourceID = resource.getId();   // TODO - check if i can do that
+            String resourceID = resource.getId();   // TODO - check if i can do that
             
             // Load capability
             try (SqlSession session = factory.openSession()) {
-          //  List <String> selectedCapability = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
-        //    Capability cap; // TODO fill capability and requirements and then resource.add...
-           // cap.; selectedCapability.get(0);
+            List <String> selectedCapability = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
             session.close();
+            Capability cap; // TODO fill capability and requirements and then resource.add...
+            String internal_id = selectedCapability.get(0);
+            String id = selectedCapability.get(1);
+            String namespace = selectedCapability.get(2);
+            String capability_id = selectedCapability.get(3);
+            
+        
             }
             
-            
-            
+ 
             // Load requirements
-        
+      
         return resource;
  
         }
-        */
+          */
         return null;
     }
 

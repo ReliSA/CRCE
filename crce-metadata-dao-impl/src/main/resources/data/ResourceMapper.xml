@@ -56,7 +56,7 @@
                 <id column="capability_id" property="capability_id"/>
 	</resultMap>
 	<select id="getCapability" parameterType="int" resultMap="resourcemap4">
-		select internal_id, id, namespace, requirement_id
+		select internal_id, id, namespace, capability_id
                 from capability
                 where resource_id = #{id}
 	</select>
