@@ -2,13 +2,9 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="org.apache.ibatis.Mapper">
 
-        <resultMap type="org.apache.ibatis.Mapper.Resource" id="resourcemap">
+        <resultMap  id="resourcemap" type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 		<id column="id" property="id"/>
 	</resultMap>
 	<select id="getResource" parameterType="String" resultMap="resourcemap">
@@ -22,7 +18,7 @@
                 from resource
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.ResourceID" id="resourcemap2">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap2">
 		<id column="internal_id" property="id"/>
 	</resultMap>
 	<select id="getResourceID" parameterType="String" resultMap="resourcemap2">
@@ -31,7 +27,7 @@
                 where id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.CapabilityID" id="resourcemap3">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap3">
 		<id column="internal_id" property="internal_id"/>
 	</resultMap>
 	<select id="getCapabilityID" parameterType="String" resultMap="resourcemap3">
@@ -40,7 +36,7 @@
                 where id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.RequirementID" id="resourcemap4">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap4">
 		<id column="internal_id" property="internal_id"/>
 	</resultMap>
 	<select id="getRequirementID" parameterType="String" resultMap="resourcemap4">
@@ -49,19 +45,19 @@
                 where id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.Capability" id="resourcemap4">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap1">
 		<id column="internal_id" property="internal_id"/>
                 <id column="id" property="id"/>
                 <id column="namespace" property="namespace"/>
                 <id column="capability_id" property="capability_id"/>
 	</resultMap>
-	<select id="getCapability" parameterType="int" resultMap="resourcemap4">
+	<select id="getCapability" parameterType="int" resultMap="resourcemap1">
 		select internal_id, id, namespace, capability_id
                 from capability
                 where resource_id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.CapabilityDirective" id="resourcemap5">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap5">
 		<id column="internal_id" property="internal_id"/>
                 <id column="name" property="name"/>
                 <id column="value" property="value"/>
@@ -72,7 +68,7 @@
                 where capability_id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.CapabilityAttribute" id="resourcemap6">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap6">
 		<id column="internal_id" property="internal_id"/>
                 <id column="type" property="type"/>
                 <id column="name" property="name"/>
@@ -85,7 +81,7 @@
                 where capability_id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.Requirement" id="resourcemap7">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap7">
 		<id column="internal_id" property="internal_id"/>
                 <id column="id" property="id"/>
                 <id column="namespace" property="namespace"/>
@@ -97,7 +93,7 @@
                 where resource_id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.RequirementDirective" id="resourcemap8">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap8">
 		<id column="internal_id" property="internal_id"/>
                 <id column="name" property="name"/>
                 <id column="value" property="value"/>
@@ -108,7 +104,7 @@
                 where requirement_id = #{id}
 	</select>
         
-        <resultMap type="org.apache.ibatis.Mapper.RequirementAttribute" id="resourcemap9">
+        <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl" id="resourcemap9">
 		<id column="internal_id" property="internal_id"/>
                 <id column="type" property="type"/>
                 <id column="name" property="name"/>
@@ -125,43 +121,43 @@
             DELETE FROM RESOURCE WHERE INTERNAL_ID = #{id}
         </delete>
        
-	<insert id="insertResource" parameterType="org.apache.ibatis.Mapper.Resource">
+	<insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (id) values (
 	    	#{id}
 	    )
 	</insert>
         
-        <insert id="insertRequirement" parameterType="org.apache.ibatis.Mapper.Requirement">
+        <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
-        <insert id="insertReq_directive" parameterType="org.apache.ibatis.Mapper.Requirement">
+        <insert id="insertReq_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (value, name, requirement_id) values (
 	    	#{value}, #{name}, #{requirement_id}
 	    )
 	</insert>
         
-        <insert id="insertReq_attribute" parameterType="org.apache.ibatis.Mapper.Requirement">
+        <insert id="insertReq_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (name, type, value, operator, requirement_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{requirement_id}
 	    )
 	</insert>
         
-        <insert id="insertCapability" parameterType="org.apache.ibatis.Mapper.Capability">
+        <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
-        <insert id="insertCap_directive" parameterType="org.apache.ibatis.Mapper.Capability">
+        <insert id="insertCap_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (value, name, capability_id) values (
 	    	#{value}, #{name}, #{capability_id}
 	    )
 	</insert>
         
-        <insert id="insertCap_attribute" parameterType="org.apache.ibatis.Mapper.Capability">
+        <insert id="insertCap_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl">
 	    insert into resource (name, type, value, operator, capability_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{capability_id}
 	    )
