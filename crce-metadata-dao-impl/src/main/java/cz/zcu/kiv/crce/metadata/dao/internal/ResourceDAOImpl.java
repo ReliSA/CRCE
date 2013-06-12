@@ -24,9 +24,6 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import tables.Cap_directive;
-import tables.Req_attribute;
-import tables.Req_directive;
 
 /**
  *
@@ -67,15 +64,15 @@ public class ResourceDAOImpl implements ResourceDAO {
                 String capability_id = selectedCapability.get(3);
                 //TODO save cap_id and namespace
 
-                SqlSession session2 = factory.openSession();
+            try (SqlSession session2 = factory.openSession()) {
                 List<String> selectedCapDirective = session2.selectList("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
                 session2.close();
                 String capDirName = selectedCapDirective.get(1);
                 String capDirValue = selectedCapDirective.get(2);
-
                 cap.setDirective(capDirName, capDirValue);
-
-                SqlSession session3 = factory.openSession();
+            }
+            
+            try (SqlSession session3 = factory.openSession()) {
                 List<String> selectedCapAttribute = session3.selectList("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
                 session3.close();
                 String capAttribute_type = selectedCapAttribute.get(1);
@@ -87,6 +84,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                 cap.setAttribute(attributeType, capAttribute_value);
 
                 resource.addCapability(cap);
+            }
+            
             }
 
             // Load requirements
@@ -100,15 +99,16 @@ public class ResourceDAOImpl implements ResourceDAO {
                 String requirement_id = selectedRequirement.get(3);
                 // TODO save namespace and req_id
 
-                SqlSession session2 = factory.openSession();
+            try (SqlSession session2 = factory.openSession()) {
                 List<String> selectedreqDirective = session2.selectList("org.apache.ibatis.Mapper.getRequirementDirective", requirement_id);
                 session2.close();
                 String reqDirName = selectedreqDirective.get(1);
                 String reqDirValue = selectedreqDirective.get(2);
 
                 req.setDirective(reqDirName, reqDirValue);
+            }
 
-                SqlSession session3 = factory.openSession();
+            try (SqlSession session3 = factory.openSession()) {
                 List<String> selectedreqAttribute = session3.selectList("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
                 session3.close();
                 String reqAttribute_type = selectedreqAttribute.get(1);
@@ -119,6 +119,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                 req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
                 //req_att.setName();  // TODO check QNAME
                 resource.addRequirement(req);
+            }
             }
 
             return resource;
@@ -159,7 +160,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         // CAPABILITY
         for (Capability c : resource.getCapabilities()) {
             // save to capability
-            tables.Capability tab_capability = new tables.Capability();
+            cz.zcu.kiv.crce.metadata.dao.internal.Capability tab_capability = new cz.zcu.kiv.crce.metadata.dao.internal.Capability();
             tab_capability.setNamespace(c.getNamespace());
             tab_capability.setId(c.getId());
             tab_capability.setResource_id(internal_id);
@@ -179,7 +180,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             // cap_attribute
             for (Attribute<?> a : c.getAttributes()) {
                 // save to cap_attribute, where the hell is attribute name ?!?
-                tables.Cap_attribute tab_capAttribute = new tables.Cap_attribute();
+                cz.zcu.kiv.crce.metadata.dao.internal.Cap_attribute tab_capAttribute = new cz.zcu.kiv.crce.metadata.dao.internal.Cap_attribute();
                 tab_capAttribute.setType(a.getAttributeType().toString());
                 tab_capAttribute.setValue(a.getValue().toString());
                 tab_capAttribute.setOperator(a.getOperator().toString());
@@ -217,7 +218,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         for (Requirement r : resource.getRequirements()) {
             r.getId();
             r.getNamespace();
-            tables.Requirement tab_requirement = new tables.Requirement();
+            cz.zcu.kiv.crce.metadata.dao.internal.Requirement tab_requirement = new cz.zcu.kiv.crce.metadata.dao.internal.Requirement();
             tab_requirement.setId(r.getId());
             tab_requirement.setNamespace(r.getNamespace());
             tab_requirement.setResource_id(internal_id);
@@ -282,13 +283,11 @@ public class ResourceDAOImpl implements ResourceDAO {
             SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
             SqlSessionFactory factory = builder.build(inputStream);
 
-            SqlSession session = factory.openSession();
-            try {
+            try(SqlSession session = factory.openSession()) {
                 session.insert("org.apache.ibatis.Mapper.deleteResource", resourceID);
                 session.commit();
-            } finally {
                 session.close();
-            }
+            } 
         }
     }
 
