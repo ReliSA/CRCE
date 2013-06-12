@@ -1,24 +1,24 @@
 
-package cz.zcu.kiv.crce.metadata.dao.internal;
+package cz.zcu.kiv.crce.metadata.dao.internal.tables;
 
 /**
  *
  * @author Cihlář
  */
-public class Req_attribute {
+public class Cap_attribute {
     //private int internal_id; // not needed
     private String name;
     private String type;
     private String value;
     private String operator;
-    private int requirement_id;
+    private int capability_id;
 
-    public int getRequirement_id() {
-        return requirement_id;
+    public int getCapability_id() {
+        return capability_id;
     }
 
-    public void setRequirement_id(int requirement_id) {
-        this.requirement_id = requirement_id;
+    public void setCapability_id(int capability_id) {
+        this.capability_id = capability_id;
     }
 
     public String getName() {
@@ -52,5 +52,4 @@ public class Req_attribute {
     public void setOperator(String operator) {
         this.operator = operator;
     }
-    
 }

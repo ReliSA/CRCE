@@ -1,5 +1,5 @@
 
-package cz.zcu.kiv.crce.metadata.dao.internal;
+package cz.zcu.kiv.crce.metadata.dao.internal.tables;
 
 /**
  *

@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.metadata.dao.internal;
 
+import cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive;
+import cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute;
+import cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 
@@ -160,7 +163,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         // CAPABILITY
         for (Capability c : resource.getCapabilities()) {
             // save to capability
-            cz.zcu.kiv.crce.metadata.dao.internal.Capability tab_capability = new cz.zcu.kiv.crce.metadata.dao.internal.Capability();
+            cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability tab_capability = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability();
             tab_capability.setNamespace(c.getNamespace());
             tab_capability.setId(c.getId());
             tab_capability.setResource_id(internal_id);
@@ -180,7 +183,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             // cap_attribute
             for (Attribute<?> a : c.getAttributes()) {
                 // save to cap_attribute, where the hell is attribute name ?!?
-                cz.zcu.kiv.crce.metadata.dao.internal.Cap_attribute tab_capAttribute = new cz.zcu.kiv.crce.metadata.dao.internal.Cap_attribute();
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute tab_capAttribute = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute();
                 tab_capAttribute.setType(a.getAttributeType().toString());
                 tab_capAttribute.setValue(a.getValue().toString());
                 tab_capAttribute.setOperator(a.getOperator().toString());
@@ -218,7 +221,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         for (Requirement r : resource.getRequirements()) {
             r.getId();
             r.getNamespace();
-            cz.zcu.kiv.crce.metadata.dao.internal.Requirement tab_requirement = new cz.zcu.kiv.crce.metadata.dao.internal.Requirement();
+            cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement tab_requirement = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement();
             tab_requirement.setId(r.getId());
             tab_requirement.setNamespace(r.getNamespace());
             tab_requirement.setResource_id(internal_id);
