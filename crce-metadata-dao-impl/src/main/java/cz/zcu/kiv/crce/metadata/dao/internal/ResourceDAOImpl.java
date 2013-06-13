@@ -59,28 +59,28 @@ public class ResourceDAOImpl implements ResourceDAO {
             Capability cap = resourceFactory.createCapability(resourceID);
 
             try (SqlSession session = factory.openSession()) {
-                List<String> selectedCapability = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capability = session.selectOne("org.apache.ibatis.Mapper.getCapability", resourceID);
                 session.close();
                 //String capInternal_id = selectedCapability.get(0);
                 //String cap_id = selectedCapability.get(1); //TODO unused
                 //String capabilityNamespace = selectedCapability.get(2); //TODO unused
-                String capability_id = selectedCapability.get(3);
+                String capability_id = capability.getId();
                 //TODO save cap_id and namespace
 
             try (SqlSession session2 = factory.openSession()) {
-                List<String> selectedCapDirective = session2.selectList("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
+                Cap_directive capabilityDirective = session2.selectOne("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
                 session2.close();
-                String capDirName = selectedCapDirective.get(1);
-                String capDirValue = selectedCapDirective.get(2);
+                String capDirName = capabilityDirective.getName();
+                String capDirValue = capabilityDirective.getValue();
                 cap.setDirective(capDirName, capDirValue);
             }
             
             try (SqlSession session3 = factory.openSession()) {
-                List<String> selectedCapAttribute = session3.selectList("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute capabilityAttribute = session3.selectOne("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
                 session3.close();
-                String capAttribute_type = selectedCapAttribute.get(1);
-                String capAttribute_name = selectedCapAttribute.get(2);
-                String capAttribute_value = selectedCapAttribute.get(3);
+                String capAttribute_type = capabilityAttribute.getType();
+                String capAttribute_name = capabilityAttribute.getName();
+                String capAttribute_value = capabilityAttribute.getValue();
                 //String capAttribute_operator = selectedCapAttribute.get(4); // TODO unfinished
                 //cap_att.setName();  // TODO check QNAME
                 GenericAttributeType attributeType = new GenericAttributeType(capAttribute_name, capAttribute_type);
@@ -94,12 +94,11 @@ public class ResourceDAOImpl implements ResourceDAO {
             // Load requirements
             //Requirement req = null;
             Requirement req = resourceFactory.createRequirement(resourceID);
-            List<String> selectedRequirement;
             try (SqlSession session = factory.openSession()) {
-                selectedRequirement = session.selectList("org.apache.ibatis.Mapper.getRequirement", resourceID);
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requirement = session.selectOne("org.apache.ibatis.Mapper.getRequirement", resourceID);
                 //String req_id = selectedRequirement.get(1); //TODO unused
                 //String requirementNamespace = selectedRequirement.get(2); //TODO unused
-                String requirement_id = selectedRequirement.get(3);
+                String requirement_id = requirement.getId();
                 // TODO save namespace and req_id
 
             try (SqlSession session2 = factory.openSession()) {
@@ -112,11 +111,11 @@ public class ResourceDAOImpl implements ResourceDAO {
             }
 
             try (SqlSession session3 = factory.openSession()) {
-                List<String> selectedreqAttribute = session3.selectList("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
+                Req_attribute requirementAttribute = session3.selectOne("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
                 session3.close();
-                String reqAttribute_type = selectedreqAttribute.get(1);
-                String reqAttribute_name = selectedreqAttribute.get(2);
-                String reqAttribute_value = selectedreqAttribute.get(3);
+                String reqAttribute_type = requirementAttribute.getType();
+                String reqAttribute_name = requirementAttribute.getName();
+                String reqAttribute_value = requirementAttribute.getValue();
                 //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished          
                 GenericAttributeType attributeType = new GenericAttributeType(reqAttribute_name, reqAttribute_type);
                 req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
