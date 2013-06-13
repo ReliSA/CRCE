@@ -1,0 +1,114 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.apache.ibatis.DB_CreatorMapper">
+
+    <update id="createResource" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS resource (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          id varchar(50) NOT NULL,
+          PRIMARY KEY (internal_id),  
+        );
+    </update > 
+    
+    <update id="createCapability" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS capability (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          id varchar(50) NOT NULL,
+          namespace varchar(50) NOT NULL,
+          capability_id long AUTO_INCREMENT NOT NULL,
+          resource_id long NOT NULL,
+          PRIMARY KEY (internal_id),
+          FOREIGN KEY (resource_id) REFERENCES resource (internal_id)
+        );
+    </update > 
+    
+    <update id="createCap_attribute" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS cap_attribute (
+          name varchar,
+          type varchar,
+          value varchar,
+          operator varchar,
+          capability_id long NOT NULL,
+          PRIMARY KEY (name),
+          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)  
+        );
+    </update > 
+    
+    <update id="createCap_directive" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS cap_directive (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          name varchar(50) NOT NULL,
+          value varchar(200)  NOT NULL,
+          capability_id long NOT NULL,
+          PRIMARY KEY (internal_id),
+          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)  
+        );
+    </update > 
+    
+    <update id="createProperty" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS property (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          namespace varchar(50) NOT NULL,
+          resource_id long NOT NULL,
+          PRIMARY KEY (internal_id)
+        );
+    </update > 
+    
+    <update id="createPro_attribute" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS pro_attribute (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          property_id long NOT NULL,
+          PRIMARY KEY (internal_id)
+        );
+    </update > 
+    
+    <update id="createRepository" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS repository (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          name varchar(50) NOT NULL,
+          increment long NOT NULL,
+          xmlns varchar(50) NOT NULL,
+          PRIMARY KEY (internal_id)
+        );
+    </update > 
+    
+    <update id="createRequirement" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS requirement(
+          internal_id long AUTO_INCREMENT NOT NULL,
+          id varchar(50) NOT NULL,
+          namespace varchar(50) NOT NULL,
+          requirement_id long AUTO_INCREMENT NOT NULL,
+          resource_id long NOT NULL,
+          PRIMARY KEY (internal_id),
+          FOREIGN KEY (resource_id) REFERENCES resource (internal_id)
+        );
+    </update > 
+    
+    <update id="createReq_attribute" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS req_attribute (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          name varchar(50),
+          type varchar(50),
+          value varchar(50),
+          operator varchar(50),
+          requirement_id long NOT NULL,
+          PRIMARY KEY (internal_id),
+          FOREIGN KEY (requirement_id) REFERENCES requirement (requirement_id) 
+        );
+    </update > 
+    
+    <update id="createReq_directive" parameterType="String" > 
+        CREATE TABLE IF NOT EXISTS req_directive (
+          internal_id long AUTO_INCREMENT NOT NULL,
+          name varchar(50) NOT NULL,
+          value varchar(200) NOT NULL,
+          requirement_id long NOT NULL,
+          PRIMARY KEY (internal_id),
+          FOREIGN KEY (requirement_id) REFERENCES requirement (requirement_id)
+        );
+    </update > 
+    
+    
+</mapper>
