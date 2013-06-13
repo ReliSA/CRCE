@@ -141,7 +141,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     @Override
     public synchronized void saveResource(Resource resource) throws IOException {
-
+        
         // TODO: check internal_id, autoincrement ??
 
         String conf = "data/mybatis-config.xml";
