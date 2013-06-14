@@ -61,19 +61,19 @@ public class SQLSessionHandler {
                 setFactory(new SqlSessionFactoryBuilder().build(getInputStream()));
                 setSession(getFactory().openSession());
 
-                session.update("org.apache.ibatis.DB_CreatorMapper.createResource");
+                session.update("org.apache.ibatis.DBMapper.createResource");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createCapability");
+                session.update("org.apache.ibatis.DBMapper.createCapability");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createCap_attribute");
+                session.update("org.apache.ibatis.DBMapper.createCap_attribute");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createCap_directive");
+                session.update("org.apache.ibatis.DBMapper.createCap_directive");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createRequirement");
+                session.update("org.apache.ibatis.DBMapper.createRequirement");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createReq_attribute");
+                session.update("org.apache.ibatis.DBMapper.createReq_attribute");
                 session.commit();
-                session.update("org.apache.ibatis.DB_CreatorMapper.createReq_directive");
+                session.update("org.apache.ibatis.DBMapper.createReq_directive");
                 session.commit();
             }
         } catch (IOException ex) {
