@@ -216,12 +216,12 @@ public class ResourceTest {
         Requirement req = factory.createRequirement("a", "id");
         r.addRequirement(req);
      
-        /*
+        
         ResourceDAOImpl impl = new ResourceDAOImpl();
         impl.saveResource(r);
         Resource r2 = impl.loadResource(null);
         
         assertTrue(r.equals(r2));
-        */
+        
     }
 }
