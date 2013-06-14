@@ -110,5 +110,17 @@
         );
     </update > 
     
+    <!-- For test purpose -->
+    <update id="delete_DB" parameterType="String" > 
+        DROP TABLE (
+            CAPABILITY, 
+            CAP_ATTRIBUTE, 
+            CAP_DIRECTIVE, 
+            REQUIREMENT, 
+            REQ_ATTRIBUTE, 
+            REQ_DIRECTIVE, 
+            RESOURCE
+        );
+    </update > 
     
 </mapper>
