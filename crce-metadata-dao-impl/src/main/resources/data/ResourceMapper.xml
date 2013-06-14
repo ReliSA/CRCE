@@ -127,38 +127,38 @@
 	    )
 	</insert>
         
-        <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (id, namespace, resource_id) values (
+        <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement">
+	    insert into requierement (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
-        <insert id="insertReq_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (value, name, requirement_id) values (
+        <insert id="insertReq_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive">
+	    insert into reg_directive (value, name, requirement_id) values (
 	    	#{value}, #{name}, #{requirement_id}
 	    )
 	</insert>
         
-        <insert id="insertReq_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (name, type, value, operator, requirement_id) values (
+        <insert id="insertReq_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute">
+	    insert into req_attribute (name, type, value, operator, requirement_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{requirement_id}
 	    )
 	</insert>
         
-        <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (id, namespace, resource_id) values (
+        <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability">
+	    insert into capability (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
 	
-        <insert id="insertCap_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (value, name, capability_id) values (
+        <insert id="insertCap_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive">
+	    insert into cap_directive (value, name, capability_id) values (
 	    	#{value}, #{name}, #{capability_id}
 	    )
 	</insert>
         
-        <insert id="insertCap_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (name, type, value, operator, capability_id) values (
+        <insert id="insertCap_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute">
+	    insert into cap_attribute (name, type, value, operator, capability_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{capability_id}
 	    )
 	</insert>
