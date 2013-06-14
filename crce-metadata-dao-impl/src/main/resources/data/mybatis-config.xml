@@ -15,7 +15,7 @@
         </environment>
     </environments>
     <mappers>
-        <mapper resource="data/DB_CreatorMapper.xml"/>
+        <mapper resource="data/DBMapper.xml"/>
         <mapper resource="data/ResourceMapper.xml"/>
     </mappers>
 </configuration>
