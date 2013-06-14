@@ -21,6 +21,7 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import org.apache.ibatis.session.SqlSession;
 
@@ -52,54 +53,77 @@ public class ResourceDAOImpl implements ResourceDAO {
             //Capability cap = null; 
             Capability cap = resourceFactory.createCapability(resourceID);
 
-            cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capability = session.selectOne("org.apache.ibatis.Mapper.getCapability", resourceID);
-            //String capInternal_id = selectedCapability.get(0);
-            //String cap_id = selectedCapability.get(1); //TODO unused
-            //String capabilityNamespace = selectedCapability.get(2); //TODO unused
-            String capability_id = capability.getId();
-            //TODO save cap_id and namespace
-
-            Cap_directive capabilityDirective = session.selectOne("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
-            String capDirName = capabilityDirective.getName();
-            String capDirValue = capabilityDirective.getValue();
-            cap.setDirective(capDirName, capDirValue);
-                       
-            cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute capabilityAttribute = session.selectOne("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
-            String capAttribute_type = capabilityAttribute.getType();
-            String capAttribute_name = capabilityAttribute.getName();
-            String capAttribute_value = capabilityAttribute.getValue();
-            //String capAttribute_operator = selectedCapAttribute.get(4); // TODO unfinished
-            //cap_att.setName();  // TODO check QNAME
-            GenericAttributeType attributeType = new GenericAttributeType(capAttribute_name, capAttribute_type);
-            cap.setAttribute(attributeType, capAttribute_value);
-
-            resource.addCapability(cap);    
+            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> capabilityList = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
+            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> itr0 = capabilityList.iterator();
+            while(itr0.hasNext()) {
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capability = itr0.next();
+                //String capInternal_id = selectedCapability.get(0);
+                //String cap_id = selectedCapability.get(1); //TODO unused
+                //String capabilityNamespace = selectedCapability.get(2); //TODO unused
+                String capability_id = capability.getId();
+                //TODO save cap_id and namespace
             
+            
+            List<Cap_directive> capabilityDirective = session.selectList("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
+            Iterator<Cap_directive> itr = capabilityDirective.iterator();
+            while(itr.hasNext()) {
+                Cap_directive cDirective = itr.next();
+                String capDirName = cDirective.getName();
+                String capDirValue = cDirective.getValue();
+                cap.setDirective(capDirName, capDirValue);
+            }
+            
+            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> capabilityAttribute = session.selectList("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
+            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> itr2 = capabilityAttribute.iterator();
+            while(itr.hasNext()) {
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute cAttribute = itr2.next();
+                String capAttribute_type = cAttribute.getType();
+                String capAttribute_name = cAttribute.getName();
+                String capAttribute_value = cAttribute.getValue();
+                //String capAttribute_operator = selectedCapAttribute.get(4); // TODO unfinished
+                //cap_att.setName();  // TODO check QNAME
+                GenericAttributeType attributeType = new GenericAttributeType(capAttribute_name, capAttribute_type);
+                cap.setAttribute(attributeType, capAttribute_value);
+            }
+            resource.addCapability(cap);    
+            }
             
             // Load requirements
             //Requirement req = null;
             Requirement req = resourceFactory.createRequirement(resourceID);
-            cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requirement = session.selectOne("org.apache.ibatis.Mapper.getRequirement", resourceID);
-            //String req_id = selectedRequirement.get(1); //TODO unused
-            //String requirementNamespace = selectedRequirement.get(2); //TODO unused
-            String requirement_id = requirement.getId();
-            // TODO save namespace and req_id
+            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> requirementList = session.selectList("org.apache.ibatis.Mapper.getRequirement", resourceID);
+            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> itr3 = requirementList.iterator();
+            while(itr3.hasNext()) {
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requirement = itr3.next();
+                //String req_id = selectedRequirement.get(1); //TODO unused
+                //String requirementNamespace = selectedRequirement.get(2); //TODO unused
+                String requirement_id = requirement.getId();
+                // TODO save namespace and req_id
 
-            Req_directive regDirective = session.selectOne("org.apache.ibatis.Mapper.getRequirementDirective", requirement_id);
-            String reqDirName = regDirective.getName();
-            String reqDirValue = regDirective.getValue();
+                List<Req_directive> regDirectiveList = session.selectList("org.apache.ibatis.Mapper.getRequirementDirective", requirement_id);
+                Iterator<Req_directive> itr4 = regDirectiveList.iterator();
+                while(itr4.hasNext()) {
+                    Req_directive regDirective = itr4.next();
+                    String reqDirName = regDirective.getName();
+                    String reqDirValue = regDirective.getValue();
 
-            req.setDirective(reqDirName, reqDirValue);
-            
-            Req_attribute requirementAttribute = session.selectOne("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
-            String reqAttribute_type = requirementAttribute.getType();
-            String reqAttribute_name = requirementAttribute.getName();
-            String reqAttribute_value = requirementAttribute.getValue();
-            //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished          
-            attributeType = new GenericAttributeType(reqAttribute_name, reqAttribute_type);
-            req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
-            //req_att.setName();  // TODO check QNAME
-            resource.addRequirement(req);
+                    req.setDirective(reqDirName, reqDirValue);
+                }
+                
+                List<Req_attribute> requirementAttributeList = session.selectList("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
+                Iterator<Req_attribute> itr5 = requirementAttributeList.iterator();
+                while(itr5.hasNext()) {
+                    Req_attribute requirementAttribute = itr5.next();
+                    String reqAttribute_type = requirementAttribute.getType();
+                    String reqAttribute_name = requirementAttribute.getName();
+                    String reqAttribute_value = requirementAttribute.getValue();
+                    //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished          
+                    GenericAttributeType attributeType = new GenericAttributeType(reqAttribute_name, reqAttribute_type);
+                    req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
+                    //req_att.setName();  // TODO check QNAME
+                    resource.addRequirement(req);
+                }
+            }
             return resource;
             } 
         return null;
@@ -124,8 +148,12 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         
         // get internnal_id - autogenerated
-        int internal_id = session.selectOne("org.apache.ibatis.Mapper.getResourceID", resource.getId());
-
+        List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> ResourceList = session.selectList("org.apache.ibatis.Mapper.getResourceID", resource.getId());
+        Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> itr = ResourceList.iterator();
+        while(itr.hasNext()) {
+            cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource res = itr.next();
+            int internal_id = res.getInternal_id();
+        
         // CAPABILITY
         for (Capability c : resource.getCapabilities()) {
             // save to capability
@@ -140,8 +168,12 @@ public class ResourceDAOImpl implements ResourceDAO {
             session.commit();
 
             // get cap_InternalID - autogenerated
-            int cap_InternalID = session.selectOne("org.apache.ibatis.Mapper.getCapabilityID", c.getId());
-
+            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> CapabilityList = session.selectList("org.apache.ibatis.Mapper.getCapabilityID", c.getId());
+            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> itr1 = CapabilityList.iterator();
+            while(itr1.hasNext()) {
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capa = itr1.next();
+                int cap_InternalID = capa.getInternal_id();
+            
             // cap_attribute
             for (Attribute<?> a : c.getAttributes()) {
                 // save to cap_attribute, where the hell is attribute name ?!?
@@ -174,7 +206,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                 session.commit();
             }
         }
-
+        }
+        
         // REQUIREMENT
         for (Requirement r : resource.getRequirements()) {
             r.getId();
@@ -188,8 +221,12 @@ public class ResourceDAOImpl implements ResourceDAO {
             session.commit();
 
             // get cap_InternalID - autogenerated
-            int req_Internal_id = session.selectOne("org.apache.ibatis.Mapper.getRequirementID", r.getId());
-
+            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> RequirementList = session.selectList("org.apache.ibatis.Mapper.getRequirementID", r.getId());
+            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> itr2 = RequirementList.iterator();
+            while(itr2.hasNext()) {
+                cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requ = itr2.next();
+                int req_Internal_id = requ.getInternal_id();
+            
             // req_attribute
             for (Attribute<?> a : r.getAttributes()) {
                 // save to req_attribute, where the hell is attribute name ?!?
@@ -202,7 +239,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
                 session.insert("org.apache.ibatis.Mapper.insertReq_attribute", tab_reqAttribute);
                 session.commit();
-                
+            
             }
 
             // req_directive 
@@ -222,7 +259,9 @@ public class ResourceDAOImpl implements ResourceDAO {
                 session.insert("org.apache.ibatis.Mapper.insertReq_directive", tab_reqDirective);
                 session.commit();
             }
+           } 
         }
+      }
     }
 
     @Override
