@@ -128,7 +128,7 @@
 	</insert>
         
         <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement">
-	    insert into requierement (id, namespace, resource_id) values (
+	    insert into requirement (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
