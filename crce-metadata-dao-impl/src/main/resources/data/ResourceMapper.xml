@@ -19,7 +19,7 @@
 	</select>
         
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource" id="resourcemap2">
-		<id property="id" column="internal_id" />
+		<id property="internal_id" column="internal_id" />
 	</resultMap>
 	<select id="getResourceID" parameterType="String" resultMap="resourcemap2">
 		select internal_id
