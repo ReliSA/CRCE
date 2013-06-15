@@ -8,16 +8,16 @@
 		<id column="id" property="id" />
 	</resultMap>
 	<select id="getResource" parameterType="int" resultMap="resourcemap">
-		select id 
+		select id
                 from resource
                 where internal_id = #{id}
 	</select>
-        
+
 	<select id="getResources" resultMap="resourcemap">
 		select *
                 from resource
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource" id="resourcemap2">
 		<id property="internal_id" column="internal_id" />
 	</resultMap>
@@ -26,7 +26,7 @@
                 from resource
                 where id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability" id="resourcemap3">
 		<id column="internal_id" property="internal_id"/>
 	</resultMap>
@@ -35,7 +35,7 @@
                 from capability
                 where id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement" id="resourcemap4">
 		<id column="internal_id" property="internal_id"/>
 	</resultMap>
@@ -44,7 +44,7 @@
                 from requirement
                 where id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability" id="resourcemap1">
 		<id column="internal_id" property="internal_id"/>
                 <id column="id" property="id"/>
@@ -56,7 +56,7 @@
                 from capability
                 where resource_id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive" id="resourcemap5">
 		<id column="internal_id" property="internal_id"/>
                 <id column="name" property="name"/>
@@ -67,7 +67,7 @@
                 from cap_directive
                 where capability_id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute" id="resourcemap6">
 		<id column="internal_id" property="internal_id"/>
                 <id column="type" property="type"/>
@@ -80,7 +80,7 @@
                 from cap_attribute
                 where capability_id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement" id="resourcemap7">
 		<id column="internal_id" property="internal_id"/>
                 <id column="id" property="id"/>
@@ -92,7 +92,7 @@
                 from requirement
                 where resource_id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive" id="resourcemap8">
 		<id column="internal_id" property="internal_id"/>
                 <id column="name" property="name"/>
@@ -103,7 +103,7 @@
                 from req_directive
                 where requirement_id = #{id}
 	</select>
-        
+
         <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute" id="resourcemap9">
 		<id column="internal_id" property="internal_id"/>
                 <id column="type" property="type"/>
@@ -116,47 +116,47 @@
                 from req_attribute
                 where requirement_id = #{id}
 	</select>
-           	
+
         <delete id="deleteResource" parameterType="int">
             DELETE FROM RESOURCE WHERE INTERNAL_ID = #{id}
         </delete>
-       
+
 	<insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-	    insert into resource (id) values (
-	    	#{id}
+	    insert into resource (id, uri, repository_uri) values (
+	    	#{id}, #{uri}, #{repository_uri}
 	    )
 	</insert>
-        
+
         <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement">
 	    insert into requirement (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
-	
+
         <insert id="insertReq_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive">
 	    insert into reg_directive (value, name, requirement_id) values (
 	    	#{value}, #{name}, #{requirement_id}
 	    )
 	</insert>
-        
+
         <insert id="insertReq_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute">
 	    insert into req_attribute (name, type, value, operator, requirement_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{requirement_id}
 	    )
 	</insert>
-        
+
         <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability">
 	    insert into capability (id, namespace, resource_id) values (
 	    	#{id}, #{namespace}, #{resource_id}
 	    )
 	</insert>
-	
+
         <insert id="insertCap_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive">
 	    insert into cap_directive (value, name, capability_id) values (
 	    	#{value}, #{name}, #{capability_id}
 	    )
 	</insert>
-        
+
         <insert id="insertCap_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute">
 	    insert into cap_attribute (name, type, value, operator, capability_id) values (
 	    	#{name}, #{type}, #{value}, #{operator}, #{capability_id}

@@ -4,15 +4,17 @@
 
 <mapper namespace="org.apache.ibatis.DBMapper">
 
-    <update id="createResource" parameterType="String" > 
+    <update id="createResource" parameterType="String" >
         CREATE TABLE IF NOT EXISTS resource (
           internal_id long AUTO_INCREMENT NOT NULL,
           id varchar(50) NOT NULL,
-          PRIMARY KEY (internal_id),  
+          uri varchar(512) NOT NULL,
+          repository_uri varchar(512) NOT NULL,
+          PRIMARY KEY (internal_id),
         );
-    </update > 
-    
-    <update id="createCapability" parameterType="String" > 
+    </update >
+
+    <update id="createCapability" parameterType="String" >
         CREATE TABLE IF NOT EXISTS capability (
           internal_id long AUTO_INCREMENT NOT NULL,
           id varchar(50) NOT NULL,
@@ -22,9 +24,9 @@
           PRIMARY KEY (internal_id),
           FOREIGN KEY (resource_id) REFERENCES resource (internal_id)
         );
-    </update > 
-    
-    <update id="createCap_attribute" parameterType="String" > 
+    </update >
+
+    <update id="createCap_attribute" parameterType="String" >
         CREATE TABLE IF NOT EXISTS cap_attribute (
           name varchar,
           type varchar,
@@ -32,39 +34,39 @@
           operator varchar,
           capability_id long NOT NULL,
           PRIMARY KEY (name),
-          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)  
+          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)
         );
-    </update > 
-    
-    <update id="createCap_directive" parameterType="String" > 
+    </update >
+
+    <update id="createCap_directive" parameterType="String" >
         CREATE TABLE IF NOT EXISTS cap_directive (
           internal_id long AUTO_INCREMENT NOT NULL,
           name varchar(50) NOT NULL,
           value varchar(200)  NOT NULL,
           capability_id long NOT NULL,
           PRIMARY KEY (internal_id),
-          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)  
+          FOREIGN KEY (capability_id) REFERENCES CAPABILITY(capability_id)
         );
-    </update > 
-    
-    <update id="createProperty" parameterType="String" > 
+    </update >
+
+    <update id="createProperty" parameterType="String" >
         CREATE TABLE IF NOT EXISTS property (
           internal_id long AUTO_INCREMENT NOT NULL,
           namespace varchar(50) NOT NULL,
           resource_id long NOT NULL,
           PRIMARY KEY (internal_id)
         );
-    </update > 
-    
-    <update id="createPro_attribute" parameterType="String" > 
+    </update >
+
+    <update id="createPro_attribute" parameterType="String" >
         CREATE TABLE IF NOT EXISTS pro_attribute (
           internal_id long AUTO_INCREMENT NOT NULL,
           property_id long NOT NULL,
           PRIMARY KEY (internal_id)
         );
-    </update > 
-    
-    <update id="createRepository" parameterType="String" > 
+    </update >
+
+    <update id="createRepository" parameterType="String" >
         CREATE TABLE IF NOT EXISTS repository (
           internal_id long AUTO_INCREMENT NOT NULL,
           name varchar(50) NOT NULL,
@@ -72,9 +74,9 @@
           xmlns varchar(50) NOT NULL,
           PRIMARY KEY (internal_id)
         );
-    </update > 
-    
-    <update id="createRequirement" parameterType="String" > 
+    </update >
+
+    <update id="createRequirement" parameterType="String" >
         CREATE TABLE IF NOT EXISTS requirement(
           internal_id long AUTO_INCREMENT NOT NULL,
           id varchar(50) NOT NULL,
@@ -84,9 +86,9 @@
           PRIMARY KEY (internal_id),
           FOREIGN KEY (resource_id) REFERENCES resource (internal_id)
         );
-    </update > 
-    
-    <update id="createReq_attribute" parameterType="String" > 
+    </update >
+
+    <update id="createReq_attribute" parameterType="String" >
         CREATE TABLE IF NOT EXISTS req_attribute (
           internal_id long AUTO_INCREMENT NOT NULL,
           name varchar(50),
@@ -95,11 +97,11 @@
           operator varchar(50),
           requirement_id long NOT NULL,
           PRIMARY KEY (internal_id),
-          FOREIGN KEY (requirement_id) REFERENCES requirement (requirement_id) 
+          FOREIGN KEY (requirement_id) REFERENCES requirement (requirement_id)
         );
-    </update > 
-    
-    <update id="createReq_directive" parameterType="String" > 
+    </update >
+
+    <update id="createReq_directive" parameterType="String" >
         CREATE TABLE IF NOT EXISTS req_directive (
           internal_id long AUTO_INCREMENT NOT NULL,
           name varchar(50) NOT NULL,
@@ -108,11 +110,11 @@
           PRIMARY KEY (internal_id),
           FOREIGN KEY (requirement_id) REFERENCES requirement (requirement_id)
         );
-    </update > 
-    
+    </update >
+
     <!-- For test purpose -->
-    <update id="delete_DB" parameterType="String" > 
+    <update id="delete_DB" parameterType="String" >
         drop table cap_attribute , cap_directive , capability , req_attribute , req_directive , requirement , resource
-    </update > 
-    
+    </update >
+
 </mapper>

@@ -32,7 +32,7 @@ public class ResourceTest {
         factory = new ResourceFactoryImpl();
     }
 
-    
+
     @Test
     public void testSimpleCapability() {
         Resource resource = factory.createResource();
@@ -202,26 +202,27 @@ public class ResourceTest {
 //        assertTrue(resource.hasRequirement(nest));
 //        assertFalse(resource.hasRequirement(nested));
     }
-    
+
     @Test
+    @Ignore
     public void testResourceDAOImp() throws IOException {
-    
+
         String resourceID = "jedna";
-        
+
         Resource r = factory.createResource(resourceID);
-        
+
         Capability cap = factory.createCapability("a", "id");
         r.addCapability(cap);
-        
+
         Requirement req = factory.createRequirement("a", "id");
         r.addRequirement(req);
-     
-        
+
+
         ResourceDAOImpl impl = new ResourceDAOImpl();
         impl.saveResource(r);
         Resource r2 = impl.loadResource(null);
-        
+
         assertTrue(r.equals(r2));
-        
+
     }
 }

@@ -4,4 +4,24 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
+Embed-Dependency: \
+  h2;groupId=com.h2database;inline=false,\
+  mybatis;groupId=org.mybatis;inline=false
+
+Import-Package: \
+  !org.apache.lucene.analysis,\
+  !org.apache.lucene.analysis.standard,\
+  !org.apache.lucene.document,\
+  !org.apache.lucene.index,\
+  !org.apache.lucene.queryParser,\
+  !org.apache.lucene.search,\
+  !org.apache.lucene.store,\
+  !org.apache.lucene.util,\
+  !javax.servlet,\
+  !javax.servlet.http,\
+  !javassist.util.proxy,\
+  !net.sf.cglib.proxy,\
+  *
+
+
 Export-Package:

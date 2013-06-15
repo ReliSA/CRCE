@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.Set;
 import org.apache.ibatis.session.SqlSession;
 
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
@@ -36,21 +38,22 @@ public class ResourceDAOImpl implements ResourceDAO {
     //private volatile MetadataService metadataService;
     Map<URI, Map<URI, Resource>> repositories = new HashMap<>();
     private volatile ResourceFactory resourceFactory;
+    private volatile MetadataService metadataService;
 
     @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
 
         if (uri != null) {
-            
+
             SqlSession session = SQLSessionHandler.getSession();
-            
+
             //Resource resource = loadResource(uri);
             String resourceID = uri.toString();
 
             Resource resource = resourceFactory.createResource(resourceID);
 
             // Load capability
-            //Capability cap = null; 
+            //Capability cap = null;
             Capability cap = resourceFactory.createCapability(resourceID);
 
             List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> capabilityList = session.selectList("org.apache.ibatis.Mapper.getCapability", resourceID);
@@ -62,8 +65,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                 //String capabilityNamespace = selectedCapability.get(2); //TODO unused
                 String capability_id = capability.getId();
                 //TODO save cap_id and namespace
-            
-            
+
+
             List<Cap_directive> capabilityDirective = session.selectList("org.apache.ibatis.Mapper.getCapabilityDirective", capability_id);
             Iterator<Cap_directive> itr = capabilityDirective.iterator();
             while(itr.hasNext()) {
@@ -72,7 +75,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                 String capDirValue = cDirective.getValue();
                 cap.setDirective(capDirName, capDirValue);
             }
-            
+
             List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> capabilityAttribute = session.selectList("org.apache.ibatis.Mapper.getCapabilityAttribute", capability_id);
             Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> itr2 = capabilityAttribute.iterator();
             while(itr.hasNext()) {
@@ -85,9 +88,9 @@ public class ResourceDAOImpl implements ResourceDAO {
                 GenericAttributeType attributeType = new GenericAttributeType(capAttribute_name, capAttribute_type);
                 cap.setAttribute(attributeType, capAttribute_value);
             }
-            resource.addCapability(cap);    
+            resource.addCapability(cap);
             }
-            
+
             // Load requirements
             //Requirement req = null;
             Requirement req = resourceFactory.createRequirement(resourceID);
@@ -109,7 +112,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
                     req.setDirective(reqDirName, reqDirValue);
                 }
-                
+
                 List<Req_attribute> requirementAttributeList = session.selectList("org.apache.ibatis.Mapper.RequirementAttribute", requirement_id);
                 Iterator<Req_attribute> itr5 = requirementAttributeList.iterator();
                 while(itr5.hasNext()) {
@@ -117,7 +120,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                     String reqAttribute_type = requirementAttribute.getType();
                     String reqAttribute_name = requirementAttribute.getName();
                     String reqAttribute_value = requirementAttribute.getValue();
-                    //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished          
+                    //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished
                     GenericAttributeType attributeType = new GenericAttributeType(reqAttribute_name, reqAttribute_type);
                     req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
                     //req_att.setName();  // TODO check QNAME
@@ -125,7 +128,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                 }
             }
             return resource;
-            } 
+            }
         return null;
     }
 
@@ -142,18 +145,26 @@ public class ResourceDAOImpl implements ResourceDAO {
     public synchronized void saveResource(Resource resource) throws IOException {
 
         SqlSession session = SQLSessionHandler.getSession();
-        
-        session.insert("org.apache.ibatis.Mapper.insertResource", resource.getId());
+
+        URI uri = metadataService.getUri(resource);
+
+        cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource dbResource = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource();
+        dbResource.setId(resource.getId());
+        dbResource.setUri(uri.toString());
+        Repository repository = resource.getRepository();
+        dbResource.setRepository_uri(repository != null ? repository.getURI().toString() : "");
+
+        session.insert("org.apache.ibatis.Mapper.insertResource", dbResource);
         session.commit();
 
-        
+
         // get internnal_id - autogenerated
         List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> ResourceList = session.selectList("org.apache.ibatis.Mapper.getResourceID", resource.getId());
         Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> itr = ResourceList.iterator();
         while(itr.hasNext()) {
             cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource res = itr.next();
             int internal_id = res.getInternal_id();
-        
+
         // CAPABILITY
         for (Capability c : resource.getCapabilities()) {
             // save to capability
@@ -173,7 +184,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             while(itr1.hasNext()) {
                 cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capa = itr1.next();
                 int cap_InternalID = capa.getInternal_id();
-            
+
             // cap_attribute
             for (Attribute<?> a : c.getAttributes()) {
                 // save to cap_attribute, where the hell is attribute name ?!?
@@ -207,7 +218,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             }
         }
         }
-        
+
         // REQUIREMENT
         for (Requirement r : resource.getRequirements()) {
             r.getId();
@@ -226,7 +237,7 @@ public class ResourceDAOImpl implements ResourceDAO {
             while(itr2.hasNext()) {
                 cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requ = itr2.next();
                 int req_Internal_id = requ.getInternal_id();
-            
+
             // req_attribute
             for (Attribute<?> a : r.getAttributes()) {
                 // save to req_attribute, where the hell is attribute name ?!?
@@ -239,10 +250,10 @@ public class ResourceDAOImpl implements ResourceDAO {
 
                 session.insert("org.apache.ibatis.Mapper.insertReq_attribute", tab_reqAttribute);
                 session.commit();
-            
+
             }
 
-            // req_directive 
+            // req_directive
             Map<String, String> d = r.getDirectives();
             Set<String> k = d.keySet();
             Collection<String> v = d.values();
@@ -259,7 +270,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                 session.insert("org.apache.ibatis.Mapper.insertReq_directive", tab_reqDirective);
                 session.commit();
             }
-           } 
+           }
         }
       }
     }
@@ -268,7 +279,7 @@ public class ResourceDAOImpl implements ResourceDAO {
     public synchronized void deleteResource(URI uri) throws IOException {
 
         SqlSession session = SQLSessionHandler.getSession();
-        
+
         Resource resource = loadResource(uri);
 
         if (resource != null) {

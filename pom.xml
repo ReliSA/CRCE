@@ -93,7 +93,6 @@
         <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
         <!--<module>crce-rest</module>-->
-        <module>crce-metadata-metaDB</module>
     </modules>
 
     <profiles>
