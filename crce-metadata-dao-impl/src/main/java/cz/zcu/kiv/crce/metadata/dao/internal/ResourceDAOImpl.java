@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -35,17 +38,37 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  */
 public class ResourceDAOImpl implements ResourceDAO {
 
+    private static final Logger logger = LoggerFactory.getLogger(ResourceDAOImpl.class);
+
     //private volatile MetadataService metadataService;
     Map<URI, Map<URI, Resource>> repositories = new HashMap<>();
     private volatile ResourceFactory resourceFactory;
     private volatile MetadataService metadataService;
+    private SQLSessionHandler handler;
+
+    synchronized void init() {
+        handler = new SQLSessionHandler();
+        handler.init();
+    }
+
+    void start() {
+        logger.info("CRCE Metadata DAO started.");
+    }
+
+    synchronized void stop() {
+        handler.closeSession();
+        logger.info("CRCE Metadata DAO finished.");
+    }
 
     @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
+        logger.debug("loadResource(uri={})", uri);
+
+        Resource result = null;
 
         if (uri != null) {
 
-            SqlSession session = SQLSessionHandler.getSession();
+            SqlSession session = handler.getSession();
 
             //Resource resource = loadResource(uri);
             String resourceID = uri.toString();
@@ -127,24 +150,38 @@ public class ResourceDAOImpl implements ResourceDAO {
                     resource.addRequirement(req);
                 }
             }
-            return resource;
+            result = resource;
             }
-        return null;
+
+        logger.debug("loadResource(uri) returns {}", result);
+        return result;
     }
 
     @Override
     public synchronized List<Resource> loadResources(Repository repository) throws IOException {
+        logger.debug("loadResources(repository={})", repository);
+
+        List<Resource> result;
         Map<URI, Resource> resources = repositories.get(repository.getURI());
         if (resources != null) {
-            return Collections.unmodifiableList(new ArrayList<>(resources.values()));
+            result = Collections.unmodifiableList(new ArrayList<>(resources.values()));
+        } else {
+            result = Collections.emptyList();
         }
-        return Collections.emptyList();
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("loadResources(repository={}) returns {}", repository, result);
+        } else {
+            logger.debug("loadResources(repository) returns {}", result.size());
+        }
+        return result;
     }
 
     @Override
     public synchronized void saveResource(Resource resource) throws IOException {
+        logger.debug("saveResource(resource={})", resource);
 
-        SqlSession session = SQLSessionHandler.getSession();
+        SqlSession session = handler.getSession();
 
         URI uri = metadataService.getUri(resource);
 
@@ -273,12 +310,14 @@ public class ResourceDAOImpl implements ResourceDAO {
            }
         }
       }
+        logger.debug("saveResource(resource) returns", resource);
     }
 
     @Override
     public synchronized void deleteResource(URI uri) throws IOException {
+        logger.debug("deleteResource(uri={})", uri);
 
-        SqlSession session = SQLSessionHandler.getSession();
+        SqlSession session = handler.getSession();
 
         Resource resource = loadResource(uri);
 
@@ -287,22 +326,33 @@ public class ResourceDAOImpl implements ResourceDAO {
             session.insert("org.apache.ibatis.Mapper.deleteResource", resourceID);
             session.commit();
         }
+        logger.debug("deleteResource(uri) returns");
     }
 
     @Override
     public synchronized boolean existsResource(URI uri) throws IOException {    // TODO just simple select, check if return null
+        logger.debug("existsResource(uri={})", uri);
+
+        boolean result = false;
         for (Map<URI, Resource> resources : repositories.values()) {
             if (resources != null && resources.containsKey(uri)) {
-                return true;
+                result = true;
             }
         }
-        return false;
+
+        logger.debug("existsResource(uri) returns {}", result);
+        return result;
     }
 
     @Override
     public boolean existsResource(URI uri, Repository repository) throws IOException {  // not needed
+        logger.debug("existsResource(uri={}, repository={})", uri, repository);
+
         Map<URI, Resource> resources = repositories.get(repository.getURI());
-        return resources.containsKey(uri);
+        boolean result = resources.containsKey(uri);
+
+        logger.debug("existsResource(uri, repository) returns {}", result);
+        return result;
     }
 
     @Override

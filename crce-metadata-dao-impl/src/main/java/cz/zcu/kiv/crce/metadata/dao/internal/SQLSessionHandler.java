@@ -2,12 +2,14 @@ package cz.zcu.kiv.crce.metadata.dao.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,47 +17,53 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
  */
 public class SQLSessionHandler {
 
-    private static String conf;
-    private static InputStream inputStream;
-    private static SqlSessionFactory factory;
-    private static SqlSession session;
+    private static final Logger logger = LoggerFactory.getLogger(SQLSessionHandler.class);
 
-    public static String getConf() {
+    private String conf;
+    private InputStream inputStream;
+    private SqlSessionFactory factory;
+    private SqlSession session;
+
+    public String getConf() {
         return conf;
     }
 
-    public static void setConf(String conf) {
-        SQLSessionHandler.conf = conf;
+    public void setConf(String conf) {
+        this.conf = conf;
     }
 
-    public static InputStream getInputStream() {
+    public InputStream getInputStream() {
         return inputStream;
     }
 
-    public static void setInputStream(InputStream inputStream) {
-        SQLSessionHandler.inputStream = inputStream;
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    public static SqlSessionFactory getFactory() {
+    public SqlSessionFactory getFactory() {
         return factory;
     }
 
-    public static void setFactory(SqlSessionFactory factory) {
-        SQLSessionHandler.factory = factory;
+    public void setFactory(SqlSessionFactory factory) {
+        this.factory = factory;
     }
 
-    public static SqlSession getSession() {
+    public SqlSession getSession() {
         init();
         return session;
     }
 
-    public static void setSession(SqlSession session) {
-        SQLSessionHandler.session = session;
+    public void setSession(SqlSession session) {
+        this.session = session;
     }
 
-    public static void init() {
+    public void init() {
         try {
             if (session == null) {
+                logger.debug("Initializing DB session.");
+
+                Resources.setDefaultClassLoader(getClass().getClassLoader());
+
                 setConf("data/mybatis-config.xml");
                 setInputStream(Resources.getResourceAsStream(getConf()));
                 setFactory(new SqlSessionFactoryBuilder().build(getInputStream()));
@@ -75,13 +83,16 @@ public class SQLSessionHandler {
                 session.commit();
                 session.update("org.apache.ibatis.DBMapper.createReq_directive");
                 session.commit();
+
+                logger.debug("DB session initialized.");
             }
-        } catch (IOException ex) {
-            Logger.getLogger(SQLSessionHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            logger.error("Can't load MyBatis configuration, DB session could not be initialized.", e);
         }
     }
 
-    public static void closeSession() {
+    public void closeSession() {
         session.close();
+        logger.debug("DB session closed.");
     }
 }
