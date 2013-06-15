@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -88,7 +87,7 @@ public class IntegrationTestBase extends TestCase {
      *   configure("org.apache.felix.http",
      *     "org.osgi.service.http.port", "1234");
      * </pre>
-     
+
     protected void configure(String pid, String... configuration) throws IOException {
         Properties props = properties(configuration);
         Configuration config = getConfiguration(pid);

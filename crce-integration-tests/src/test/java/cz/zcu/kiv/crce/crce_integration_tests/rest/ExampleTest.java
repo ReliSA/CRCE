@@ -18,8 +18,7 @@
  */
 package cz.zcu.kiv.crce.crce_integration_tests.rest;
 
-import cz.zcu.kiv.crce.crce_integration_tests.rest.Options.Felix;
-import cz.zcu.kiv.crce.crce_integration_tests.rest.Options.Osgi;
+import static org.junit.Assert.assertNotNull;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -29,20 +28,23 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.felix.dm.Component;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.Configuration;
-import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.osgi.service.packageadmin.PackageAdmin;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.junit.PaxExam;
+
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
  * This class serves as a minimal example of our integration tests. Also, if this test fails, something is likely
  * wrong with the environment
  */
-@RunWith(JUnit4TestRunner.class)
+@RunWith(PaxExam.class)
 public class ExampleTest extends IntegrationTestBase {
 
     /*
@@ -67,12 +69,15 @@ public class ExampleTest extends IntegrationTestBase {
             "com.sun.*,javax.xml.*,com.sun.org.apache.xerces.internal.*,"
             + "javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,"
             + "javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,"
-            + "javax.microedition.io,javax.naming,javax.script,javax.security.auth.x500,javax.servlet,"
+            + "javax.microedition.io,javax.naming,javax.naming.spi,javax.script,javax.security.auth.x500,javax.servlet,"
             + "javax.servlet.http,javax.servlet.jsp,javax.sql,"
             + "org.w3c.dom,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers,"
             + "org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,"
-            + "com.sun.java_cup.internal,com.sun.xml.internal.bind.v2";
-    
+            + "com.sun.java_cup.internal,com.sun.xml.internal.bind.v2,"
+            + "javax.net,javax.net.ssl,javax.transaction.xa";
+
+    private String bootDelegationPackages = "sun.*,com.sun.*";
+
     /**
      * Configuration of the OSGi runtime.
      *
@@ -84,17 +89,19 @@ public class ExampleTest extends IntegrationTestBase {
         System.out.println("Option config");
         return options(
                 systemPackage(systemPackages),
+                bootDelegationPackage(bootDelegationPackages),
                 junitBundles(),
-                felix(),
+//                felix(),
                 // DS support
                 mavenBundle("org.apache.felix", "org.apache.felix.scr", "1.6.0"),
                 mavenBundle("org.apache.felix", "org.apache.felix.dependencymanager"),
+                mavenBundle("org.apache.felix", "org.apache.felix.dependencymanager.runtime"),
                 mavenBundle("org.apache.felix", "org.apache.felix.bundlerepository"),
                 mavenBundle("org.apache.felix", "org.osgi.service.obr"),
                 mavenBundle("org.apache.ace", "org.apache.ace.obr.metadata"),
                 mavenBundle("org.apache.ace", "org.apache.ace.obr.storage"),
                 mavenBundle("org.apache.felix", "org.apache.felix.shell"),
-                mavenBundle("org.osgi", "org.osgi.compendium"),
+                mavenBundle("org.osgi", "org.osgi.compendium", "4.3.1"),
                 mavenBundle("org.slf4j", "slf4j-api"),
                 mavenBundle("ch.qos.logback", "logback-core"),
                 mavenBundle("ch.qos.logback", "logback-classic"),
@@ -106,21 +113,16 @@ public class ExampleTest extends IntegrationTestBase {
 
                 //mavenBundle().groupId("log4j").artifactId("log4j").version("1.2.16"),
 
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-results-api").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-results-impl").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-api").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-plugin-api").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-repository-api").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-repository-impl").version("1.0.0-SNAPSHOT"),
                 mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-api").version("2.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-impl").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-metafile").version("1.0.0-SNAPSHOT"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-plugin-api").version("2.0.0-SNAPSHOT"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-impl").version("2.0.0-SNAPSHOT"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-service-api").version("2.0.0-SNAPSHOT"),
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-service-impl").version("2.0.0-SNAPSHOT"),
                 mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-dao-api").version("2.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-efp-indexer").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-efp-assignment").version("1.0.0-SNAPSHOT"),
-                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-rest").version("1.0.0-SNAPSHOT").classifier("classes"));
+                mavenBundle().groupId("cz.zcu.kiv.crce").artifactId("crce-metadata-dao-impl").version("2.0.0-SNAPSHOT")
+                );
     }
-    
+
     @Override
     protected void before() throws IOException {
         // configure the services you need; you cannot use the injected members yet
@@ -134,48 +136,42 @@ public class ExampleTest extends IntegrationTestBase {
                 createComponent()
                     .setImplementation(this)
                     .add(createServiceDependency()
-                        .setService(PackageAdmin.class)
+                        .setService(ResourceFactory.class)
                         .setRequired(true))
                     .add(createServiceDependency()
-                        .setService(ResourceFactory.class)
-                //        .setRequired(true)
-                )
-                    .add(createServiceDependency()
                         .setService(ResourceDAO.class)
-                //        .setRequired(true)
-                )
+                        .setRequired(true))
+                    .add(createServiceDependency()
+                        .setService(MetadataService.class)
+                        .setRequired(true))
         };
-    }           
+    }
 
     // You can inject services as usual.
-    private volatile PackageAdmin m_packageAdmin;
-
-    @Test
-    public void exampleTest() {
-        assertEquals("Hey, who stole my package!",
-                0,
-                m_packageAdmin.getExportedPackage("org.osgi.framework").getExportingBundle().getBundleId());
-    }
-    
     private volatile ResourceFactory resourceFactory;       /* injected by dependency manager */
     private volatile ResourceDAO resourceDAO;     /* injected by dependency manager */
-    
+    private volatile MetadataService metadataService;     /* injected by dependency manager */
+
     @Test
-    public void testResourceDAOImp() throws IOException {
+    public void testResourceDAOImp() throws IOException, URISyntaxException {
+
+        URI uri = new URI("file://a/b/c");
 
         Resource r = resourceFactory.createResource();
-        
+
+        metadataService.setUri(r, uri);
+
         Capability cap = resourceFactory.createCapability("nameSpace", "1");
-        r.addCapability(cap);
-        
+        metadataService.addRootCapability(r, cap);
+
         Requirement req = resourceFactory.createRequirement("nameSpace", "1");
-        r.addRequirement(req);
-     
-        //ResourceDAO impl = new ResourceDAOImpl();
+        metadataService.addRequirement(r, req);
+
         resourceDAO.saveResource(r);
-        Resource r2 = resourceDAO.loadResource(null);
-        
+        Resource r2 = resourceDAO.loadResource(uri);
+
+        assertNotNull(r2);
+
         assertTrue(r.equals(r2));
-        
     }
 }
