@@ -309,7 +309,7 @@ public class MetadataServiceImpl implements MetadataService {
 
         List<Requirement> requirements = resource.getRequirements(requirement.getNamespace());
         if (!requirements.contains(requirement)) {
-            requirements.add(requirement);
+            resource.addRequirement(requirement);
         }
 
         addRequirementTree(resource, requirement);
