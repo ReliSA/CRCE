@@ -1,11 +1,11 @@
 package cz.zcu.kiv.crce.metadata.service.validation;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Resource;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Service for validation of metadata entities.
