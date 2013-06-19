@@ -65,7 +65,7 @@ public class MetadataServiceImpl implements MetadataService {
             throw new IllegalArgumentException("Resource is null.");
         }
 
-        String name = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__NAME);
+        String name = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__NAME);
 
         if (name == null || name.isEmpty()) {
             logger.warn("Resource with id {} has no name specified.", resource.getId());
@@ -76,7 +76,7 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void setPresentationName(Resource resource, String name) {
-        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__NAME, name);
+        getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__NAME, name);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public URI getUri(Resource resource) {
-        URI uri = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__URI);
+        URI uri = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__URI);
         if (uri == null) {
             throw new IllegalStateException("URI is null, resource: " + resource.getId());
         }
@@ -164,12 +164,12 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void setUri(Resource resource, URI uri) {
-        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__URI, uri);
+        getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__URI, uri);
     }
 
     @Override
     public String getFileName(Resource resource) {
-        String fileName = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__FILE_NAME);
+        String fileName = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__FILE_NAME);
         if (fileName == null) {
             throw new IllegalStateException("File name attribute is null");
         }
@@ -178,12 +178,12 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void setFileName(Resource resource, String fileName) {
-        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__FILE_NAME, fileName);
+        getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__FILE_NAME, fileName);
     }
 
     @Override
     public long getSize(Resource resource) {
-        Long size = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__SIZE);
+        Long size = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__SIZE);
         if (size == null) {
             throw new IllegalStateException("Size attribute is null"); // -1 would be optionally returned
         }
@@ -192,12 +192,12 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void setSize(Resource resource, long size) {
-        getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__SIZE, size);
+        getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__SIZE, size);
     }
 
     @Override
     public List<String> getCategories(Resource resource) {
-        List<String> categories = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
+        List<String> categories = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
         if (categories == null) {
             return Collections.emptyList();
         }
@@ -206,7 +206,7 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void addCategory(Resource resource, String category) {
-        Capability identity = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY);
+        Capability identity = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY);
         List<String> categories = identity.getAttributeValue(ATTRIBUTE__CATEGORIES);
         if (categories == null) {
             categories = new ArrayList<>();
@@ -219,7 +219,7 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void removeCategory(Resource resource, String category) {
-        List<String> categories = getSingleCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
+        List<String> categories = getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).getAttributeValue(ATTRIBUTE__CATEGORIES);
         if (categories != null && !categories.isEmpty()) {
             categories.remove(category);
         }
@@ -339,7 +339,7 @@ public class MetadataServiceImpl implements MetadataService {
     // ---
 
     @Nonnull
-    private Capability getSingleCapability(@Nonnull Resource resource, @Nonnull String namespace) {
+    public Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace) {
         List<Capability> capabilities = resource.getCapabilities(namespace);
 
         assert capabilities.size() < 2;

@@ -85,4 +85,17 @@ public interface MetadataService {
     void addRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
 
     void removeRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
+
+    /**
+     * Returns a capability of the given namespace which exists only as a singleton
+     * in scope of the given resource.<p>
+     * If the requested capability doesn't exist, then a new one is created and set as
+     * a root capability.
+     * 
+     * @param resource
+     * @param namespace
+     * @return
+     */
+    @Nonnull
+    Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace);
 }
