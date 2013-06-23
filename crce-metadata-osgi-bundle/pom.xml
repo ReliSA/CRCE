@@ -23,12 +23,22 @@
 
     <dependencies>
         <dependency>
+            <artifactId>org.osgi.core</artifactId>
+            <groupId>org.osgi</groupId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.utils</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -41,6 +51,15 @@
             <version>2.3.0</version>
         </dependency>
 
+        <!-- Optional dependencies -->
+
+        <dependency>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+          <optional>true</optional>
+        </dependency>
+
+        <!-- Project dependencies -->
 
         <dependency>
             <groupId>${project.groupId}</groupId>

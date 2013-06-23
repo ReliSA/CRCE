@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
 import cz.zcu.kiv.crce.plugin.Plugin;
-import org.apache.felix.bundlerepository.RepositoryAdmin;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -20,7 +19,6 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(OsgiManifestBundleIndexer.class)
-                .add(createServiceDependency().setService(RepositoryAdmin.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 );

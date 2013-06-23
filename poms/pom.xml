@@ -417,7 +417,7 @@
                 <artifactId>org.apache.felix.utils</artifactId>
                 <version>1.2.0</version>
                 <type>jar</type>
-                <scope>provided</scope>
+                <scope>compile</scope><!-- Not a bundle -->
             </dependency>
             <dependency>
                 <groupId>asm</groupId>
