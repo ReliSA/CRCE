@@ -16,7 +16,6 @@ import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.webui.internal.legacy.Property;
 import cz.zcu.kiv.crce.webui.internal.legacy.Type;
@@ -37,27 +36,16 @@ abstract class ResourceWrap extends ResourceAdapter {
     public Property[] getProperties() {
         Property[] properties;
         List<Capability> crceCapabilities = resource.getCapabilities(metadataService.getIdentityNamespace());
-        List<Capability> osgiCapabilities = resource.getCapabilities(LegacyMetadataHelper.NS__OSGI_IDENTITY);
 
         int crceSize = crceCapabilities.size() > 0 ? crceCapabilities.get(0).getAttributes().size() : 0;
-        int osgiSize = osgiCapabilities.size() > 0 ? osgiCapabilities.get(0).getAttributes().size() : 0;
 
-        properties = new Property[crceSize + osgiSize];
+        properties = new Property[crceSize];
         int i = 0;
         if (crceSize > 0) {
             for (Attribute<?> atr : crceCapabilities.get(0).getAttributes()) {
                 properties[i++] = new PropertyImpl(atr);
             }
         }
-        if (osgiSize > 0) {
-            for (Attribute<?> atr : osgiCapabilities.get(0).getAttributes()) {
-                properties[i++] = new PropertyImpl(atr);
-            }
-        }
-//        for (Attribute atr : resource.getCapabilities(LegacyMetadataHelper.NS__CRCE_IDENTITY)
-
-//        return resource.getProperties().toArray();
-
         return properties;
     }
 
@@ -90,7 +78,7 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public String getSymbolicName() {
-        return LegacyMetadataHelper.getSymbolicName(resource);
+        return "unknown-symbolic-name";
     }
 
     @Override
@@ -100,7 +88,7 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public Version getVersion() {
-        return LegacyMetadataHelper.getVersion(resource);
+        return new Version("0.0.0");
     }
 
     @Override

@@ -146,12 +146,11 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
                 manifest = new Manifest(new ByteArrayInputStream(man));
             }
 
+            @Override
             public String getHeader(String name) throws IOException {
                 String value = manifest.getMainAttributes().getValue(name);
                 if (value != null && value.startsWith("%")) {
                     if (localization == null) {
-//                        try
-//                        {
                         localization = new Properties();
                         String path = manifest.getMainAttributes().getValue(Constants.BUNDLE_LOCALIZATION);
                         if (path == null) {
@@ -162,11 +161,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
                         if (loc != null) {
                             localization.load(new ByteArrayInputStream(loc));
                         }
-//                        }
-//                        catch (IOException e)
-//                        {
-//                            // TODO: ?
-//                        }
                     }
                     value = value.substring(1);
                     value = localization.getProperty(value, value);
@@ -275,6 +269,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     private void doImportServices(Resource resource, Headers headers) throws IOException {
+        @SuppressWarnings("deprecation")
         Clause[] imports = Parser.parseHeader(headers.getHeader(Constants.IMPORT_SERVICE));
         for (int i = 0; imports != null && i < imports.length; i++) {
 //            RequirementImpl ri = new RequirementImpl(Capability.SERVICE);
@@ -292,6 +287,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     private void doExportServices(Resource resource, Capability root, Headers headers) throws IOException {
+        @SuppressWarnings("deprecation")
         Clause[] exports = Parser.parseHeader(headers.getHeader(Constants.EXPORT_SERVICE));
         if (exports != null) {
             for (Clause export : exports) {
@@ -399,6 +395,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private Capability createCapability(Clause clause) {
         Capability capability = resourceFactory.createCapability(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         capability.setAttribute(NsOsgiPackage.ATTRIBUTE__NAME, clause.getName());
@@ -406,9 +403,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         Attribute[] attributes = clause.getAttributes();
         for (int i = 0; attributes != null && i < attributes.length; i++) {
             String key = attributes[i].getName();
-            if (key.equalsIgnoreCase(Constants.PACKAGE_SPECIFICATION_VERSION) || key.equalsIgnoreCase(Constants.VERSION_ATTRIBUTE)) {
-                continue;
-            } else {
+            if (!key.equalsIgnoreCase(Constants.PACKAGE_SPECIFICATION_VERSION) && !key.equalsIgnoreCase(Constants.VERSION_ATTRIBUTE)) {
                 String value = attributes[i].getValue();
                 capability.setAttribute(new SimpleAttributeType<>(key, String.class), value);
             }
@@ -460,10 +455,9 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 //            }
 //            filter.append(")");
         }
-//        filter.append(")");
-//        requirement.setFilter(filter.toString());
     }
 
+    @SuppressWarnings("deprecation")
     private Set<String> doImportPackageAttributes(Requirement requirement, Attribute[] attributes) {
         HashSet<String> set = new HashSet<>();
         for (int i = 0; attributes != null && i < attributes.length; i++) {
@@ -483,19 +477,20 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     private void doExecutionEnvironment(Resource resource, Headers headers) throws IOException {
+        @SuppressWarnings("deprecation")
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT));
         if (clauses != null && clauses.length > 0) {
             Requirement req = resourceFactory.createRequirement(NsOsgiExecutionEnvironment.NAMESPACE__OSGI_EXECUTION_ENVIRONMENT);
             req.setDirective("operation", "or"); // TODO constant
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("(|");
-            for (int i = 0; i < clauses.length; i++) {
-                req.addAttribute(NsOsgiExecutionEnvironment.ATTRIBUTE__EXECUTION_ENVIRONMENT, clauses[i].getName());
+            for (Clause clause : clauses) {
+                req.addAttribute(NsOsgiExecutionEnvironment.ATTRIBUTE__EXECUTION_ENVIRONMENT, clause.getName());
                 sb.append("(");
                 sb.append(NsOsgiExecutionEnvironment.ATTRIBUTE__EXECUTION_ENVIRONMENT.getName());
                 sb.append("=");
-                sb.append(clauses[i].getName());
+                sb.append(clause.getName());
                 sb.append(")");
             }
             sb.append(")");
@@ -506,6 +501,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static String getVersion(Clause clause) {
         String v = clause.getAttribute(Constants.VERSION_ATTRIBUTE);
         if (v == null) {
@@ -517,6 +513,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         return VersionCleaner.clean(v);
     }
 
+    @SuppressWarnings("deprecation")
     private VersionRange getVersionRange(Clause clause) {
         String v = clause.getAttribute(Constants.VERSION_ATTRIBUTE);
         if (v == null) {

@@ -12,7 +12,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Validator {
+public interface MetadataValidator {
 
     /**
      * Validates the given resource including child entities (capabilities, requirements, properties).

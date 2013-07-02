@@ -26,16 +26,16 @@ import cz.zcu.kiv.crce.metadata.service.validation.PropertyValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.ReasonType;
 import cz.zcu.kiv.crce.metadata.service.validation.RequirementValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
-import cz.zcu.kiv.crce.metadata.service.validation.Validator;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-@Component(provides = Validator.class)
-public class ValidatorImpl implements Validator, ManagedService {
+@Component(provides = MetadataValidator.class)
+public class MetadataValidatorImpl implements MetadataValidator, ManagedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidatorImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetadataValidatorImpl.class);
 
     public static final String CFG__STRUCTURE_VALIDATION = "structure-validation";
 

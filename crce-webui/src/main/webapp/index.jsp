@@ -5,7 +5,6 @@
 --%>
 
 <%@page import="cz.zcu.kiv.crce.metadata.Attribute"%>
-<%@page import="cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper"%>
 <%@page import="java.util.List"%>
 <%
  response.sendRedirect("resource");
@@ -70,8 +69,6 @@
                     out.println("<h2>" + res.getId() + "</h2>");
 
                     out.println("<table>");
-                    out.println("<tr><td>Symbolic name:</td><td>" + LegacyMetadataHelper.getSymbolicName(res) + "</td></tr>");
-                    out.println("<tr><td>Version:</td><td>" + LegacyMetadataHelper.getVersion(res) + "</td></tr>");
                     out.println("<tr><td>Presentation name:</td><td>" + Activator.instance().getMetadataService().getPresentationName(res) + "</td></tr>");
                     out.println("<tr><td>Size:</td><td>" + Activator.instance().getMetadataService().getSize(res) + "</td></tr>");
                     out.println("<tr><td>URI:</td><td>" + Activator.instance().getMetadataService().getUri(res).normalize() + "</td></tr>");

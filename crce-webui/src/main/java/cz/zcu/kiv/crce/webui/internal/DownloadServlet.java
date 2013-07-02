@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
 
 public class DownloadServlet extends HttpServlet {
@@ -116,7 +115,7 @@ public class DownloadServlet extends HttpServlet {
             //
             resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
             resp.setContentLength((int) f.length());
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + LegacyMetadataHelper.getSymbolicName(found)
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + Activator.instance().getMetadataService().getFileName(found)
                     + chooseCategory(Activator.instance().getMetadataService().getCategories(found)) + "\"");
 
             //

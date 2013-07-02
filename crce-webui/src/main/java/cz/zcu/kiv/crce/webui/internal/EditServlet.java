@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.osgi.framework.Version;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.webui.internal.legacy.Type;
 
 public class EditServlet extends HttpServlet {
@@ -154,11 +151,12 @@ public class EditServlet extends HttpServlet {
                 return false;
             }
             Resource resource = findResource(resURI, resources);
-            String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
-            String version = ((String[]) parameters.get("version"))[0];
+            // TODO why was the following here:
+//            String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
+//            String version = ((String[]) parameters.get("version"))[0];
 
-            LegacyMetadataHelper.setVersion(Activator.instance().getResourceFactory(), resource, new Version(version));
-            LegacyMetadataHelper.setSymbolicName(Activator.instance().getResourceFactory(), resource, symbolicName);
+//            LegacyMetadataHelper.setVersion(Activator.instance().getResourceFactory(), resource, new Version(version));
+//            LegacyMetadataHelper.setSymbolicName(Activator.instance().getResourceFactory(), resource, symbolicName);
 
             Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {

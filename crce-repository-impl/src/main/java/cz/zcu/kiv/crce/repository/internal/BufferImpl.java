@@ -8,9 +8,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.osgi.framework.BundleContext;
@@ -27,8 +26,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
-import cz.zcu.kiv.crce.metadata.legacy.LegacyMetadataHelper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -51,17 +51,19 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile ResourceDAO resourceDAO;     /* injected by dependency manager */
     private volatile ResourceIndexerService resourceIndexerService; /* injected by dependency manager */
     private volatile MetadataService metadataService;
+    private volatile MetadataValidator metadataValidator;
 
     private final int BUFFER_SIZE = 8 * 1024;
-    private final Properties sessionProperties;
+    private final Dictionary<String, String> sessionProperties;
 
     private File baseDir;
     private Repository repository;
 
     private static final Logger logger = LoggerFactory.getLogger(BufferImpl.class);
 
+    @SuppressWarnings("UseOfObsoleteCollectionType")
     public BufferImpl(String sessionId) {
-        sessionProperties = new Properties();
+        sessionProperties = new Hashtable<>();
         sessionProperties.put(SessionRegister.SERVICE_SESSION_ID, sessionId);
     }
 
@@ -70,16 +72,16 @@ public class BufferImpl implements Buffer, EventHandler {
      */
     @SuppressWarnings({"UseOfObsoleteCollectionType", "unchecked"})
     void init() {
-        Dictionary<String, String> props = new java.util.Hashtable<>();
+        Dictionary<String, String> props = new Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
         context.registerService(EventHandler.class.getName(), this, props);
 
-        baseDir = context.getDataFile(sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
+        baseDir = context.getDataFile(sessionProperties.get(SessionRegister.SERVICE_SESSION_ID));
         if (!baseDir.exists()) {
             if (!baseDir.mkdirs()) {
                 logger.error("Could not create buffer directory {}, session: {}",
-                        baseDir, sessionProperties.getProperty(SessionRegister.SERVICE_SESSION_ID));
+                        baseDir, sessionProperties.get(SessionRegister.SERVICE_SESSION_ID));
             }
         } else if (!baseDir.isDirectory()) {
             throw new IllegalStateException("Base directory is not a directory: " + baseDir);
@@ -153,7 +155,8 @@ public class BufferImpl implements Buffer, EventHandler {
             }
         }
 
-        Resource resource = resourceDAO.loadResource(file.toURI());
+//        Resource resource = resourceDAO.loadResource(file.toURI());
+        Resource resource = null;
         if (resource == null) {
             resource = resourceIndexerService.indexResource(file);
         }
@@ -161,7 +164,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
         // TODO alternatively can be moved to some plugin
         metadataService.setFileName(resource, name2);
-        LegacyMetadataHelper.setSymbolicName(resourceFactory, resource, name2);
+//        metadataService.setPresentationName(resource, name2);
 
         String presentationName = metadataService.getPresentationName(resource);
         if (presentationName.trim().isEmpty()) {
@@ -183,6 +186,15 @@ public class BufferImpl implements Buffer, EventHandler {
         } else {
             resource = tmp;
         }
+
+        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+
+        if (!validationResult.isContextValid()) {
+            logger.error("Uploaded Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+            throw new RefusedArtifactException("Resource is not valid.");
+        }
+
+        logger.info("Uploaded resource {} is valid.", resource.getId());
 
         resourceDAO.saveResource(resource);
 
@@ -236,19 +248,14 @@ public class BufferImpl implements Buffer, EventHandler {
 
         List<Resource> commitedResources = new ArrayList<>();
         List<URI> resourcesToRemove = new ArrayList<>();
-        Map<String, String[]> toRemoveNonrenamed = new HashMap<>(); // K: new ID, V: old sn, old ver
-//        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 
         // put resources to store
         if (move && store instanceof FilebasedStoreImpl) {
             for (Resource resource : resourcesToCommit) {
                 Resource commitedResource;
                 try {
-                    URI uri = metadataService.getUri(resource);
-                    String[] old = new String[] {LegacyMetadataHelper.getSymbolicName(resource), LegacyMetadataHelper.getVersion(resource).toString()};
+                    resourcesToRemove.add(metadataService.getUri(resource));
                     commitedResource = ((FilebasedStoreImpl) store).move(resource);
-                    toRemoveNonrenamed.put(resource.getId(), old);
-                    resourcesToRemove.add(uri);
                 } catch (RefusedArtifactException ex) {
                 	logger.info( "Resource can not be commited, it was revoked by store: {}", resource.getId(), ex);
                     continue;
@@ -341,7 +348,7 @@ public class BufferImpl implements Buffer, EventHandler {
         }).start();
     }
 
-    Dictionary getSessionProperties() {
+    Dictionary<String, String> getSessionProperties() {
         return sessionProperties;
     }
 
