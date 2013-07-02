@@ -64,24 +64,19 @@ public class SQLSessionHandler {
 
                 Resources.setDefaultClassLoader(getClass().getClassLoader());
 
-                setConf("data/mybatis-config.xml");
+                setConf("META-INF/mybatis/config.xml");
                 setInputStream(Resources.getResourceAsStream(getConf()));
                 setFactory(new SqlSessionFactoryBuilder().build(getInputStream()));
                 setSession(getFactory().openSession());
 
-                session.update("org.apache.ibatis.DBMapper.createResource");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createCapability");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createCap_attribute");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createCap_directive");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createRequirement");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createReq_attribute");
-                session.commit();
-                session.update("org.apache.ibatis.DBMapper.createReq_directive");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createResource");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCapability");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCap_attribute");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCap_directive");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createRequirement");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createReq_attribute");
+                session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createReq_directive");
+                
                 session.commit();
 
                 logger.debug("DB session initialized.");
