@@ -162,6 +162,8 @@ public class BufferImpl implements Buffer, EventHandler {
         }
         resource.setRepository(repository);
 
+        metadataService.setUri(resource, file.toURI().normalize());
+        
         // TODO alternatively can be moved to some plugin
         metadataService.setFileName(resource, name2);
 //        metadataService.setPresentationName(resource, name2);
@@ -188,7 +190,6 @@ public class BufferImpl implements Buffer, EventHandler {
         }
 
         ResourceValidationResult validationResult = metadataValidator.validate(resource);
-
         if (!validationResult.isContextValid()) {
             logger.error("Uploaded Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
             throw new RefusedArtifactException("Resource is not valid.");

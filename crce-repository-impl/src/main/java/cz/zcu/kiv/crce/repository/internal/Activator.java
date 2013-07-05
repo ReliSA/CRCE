@@ -21,6 +21,7 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -108,6 +109,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                         .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                         .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
                         .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
+                        .add(createServiceDependency().setService(MetadataValidator.class).setRequired(true))
                         .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
             } catch (IOException e) {
                 throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);

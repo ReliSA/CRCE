@@ -24,6 +24,8 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
+import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
@@ -42,6 +44,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile ResourceFactory resourceFactory;
     private volatile MetadataService metadataService; // NOPMD
+    private volatile MetadataValidator metadataValidator;
 
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
@@ -178,7 +181,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             FileUtils.copyFile(sourceFile, targetFile);
         }
 //        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
-        metadataService.setUri(resource, targetFile.toURI());
+        metadataService.setUri(resource, targetFile.toURI().normalize());
 //        if (!m_repository.addResource(out)) {
 //        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
 //            if (!targetFile.delete()) {
@@ -186,6 +189,14 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //            }
 //            return null;
 //        }
+
+        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+        if (!validationResult.isContextValid()) {
+            logger.error("Saved Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+            throw new RefusedArtifactException("Resource is not valid.");
+        }
+
+        logger.info("Saved resource {} is valid.", resource.getId());
         resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
@@ -302,6 +313,15 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                             continue;
                         }
                         resource.setRepository(repository);
+                        metadataService.setUri(resource, file.toURI().normalize());
+
+                        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+                        if (!validationResult.isContextValid()) {
+                            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+                            continue;
+                        }
+                        logger.info("Indexed resource {} is valid.", resource.getId());
+
                         try {
                             resourceDAO.saveResource(resource);
                         } catch (IOException e) {

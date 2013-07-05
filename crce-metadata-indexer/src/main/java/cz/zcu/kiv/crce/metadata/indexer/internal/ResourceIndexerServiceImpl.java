@@ -77,7 +77,7 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
 
         metadataService.setSize(resource, file.length());
 
-        metadataService.setUri(resource, file.toURI()); // TODO move to Store logic
+        metadataService.setUri(resource, file.toURI().normalize()); // TODO move to Store logic
 
         return resource;
     }

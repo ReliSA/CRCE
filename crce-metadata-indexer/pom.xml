@@ -14,7 +14,7 @@
     <artifactId>crce-metadata-indexer</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - Metadata Indexer</name>
+    <name>CRCE - Plugin - Metadata Indexer Implementation</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>
