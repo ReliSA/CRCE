@@ -11,6 +11,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -65,13 +66,16 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
      */
     private boolean createFactory(@Nonnull String config, @Nonnull Properties properties) throws IOException {
         try (InputStream is = Resources.getResourceAsStream(config)) {
-            this.factory = new SqlSessionFactoryBuilder().build(is, properties);
+            factory = new SqlSessionFactoryBuilder().build(is, properties);
+            factoryPostConfiguration(factory.getConfiguration());
         } catch (RuntimeException e) { // thrown by build()
             logger.error("Could not create MyBatis SqlSessionFactory.", e);
             return false;
         }
         return true;
     }
+
+    abstract void factoryPostConfiguration(Configuration configuration);
 
     @Override
     public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {

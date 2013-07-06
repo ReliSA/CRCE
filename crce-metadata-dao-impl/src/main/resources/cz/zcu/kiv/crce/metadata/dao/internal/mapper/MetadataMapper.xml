@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper">
 
-    <resultMap  id="resourcemap" type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
+    <resultMap  id="resourcemap" type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
         <id column="id" property="id" />
     </resultMap>
     <select id="getResource" parameterType="int" resultMap="resourcemap">
@@ -16,7 +16,7 @@
         from resource
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource" id="resourcemap2">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource" id="resourcemap2">
         <id property="internal_id" column="internal_id" />
     </resultMap>
     <select id="getResourceID" parameterType="String" resultMap="resourcemap2">
@@ -25,7 +25,7 @@
         where id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability" id="resourcemap3">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="resourcemap3">
         <id column="internal_id" property="internal_id"/>
     </resultMap>
     <select id="getCapabilityID" parameterType="String" resultMap="resourcemap3">
@@ -34,7 +34,7 @@
         where id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement" id="resourcemap4">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="resourcemap4">
         <id column="internal_id" property="internal_id"/>
     </resultMap>
     <select id="getRequirementID" parameterType="String" resultMap="resourcemap4">
@@ -43,7 +43,7 @@
         where id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability" id="resourcemap1">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="resourcemap1">
         <id column="internal_id" property="internal_id"/>
         <id column="id" property="id"/>
         <id column="namespace" property="namespace"/>
@@ -55,7 +55,7 @@
         where resource_id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive" id="resourcemap5">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="resourcemap5">
         <id column="internal_id" property="internal_id"/>
         <id column="name" property="name"/>
         <id column="value" property="value"/>
@@ -66,12 +66,12 @@
         where capability_id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute" id="resourcemap6">
-        <id column="internal_id" property="internal_id"/>
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="resourcemap6">
+<!--        <id column="internal_id" property="internal_id"/>
         <id column="type" property="type"/>
         <id column="name" property="name"/>
         <id column="value" property="value"/>
-        <id column="operator" property="operator"/>
+        <id column="operator" property="operator"/>-->
     </resultMap>
     <select id="getCapabilityAttribute" parameterType="int" resultMap="resourcemap6">
         select internal_id, type, name, value, operator
@@ -79,7 +79,7 @@
         where capability_id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement" id="resourcemap7">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="resourcemap7">
         <id column="internal_id" property="internal_id"/>
         <id column="id" property="id"/>
         <id column="namespace" property="namespace"/>
@@ -91,7 +91,7 @@
         where resource_id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive" id="resourcemap8">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="resourcemap8">
         <id column="internal_id" property="internal_id"/>
         <id column="name" property="name"/>
         <id column="value" property="value"/>
@@ -102,7 +102,7 @@
         where requirement_id = #{id}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute" id="resourcemap9">
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="resourcemap9">
         <id column="internal_id" property="internal_id"/>
         <id column="type" property="type"/>
         <id column="name" property="name"/>
@@ -119,46 +119,83 @@
         DELETE FROM RESOURCE WHERE INTERNAL_ID = #{id}
     </delete>
 
-    <insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource">
-        insert into resource (id, uri, repository_uri) values (
-        #{id}, #{uri}, #{repository_uri}
+    <!-- Inserts -->
+
+    <insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        insert into resource (resource_id, id, uri) values (
+          #{resourceId}, #{id}, #{uri}
         )
     </insert>
 
-    <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement">
-        insert into requirement (id, namespace, resource_id) values (
-        #{id}, #{namespace}, #{resource_id}
+    <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability">
+        insert into capability (capability_id, parent_capability_id, resource_id, id, namespace) values (
+          #{capabilityId}, #{parentCapabilityId}, #{resourceId}, #{id}, #{namespace}
         )
     </insert>
 
-    <insert id="insertReq_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive">
-        insert into reg_directive (value, name, requirement_id) values (
-        #{value}, #{name}, #{requirement_id}
+    <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
+        insert into requirement (requirement_id, parent_requirement_id, resource_id, id, namespace) values (
+          #{requirementId}, #{parentRequirementId}, #{resourceId}, #{id}, #{namespace}
         )
     </insert>
 
-    <insert id="insertReq_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute">
-        insert into req_attribute (name, type, value, operator, requirement_id) values (
-        #{name}, #{type}, #{value}, #{operator}, #{requirement_id}
-        )
+    <insert id="insertCapabilityAttributes" parameterType="java.util.List">
+        INSERT INTO capability_attribute (
+          capability_id, name, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        ) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.listIndex, jdbcType=SMALLINT},
+            #{item.type, jdbcType=SMALLINT},
+            #{item.operator, jdbcType=SMALLINT},
+            #{item.stringValue, jdbcType=VARCHAR},
+            #{item.longValue, jdbcType=BIGINT},
+            #{item.doubleValue, jdbcType=DOUBLE},
+            #{item.versionMajorValue, jdbcType=INTEGER},
+            #{item.versionMinorValue, jdbcType=INTEGER},
+            #{item.versionMicroValue, jdbcType=INTEGER}
+        </foreach>
     </insert>
 
-    <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability">
-        insert into capability (id, namespace, resource_id) values (
-        #{id}, #{namespace}, #{resource_id}
-        )
+    <insert id="insertRequirementAttributes" parameterType="java.util.List">
+        INSERT INTO requirement_attribute (
+          requirement_id, name, attribute_index, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        ) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.attributeIndex, jdbcType=SMALLINT},
+            #{item.listIndex, jdbcType=SMALLINT},
+            #{item.type, jdbcType=SMALLINT},
+            #{item.operator, jdbcType=SMALLINT},
+            #{item.stringValue, jdbcType=VARCHAR},
+            #{item.longValue, jdbcType=BIGINT},
+            #{item.doubleValue, jdbcType=DOUBLE},
+            #{item.versionMajorValue, jdbcType=INTEGER},
+            #{item.versionMinorValue, jdbcType=INTEGER},
+            #{item.versionMicroValue, jdbcType=INTEGER}
+        </foreach>
     </insert>
 
-    <insert id="insertCap_directive" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive">
-        insert into cap_directive (value, name, capability_id) values (
-        #{value}, #{name}, #{capability_id}
-        )
+    <insert id="insertCapabilityDirectives" parameterType="java.util.List">
+        INSERT INTO capability_directive (capability_id, name, value) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.value, jdbcType=VARCHAR},
+        </foreach>
     </insert>
 
-    <insert id="insertCap_attribute" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute">
-        insert into cap_attribute (name, type, value, operator, capability_id) values (
-        #{name}, #{type}, #{value}, #{operator}, #{capability_id}
-        )
+    <insert id="insertRequirementDirectives" parameterType="java.util.List">
+        INSERT INTO requirement_directive (requirement_id, name, value) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.value, jdbcType=VARCHAR},
+        </foreach>
     </insert>
 
 </mapper>

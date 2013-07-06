@@ -1,25 +1,22 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package cz.zcu.kiv.crce.metadata.dao.internal.tables;
+package cz.zcu.kiv.crce.metadata.dao.internal.db;
 
 /**
  *
  * @author cihlator
  */
-public class Resource {
-    private int internal_id;
+public class DbResource {
+
+    private long resourceId;
     private String id;
     private String uri;
     private String repository_uri;
 
-    public int getInternal_id() {
-        return internal_id;
+    public long getResourceId() {
+        return resourceId;
     }
 
-    public void setInternal_id(int internal_id) {
-        this.internal_id = internal_id;
+    public void setResourceId(long resourceId) {
+        this.resourceId = resourceId;
     }
 
     public String getId() {

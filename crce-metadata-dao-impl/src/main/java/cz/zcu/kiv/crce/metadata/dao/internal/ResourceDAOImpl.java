@@ -3,30 +3,39 @@ package cz.zcu.kiv.crce.metadata.dao.internal;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import org.osgi.service.cm.ConfigurationException;
 
+import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.ConfigurationDependency;
+import org.apache.felix.dm.annotation.api.Init;
+import org.apache.felix.dm.annotation.api.LifecycleController;
+import org.apache.felix.dm.annotation.api.ServiceDependency;
+import org.apache.felix.dm.annotation.api.Start;
+import org.apache.felix.dm.annotation.api.Stop;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_directive;
-import cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_attribute;
-import cz.zcu.kiv.crce.metadata.dao.internal.tables.Req_directive;
-import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
+import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -35,35 +44,54 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  * @author Jan Dyrczyk (dyrczyk@students.zcu.cz)
  * @author Pavel Cihlář
  */
+@Component(provides={ResourceDAO.class})
 public class ResourceDAOImpl extends AbstractResourceDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceDAOImpl.class);
 
+    private static final String METADATA_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.";
+
     //private volatile MetadataService metadataService;
     Map<URI, Map<URI, Resource>> repositories = new HashMap<>();
-    private volatile ResourceFactory resourceFactory;
-    private volatile MetadataService metadataService;
 
-    void start() throws IOException {
+    @ServiceDependency private volatile ResourceFactory resourceFactory;
+    @ServiceDependency private volatile MetadataService metadataService;
+
+    @LifecycleController
+    Runnable lifeCycleController;
+
+    @Override
+    void factoryPostConfiguration(Configuration configuration) {
+        configuration.addMapper(SequenceMapper.class);
+    }
+
+    @Init
+    void init() {
         logger.info("Starting CRCE Metadata DAO.");
 
         try (SqlSession session = getSession()) {
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createResource");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCapability");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCap_attribute");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createCap_directive");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createRequirement");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createReq_attribute");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createReq_directive");
-
+            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createTables");
+            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createSequences");
             session.commit();
+            // starts the component only if initialization is successful
+            lifeCycleController.run();
         } catch (Exception e) {
             logger.error("Could not initialize DB.", e);
         }
+    }
 
+    @Override
+    @ConfigurationDependency(pid = Activator.PID)
+    public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
+        super.updated(dict);
+    }
+
+    @Start
+    void start() {
         logger.info("CRCE Metadata DAO started.");
     }
 
+    @Stop
     synchronized void stop() {
         logger.info("CRCE Metadata DAO finished.");
     }
@@ -85,31 +113,31 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
 
                 // Load capability
                 //Capability cap = null;
+                /*
                 Capability cap = resourceFactory.createCapability(resourceID);
 
-                List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> capabilityList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getCapability", resourceID);
-                Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> itr0 = capabilityList.iterator();
+                List<DbCapability> capabilityList = session.selectList(METADATA_MAPPER + "getCapability", resourceID);
+                Iterator<DbCapability> itr0 = capabilityList.iterator();
                 while (itr0.hasNext()) {
-                    cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capability = itr0.next();
+                    DbCapability capability = itr0.next();
                     //String capInternal_id = selectedCapability.get(0);
                     //String cap_id = selectedCapability.get(1); //TODO unused
                     //String capabilityNamespace = selectedCapability.get(2); //TODO unused
                     String capability_id = capability.getId();
                     //TODO save cap_id and namespace
 
-                    List<Cap_directive> capabilityDirective = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getCapabilityDirective", capability_id);
-                    Iterator<Cap_directive> itr = capabilityDirective.iterator();
+                    List<DbDirective> capabilityDirective = session.selectList(METADATA_MAPPER + "getCapabilityDirective", capability_id);
+                    Iterator<DbDirective> itr = capabilityDirective.iterator();
                     while (itr.hasNext()) {
-                        Cap_directive cDirective = itr.next();
+                        DbDirective cDirective = itr.next();
                         String capDirName = cDirective.getName();
                         String capDirValue = cDirective.getValue();
                         cap.setDirective(capDirName, capDirValue);
                     }
-
-                    List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> capabilityAttribute = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getCapabilityAttribute", capability_id);
-                    Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute> itr2 = capabilityAttribute.iterator();
+                    List<cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute> capabilityAttribute = session.selectList(METADATA_MAPPER + "getCapabilityAttribute", capability_id);
+                    Iterator<cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute> itr2 = capabilityAttribute.iterator();
                     while (itr.hasNext()) {
-                        cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute cAttribute = itr2.next();
+                        cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute cAttribute = itr2.next();
                         String capAttribute_type = cAttribute.getType();
                         String capAttribute_name = cAttribute.getName();
                         String capAttribute_value = cAttribute.getValue();
@@ -120,20 +148,22 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
                     }
                     resource.addCapability(cap);
                 }
+                */
 
                 // Load requirements
                 //Requirement req = null;
+                /*
                 Requirement req = resourceFactory.createRequirement(resourceID);
-                List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> requirementList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getRequirement", resourceID);
-                Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> itr3 = requirementList.iterator();
+                List<DbRequirement> requirementList = session.selectList(METADATA_MAPPER + "getRequirement", resourceID);
+                Iterator<DbRequirement> itr3 = requirementList.iterator();
                 while (itr3.hasNext()) {
-                    cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requirement = itr3.next();
+                    DbRequirement requirement = itr3.next();
                     //String req_id = selectedRequirement.get(1); //TODO unused
                     //String requirementNamespace = selectedRequirement.get(2); //TODO unused
                     String requirement_id = requirement.getId();
                     // TODO save namespace and req_id
 
-                    List<Req_directive> regDirectiveList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getRequirementDirective", requirement_id);
+                    List<Req_directive> regDirectiveList = session.selectList(METADATA_MAPPER + "getRequirementDirective", requirement_id);
                     Iterator<Req_directive> itr4 = regDirectiveList.iterator();
                     while (itr4.hasNext()) {
                         Req_directive regDirective = itr4.next();
@@ -142,8 +172,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
 
                         req.setDirective(reqDirName, reqDirValue);
                     }
-
-                    List<Req_attribute> requirementAttributeList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.RequirementAttribute", requirement_id);
+                    List<Req_attribute> requirementAttributeList = session.selectList(METADATA_MAPPER + "RequirementAttribute", requirement_id);
                     Iterator<Req_attribute> itr5 = requirementAttributeList.iterator();
                     while (itr5.hasNext()) {
                         Req_attribute requirementAttribute = itr5.next();
@@ -157,6 +186,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
                         resource.addRequirement(req);
                     }
                 }
+                */
                 result = resource;
             }
         }
@@ -190,136 +220,81 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         logger.debug("saveResource(resource={})", resource);
 
         try (SqlSession session = getSession()) {
+            SequenceMapper seqMapper = session.getMapper(SequenceMapper.class);
 
-            URI uri = metadataService.getUri(resource);
+            DbResource dbResource = MetadataMapping.mapResource2DbResource(resource, metadataService);
 
-            cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource dbResource = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource();
-            dbResource.setId(resource.getId());
-            dbResource.setUri(uri.toString());
-            Repository repository = resource.getRepository();
-            dbResource.setRepository_uri(repository != null ? repository.getURI().toString() : "");
+            long resourceId = seqMapper.nextVal("resource_seq");
+            dbResource.setResourceId(resourceId);
 
-            session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertResource", dbResource);
-            session.commit();
+            session.insert(METADATA_MAPPER + "insertResource", dbResource);
 
-            // get internnal_id - autogenerated
-            List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> ResourceList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getResourceID", resource.getId());
-            Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource> itr = ResourceList.iterator();
-            while (itr.hasNext()) {
-                cz.zcu.kiv.crce.metadata.dao.internal.tables.Resource res = itr.next();
-                int internal_id = res.getInternal_id();
-
-                // CAPABILITY
-                for (Capability c : resource.getCapabilities()) {
-                    // save to capability
-                    cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability tab_capability = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability();
-                    tab_capability.setNamespace(c.getNamespace());
-                    tab_capability.setId(c.getId());
-                    tab_capability.setResource_id(internal_id);
-                    //capability_id autoincrement
-                    // resource.getId(); // not used because String is slow - internal_id is int
-
-                    session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertCapability", tab_capability);
-                    session.commit();
-
-                    // get cap_InternalID - autogenerated
-                    List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> CapabilityList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getCapabilityID", c.getId());
-                    Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability> itr1 = CapabilityList.iterator();
-                    while (itr1.hasNext()) {
-                        cz.zcu.kiv.crce.metadata.dao.internal.tables.Capability capa = itr1.next();
-                        int cap_InternalID = capa.getInternal_id();
-
-                        // cap_attribute
-                        for (Attribute<?> a : c.getAttributes()) {
-                            // save to cap_attribute, where the hell is attribute name ?!?
-                            cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute tab_capAttribute = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Cap_attribute();
-                            tab_capAttribute.setType(a.getAttributeType().toString());
-                            tab_capAttribute.setValue(a.getValue().toString());
-                            tab_capAttribute.setOperator(a.getOperator().toString());
-                            tab_capAttribute.setName(a.getStringValue());
-                            tab_capAttribute.setCapability_id(cap_InternalID);
-
-                            session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertCap_attribute", tab_capAttribute);
-                            session.commit();
-                        }
-
-                        // cap_directive
-                        Map<String, String> d = c.getDirectives();
-                        Set<String> k = d.keySet();
-                        Collection<String> v = d.values();
-
-                        String[] names = k.toArray(new String[k.size()]);
-                        String[] values = v.toArray(new String[v.size()]);
-
-                        for (int i = 0; i < k.size(); i++) {
-                            Cap_directive tab_capDirective = new Cap_directive();
-                            tab_capDirective.setName(names[i]);
-                            tab_capDirective.setValue(values[i]);
-                            tab_capDirective.setCapability_id(cap_InternalID);
-
-                            session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertCap_directive", tab_capDirective);
-                            session.commit();
-                        }
-                    }
-                }
-
-                // REQUIREMENT
-                for (Requirement r : resource.getRequirements()) {
-                    r.getId();
-                    r.getNamespace();
-                    cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement tab_requirement = new cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement();
-                    tab_requirement.setId(r.getId());
-                    tab_requirement.setNamespace(r.getNamespace());
-                    tab_requirement.setResource_id(internal_id);
-
-                    session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertRequirement", tab_requirement);
-                    session.commit();
-
-                    // get cap_InternalID - autogenerated
-                    List<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> RequirementList = session.selectList("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.getRequirementID", r.getId());
-                    Iterator<cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement> itr2 = RequirementList.iterator();
-                    while (itr2.hasNext()) {
-                        cz.zcu.kiv.crce.metadata.dao.internal.tables.Requirement requ = itr2.next();
-                        int req_Internal_id = requ.getInternal_id();
-
-                        // req_attribute
-                        for (Attribute<?> a : r.getAttributes()) {
-                            // save to req_attribute, where the hell is attribute name ?!?
-                            Req_attribute tab_reqAttribute = new Req_attribute();
-                            tab_reqAttribute.setName(a.getStringValue());
-                            tab_reqAttribute.setType(a.getAttributeType().toString());
-                            tab_reqAttribute.setValue(a.getValue().toString());
-                            tab_reqAttribute.setOperator(a.getOperator().toString());
-                            tab_reqAttribute.setRequirement_id(req_Internal_id);
-
-                            session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertReq_attribute", tab_reqAttribute);
-                            session.commit();
-
-                        }
-
-                        // req_directive
-                        Map<String, String> d = r.getDirectives();
-                        Set<String> k = d.keySet();
-                        Collection<String> v = d.values();
-
-                        String[] names = k.toArray(new String[k.size()]);
-                        String[] values = v.toArray(new String[v.size()]);
-
-                        for (int i = 0; i < k.size(); i++) {
-                            Req_directive tab_reqDirective = new Req_directive();
-                            tab_reqDirective.setName(names[i]);
-                            tab_reqDirective.setValue(values[i]);
-                            tab_reqDirective.setRequirement_id(req_Internal_id);
-
-                            session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.insertReq_directive", tab_reqDirective);
-                            session.commit();
-                        }
-                    }
-                }
+            // capabilities
+            for (Capability capability : resource.getRootCapabilities()) {
+                saveCapabilityRecursive(capability, resourceId, null, session, seqMapper);
             }
+
+            // requirements
+            for (Requirement requirement : resource.getRequirements()) {
+                saveRequirementRecursive(requirement, resourceId, null, session, seqMapper);
+            }
+
+            session.commit();
         }
 
         logger.debug("saveResource(resource) returns", resource);
+    }
+
+    private void saveCapabilityRecursive(Capability capability, long resourceId, Long parentId, SqlSession session, SequenceMapper seqMapper) {
+
+        DbCapability dbCapability = MetadataMapping.mapCapability2DbCapability(capability, metadataService);
+        dbCapability.setResourceId(resourceId);
+
+        long capabilityId = seqMapper.nextVal("capability_seq");
+        dbCapability.setCapabilityId(capabilityId);
+        dbCapability.setParentCapabilityId(parentId != null ? parentId : capabilityId);
+
+        session.insert(METADATA_MAPPER + "insertCapability", dbCapability);
+
+        List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(capability.getAttributes(), capabilityId);
+        if (!dbAttributes.isEmpty()) {
+            session.insert(METADATA_MAPPER + "insertCapabilityAttributes", dbAttributes);
+        }
+
+        List<DbDirective> dbDirectives = MetadataMapping.mapDirectives2DbDirectives(capability.getDirectives(), capabilityId);
+        if (!dbDirectives.isEmpty()) {
+            session.insert(METADATA_MAPPER + "insertCapabilityDirectives", dbDirectives);
+        }
+
+        for (Capability child : capability.getChildren()) {
+            saveCapabilityRecursive(child, resourceId, capabilityId, session, seqMapper);
+        }
+    }
+
+    private void saveRequirementRecursive(Requirement requirement, long resourceId, Long parentId, SqlSession session, SequenceMapper seqMapper) {
+
+        DbRequirement dbRequirement = MetadataMapping.mapRequirement2DbRequirement(requirement, metadataService);
+        dbRequirement.setResourceId(resourceId);
+
+        long requirementId = seqMapper.nextVal("requirement_seq");
+        dbRequirement.setRequirementId(requirementId);
+        dbRequirement.setParentRequirementId(parentId != null ? parentId : requirementId);
+
+        session.insert(METADATA_MAPPER + "insertRequirement", dbRequirement);
+
+        List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(requirement.getAttributes(), requirementId, true);
+        if (!dbAttributes.isEmpty()) {
+            session.insert(METADATA_MAPPER + "insertRequirementAttributes", dbAttributes);
+        }
+
+        List<DbDirective> dbDirectives = MetadataMapping.mapDirectives2DbDirectives(requirement.getDirectives(), requirementId);
+        if (!dbDirectives.isEmpty()) {
+            session.insert(METADATA_MAPPER + "insertRequirementDirectives", dbDirectives);
+        }
+
+        for (Requirement child : requirement.getChildren()) {
+            saveRequirementRecursive(child, resourceId, requirementId, session, seqMapper);
+        }
     }
 
     @Override
@@ -331,11 +306,11 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
 
             if (resource != null) {
                 String resourceID = resource.getId();
-                session.insert("cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.deleteResource", resourceID);
+                session.insert(METADATA_MAPPER + "deleteResource", resourceID);
                 session.commit();
             }
         }
-        
+
         logger.debug("deleteResource(uri) returns");
     }
 
