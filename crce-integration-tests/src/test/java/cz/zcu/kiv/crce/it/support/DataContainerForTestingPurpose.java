@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_integration_tests.rest.support;
+package cz.zcu.kiv.crce.it.support;
 
 import java.net.URI;
 import java.net.URISyntaxException;

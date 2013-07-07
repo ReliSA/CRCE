@@ -1,7 +1,7 @@
 /**
  *
  */
-package cz.zcu.kiv.crce.crce_integration_tests.rest.container;
+package cz.zcu.kiv.crce.it.container;
 
 //import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
@@ -28,12 +28,13 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.crce_integration_tests.rest.Activator;
-import cz.zcu.kiv.crce.crce_integration_tests.rest.support.DataContainerForTestingPurpose;
 //import cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl;
 //import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 //import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
 //import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
+
+import cz.zcu.kiv.crce.it.Activator;
+import cz.zcu.kiv.crce.it.support.DataContainerForTestingPurpose;
 import java.util.logging.Level;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;

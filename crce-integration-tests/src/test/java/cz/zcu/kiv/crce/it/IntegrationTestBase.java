@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package cz.zcu.kiv.crce.crce_integration_tests.rest;
+package cz.zcu.kiv.crce.it;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 //import static org.apache.ace.test.utils.Util.properties;
@@ -25,6 +25,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -59,8 +61,8 @@ public class IntegrationTestBase extends TestCase {
     private static final int SERVICE_TIMEOUT = 5;
 
     @Inject
-    protected BundleContext m_bundleContext;
-    protected DependencyManager m_dependencyManager;
+    protected BundleContext bundleContext;
+    protected DependencyManager dependencyManager;
 
     /**
      * The 'before' callback will be called after the components from {@link #getDependencies} have been
@@ -69,6 +71,7 @@ public class IntegrationTestBase extends TestCase {
      * <br>
      * The {@link #before} callback is most useful for configuring services that have been provisioned
      * in the 'configuration' method.
+     * @throws Exception
      */
     protected void before() throws Exception {}
 
@@ -76,6 +79,7 @@ public class IntegrationTestBase extends TestCase {
      * Gets a list of components that must be started before the test is started; this useful to
      * (a) add additional services, e.g. services that should be picked up by the service under
      * test, or (b) to declare 'this' as a component, and get services injected.
+     * @return
      */
     protected Component[] getDependencies() {
         return new Component[0];
@@ -87,28 +91,50 @@ public class IntegrationTestBase extends TestCase {
      *   configure("org.apache.felix.http",
      *     "org.osgi.service.http.port", "1234");
      * </pre>
-
+     * @param pid
+     * @param configuration
+     * @throws java.io.IOException
+     */
     protected void configure(String pid, String... configuration) throws IOException {
-        Properties props = properties(configuration);
+        Dictionary<String, ?> props = properties(configuration);
         Configuration config = getConfiguration(pid);
         config.update(props);
     }
 
     /**
      * Creates a factory configuration with the given properties, just like {@link #configure}.
+     * @param factoryPid
+     * @param configuration
      * @return The PID of newly created configuration.
-     *
+     * @throws java.io.IOException
+     */
     protected String configureFactory(String factoryPid, String... configuration) throws IOException {
-        Properties props = properties(configuration);
+        Dictionary<String, ?> props = properties(configuration);
         Configuration config = createFactoryConfiguration(factoryPid);
         config.update(props);
         return config.getPid();
     }
-    */
+
+    /**
+     * Creates a Properties object from a list of key-value pairs, e.g.
+     * <pre>
+     * properties("key", "value", "key2", "value2");
+     * </pre>
+     * @param values
+     * @return
+     */
+    public static Dictionary<String, ?> properties(String... values) {
+        @SuppressWarnings("UseOfObsoleteCollectionType")
+        Dictionary<String, String> props = new Hashtable<>();
+        for (int i = 0; i < values.length; i += 2) {
+            props.put(values[i], values[i+1]);
+        }
+        return props;
+    }
 
     @Before
     public void setupTest() throws Exception {
-        m_dependencyManager = new DependencyManager(m_bundleContext);
+        dependencyManager = new DependencyManager(bundleContext);
         Component[] components = getDependencies();
         ComponentCounter listener = new ComponentCounter(components);
 
@@ -119,7 +145,7 @@ public class IntegrationTestBase extends TestCase {
 
         // Then give them to the dependency manager...
         for (Component component : components) {
-            m_dependencyManager.add(component);
+            dependencyManager.add(component);
         }
 
         // Call back the implementation...
@@ -136,22 +162,22 @@ public class IntegrationTestBase extends TestCase {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unchecked", "CallToThreadDumpStack"})
     protected <T> T getService(Class<T> serviceClass, String filterString) throws InvalidSyntaxException {
         T serviceInstance = null;
 
-        ServiceTracker serviceTracker;
+        ServiceTracker<?, T> serviceTracker;
         if (filterString == null) {
-            serviceTracker = new ServiceTracker(m_bundleContext, serviceClass.getName(), null);
+            serviceTracker = new ServiceTracker<>(bundleContext, serviceClass.getName(), null);
         }
         else {
             String classFilter = "(" + Constants.OBJECTCLASS + "=" + serviceClass.getName() + ")";
             filterString = "(&" + classFilter + filterString + ")";
-            serviceTracker = new ServiceTracker(m_bundleContext, m_bundleContext.createFilter(filterString), null);
+            serviceTracker = new ServiceTracker<>(bundleContext, bundleContext.createFilter(filterString), null);
         }
         serviceTracker.open();
         try {
-            serviceInstance = (T) serviceTracker.waitForService(SERVICE_TIMEOUT * 1000);
+            serviceInstance = serviceTracker.waitForService(SERVICE_TIMEOUT * 1000);
 
             if (serviceInstance == null) {
                 fail(serviceClass + " service not found.");
@@ -191,16 +217,16 @@ public class IntegrationTestBase extends TestCase {
     // Dependency Manager bridge methods
 
     protected Component createComponent() {
-        return m_dependencyManager.createComponent();
+        return dependencyManager.createComponent();
     }
 
     protected ServiceDependency createServiceDependency() {
-        return m_dependencyManager.createServiceDependency();
+        return dependencyManager.createServiceDependency();
     }
 
 
     private static class ComponentCounter implements ComponentStateListener {
-        private final List<Component> m_components = new ArrayList<Component>();
+        private final List<Component> m_components = new ArrayList<>();
         private final CountDownLatch m_latch;
 
         public ComponentCounter(Component[] components) {
@@ -226,6 +252,7 @@ public class IntegrationTestBase extends TestCase {
             return m_latch.await(timeout, unit);
         }
 
+        @SuppressWarnings("unchecked")
         public String componentsString() {
             StringBuilder result = new StringBuilder();
             for (Component component : m_components) {

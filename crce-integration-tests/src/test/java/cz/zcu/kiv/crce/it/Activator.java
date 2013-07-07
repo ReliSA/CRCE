@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_integration_tests.rest;
+package cz.zcu.kiv.crce.it;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
