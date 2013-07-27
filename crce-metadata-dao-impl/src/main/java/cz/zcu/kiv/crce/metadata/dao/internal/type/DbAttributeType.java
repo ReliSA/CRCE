@@ -43,6 +43,15 @@ public enum DbAttributeType {
         throw new IllegalArgumentException("Invalid attribute type class: " + clazz);
     }
 
+    public static DbAttributeType fromDbValue(short dbValue) {
+        for (DbAttributeType value : values()) {
+            if (value.dbValue == dbValue) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Invalid attribute type DB value: " + dbValue);
+    }
+
     public static short getDbValue(Class<?> clazz) {
         for (DbAttributeType value : values()) {
             if (value.clazz.equals(clazz)) {
@@ -52,7 +61,7 @@ public enum DbAttributeType {
         throw new IllegalArgumentException("Invalid attribute type class: " + clazz);
     }
 
-    public static Class<?> getClassValue(int dbValue) {
+    public static Class<?> getClassValue(short dbValue) {
         for (DbAttributeType value : values()) {
             if (value.dbValue == dbValue) {
                 return value.clazz;

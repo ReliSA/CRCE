@@ -2,12 +2,15 @@ package cz.zcu.kiv.crce.metadata.dao.internal;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.osgi.service.cm.ConfigurationException;
 
@@ -103,96 +106,154 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         Resource result = null;
 
         try (SqlSession session = getSession()) {
+            DbResource dbResource = session.selectOne(METADATA_MAPPER + "selectResourceByUri", uri.toString());
 
-            if (uri != null) {
+            if (dbResource != null) {
+                Resource resource = resourceFactory.createResource(dbResource.getId());
+//                metadataService.setUri(resource, dbResource.getUri());
 
-                //Resource resource = loadResource(uri);
-                String resourceID = uri.toString();
+                loadCapabilities(resource, dbResource.getResourceId(), session);
+                loadRequirements(resource, dbResource.getResourceId(), session);
 
-                Resource resource = resourceFactory.createResource(resourceID);
-
-                // Load capability
-                //Capability cap = null;
-                /*
-                Capability cap = resourceFactory.createCapability(resourceID);
-
-                List<DbCapability> capabilityList = session.selectList(METADATA_MAPPER + "getCapability", resourceID);
-                Iterator<DbCapability> itr0 = capabilityList.iterator();
-                while (itr0.hasNext()) {
-                    DbCapability capability = itr0.next();
-                    //String capInternal_id = selectedCapability.get(0);
-                    //String cap_id = selectedCapability.get(1); //TODO unused
-                    //String capabilityNamespace = selectedCapability.get(2); //TODO unused
-                    String capability_id = capability.getId();
-                    //TODO save cap_id and namespace
-
-                    List<DbDirective> capabilityDirective = session.selectList(METADATA_MAPPER + "getCapabilityDirective", capability_id);
-                    Iterator<DbDirective> itr = capabilityDirective.iterator();
-                    while (itr.hasNext()) {
-                        DbDirective cDirective = itr.next();
-                        String capDirName = cDirective.getName();
-                        String capDirValue = cDirective.getValue();
-                        cap.setDirective(capDirName, capDirValue);
-                    }
-                    List<cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute> capabilityAttribute = session.selectList(METADATA_MAPPER + "getCapabilityAttribute", capability_id);
-                    Iterator<cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute> itr2 = capabilityAttribute.iterator();
-                    while (itr.hasNext()) {
-                        cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapabilityAttribute cAttribute = itr2.next();
-                        String capAttribute_type = cAttribute.getType();
-                        String capAttribute_name = cAttribute.getName();
-                        String capAttribute_value = cAttribute.getValue();
-                        //String capAttribute_operator = selectedCapAttribute.get(4); // TODO unfinished
-                        //cap_att.setName();  // TODO check QNAME
-                        GenericAttributeType attributeType = new GenericAttributeType(capAttribute_name, capAttribute_type);
-                        cap.setAttribute(attributeType, capAttribute_value);
-                    }
-                    resource.addCapability(cap);
+                try {
+                    assert dbResource.getUri() != null && new URI(dbResource.getUri()).equals(metadataService.getUri(resource));
+                } catch (URISyntaxException ex) {
+                    throw new IllegalStateException("Illegal URI in resource table.", ex);
                 }
-                */
 
-                // Load requirements
-                //Requirement req = null;
-                /*
-                Requirement req = resourceFactory.createRequirement(resourceID);
-                List<DbRequirement> requirementList = session.selectList(METADATA_MAPPER + "getRequirement", resourceID);
-                Iterator<DbRequirement> itr3 = requirementList.iterator();
-                while (itr3.hasNext()) {
-                    DbRequirement requirement = itr3.next();
-                    //String req_id = selectedRequirement.get(1); //TODO unused
-                    //String requirementNamespace = selectedRequirement.get(2); //TODO unused
-                    String requirement_id = requirement.getId();
-                    // TODO save namespace and req_id
-
-                    List<Req_directive> regDirectiveList = session.selectList(METADATA_MAPPER + "getRequirementDirective", requirement_id);
-                    Iterator<Req_directive> itr4 = regDirectiveList.iterator();
-                    while (itr4.hasNext()) {
-                        Req_directive regDirective = itr4.next();
-                        String reqDirName = regDirective.getName();
-                        String reqDirValue = regDirective.getValue();
-
-                        req.setDirective(reqDirName, reqDirValue);
-                    }
-                    List<Req_attribute> requirementAttributeList = session.selectList(METADATA_MAPPER + "RequirementAttribute", requirement_id);
-                    Iterator<Req_attribute> itr5 = requirementAttributeList.iterator();
-                    while (itr5.hasNext()) {
-                        Req_attribute requirementAttribute = itr5.next();
-                        String reqAttribute_type = requirementAttribute.getType();
-                        String reqAttribute_name = requirementAttribute.getName();
-                        String reqAttribute_value = requirementAttribute.getValue();
-                        //String reqAttribute_operator = selectedreqAttribute.get(4);  //not finished
-                        GenericAttributeType attributeType = new GenericAttributeType(reqAttribute_name, reqAttribute_type);
-                        req.addAttribute(attributeType, reqAttribute_value); //TODO check setAttribute
-                        //req_att.setName();  // TODO check QNAME
-                        resource.addRequirement(req);
-                    }
-                }
-                */
                 result = resource;
             }
         }
 
         logger.debug("loadResource(uri) returns {}", result);
         return result;
+    }
+
+    void loadRequirements(Resource resource, long resourceId, SqlSession session) {
+        List<DbRequirement> dbRequirements = session.selectList(METADATA_MAPPER + "selectRequirements", resourceId);
+
+        Map<Long, Requirement> requirements = new HashMap<>(dbRequirements.size());
+        Map<Long, Long> unprocessedRequirements = new HashMap<>(dbRequirements.size()); // K: requirement ID, V: requirement parent ID
+
+        for (DbRequirement dbRequirement : dbRequirements) {
+            Requirement requirement = resourceFactory.createRequirement(dbRequirement.getNamespace(), dbRequirement.getId());
+
+            loadRequirementAttributes(requirement, dbRequirement.getRequirementId(), session);
+            loadRequirementDirectives(requirement, dbRequirement.getRequirementId(), session);
+
+            requirement.setResource(resource);
+
+            requirements.put(dbRequirement.getRequirementId(), requirement);
+
+            if (dbRequirement.getRequirementId() == dbRequirement.getParentRequirementId()) {
+                assert dbRequirement.getLevel() == 0;
+
+                resource.addRequirement(requirement);
+            } else {
+                Requirement parent = requirements.get(dbRequirement.getParentRequirementId());
+                if (parent != null) {
+                    parent.addChild(requirement);
+                    requirement.setParent(parent);
+                } else {
+                    logger.warn("There is unprocessed requirement (missing parent) for resource {}, ID: {}, parent ID: {}.",
+                            resourceId, dbRequirement.getRequirementId(), dbRequirement.getParentRequirementId());
+                    unprocessedRequirements.put(dbRequirement.getRequirementId(), dbRequirement.getParentRequirementId());
+                }
+            }
+        }
+
+        assert unprocessedRequirements.isEmpty();
+
+        while (!unprocessedRequirements.isEmpty()) {
+            Iterator<Entry<Long, Long>> iterator = unprocessedRequirements.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Entry<Long, Long> entry = iterator.next();
+                Requirement parent = requirements.get(entry.getValue());
+                if (parent != null) {
+                    Requirement requirement = requirements.get(entry.getKey());
+                    parent.addChild(requirement);
+                    requirement.setParent(parent);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    void loadCapabilities(Resource resource, long resourceId, SqlSession session) {
+        List<DbCapability> dbCapabilities = session.selectList(METADATA_MAPPER + "selectCapabilities", resourceId);
+
+        Map<Long, Capability> capabilities = new HashMap<>(dbCapabilities.size());
+        Map<Long, Long> unprocessedCapabilities = new HashMap<>(dbCapabilities.size()); // K: capability ID, V: capability parent ID
+
+        for (DbCapability dbCapability : dbCapabilities) {
+            Capability capability = resourceFactory.createCapability(dbCapability.getNamespace(), dbCapability.getId());
+
+            loadCapabilityAttributes(capability, dbCapability.getCapabilityId(), session);
+            loadCapabilityDirectives(capability, dbCapability.getCapabilityId(), session);
+
+            capability.setResource(resource);
+            resource.addCapability(capability);
+
+            capabilities.put(dbCapability.getCapabilityId(), capability);
+
+            if (dbCapability.getCapabilityId() == dbCapability.getParentCapabilityId()) {
+                assert dbCapability.getLevel() == 0;
+
+                resource.addRootCapability(capability);
+            } else {
+                Capability parent = capabilities.get(dbCapability.getParentCapabilityId());
+                if (parent != null) {
+                    parent.addChild(capability);
+                    capability.setParent(parent);
+                } else {
+                    logger.warn("There is unprocessed capability (missing parent) for resource {}, ID: {}, parent ID: {}.",
+                            resourceId, dbCapability.getCapabilityId(), dbCapability.getParentCapabilityId());
+                    unprocessedCapabilities.put(dbCapability.getCapabilityId(), dbCapability.getParentCapabilityId());
+                }
+            }
+        }
+
+        assert unprocessedCapabilities.isEmpty();
+
+        // Reconstruct capability tree structure - this would be optimized by MPTT or hierarchy leveling or:
+        // http://www.codeproject.com/Articles/8355/Trees-in-SQL-databases
+        while (!unprocessedCapabilities.isEmpty()) {
+            Iterator<Entry<Long, Long>> iterator = unprocessedCapabilities.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Entry<Long, Long> entry = iterator.next();
+                Capability parent = capabilities.get(entry.getValue());
+                if (parent != null) {
+                    Capability capability = capabilities.get(entry.getKey());
+                    parent.addChild(capability);
+                    capability.setParent(parent);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    void loadCapabilityAttributes(Capability capability, long capabilityId, SqlSession session) {
+        List<DbAttribute> dbAttributes = session.selectList(METADATA_MAPPER + "selectCapabilityAttributes", capabilityId);
+
+        MetadataMapping.mapDbAttributes2Capability(dbAttributes, capability);
+    }
+
+    void loadCapabilityDirectives(Capability capability, long capabilityId, SqlSession session) {
+        List<DbDirective> dbDirectives = session.selectList(METADATA_MAPPER + "selectCapabilityDirectives", capabilityId);
+
+        MetadataMapping.mapDbDirectives2Capability(dbDirectives, capability);
+    }
+
+    void loadRequirementAttributes(Requirement requirement, long requirementId, SqlSession session) {
+        List<DbAttribute> dbAttributes = session.selectList(METADATA_MAPPER + "selectRequirementAttributes", requirementId);
+
+        MetadataMapping.mapDbAttributes2Requirement(dbAttributes, requirement);
+    }
+
+    void loadRequirementDirectives(Requirement requirement, long requirementId, SqlSession session) {
+        List<DbDirective> dbDirectives = session.selectList(METADATA_MAPPER + "selectRequirementDirectives", requirementId);
+
+        MetadataMapping.mapDbDirectives2Requirement(dbDirectives, requirement);
     }
 
     @Override
@@ -231,12 +292,12 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
 
             // capabilities
             for (Capability capability : resource.getRootCapabilities()) {
-                saveCapabilityRecursive(capability, resourceId, null, session, seqMapper);
+                saveCapabilityRecursive(capability, resourceId, null, 0, session, seqMapper);
             }
 
             // requirements
             for (Requirement requirement : resource.getRequirements()) {
-                saveRequirementRecursive(requirement, resourceId, null, session, seqMapper);
+                saveRequirementRecursive(requirement, resourceId, null, 0, session, seqMapper);
             }
 
             session.commit();
@@ -245,10 +306,12 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         logger.debug("saveResource(resource) returns", resource);
     }
 
-    private void saveCapabilityRecursive(Capability capability, long resourceId, Long parentId, SqlSession session, SequenceMapper seqMapper) {
+    private void saveCapabilityRecursive(Capability capability, long resourceId, Long parentId, int level,
+            SqlSession session, SequenceMapper seqMapper) {
 
         DbCapability dbCapability = MetadataMapping.mapCapability2DbCapability(capability, metadataService);
         dbCapability.setResourceId(resourceId);
+        dbCapability.setLevel(level);
 
         long capabilityId = seqMapper.nextVal("capability_seq");
         dbCapability.setCapabilityId(capabilityId);
@@ -267,14 +330,16 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         }
 
         for (Capability child : capability.getChildren()) {
-            saveCapabilityRecursive(child, resourceId, capabilityId, session, seqMapper);
+            saveCapabilityRecursive(child, resourceId, capabilityId, level + 1, session, seqMapper);
         }
     }
 
-    private void saveRequirementRecursive(Requirement requirement, long resourceId, Long parentId, SqlSession session, SequenceMapper seqMapper) {
+    private void saveRequirementRecursive(Requirement requirement, long resourceId, Long parentId, int level,
+            SqlSession session, SequenceMapper seqMapper) {
 
         DbRequirement dbRequirement = MetadataMapping.mapRequirement2DbRequirement(requirement, metadataService);
         dbRequirement.setResourceId(resourceId);
+        dbRequirement.setLevel(level);
 
         long requirementId = seqMapper.nextVal("requirement_seq");
         dbRequirement.setRequirementId(requirementId);
@@ -293,7 +358,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         }
 
         for (Requirement child : requirement.getChildren()) {
-            saveRequirementRecursive(child, resourceId, requirementId, session, seqMapper);
+            saveRequirementRecursive(child, resourceId, requirementId, level + 1, session, seqMapper);
         }
     }
 

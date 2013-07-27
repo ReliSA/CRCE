@@ -21,7 +21,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  * Implementation of Requirement interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class RequirementImpl extends AbstractDirectiveProvider implements Requirement {
+public class RequirementImpl extends AbstractDirectiveProvider implements Requirement, Comparable<Requirement> {
 
     private static final long serialVersionUID = -2992854704112505654L;
 
@@ -214,10 +214,15 @@ public class RequirementImpl extends AbstractDirectiveProvider implements Requir
                     return false;
                 }
                 return true;
-                
+
             default:
                 return equalsTo(other, EqualityLevel.KEY);
         }
 
+    }
+
+    @Override
+    public int compareTo(Requirement o) {
+        return id.compareTo(o.getId());
     }
 }

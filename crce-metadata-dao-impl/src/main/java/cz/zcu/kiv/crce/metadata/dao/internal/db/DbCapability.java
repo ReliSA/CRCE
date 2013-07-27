@@ -9,6 +9,7 @@ public class DbCapability {
     private long capabilityId;
     private long parentCapabilityId;
     private long resourceId;
+    private int level;
     private String id;
     private String namespace;
 
@@ -50,5 +51,13 @@ public class DbCapability {
 
     public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

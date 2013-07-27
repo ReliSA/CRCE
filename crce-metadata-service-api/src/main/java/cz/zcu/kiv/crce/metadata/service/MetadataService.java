@@ -44,6 +44,14 @@ public interface MetadataService {
 
     void setUri(@Nonnull Resource resource, @Nonnull URI uri);
 
+    /**
+     *
+     * @param resource
+     * @param uri
+     * @throws IllegalArgumentException If the given URI syntax is not valid.
+     */
+    void setUri(@Nonnull Resource resource, @Nonnull String uri) throws IllegalArgumentException;
+
     @Nonnull
     String getFileName(@Nonnull Resource resource);
 
@@ -91,7 +99,7 @@ public interface MetadataService {
      * in scope of the given resource.<p>
      * If the requested capability doesn't exist, then a new one is created and set as
      * a root capability.
-     * 
+     *
      * @param resource
      * @param namespace
      * @return

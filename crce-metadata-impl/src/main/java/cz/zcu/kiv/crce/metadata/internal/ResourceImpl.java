@@ -20,7 +20,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * Implementation of <code>Resource</code> interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class ResourceImpl implements Resource {
+public class ResourceImpl implements Resource, Comparable<Resource> {
 
     private static final long serialVersionUID = 2594634894045505360L;
 
@@ -286,5 +286,10 @@ public class ResourceImpl implements Resource {
              default:
                 return equalsTo(other, EqualityLevel.KEY);
        }
+    }
+
+    @Override
+    public int compareTo(Resource o) {
+        return id.compareTo(o.getId());
     }
 }

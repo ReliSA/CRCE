@@ -65,6 +65,7 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
      * @throws IOException Thrown when the given configuration file can't be opened.
      */
     private boolean createFactory(@Nonnull String config, @Nonnull Properties properties) throws IOException {
+        Resources.setDefaultClassLoader(getClass().getClassLoader());
         try (InputStream is = Resources.getResourceAsStream(config)) {
             factory = new SqlSessionFactoryBuilder().build(is, properties);
             factoryPostConfiguration(factory.getConfiguration());
@@ -104,7 +105,8 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
                 config = MYBATIS_DEFAULT_CONFIG;
             }
 
-            Resources.setDefaultClassLoader(getClass().getClassLoader());
+            // Additional auto-configuration
+            properties.put("logImpl", "SLF4J");
 
             try {
                 if (createFactory(config, properties)) {

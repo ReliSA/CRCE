@@ -9,6 +9,7 @@ public class DbRequirement {
     private long requirementId;
     private long parentRequirementId;
     private long resourceId;
+    private int level;
     private String id;
     private String namespace;
 
@@ -50,5 +51,13 @@ public class DbRequirement {
 
     public void setResourceId(long resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

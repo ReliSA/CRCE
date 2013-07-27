@@ -16,7 +16,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class CapabilityImpl extends AbstractEntityBase implements Capability {
+public class CapabilityImpl extends AbstractEntityBase implements Capability, Comparable<Capability> {
 
     private static final long serialVersionUID = -813453152194473221L;
 
@@ -157,5 +157,10 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability {
             default:
                 return equalsTo(other, EqualityLevel.KEY);
         }
+    }
+
+    @Override
+    public int compareTo(Capability o) {
+        return id.compareTo(o.getId());
     }
 }

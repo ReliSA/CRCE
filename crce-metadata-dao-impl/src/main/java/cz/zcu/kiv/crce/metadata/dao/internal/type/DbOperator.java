@@ -36,7 +36,7 @@ public enum DbOperator {
         throw new IllegalArgumentException("Invalid operator: " + operator);
     }
 
-    public static Operator getOperatorValue(int dbValue) {
+    public static Operator getOperatorValue(short dbValue) {
         for (DbOperator value : values()) {
             if (value.dbValue == dbValue) {
                 return value.operator;

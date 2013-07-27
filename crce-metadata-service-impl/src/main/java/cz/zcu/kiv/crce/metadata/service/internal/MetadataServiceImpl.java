@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.service.internal;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -165,6 +166,15 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public void setUri(Resource resource, URI uri) {
         getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY).setAttribute(ATTRIBUTE__URI, uri);
+    }
+
+    @Override
+    public void setUri(Resource resource, String uri) throws IllegalArgumentException {
+        try {
+            setUri(resource, new URI(uri));
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
