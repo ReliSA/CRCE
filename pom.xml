@@ -80,13 +80,13 @@
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-metadata-cosi-bundle</module>
-        <module>crce-efp-indexer</module>
+        <!-- <module>crce-efp-indexer</module> -->
 
         <!-- Libraries -->
         <module>crce-efpAssignment</module>
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-versioning</module>
+<!--        <module>crce-handler-versioning</module> -->
         <module>crce-webui</module>
         <module>crce-rest</module>
 
@@ -172,6 +172,18 @@
             <name>CRCE Snapshots Repository</name>
             <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
         </snapshotRepository>
+
+        <repository>
+            <id>relisa-release</id>
+            <name>ReliSA Internal Releases</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>relisa-snapshots</id>
+            <name>ReliSA Internal Snapshots</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+
     </distributionManagement>
 
     <repositories>
@@ -207,6 +219,13 @@
             <id>crce.maven.repository.third-parties</id>
             <url>svn:http://subversion.assembla.com/svn/crce/third-parties</url>
         </repository>
+
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
+        </repository>
+
     </repositories>
 
     <developers>
