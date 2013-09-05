@@ -162,6 +162,7 @@
     </build>
 
     <distributionManagement>
+<!--
         <repository>
             <id>crce.maven.repository.releases</id>
             <name>CRCE Releases Repository</name>
@@ -172,7 +173,7 @@
             <name>CRCE Snapshots Repository</name>
             <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
         </snapshotRepository>
-
+-->
         <repository>
             <id>relisa-release</id>
             <name>ReliSA Internal Releases</name>
