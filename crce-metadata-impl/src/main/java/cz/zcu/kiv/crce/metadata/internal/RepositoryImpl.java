@@ -17,7 +17,7 @@ import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * Implementation of <code>Repository</code> interface.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RepositoryImpl implements Repository, WritableRepository {
 

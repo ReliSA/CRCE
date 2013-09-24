@@ -20,7 +20,7 @@ import static org.apache.felix.bundlerepository.Resource.*;
 
 /**
  * Implementation of <code>Resource</code> interface.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ResourceImpl extends AbstractPropertyProvider<Resource> implements Resource {
 

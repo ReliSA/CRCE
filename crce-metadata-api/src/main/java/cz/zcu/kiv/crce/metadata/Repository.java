@@ -7,7 +7,7 @@ import org.osgi.framework.InvalidSyntaxException;
  * Represents a set of resources. Repository can be assigned to a physical URI
  * which resources are stored on, but it does not manage physical content.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Repository {
 

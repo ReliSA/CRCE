@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class CapabilityWrapper implements org.osgi.service.obr.Capability {
 

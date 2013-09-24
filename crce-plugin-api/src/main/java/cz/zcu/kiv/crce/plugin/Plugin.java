@@ -5,7 +5,7 @@ import org.osgi.framework.Version;
 /**
  * Common plugin interface. Every plugin must implement it.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Plugin extends Comparable<Plugin> {
 

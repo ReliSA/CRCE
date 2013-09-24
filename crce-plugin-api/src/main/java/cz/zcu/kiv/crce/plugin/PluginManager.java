@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.plugin;
 /**
  * Plugin manager is responsible to register, unregister and provide plugins.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface PluginManager {
 

@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ConvertedResource extends ResourceImpl implements Resource { // TODO ResourceImpl is probably not visible for other bundles
 

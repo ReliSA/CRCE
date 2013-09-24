@@ -5,7 +5,7 @@ import org.osgi.service.obr.Capability;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RequirementWrapper implements org.osgi.service.obr.Requirement {
 

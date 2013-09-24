@@ -19,7 +19,7 @@ import org.osgi.service.event.EventAdmin;
  * It can be extended of any plugin - it's recommended to keep unified
  * behaviour of plugins.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
 

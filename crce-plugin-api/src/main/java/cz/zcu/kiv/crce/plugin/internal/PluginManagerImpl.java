@@ -17,7 +17,7 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
  * Implementation of <code>PluginManager</code>.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class PluginManagerImpl implements PluginManager {
 

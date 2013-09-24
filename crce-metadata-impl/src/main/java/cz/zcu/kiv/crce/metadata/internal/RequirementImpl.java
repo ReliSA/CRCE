@@ -8,7 +8,7 @@ import org.osgi.framework.InvalidSyntaxException;
 
 /**
  * Implementation of Requirement interface.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class RequirementImpl implements Requirement {
 

@@ -21,7 +21,7 @@ import java.io.InputStream;
  * 'txt'...) as category, some other indexer which requires 'jar' category could
  * set up 'osgi' or 'cosi' as categories.
  * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface ResourceIndexer extends Plugin {
     

@@ -8,7 +8,7 @@ import java.io.InputStream;
 /**
  * A samle implementation of <code>ResourceIndexer</code> which can determine
  * a file type. It supports ZIP, PNG and JPG files.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class FileTypeResourceIndexer extends AbstractResourceIndexer {
 
