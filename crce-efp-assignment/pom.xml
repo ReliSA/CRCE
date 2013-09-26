@@ -15,11 +15,11 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>CRCE - EfpAssignment</name>
+    <name>CRCE - EFPs Assignment</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.efpAssignment</bundle.symbolicName>
-        <bundle.namespace>${namespace}.efpAssignment</bundle.namespace>
+        <bundle.symbolicName>${namespace}.efp-assignment</bundle.symbolicName>
+        <bundle.namespace>${namespace}.efp-assignment</bundle.namespace>
     </properties>
 
     <dependencies>

@@ -83,7 +83,7 @@
         <!-- <module>crce-efp-indexer</module> -->
 
         <!-- Libraries -->
-        <module>crce-efpAssignment</module>
+        <module>crce-efp-assignment</module>
 
         <!-- UI & Optional Plugins -->
 <!--        <module>crce-handler-versioning</module> -->
