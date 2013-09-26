@@ -126,7 +126,7 @@
                     <provision>
                         <param>--vmOptions=-Xdebug -Xrunjdwp:"transport=dt_socket,server=y,suspend=n,address=65505"</param>
                         <param>--platform=felix</param>
-                        <param>--repositories=http://repo1.maven.org/maven2,http://repository.ops4j.org/maven2,http://subversion.assembla.com/svn/crce/third-parties,http://subversion.assembla.com/svn/crce/releases,http://subversion.assembla.com/svn/crce/snapshots</param>
+                        <param>--repositories=http://repo1.maven.org/maven2,http://relisa.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2</param>
                         <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
                         <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
@@ -177,14 +177,14 @@
 
     <distributionManagement>
         <repository>
-            <id>crce.maven.repository.releases</id>
-            <name>CRCE Releases Repository</name>
-            <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
+            <id>relisa-release</id>
+            <name>ReliSA Internal Releases</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
-            <id>crce.maven.repository.snapshots</id>
-            <name>CRCE Snapshots Repository</name>
-            <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
+            <id>relisa-snapshots</id>
+            <name>ReliSA Internal Snapshots</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -193,6 +193,12 @@
         <repository>
             <id>central</id>
             <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
         </repository>
 
         <!-- sacco repo -->
@@ -209,18 +215,6 @@
       		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-third-parties-repository</url>
       	</repository>
 
-        <repository>
-            <id>crce.maven.repository.releases</id>
-            <url>svn:http://subversion.assembla.com/svn/crce/releases</url>
-        </repository>
-        <repository>
-            <id>crce.maven.repository.snapshots</id>
-            <url>svn:http://subversion.assembla.com/svn/crce/snapshots</url>
-        </repository>
-        <repository>
-            <id>crce.maven.repository.third-parties</id>
-            <url>svn:http://subversion.assembla.com/svn/crce/third-parties</url>
-        </repository>
     </repositories>
 
 </project>
