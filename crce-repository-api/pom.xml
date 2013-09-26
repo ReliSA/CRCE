@@ -31,7 +31,7 @@
         <!-- for VersioningBundleStore iface: -->
         <dependency>
             <groupId>org.apache.ace</groupId>
-            <artifactId>ace-obr-storage</artifactId>
+            <artifactId>org.apache.ace.obr.storage</artifactId>
         </dependency> 
         <dependency>
             <groupId>${project.groupId}</groupId>
