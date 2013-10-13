@@ -15,7 +15,7 @@ public class RepositoryImpl implements Repository {
 
     private static final long serialVersionUID = -5217714862846966653L;
 
-    private URI uri;
+    private final URI uri;
 
     public RepositoryImpl(@Nonnull URI uri) {
         this.uri = uri;
@@ -24,11 +24,6 @@ public class RepositoryImpl implements Repository {
     @Override
     public URI getURI() {
         return uri;
-    }
-
-    @Override
-    public long getIncrement() {
-        return -1;
     }
 
     @Override
@@ -47,9 +42,11 @@ public class RepositoryImpl implements Repository {
             return false;
         }
         final RepositoryImpl other = (RepositoryImpl) obj;
-        if (!Objects.equals(this.uri, other.uri)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.uri, other.uri);
+    }
+
+    @Override
+    public String toString() {
+        return "RepositoryImpl{" + "uri=" + uri + '}';
     }
 }

@@ -87,8 +87,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
-            <type>jar</type>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -116,23 +115,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1</version>
-            <type>jar</type>
-        </dependency>-->
-<!--        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-activation_1.0.2_spec</artifactId>
-            <version>1.1</version>
-            <type>jar</type>
-        </dependency>-->
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-metadata-impl</artifactId>
-            <version>2.0.0-SNAPSHOT</version>
-            <type>jar</type>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

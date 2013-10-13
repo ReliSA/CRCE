@@ -24,6 +24,7 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -44,14 +45,17 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
  */
 public class BufferImpl implements Buffer, EventHandler {
 
-    private volatile BundleContext context;       /* injected by dependency manager */
-    private volatile PluginManager pluginManager; /* injected by dependency manager */
-    private volatile Store store;                 /* injected by dependency manager */
-    private volatile ResourceFactory resourceFactory;     /* injected by dependency manager */
-    private volatile ResourceDAO resourceDAO;     /* injected by dependency manager */
-    private volatile ResourceIndexerService resourceIndexerService; /* injected by dependency manager */
+    // injected by dependency manager
+    private volatile BundleContext context;
+    private volatile PluginManager pluginManager;
+    private volatile Store store;
+    private volatile ResourceFactory resourceFactory;
+    private volatile ResourceDAO resourceDAO;
+    private volatile RepositoryDAO repositoryDAO;
+    private volatile ResourceIndexerService resourceIndexerService;
     private volatile MetadataService metadataService;
     private volatile MetadataValidator metadataValidator;
+    // injected by dependency manager
 
     private final int BUFFER_SIZE = 8 * 1024;
     private final Dictionary<String, String> sessionProperties;
@@ -89,7 +93,26 @@ public class BufferImpl implements Buffer, EventHandler {
         if (!baseDir.exists()) {
             throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
-        repository = resourceFactory.createRepository(baseDir.toURI());
+    }
+
+    /*
+     * Called by dependency manager
+     */
+    void start() {
+        try {
+            repository = repositoryDAO.loadRepository(baseDir.toURI());
+        } catch (IOException ex) {
+            logger.error("Could not load repository for {}", baseDir, ex);
+        }
+
+        if (repository == null) {
+            repository = resourceFactory.createRepository(baseDir.toURI());
+            try {
+                repositoryDAO.saveRepository(repository);
+            } catch (IOException ex) {
+                logger.error("Could not save repository for {}", baseDir, ex);
+            }
+        }
     }
 
     /*
@@ -163,7 +186,7 @@ public class BufferImpl implements Buffer, EventHandler {
         resource.setRepository(repository);
 
         metadataService.setUri(resource, file.toURI().normalize());
-        
+
         // TODO alternatively can be moved to some plugin
         metadataService.setFileName(resource, name2);
 //        metadataService.setPresentationName(resource, name2);

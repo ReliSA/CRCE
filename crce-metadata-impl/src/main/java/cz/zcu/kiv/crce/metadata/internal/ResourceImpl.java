@@ -292,4 +292,9 @@ public class ResourceImpl implements Resource, Comparable<Resource> {
     public int compareTo(Resource o) {
         return id.compareTo(o.getId());
     }
+
+    @Override
+    public String toString() {
+        return "ResourceImpl{" + "id=" + id + '}';
+    }
 }

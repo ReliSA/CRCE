@@ -10,6 +10,8 @@ import javax.annotation.Nonnull;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
+import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.ConfigurationDependency;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -18,15 +20,18 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+
+import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
+
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService {
+@Component(provides={SessionManager.class})
+public class SessionManager implements ManagedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractResourceDAO.class);
+    private static final Logger logger = LoggerFactory.getLogger(SessionManager.class);
 
     protected static final String MYBATIS_DEFAULT_CONFIG = "META-INF/mybatis/config.xml";
 
@@ -44,7 +49,7 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
      * @return session.
      * @throws IOException
      */
-    protected synchronized SqlSession getSession() throws IOException {
+    public synchronized SqlSession getSession() throws IOException {
         if (factory != null) {
             return factory.openSession();
         } else if (properties != null) {
@@ -76,9 +81,12 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
         return true;
     }
 
-    abstract void factoryPostConfiguration(Configuration configuration);
+    private void factoryPostConfiguration(Configuration configuration) {
+        configuration.addMapper(SequenceMapper.class);
+    }
 
     @Override
+    @ConfigurationDependency(pid = Activator.PID)
     public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
 
         if (dict != null) {
@@ -128,7 +136,7 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
      * @param defaultValue the default value to return in case the property does not exist, or the given dictionary was <code>null</code>.
      * @return a property value, can be <code>null</code>.
      */
-    String getProperty(Dictionary<String, ?> properties, String key, String defaultValue) {
+    private String getProperty(Dictionary<String, ?> properties, String key, String defaultValue) {
         String value = getProperty(properties, key);
         return (value == null) ? defaultValue : value;
     }
@@ -140,7 +148,7 @@ public abstract class AbstractResourceDAO implements ResourceDAO, ManagedService
      * @param key the name of the property to retrieve, cannot be <code>null</code>.
      * @return a property value, can be <code>null</code>.
      */
-    String getProperty(Dictionary<String, ?> properties, String key) {
+    private String getProperty(Dictionary<String, ?> properties, String key) {
         if (properties != null) {
             Object value = properties.get(key);
             if (value != null && value instanceof String) {

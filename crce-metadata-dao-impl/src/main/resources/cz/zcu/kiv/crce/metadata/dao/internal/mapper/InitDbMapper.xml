@@ -11,11 +11,11 @@
 
         CREATE TABLE IF NOT EXISTS resource (
           resource_id BIGINT NOT NULL,
-          -- repository_id BIGINT NOT NULL,
+          repository_id BIGINT NOT NULL,
           id VARCHAR(48) NOT NULL,
           uri VARCHAR(512) NOT NULL,
           PRIMARY KEY (resource_id),
-          -- FOREIGN KEY (repository_id) REFERENCES repository (repository_id) ON DELETE CASCADE
+          FOREIGN KEY (repository_id) REFERENCES repository (repository_id) ON DELETE CASCADE
         );
 
         CREATE TABLE IF NOT EXISTS capability (

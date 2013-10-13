@@ -14,6 +14,7 @@
     </environments>
     <mappers>
         <mapper resource="cz/zcu/kiv/crce/metadata/dao/internal/mapper/InitDbMapper.xml"/>
-        <mapper resource="cz/zcu/kiv/crce/metadata/dao/internal/mapper/MetadataMapper.xml"/>
+        <mapper resource="cz/zcu/kiv/crce/metadata/dao/internal/mapper/ResourceMapper.xml"/>
+        <mapper resource="cz/zcu/kiv/crce/metadata/dao/internal/mapper/RepositoryMapper.xml"/>
     </mappers>
 </configuration>

@@ -18,11 +18,18 @@ public interface RepositoryDAO {
     /**
      * Reads metadata of resources stored in repository on the given URI.
      * @param uri Path to repository or a repository identificator.
-     * @return Writable
+     * @return Loaded repository or null if such repository doesn't exist.
      * @throws IOException
      */
     @CheckForNull
     Repository loadRepository(@Nonnull URI uri) throws IOException;
+
+    /**
+     * Deletes existing repository (if it exists) including all contained resources.
+     * @param repository
+     * @throws IOException
+     */
+    void deleteRepository(@Nonnull Repository repository) throws IOException;
 
     /**
      * Stores metadata of resources stored in the given repository. Typical

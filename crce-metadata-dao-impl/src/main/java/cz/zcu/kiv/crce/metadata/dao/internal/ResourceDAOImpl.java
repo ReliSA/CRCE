@@ -5,23 +5,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.osgi.service.cm.ConfigurationException;
+import javax.annotation.Nonnull;
 
 import org.apache.felix.dm.annotation.api.Component;
-import org.apache.felix.dm.annotation.api.ConfigurationDependency;
 import org.apache.felix.dm.annotation.api.Init;
 import org.apache.felix.dm.annotation.api.LifecycleController;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
-import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 
 import org.slf4j.Logger;
@@ -48,31 +46,25 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  * @author Pavel Cihlář
  */
 @Component(provides={ResourceDAO.class})
-public class ResourceDAOImpl extends AbstractResourceDAO {
+public class ResourceDAOImpl implements ResourceDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceDAOImpl.class);
 
-    private static final String METADATA_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.MetadataMapper.";
-
-    //private volatile MetadataService metadataService;
-    Map<URI, Map<URI, Resource>> repositories = new HashMap<>();
+    private static final String RESOURCE_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResourceMapper.";
 
     @ServiceDependency private volatile ResourceFactory resourceFactory;
     @ServiceDependency private volatile MetadataService metadataService;
+    @ServiceDependency private volatile SessionManager sessionManager;
+    @ServiceDependency private volatile RepositoryDAOImpl repositoryDAOImpl;
 
     @LifecycleController
     Runnable lifeCycleController;
-
-    @Override
-    void factoryPostConfiguration(Configuration configuration) {
-        configuration.addMapper(SequenceMapper.class);
-    }
 
     @Init
     void init() {
         logger.info("Starting CRCE Metadata DAO.");
 
-        try (SqlSession session = getSession()) {
+        try (SqlSession session = sessionManager.getSession()) {
             session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createTables");
             session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createSequences");
             session.commit();
@@ -81,12 +73,6 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         } catch (Exception e) {
             logger.error("Could not initialize DB.", e);
         }
-    }
-
-    @Override
-    @ConfigurationDependency(pid = Activator.PID)
-    public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
-        super.updated(dict);
     }
 
     @Start
@@ -105,23 +91,18 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
 
         Resource result = null;
 
-        try (SqlSession session = getSession()) {
-            DbResource dbResource = session.selectOne(METADATA_MAPPER + "selectResourceByUri", uri.toString());
+        try (SqlSession session = sessionManager.getSession()) {
+            DbResource dbResource = session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString());
 
             if (dbResource != null) {
-                Resource resource = resourceFactory.createResource(dbResource.getId());
-//                metadataService.setUri(resource, dbResource.getUri());
+                result = loadResource(dbResource, session);
 
-                loadCapabilities(resource, dbResource.getResourceId(), session);
-                loadRequirements(resource, dbResource.getResourceId(), session);
-
-                try {
-                    assert dbResource.getUri() != null && new URI(dbResource.getUri()).equals(metadataService.getUri(resource));
-                } catch (URISyntaxException ex) {
-                    throw new IllegalStateException("Illegal URI in resource table.", ex);
+                Repository repository = repositoryDAOImpl.loadRepository(dbResource.getRepositoryId(), session);
+                if (repository != null) {
+                    result.setRepository(repository);
+                } else {
+                    logger.warn("Could not load repository for resource {}", result);
                 }
-
-                result = resource;
             }
         }
 
@@ -129,8 +110,24 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         return result;
     }
 
+    private Resource loadResource(@Nonnull DbResource dbResource, @Nonnull SqlSession session) {
+        Resource resource = resourceFactory.createResource(dbResource.getId());
+//        metadataService.setUri(resource, dbResource.getUri());
+
+        loadCapabilities(resource, dbResource.getResourceId(), session);
+        loadRequirements(resource, dbResource.getResourceId(), session);
+
+        try {
+            assert dbResource.getUri() != null && new URI(dbResource.getUri()).equals(metadataService.getUri(resource));
+        } catch (URISyntaxException ex) {
+            throw new IllegalStateException("Illegal URI in resource table.", ex);
+        }
+
+        return resource;
+    }
+
     void loadRequirements(Resource resource, long resourceId, SqlSession session) {
-        List<DbRequirement> dbRequirements = session.selectList(METADATA_MAPPER + "selectRequirements", resourceId);
+        List<DbRequirement> dbRequirements = session.selectList(RESOURCE_MAPPER + "selectRequirements", resourceId);
 
         Map<Long, Requirement> requirements = new HashMap<>(dbRequirements.size());
         Map<Long, Long> unprocessedRequirements = new HashMap<>(dbRequirements.size()); // K: requirement ID, V: requirement parent ID
@@ -180,7 +177,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     }
 
     void loadCapabilities(Resource resource, long resourceId, SqlSession session) {
-        List<DbCapability> dbCapabilities = session.selectList(METADATA_MAPPER + "selectCapabilities", resourceId);
+        List<DbCapability> dbCapabilities = session.selectList(RESOURCE_MAPPER + "selectCapabilities", resourceId);
 
         Map<Long, Capability> capabilities = new HashMap<>(dbCapabilities.size());
         Map<Long, Long> unprocessedCapabilities = new HashMap<>(dbCapabilities.size()); // K: capability ID, V: capability parent ID
@@ -233,25 +230,25 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     }
 
     void loadCapabilityAttributes(Capability capability, long capabilityId, SqlSession session) {
-        List<DbAttribute> dbAttributes = session.selectList(METADATA_MAPPER + "selectCapabilityAttributes", capabilityId);
+        List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectCapabilityAttributes", capabilityId);
 
         MetadataMapping.mapDbAttributes2Capability(dbAttributes, capability);
     }
 
     void loadCapabilityDirectives(Capability capability, long capabilityId, SqlSession session) {
-        List<DbDirective> dbDirectives = session.selectList(METADATA_MAPPER + "selectCapabilityDirectives", capabilityId);
+        List<DbDirective> dbDirectives = session.selectList(RESOURCE_MAPPER + "selectCapabilityDirectives", capabilityId);
 
         MetadataMapping.mapDbDirectives2Capability(dbDirectives, capability);
     }
 
     void loadRequirementAttributes(Requirement requirement, long requirementId, SqlSession session) {
-        List<DbAttribute> dbAttributes = session.selectList(METADATA_MAPPER + "selectRequirementAttributes", requirementId);
+        List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectRequirementAttributes", requirementId);
 
         MetadataMapping.mapDbAttributes2Requirement(dbAttributes, requirement);
     }
 
     void loadRequirementDirectives(Requirement requirement, long requirementId, SqlSession session) {
-        List<DbDirective> dbDirectives = session.selectList(METADATA_MAPPER + "selectRequirementDirectives", requirementId);
+        List<DbDirective> dbDirectives = session.selectList(RESOURCE_MAPPER + "selectRequirementDirectives", requirementId);
 
         MetadataMapping.mapDbDirectives2Requirement(dbDirectives, requirement);
     }
@@ -260,12 +257,22 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     public synchronized List<Resource> loadResources(Repository repository) throws IOException {
         logger.debug("loadResources(repository={})", repository);
 
-        List<Resource> result;
-        Map<URI, Resource> resources = repositories.get(repository.getURI());
-        if (resources != null) {
-            result = Collections.unmodifiableList(new ArrayList<>(resources.values()));
-        } else {
-            result = Collections.emptyList();
+        List<Resource> result = Collections.emptyList();
+        try (SqlSession session = sessionManager.getSession()) {
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+
+            if (repositoryId != null) {
+                List<DbResource> dbResources = session.selectList(RESOURCE_MAPPER + "selectResourcesByRepositoryId", repositoryId);
+                if (dbResources != null && !dbResources.isEmpty()) {
+                    result = new ArrayList<>(dbResources.size());
+                    for (DbResource dbResource : dbResources) {
+                        // TODO optimize - select in loop
+                        Resource resource = loadResource(dbResource, session);
+                        resource.setRepository(repository);
+                        result.add(resource);
+                    }
+                }
+            }
         }
 
         if (logger.isTraceEnabled()) {
@@ -273,6 +280,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         } else {
             logger.debug("loadResources(repository) returns {}", result.size());
         }
+
         return result;
     }
 
@@ -280,7 +288,7 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     public synchronized void saveResource(Resource resource) throws IOException {
         logger.debug("saveResource(resource={})", resource);
 
-        try (SqlSession session = getSession()) {
+        try (SqlSession session = sessionManager.getSession()) {
             SequenceMapper seqMapper = session.getMapper(SequenceMapper.class);
 
             DbResource dbResource = MetadataMapping.mapResource2DbResource(resource, metadataService);
@@ -288,7 +296,17 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
             long resourceId = seqMapper.nextVal("resource_seq");
             dbResource.setResourceId(resourceId);
 
-            session.insert(METADATA_MAPPER + "insertResource", dbResource);
+            Repository repository = resource.getRepository();
+            if (repository == null) {
+                throw new IllegalArgumentException("Repository is not set on resource: " + resource.getId());
+            }
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+            if (repositoryId == null) {
+                throw new IllegalStateException("Repository doesn't exist: " + repository.getURI());
+            }
+            dbResource.setRepositoryId(repositoryId);
+
+            session.insert(RESOURCE_MAPPER + "insertResource", dbResource);
 
             // capabilities
             for (Capability capability : resource.getRootCapabilities()) {
@@ -301,6 +319,8 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
             }
 
             session.commit();
+        } catch (PersistenceException e) {
+            throw new IOException("Could not save resource.", e);
         }
 
         logger.debug("saveResource(resource) returns", resource);
@@ -317,16 +337,16 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         dbCapability.setCapabilityId(capabilityId);
         dbCapability.setParentCapabilityId(parentId != null ? parentId : capabilityId);
 
-        session.insert(METADATA_MAPPER + "insertCapability", dbCapability);
+        session.insert(RESOURCE_MAPPER + "insertCapability", dbCapability);
 
         List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(capability.getAttributes(), capabilityId);
         if (!dbAttributes.isEmpty()) {
-            session.insert(METADATA_MAPPER + "insertCapabilityAttributes", dbAttributes);
+            session.insert(RESOURCE_MAPPER + "insertCapabilityAttributes", dbAttributes);
         }
 
         List<DbDirective> dbDirectives = MetadataMapping.mapDirectives2DbDirectives(capability.getDirectives(), capabilityId);
         if (!dbDirectives.isEmpty()) {
-            session.insert(METADATA_MAPPER + "insertCapabilityDirectives", dbDirectives);
+            session.insert(RESOURCE_MAPPER + "insertCapabilityDirectives", dbDirectives);
         }
 
         for (Capability child : capability.getChildren()) {
@@ -345,16 +365,16 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         dbRequirement.setRequirementId(requirementId);
         dbRequirement.setParentRequirementId(parentId != null ? parentId : requirementId);
 
-        session.insert(METADATA_MAPPER + "insertRequirement", dbRequirement);
+        session.insert(RESOURCE_MAPPER + "insertRequirement", dbRequirement);
 
         List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(requirement.getAttributes(), requirementId, true);
         if (!dbAttributes.isEmpty()) {
-            session.insert(METADATA_MAPPER + "insertRequirementAttributes", dbAttributes);
+            session.insert(RESOURCE_MAPPER + "insertRequirementAttributes", dbAttributes);
         }
 
         List<DbDirective> dbDirectives = MetadataMapping.mapDirectives2DbDirectives(requirement.getDirectives(), requirementId);
         if (!dbDirectives.isEmpty()) {
-            session.insert(METADATA_MAPPER + "insertRequirementDirectives", dbDirectives);
+            session.insert(RESOURCE_MAPPER + "insertRequirementDirectives", dbDirectives);
         }
 
         for (Requirement child : requirement.getChildren()) {
@@ -366,12 +386,12 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     public synchronized void deleteResource(URI uri) throws IOException {
         logger.debug("deleteResource(uri={})", uri);
 
-        try (SqlSession session = getSession()) {
-            Resource resource = loadResource(uri);
+        try (SqlSession session = sessionManager.getSession()) {
+            DbResource dbResource = session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString());
 
-            if (resource != null) {
-                String resourceID = resource.getId();
-                session.insert(METADATA_MAPPER + "deleteResource", resourceID);
+            if (dbResource != null) {
+                long resourceId = dbResource.getResourceId();
+                session.delete(RESOURCE_MAPPER + "deleteResource", resourceId);
                 session.commit();
             }
         }
@@ -384,13 +404,14 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
         logger.debug("existsResource(uri={})", uri);
 
         boolean result = false;
-        for (Map<URI, Resource> resources : repositories.values()) {
-            if (resources != null && resources.containsKey(uri)) {
+        try (SqlSession session = sessionManager.getSession()) {
+            if (session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString()) != null) {
                 result = true;
             }
         }
 
         logger.debug("existsResource(uri) returns {}", result);
+
         return result;
     }
 
@@ -398,15 +419,18 @@ public class ResourceDAOImpl extends AbstractResourceDAO {
     public boolean existsResource(URI uri, Repository repository) throws IOException {  // not needed
         logger.debug("existsResource(uri={}, repository={})", uri, repository);
 
-        Map<URI, Resource> resources = repositories.get(repository.getURI());
-        boolean result = resources.containsKey(uri);
+        boolean result = false;
+        try (SqlSession session = sessionManager.getSession()) {
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+
+            DbResource dbResource = session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString());
+            if (dbResource != null && dbResource.getRepositoryId() == repositoryId) {
+                result = true;
+            }
+        }
 
         logger.debug("existsResource(uri, repository) returns {}", result);
-        return result;
-    }
 
-    @Override
-    public String toString() {
-        return "Persisted repositories and resources:\r\n" + repositories.toString();
+        return result;
     }
 }

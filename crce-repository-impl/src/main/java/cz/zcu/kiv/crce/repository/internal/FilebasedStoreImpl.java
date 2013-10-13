@@ -21,6 +21,7 @@ import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -41,6 +42,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile BundleContext context;
     private volatile PluginManager pluginManager;
     private volatile ResourceDAO resourceDAO;
+    private volatile RepositoryDAO repositoryDAO;
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile ResourceFactory resourceFactory;
     private volatile MetadataService metadataService; // NOPMD
@@ -81,7 +83,20 @@ public class FilebasedStoreImpl implements Store, EventHandler {
      * Called by dependency manager.
      */
     synchronized void start() {
-        repository = resourceFactory.createRepository(baseDir.toURI());
+        try {
+            repository = repositoryDAO.loadRepository(baseDir.toURI());
+        } catch (IOException ex) {
+            logger.error("Could not load repository for {}", baseDir, ex);
+        }
+
+        if (repository == null) {
+            repository = resourceFactory.createRepository(baseDir.toURI());
+            try {
+                repositoryDAO.saveRepository(repository);
+            } catch (IOException ex) {
+                logger.error("Could not save repository for {}", baseDir, ex);
+            }
+        }
 
         final Object lock = this;
         new Thread(new Runnable() {
@@ -297,7 +312,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     private void indexResources(File baseDir, Repository repository) {
         indexDirectory(baseDir, repository);
-        logger.debug("Indexing done for {}:\r\n{}", baseDir, resourceDAO);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Indexing done for store directory: {}", baseDir.getAbsolutePath());
+        }
     }
 
     private void indexDirectory(File directory, Repository repository) {

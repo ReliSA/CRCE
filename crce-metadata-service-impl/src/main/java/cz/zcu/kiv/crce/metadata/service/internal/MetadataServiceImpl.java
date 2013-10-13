@@ -349,6 +349,7 @@ public class MetadataServiceImpl implements MetadataService {
     // ---
 
     @Nonnull
+    @Override
     public Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace) {
         List<Capability> capabilities = resource.getCapabilities(namespace);
 
