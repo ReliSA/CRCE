@@ -89,11 +89,14 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
      */
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
+        logger.debug("Entering beforePutToStore method");
     	
     	if (resource == null || !resource.hasCategory("osgi")) {
+            logger.debug("Resource " + resource == null ? "is null." : "doesnt have category osgi.");
             return resource;
         }
         if (!resource.hasCategory(CATEGORY_VERSIONED)) {
+            logger.debug("Resource doesnt have category versioned");
         	
         	/*candidate for base resource is selected as bundle with same symbolic name 
         	  and highest version in repository.*/
@@ -101,8 +104,11 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
             try {
 				String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
+                logger.debug("Searching for previous versions of: {}", resource.getSymbolicName());
 				for (Resource i : store.getRepository().getResources(filter)) {
+                    logger.debug("Candidate: {}", i.getSymbolicName());
 				        if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
+                            logger.debug("Candidate selected");
 				            cand = i;
 				        }
 				}
@@ -113,14 +119,17 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             
             String category = null;
             if (cand == null) {
+                logger.debug("No candidate found");
                 category = CATEGORY_VERSIONED;
                 resource.addCategory("initial-version");
             } else {
+                logger.debug("Candidate found, commencing bundle comparison.");
             	InputStream versionedBundleIs = null;
                 try {
                 	//candidate = base bundle for version generation
+                    logger.debug("Candidate URI: {}", cand.getUri());
                     InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
-                    
+                    logger.debug("Uploaded bundle URI: {}", resource.getUri());
                     InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
                     
                     HashMap<String, String> options = new HashMap<String, String>();
@@ -153,7 +162,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 	File versionedBundleFile = fileFromStream(versionedBundleIs);
                 	
                     resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
-                    
+                    logger.debug("Created resource from uploaded bundle:" + resource.getUri());
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
                     throw new RevokedArtifactException("I/O error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
@@ -176,11 +185,17 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
      * Activate only for unversioned osgi resources
      */
     @Override
-    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) {
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+        logger.debug("Entering onUploadToBuffer");
+
+        checkAlreadyInBuffer(resource, buffer);
+
         if (!resource.hasCategory("osgi")) {
+            logger.debug("Resource doesnt have category osgi");
             return resource;
         }
         if (!resource.hasCategory("versioned")) {
+            logger.debug("Resource doesnt have category versioned.");
 
             String ext = name.substring(name.lastIndexOf("."));
             
@@ -195,6 +210,25 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
         }
         return resource;
+    }
+
+    private void checkAlreadyInBuffer(Resource resource, Buffer buffer) throws RevokedArtifactException {
+        logger.debug("Checking for presence of a resource with the same symbolic name in the buffer.");
+
+        try {
+            String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
+
+            logger.debug("Searching for previously buffered versions of: " + resource.getSymbolicName());
+
+            if(buffer.getRepository().getResources(filter).length != 0) {
+                logger.debug("Resource with the same symbolic name found!");
+                throw new RevokedArtifactException("There is already a resource with the same symbolic name in the buffer.", RevokedArtifactException.REASON.ALREADY_IN_BUFFER);
+            }
+        } catch (InvalidSyntaxException e1) {
+            logger.error("Could proceed with bundle search, invalid syndax error", e1);
+        }
+
+        logger.debug("No resource with the same symbolic name found in the buffer. Moving on...");
     }
 
     @Override

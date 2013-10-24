@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -96,6 +97,8 @@ public class UploadServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean success = true;
         String message;
+        List<String> reasons = new ArrayList<>();
+        StringBuilder builder = new StringBuilder();
         if (ServletFileUpload.isMultipartContent(req)) {
             ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
             List fileItemsList;
@@ -122,6 +125,17 @@ public class UploadServlet extends HttpServlet {
                         } catch (RevokedArtifactException ex) {
                             logger.warn("Artifact revoked: ", ex.getMessage());
                             success = false;
+                            builder.setLength(0); //reset the StringBuilder
+                            switch (ex.getReason()) {
+                                case ALREADY_IN_BUFFER:
+                                    builder.append("Couldn't upload file: ");
+                                    builder.append(fileName);
+                                    builder.append(". The buffer already contains resource with the same symbolic name.");
+                                    reasons.add(builder.toString());
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }
@@ -143,7 +157,13 @@ public class UploadServlet extends HttpServlet {
                 indexerResult.removeAllMessages();
             }
         } else {
-            message = "Upload failed.";
+            builder.setLength(0); //reset the StringBuilder
+            builder.append("Upload failed.");
+            for(String s : reasons) {
+                builder.append("<BR>");
+                builder.append(s);
+            }
+            message = builder.toString();
             metadataIndexerResult = "";
         }
 
