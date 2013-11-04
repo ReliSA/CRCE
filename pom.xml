@@ -89,8 +89,9 @@
         <module>crce-handler-versioning</module>
         <module>crce-webui</module>
         <module>crce-rest</module>
+        <module>crce-jersey-hack</module>
 
- 	<!-- integration tests are not finished yet -->
+        <!-- integration tests are not finished yet -->
 <!--	<module>crce-integration-tests</module> -->
     </modules>
 

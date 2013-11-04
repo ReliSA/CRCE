@@ -1,0 +1,1 @@
+Placeholder which fools maven into building an empty jar.

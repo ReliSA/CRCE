@@ -76,6 +76,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata{
     	
     	try {
         	if(filter != null) {
+                log.debug("Filter used to get metadata: {}.", filter);
         		storeResources = Activator.instance().getStore().getRepository().getResources(filter);
         	} else {
         		storeResources = Activator.instance().getStore().getRepository().getResources();
