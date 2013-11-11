@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.service.internal.validation;
 
 
+import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.service.validation.PropertyValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.Reason;
@@ -10,7 +11,7 @@ import cz.zcu.kiv.crce.metadata.service.validation.Reason;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyValidationResultImpl<T> extends AbstractValidationResult implements PropertyValidationResult<T> {
+public class PropertyValidationResultImpl<T extends EqualityComparable<T>> extends AbstractValidationResult implements PropertyValidationResult<T> {
 
     private Property<T> property;
 
