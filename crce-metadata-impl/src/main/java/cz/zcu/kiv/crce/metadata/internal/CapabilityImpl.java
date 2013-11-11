@@ -171,6 +171,9 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
                 if (!Objects.equals(this.getDirectives(), other.getDirectives())) {
                     return false;
                 }
+                if (!Objects.equals(propertyProvider.getProperties(), other.getProperties())) {
+                    return false;
+                }
                 return true;
 
             case SHALLOW_WITH_KEY:

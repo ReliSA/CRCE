@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
+import cz.zcu.kiv.crce.metadata.EqualityComparable;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
 
 /**
@@ -11,7 +13,7 @@ import cz.zcu.kiv.crce.metadata.Property;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyImpl<T> extends AttributeProviderImpl implements Property<T> {
+public class PropertyImpl<T extends EqualityComparable<T>> extends AttributeProviderImpl implements Property<T> {
 
     private static final long serialVersionUID = -7003533524061344584L;
 
@@ -42,6 +44,54 @@ public class PropertyImpl<T> extends AttributeProviderImpl implements Property<T
     @Override
     public void setParent(T parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public boolean equalsTo(Property<T> other, EqualityLevel level) {
+        if (other == null) {
+            return false;
+        }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
+
+            case SHALLOW_NO_KEY:
+                if (!Objects.equals(this.namespace, other.getNamespace())) {
+                    return false;
+                }
+                if (!Objects.equals(this.attributesMap, other.getAttributesMap())) {
+                    return false;
+                }
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.KEY)) {
+                    return false;
+                }
+                return this.equalsTo(other, EqualityLevel.SHALLOW_NO_KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+
+            default:
+                return equalsTo(other, EqualityLevel.KEY);
+
+        }
     }
 
     @Override

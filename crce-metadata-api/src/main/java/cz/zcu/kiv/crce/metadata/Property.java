@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public interface Property<T> extends AttributeProvider, Serializable {
+public interface Property<T extends EqualityComparable<T>> extends AttributeProvider, EqualityComparable<Property<T>>, Serializable {
 
     @Nonnull
     String getId();

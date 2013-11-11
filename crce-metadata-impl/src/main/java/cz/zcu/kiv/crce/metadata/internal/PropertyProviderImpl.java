@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
@@ -14,7 +15,7 @@ import cz.zcu.kiv.crce.metadata.PropertyProvider;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyProviderImpl<T> implements PropertyProvider<T> {
+public class PropertyProviderImpl<T extends EqualityComparable<T>> implements PropertyProvider<T> {
 
     private static final long serialVersionUID = 1L;
 
