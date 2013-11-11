@@ -15,7 +15,7 @@
         <param-name>com.sun.jersey.config.property.packages</param-name>
         <param-value>cz.zcu.kiv.crce.rest.internal.rest.xml</param-value>
     </init-param>
-    <load-on-startup>1</load-on-startup>
+        <load-on-startup>1</load-on-startup>
 	</servlet> 
 	<servlet-mapping>
     	<servlet-name>Jersey</servlet-name>

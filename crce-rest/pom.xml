@@ -99,7 +99,7 @@
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>    
+        </dependency>
 
 
 		 <!-- 3rd party dependencies -->		
@@ -115,7 +115,7 @@
 	    <dependency>
       		<groupId>com.sun.jersey</groupId>
       		<artifactId>jersey-servlet</artifactId>
-	 	</dependency>	 
+	 	</dependency>
 	 	<dependency>
     		<groupId>com.sun.jersey</groupId>
     		<artifactId>jersey-json</artifactId>
