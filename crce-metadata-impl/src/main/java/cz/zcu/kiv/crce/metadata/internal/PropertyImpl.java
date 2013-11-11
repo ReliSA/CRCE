@@ -1,28 +1,23 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @param <T>
  */
-public class PropertyImpl extends AbstractEntityBase implements Property {
+public class PropertyImpl<T> extends AttributeProviderImpl implements Property<T> {
 
     private static final long serialVersionUID = -7003533524061344584L;
 
     private final String id;
     private String namespace = null;
-    private Resource resource = null;
-    private Property parent = null;
-    private final List<Property> children = new ArrayList<>();
+    private T parent;
 
     public PropertyImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace;
@@ -40,39 +35,13 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
     }
 
     @Override
-    public Resource getResource() {
-        return resource;
-    }
-
-    @Override
-    public void setResource(Resource resource) {
-        this.resource = resource;
-    }
-
-    @Override
-    public Property getParent() {
+    public T getParent() {
         return parent;
     }
 
     @Override
-    public boolean setParent(Property parent) {
+    public void setParent(T parent) {
         this.parent = parent;
-        return true;
-    }
-
-    @Override
-    public boolean addChild(Property property) {
-        return children.add(property);
-    }
-
-    @Override
-    public boolean removeChild(Property property) {
-        return children.remove(property);
-    }
-
-    @Override
-    public List<Property> getChildren() {
-        return Collections.unmodifiableList(children);
     }
 
     @Override
@@ -83,7 +52,7 @@ public class PropertyImpl extends AbstractEntityBase implements Property {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final PropertyImpl other = (PropertyImpl) obj;
+        final PropertyImpl<?> other = (PropertyImpl<?>) obj;
         return Objects.equals(this.id, other.id);
     }
 

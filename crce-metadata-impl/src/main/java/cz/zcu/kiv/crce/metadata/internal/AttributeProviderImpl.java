@@ -8,19 +8,17 @@ import java.util.Map;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeProvider;
-
 import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.DirectiveProvider;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
- * Abstract implementatio of
- * <code>PropertyProvider</code> interface. It serves to provide unique implementation of providing Properties.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public abstract class AbstractEntityBase extends AbstractDirectiveProvider implements AttributeProvider, DirectiveProvider {
+public class AttributeProviderImpl implements AttributeProvider {
+    
+    private static final long serialVersionUID = 1L;
 
     protected final Map<String, Attribute<?>> attributesMap = new HashMap<>();
 

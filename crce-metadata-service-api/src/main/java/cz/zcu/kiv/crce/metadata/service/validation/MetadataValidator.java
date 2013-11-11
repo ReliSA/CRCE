@@ -69,18 +69,10 @@ public interface MetadataValidator {
 
     /**
      * Validates the given property including child properties.
+     * @param <T>
      * @param property
      * @return
      */
     @Nonnull
-    PropertyValidationResult validate(@Nonnull Property property);
-
-    /**
-     * Validates the given property and optionally validates its child properties.
-     * @param property
-     * @param includeChildren
-     * @return
-     */
-    @Nonnull
-    PropertyValidationResult validate(@Nonnull Property property, boolean includeChildren);
+    <T> PropertyValidationResult<T> validate(@Nonnull Property<T> property);
 }

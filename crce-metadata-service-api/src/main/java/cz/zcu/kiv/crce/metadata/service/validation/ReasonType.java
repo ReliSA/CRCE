@@ -15,6 +15,6 @@ public enum ReasonType {
     RESOURCE_REFERENCE,
     CHILD_REFERENCE,
     CAPABILITY_TREE,
-    
+
 
 }

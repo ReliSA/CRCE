@@ -12,7 +12,8 @@ import javax.annotation.Nullable;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Capability extends AttributeProvider, DirectiveProvider, EqualityComparable<Capability>, Serializable {
+public interface Capability
+        extends AttributeProvider, DirectiveProvider, PropertyProvider<Capability>, EqualityComparable<Capability>, Serializable {
 
     @Nonnull
     String getId();

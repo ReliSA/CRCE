@@ -1,9 +1,5 @@
 package cz.zcu.kiv.crce.metadata.service.internal.validation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.service.validation.PropertyValidationResult;
@@ -12,30 +8,20 @@ import cz.zcu.kiv.crce.metadata.service.validation.Reason;
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @param <T>
  */
-public class PropertyValidationResultImpl extends AbstractValidationResult implements PropertyValidationResult {
+public class PropertyValidationResultImpl<T> extends AbstractValidationResult implements PropertyValidationResult<T> {
 
-    private final List<PropertyValidationResult> childResults = new ArrayList<>();
-    private Property property;
+    private Property<T> property;
 
     @Override
-    public void setProperty(Property property) {
+    public void setProperty(Property<T> property) {
         this.property = property;
     }
 
     @Override
-    public Property getProperty() {
+    public Property<T> getProperty() {
         return property;
-    }
-
-    @Override
-    public List<PropertyValidationResult> getChildResults() {
-        return childResults;
-    }
-
-    @Override
-    public void addChildResult(@Nonnull PropertyValidationResult result) {
-        childResults.add(result);
     }
 
     @Override
@@ -49,9 +35,6 @@ public class PropertyValidationResultImpl extends AbstractValidationResult imple
         sb.append(": ").append(isEntityValid() ? "valid" : "invalid").append("\r\n");
         for (Reason reason : getReasons()) {
             sb.append("  ").append(reason.getId()).append(" - ").append(reason.getType()).append(" - ").append(reason.getText()).append("\r\n");
-        }
-        for (PropertyValidationResult propertyValidationResult : childResults) {
-            sb.append(propertyValidationResult.toString());
         }
         return sb.toString();
     }

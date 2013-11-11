@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata.service.validation;
 
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -10,16 +9,12 @@ import cz.zcu.kiv.crce.metadata.Property;
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @param <T>
  */
-public interface PropertyValidationResult extends ValidationResult {
+public interface PropertyValidationResult<T> extends ValidationResult {
 
-    void setProperty(@Nonnull Property property);
+    void setProperty(@Nonnull Property<T> property);
 
     @Nullable
-    Property getProperty();
-
-    @Nonnull
-    List<PropertyValidationResult> getChildResults();
-
-    void addChildResult(@Nonnull PropertyValidationResult result);
+    Property<T> getProperty();
 }

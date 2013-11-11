@@ -21,7 +21,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  * Implementation of Requirement interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class RequirementImpl extends AbstractDirectiveProvider implements Requirement, Comparable<Requirement> {
+public class RequirementImpl extends DirectiveProviderImpl implements Requirement, Comparable<Requirement> {
 
     private static final long serialVersionUID = -2992854704112505654L;
 

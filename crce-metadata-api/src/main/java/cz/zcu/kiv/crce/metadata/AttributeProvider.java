@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface AttributeProvider {
+public interface AttributeProvider extends Serializable {
 
     @CheckForNull
     <T> Attribute<T> getAttribute(@Nonnull AttributeType<T> type);

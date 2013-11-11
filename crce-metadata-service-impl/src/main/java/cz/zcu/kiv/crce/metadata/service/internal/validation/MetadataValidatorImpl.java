@@ -226,54 +226,23 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
     }
 
     @Override
-    public PropertyValidationResult validate(Property property) {
-        PropertyValidationResult result = validate(property, null, true);
+    public <T> PropertyValidationResult<T> validate(Property<T> property) {
+        PropertyValidationResult<T> result = validate(property, null);
         return result;
     }
 
-    @Override
-    public PropertyValidationResult validate(Property property, boolean includeChildren) {
-        return validate(property, null, includeChildren);
-    }
-
     @Nonnull
-    private PropertyValidationResult validate(@Nonnull Property property, @CheckForNull Resource resource, boolean includeChildren) {
-        return validateRecursive(property, null, resource, includeChildren);
-    }
-
-    @Nonnull
-    private PropertyValidationResult validateRecursive(@Nonnull Property property, @CheckForNull Property parent,
-            @CheckForNull Resource resource, boolean includeChildren) {
-
-        PropertyValidationResult result = new PropertyValidationResultImpl();
+    private <T> PropertyValidationResult<T> validate(@Nonnull Property<T> property, @CheckForNull T parent) {
+        PropertyValidationResult<T> result = new PropertyValidationResultImpl<>();
         result.setProperty(property);
 
-        if (structureValidationEnabled) {
-            if (parent != null && !parent.equals(property.getParent())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.PARENT_REFERENCE, property.getId(),
-                        "Wrong reference to parent: " + property.getParent()));
+        if (structureValidationEnabled && parent != null && !parent.equals(property.getParent())) {
+            result.addReason(
+                    new ReasonImpl(ReasonType.PARENT_REFERENCE, property.getId(),
+                            "Wrong reference to resource: " + property.getParent()));
 
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
-            if (resource != null && !resource.equals(property.getResource())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.RESOURCE_REFERENCE, property.getId(),
-                        "Wrong reference to resource: " + property.getResource()));
-
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
-        }
-
-        if (includeChildren) {
-            for (Property child : property.getChildren()) {
-                PropertyValidationResult childResult = validateRecursive(child, property, resource, includeChildren);
-                if (!childResult.isContextValid()) {
-                    result.setContextValid(false);
-                }
-            }
+            result.setEntityValid(false);
+            result.setContextValid(false);
         }
 
         return result;

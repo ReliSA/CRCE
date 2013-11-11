@@ -3,12 +3,16 @@ package cz.zcu.kiv.crce.metadata.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.DirectiveProvider;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -16,12 +20,15 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class CapabilityImpl extends AbstractEntityBase implements Capability, Comparable<Capability> {
+public class CapabilityImpl extends AttributeProviderImpl implements Capability, Comparable<Capability> {
 
     private static final long serialVersionUID = -813453152194473221L;
 
     private final String id;
     private final List<Capability> children = new ArrayList<>();
+
+    private final PropertyProvider<Capability> propertyProvider = new PropertyProviderImpl<>();
+    private final DirectiveProvider directiveProvider = new DirectiveProviderImpl();
 
     private String namespace = null;
     private Resource resource = null;
@@ -78,6 +85,54 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability, Co
         return Collections.unmodifiableList(children);
     }
 
+    // delegated methods
+
+    @Override
+    public List<Property<Capability>> getProperties() {
+        return propertyProvider.getProperties();
+    }
+
+    @Override
+    public List<Property<Capability>> getProperties(String namespace) {
+        return propertyProvider.getProperties(namespace);
+    }
+
+    @Override
+    public boolean hasProperty(Property<Capability> property) {
+        return propertyProvider.hasProperty(property);
+    }
+
+    @Override
+    public void addProperty(Property<Capability> property) {
+        propertyProvider.addProperty(property);
+    }
+
+    @Override
+    public void removeProperty(Property<Capability> property) {
+        propertyProvider.removeProperty(property);
+    }
+
+    @Override
+    public String getDirective(String name) {
+        return directiveProvider.getDirective(name);
+    }
+
+    @Override
+    public Map<String, String> getDirectives() {
+        return directiveProvider.getDirectives();
+    }
+
+    @Override
+    public boolean setDirective(String name, String directive) {
+        return directiveProvider.setDirective(name, directive);
+    }
+
+    @Override
+    public boolean unsetDirective(String name) {
+        return directiveProvider.unsetDirective(name);
+    }
+
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -113,7 +168,7 @@ public class CapabilityImpl extends AbstractEntityBase implements Capability, Co
                 if (!Objects.equals(this.attributesMap, other.getAttributesMap())) {
                     return false;
                 }
-                if (!Objects.equals(this.directivesMap, other.getDirectives())) {
+                if (!Objects.equals(this.getDirectives(), other.getDirectives())) {
                     return false;
                 }
                 return true;

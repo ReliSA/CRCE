@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.metadata.internal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import cz.zcu.kiv.crce.metadata.DirectiveProvider;
 
@@ -10,7 +11,9 @@ import cz.zcu.kiv.crce.metadata.DirectiveProvider;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class AbstractDirectiveProvider implements DirectiveProvider {
+public class DirectiveProviderImpl implements DirectiveProvider {
+
+    private static final long serialVersionUID = 1L;
 
     protected final Map<String, String> directivesMap = new HashMap<>();
 
@@ -33,5 +36,27 @@ public class AbstractDirectiveProvider implements DirectiveProvider {
     @Override
     public boolean unsetDirective(String name) {
         return directivesMap.remove(name) != null;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + Objects.hashCode(this.directivesMap);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DirectiveProviderImpl other = (DirectiveProviderImpl) obj;
+        if (!Objects.equals(this.directivesMap, other.directivesMap)) {
+            return false;
+        }
+        return true;
     }
 }

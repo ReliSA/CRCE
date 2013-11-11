@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Resource extends EqualityComparable<Resource>, Serializable {
+public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Serializable {
 
     @Nonnull
     String getId();
@@ -41,17 +41,9 @@ public interface Resource extends EqualityComparable<Resource>, Serializable {
     @Nonnull
     List<Requirement> getRequirements(@Nonnull String namespace);
 
-    @Nonnull
-    List<Property> getProperties();
-
-    @Nonnull
-    List<Property> getProperties(@Nonnull String namespace);
-
     boolean hasCapability(@Nonnull Capability capability);
 
     boolean hasRequirement(@Nonnull Requirement requirement);
-
-    boolean hasProperty(@Nonnull Property property);
 
     /* --- setters --- */
 
@@ -70,15 +62,11 @@ public interface Resource extends EqualityComparable<Resource>, Serializable {
 
     void addRequirement(@Nonnull Requirement requirement);
 
-    void addProperty(@Nonnull Property property);
-
     void removeCapability(@Nonnull Capability capability);
 
     void removeRootCapability(@Nonnull Capability capability);
 
     void removeRequirement(@Nonnull Requirement requirement);
-
-    void removeProperty(@Nonnull Property property);
 
     void setRepository(@Nonnull Repository repository);
 }
