@@ -113,6 +113,9 @@ public class TaskRunnerTest {
 
         try {
             f4.get(6, TimeUnit.SECONDS); //wait until t4 is finished
+            f1.get(1, TimeUnit.SECONDS);
+            f2.get(1, TimeUnit.SECONDS);
+            f3.get(1, TimeUnit.SECONDS);
         } catch (TimeoutException ex) {
             fail("Tasks took too long to run, something must have gone wrong.");
         }
