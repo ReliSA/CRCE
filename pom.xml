@@ -90,6 +90,7 @@
         <module>crce-webui</module>
         <module>crce-rest</module>
         <module>crce-jersey-hack</module>
+        <module>crce-concurrency</module>
 
         <!-- integration tests are not finished yet -->
 <!--	<module>crce-integration-tests</module> -->

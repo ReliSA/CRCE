@@ -21,7 +21,7 @@ Component Repository with Compatibility Evaluation
       - if you don't do that, maven will copy the configuration
         folder on the first run.
 
-  3) To run CRCE with a module crce-efp-indexer 
+  3) To run CRCE with a module crce-efp-indexer
      you must set-up your maven for access to EFFCC repository. 
      Follow instructions in wiki page "Running CRCE with a module crce-efp-indexer".
 
