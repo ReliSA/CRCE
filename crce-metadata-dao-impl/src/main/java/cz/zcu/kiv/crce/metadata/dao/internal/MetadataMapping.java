@@ -15,11 +15,13 @@ import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 import cz.zcu.kiv.crce.metadata.dao.internal.type.DbAttributeType;
@@ -63,6 +65,15 @@ public class MetadataMapping {
         dbRequirement.setNamespace(requirement.getNamespace());
 
         return dbRequirement;
+    }
+
+    public static DbProperty mapProperty2DbProperty(Property<?> property, long propertyId, long parentId, MetadataService metadataService) {
+        DbProperty dbProperty = new DbProperty();
+
+        dbProperty.setId(property.getId());
+        dbProperty.setNamespace(property.getNamespace());
+
+        return dbProperty;
     }
 
     public static List<DbAttribute> mapAttributes2DbAttributes(List<Attribute<?>> attributes, long entityId) {

@@ -118,7 +118,7 @@
         );
 
         CREATE TABLE IF NOT EXISTS resource_property_attribute (
-          resource_id BIGINT NOT NULL,
+          property_id BIGINT NOT NULL,
           name VARCHAR(16) NOT NULL,
           list_index SMALLINT DEFAULT 0 NOT NULL,
           type SMALLINT DEFAULT 0 NOT NULL,
@@ -129,8 +129,8 @@
           version_major_value INTEGER,
           version_minor_value INTEGER,
           version_micro_value INTEGER,
-          PRIMARY KEY (resource_id, name, list_index),
-          FOREIGN KEY (resource_id) REFERENCES resource_property (property_id) ON DELETE CASCADE,
+          PRIMARY KEY (property_id, name, list_index),
+          FOREIGN KEY (property_id) REFERENCES resource_property (property_id) ON DELETE CASCADE,
           CONSTRAINT res_property_attribute_ck1 CHECK
             string_value IS NOT NULL
             OR long_value IS NOT NULL
@@ -146,7 +146,7 @@
         );
 
         CREATE TABLE IF NOT EXISTS capability_property_attribute (
-          capability_id BIGINT NOT NULL,
+          property_id BIGINT NOT NULL,
           name VARCHAR(16) NOT NULL,
           list_index SMALLINT DEFAULT 0 NOT NULL,
           type SMALLINT DEFAULT 0 NOT NULL,
@@ -157,8 +157,8 @@
           version_major_value INTEGER,
           version_minor_value INTEGER,
           version_micro_value INTEGER,
-          PRIMARY KEY (capability_id, name, list_index),
-          FOREIGN KEY (capability_id) REFERENCES capability_property (capability_id) ON DELETE CASCADE,
+          PRIMARY KEY (property_id, name, list_index),
+          FOREIGN KEY (property_id) REFERENCES capability_property (property_id) ON DELETE CASCADE,
           CONSTRAINT cap_property_attribute_ck1 CHECK
             string_value IS NOT NULL
             OR long_value IS NOT NULL
@@ -195,6 +195,8 @@
         CREATE SEQUENCE IF NOT EXISTS resource_seq;
         CREATE SEQUENCE IF NOT EXISTS capability_seq;
         CREATE SEQUENCE IF NOT EXISTS requirement_seq;
+        CREATE SEQUENCE IF NOT EXISTS resource_property_seq;
+        CREATE SEQUENCE IF NOT EXISTS capability_property_seq;
     </update>
 
     <!-- For test purpose -->

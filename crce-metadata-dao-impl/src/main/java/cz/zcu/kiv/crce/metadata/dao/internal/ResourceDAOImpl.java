@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -34,6 +35,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
@@ -318,6 +320,11 @@ public class ResourceDAOImpl implements ResourceDAO {
                 saveRequirementRecursive(requirement, resourceId, null, 0, session, seqMapper);
             }
 
+            // properties
+            for (Property<Resource> property : resource.getProperties()) {
+                saveResourceProperty(property, resourceId, session, seqMapper);
+            }
+
             session.commit();
         } catch (PersistenceException e) {
             throw new IOException("Could not save resource.", e);
@@ -347,6 +354,10 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbDirective> dbDirectives = MetadataMapping.mapDirectives2DbDirectives(capability.getDirectives(), capabilityId);
         if (!dbDirectives.isEmpty()) {
             session.insert(RESOURCE_MAPPER + "insertCapabilityDirectives", dbDirectives);
+        }
+
+        for (Property<Capability> property : capability.getProperties()) {
+            saveCapabilityProperty(property, resourceId, session, seqMapper);
         }
 
         for (Capability child : capability.getChildren()) {
@@ -379,6 +390,30 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         for (Requirement child : requirement.getChildren()) {
             saveRequirementRecursive(child, resourceId, requirementId, level + 1, session, seqMapper);
+        }
+    }
+
+    private void saveResourceProperty(Property<Resource> property, long resourceId, SqlSession session, SequenceMapper seqMapper) {
+        long propertyId = seqMapper.nextVal("resource_property_seq");
+        DbProperty dbProperty = MetadataMapping.mapProperty2DbProperty(property, propertyId, resourceId, metadataService);
+
+        session.insert(RESOURCE_MAPPER + "insertResourceProperty", dbProperty);
+
+        List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(property.getAttributes(), propertyId);
+        if (!dbAttributes.isEmpty()) {
+            session.insert(RESOURCE_MAPPER + "insertResourcePropertyAttributes", dbAttributes);
+        }
+    }
+
+    private void saveCapabilityProperty(Property<Capability> property, long capabilityId, SqlSession session, SequenceMapper seqMapper) {
+        long propertyId = seqMapper.nextVal("capability_property_seq");
+        DbProperty dbProperty = MetadataMapping.mapProperty2DbProperty(property, propertyId, capabilityId, metadataService);
+
+        session.insert(RESOURCE_MAPPER + "insertCapabilityProperty", dbProperty);
+
+        List<DbAttribute> dbAttributes = MetadataMapping.mapAttributes2DbAttributes(property.getAttributes(), propertyId);
+        if (!dbAttributes.isEmpty()) {
+            session.insert(RESOURCE_MAPPER + "insertCapabilityPropertyAttributes", dbAttributes);
         }
     }
 
