@@ -86,7 +86,9 @@
         <module>crce-efp-assignment</module>
 
         <!-- UI & Optional Plugins -->
+        <!-- disabled by default until all dependencies will be in Maven repository
         <module>crce-handler-versioning</module>
+        -->
         <module>crce-webui</module>
         <module>crce-rest</module>
         <module>crce-jersey-hack</module>
