@@ -1,53 +1,61 @@
 package cz.zcu.kiv.crce.repository;
 
-import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.plugins.Executable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
+import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.repository.plugins.Executable;
+
 /**
  * This interface defines permanent store for artifacts.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Store {
-    
+
     /**
      * Puts resource to the <code>Store</code>.
-     * 
-     * @param resource 
+     *
+     * @param resource
      * @return
      * @throws IOException
-     * @throws RevokedArtifactException  
+     * @throws RefusedArtifactException
      */
-    public Resource put(Resource resource) throws IOException, RevokedArtifactException;
-   
+    @Nonnull
+    Resource put(@Nonnull Resource resource) throws IOException, RefusedArtifactException;
+
     /**
      * Removes the resource from this buffer and returns <code>true</code>, if
      * the buffer contained the given resource before removing, <code>false</code>
      * otherwise.
-     * 
+     *
      * @param resource Resource to be removed from this buffer.
      * @return <code>true</code>, if the buffer contained the resource before
      * removing.
-     * @throws IOException  
+     * @throws IOException
      */
-    public boolean remove(Resource resource) throws IOException;
+    boolean remove(@Nonnull Resource resource) throws IOException;
 
     /**
-     * Returns resources stored in buffer.
-     * @return array of resources.
+     * Returns list of resources stored in the Store.
+     * @return list of stored resources.
      */
-    public Repository getRepository();
-    
+    @Nonnull
+    List<Resource> getResources();
+
+    @Nonnull
+    List<Resource> getResources(Requirement requirement);
+
     /**
      * TODO analyze requirements for this method:
      * - add an executable plugin
      * @param resources
      * @param executable
-     * @param properties 
+     * @param properties
      */
-    public void execute(List<Resource> resources, Executable executable, Properties properties);
-    
+    void execute(@Nonnull List<Resource> resources, @Nonnull Executable executable, @CheckForNull Properties properties);
 }

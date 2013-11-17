@@ -5,7 +5,7 @@ import org.junit.*;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class PriorityActionHandlerTest {
 

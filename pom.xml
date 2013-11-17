@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <organization>
-        <name>ZČU KIV</name>
-        <url>http://www.kiv.zcu.cz</url>
-    </organization>
-
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-reactor</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>CRCE - Reactor</name>
 
     <description>Component Repository supporting Compatibility Evaluation</description>
 
     <url>https://www.assembla.com/spaces/crce/</url>
+
+    <organization>
+        <name>ZČU KIV</name>
+        <url>http://www.kiv.zcu.cz</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>kalwi</id>
+            <name>Jiří Kučera</name>
+        </developer>
+    </developers>
+
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
 
     <properties>
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -30,6 +43,9 @@
         <org.osgi.framework.system.packages.extra>
             javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
         </org.osgi.framework.system.packages.extra>
+        <org.osgi.framework.bootdelegation>
+            sun.*,com.sun.*
+        </org.osgi.framework.bootdelegation>
         <!--
              The following packages are not imported by any bundle,
              but they may be used by some efp assignment wrapped library, check it and remove them.
@@ -49,10 +65,8 @@
            for crce-webui: javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
           com.sun.xml.internal.bind.v2
         </org.osgi.framework.system.packages.extra>-->
-        <version.org.slf4j>1.7.3</version.org.slf4j>
+        <version.org.slf4j>1.7.5</version.org.slf4j>
     </properties>
-
-    <packaging>pom</packaging>
 
     <modules>
         <module>poms</module>
@@ -64,35 +78,33 @@
         <module>crce-plugin-api</module>
         <module>crce-metadata-api</module>
         <module>crce-metadata-dao-api</module>
+        <module>crce-metadata-service-api</module>
         <module>crce-repository-api</module>
-        <module>crce-results-api</module>
+        <module>crce-metadata-indexer-api</module>
+        <!--<module>crce-results-api</module>-->
 
         <!-- API Implementation -->
         <module>crce-metadata-impl</module>
+        <module>crce-metadata-dao-impl</module>
+        <module>crce-metadata-service-impl</module>
         <module>crce-repository-impl</module>
-        <module>crce-results-impl</module>
+        <!--<module>crce-results-impl</module>-->
 
         <!-- Core Plugins -->
         <module>crce-metadata-indexer</module>
-        <module>crce-metadata-metafile</module>
-        <module>crce-metadata-combined</module>
 
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
-        <module>crce-metadata-cosi-bundle</module>
-        <!-- <module>crce-efp-indexer</module> -->
+        <!--<module>crce-metadata-cosi-bundle</module>-->
+        <!--<module>crce-efp-indexer</module>-->
 
         <!-- Libraries -->
-        <module>crce-efp-assignment</module>
+        <!--<module>crce-efpAssignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-versioning</module>
+        <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
-        <module>crce-rest</module>
-        <module>crce-jersey-hack</module>
-
-        <!-- integration tests are not finished yet -->
-<!--	<module>crce-integration-tests</module> -->
+        <!--<module>crce-rest</module>-->
     </modules>
 
     <profiles>
@@ -112,6 +124,7 @@
                 <version>1.5</version>
                 <configuration>
                     <provision>
+                        <param>--vmOptions=-Xdebug -Xrunjdwp:"transport=dt_socket,server=y,suspend=n,address=65505"</param>
                         <param>--platform=felix</param>
                         <param>--repositories=http://repo1.maven.org/maven2,http://relisa.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2</param>
                         <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
@@ -163,7 +176,6 @@
     </build>
 
     <distributionManagement>
-
         <repository>
             <id>relisa-release</id>
             <name>ReliSA Internal Releases</name>
@@ -174,7 +186,6 @@
             <name>ReliSA Internal Snapshots</name>
             <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
-
     </distributionManagement>
 
     <repositories>
@@ -205,12 +216,5 @@
       	</repository>
 
     </repositories>
-
-    <developers>
-        <developer>
-            <id>kalwi</id>
-            <name>Jiří Kučera</name>
-        </developer>
-    </developers>
 
 </project>

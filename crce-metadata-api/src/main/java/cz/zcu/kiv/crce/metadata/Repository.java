@@ -1,63 +1,24 @@
 package cz.zcu.kiv.crce.metadata;
 
+import java.io.Serializable;
 import java.net.URI;
-import org.osgi.framework.InvalidSyntaxException;
+
+import javax.annotation.Nonnull;
 
 /**
- * Represents a set of resources. Repository can be assigned to a physical URI
- * which resources are stored on, but it does not manage physical content.
- * 
+ * Descriptor of resources storage.
+ *
+ * PENDING Attributes and directives could be added instead of hard-coded ones like URI.
+ *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Repository {
+public interface Repository extends Serializable {
 
     /**
      * Return the associated URL for the repository.
-     * 
-     * @return 
-     */
-    URI getURI();
-
-    /**
-     * Return the resources for this repository.
-     * @return 
-     */
-    Resource[] getResources();
-
-    /**
-     * 
-     * @param filter
-     * @return
-     * @throws InvalidSyntaxException  
-     */
-    Resource[] getResources(String filter) throws InvalidSyntaxException;
-    
-    /**
-     * 
-     * @param requirements
-     * @return 
-     */
-    Resource[] getResources(Requirement[] requirements);
-    
-    /**
-     * Return the name of this repository.
-     * 
-     * @return a non-null name
-     */
-    String getName();
-
-    /**
-     * Return the last modification date of this repository
      *
-     * @return the last modification date
+     * @return
      */
-    long getLastModified();
-
-    /**
-     * TODO
-     * @param resource
-     * @return 
-     */
-    boolean contains(Resource resource);
-
+    @Nonnull
+    URI getURI();
 }

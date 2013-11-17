@@ -15,11 +15,11 @@ import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 public class MetadataIndexingResultServiceImpl implements MetadataIndexingResultService, ManagedService {
 
     /** This instance holds information about result of indexing process. */
-    private ArrayList<String> messages;
+    private final ArrayList<String> messages;
 
     /** Constructor of MetadataIndexingResultServiceImpl class. */
     public MetadataIndexingResultServiceImpl() {
-        messages = new ArrayList<String>();
+        messages = new ArrayList<>();
     }
 
     /**
@@ -62,7 +62,6 @@ public class MetadataIndexingResultServiceImpl implements MetadataIndexingResult
     }
 
     @Override
-    public final void updated(final Dictionary properties) throws ConfigurationException {
-        return;
+    public final void updated(final Dictionary<String, ?> properties) throws ConfigurationException {
     }
 }

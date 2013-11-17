@@ -10,7 +10,7 @@ import org.osgi.service.obr.RepositoryAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
@@ -19,28 +19,28 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
 /**
  * Implementation of <code>Store</code> which can connect to remote OBR repository.
  * Not implemented yet.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class ObrStoreImpl implements Store {
     public static final String RESOURCE_METADATA_FILE_EXTENSION = ".metadata";
-    
-    private volatile RepositoryAdmin m_repositoryAdmin; /* will be injected by dependencymanager */
-    
-    private static final Logger logger = LoggerFactory.getLogger(ObrStoreImpl.class);
-    
-    private PluginManager m_pluginManager;
-    private URL m_obrBase;
-    
+
+    private volatile RepositoryAdmin repositoryAdmin; /* will be injected by dependencymanager */ // NOPMD
+
+    private static final Logger logger = LoggerFactory.getLogger(ObrStoreImpl.class); // NOPMD
+
+    private PluginManager pluginManager; // NOPMD
+    private URL obrBase; // NOPMD
+
     public ObrStoreImpl(URL obrBase) {
-        m_obrBase = obrBase;
+        this.obrBase = obrBase;
     }
-    
+
     @Override
     public Resource put(Resource resource) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
 
 ////        m_repositoryAdmin.listRepositories()[0].getURL();
-//        
+//
 //        if (m_obrBase == null) {
 //            throw new IOException("There is no storage available for this artifact.");
 //        }
@@ -105,23 +105,23 @@ public class ObrStoreImpl implements Store {
     public Resource[] get(String filter) {
         throw new UnsupportedOperationException("Not supported yet.");
 //        org.osgi.service.obr.Resource[] resources = m_repositoryAdmin.discoverResources(filter);
-        
+
 //        Resource[] resources = new Resource[resources.length];
-        
+
 //        for (int i = 0; i < resources.length; i++) {
 //            Resource resource;
 //            resource = new ResourceExtImpl(resources[i]);
-            
+
 //            String url = resource.getURL().toString() + RESOURCE_METADATA_FILE_EXTENSION;
 //            try {
 //                resource.setMetadataURL(new URL(url));
 //            } catch (MalformedURLException e) {
 //                logger.warn("Could not add metadata URL to ResourceExt: " + url, e);
 //            }
-            
+
 //            resources[i] = resource;
 //        }
-        
+
 //        return resources;
     }
 
@@ -131,13 +131,17 @@ public class ObrStoreImpl implements Store {
     }
 
     @Override
-    public Repository getRepository() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public void execute(List<Resource> resource, Executable plugin, Properties properties) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public List<Resource> getResources() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

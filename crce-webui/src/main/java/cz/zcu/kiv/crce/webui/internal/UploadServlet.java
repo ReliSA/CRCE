@@ -2,9 +2,6 @@ package cz.zcu.kiv.crce.webui.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,10 +16,9 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 /**
  *
@@ -33,22 +29,22 @@ public class UploadServlet extends HttpServlet {
     private static final long serialVersionUID = -7359560802937893940L;
 
     private static final Logger logger = LoggerFactory.getLogger(UploadServlet.class);
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean failed = false;
 
         if (req.getParameter("uri") != null) {
             Buffer buffer = Activator.instance().getBuffer(req);
-            Resource[] array = buffer.getRepository().getResources();
-            String uriParam = req.getParameter("uri");
+//            List<Resource> resources = buffer.getResources();
+//            String uriParam = req.getParameter("uri");
             try {
-                URI uri = new URI(uriParam);
-                Resource found = EditServlet.findResource(uri, array);
+//                URI uri = new URI(uriParam);
+//                Resource found = EditServlet.findResource(uri, resources);
                 buffer.commit(true); //TODO! Bad API -> Resources should be committed one by one
-            } catch (URISyntaxException e) {
-                logger.error("Invalid URI syntax", e);
-                failed = true;
+//            } catch (URISyntaxException e) {
+//                logger.error("Invalid URI syntax", e);
+//                failed = true;
             } catch (IOException e) {
                 logger.error("Could not commit", e);
                 failed = true;
@@ -97,11 +93,9 @@ public class UploadServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         boolean success = true;
         String message;
-        List<String> reasons = new ArrayList<>();
-        StringBuilder builder = new StringBuilder();
         if (ServletFileUpload.isMultipartContent(req)) {
             ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
-            List fileItemsList;
+            List<?> fileItemsList;
             try {
                 fileItemsList = servletFileUpload.parseRequest(req);
             } catch (FileUploadException e) {
@@ -113,29 +107,14 @@ public class UploadServlet extends HttpServlet {
             for (Object o : fileItemsList) {
                 FileItem fi = (FileItem) o;
 
-                if (fi.isFormField()) {
-                    // do nothing
-                } else {
+                if (!fi.isFormField()) {
                     String fileName = fi.getName();
                     try (InputStream is = fi.getInputStream()) {
                         try {
-                            if (Activator.instance().getBuffer(req).put(fileName, is) == null) {
-                                success = false;
-                            }
-                        } catch (RevokedArtifactException ex) {
+                            Activator.instance().getBuffer(req).put(fileName, is);
+                        } catch (RefusedArtifactException ex) {
                             logger.warn("Artifact revoked: ", ex.getMessage());
                             success = false;
-                            builder.setLength(0); //reset the StringBuilder
-                            switch (ex.getReason()) {
-                                case ALREADY_IN_BUFFER:
-                                    builder.append("Couldn't upload file: ");
-                                    builder.append(fileName);
-                                    builder.append(". The buffer already contains resource with the same symbolic name.");
-                                    reasons.add(builder.toString());
-                                    break;
-                                default:
-                                    break;
-                            }
                         }
                     }
                 }
@@ -143,8 +122,7 @@ public class UploadServlet extends HttpServlet {
         } else {
             success = false;
         }
-
-        String metadataIndexerResult = "";
+        StringBuilder metadataIndexerResult = new StringBuilder();
         if (success) {
             message = "Upload was succesful.";
 
@@ -152,19 +130,12 @@ public class UploadServlet extends HttpServlet {
             if (!indexerResult.isEmpty()) {
                 String[] metadataIndexerMessages = indexerResult.getMessages();
                 for (String indexerMessage : metadataIndexerMessages) {
-                    metadataIndexerResult += "<BR>" + indexerMessage;
+                    metadataIndexerResult.append("<BR>").append(indexerMessage);
                 }
                 indexerResult.removeAllMessages();
             }
         } else {
-            builder.setLength(0); //reset the StringBuilder
-            builder.append("Upload failed.");
-            for(String s : reasons) {
-                builder.append("<BR>");
-                builder.append(s);
-            }
-            message = builder.toString();
-            metadataIndexerResult = "";
+            message = "Upload failed.";
         }
 
         ResourceServlet.setError(req.getSession(), success, message + metadataIndexerResult);

@@ -1,445 +1,253 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.WritableRepository;
 import java.util.List;
-import cz.zcu.kiv.crce.metadata.Property;
-import org.apache.felix.utils.version.VersionTable;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.osgi.framework.Version;
-
-import static org.apache.felix.bundlerepository.Resource.*;
 
 /**
  * Implementation of <code>Resource</code> interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class ResourceImpl extends AbstractPropertyProvider<Resource> implements Resource {
+public class ResourceImpl extends PropertyProviderImpl<Resource> implements Resource, Comparable<Resource> {
 
-    private boolean m_writable;
-    private boolean m_versionStatic;
-    private boolean m_symbolicNameStatic;
-    
-    private final Set<Capability> m_capabilities = new HashSet<Capability>();
-    private final Set<Requirement> m_requirements = new HashSet<Requirement>();
-    private final Set<String> m_categories = new HashSet<String>();
-    
-    private WritableRepository m_repository = null;
-    
-    private transient int m_hash;
+    private static final long serialVersionUID = 2594634894045505360L;
 
-    public ResourceImpl() {
-        m_writable = true;
+    private final String id;
+    private Repository repository = null;
+    /*
+     * All maps:
+     * Key: namespace, value: list of entities.
+     */
+    private final Map<String, List<Capability>> allCapabilities = new HashMap<>();
+    private final Map<String, List<Capability>> rootCapabilities = new HashMap<>();
+    private final Map<String, List<Requirement>> allRequirements = new HashMap<>();
+
+    public ResourceImpl(@Nonnull String id) {
+        this.id = id;
     }
 
     @Override
     public String getId() {
-        return getPropertyString(ID);
+        return id;
     }
 
     @Override
-    public String getSymbolicName() {
-        return getPropertyString(SYMBOLIC_NAME);
+    public Repository getRepository() {
+        return repository;
     }
 
     @Override
-    public Version getVersion() {
-        Property version = getProperty(VERSION);
-        return version == null ? Version.emptyVersion : (Version) version.getConvertedValue();
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public String getPresentationName() {
-        return getPropertyString(PRESENTATION_NAME);
-    }
-
-    @Override
-    public URI getUri() {
-        Property uri = getProperty(URI);
-        return uri == null ? null : (URI) uri.getConvertedValue();
-    }
-
-    @Override
-    public URI getRelativeUri() {
-        URI absolute = getUri();
-        if (absolute == null) {
-            return null;
+    public List<Capability> getCapabilities() {
+        List<Capability> result = new ArrayList<>();
+        for (List<Capability> capabilities : allCapabilities.values()) {
+            result.addAll(capabilities);
         }
-        if (m_repository == null) {
-            return absolute;
+        return result;
+    }
+
+    @Override
+    public List<Capability> getRootCapabilities() {
+        List<Capability> result = new ArrayList<>();
+        for (List<Capability> capabilities : rootCapabilities.values()) {
+            result.addAll(capabilities);
         }
-        URI repo = m_repository.getURI();
-        return repo == null ? absolute : repo.relativize(absolute);
+        return result;
     }
 
     @Override
-    public long getSize() {
-        Property size = getProperty(SIZE);
-        return size == null ? -1 : (Long) size.getConvertedValue();
-    }
-
-    @Override
-    public String[] getCategories() {
-        synchronized (m_categories) {
-            return m_categories.toArray(new String[m_categories.size()]);
+    public List<Capability> getRootCapabilities(String namespace) {
+        List<Capability> capabilities = rootCapabilities.get(namespace);
+        if (capabilities == null) {
+            capabilities = Collections.emptyList();
         }
+        return capabilities;
     }
 
     @Override
-    public Capability[] getCapabilities() {
-        synchronized (m_capabilities) {
-            return m_capabilities.toArray(new Capability[m_capabilities.size()]);
+    public List<Capability> getCapabilities(String namespace) {
+        List<Capability> capabilities = allCapabilities.get(namespace);
+        if (capabilities == null) {
+            capabilities = Collections.emptyList();
         }
-    }
-
-    @Override
-    public Capability[] getCapabilities(String name) {
-        if (name == null) {
-            return getCapabilities();
-        }
-        List<Capability> out = new ArrayList<Capability>();
-        
-        synchronized (m_capabilities) {
-            for (Capability cap : m_capabilities) {
-                if (name.equals(cap.getName())) {
-                    out.add(cap);
-                }
-            }
-        }
-        
-        return out.toArray(new Capability[out.size()]);
-    }
-
-    @Override
-    public Requirement[] getRequirements() {
-        synchronized (m_requirements) {
-            return m_requirements.toArray(new Requirement[m_requirements.size()]);
-        }
-    }
-
-    @Override
-    public Requirement[] getRequirements(String name) {
-        if (name == null) {
-            return getRequirements();
-        }
-        List<Requirement> out = new ArrayList<Requirement>();
-        
-        synchronized (m_requirements) {
-            for (Requirement req : m_requirements) {
-                if (name.equals(req.getName())) {
-                    out.add(req);
-                }
-            }
-        }
-        
-        return out.toArray(new Requirement[out.size()]);
-    }
-
-    @Override
-    public Map<String, String> getPropertiesMap() {
-        Map<String, String> map = new HashMap<String, String>();
-        for (Property p : getProperties()) {
-            map.put(p.getName(), p.getValue());
-        }
-        return map;
-    }
-
-    @Override
-    public boolean hasCategory(String category) {
-        synchronized (m_categories) {
-            return m_categories.contains(category);
-        }
-    }
-
-    @Override
-    public synchronized void setSymbolicName(String name) {
-        setSymbolicName(name, false);
-    }
-    
-    @Override
-    public synchronized void setSymbolicName(String name, boolean isStatic) {
-        if (name != null && isWritable() && !isSymbolicNameStatic()) {
-            WritableRepository r;
-            boolean removed = false;
-            if ((r = m_repository) != null) {
-                removed = m_repository.removeResource(this);
-            }
-            setProperty(SYMBOLIC_NAME, name);
-            setProperty(ID, name + "-" + getVersion());
-            m_hash = 0;
-            m_symbolicNameStatic = isStatic;
-            if (removed && (m_repository = r) != null) {
-                m_repository.addResource(this);
-            }
-        }
-    }
-
-    @Override
-    public synchronized void setVersion(Version version) {
-        setVersion(version, false);
-    }
-
-    @Override
-    public synchronized void setVersion(Version version, boolean isStatic) {
-        if (version != null && isWritable() && !isVersionStatic()) {
-            WritableRepository r;
-            boolean removed = false;
-            if ((r = m_repository) != null) {
-                removed = m_repository.removeResource(this);
-            }
-            setProperty(VERSION, version);
-            setProperty(ID, getSymbolicName() + "-" + version);
-            m_hash = 0;
-            m_versionStatic = isStatic;
-            if (removed && (m_repository = r) != null) {
-                m_repository.addResource(this);
-            }
-        }
-    }
-
-
-    @Override
-    public synchronized void setVersion(String version) {
-        setVersion(version, false);
-    }
-
-    @Override
-    public synchronized void setVersion(String version, boolean isStatic) {
-        setVersion(VersionTable.getVersion(version), isStatic);
-    }
-
-    @Override
-    public void addCategory(String category) {
-        if (isWritable() && category != null && !"".equals(category.trim())) {
-            synchronized (m_categories) {
-                m_categories.add(category);
-            }
-        }
-    }
-
-    @Override
-    public void addCapability(Capability capability) {
-        if (isWritable() && capability != null) {
-            synchronized (m_capabilities) {
-                m_capabilities.add(capability);
-            }
-        }
-    }
-
-    @Override
-    public void addRequirement(Requirement requirement) {
-        if (isWritable() && requirement != null) {
-            synchronized (m_requirements) {
-                m_requirements.add(requirement);
-            }
-        }
-    }
-
-    @Override
-    public Capability createCapability(String name) {
-        Capability c = new CapabilityImpl(name);
-        if (isWritable()) {
-            synchronized (m_capabilities) {
-                m_capabilities.add(c);
-            }
-        }
-        return c;
-    }
-
-    @Override
-    public Requirement createRequirement(String name) {
-        Requirement r = new RequirementImpl(name);
-        if (isWritable()) {
-            synchronized (m_requirements) {
-                m_requirements.add(r);
-            }
-        }
-        return r;
-    }
-
-    @Override
-    public void unsetCategory(String category) {
-        if (isWritable()) {
-            synchronized (m_categories) {
-                m_categories.remove(category);
-            }
-        }
-    }
-
-    @Override
-    public void unsetCapability(Capability capability) {
-        if (isWritable()) {
-            synchronized (m_capabilities) {
-                m_capabilities.remove(capability);
-            }
-        }
-    }
-
-    @Override
-    public void unsetRequirement(Requirement requirement) {
-        if (isWritable()) {
-            synchronized (m_requirements) {
-                m_requirements.remove(requirement);
-            }
-        }
+        return capabilities;
     }
 
     @Override
     public boolean hasCapability(Capability capability) {
-        synchronized (m_capabilities) {
-            return m_capabilities.contains(capability);
+        List<Capability> capabilities = allCapabilities.get(capability.getNamespace());
+        if (capabilities != null) {
+            return capabilities.contains(capability);
         }
+        return false;
+    }
+
+    @Override
+    public void addCapability(Capability capability) {
+        List<Capability> capabilities = allCapabilities.get(capability.getNamespace());
+        if (capabilities == null) {
+            capabilities = new ArrayList<>();
+            allCapabilities.put(capability.getNamespace(), capabilities);
+        }
+        capabilities.add(capability);
+    }
+
+    @Override
+    public void addRootCapability(Capability capability) {
+        List<Capability> capabilities = rootCapabilities.get(capability.getNamespace());
+        if (capabilities == null) {
+            capabilities = new ArrayList<>();
+            rootCapabilities.put(capability.getNamespace(), capabilities);
+        }
+        capabilities.add(capability);
+    }
+
+    @Override
+    public void removeCapability(Capability capability) {
+        List<Capability> roots = allCapabilities.get(capability.getNamespace());
+        if (roots != null) {
+            roots.remove(capability);
+        }
+    }
+
+    @Override
+    public void removeRootCapability(Capability capability) {
+        List<Capability> all = rootCapabilities.get(capability.getNamespace());
+        if (all != null) {
+            all.remove(capability);
+        }
+    }
+
+    @Override
+    public List<Requirement> getRequirements() {
+        List<Requirement> result = new ArrayList<>();
+        for (List<Requirement> requirements : allRequirements.values()) {
+            result.addAll(requirements);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Requirement> getRequirements(String namespace) {
+        List<Requirement> result = allRequirements.get(namespace);
+        if (result == null) {
+            result = Collections.emptyList();
+        }
+        return result;
     }
 
     @Override
     public boolean hasRequirement(Requirement requirement) {
-        synchronized (m_requirements) {
-            return m_requirements.contains(requirement);
+        List<Requirement> requirements = allRequirements.get(requirement.getNamespace());
+        if (requirements != null) {
+            return requirements.contains(requirement);
         }
+        return false;
     }
 
     @Override
-    public boolean isWritable() {
-        return m_writable;
+    public void addRequirement(Requirement requirement) {
+        List<Requirement> requirements = allRequirements.get(requirement.getNamespace());
+        if (requirements == null) {
+            requirements = new ArrayList<>();
+            allRequirements.put(requirement.getNamespace(), requirements);
+        }
+        requirements.add(requirement);
     }
 
     @Override
-    public void setPresentationName(String name) {
-        if (isWritable()) {
-            setProperty(PRESENTATION_NAME, name);
+    public void removeRequirement(Requirement requirement) {
+        List<Requirement> requirements = allRequirements.get(requirement.getNamespace());
+        if (requirements != null) {
+            requirements.remove(requirement);
         }
-    }
-
-    @Override
-    public void setSize(long size) {
-        if (isWritable()) {
-            if (size < 0) {
-                throw new IllegalArgumentException("Size can't be less than zero: " + size);
-            }
-            setProperty(SIZE, size);
-        }
-    }
-
-    @Override
-    public void setUri(URI uri) {
-        if (isWritable()) {
-            setProperty(URI, uri);
-        }
-    }
-    
-    @Override
-    public String toString() {
-        return getSymbolicName() + "-" + getVersion().toString();
-    }
-
-    @Override
-    public String asString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("ID                : ").append(getId()).append("\n");
-        sb.append("Symbolic name     : ").append(getSymbolicName()).append("\n");
-        sb.append("Version           : ").append(getVersion()).append("\n");
-        sb.append("Presentation name : ").append(getPresentationName()).append("\n");
-        sb.append("Size              : ").append(getSize()).append("\n");
-        sb.append("URI               : ").append(getUri()).append("\n");
-        sb.append("Categories:\n");
-        for (String cat : getCategories()) {
-            sb.append("  ").append(cat).append("\n");
-        }
-        sb.append("Capabilities:\n");
-        for (Capability cap : getCapabilities()) {
-            sb.append("  ").append(cap.getName()).append("\n");
-            for (Property prop : cap.getProperties()) {
-                sb.append("    ").append(prop.getName()).append("[").append(prop.getType()).append("]: ").append(prop.getValue()).append("\n");
-            }
-        }
-        sb.append("Requirements:\n");
-        for (Requirement req : getRequirements()) {
-            sb.append("  O: ").append(req.isOptional() ? "T" : "F");
-            sb.append("\tM: ").append(req.isMultiple() ? "T" : "F");
-            sb.append("\tE: ").append(req.isExtend() ? "T" : "F");
-            sb.append("\tN: ").append(req.getName());
-            sb.append("\tF: ").append(req.getFilter());
-            sb.append("\tC: ").append(req.getComment());
-            sb.append("\n");
-        }
-        
-        return sb.toString();
-    }
-
-    @Override
-    public void unsetWritable() {
-        m_writable = false;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Resource) {
-            if (getSymbolicName() == null || getVersion() == null) {
-                return this == obj;
-            }
-            return getSymbolicName().equals(((Resource) obj).getSymbolicName())
-                    && getVersion().equals(((Resource) obj).getVersion());
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() == obj.getClass() || obj instanceof Resource) {
+            final Resource other = (Resource) obj;
+            return Objects.equals(this.id, other.getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        if (m_hash == 0) {
-            if (getSymbolicName() == null || getVersion() == null) {
-                m_hash = super.hashCode();
-            } else {
-                m_hash = getSymbolicName().hashCode() ^ getVersion().hashCode();
-            }
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equalsTo(Resource other, EqualityLevel level) {
+        if (other == null) {
+            return false;
         }
-        return m_hash;
-    }
-    
-    protected void setWritable(boolean writable) {
-        m_writable = writable;
-    }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
 
-    protected void setId(String id) {
-        if (isWritable()) {
-            setProperty(ID, id);
-        }
+            case SHALLOW_NO_KEY:
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                return Util.equalsTo(this, other, EqualityLevel.KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getRequirements(), other.getRequirements(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getRequirements(), other.getRequirements(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+
+             default:
+                return equalsTo(other, EqualityLevel.KEY);
+       }
     }
 
     @Override
-    public synchronized void setRepository(WritableRepository repository) {
-        m_repository = repository;
-    }
-    
-    protected WritableRepository getWritableRepository() {
-        return m_repository;
+    public int compareTo(Resource o) {
+        return id.compareTo(o.getId());
     }
 
     @Override
-    public boolean isVersionStatic() {
-        return m_versionStatic;
-    }
-
-    @Override
-    public boolean isSymbolicNameStatic() {
-        return m_symbolicNameStatic;
-    }
-
-    @Override
-    protected Resource getThis() {
-        return this;
-    }
-
-    @Override
-    public Repository getRepository() {
-        return m_repository;
+    public String toString() {
+        return "ResourceImpl{" + "id=" + id + '}';
     }
 }

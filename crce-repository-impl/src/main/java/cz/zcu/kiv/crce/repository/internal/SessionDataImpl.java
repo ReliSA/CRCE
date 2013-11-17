@@ -6,15 +6,15 @@ import org.apache.felix.dm.Component;
 
 /**
  * Implementation of <code>SessionData</code>
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SessionDataImpl implements SessionData {
 
-    Component m_bufferComponent;
-    Buffer m_buffer;
+    Component bufferComponent;
+    Buffer buffer;
 
     @Override
     public Buffer getBuffer() {
-        return m_buffer;
+        return buffer;
     }
 }

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResourceMapper">
+
+    <!-- Resource -->
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource" id="resourceResultMap">
+        <id property="resourceId" column="resource_id"/>
+        <id property="repositoryId" column="repository_id"/>
+        <id property="id" column="id"/>
+        <id property="uri" column="uri"/>
+    </resultMap>
+    <select id="selectResourceByUri" parameterType="String" resultMap="resourceResultMap">
+        SELECT resource_id, id, uri
+        FROM resource
+        WHERE uri = #{uri}
+    </select>
+
+    <select id="selectResourcesByRepositoryId" parameterType="Long" resultMap="resourceResultMap">
+        SELECT resource_id, id, uri
+        FROM resource
+        WHERE repository_id = #{repositoryId}
+    </select>
+
+    <!-- Capability -->
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="capabilityResultMap">
+        <id column="capability_id" property="capabilityId"/>
+        <id column="parent_capability_id" property="parentCapabilityId"/>
+        <id column="resource_id" property="resourceId"/>
+        <id column="level" property="level"/>
+        <id column="id" property="id"/>
+        <id column="namespace" property="namespace"/>
+    </resultMap>
+    <select id="selectCapabilities" parameterType="Long" resultMap="capabilityResultMap">
+        SELECT capability_id, parent_capability_id, resource_id, level, id, namespace
+        FROM capability
+        WHERE resource_id = #{resourceId}
+        ORDER BY level
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="capabilityAttributesResultMap">
+        <id column="capability_id" property="entityId"/>
+        <id column="name" property="name"/>
+        <id column="list_index" property="listIndex"/>
+        <id column="type" property="type"/>
+        <id column="operator" property="operator"/>
+        <id column="string_value" property="stringValue"/>
+        <id column="long_value" property="longValue"/>
+        <id column="double_value" property="doubleValue"/>
+        <id column="version_major_value" property="versionMajorValue"/>
+        <id column="version_minor_value" property="versionMinorValue"/>
+        <id column="version_micro_value" property="versionMicroValue"/>
+    </resultMap>
+    <select id="selectCapabilityAttributes" parameterType="Long" resultMap="capabilityAttributesResultMap">
+        SELECT capability_id, name, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        FROM capability_attribute
+        WHERE capability_id = #{capabilityId}
+        ORDER BY name, list_index
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="capabilityDirectivesResultMap">
+        <id column="capability_id" property="entityId"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+    </resultMap>
+    <select id="selectCapabilityDirectives" parameterType="Long" resultMap="capabilityDirectivesResultMap">
+        SELECT capability_id, name, value
+        FROM capability_directive
+        WHERE capability_id = #{requirementId}
+    </select>
+
+    <!-- Requirement -->
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="requirementResultMap">
+        <id column="requirement_id" property="requirementId"/>
+        <id column="parent_requirement_id" property="parentRequirementId"/>
+        <id column="resource_id" property="resourceId"/>
+        <id column="level" property="level"/>
+        <id column="id" property="id"/>
+        <id column="namespace" property="namespace"/>
+    </resultMap>
+    <select id="selectRequirements" parameterType="Long" resultMap="requirementResultMap">
+        SELECT requirement_id, parent_requirement_id, resource_id, level, id, namespace
+        FROM requirement
+        WHERE resource_id = #{resourceId}
+        ORDER BY level
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="requirementAttributesResultMap">
+        <id column="requirement_id" property="entityId"/>
+        <id column="name" property="name"/>
+        <id column="attribute_index" property="attributeIndex"/>
+        <id column="list_index" property="listIndex"/>
+        <id column="type" property="type"/>
+        <id column="operator" property="operator"/>
+        <id column="string_value" property="stringValue"/>
+        <id column="long_value" property="longValue"/>
+        <id column="double_value" property="doubleValue"/>
+        <id column="version_major_value" property="versionMajorValue"/>
+        <id column="version_minor_value" property="versionMinorValue"/>
+        <id column="version_micro_value" property="versionMicroValue"/>
+    </resultMap>
+    <select id="selectRequirementAttributes" parameterType="Long" resultMap="requirementAttributesResultMap">
+        SELECT requirement_id, name, attribute_index, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        FROM requirement_attribute
+        WHERE requirement_id = #{requirementId}
+        ORDER BY name, attribute_index, list_index
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="requirementDirectivesResultMap">
+        <id column="requirement_id" property="entityId"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+    </resultMap>
+    <select id="selectRequirementDirectives" parameterType="Long" resultMap="requirementDirectivesResultMap">
+        SELECT requirement_id, name, value
+        FROM requirement_directive
+        WHERE requirement_id = #{requirementId}
+    </select>
+
+
+
+
+<!--    <resultMap  id="resourcemap" type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        <id column="id" property="id" />
+    </resultMap>
+    <select id="getResource" parameterType="int" resultMap="resourcemap">
+        select id
+        from resource
+        where internal_id = #{id}
+    </select>
+
+    <select id="getResources" resultMap="resourcemap">
+        select *
+        from resource
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource" id="resourcemap2">
+        <id property="internal_id" column="internal_id" />
+    </resultMap>
+    <select id="getResourceID" parameterType="String" resultMap="resourcemap2">
+        select internal_id
+        from resource
+        where id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="resourcemap3">
+        <id column="internal_id" property="internal_id"/>
+    </resultMap>
+    <select id="getCapabilityID" parameterType="String" resultMap="resourcemap3">
+        select internal_id
+        from capability
+        where id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="resourcemap4">
+        <id column="internal_id" property="internal_id"/>
+    </resultMap>
+    <select id="getRequirementID" parameterType="String" resultMap="resourcemap4">
+        select internal_id
+        from requirement
+        where id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="resourcemap1">
+        <id column="internal_id" property="internal_id"/>
+        <id column="id" property="id"/>
+        <id column="namespace" property="namespace"/>
+        <id column="capability_id" property="capability_id"/>
+    </resultMap>
+    <select id="getCapability" parameterType="int" resultMap="resourcemap1">
+        select internal_id, id, namespace, capability_id
+        from capability
+        where resource_id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="resourcemap5">
+        <id column="internal_id" property="internal_id"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+    </resultMap>
+    <select id="getCapabilityDirective" parameterType="int" resultMap="resourcemap5">
+        select internal_id, name, value
+        from cap_directive
+        where capability_id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="resourcemap6">
+        <id column="internal_id" property="internal_id"/>
+        <id column="type" property="type"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+        <id column="operator" property="operator"/>
+    </resultMap>
+    <select id="getCapabilityAttribute" parameterType="int" resultMap="resourcemap6">
+        select internal_id, type, name, value, operator
+        from cap_attribute
+        where capability_id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="resourcemap7">
+        <id column="internal_id" property="internal_id"/>
+        <id column="id" property="id"/>
+        <id column="namespace" property="namespace"/>
+        <id column="requirement_id" property="requirement_id"/>
+    </resultMap>
+    <select id="getRequirement" parameterType="int" resultMap="resourcemap7">
+        select internal_id, id, namespace, requirement_id
+        from requirement
+        where resource_id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="resourcemap8">
+        <id column="internal_id" property="internal_id"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+    </resultMap>
+    <select id="getRequirementDirective" parameterType="int" resultMap="resourcemap8">
+        select internal_id, name, value
+        from req_directive
+        where requirement_id = #{id}
+    </select>
+
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="resourcemap9">
+        <id column="internal_id" property="internal_id"/>
+        <id column="type" property="type"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+        <id column="operator" property="operator"/>
+    </resultMap>
+    <select id="getRequirementAttribute" parameterType="int" resultMap="resourcemap9">
+        select internal_id, type, name, value, operator
+        from req_attribute
+        where requirement_id = #{id}
+    </select>
+    -->
+
+    <delete id="deleteResource" parameterType="Long">
+        DELETE FROM resource WHERE resource_id = #{id}
+    </delete>
+
+    <!-- Inserts -->
+
+    <insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        insert into resource (resource_id, repository_id, id, uri) values (
+          #{resourceId}, #{repositoryId}, #{id}, #{uri}
+        )
+    </insert>
+
+    <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability">
+        insert into capability (capability_id, parent_capability_id, resource_id, level, id, namespace) values (
+          #{capabilityId}, #{parentCapabilityId}, #{resourceId}, #{level}, #{id}, #{namespace}
+        )
+    </insert>
+
+    <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
+        insert into requirement (requirement_id, parent_requirement_id, resource_id, level, id, namespace) values (
+          #{requirementId}, #{parentRequirementId}, #{resourceId}, #{level}, #{id}, #{namespace}
+        )
+    </insert>
+
+    <insert id="insertCapabilityAttributes" parameterType="java.util.List">
+        INSERT INTO capability_attribute (
+          capability_id, name, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        ) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.listIndex, jdbcType=SMALLINT},
+            #{item.type, jdbcType=SMALLINT},
+            #{item.operator, jdbcType=SMALLINT},
+            #{item.stringValue, jdbcType=VARCHAR},
+            #{item.longValue, jdbcType=BIGINT},
+            #{item.doubleValue, jdbcType=DOUBLE},
+            #{item.versionMajorValue, jdbcType=INTEGER},
+            #{item.versionMinorValue, jdbcType=INTEGER},
+            #{item.versionMicroValue, jdbcType=INTEGER}
+        </foreach>
+    </insert>
+
+    <insert id="insertRequirementAttributes" parameterType="java.util.List">
+        INSERT INTO requirement_attribute (
+          requirement_id, name, attribute_index, list_index, type, operator, string_value, long_value, double_value,
+          version_major_value, version_minor_value, version_micro_value
+        ) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.attributeIndex, jdbcType=SMALLINT},
+            #{item.listIndex, jdbcType=SMALLINT},
+            #{item.type, jdbcType=SMALLINT},
+            #{item.operator, jdbcType=SMALLINT},
+            #{item.stringValue, jdbcType=VARCHAR},
+            #{item.longValue, jdbcType=BIGINT},
+            #{item.doubleValue, jdbcType=DOUBLE},
+            #{item.versionMajorValue, jdbcType=INTEGER},
+            #{item.versionMinorValue, jdbcType=INTEGER},
+            #{item.versionMicroValue, jdbcType=INTEGER}
+        </foreach>
+    </insert>
+
+    <insert id="insertCapabilityDirectives" parameterType="java.util.List">
+        INSERT INTO capability_directive (capability_id, name, value) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.value, jdbcType=VARCHAR},
+        </foreach>
+    </insert>
+
+    <insert id="insertRequirementDirectives" parameterType="java.util.List">
+        INSERT INTO requirement_directive (requirement_id, name, value) VALUES
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator="), (">
+            #{item.entityId, jdbcType=BIGINT},
+            #{item.name, jdbcType=VARCHAR},
+            #{item.value, jdbcType=VARCHAR},
+        </foreach>
+    </insert>
+
+</mapper>

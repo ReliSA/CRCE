@@ -2,10 +2,10 @@ package cz.zcu.kiv.crce.webui.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,19 +13,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.osgi.framework.InvalidSyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
+import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
 
 public class ResourceServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4218424299866417104L;
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
 
     @Override
@@ -55,7 +56,8 @@ public class ResourceServlet extends HttpServlet {
             doGet(req, resp);
         } else if (req.getParameter("filter") != null) {
             String filter = req.getParameter("filter");
-            fillSession(source, req, filter);
+            logger.warn("LDAP filter is not supported yet with new Metadata API, returning all resources for filter: {}", filter);
+            fillSession(source, req, null); // TODO there was filter instead of null in implementation with old metadata
             req.getRequestDispatcher("jsp/" + source + ".jsp").forward(req, resp);
         } else {
             doGet(req, resp);
@@ -67,10 +69,10 @@ public class ResourceServlet extends HttpServlet {
 
         String link = null;
 
-        if (req.getParameter("link") != null && req.getParameter("link") instanceof String) {
+        if (req.getParameter("link") != null) {
             link = req.getParameter("link");
         }
-        
+
         try {
             if (fillSession(link, req, null)) {
                 //resp.sendRedirect("jsp/"+link+".jsp");
@@ -81,7 +83,7 @@ public class ResourceServlet extends HttpServlet {
             }
 
         } catch (ServletException e) {
-            logger.warn("Can't forward: {}", e.getMessage());
+            logger.warn("Can't forward: {}", e);
         } catch (IOException e) {
             logger.error("Can't forward", e);
         }
@@ -98,7 +100,7 @@ public class ResourceServlet extends HttpServlet {
         session.setAttribute("message", message);
     }
 
-    private boolean fillSession(String link, HttpServletRequest req, String filter) {
+    private boolean fillSession(String link, HttpServletRequest req, Requirement filter) {
 
         String errorMessage = filter + " is not a valid filter";
         HttpSession session = req.getSession();
@@ -108,55 +110,69 @@ public class ResourceServlet extends HttpServlet {
         }
         switch (link) {
             case "buffer":
-                Resource[] buffer;
+                List<Resource> bufferResources;
                 if (filter == null) {
-                    buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+                    bufferResources = Activator.instance().getBuffer(req).getResources();
                 } else {
                     try {
-                        buffer = Activator.instance().getBuffer(req).getRepository().getResources(filter);
-                    } catch (InvalidSyntaxException e) {
+                        bufferResources = Activator.instance().getBuffer(req).getResources(filter);
+                    } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        buffer = Activator.instance().getBuffer(req).getRepository().getResources();
+                        bufferResources = Activator.instance().getBuffer(req).getResources();
                     }
                 }
-                session.setAttribute("buffer", buffer);
+                List<ResourceExt> bufferResourcesExt = new ArrayList<>(bufferResources.size());
+                for (Resource resource : bufferResources) {
+                    bufferResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
+                }
+                session.setAttribute("buffer", bufferResourcesExt);
                 return true;
-                
+
             case "plugins":
-                Plugin[] plugins;
+                List<Plugin> plugins;
                 if (filter == null) {
                     plugins = Activator.instance().getPluginManager().getPlugins();
                 } else {
-                    plugins = Activator.instance().getPluginManager().getPlugins(Plugin.class, filter);
+                    plugins = Activator.instance().getPluginManager().getPlugins();
+                    logger.warn("Filtering plugins with new Metadata API is not supported yet, returning all plugins.");
+//                    plugins = Activator.instance().getPluginManager().getPlugins(Plugin.class, filter);
                 }
-                session.setAttribute("plugins", plugins);
+                List<cz.zcu.kiv.crce.webui.internal.custom.Plugin> pluginWrappers = new ArrayList<>(plugins.size());
+                for (Plugin plugin : plugins) {
+                    pluginWrappers.add(new cz.zcu.kiv.crce.webui.internal.custom.Plugin(plugin));
+                }
+                session.setAttribute("plugins", pluginWrappers);
                 return true;
-                
+
             case "store":
-                Resource[] store;
+                List<Resource> storeResources;
                 if (filter == null) {
-                    store = Activator.instance().getStore().getRepository().getResources();
+                    storeResources = Activator.instance().getStore().getResources();
                 } else {
                     try {
-                        store = Activator.instance().getStore().getRepository().getResources(filter);
-                    } catch (InvalidSyntaxException e) {
+                        storeResources = Activator.instance().getStore().getResources(filter);
+                    } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        store = Activator.instance().getStore().getRepository().getResources();
+                        storeResources = Activator.instance().getStore().getResources();
                     }
                 }
-                session.setAttribute("store", store);
+                List<ResourceExt> storeResourcesExt = new ArrayList<>(storeResources.size());
+                for (Resource resource : storeResources) {
+                    storeResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
+                }
+                session.setAttribute("store", storeResourcesExt);
                 return true;
-                
+
             case "tags":
-                Resource[] resources = prepareResourceArray(req, filter);
+                List<Resource> resources = prepareResources(req, filter);
                 ArrayList<Category> categoryList = prepareCategoryList(resources);
-                ArrayList<Resource> filteredResourceList;
+                ArrayList<ResourceExt> filteredResourceList;
 
                 String selectedCategory;
-                if (req.getParameter("tag") != null && req.getParameter("tag") instanceof String) {
+                if (req.getParameter("tag") != null) {
                     selectedCategory = req.getParameter("tag");
 
-                    filteredResourceList = filterResurces(selectedCategory, resources);
+                    filteredResourceList = filterResources(selectedCategory, resources);
 
                 } else {
                     filteredResourceList = null;
@@ -166,7 +182,7 @@ public class ResourceServlet extends HttpServlet {
                 session.setAttribute("categoryList", categoryList);
 
                 return true;
-                
+
             default:
                 return false;
         }
@@ -181,47 +197,48 @@ public class ResourceServlet extends HttpServlet {
      * @param filter possible filter of resources
      * @return array of resources
      */
-    private Resource[] prepareResourceArray(HttpServletRequest req, String filter) {
+    private List<Resource> prepareResources(HttpServletRequest req, Requirement filter) {
         String errorMessage = filter + " is not a valid filter";
         HttpSession session = req.getSession();
-        Resource[] storeResources, bufferResources, resources;
-        storeResources = new Resource[0];
-        bufferResources = new Resource[0];
+        List<Resource> storeResources, bufferResources, resources;
+        storeResources = Collections.emptyList();
+        bufferResources = Collections.emptyList();
 
         String sessStoreAtr = (String) session.getAttribute("showStoreTag");
         String sessBufferAtr = (String) session.getAttribute("showBufferTag");
 
         if ("yes".equalsIgnoreCase(sessStoreAtr)) {
             if (filter == null) {
-                storeResources = Activator.instance().getStore().getRepository().getResources();
+                storeResources = Activator.instance().getStore().getResources();
             } else {
                 try {
-                    storeResources = Activator.instance().getStore().getRepository().getResources(filter);
-                } catch (InvalidSyntaxException e) {
+                    storeResources = Activator.instance().getStore().getResources(filter);
+                } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
                     setError(session, false, errorMessage);
-                    storeResources = Activator.instance().getStore().getRepository().getResources();
+                    storeResources = Activator.instance().getStore().getResources();
                 }
             }
         }
 
         if ("yes".equals(sessBufferAtr)) {
             if (filter == null) {
-                bufferResources = Activator.instance().getBuffer(req).getRepository().getResources();
+                bufferResources = Activator.instance().getBuffer(req).getResources();
             } else {
                 try {
-                    bufferResources = Activator.instance().getBuffer(req).getRepository().getResources(filter);
-                } catch (InvalidSyntaxException e) {
+                    bufferResources = Activator.instance().getBuffer(req).getResources(filter);
+                } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
                     setError(session, false, errorMessage);
-                    bufferResources = Activator.instance().getBuffer(req).getRepository().getResources();
+                    bufferResources = Activator.instance().getBuffer(req).getResources();
                 }
             }
         }
 
         //merge two resources arrays
-        resources = Arrays.copyOf(storeResources, storeResources.length + bufferResources.length);
-        System.arraycopy(bufferResources, 0, resources, storeResources.length, bufferResources.length);
+        resources = new ArrayList<>(storeResources.size() + bufferResources.size());
+        resources.addAll(storeResources);
+        resources.addAll(bufferResources);
 
         return resources;
     }
@@ -233,30 +250,29 @@ public class ResourceServlet extends HttpServlet {
      * @param resources - all resources from the store
      * @return array list of categories
      */
-    private ArrayList<Category> prepareCategoryList(Resource[] resources) {
+    private ArrayList<Category> prepareCategoryList(List<Resource> resources) {
 
         HashMap<String, Integer> categoryMap = new HashMap<>();
 
         for (Resource resource : resources) {
-            String[] categories = resource.getCategories();
+            List<String> categories = Activator.instance().getMetadataService().getCategories(resource);
             for (String category : categories) {
                 if (categoryMap.containsKey(category)) {
                     //category is already contained, increase count
-                    categoryMap.put(category, new Integer(categoryMap.get(category).intValue() + 1));
+                    categoryMap.put(category, Integer.valueOf(categoryMap.get(category).intValue() + 1));
                 } else {
                     //add new category
-                    categoryMap.put(category, new Integer(1));
+                    categoryMap.put(category, 1);
                 }
             }
         }
 
         ArrayList<Category> categoryList = new ArrayList<>();
-        Set<String> categorySet = categoryMap.keySet();
 
-        /*Get categories from map to list*/
-        for (String category : categorySet) {
-            Category newCategory = new Category(category);
-            newCategory.setCount(categoryMap.get(category));
+        //Get categories from map to list
+        for (Map.Entry<String, Integer> entry : categoryMap.entrySet()) {
+            Category newCategory = new Category(entry.getKey());
+            newCategory.setCount(entry.getValue());
             categoryList.add(newCategory);
         }
 
@@ -275,13 +291,13 @@ public class ResourceServlet extends HttpServlet {
      * @param resources resources
      * @return filtered resources list
      */
-    private ArrayList<Resource> filterResurces(String filterCategory, Resource[] resources) {
-        ArrayList<Resource> filteredResourceList = new ArrayList<>();
+    private ArrayList<ResourceExt> filterResources(String filterCategory, List<Resource> resources) {
+        ArrayList<ResourceExt> filteredResourceList = new ArrayList<>();
         for (Resource resource : resources) {
-            String[] categories = resource.getCategories();
+            List<String> categories = Activator.instance().getMetadataService().getCategories(resource);
             for (String category : categories) {
                 if (category.equals(filterCategory)) {
-                    filteredResourceList.add(resource);
+                    filteredResourceList.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                     break;
                 }
             }

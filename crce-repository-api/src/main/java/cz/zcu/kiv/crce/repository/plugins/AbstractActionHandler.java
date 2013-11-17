@@ -1,21 +1,22 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
+import java.util.List;
+import java.util.Properties;
+
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
-import java.util.List;
-import java.util.Properties;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 /**
  * Abstract implementation of <code>ActionHandler</code> which do nothing and
  * it's methods return unmodified argument.
- * 
+ *
  * <p>This class is recommended to be used as superclass for all implementations
  * of <code>ActionHandler</code> so then it's not necessary to implement all
  * methods.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public abstract class AbstractActionHandler extends AbstractPlugin implements ActionHandler {
 
@@ -25,7 +26,7 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+    public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
         return resource;
     }
 
@@ -50,12 +51,12 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RefusedArtifactException {
         return name;
     }
 
     @Override
-    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
+    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
         return resource;
     }
 
@@ -100,12 +101,12 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     }
 
     @Override
-    public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
+    public Resource beforePutToStore(Resource resource, Store store) throws RefusedArtifactException {
         return resource;
     }
 
     @Override
-    public Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException {
+    public Resource afterPutToStore(Resource resource, Store store) throws RefusedArtifactException {
         return resource;
     }
 
@@ -118,5 +119,4 @@ public abstract class AbstractActionHandler extends AbstractPlugin implements Ac
     public Resource afterDownloadFromStore(Resource resource, Store store) {
         return resource;
     }
-
 }

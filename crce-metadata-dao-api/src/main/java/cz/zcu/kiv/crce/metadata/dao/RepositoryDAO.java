@@ -1,33 +1,41 @@
 package cz.zcu.kiv.crce.metadata.dao;
 
-import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.WritableRepository;
-import cz.zcu.kiv.crce.plugin.Plugin;
 import java.io.IOException;
 import java.net.URI;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import cz.zcu.kiv.crce.metadata.Repository;
 
 /**
  * This type of plugin defines DAO class for reading and storing the metadata of
  * a repository.
- * 
- * 
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ *
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface RepositoryDAO extends Plugin {
+public interface RepositoryDAO {
 
     /**
      * Reads metadata of resources stored in repository on the given URI.
      * @param uri Path to repository or a repository identificator.
-     * @return Writable 
-     * @throws IOException 
+     * @return Loaded repository or null if such repository doesn't exist.
+     * @throws IOException
      */
-    WritableRepository getRepository(URI uri) throws IOException;
-    
+    @CheckForNull
+    Repository loadRepository(@Nonnull URI uri) throws IOException;
+
+    /**
+     * Deletes existing repository (if it exists) including all contained resources.
+     * @param repository
+     * @throws IOException
+     */
+    void deleteRepository(@Nonnull Repository repository) throws IOException;
+
     /**
      * Stores metadata of resources stored in the given repository. Typical
      * target is a repository.xml in the root folder of the repository.
      * @param repository
-     * @throws IOException 
+     * @throws IOException
      */
-    void saveRepository(Repository repository) throws IOException;
+    void saveRepository(@Nonnull Repository repository) throws IOException;
 }

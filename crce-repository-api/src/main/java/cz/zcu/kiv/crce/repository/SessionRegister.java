@@ -1,29 +1,32 @@
 package cz.zcu.kiv.crce.repository;
 
+import javax.annotation.Nonnull;
+
 /**
  * Implementing class of this interface can instantiate and register Buffer.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface SessionRegister {
-    
-    public static final String SERVICE_SESSION_ID = "service.sid";
+
+    String SERVICE_SESSION_ID = "service.sid";
 
     /**
      * Registers session data with Buffer for given ID.
-     * @param sessionId 
+     * @param sessionId
      */
-    void registerSession(String sessionId);
+    void registerSession(@Nonnull String sessionId);
 
     /**
      * Unregisters and erase session data with Buffer for given ID.
-     * @param sessionId 
+     * @param sessionId
      */
-    void unregisterSession(String sessionId);
-    
+    void unregisterSession(@Nonnull String sessionId);
+
     /**
      * Registers session data with Buffer for given ID and returns it.
      * @param sessionId
-     * @return 
+     * @return
      */
-    SessionData getSessionData(String sessionId);
+    @Nonnull
+    SessionData getSessionData(@Nonnull String sessionId);
 }

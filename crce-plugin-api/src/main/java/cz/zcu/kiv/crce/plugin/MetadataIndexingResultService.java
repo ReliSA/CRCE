@@ -13,6 +13,8 @@ package cz.zcu.kiv.crce.plugin;
  * But indexer module can through this interface provide information about itself
  * to others modules or to module with GUI. So target (crce-webui) module
  * can take out result information and display it on the website.
+ *
+ * TODO Move this interface to higher-level module (not low-level API).
  */
 public interface MetadataIndexingResultService {
 

@@ -1,156 +1,228 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import cz.zcu.kiv.crce.metadata.Capability;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
+import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import java.util.regex.Pattern;
-import org.apache.felix.utils.filter.FilterImpl;
-import org.osgi.framework.InvalidSyntaxException;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Implementation of Requirement interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class RequirementImpl implements Requirement {
+public class RequirementImpl extends DirectiveProviderImpl implements Requirement, Comparable<Requirement> {
 
-    private static final Pattern REMOVE_LT = Pattern.compile("\\(([^<>=~()]*)<([^*=]([^\\\\\\*\\(\\)]|\\\\|\\*|\\(|\\))*)\\)");
-    private static final Pattern REMOVE_GT = Pattern.compile("\\(([^<>=~()]*)>([^*=]([^\\\\\\*\\(\\)]|\\\\|\\*|\\(|\\))*)\\)");
-    private static final Pattern REMOVE_NV = Pattern.compile("\\(version>=0.0.0\\)");
-    private String m_name;
-    private boolean m_multiple = false;
-    private boolean m_optional = false;
-    private boolean m_extend = false;
-    private String m_comment = "";
-    private FilterImpl m_filter = null;
-    private boolean m_writable = true;
+    private static final long serialVersionUID = -2992854704112505654L;
 
-    public RequirementImpl(String name) {
-        m_name = name.intern();
+    private final String id;
+    private final List<Requirement> children = new ArrayList<>();
+    protected final Map<String, List<Attribute<?>>> attributesMap = new HashMap<>();
+
+    private String namespace = null;
+    private Resource resource = null;
+    private Requirement parent = null;
+
+    public RequirementImpl(@Nonnull String namespace, @Nonnull String id) {
+        this.namespace = namespace.intern();
+        this.id = id;
     }
 
     @Override
-    public String getName() {
-        return m_name;
+    public String getId() {
+        return id;
     }
 
     @Override
-    public String getFilter() {
-        return m_filter.toString();
+    public String getNamespace() {
+        return namespace;
     }
 
     @Override
-    public boolean isMultiple() {
-        return m_multiple;
+    public Resource getResource() {
+        return resource;
     }
 
     @Override
-    public boolean isOptional() {
-        return m_optional;
+    public void setResource(Resource resource) {
+        this.resource = resource;
     }
 
     @Override
-    public boolean isExtend() {
-        return m_extend;
+    public Requirement getParent() {
+        return parent;
     }
 
     @Override
-    public String getComment() {
-        return m_comment;
+    public boolean setParent(Requirement parent) {
+        this.parent = parent;
+        return true;
     }
 
     @Override
-    public synchronized Requirement setFilter(String filter) {
-        if (isWritable()) {
-            try {
-                String nf = REMOVE_LT.matcher(filter).replaceAll("(!($1>=$2))");
-                nf = REMOVE_GT.matcher(nf).replaceAll("(!($1<=$2))");
-                nf = REMOVE_NV.matcher(nf).replaceAll("");
-                m_filter = FilterImpl.newInstance(nf, true);
-            } catch (InvalidSyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-        return this;
+    public boolean addChild(Requirement requirement) {
+        return children.add(requirement);
     }
 
     @Override
-    public synchronized Requirement setMultiple(boolean multiple) {
-        if (isWritable()) {
-            m_multiple = multiple;
-        }
-        return this;
+    public boolean removeChild(Requirement requirement) {
+        return children.remove(requirement);
     }
 
     @Override
-    public synchronized Requirement setOptional(boolean optional) {
-        if (isWritable()) {
-            m_optional = optional;
-        }
-        return this;
+    public List<Requirement> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     @Override
-    public synchronized Requirement setExtend(boolean extend) {
-        if (isWritable()) {
-            m_extend = extend;
-        }
-        return this;
+    public <T> boolean addAttribute(AttributeType<T> type, T value) {
+        return addAttribute(type, value, Operator.EQUAL);
     }
 
     @Override
-    public synchronized Requirement setComment(String comment) {
-        if (isWritable()) {
-            m_comment = comment;
-        }
-        return this;
+    public <T> boolean addAttribute(AttributeType<T> type, T value, Operator operator) {
+        Attribute<T> attribute = new AttributeImpl<>(type, value, operator != null ? operator : Operator.EQUAL);
+        return addAttribute(attribute);
     }
 
     @Override
-    public synchronized boolean isWritable() {
-        return m_writable;
+    public <T> boolean addAttribute(String name, Class<T> type, T value, Operator operator) {
+        AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
+        return addAttribute(attributeType, value, operator);
     }
 
     @Override
-    public boolean isSatisfied(Capability capability) {
-        if (capability instanceof CapabilityImpl) {
-            return m_name.equals(capability.getName())
-                    && m_filter.matchCase(((CapabilityImpl) capability).m_map)
-                    && (m_filter.toString().indexOf("(mandatory:<*") >= 0 || ((CapabilityImpl) capability).m_map.get("mandatory:") == null);
-        }
-        throw new UnsupportedOperationException("Other implementation of Metadata API is not supported");
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RequirementImpl other = (RequirementImpl) obj;
-        if ((this.m_name == null) ? (other.m_name != null) : !this.m_name.equals(other.m_name)) {
-            return false;
-        }
-        if (this.m_multiple != other.m_multiple) {
-            return false;
-        }
-        if (this.m_optional != other.m_optional) {
-            return false;
-        }
-        if (this.m_extend != other.m_extend) {
-            return false;
-        }
-        if ((this.m_filter == null) ? (other.m_filter != null) : !this.m_filter.equals(other.m_filter)) {
-            return false;
+    public <T> boolean addAttribute(Attribute<T> attribute) {
+        AttributeType<T> type = attribute.getAttributeType();
+        List<Attribute<?>> attributes = attributesMap.get(type.getName());
+        if (attributes == null) {
+            attributes = new ArrayList<>();
+            attributes.add(attribute);
+            attributesMap.put(type.getName(), attributes);
+        } else if (!attributes.contains(attribute)) {
+            attributes.add(attribute);
         }
         return true;
     }
 
     @Override
+    public List<Attribute<?>> getAttributes() {
+        List<Attribute<?>> result = new ArrayList<>();
+        for (List<Attribute<?>> list : attributesMap.values()) {
+            result.addAll(list);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, List<Attribute<?>>> getAttributesMap() {
+        return Collections.unmodifiableMap(attributesMap);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> List<Attribute<T>> getAttributes(AttributeType<T> type) {
+        List<Attribute<?>> attributes = attributesMap.get(type.getName());
+        if (attributes == null) {
+            return Collections.emptyList();
+        }
+        return (List<Attribute<T>>) (List) attributes;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() == obj.getClass() || obj instanceof Requirement) {
+            final Requirement other = (Requirement) obj;
+            return Objects.equals(this.id, other.getId());
+        }
+        return false;
+    }
+
+    @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 23 * hash + (this.m_name != null ? this.m_name.hashCode() : 0);
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.id);
         return hash;
     }
-    
+
+    @Override
+    public boolean equalsTo(Requirement other, EqualityLevel level) {
+        if (other == null) {
+            return false;
+        }
+        switch (level) {
+            case KEY:
+                return id.equals(other.getId());
+
+            case SHALLOW_NO_KEY:
+                if (!Objects.equals(this.namespace, other.getNamespace())) {
+                    return false;
+                }
+                if (!Objects.equals(this.attributesMap, other.getAttributesMap())) {
+                    return false;
+                }
+                if (!Objects.equals(this.directivesMap, other.getDirectives())) {
+                    return false;
+                }
+                return true;
+
+            case SHALLOW_WITH_KEY:
+                if (!this.equalsTo(other, EqualityLevel.KEY)) {
+                    return false;
+                }
+                return this.equalsTo(other, EqualityLevel.SHALLOW_NO_KEY);
+
+            case DEEP_NO_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
+                return true;
+
+            case DEEP_WITH_KEY:
+                if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                return true;
+
+            default:
+                return equalsTo(other, EqualityLevel.KEY);
+        }
+
+    }
+
+    @Override
+    public int compareTo(Requirement o) {
+        return id.compareTo(o.getId());
+    }
 }

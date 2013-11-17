@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -15,23 +16,21 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.Type;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
+import cz.zcu.kiv.crce.webui.internal.legacy.Type;
 
 public class EditServlet extends HttpServlet {
 
     private static final long serialVersionUID = -4949620462179710290L;
-    
+
     private static final Logger logger = LoggerFactory.getLogger(EditServlet.class);
-    
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         boolean success = false;
         Map<?, ?> parameters = req.getParameterMap();
@@ -54,7 +53,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "requirements":
                     if (saveRequirements(req, resp, parameters)) {
                         success = editRequirements(req, resp, parameters);
@@ -64,11 +63,10 @@ public class EditServlet extends HttpServlet {
                         }
                     }
                     break;
-                    
+
                 case "addRequirement":
                     if (!addRequirementForm(req, resp, parameters)) {
                         ResourceServlet.setError(req.getSession(), false, "Cannot add requirement.");
-                        success = true;
                     }
                     success = editRequirements(req, resp, parameters);
                     if (!success) {
@@ -76,7 +74,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "capabilities":
                     if (saveCapabilities(req, resp, parameters)) {
                         success = editCapabilities(req, resp, parameters);
@@ -90,7 +88,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "capability":
                     if (saveCapability(req, resp, parameters)) {
                         success = editCapabilities(req, resp, parameters, true);
@@ -103,7 +101,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "property":
                     if (!saveProperty(req, resp, parameters)) {
                         ResourceServlet.setError(req.getSession(), false, "Cannot add property.");
@@ -114,7 +112,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "editProperties":
                     if (!saveResourceProperty(req, resp, parameters)) {
                         ResourceServlet.setError(req.getSession(), false, "Cannot change properties.");
@@ -125,7 +123,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 default:
             }
         }
@@ -134,7 +132,7 @@ public class EditServlet extends HttpServlet {
         }
     }
 
-    private boolean saveResourceProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveResourceProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -144,25 +142,23 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> resources;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                resources = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                resources = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
-            Resource resource = findResource(resURI, array);
-            String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
-            String version = ((String[]) parameters.get("version"))[0];
+            Resource resource = findResource(resURI, resources);
+            // TODO why was the following here:
+//            String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
+//            String version = ((String[]) parameters.get("version"))[0];
 
-            resource.setVersion(version);
-            resource.setSymbolicName(symbolicName);
+//            LegacyMetadataHelper.setVersion(Activator.instance().getResourceFactory(), resource, new Version(version));
+//            LegacyMetadataHelper.setSymbolicName(Activator.instance().getResourceFactory(), resource, symbolicName);
 
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
-
+            Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save resource property: {}", e.getMessage());
             return false;
@@ -177,8 +173,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean saveProperty(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         String id;
         if (parameters.containsKey("uri") && parameters.containsKey("capabilityId")) {
@@ -190,28 +185,26 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
             Resource resource = findResource(resURI, array);
-            Capability capability = resource.getCapabilities()[Integer.valueOf(id) - 1];
+            Capability capability = resource.getCapabilities().get(Integer.valueOf(id) - 1);
             String name = ((String[]) parameters.get("name"))[0];
             String type = ((String[]) parameters.get("propertyType"))[0];
-            String value = ((String[]) parameters.get("value"))[0];
+            Object value = ((String[]) parameters.get("value"))[0];
 
             try {
-                capability.setProperty(name, value, Type.getValue(type));
+                capability.setAttribute(new GenericAttributeType(name, type), value);
             } catch (IllegalArgumentException e) {
                 return false;
             }
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
+            Activator.instance().getResourceDAO().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't save property: {}", e.getMessage());
@@ -246,29 +239,27 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 {
                     return false;
                 }
             }
             Resource resource = findResource(resURI, array);
-            int lengthBefore = resource.getCapabilities().length;
-            resource.createCapability(capabilityName);
-            if (lengthBefore == resource.getCapabilities().length) {
+            int lengthBefore = resource.getCapabilities().size();
+            resource.addCapability(Activator.instance().getResourceFactory().createCapability(capabilityName));
+            if (lengthBefore == resource.getCapabilities().size()) {
                 resp.sendRedirect("resource");
                 return false;
             }
 
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
+            Activator.instance().getResourceDAO().saveResource(resource);
 
-            req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().length));
+            req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().size()));
         } catch (URISyntaxException e) {
             logger.warn("Can't save capability: {}", e.getMessage());
             return false;
@@ -283,8 +274,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addRequirementForm(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addRequirementForm(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -295,11 +285,11 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
@@ -316,40 +306,39 @@ public class EditServlet extends HttpServlet {
                 name = ((String[]) parameters.get("name"))[0];
                 filter = ((String[]) parameters.get("filter"))[0];
                 if (parameters.containsKey("multiple")) {
-                    multiple = (((String[]) parameters.get("multiple"))[0]).equals("on");
+                    multiple = ((String[]) parameters.get("multiple"))[0].equals("on");
                 }
                 if (parameters.containsKey("optional")) {
-                    optional = (((String[]) parameters.get("optional"))[0]).equals("on");
+                    optional = ((String[]) parameters.get("optional"))[0].equals("on");
                 }
                 if (parameters.containsKey("extend")) {
-                    extend = (((String[]) parameters.get("extend"))[0]).equals("on");
+                    extend = ((String[]) parameters.get("extend"))[0].equals("on");
                 }
                 String comment = null;
                 if (parameters.containsKey("comment")) {
-                    comment = (((String[]) parameters.get("comment"))[0]);
+                    comment = ((String[]) parameters.get("comment"))[0];
                 }
-                int lengthBefore = resource.getRequirements().length;
-                requir = resource.createRequirement(name);
-                if (lengthBefore == resource.getRequirements().length) {
+                int lengthBefore = resource.getRequirements().size();
+                requir = Activator.instance().getResourceFactory().createRequirement(name);
+                resource.addRequirement(requir);
+                if (lengthBefore == resource.getRequirements().size()) {
                     req.getSession().setAttribute("success", false);
                     req.getSession().setAttribute("message", "Cannot add requirement.");
                     return false;
                 }
                 try {
-                    requir.setFilter(filter);
+                    logger.warn("OSGi filter is not supported yet with new Metadata API, setting as a directive to track it's usage: {}", filter);
+                    requir.setDirective("filter", filter);
                 } catch (IllegalArgumentException e) {
-                    resource.unsetRequirement(requir);
+                    resource.removeRequirement(requir);
                     resource.addRequirement(requirBefore);
                 }
-                requir.setMultiple(multiple);
-                requir.setOptional(optional);
-                requir.setExtend(extend);
-                requir.setComment(comment);
+                requir.setDirective("multiple", String.valueOf(multiple));
+                requir.setDirective("optional", String.valueOf(optional));
+                requir.setDirective("extend", String.valueOf(extend));
+                requir.setDirective("comment", comment);
             }
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
-
+            Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't add requirement: {}", e.getMessage());
             return false;
@@ -360,13 +349,13 @@ public class EditServlet extends HttpServlet {
             logger.error("Can't requirement", e);
             return false;
         }
-        
+
         req.getSession().setAttribute("success", true);
         return true;
 
     }
 
-    private boolean saveCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         int capabilityId = -1;
         String uri;
         if (parameters.containsKey("uri") && parameters.containsKey("capabilityId")) {
@@ -379,11 +368,11 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 {
                     return false;
@@ -391,17 +380,18 @@ public class EditServlet extends HttpServlet {
             }
             Resource resource = findResource(resURI, array);
 
-            Capability capability = resource.getCapabilities()[capabilityId - 1];
-            Property[] properties = capability.getProperties();
-            for (int i = 0; i < properties.length; i++) {
+            Capability capability = resource.getCapabilities().get(capabilityId - 1);
+            List<? extends Attribute<?>> attributes = capability.getAttributes();
+//            Property[] properties = capability.getProperties();
+            for (int i = 0; i < attributes.size(); i++) {
                 String name = ((String[]) parameters.get("name_" + (i + 1)))[0];
                 String type = ((String[]) parameters.get("type_" + (i + 1)))[0];
                 String value = ((String[]) parameters.get("value_" + (i + 1)))[0];
-                Property propBefore = properties[i];
-                int propertiesLengthBefore = properties.length;
-                capability.unsetProperty(properties[i].getName());
+                Attribute<?> propBefore = attributes.get(i);
+                int propertiesLengthBefore = attributes.size();
+                capability.removeAttribute(attributes.get(i).getAttributeType());
 
-                if (propertiesLengthBefore == capability.getProperties().length) {
+                if (propertiesLengthBefore == capability.getAttributes().size()) {
                     req.getSession().setAttribute("success", false);
                     req.getSession().setAttribute("message", "Cannot change property.");
                     logger.debug("Cannot change property, resource: {}", resource);
@@ -409,18 +399,15 @@ public class EditServlet extends HttpServlet {
                 }
 
                 try {
-                    capability.setProperty(name, value, Type.getValue(type));
+                    capability.setAttribute(new GenericAttributeType(name, type), value);
                 } catch (IllegalArgumentException e) {
-                    capability.setProperty(propBefore);
+                    capability.setAttribute(propBefore);
                     req.getSession().setAttribute("success", false);
                     req.getSession().setAttribute("message", "Cannot change property.");
                     logger.warn("Cannot change property, resource: {}, capability: {}", resource, capability);
                 }
             }
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
-
+            Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save capabilities: {}", e.getMessage());
             return false;
@@ -434,7 +421,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean saveRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean saveRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String uri;
         if (parameters.containsKey("uri")) {
             uri = ((String[]) parameters.get("uri"))[0];
@@ -445,17 +432,17 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
             Resource resource = findResource(resURI, array);
 
-            Requirement[] requirements = resource.getRequirements();
+            List<Requirement> requirements = resource.getRequirements();
             int requirLengthBefore = 0;
             String name = null;
             Requirement requir = null;
@@ -465,7 +452,7 @@ public class EditServlet extends HttpServlet {
             boolean extend = false;
             boolean optional = false;
             Requirement requirBefore = null;
-            for (int i = 0; i < requirements.length; i++) {
+            for (int i = 0; i < requirements.size(); i++) {
 
                 if (parameters.containsKey("name_" + (i + 1))
                         && parameters.containsKey("filter_" + (i + 1))) {
@@ -474,47 +461,45 @@ public class EditServlet extends HttpServlet {
                     filter = ((String[]) parameters.get("filter_" + (i + 1)))[0];
 
                     if (parameters.containsKey("multiple_" + (i + 1))) {
-                        multiple = (((String[]) parameters.get("multiple_" + (i + 1)))[0]).equals("on");
+                        multiple = ((String[]) parameters.get("multiple_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("optional_" + (i + 1))) {
-                        optional = (((String[]) parameters.get("optional_" + (i + 1)))[0]).equals("on");
+                        optional = ((String[]) parameters.get("optional_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("extend_" + (i + 1))) {
-                        extend = (((String[]) parameters.get("extend_" + (i + 1)))[0]).equals("on");
+                        extend = ((String[]) parameters.get("extend_" + (i + 1)))[0].equals("on");
                     }
                     if (parameters.containsKey("comment_" + (i + 1))) {
-                        comment = (((String[]) parameters.get("comment_" + (i + 1)))[0]);
+                        comment = ((String[]) parameters.get("comment_" + (i + 1)))[0];
                     }
 //					requirBefore = requirements[i];
-                    requirLengthBefore = requirements.length;
-                    resource.unsetRequirement(requirements[i]);
-                    if (requirLengthBefore == resource.getRequirements().length) {
+                    requirLengthBefore = requirements.size();
+                    resource.removeRequirement(requirements.get(i));
+                    if (requirLengthBefore == resource.getRequirements().size()) {
 //TODO						req.getSession().setAttribute("success", false);
 //TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
                         continue;
                     }
-
-                    requir = resource.createRequirement(name);
+                    requir = Activator.instance().getResourceFactory().createRequirement(name);
+                    resource.addRequirement(requir);
                     try {
-                        requir.setFilter(filter);
+                        logger.warn("OSGi filter is not supported yet with new Metadata API, setting as a directive to track it's usage: {}", filter);
+                        requir.setDirective("filter", filter);
                     } catch (IllegalArgumentException e) {
 //TODO						req.getSession().setAttribute("success", false);
 //TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
-                        resource.unsetRequirement(requir);
+                        resource.removeRequirement(requir);
                         resource.addRequirement(requirBefore);
                         continue;
                     }
-                    requir.setMultiple(multiple);
-                    requir.setOptional(optional);
-                    requir.setExtend(extend);
-                    requir.setComment(comment);
+                    requir.setDirective("multiple", String.valueOf(multiple));
+                    requir.setDirective("optional", String.valueOf(optional));
+                    requir.setDirective("extend", String.valueOf(extend));
+                    requir.setDirective("comment", comment);
 //					resource.addRequirement(requir);
                 }
             }
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
-
+            Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save requirements: {}", e.getMessage());
             return false;
@@ -528,7 +513,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String category = null;
         String uri = null;
         if (parameters.containsKey("category")
@@ -543,29 +528,27 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
             Resource resource = findResource(resURI, array);
 
-            int categoriesLengthBefore = resource.getCategories().length;
-            resource.addCategory(category);
 
-//			Zjištění zda kategorie byla odstraněna.
-            if (categoriesLengthBefore < resource.getCategories().length) {
-            } else {
+            int categoriesLengthBefore = Activator.instance().getMetadataService().getCategories(resource).size();
+            Activator.instance().getMetadataService().addCategory(resource, category);
+
+            // check that category was really added
+            if (categoriesLengthBefore >= Activator.instance().getMetadataService().getCategories(resource).size()) {
                 req.getSession().setAttribute("success", false);
                 req.getSession().setAttribute("message", "Cannot add category.");
             }
 
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
+            Activator.instance().getResourceDAO().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't add category: {}", e.getMessage());
@@ -588,7 +571,7 @@ public class EditServlet extends HttpServlet {
         boolean success = false;
         Map<?, ?> parameters = (Map<?, ?>) req.getParameterMap();
 
-        String type = null;;
+        String type = null;
         if (parameters.containsKey("type")) {
             type = ((String[]) parameters.get("type"))[0];
         }
@@ -601,7 +584,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "category":
                     success = editCategories(req, resp);
                     if (!success) {
@@ -609,7 +592,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "deleteCategory":
                     if (!deleteCategory(req, resp, parameters)) {
                         ResourceServlet.setError(req.getSession(), false, "Cannot delete category.");
@@ -617,7 +600,7 @@ public class EditServlet extends HttpServlet {
                     }
                     success = editCategories(req, resp);
                     break;
-                    
+
                 case "addCategory":
                     success = addCategories(req, resp, parameters);
                     if (!success) {
@@ -625,7 +608,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "addCapability":
                     success = addCapabilities(req, resp, parameters);
                     if (!success) {
@@ -633,7 +616,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "addCapabilityProperty":
                     success = addCapabilityProperty(req, resp, parameters);
                     if (!success) {
@@ -641,7 +624,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "capability":
                     success = editCapabilities(req, resp, parameters);
                     if (!success) {
@@ -649,7 +632,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "requirement":
                     success = editRequirements(req, resp, parameters);
                     if (!success) {
@@ -657,7 +640,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "addRequirement":
                     success = addRequirement(req, resp, parameters);
                     if (!success) {
@@ -665,7 +648,7 @@ public class EditServlet extends HttpServlet {
                         success = true;
                     }
                     break;
-                    
+
                 case "properties":
                     success = editProperties(req, resp, parameters);
                     if (!success) {
@@ -683,13 +666,13 @@ public class EditServlet extends HttpServlet {
         }
     }
 
-    private boolean editProperties(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean editProperties(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -715,13 +698,13 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCapabilityProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCapabilityProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -749,14 +732,14 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addRequirement(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addRequirement(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -783,20 +766,20 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean editRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean editRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
 
         String uri = req.getParameter("uri");
-        
+
         try {
             URI resURI = new URI(uri);
             Resource resource = findResource(resURI, array);
@@ -818,19 +801,19 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
-        
+
         String uri = req.getParameter("uri");
-        
+
         try {
             URI resURI = new URI(uri);
             Resource resource = findResource(resURI, array);
@@ -854,15 +837,14 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean editCapabilities(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
+    private boolean editCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
 
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -883,7 +865,7 @@ public class EditServlet extends HttpServlet {
 
             req.getSession().setAttribute("resource", resource);
             req.getSession().setAttribute("types", Type.values());
-            req.getSession().setAttribute("capability", resource.getCapabilities()[Integer.valueOf(id) - 1]);
+            req.getSession().setAttribute("capability", resource.getCapabilities().get(Integer.valueOf(id) - 1));
             req.getSession().setAttribute("capabilityId", id);
             req.getRequestDispatcher("jsp/forms/capabilitiesForm.jsp").forward(req, resp); // FIXME hardcoded
         } catch (URISyntaxException e) {
@@ -903,14 +885,14 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean addCategories(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean addCategories(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -940,11 +922,11 @@ public class EditServlet extends HttpServlet {
 
     private boolean editCategories(HttpServletRequest req, HttpServletResponse resp) {
         String link = (String) req.getSession().getAttribute("source");
-        Resource[] array;
+        List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getRepository().getResources();
+            array = Activator.instance().getStore().getResources();
         } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getRepository().getResources();
+            array = Activator.instance().getBuffer(req).getResources();
         } else {
             return false;
         }
@@ -972,8 +954,7 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    private boolean deleteCategory(HttpServletRequest req,
-            HttpServletResponse resp, Map<?, ?> parameters) {
+    private boolean deleteCategory(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD resp would be used in the future
         String category = null;
         String uri = null;
         if (parameters.containsKey("category")
@@ -987,28 +968,26 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            Resource[] array;
+            List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getRepository().getResources();
+                array = Activator.instance().getStore().getResources();
             } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getRepository().getResources();
+                array = Activator.instance().getBuffer(req).getResources();
             } else {
                 return false;
             }
 
             Resource resource = findResource(resURI, array);
 
-            int categoriesLengthBefore = resource.getCategories().length;
-            resource.unsetCategory(category);
+            int categoriesLengthBefore = Activator.instance().getMetadataService().getCategories(resource).size();
+            Activator.instance().getMetadataService().removeCategory(resource, category);
 
 //			Zjištění zda kategorie byla odstraněna.
-            if (categoriesLengthBefore == resource.getCategories().length) {
+            if (categoriesLengthBefore == Activator.instance().getMetadataService().getCategories(resource).size()) {
                 return false;
             }
 
-            PluginManager pm = Activator.instance().getPluginManager();
-            ResourceDAO rd = pm.getPlugin(ResourceDAO.class);
-            rd.save(resource);
+            Activator.instance().getResourceDAO().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't delete category: {}", e.getMessage());
@@ -1020,7 +999,7 @@ public class EditServlet extends HttpServlet {
             logger.error("Can't delete category", e);
             return false;
         }
-        
+
         return true;
     }
 
@@ -1038,14 +1017,14 @@ public class EditServlet extends HttpServlet {
         try {
             URI fileUri = new URI(uri);
             if ("store".equals(link)) {
-                Resource[] array = Activator.instance().getStore().getRepository().getResources();
+                List<Resource> array = Activator.instance().getStore().getResources();
                 Resource found = findResource(fileUri, array);
                 Activator.instance().getStore().remove(found);
             } else if ("buffer".equals(link)) {
-                Resource[] array = Activator.instance().getBuffer(req).getRepository().getResources();
+                List<Resource> array = Activator.instance().getBuffer(req).getResources();
                 Resource found = findResource(fileUri, array);
                 if (!Activator.instance().getBuffer(req).remove(found)) {
-                    // TODO
+                    logger.warn("Buffer didn't contain removed resource: {}", found);
                 }
             } else {
                 return false;
@@ -1069,10 +1048,10 @@ public class EditServlet extends HttpServlet {
         return true;
     }
 
-    public static Resource findResource(URI uri, Resource[] array) throws FileNotFoundException {
+    public static Resource findResource(URI uri, List<Resource> array) throws FileNotFoundException {
         Resource found = null;
         for (Resource r : array) {
-            if (r.getUri().equals(uri)) {
+            if (Activator.instance().getMetadataService().getUri(r).equals(uri)) {
                 found = r;
                 break;
             }

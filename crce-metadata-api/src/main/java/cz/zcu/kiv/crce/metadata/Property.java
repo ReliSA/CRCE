@@ -1,36 +1,26 @@
 package cz.zcu.kiv.crce.metadata;
 
+import java.io.Serializable;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
- * A property that can be set to a Resource or a Capability.
- * 
+ *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @param <T>
  */
-public interface Property {
+public interface Property<T extends EqualityComparable<T>> extends AttributeProvider, EqualityComparable<Property<T>>, Serializable {
 
-    String getName();
+    @Nonnull
+    String getId();
 
-    Type getType();
+    @Nonnull
+    String getNamespace();
 
-    String getValue();
+    @CheckForNull
+    T getParent();
 
-    Object getConvertedValue();
-    
-    boolean isWritable();
-            
-//    void setValue(String value, Type type);
-//    
-//    void setValue(String string);
-//    
-//    void setValue(Version version);
-//
-//    void setValue(URL url);
-//    
-//    void setValue(URI uri);
-//    
-//    void setValue(long llong);
-//    
-//    void setValue(double ddouble);
-//    
-//    void setValue(Set values);
-    
+    void setParent(@Nullable T parent);
 }

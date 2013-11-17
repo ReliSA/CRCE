@@ -3,96 +3,142 @@ package cz.zcu.kiv.crce.repository.internal;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Repository;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceCreator;
-import cz.zcu.kiv.crce.metadata.WritableRepository;
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
+import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.RevokedArtifactException;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 
 /**
  * Filebased implementation of <code>Store</code>.
- * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class FilebasedStoreImpl implements Store, EventHandler {
-    
-    private volatile BundleContext m_context;
-    private volatile PluginManager m_pluginManager;
-    
+
+    private volatile BundleContext context;
+    private volatile PluginManager pluginManager;
+    private volatile ResourceDAO resourceDAO;
+    private volatile RepositoryDAO repositoryDAO;
+    private volatile ResourceIndexerService resourceIndexerService;
+    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataService metadataService; // NOPMD
+    private volatile MetadataValidator metadataValidator;
+
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
-    private WritableRepository m_repository;
-    private File m_baseDir;
-    
-    
+    private Repository repository;
+    private final File baseDir;
+
+
     public FilebasedStoreImpl(File baseDir) throws IOException {
-        m_baseDir = baseDir;
-        if (!m_baseDir.exists()) {
-            m_baseDir.mkdirs();
-        } else if (!m_baseDir.isDirectory()) {
-            throw new IOException("Base directory is not a directory: " + m_baseDir);
+        this.baseDir = baseDir;
+        if (!baseDir.exists()) {
+            if (!baseDir.mkdirs()) {
+                logger.error("Could not create store directory {}", baseDir);
+            }
+        } else if (!baseDir.isDirectory()) {
+            throw new IOException("Base directory is not a directory: " + baseDir);
         }
-        if (!m_baseDir.exists()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + m_baseDir, new IOException("Can not create directory"));
+        if (!baseDir.exists()) {
+            throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
         }
     }
 
     /*
-     * Called by dependency manager
+     * Called by dependency manager.
      */
     @SuppressWarnings({"UseOfObsoleteCollectionType", "unchecked"})
     void init() {
-        Dictionary props = new java.util.Hashtable();
+        Dictionary<String, String> props = new java.util.Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
-        m_context.registerService(EventHandler.class.getName(), this, props);
+        context.registerService(EventHandler.class.getName(), this, props);
     }
-    
-    @Override
-    public void handleEvent(final Event event) {
+
+    /*
+     * Called by dependency manager.
+     */
+    synchronized void start() {
+        try {
+            repository = repositoryDAO.loadRepository(baseDir.toURI());
+        } catch (IOException ex) {
+            logger.error("Could not load repository for {}", baseDir, ex);
+        }
+
+        if (repository == null) {
+            repository = resourceFactory.createRepository(baseDir.toURI());
+            try {
+                repositoryDAO.saveRepository(repository);
+            } catch (IOException ex) {
+                logger.error("Could not save repository for {}", baseDir, ex);
+            }
+        }
+
         final Object lock = this;
         new Thread(new Runnable() {
 
             @Override
             public void run() {
                 synchronized (lock) {
-                    m_repository = null;
+                    indexResources(baseDir, repository);
                 }
             }
         }).start();
+
     }
-    
-    private synchronized void loadRepository() {
-        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
-        
-        try {
-            m_repository = rd.getRepository(m_baseDir.toURI());
-        } catch (IOException ex) {
-            logger.error("Could not get repository for URI: " + m_baseDir.toURI(), ex);
-            m_repository = m_pluginManager.getPlugin(ResourceCreator.class).createRepository(m_baseDir.toURI());
-        }
+
+    @Override
+    public void handleEvent(final Event event) {
+    // TODO why was that there?
+//        final Object lock = this;
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                synchronized (lock) {
+//                    m_repository = null;
+//                }
+//            }
+//        }).start();
     }
-    
-    public synchronized Resource move(Resource resource) throws IOException, RevokedArtifactException {
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
+
+//    private synchronized void loadRepository() {
+//        RepositoryDAO rd = m_pluginManager.getPlugin(RepositoryDAO.class);
+//
+//        try {
+//            m_repository = rd.getRepository(m_baseDir.toURI());
+//        } catch (IOException ex) {
+//            logger.error("Could not get repository for URI: " + m_baseDir.toURI(), ex);
+//            m_repository = m_pluginManager.getPlugin(ResourceCreator.class).createRepository(m_baseDir.toURI());
+//        }
+//    }
+
+    public synchronized Resource move(Resource resource) throws IOException, RefusedArtifactException {
+        Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
@@ -101,22 +147,20 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             resource = tmp;
         }
-        if (m_repository == null) {
-            loadRepository();
+
+        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
+            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
-        if (m_repository.contains(resource)) {
-            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
-        }
-        if ("file".equals(resource.getUri().getScheme())) {
-            return putFile(resource, true);
+        if ("file".equals(metadataService.getUri(resource).getScheme())) {
+            return putFileResource(resource, true);
         } else {
-            return putAnother(resource, true);
+            return putNonFileResource(resource, true);
         }
     }
-    
+
     @Override
-    public synchronized Resource put(Resource resource) throws IOException, RevokedArtifactException {
-        Resource tmp = m_pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
+    public synchronized Resource put(Resource resource) throws IOException, RefusedArtifactException {
+        Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
         }
@@ -125,104 +169,102 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         } else {
             resource = tmp;
         }
-        if (m_repository == null) {
-            loadRepository();
+
+        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
+            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
-        if (m_repository.contains(resource)) {
-            throw new RevokedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
-        }
-        if ("file".equals(resource.getUri().getScheme())) {
-            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putFile(resource, false), this);
+        if ("file".equals(metadataService.getUri(resource).getScheme())) {
+            resource = putFileResource(resource, false);
         } else {
-            return m_pluginManager.getPlugin(ActionHandler.class).afterPutToStore(putAnother(resource, false), this);
+            resource = putNonFileResource(resource, false);
         }
+        return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(resource, this);
     }
-    
-    private Resource putFile(Resource resource, boolean move) throws IOException, RevokedArtifactException {
-        File sourceFile = new File(resource.getUri());
+
+    private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RefusedArtifactException {
+        File sourceFile = new File(metadataService.getUri(resource));
         if (!sourceFile.exists()) {
-            throw new RevokedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
+            throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
-        if (m_repository == null) {
-            loadRepository();
-        }
-        File targetFile = File.createTempFile("res", "", m_baseDir);
-        
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-        
+        resource.setRepository(repository);
+
+        File targetFile = new File(baseDir, resource.getId());
+
         if (move) {
-            FileUtils.rename(sourceFile, targetFile);
+            FileUtils.moveFile(sourceFile, targetFile);
         } else {
             FileUtils.copyFile(sourceFile, targetFile);
         }
-        Resource out = resourceDao.moveResource(resource, targetFile.toURI());
-        if (!m_repository.addResource(out)) {
-        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
-            if (!targetFile.delete()) {
-                throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
-            }
-            return null;
+//        Resource out = resourceDAO.moveResource(resource, targetFile.toURI());
+        metadataService.setUri(resource, targetFile.toURI().normalize());
+//        if (!m_repository.addResource(out)) {
+//        	logger.warn( "Resource with the same symbolic name and version already exists in Store, but it has not been expected: {}", targetFile.getPath());
+//            if (!targetFile.delete()) {
+//                throw new IOException("Can not delete file of revoked artifact: " + targetFile.getPath());
+//            }
+//            return null;
+//        }
+
+        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+        if (!validationResult.isContextValid()) {
+            logger.error("Saved Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+            throw new RefusedArtifactException("Resource is not valid.");
         }
-        resourceDao.save(out);
-        
-        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
-        
-        return out;
+
+        logger.info("Saved resource {} is valid.", resource.getId());
+        resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
+
+//        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+
+        return resource;
     }
-    
-    private Resource putAnother(Resource resource, boolean move) {
-        throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: " + resource.getId() + ": " + resource.getUri());
+
+    private Resource putNonFileResource(Resource resource, boolean move) {
+        throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: "
+                + resource.getId() + ": " + metadataService.getUri(resource) + ", move: " + move);
     }
 
     @Override
     public synchronized boolean remove(Resource resource) throws IOException {
-        resource = m_pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
-        
+        resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
+
         if (!isInStore(resource)) {
-            if (m_repository != null && m_repository.contains(resource)) {
+            if (resourceDAO.existsResource(metadataService.getUri(resource))) {
             	logger.warn( "Removing resource is not in store but it is in internal repository: {}", resource.getId());
-                m_repository.removeResource(resource);
+                resourceDAO.deleteResource(metadataService.getUri(resource));
             }
-            m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+            pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
             return false;
         }
-        
+
         // if URI scheme is not 'file', it is detected in previous isInStore() check
-        File file = new File(resource.getUri());
+        File file = new File(metadataService.getUri(resource));
         if (!file.delete()) {
-            throw new IOException("Can not delete artifact file from store: " + resource.getUri());
+            throw new IOException("Can not delete artifact file from store: " + metadataService.getUri(resource));
         }
-        
-        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
-        try {
-            resourceDao.remove(resource);
-        } finally {
+
+//        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
+//        try {
+            resourceDAO.deleteResource(metadataService.getUri(resource));
+//        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
             // to keep consistency of repository with stored artifact files
-            if (m_repository == null) {
-                loadRepository();
-            }
-            if (!m_repository.removeResource(resource)) {
-            	logger.warn( "Store's internal repository does not contain removing resource: {}", resource.getId());
-            }
-            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
-        }
-        m_pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+//            if (m_repository == null) {
+//                loadRepository();
+//            }
+//            if (!m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource))) {
+//            	logger.warn( "Store's internal repository does not contain removing resource: {}", resource.getId());
+//            }
+//            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+//        }
+        pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
         return true;
     }
 
     @Override
-    public Repository getRepository() {
-        if (m_repository == null) {
-            loadRepository();
-        }
-        return m_repository;
-    }
-
-    @Override
     public synchronized void execute(List<Resource> resources, final Executable executable, final Properties properties) {
-        final ActionHandler ah = m_pluginManager.getPlugin(ActionHandler.class);
+        final ActionHandler ah = pluginManager.getPlugin(ActionHandler.class);
         final List<Resource> res = ah.beforeExecuteInStore(resources, executable, properties, this);
         final Store store = this;
 
@@ -240,11 +282,75 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }).start();
     }
 
+    @Override
+    public synchronized List<Resource> getResources() {
+        try {
+            return resourceDAO.loadResources(repository);
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     private boolean isInStore(Resource resource) {
-        URI uri = resource.getUri().normalize();
+        URI uri = metadataService.getUri(resource).normalize();
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return new File(uri).getPath().startsWith(m_baseDir.getAbsolutePath());
+        return new File(uri).getPath().startsWith(baseDir.getAbsolutePath());
+    }
+
+    @Override
+    public String toString() {
+        return "FilebasedStoreImpl{" + "baseDir=" + baseDir + '}';
+    }
+
+    private void indexResources(File baseDir, Repository repository) {
+        indexDirectory(baseDir, repository);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Indexing done for store directory: {}", baseDir.getAbsolutePath());
+        }
+    }
+
+    private void indexDirectory(File directory, Repository repository) {
+        for (File file : directory.listFiles()) {
+            if (file.isFile()) {
+                try {
+                    if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
+                        Resource resource;
+                        try {
+                            resource = resourceIndexerService.indexResource(file);
+                        } catch (IOException e) {
+                            logger.error("Could not index file {}", file, e);
+                            continue;
+                        }
+                        resource.setRepository(repository);
+                        metadataService.setUri(resource, file.toURI().normalize());
+
+                        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+                        if (!validationResult.isContextValid()) {
+                            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+                            continue;
+                        }
+                        logger.info("Indexed resource {} is valid.", resource.getId());
+
+                        try {
+                            resourceDAO.saveResource(resource);
+                        } catch (IOException e) {
+                            logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
+                        }
+                    }
+                } catch (IOException e) {
+                    logger.error("Could not check that resource exists: {}", file, e);
+                }
+            } else if (file.isDirectory()) {
+                indexDirectory(file, repository);
+            }
+        }
     }
 }

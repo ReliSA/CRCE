@@ -1,120 +1,72 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.net.URI;
-import java.util.Map;
-import org.osgi.framework.Version;
+import java.io.Serializable;
+import java.util.List;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
- * Resource represents an artifact and it's OBR metadata.
- * 
- * <p>An unique identificator of a resource is it's symbolic name and version.
- * 
+ * Resource represents an artifact and it's metadata.
+ *
+ * <p>An unique identificator of a resource is ID.
+ *
  * <p>Resource have capabilities, requirements, properties and categories.
- * 
+ *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Resource extends PropertyProvider<Resource> {
+public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Serializable {
 
+    @Nonnull
     String getId();
 
-    String getSymbolicName();
-
-    Version getVersion();
-
-    String getPresentationName();
-
-    URI getUri();
-    
-    URI getRelativeUri();
-    
+    @CheckForNull
     Repository getRepository();
 
-    /**
-     * Returns the resource size in bytes or -1 if size is unknown.
-     * @return the resource size.
-     */
-    long getSize();
+    @Nonnull
+    List<Capability> getCapabilities();
 
-    String[] getCategories();
+    @Nonnull
+    List<Capability> getCapabilities(@Nonnull String namespace);
 
-    Capability[] getCapabilities();
+    @Nonnull
+    List<Capability> getRootCapabilities();
 
-    Capability[] getCapabilities(String name);
+    @Nonnull
+    List<Capability> getRootCapabilities(@Nonnull String namespace);
 
-    Requirement[] getRequirements();
+    @Nonnull
+    List<Requirement> getRequirements();
 
-    Requirement[] getRequirements(String name);
-    
-    Map<String, String> getPropertiesMap();
+    @Nonnull
+    List<Requirement> getRequirements(@Nonnull String namespace);
 
-    boolean hasCategory(String category);
+    boolean hasCapability(@Nonnull Capability capability);
 
-    boolean hasCapability(Capability capability);
+    boolean hasRequirement(@Nonnull Requirement requirement);
 
-    boolean hasRequirement(Requirement requirement);
-    
     /* --- setters --- */
 
-    void setSymbolicName(String name);
-    
-    void setSymbolicName(String name, boolean isStatic);
-
-    void setPresentationName(String name);
-
-    void setVersion(Version version);
-    
-    void setVersion(Version version, boolean isStatic);
-
-    void setVersion(String version);
-    
-    void setVersion(String version, boolean isStatic);
-
-    void addCategory(String category);
-
-    void addCapability(Capability capability);
-
-    void addRequirement(Requirement requirement);
-
-    Capability createCapability(String name);
-
-    Requirement createRequirement(String name);
-
-    void unsetCategory(String category);
-    
-    void unsetCapability(Capability capability);
-    
-    void unsetRequirement(Requirement requirement);
-    
-    
     /**
-     * Sets resource size.
-     * @param size size in bytes to set.
+     * Adds the given capability to the list of all capabilities.
+     * <p>Note: This method doesn add the capability to the list of root capabilities.
+     * @param capability Capability to be added.
      */
-    void setSize(long size);
+    void addCapability(@Nonnull Capability capability);
 
-    void setUri(URI uri);
-    
-    void setRepository(WritableRepository repository);
+    /**
+     * Adds the given capability to the list of root capabilities.
+     * @param capability Capability to be added.
+     */
+    void addRootCapability(@Nonnull Capability capability);
 
-    boolean isWritable();
-    
-    void unsetWritable();
-    
-    /**
-     * Tells whether or not the version of this resource is hard-coded in
-     * artifact's binary data (e.g. in bundle manifest).
-     * @return <code>true</code> if the version is hard-coded and can not be
-     * changed.
-     */
-    boolean isVersionStatic();
-    
-    /**
-     * Tells whether or not the symbolic name of this resource is hard-coded in
-     * artifact's binary data (e.g. in bundle manifest).
-     * @return <code>true</code> if the symbolic name is hard-coded and can not
-     * be changed.
-     */
-    boolean isSymbolicNameStatic();
-    
-    String asString();
+    void addRequirement(@Nonnull Requirement requirement);
+
+    void removeCapability(@Nonnull Capability capability);
+
+    void removeRootCapability(@Nonnull Capability capability);
+
+    void removeRequirement(@Nonnull Requirement requirement);
+
+    void setRepository(@Nonnull Repository repository);
 }

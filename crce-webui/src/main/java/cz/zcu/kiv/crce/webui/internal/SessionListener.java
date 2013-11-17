@@ -5,7 +5,7 @@ import javax.servlet.http.HttpSessionListener;
 
 /**
  *
- * @author Jiri Kucera (kalwi@students.zcu.cz, kalwi@kalwi.eu)
+ * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class SessionListener implements HttpSessionListener {
 
@@ -13,13 +13,13 @@ public class SessionListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent se) {
     	se.getSession();
         String sid = se.getSession().getId();
-        Activator.instance().getSessionFactory().registerSession(sid);
+        Activator.instance().getSessionRegister().registerSession(sid);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         String sid = se.getSession().getId();
-        Activator.instance().getSessionFactory().unregisterSession(sid);
+        Activator.instance().getSessionRegister().unregisterSession(sid);
     }
 
 }
