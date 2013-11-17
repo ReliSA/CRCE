@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -131,8 +132,17 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public String getPresentationName(Property property) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public <T extends EqualityComparable<T>> String getPresentationName(Property<T> property) {
+        if (property == null) {
+            throw new IllegalArgumentException("Attribute is null.");
+        }
+        String name = property.getAttributeValue(ATTRIBUTE__NAME);
+
+        if (name == null || name.isEmpty()) {
+            logger.warn("Capability with id {} has no name specified.", property.getId());
+            name = "unknown-name:" + property.getId();
+        }
+        return name;
     }
 
     @Override

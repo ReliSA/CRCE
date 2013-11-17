@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -31,7 +32,7 @@ public interface MetadataService {
     String getPresentationName(@Nonnull Requirement requirement);
 
     @Nonnull
-    String getPresentationName(@Nonnull Property property);
+    <T extends EqualityComparable<T>> String getPresentationName(@Nonnull Property<T> property);
 
     @Nonnull
     String getPresentationName(@Nonnull Attribute<?> attribute);
