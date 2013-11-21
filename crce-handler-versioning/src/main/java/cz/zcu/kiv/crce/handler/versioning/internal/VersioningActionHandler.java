@@ -12,6 +12,11 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
+import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
+
+import cz.zcu.kiv.crce.concurrency.model.Task;
+import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -21,20 +26,21 @@ import cz.zcu.kiv.crce.repository.RevokedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
-import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
-import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 
 /**
  * Implementation of <code>ActionHandler</code> which compares commited OSGi
  * bundle to existing bundles with the same symbolic name and sets a new version
  * based on comparison.
+ *
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  * @author Jan Reznicek
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
 
+    private TaskRunnerService m_taskRunnerService;   /* injected by dependency manager */
+
     private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
-    
+
     private static final String CATEGORY_VERSIONED = "versioned";
 
     private volatile VersionService m_versionService;   /* injected by dependency manager */
@@ -44,16 +50,17 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
     /**
      * Create file from bundle in form of InputSteam.
+     *
      * @param bundleAsStream bundle as InputStream
      * @return file with bundle
      * @throws IOException reading from stream or creation of file or write to file failed
      */
     private File fileFromStream(InputStream bundleAsStream) throws IOException {
-    	
-    	if (null == bundleAsStream)
-    		throw new IllegalArgumentException("'null' passed as input stream");
-    	
-    	OutputStream output = null;
+
+        if (null == bundleAsStream)
+            throw new IllegalArgumentException("'null' passed as input stream");
+
+        OutputStream output = null;
         File bundleFile;
         try {
             bundleFile = File.createTempFile("source", ".jar");
@@ -77,11 +84,11 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 }
             }
         }
-        
-        
+
+
         return bundleFile;
     }
-    
+
     /**
      * Create version of the OSGi bundle, before is committed to the Store.
      * Before resource is committed to the Store, check if the resource is unversioned OSGi bundle.
@@ -90,33 +97,33 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
     @Override
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
         logger.debug("Entering beforePutToStore method");
-    	
-    	if (resource == null || !resource.hasCategory("osgi")) {
+
+        if (resource == null || !resource.hasCategory("osgi")) {
             logger.debug("Resource " + resource == null ? "is null." : "doesnt have category osgi.");
             return resource;
         }
         if (!resource.hasCategory(CATEGORY_VERSIONED)) {
             logger.debug("Resource doesnt have category versioned");
-        	
-        	/*candidate for base resource is selected as bundle with same symbolic name 
-        	  and highest version in repository.*/
+
+            /*candidate for base resource is selected as bundle with same symbolic name
+              and highest version in repository.*/
             Resource cand = null;
 
             try {
-				String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
+                String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
                 logger.debug("Searching for previous versions of: {}", resource.getSymbolicName());
-				for (Resource i : store.getRepository().getResources(filter)) {
+                for (Resource i : store.getRepository().getResources(filter)) {
                     logger.debug("Candidate: {}", i.getSymbolicName());
-				        if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
-                            logger.debug("Candidate selected");
-				            cand = i;
-				        }
-				}
-			} catch (InvalidSyntaxException e1) {
-				logger.error("Could not find base bundle, invalid syndax error", e1);
-			}
-            
-            
+                    if (cand == null || cand.getVersion().compareTo(i.getVersion()) < 0) {
+                        logger.debug("Candidate selected");
+                        cand = i;
+                    }
+                }
+            } catch (InvalidSyntaxException e1) {
+                logger.error("Could not find base bundle, invalid syndax error", e1);
+            }
+
+
             String category = null;
             if (cand == null) {
                 logger.debug("No candidate found");
@@ -124,21 +131,21 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 resource.addCategory("initial-version");
             } else {
                 logger.debug("Candidate found, commencing bundle comparison.");
-            	InputStream versionedBundleIs = null;
+                InputStream versionedBundleIs = null;
                 try {
-                	//candidate = base bundle for version generation
+                    //candidate = base bundle for version generation
                     logger.debug("Candidate URI: {}", cand.getUri());
                     InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
                     logger.debug("Uploaded bundle URI: {}", resource.getUri());
                     InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
-                    
+
                     HashMap<String, String> options = new HashMap<String, String>();
-                    
+
                     //micro part of version is generated too
                     options.put("keep-micro-if-identical", "false");
 
-                    versionedBundleIs =  m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
-                    
+                    versionedBundleIs = m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
+
                     category = CATEGORY_VERSIONED;
                 } catch (IOException ex) {
                     logger.error("Could not update version due to I/O error", ex);
@@ -153,22 +160,22 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     logger.error("Could not update version (unknown error)", e);
                     category = null;
                 }
-                
+
 
                 ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
 
                 try {
-                	//create resource from file with bundle with generated version
-                	File versionedBundleFile = fileFromStream(versionedBundleIs);
-                	
+                    //create resource from file with bundle with generated version
+                    File versionedBundleFile = fileFromStream(versionedBundleIs);
+
                     resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
                     logger.debug("Created resource from uploaded bundle:" + resource.getUri());
                 } catch (IOException e) {
                     logger.error("Could not reload changed resource", e);
                     throw new RevokedArtifactException("I/O error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
                 } catch (Exception e) {
-                	logger.error("Resource handling error", e);
-                	throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
+                    logger.error("Resource handling error", e);
+                    throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
                 }
             }
 
@@ -176,7 +183,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 resource.addCategory(category);
             }
         }
-        
+
         return resource;
     }
 
@@ -198,17 +205,31 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             logger.debug("Resource doesnt have category versioned.");
 
             String ext = name.substring(name.lastIndexOf("."));
-            
+
             Capability[] caps = resource.getCapabilities("file");
             Capability cap = (caps.length == 0 ? resource.createCapability("file") : caps[0]);
             cap.setProperty("original-name", name);
             cap.setProperty("name", resource.getSymbolicName() + "-" + resource.getVersion() + ext);
 
-//            caps = resource.getCapabilities("bundle");
-//            cap = (caps.length == 0 ? resource.createCapability("bundle") : caps[0]);
+            //caps = resource.getCapabilities("bundle");
+            // cap = (caps.length == 0 ? resource.createCapability("bundle") : caps[0]);
             cap.setProperty("original-version", resource.getVersion());
 
         }
+        return resource;
+    }
+
+    @Override
+    public Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException {
+        /*
+            After the resource is put to store, start calculation of its compatibility data.
+         */
+        if (resource == null) {
+            return resource;
+        }
+
+        Task compTask = new CompatibilityCalculationTask(resource.getId(), resource);
+        m_taskRunnerService.scheduleTask(compTask);
         return resource;
     }
 
@@ -220,7 +241,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
             logger.debug("Searching for previously buffered versions of: " + resource.getSymbolicName());
 
-            if(buffer.getRepository().getResources(filter).length != 0) {
+            if (buffer.getRepository().getResources(filter).length != 0) {
                 logger.debug("Resource with the same symbolic name found!");
                 throw new RevokedArtifactException("There is already a resource with the same symbolic name in the buffer.", RevokedArtifactException.REASON.ALREADY_IN_BUFFER);
             }

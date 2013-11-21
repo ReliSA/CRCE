@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
@@ -31,97 +32,109 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>cz.zcu.kiv.osgi</groupId>
             <artifactId>version-generator</artifactId>
-	    <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1-SNAPSHOT</version>
         </dependency>
 
 
-		<!-- THIS BLOCK OF DEPENDENCIES IS ADDED BECAUSE
+        <!-- THIS BLOCK OF DEPENDENCIES IS ADDED BECAUSE
                      PAX RUNNER SEEMS UNABLE TO INSTALL TRANSITIVE
                      CLOSURE OF DEPENDENCIES FOR THE VERSIONING HANDLER
                      -->
-		<dependency>
-			<groupId>cz.zcu.kiv.obcc</groupId>
-			<artifactId>bundle-types</artifactId>
-			<version>1.0.1</version>
-			<type>bundle</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.obcc</groupId>
-			<artifactId>bundle-loader</artifactId>
-			<version>1.0.1</version>
-			<type>bundle</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.obcc</groupId>
-			<artifactId>bundle-cmp</artifactId>
-			<version>1.0.1</version>
-			<type>bundle</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.jacc</groupId>
-			<artifactId>types-cmp</artifactId>
-			<type>bundle</type>
-			<version>1.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.jacc</groupId>
-			<artifactId>javatypes</artifactId>
-			<version>1.0.1</version>
-			<type>bundle</type>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.jacc</groupId>
-			<artifactId>javatypes-cmp</artifactId>
-			<version>1.0.1</version>
-			<type>bundle</type>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv</groupId>
-			<artifactId>file-utils</artifactId>
-			<scope>compile</scope>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>                
-		    <groupId>org.apache.commons</groupId>                
-		    <artifactId>commons-vfs2</artifactId>
-		    <version>2.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.servicemix.bundles</groupId>
-		    <artifactId>org.apache.servicemix.bundles.jsch</artifactId>
-		    <version>0.1.49_1</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.servicemix.bundles</groupId>
-		    <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-		    <version>3.1_7</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.servicemix.bundles</groupId>
-		    <artifactId>org.apache.servicemix.bundles.commons-net</artifactId>
-		    <version>1.4.1_6</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.jackrabbit</groupId>
-		    <artifactId>jackrabbit-webdav</artifactId>
-		    <version>2.6.0</version>
-	      </dependency>
-	      <dependency>
-		  <groupId>org.apache.servicemix.bundles</groupId>
-		  <artifactId>org.apache.servicemix.bundles.ant</artifactId>
-		  <version>1.8.4_1</version>
-	      </dependency>
-		<!-- END OF BLOCK FOR PAX RUNNER -->
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-types</artifactId>
+            <version>1.0.1</version>
+            <type>bundle</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-loader</artifactId>
+            <version>1.0.1</version>
+            <type>bundle</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-cmp</artifactId>
+            <version>1.0.1</version>
+            <type>bundle</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>types-cmp</artifactId>
+            <type>bundle</type>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+            <version>1.0.1</version>
+            <type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+            <version>1.0.1</version>
+            <type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv</groupId>
+            <artifactId>file-utils</artifactId>
+            <scope>compile</scope>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.jsch</artifactId>
+            <version>0.1.49_1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
+            <version>3.1_7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-net</artifactId>
+            <version>1.4.1_6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.ant</artifactId>
+            <version>1.8.4_1</version>
+        </dependency>
+        <!-- END OF BLOCK FOR PAX RUNNER -->
 
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-concurrency</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
@@ -146,7 +159,7 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
     </dependencies>
 
 </project>
