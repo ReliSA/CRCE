@@ -18,4 +18,9 @@ public class CompatibilityFactoryImpl implements CompatibilityFactory {
     public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName, Version baseVersion, Difference diffValue, Diff diffTree) {
         return new CompatibilityImpl(id, resourceName, resourceVersion, baseName, baseVersion, diffValue, diffTree);
     }
+
+    @Override
+    public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, Version baseVersion, Difference diffValue, Diff diffTree) {
+        return this.createCompatibility(id, resourceName, resourceVersion, resourceName, baseVersion, diffValue, diffTree);
+    }
 }

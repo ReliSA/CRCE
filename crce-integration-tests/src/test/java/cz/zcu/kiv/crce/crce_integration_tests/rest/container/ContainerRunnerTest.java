@@ -3,11 +3,7 @@
  */
 package cz.zcu.kiv.crce.crce_integration_tests.rest.container;
 
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.systemPackage;
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,9 +12,8 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import junit.framework.TestCase;
-
 import org.apache.felix.dm.DependencyManager;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -32,6 +27,8 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import junit.framework.TestCase;
+
 import cz.zcu.kiv.crce.crce_integration_tests.rest.Activator;
 import cz.zcu.kiv.crce.crce_integration_tests.rest.support.DataContainerForTestingPurpose;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -41,6 +38,7 @@ import cz.zcu.kiv.crce.repository.Store;
 /**
  * Class starts testing container.
  */
+@Ignore
 @RunWith(JUnit4TestRunner.class)
 @ExamReactorStrategy(AllConfinedStagedReactorFactory.class)
 public class ContainerRunnerTest extends TestCase {
@@ -72,7 +70,7 @@ public class ContainerRunnerTest extends TestCase {
         return options(
                 systemPackage(systemPackages),
                 junitBundles(),
-                felix(),
+                //felix(),
                 // DS support
                 mavenBundle("org.apache.felix", "org.apache.felix.scr", "1.6.0"),
                 mavenBundle("org.apache.felix", "org.apache.felix.dependencymanager"),

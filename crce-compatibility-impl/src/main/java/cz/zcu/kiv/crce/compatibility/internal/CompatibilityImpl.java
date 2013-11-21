@@ -85,6 +85,9 @@ public class CompatibilityImpl implements Compatibility {
 
     @Override
     public String getBaseResourceName() {
+        if(baseResourceName == null || baseResourceName.isEmpty()) {
+            return getResourceName();
+        }
         return baseResourceName;
     }
 

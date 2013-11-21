@@ -91,9 +91,13 @@
         <module>crce-rest</module>
         <module>crce-jersey-hack</module>
         <module>crce-concurrency</module>
+        <module>crce-compatibility-api</module>
+        <module>crce-compatibility-impl</module>
+        <module>crce-compatibility-dao-api</module>
+        <module>crce-compatibility-dao-mongodb</module>
 
         <!-- integration tests are not finished yet -->
-<!--	<module>crce-integration-tests</module> -->
+        <!--<module>crce-integration-tests</module>-->
     </modules>
 
     <profiles>
