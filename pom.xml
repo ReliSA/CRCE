@@ -104,7 +104,7 @@
         <!-- UI & Optional Plugins -->
         <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
-        <!--<module>crce-rest</module>-->
+        <module>crce-rest</module>
     </modules>
 
     <profiles>
