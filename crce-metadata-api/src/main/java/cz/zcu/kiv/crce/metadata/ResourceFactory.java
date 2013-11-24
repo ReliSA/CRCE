@@ -50,6 +50,12 @@ public interface ResourceFactory {
     Capability createCapability(@Nonnull String namespace, @Nonnull String id);
 
     @Nonnull
+    <T extends EqualityComparable<T>> Property<T>createProperty(@Nonnull String namespace);
+
+    @Nonnull
+    <T extends EqualityComparable<T>> Property<T>createProperty(@Nonnull String namespace, @Nonnull String id);
+
+    @Nonnull
     Repository createRepository(@Nonnull URI uri);
 
     /**
@@ -81,5 +87,5 @@ public interface ResourceFactory {
     Requirement cloneRequirement(@Nonnull Requirement requirement);
 
     @Nonnull
-    Property cloneRequirement(@Nonnull Property property);
+    <T extends EqualityComparable<T>> Property<T> cloneProperty(@Nonnull Property<T> property);
 }

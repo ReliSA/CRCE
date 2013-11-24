@@ -36,7 +36,7 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  */
 public class MetadataMapping {
 
-    public static DbResource mapResource2DbResource(Resource resource, MetadataService metadataService) {
+    static DbResource mapResource2DbResource(Resource resource, MetadataService metadataService) {
         DbResource dbResource = new DbResource();
 
         URI uri = metadataService.getUri(resource);
@@ -49,7 +49,7 @@ public class MetadataMapping {
         return dbResource;
     }
 
-    public static DbCapability mapCapability2DbCapability(Capability capability, MetadataService metadataService) {
+    static DbCapability mapCapability2DbCapability(Capability capability, MetadataService metadataService) {
         DbCapability dbCapability = new DbCapability();
 
         dbCapability.setId(capability.getId());
@@ -58,7 +58,7 @@ public class MetadataMapping {
         return dbCapability;
     }
 
-    public static DbRequirement mapRequirement2DbRequirement(Requirement requirement, MetadataService metadataService) {
+    static DbRequirement mapRequirement2DbRequirement(Requirement requirement, MetadataService metadataService) {
         DbRequirement dbRequirement = new DbRequirement();
 
         dbRequirement.setId(requirement.getId());
@@ -67,20 +67,22 @@ public class MetadataMapping {
         return dbRequirement;
     }
 
-    public static DbProperty mapProperty2DbProperty(Property<?> property, long propertyId, long parentId, MetadataService metadataService) {
+    static DbProperty mapProperty2DbProperty(Property<?> property, long propertyId, long parentId, MetadataService metadataService) {
         DbProperty dbProperty = new DbProperty();
 
+        dbProperty.setPropertyId(propertyId);
+        dbProperty.setParentId(parentId);
         dbProperty.setId(property.getId());
         dbProperty.setNamespace(property.getNamespace());
 
         return dbProperty;
     }
 
-    public static List<DbAttribute> mapAttributes2DbAttributes(List<Attribute<?>> attributes, long entityId) {
+    static List<DbAttribute> mapAttributes2DbAttributes(List<Attribute<?>> attributes, long entityId) {
         return mapAttributes2DbAttributes(attributes, entityId, false);
     }
 
-    public static List<DbAttribute> mapAttributes2DbAttributes(List<Attribute<?>> attributes, long entityId, boolean multipleAttributes) {
+    static List<DbAttribute> mapAttributes2DbAttributes(List<Attribute<?>> attributes, long entityId, boolean multipleAttributes) {
         List<DbAttribute> result = new ArrayList<>(attributes.size());
 
         Map<String, Short> attributeIndexes = new HashMap<>();
@@ -177,12 +179,22 @@ public class MetadataMapping {
         }, true);
     }
 
-    public static void mapDbAttributes2Capability(List<DbAttribute> dbAttributes, final Capability capability) {
+    static void mapDbAttributes2Capability(List<DbAttribute> dbAttributes, final Capability capability) {
         mapDbAttributes2Entity(dbAttributes, new Entity() {
 
             @Override
             public <T> void setAttribute(AttributeType<T> type, T value, Operator operator) {
                 capability.setAttribute(type, value, operator);
+            }
+        }, false);
+    }
+
+    static void mapDbAttributes2Property(List<DbAttribute> dbAttributes, final Property<?> property) {
+        mapDbAttributes2Entity(dbAttributes, new Entity() {
+
+            @Override
+            public <T> void setAttribute(AttributeType<T> type, T value, Operator operator) {
+                property.setAttribute(type, value, operator);
             }
         }, false);
     }

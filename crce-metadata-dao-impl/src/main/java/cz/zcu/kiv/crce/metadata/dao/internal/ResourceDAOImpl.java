@@ -118,6 +118,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         loadCapabilities(resource, dbResource.getResourceId(), session);
         loadRequirements(resource, dbResource.getResourceId(), session);
+        loadProperties(resource, dbResource.getResourceId(), session);
 
         try {
             assert dbResource.getUri() != null && new URI(dbResource.getUri()).equals(metadataService.getUri(resource));
@@ -189,6 +190,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
             loadCapabilityAttributes(capability, dbCapability.getCapabilityId(), session);
             loadCapabilityDirectives(capability, dbCapability.getCapabilityId(), session);
+            loadProperties(capability, dbCapability.getCapabilityId(), session);
 
             capability.setResource(resource);
             resource.addCapability(capability);
@@ -231,6 +233,32 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
     }
 
+    void loadProperties(Resource resource, long resourceId, SqlSession session) {
+        List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectResourceProperties", resourceId);
+
+        for (DbProperty dbProperty : dbProperties) {
+            Property<Resource> property = resourceFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+
+            loadResourcePropertyAttributes(property, dbProperty.getPropertyId(), session);
+
+            property.setParent(resource);
+            resource.addProperty(property);
+        }
+    }
+
+    void loadProperties(Capability capability, long resourceId, SqlSession session) {
+        List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectCapabilityProperties", resourceId);
+
+        for (DbProperty dbProperty : dbProperties) {
+            Property<Capability> property = resourceFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+
+            loadCapabilityPropertyAttributes(property, dbProperty.getPropertyId(), session);
+
+            property.setParent(capability);
+            capability.addProperty(property);
+        }
+    }
+
     void loadCapabilityAttributes(Capability capability, long capabilityId, SqlSession session) {
         List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectCapabilityAttributes", capabilityId);
 
@@ -253,6 +281,18 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbDirective> dbDirectives = session.selectList(RESOURCE_MAPPER + "selectRequirementDirectives", requirementId);
 
         MetadataMapping.mapDbDirectives2Requirement(dbDirectives, requirement);
+    }
+
+    void loadResourcePropertyAttributes(Property<Resource> property, long propertyId, SqlSession session) {
+        List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectResourcePropertyAttributes", propertyId);
+
+        MetadataMapping.mapDbAttributes2Property(dbAttributes, property);
+    }
+
+    void loadCapabilityPropertyAttributes(Property<Capability> property, long propertyId, SqlSession session) {
+        List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectCapabilityPropertyAttributes", propertyId);
+
+        MetadataMapping.mapDbAttributes2Property(dbAttributes, property);
     }
 
     @Override
@@ -357,7 +397,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
 
         for (Property<Capability> property : capability.getProperties()) {
-            saveCapabilityProperty(property, resourceId, session, seqMapper);
+            saveCapabilityProperty(property, capabilityId, session, seqMapper);
         }
 
         for (Capability child : capability.getChildren()) {
