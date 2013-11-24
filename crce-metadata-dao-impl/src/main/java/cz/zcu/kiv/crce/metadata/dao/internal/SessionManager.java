@@ -113,9 +113,6 @@ public class SessionManager implements ManagedService {
                 config = MYBATIS_DEFAULT_CONFIG;
             }
 
-            // Additional auto-configuration
-            properties.put("logImpl", "SLF4J");
-
             try {
                 if (createFactory(config, properties)) {
                     // Factory is created, so the new setting can be used as a default setting.

@@ -3,40 +3,27 @@
 <mapper namespace="cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResourceMapper">
 
     <!-- Resource -->
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource" id="resourceResultMap">
-        <id property="resourceId" column="resource_id"/>
-        <id property="repositoryId" column="repository_id"/>
-        <id property="id" column="id"/>
-        <id property="uri" column="uri"/>
-    </resultMap>
-    <select id="selectResourceByUri" parameterType="String" resultMap="resourceResultMap">
-        SELECT resource_id, id, uri
+    <select id="selectResourceByUri" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        SELECT resource_id, repository_id, id, uri
         FROM resource
         WHERE uri = #{uri}
     </select>
 
-    <select id="selectResourcesByRepositoryId" parameterType="Long" resultMap="resourceResultMap">
-        SELECT resource_id, id, uri
+    <select id="selectResourcesByRepositoryId" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        SELECT resource_id, repository_id, id, uri
         FROM resource
         WHERE repository_id = #{repositoryId}
     </select>
 
-    <select id="selectResourceById" parameterType="String" resultMap="resourceResultMap">
-        SELECT resource_id, id, uri
+    <select id="selectResourceById" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        SELECT resource_id, repository_id, id, uri
         FROM resource
         WHERE id = #{id}
     </select>
 
+
     <!-- Capability -->
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="capabilityResultMap">
-        <id column="capability_id" property="capabilityId"/>
-        <id column="parent_capability_id" property="parentCapabilityId"/>
-        <id column="resource_id" property="resourceId"/>
-        <id column="level" property="level"/>
-        <id column="id" property="id"/>
-        <id column="namespace" property="namespace"/>
-    </resultMap>
-    <select id="selectCapabilities" parameterType="Long" resultMap="capabilityResultMap">
+    <select id="selectCapabilities" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability">
         SELECT capability_id, parent_capability_id, resource_id, level, id, namespace
         FROM capability
         WHERE resource_id = #{resourceId}
@@ -45,16 +32,6 @@
 
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="capabilityAttributesResultMap">
         <id column="capability_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="list_index" property="listIndex"/>
-        <id column="type" property="type"/>
-        <id column="operator" property="operator"/>
-        <id column="string_value" property="stringValue"/>
-        <id column="long_value" property="longValue"/>
-        <id column="double_value" property="doubleValue"/>
-        <id column="version_major_value" property="versionMajorValue"/>
-        <id column="version_minor_value" property="versionMinorValue"/>
-        <id column="version_micro_value" property="versionMicroValue"/>
     </resultMap>
     <select id="selectCapabilityAttributes" parameterType="Long" resultMap="capabilityAttributesResultMap">
         SELECT capability_id, name, list_index, type, operator, string_value, long_value, double_value,
@@ -66,8 +43,6 @@
 
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="capabilityDirectivesResultMap">
         <id column="capability_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="value" property="value"/>
     </resultMap>
     <select id="selectCapabilityDirectives" parameterType="Long" resultMap="capabilityDirectivesResultMap">
         SELECT capability_id, name, value
@@ -75,16 +50,9 @@
         WHERE capability_id = #{requirementId}
     </select>
 
+
     <!-- Requirement -->
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement" id="requirementResultMap">
-        <id column="requirement_id" property="requirementId"/>
-        <id column="parent_requirement_id" property="parentRequirementId"/>
-        <id column="resource_id" property="resourceId"/>
-        <id column="level" property="level"/>
-        <id column="id" property="id"/>
-        <id column="namespace" property="namespace"/>
-    </resultMap>
-    <select id="selectRequirements" parameterType="Long" resultMap="requirementResultMap">
+    <select id="selectRequirements" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
         SELECT requirement_id, parent_requirement_id, resource_id, level, id, namespace
         FROM requirement
         WHERE resource_id = #{resourceId}
@@ -93,17 +61,6 @@
 
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="requirementAttributesResultMap">
         <id column="requirement_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="attribute_index" property="attributeIndex"/>
-        <id column="list_index" property="listIndex"/>
-        <id column="type" property="type"/>
-        <id column="operator" property="operator"/>
-        <id column="string_value" property="stringValue"/>
-        <id column="long_value" property="longValue"/>
-        <id column="double_value" property="doubleValue"/>
-        <id column="version_major_value" property="versionMajorValue"/>
-        <id column="version_minor_value" property="versionMinorValue"/>
-        <id column="version_micro_value" property="versionMicroValue"/>
     </resultMap>
     <select id="selectRequirementAttributes" parameterType="Long" resultMap="requirementAttributesResultMap">
         SELECT requirement_id, name, attribute_index, list_index, type, operator, string_value, long_value, double_value,
@@ -115,8 +72,6 @@
 
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective" id="requirementDirectivesResultMap">
         <id column="requirement_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="value" property="value"/>
     </resultMap>
     <select id="selectRequirementDirectives" parameterType="Long" resultMap="requirementDirectivesResultMap">
         SELECT requirement_id, name, value
@@ -124,12 +79,16 @@
         WHERE requirement_id = #{requirementId}
     </select>
 
+
+    <!-- Properties - common -->
+    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="propertyAttributesResultMap">
+        <id column="property_id" property="entityId"/>
+    </resultMap>
+
+
     <!-- Capability property -->
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty" id="capabilityPropertyResultMap">
-        <id column="property_id" property="propertyId"/>
         <id column="capability_id" property="parentId"/>
-        <id column="id" property="id"/>
-        <id column="namespace" property="namespace"/>
     </resultMap>
     <select id="selectCapabilityProperties" parameterType="Long" resultMap="capabilityPropertyResultMap">
         SELECT property_id, capability_id, id, namespace
@@ -137,20 +96,7 @@
         WHERE capability_id = #{capabilityId}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="capabilityPropertyAttributesResultMap">
-        <id column="property_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="list_index" property="listIndex"/>
-        <id column="type" property="type"/>
-        <id column="operator" property="operator"/>
-        <id column="string_value" property="stringValue"/>
-        <id column="long_value" property="longValue"/>
-        <id column="double_value" property="doubleValue"/>
-        <id column="version_major_value" property="versionMajorValue"/>
-        <id column="version_minor_value" property="versionMinorValue"/>
-        <id column="version_micro_value" property="versionMicroValue"/>
-    </resultMap>
-    <select id="selectCapabilityPropertyAttributes" parameterType="Long" resultMap="capabilityPropertyAttributesResultMap">
+    <select id="selectCapabilityPropertyAttributes" parameterType="Long" resultMap="propertyAttributesResultMap">
         SELECT property_id, name, list_index, type, operator, string_value, long_value, double_value,
           version_major_value, version_minor_value, version_micro_value
         FROM capability_property_attribute
@@ -158,12 +104,10 @@
         ORDER BY name, list_index
     </select>
 
+
     <!-- Resource property -->
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty" id="resourcePropertyResultMap">
-        <id column="property_id" property="propertyId"/>
         <id column="resource_id" property="parentId"/>
-        <id column="id" property="id"/>
-        <id column="namespace" property="namespace"/>
     </resultMap>
     <select id="selectResourceProperties" parameterType="Long" resultMap="resourcePropertyResultMap">
         SELECT property_id, resource_id, id, namespace
@@ -171,20 +115,7 @@
         WHERE resource_id = #{resourceId}
     </select>
 
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute" id="resourcePropertyAttributesResultMap">
-        <id column="property_id" property="entityId"/>
-        <id column="name" property="name"/>
-        <id column="list_index" property="listIndex"/>
-        <id column="type" property="type"/>
-        <id column="operator" property="operator"/>
-        <id column="string_value" property="stringValue"/>
-        <id column="long_value" property="longValue"/>
-        <id column="double_value" property="doubleValue"/>
-        <id column="version_major_value" property="versionMajorValue"/>
-        <id column="version_minor_value" property="versionMinorValue"/>
-        <id column="version_micro_value" property="versionMicroValue"/>
-    </resultMap>
-    <select id="selectResourcePropertyAttributes" parameterType="Long" resultMap="resourcePropertyAttributesResultMap">
+    <select id="selectResourcePropertyAttributes" parameterType="Long" resultMap="propertyAttributesResultMap">
         SELECT property_id, name, list_index, type, operator, string_value, long_value, double_value,
           version_major_value, version_minor_value, version_micro_value
         FROM resource_property_attribute
@@ -193,6 +124,8 @@
     </select>
 
 
+    <!-- Deletes -->
+
     <delete id="deleteResourceByResourceId" parameterType="Long">
         DELETE FROM resource WHERE resource_id = #{id}
     </delete>
@@ -200,6 +133,7 @@
     <delete id="deleteResourceById" parameterType="String">
         DELETE FROM resource WHERE id = #{id}
     </delete>
+
 
     <!-- Inserts -->
 
