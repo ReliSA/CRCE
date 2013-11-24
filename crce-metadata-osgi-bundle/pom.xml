@@ -14,7 +14,7 @@
     <artifactId>crce-metadata-osgi-bundle</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Plugin - OSGi Manifest Indexer</name>
+    <name>CRCE - Plugin - OSGi Support</name>
 
     <properties>
         <bundle.symbolicName>${namespace}.metadata.osgi</bundle.symbolicName>

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.metadata.osgi.internal;
+package cz.zcu.kiv.crce.metadata.osgi.namespace;
 
 import java.util.List;
 import cz.zcu.kiv.crce.metadata.AttributeType;

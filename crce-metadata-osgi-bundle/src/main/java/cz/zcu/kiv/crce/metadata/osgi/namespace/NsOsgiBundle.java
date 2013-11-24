@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.metadata.osgi.internal;
+package cz.zcu.kiv.crce.metadata.osgi.namespace;
 
 import org.osgi.framework.Version;
 import cz.zcu.kiv.crce.metadata.AttributeType;

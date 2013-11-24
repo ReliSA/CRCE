@@ -5,5 +5,3 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Embed-Dependency: kxml2,org.apache.felix.utils
-
-Export-Package: 

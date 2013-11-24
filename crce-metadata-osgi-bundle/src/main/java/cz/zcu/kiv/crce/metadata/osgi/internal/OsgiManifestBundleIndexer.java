@@ -18,6 +18,12 @@
  */
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiFragment;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiExecutionEnvironment;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiService;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
