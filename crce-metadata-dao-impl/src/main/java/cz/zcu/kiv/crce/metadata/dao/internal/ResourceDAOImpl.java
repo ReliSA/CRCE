@@ -106,6 +106,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                     logger.warn("Could not load repository for resource {}", result);
                 }
             }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not load resource.", e);
         }
 
         logger.debug("loadResource(uri) returns {}", result);
@@ -315,6 +317,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                     }
                 }
             }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not load resources.", e);
         }
 
         if (logger.isTraceEnabled()) {
@@ -469,6 +473,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                 session.delete(RESOURCE_MAPPER + "deleteResource", resourceId);
                 session.commit();
             }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not delete resource.", e);
         }
 
         logger.debug("deleteResource(uri) returns");
@@ -483,6 +489,8 @@ public class ResourceDAOImpl implements ResourceDAO {
             if (session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString()) != null) {
                 result = true;
             }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not check presence of resource.", e);
         }
 
         logger.debug("existsResource(uri) returns {}", result);
@@ -502,6 +510,8 @@ public class ResourceDAOImpl implements ResourceDAO {
             if (dbResource != null && dbResource.getRepositoryId() == repositoryId) {
                 result = true;
             }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not check presence of resource.", e);
         }
 
         logger.debug("existsResource(uri, repository) returns {}", result);
