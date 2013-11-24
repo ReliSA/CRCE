@@ -335,6 +335,16 @@ public class ResourceDAOImpl implements ResourceDAO {
         logger.debug("saveResource(resource={})", resource);
 
         try (SqlSession session = sessionManager.getSession()) {
+            /*
+             * Workaround for updating of existing resources: Resource is deleted and then re-inserted
+             * until some update solution will be implemented. This solution wastes internal unique IDs,
+             * because a new ID is generated on each insertion.
+             */
+            if (existsResource(resource.getId())) {
+                session.delete(RESOURCE_MAPPER + "deleteResourceById", resource.getId());
+                logger.trace("Update workaround: existing resource {} was deleted before insert.", resource.getId());
+            }
+
             SequenceMapper seqMapper = session.getMapper(SequenceMapper.class);
 
             DbResource dbResource = MetadataMapping.mapResource2DbResource(resource, metadataService);
@@ -470,7 +480,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
             if (dbResource != null) {
                 long resourceId = dbResource.getResourceId();
-                session.delete(RESOURCE_MAPPER + "deleteResource", resourceId);
+                session.delete(RESOURCE_MAPPER + "deleteResourceByResourceId", resourceId);
                 session.commit();
             }
         } catch (PersistenceException e) {
@@ -515,6 +525,20 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
 
         logger.debug("existsResource(uri, repository) returns {}", result);
+
+        return result;
+    }
+
+    private boolean existsResource(@Nonnull String id) throws IOException {
+        boolean result = false;
+
+        try (SqlSession session = sessionManager.getSession()) {
+            if (session.selectOne(RESOURCE_MAPPER + "selectResourceById", id) != null) {
+                result = true;
+            }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not check presence of resource.", e);
+        }
 
         return result;
     }

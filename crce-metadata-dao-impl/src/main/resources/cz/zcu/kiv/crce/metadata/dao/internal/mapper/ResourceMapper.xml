@@ -21,6 +21,12 @@
         WHERE repository_id = #{repositoryId}
     </select>
 
+    <select id="selectResourceById" parameterType="String" resultMap="resourceResultMap">
+        SELECT resource_id, id, uri
+        FROM resource
+        WHERE id = #{id}
+    </select>
+
     <!-- Capability -->
     <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability" id="capabilityResultMap">
         <id column="capability_id" property="capabilityId"/>
@@ -187,8 +193,12 @@
     </select>
 
 
-    <delete id="deleteResource" parameterType="Long">
+    <delete id="deleteResourceByResourceId" parameterType="Long">
         DELETE FROM resource WHERE resource_id = #{id}
+    </delete>
+
+    <delete id="deleteResourceById" parameterType="String">
+        DELETE FROM resource WHERE id = #{id}
     </delete>
 
     <!-- Inserts -->
