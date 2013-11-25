@@ -65,6 +65,10 @@ public class Options {
             return maven("org.apache.felix.deploymentadmin");
         }
 
+        public static MavenArtifactProvisionOption bundleRepository() {
+            return maven("org.apache.felix.bundlerepository");
+        }
+
         private static MavenArtifactProvisionOption maven(String artifactId) {
             return Options.maven("org.apache.felix", artifactId);
         }
@@ -123,6 +127,22 @@ public class Options {
 
         public static MavenArtifactProvisionOption metadataDaoImpl() {
             return maven("crce-metadata-dao-impl");
+        }
+
+        public static MavenArtifactProvisionOption compatibilityApi() {
+            return maven("crce-compatibility-api");
+        }
+
+        public static MavenArtifactProvisionOption compatibilityDaoApi() {
+            return maven("crce-compatibility-dao-api");
+        }
+
+        public static MavenArtifactProvisionOption compatibilityImpl() {
+            return maven("crce-compatibility-impl");
+        }
+
+        public static MavenArtifactProvisionOption compatibilityDaoMongo() {
+            return maven("crce-compatibility-dao-mongodb");
         }
 
         public static MavenArtifactProvisionOption maven(String artifactId) {

@@ -57,7 +57,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
-                    <linkXref>false</linkXref>
+                    <linkXRef>false</linkXRef>
                     <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>${version.jdk}</targetJdk>

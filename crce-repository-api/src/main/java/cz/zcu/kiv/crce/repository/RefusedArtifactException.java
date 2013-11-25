@@ -11,7 +11,34 @@ public class RefusedArtifactException extends Exception {
 
     private static final long serialVersionUID = 3732119005799739933L;
 
+    public enum REASON {
+        /**
+         * General reason for revoking, no special care needed.
+         */
+        UNSPECIFIED,
+        /**
+         * Revoked because there has been another resource of the same symbolic name
+         * in the buffer.
+         */
+        ALREADY_IN_BUFFER
+    }
+
+    private REASON reason;
+
     public RefusedArtifactException(@Nonnull String reason) {
-        super(reason);
+        this(reason, REASON.UNSPECIFIED);
+    }
+
+    public RefusedArtifactException(@Nonnull String reasonDesc, @Nonnull REASON reason) {
+        super(reasonDesc);
+        this.reason = reason;
+    }
+
+    public REASON getReason() {
+        return reason;
+    }
+
+    public void setReason(REASON reason) {
+        this.reason = reason;
     }
 }
