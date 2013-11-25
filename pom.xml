@@ -104,6 +104,8 @@
         <!-- UI & Optional Plugins -->
         <!--<module>crce-handler-versioning</module>-->
         <module>crce-webui</module>
+        
+        <module>crce-jersey-hack</module>
         <module>crce-rest</module>
     </modules>
 
