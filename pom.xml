@@ -169,12 +169,12 @@
         <repository>
             <id>relisa-release</id>
             <name>ReliSA Internal Releases</name>
-            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/releases/</url>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>relisa-snapshots</id>
             <name>ReliSA Internal Snapshots</name>
-            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
 
     </distributionManagement>
@@ -189,22 +189,8 @@
         <repository>
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
-            <url>http://relisa.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
         </repository>
-
-        <!-- sacco repo -->
-      	<repository>
-      		<id>sacco.maven.repository</id>
-      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-repository</url>
-      	</repository>
-      	<repository>
-      		<id>sacco.maven.snapshots.repository</id>
-      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-snapshots-repository</url>
-      	</repository>
-      	<repository>
-      		<id>sacco.maven.third-parties.repository</id>
-      		<url>http://gforge.kiv.zcu.cz/svn/sacco-mvn-repo/maven-third-parties-repository</url>
-      	</repository>
 
     </repositories>
 
