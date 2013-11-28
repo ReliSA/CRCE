@@ -103,6 +103,7 @@
 
         <!-- UI & Optional Plugins -->
         <!--<module>crce-handler-versioning</module>-->
+        <module>crce-handler-metrics</module>
         <module>crce-webui</module>
         
         <module>crce-jersey-hack</module>
