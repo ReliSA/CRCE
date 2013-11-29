@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.handler.versioning.internal;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +22,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public class CompatibilityCalculationTask extends Task {
     private static final Logger logger = LoggerFactory.getLogger(CompatibilityCalculationTask.class);
 
-    private CompatibilityService m_compatibilityService;      //injected by dependency manager
-
     private Resource resource;
 
     /**
@@ -36,9 +37,15 @@ public class CompatibilityCalculationTask extends Task {
     @Override
     protected Object run() throws Exception {
         logger.debug("Started calculation of Compatibility data for resource {}", resource.getSymbolicName());
-        //Object o =  m_compatibilityService.calculateCompatibilities(resource);
-        //TODO m_compatibilityService not implemented yet
+        Object o =  getCompatibilityService().calculateCompatibilities(resource);
         logger.debug("Finished calculation of Compatibility data for resource {}", resource.getSymbolicName());
-        return null;
+        return o;
+    }
+
+    private CompatibilityService getCompatibilityService() {
+        // get bundle instance via the OSGi Framework Util class
+        BundleContext ctx = FrameworkUtil.getBundle(CompatibilityCalculationTask.class).getBundleContext();
+        ServiceReference serviceReference = ctx.getServiceReference(CompatibilityService.class.getName());
+        return CompatibilityService.class.cast(ctx.getService(serviceReference));
     }
 }

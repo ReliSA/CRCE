@@ -46,6 +46,37 @@
             <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-types</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-loader</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-cmp</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- CRCE dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -56,6 +87,18 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

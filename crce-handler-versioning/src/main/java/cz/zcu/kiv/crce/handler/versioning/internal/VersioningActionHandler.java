@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 
-import cz.zcu.kiv.crce.concurrency.model.Task;
-import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -36,8 +34,6 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
  * @author Jan Reznicek
  */
 public class VersioningActionHandler extends AbstractActionHandler implements ActionHandler {
-
-    private TaskRunnerService m_taskRunnerService;   /* injected by dependency manager */
 
     private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
 
@@ -216,20 +212,6 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             cap.setProperty("original-version", resource.getVersion());
 
         }
-        return resource;
-    }
-
-    @Override
-    public Resource afterPutToStore(Resource resource, Store store) throws RevokedArtifactException {
-        /*
-            After the resource is put to store, start calculation of its compatibility data.
-         */
-        if (resource == null) {
-            return resource;
-        }
-
-        Task compTask = new CompatibilityCalculationTask(resource.getId(), resource);
-        m_taskRunnerService.scheduleTask(compTask);
         return resource;
     }
 

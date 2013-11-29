@@ -17,7 +17,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public interface CompatibilitySearchService {
 
     /**
-     * List all available compatibility data for the given resource.
+     * List all compatibility data the given resource owns.
      * @param resource resource present in crce
      * @return list
      */

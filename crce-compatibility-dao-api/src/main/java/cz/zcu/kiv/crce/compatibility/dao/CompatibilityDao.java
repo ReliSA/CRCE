@@ -37,13 +37,23 @@ public interface CompatibilityDao {
      */
     public void deleteCompatibility(Compatibility compatibility);
 
+
     /**
-     * List of all compatibilities available for the given resource name and version
+     * Deletes all compatibility data related to a resource with the given name an version.
+     * That is it doesnt matter whether the resource has been the new version or the base.
+     * @param resourceName symbolic name
+     * @param resourceVersion version
+     */
+    public void deleteAllRelatedCompabilities(String resourceName, Version resourceVersion);
+
+    /**
+     * List of all compatibilities owned by a resource with the given name and version
+     * i.e. all Compatibility data where this resource has been the "new" version
      * @param resourceName name of the resource
      * @param resourceVersion version of the resource
      * @return
      */
-    public List<Compatibility> listCompatibilities(String resourceName, Version resourceVersion);
+    public List<Compatibility> listOwnedCompatibilities(String resourceName, Version resourceVersion);
 
     /*
             List of differences

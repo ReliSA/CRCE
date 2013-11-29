@@ -73,10 +73,17 @@ public abstract class Task<T> implements Callable<T> {
         setState(TaskState.RUNNING);
         logger.info("Task {} called by {} has been started.", id, caller);
         logger.debug("Task description: {}", description);
-        T obj = run();
-        setState(TaskState.FINISHED);   //should be set AFTER returning the object
-        // probably will require listener thread for the TaskRunner
-        logger.info("Task {} called by {} has finished.", id, caller);
+        T obj;
+        try {
+            obj = run();
+            setState(TaskState.FINISHED);   //should be set AFTER returning the object
+            // probably will require listener thread for the TaskRunner
+            logger.info("Task {} called by {} has finished.", id, caller);
+        } catch (Exception ex) {
+            logger.error("Task {} failed with exception.", ex);
+            obj = null;
+            setState(TaskState.FINISHED_WITH_ERROR);
+        }
         return obj;
     }
 

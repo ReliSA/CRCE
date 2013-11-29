@@ -29,4 +29,12 @@ public interface CompatibilityService extends CompatibilitySearchService {
      * @return calculated compatibilities
      */
     List<Compatibility> calculateCompatibilities(Resource resource);
+
+    /**
+     * Removes all compatibility information about the resource
+     * i.e. all Compatibilities where the resource has been used as either
+     * upper or lower value.
+     * @param resource the resource to be removed
+     */
+    void removeCompatibilities(Resource resource);
 }

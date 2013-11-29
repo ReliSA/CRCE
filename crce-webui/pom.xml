@@ -145,7 +145,6 @@
             <type>bundle</type>
             <scope>provided</scope>
         </dependency>
-
         <!-- Project dependencies -->
         
         <dependency>

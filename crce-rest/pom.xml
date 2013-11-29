@@ -100,6 +100,12 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>crce-compatibility-api</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+      </dependency>
 
 
 		 <!-- 3rd party dependencies -->		

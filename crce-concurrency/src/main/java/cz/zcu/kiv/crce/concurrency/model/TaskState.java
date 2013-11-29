@@ -19,5 +19,9 @@ public enum TaskState {
     /**
      * The task has finished its job.
      */
-    FINISHED
+    FINISHED,
+    /**
+     * The task has ended due to an error.
+     */
+    FINISHED_WITH_ERROR
 }

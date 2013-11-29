@@ -207,7 +207,7 @@ public class CompatibilityDaoImplIT {
     public void compatibilityListTest() throws Exception {
         List<Compatibility> testData = createTestDataForListing();
 
-        List<Compatibility> testee = m_dao.listCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
+        List<Compatibility> testee = m_dao.listOwnedCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
 
         assertEquals("Expected to get same amount of results as VERSIONS", VERSIONS.length, testee.size());
         for(Compatibility test : testee) {
