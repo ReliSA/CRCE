@@ -3,8 +3,9 @@ package cz.zcu.kiv.crce.handler.metrics.internal;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
+
 
 
 public class Activator extends DependencyActivatorBase {
@@ -14,8 +15,8 @@ public class Activator extends DependencyActivatorBase {
         
 		manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
-                .setImplementation(FileSizeHandler.class)
-                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                .setImplementation(MetricsIndexer.class)
+                .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 );
 	}
 
