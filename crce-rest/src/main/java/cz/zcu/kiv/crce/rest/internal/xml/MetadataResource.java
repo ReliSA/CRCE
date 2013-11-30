@@ -15,7 +15,9 @@ import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetMetadata;
 import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
@@ -128,7 +130,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             @Context UriInfo ui) {
 
     	newRequest();
-    	logger.debug("Request ({}) - Get metadata request for resource with id {} was received.",getRequestId() ,id);
+        logger.debug("Request ({}) - Get metadata request for resource with id {} was received.", getRequestId(), id);
 
     	IncludeMetadata include = new IncludeMetadata();
 
@@ -159,12 +161,11 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             }
         }
 
-//        try {
-            List<Resource> storeResources;
-//            String filter = "(id=" + id + ")";
-//            storeResources = Activator.instance().getStore().getRepository().getResources(filter);
-            storeResources = Activator.instance().getStore().getResources();
-            logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
+        try {
+            Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+            requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
+
+            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
             try {
                 if (!storeResources.isEmpty()) {
@@ -177,15 +178,11 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
                     return Response.status(404).build();
                 }
             } catch (WebApplicationException e) {
-
                 return e.getResponse();
             }
-
-//        } catch (InvalidSyntaxException e) {
-//            logger.warn("Request ({}) - Invalid syntax of request LDAP filter.", getRequestId());
-//            logger.debug(e.getMessage(), e);
-//            return Response.status(400).build();
-//        }
-
+        } catch (Exception e) {
+			logger.error("Request ({}) - Could not get resources from store.", getRequestId(), e);
+			throw new WebApplicationException(500);
+		}
     }
 }

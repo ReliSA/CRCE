@@ -14,7 +14,7 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.rest.internal.Activator;
@@ -125,16 +125,14 @@ public abstract class ResourceParent {
 	 * If are more bundle found, return first of them.
 	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
 	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
-	 * @param filter LDAP filter
+     * @param requirement Resource requirement.
 	 * @return founded bundle.
 	 * @throws WebApplicationException
 	 */
-	protected Resource findSingleBundleByFilter(String filter) throws WebApplicationException {
-//        try {
-            List<Resource> storeResources;
-//            storeResources = Activator.instance().getStore().getResources(filter);
-            logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
-            storeResources = Activator.instance().getStore().getResources();
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
+	protected Resource findSingleBundleByFilter(Requirement requirement) throws WebApplicationException {
+        try {
+            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
             if (storeResources.isEmpty()) {
                 logger.debug("Request ({}) - Requested bundle was not found in the repository.", requestId);
@@ -143,10 +141,12 @@ public abstract class ResourceParent {
                 return storeResources.get(0);
             }
 
-//        } catch (InvalidSyntaxException e) {
-//            logger.debug("Request ({}) - Bad syntax of LDAP filter", requestId);
-//            throw new WebApplicationException(400);
-//        }
+        } catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+			throw new WebApplicationException(500);
+		}
 	}
 
 	/**
@@ -154,16 +154,14 @@ public abstract class ResourceParent {
 	 * If are more bundle found, return the one with the highest version.
 	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
 	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
-	 * @param filter LDAP filter
-	 * @return founded bundle.
+	 * @param requirement Resource requirement.
+	 * @return Found bundle.
 	 * @throws WebApplicationException
 	 */
-    protected Resource findSingleBundleByFilterWithHighestVersion(String filter) throws WebApplicationException {
-//        try {
-            List<Resource> storeResources;
-//            storeResources = Activator.instance().getStore().getResources(filter);
-            logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
-            storeResources = Activator.instance().getStore().getResources();
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
+    protected Resource findSingleBundleByFilterWithHighestVersion(Requirement requirement) throws WebApplicationException {
+        try {
+            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
             if (storeResources.isEmpty()) {
                 logger.debug("Request ({}) - Requested bundle was not found in the repository.", requestId);
@@ -181,11 +179,12 @@ public abstract class ResourceParent {
             }
 
             return resource;
-
-//        } catch (InvalidSyntaxException e) {
-//            logger.debug("Request ({}) - Bad syntax of LDAP filter", requestId);
-//            throw new WebApplicationException(400);
-//        }
+        } catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+			throw new WebApplicationException(500);
+		}
     }
 
 	/**
@@ -193,16 +192,14 @@ public abstract class ResourceParent {
 	 * If are more bundle found, return the one with the lowest version.
 	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
 	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
-	 * @param filter LDAP filter
+     * @param requirement Resource requirement.
 	 * @return founded bundle.
 	 * @throws WebApplicationException
 	 */
-    protected Resource findSingleBundleByFilterWithLowestVersion(String filter) throws WebApplicationException {
-//        try {
-            List<Resource> storeResources;
-//			storeResources = Activator.instance().getStore().getResources(filter);
-            logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
-            storeResources = Activator.instance().getStore().getResources();
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
+    protected Resource findSingleBundleByFilterWithLowestVersion(Requirement requirement) throws WebApplicationException {
+        try {
+            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
             if (storeResources.isEmpty()) {
                 logger.debug("Request ({}) - Requested bundle was not found in the repository.", requestId);
@@ -220,36 +217,38 @@ public abstract class ResourceParent {
             }
 
             return resource;
-
-//        } catch (InvalidSyntaxException e) {
-//            logger.debug("Request ({}) - Bad syntax of LDAP filter", requestId);
-//            throw new WebApplicationException(400);
-//        }
+		} catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+			throw new WebApplicationException(500);
+		}
     }
 
 
 	/**
 	 * Find bundles by filter
 	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
-	 * @param filter LDAP filter
+     * @param requirement Resource requirement.
 	 * @return founded bundles.
 	 * @throws WebApplicationException
 	 */
-	protected List<Resource> findBundlesByFilter(String filter) throws WebApplicationException {
-//		try {
-			List<Resource> storeResources;
-//			storeResources = Activator.instance().getStore().getResources(filter);
+	protected List<Resource> findBundlesByFilter(Requirement requirement) throws WebApplicationException {
+		try {
+            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
-            logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
-			storeResources = Activator.instance().getStore().getResources();
+            // TODO check list size?
 
 			return storeResources;
-
-//		} catch (InvalidSyntaxException e) {
-//			log.debug("Request ({}) - Bad syntax of LDAP filter", requestId);
-//			throw new WebApplicationException(400);
-//		}
+		} catch (Exception e) {
+			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+			throw new WebApplicationException(500);
+		}
 	}
+
+    protected List<Resource> findAllBundles() throws WebApplicationException {
+        return Activator.instance().getStore().getResources();
+    }
 
 	/**
 	 * Indicate that new request came to server.
@@ -271,20 +270,18 @@ public abstract class ResourceParent {
 
     protected Version getBundleVersion(Resource resource) {
         if (resource != null) {
-            List<Capability> resCapabilities = resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
-            if (!resCapabilities.isEmpty()) {
-                return resCapabilities.get(0).getAttributeValue(NsOsgiBundle.ATTRIBUTE__VERSION);
-            }
+            return Activator.instance().getMetadataService()
+                    .getSingletonCapability(resource, NsOsgiBundle.NAMESPACE__OSGI_BUNDLE)
+                    .getAttributeValue(NsOsgiBundle.ATTRIBUTE__VERSION);
         }
         return null;
     }
 
     protected String getBundleSymbolicName(Resource resource) {
         if (resource != null) {
-            List<Capability> resCapabilities = resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
-            if (!resCapabilities.isEmpty()) {
-                return resCapabilities.get(0).getAttributeValue(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME);
-            }
+            return Activator.instance().getMetadataService()
+                    .getSingletonCapability(resource, NsOsgiBundle.NAMESPACE__OSGI_BUNDLE)
+                    .getAttributeValue(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME);
         }
         return null;
     }

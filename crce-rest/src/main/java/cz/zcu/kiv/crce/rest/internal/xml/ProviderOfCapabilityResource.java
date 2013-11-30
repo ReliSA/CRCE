@@ -140,7 +140,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
             throw new WebApplicationException(400);
         }
 
-        List<Resource> allResources = findBundlesByFilter("");
+        List<Resource> allResources = findAllBundles();
         //log.info("All resources size " + allResources.length);
 
         List<Resource> matchingResources = new ArrayList<>();

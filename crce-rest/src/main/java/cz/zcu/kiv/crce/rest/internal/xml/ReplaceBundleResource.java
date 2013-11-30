@@ -16,7 +16,9 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetReplaceBundle;
 import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
@@ -40,11 +42,10 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 * @throws WebApplicationException the resource was not found.
 	 */
 	private Resource findResource(String id) throws WebApplicationException {
+        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
-		String filter = "(id=" + id + ")";
-
-		return findSingleBundleByFilter(filter);
-
+		return findSingleBundleByFilter(requirement);
 	}
 
 	/**
@@ -144,16 +145,19 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 */
     private Resource findResourceToReturn(String op, Resource clientResource) throws WebApplicationException {
         Resource resourceToReturn = null;
-        String nameFilter = "(symbolicName=" + getBundleSymbolicName(clientResource) + ")";
-        List<Resource> resourcesWithSameName = findBundlesByFilter(nameFilter);
+
+        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, getBundleSymbolicName(clientResource));
+
+        List<Resource> resourcesWithSameName = findBundlesByFilter(requirement);
 
         if (op != null) {
             switch (op) {
                 case LOWEST_OP:
-                    resourceToReturn = findSingleBundleByFilterWithLowestVersion(nameFilter);
+                    resourceToReturn = findSingleBundleByFilterWithLowestVersion(requirement);
                     break;
                 case HIGHEST_OP:
-                    resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
+                    resourceToReturn = findSingleBundleByFilterWithHighestVersion(requirement);
                     break;
                 case DOWNGRADE_OP:
                     resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
@@ -163,7 +167,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
                     break;
                 case ANY_OP:
                     //use highest (if there is no higher, use nearest lower)
-                    resourceToReturn = findSingleBundleByFilterWithHighestVersion(nameFilter);
+                    resourceToReturn = findSingleBundleByFilterWithHighestVersion(requirement);
                     if (resourceToReturn.getId().equals(clientResource.getId())) {
                         resourceToReturn = nearestLowerResource(resourcesWithSameName, clientResource);
                     }

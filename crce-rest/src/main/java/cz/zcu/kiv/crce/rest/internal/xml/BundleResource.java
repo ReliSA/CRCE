@@ -19,7 +19,9 @@ import javax.ws.rs.core.StreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetBundle;
 
@@ -120,16 +122,15 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	/**
 	 * Create response with bundle by filter.
 	 * Find bundle according LDAP filter in store repository and return him as output stream.
-	 * @param filter LDAP filter
+	 * @param requirement LDAP filter
 	 * @return bundle as output stream
 	 * @throws WebApplicationException some exception, contains html error status
 	 */
-	private Response responseByFilter(String filter) throws WebApplicationException {
+	private Response responseByRequirement(Requirement requirement) throws WebApplicationException {
 
-		logger.debug("Request ({}) - Get bundle by filter: {}", getRequestId(), filter);
+		logger.debug("Request ({}) - Get bundle by filter: {}", getRequestId(), requirement);
 
-		Resource resource = findSingleBundleByFilterWithHighestVersion(filter);
-
+		Resource resource = findSingleBundleByFilterWithHighestVersion(requirement);
 
 		final File resourceFile = new File(Activator.instance().getMetadataService().getUri(resource));
 
@@ -137,11 +138,13 @@ public class BundleResource extends ResourceParent implements GetBundle {
 
 
 
-		Response response = Response.ok(output).type(Activator.instance().getMimeTypeSelector().selectMimeType(resource))
-                .header("content-disposition", "attachment; filename = " + getFileName(resource)).build();
+        Response response =
+            Response.ok(output)
+                .type(Activator.instance().getMimeTypeSelector().selectMimeType(resource))
+                .header("content-disposition", "attachment; filename = " + getFileName(resource))
+                .build();
 
 		return response;
-
 	}
 
 	/**
@@ -150,16 +153,18 @@ public class BundleResource extends ResourceParent implements GetBundle {
 	 * @param id id of a bundle
 	 * @return bundle or error response
 	 */
-	@GET @Path("{id}")
+	@GET
+    @Path("{id}")
     @Override
 	public Response getBundleById(@PathParam("id") String id) {
 		newRequest();
 		logger.debug("Request ({}) - Get bundle by id request was received.", getRequestId());
 
-		String filter = "(id="+id+")";
+        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
 		try {
-			Response response = responseByFilter(filter);
+			Response response = responseByRequirement(requirement);
 
 			logger.debug("Request ({}) - Response was successfully created.",getRequestId());
 
@@ -168,7 +173,6 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		} catch (WebApplicationException e) {
 			return e.getResponse();
 		}
-
 	}
 
 	/**
@@ -182,32 +186,28 @@ public class BundleResource extends ResourceParent implements GetBundle {
     @Override
 	public Response getBundlebyNameAndVersion(@QueryParam("name") String name, @QueryParam("version") String version) {
 		newRequest();
+
 		logger.debug("Request ({}) - Get bundle by name and version request was received.", getRequestId());
 
+        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
 
-		String filter;
-
-		if (name != null && version != null) {
-			filter = "(&(symbolicname=" + name + ")(version=" + version + "))";
-
-		} else if (name != null && version == null) {
-			filter = "(symbolicname=" + name + ")";
-
-		} else {
-			logger.debug(
-					"Request ({}) - Wrong request, name of requested bundle has to be set.",
-					getRequestId());
+        if (name == null) {
+			logger.debug("Request ({}) - Wrong request, name of requested bundle has to be set.", getRequestId());
 			return Response.status(400).build();
-		}
+        }
 
+        requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);
+
+        if (version != null) {
+            requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, version);
+        }
 
 		try {
+			Response response = responseByRequirement(requirement);
 
-			Response response = responseByFilter(filter);
 			logger.debug("Request ({}) - Response was successfully created.", getRequestId());
 
 			return response;
-
 		} catch (WebApplicationException e) {
 			return e.getResponse();
 		}

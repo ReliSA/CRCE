@@ -21,7 +21,6 @@
         <bundle.namespace>${namespace}.rest</bundle.namespace>
     </properties>
 
-
     <build>
         <plugins>
             <plugin>
@@ -34,13 +33,10 @@
                     <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
-
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
-
                 <executions>
                     <execution>
                         <id>bundle-manifest</id>
@@ -60,12 +56,15 @@
                         <supportedProjectType>bundle</supportedProjectType>
                         <supportedProjectType>war</supportedProjectType>
                     </supportedProjectTypes>
-                    <instructions>
-
-                    </instructions>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                <configuration>
+                    <m_artifactExtension>war</m_artifactExtension>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

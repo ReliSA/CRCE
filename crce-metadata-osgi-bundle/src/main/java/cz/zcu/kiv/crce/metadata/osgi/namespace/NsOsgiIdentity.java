@@ -12,8 +12,8 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 public interface NsOsgiIdentity {
     String NAMESPACE__OSGI_IDENTITY = "osgi.identity";
 
-    AttributeType<String> ATTRIBUTE__ID =
-            new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.ID, String.class);
+    AttributeType<String> ATTRIBUTE__NAME =
+            new SimpleAttributeType<>("name", String.class);
 
     AttributeType<String> ATTRIBUTE__SYMBOLIC_NAME =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.SYMBOLIC_NAME, String.class);

@@ -226,7 +226,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         String v = getVersion(headers);
         Capability identity = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
 
-        identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__ID, bsn + "/" + v);
+        identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, bsn + "-" + v);
         identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, bsn);
         identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, v);
         if (headers.getHeader(Constants.BUNDLE_NAME) != null) {

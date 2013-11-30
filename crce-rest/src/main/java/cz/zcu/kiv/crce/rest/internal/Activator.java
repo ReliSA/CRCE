@@ -4,6 +4,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.rest.internal.convertor.ConvertorToBeans;
@@ -13,22 +14,15 @@ import cz.zcu.kiv.crce.rest.internal.convertor.MimeTypeSelector;
 public final class Activator extends DependencyActivatorBase {
 
     private static volatile Activator instance;
-    private volatile Store store;                       /*
-     * injected by dependency manager
-     */
 
-    private volatile MetadataService metadataService;   /*
-     * injected by dependency manager
+    /*
+     * Injected by Dependency Manager.
      */
-
-    private volatile ConvertorToBeans convertorToBeans; /*
-     * injected by dependency manager
-     */
-
-    private volatile MimeTypeSelector mimeTypeSelector; /*
-     * injected by dependency manager
-     */
-
+    private volatile Store store;
+    private volatile MetadataService metadataService;
+    private volatile ConvertorToBeans convertorToBeans;
+    private volatile MimeTypeSelector mimeTypeSelector;
+    private volatile ResourceFactory resourceFactory;
 
     public static Activator instance() {
         return instance;
@@ -50,6 +44,10 @@ public final class Activator extends DependencyActivatorBase {
         return mimeTypeSelector;
     }
 
+    public ResourceFactory getResourceFactory() {
+        return resourceFactory;
+    }
+
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
 
@@ -66,6 +64,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ConvertorToBeans.class).setRequired(true))
                 .add(createServiceDependency().setService(MimeTypeSelector.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
         );
     }
 }

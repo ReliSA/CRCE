@@ -26,17 +26,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
-                <version>${version.org.apache.felix.dependencymanager}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>scan</goal>
-                        </goals>
-                        <configuration>
-                            <log>info</log>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
