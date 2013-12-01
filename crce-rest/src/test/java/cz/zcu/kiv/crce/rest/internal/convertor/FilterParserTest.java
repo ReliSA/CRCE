@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.rest.convertor;
+package cz.zcu.kiv.crce.rest.internal.convertor;
 
 import cz.zcu.kiv.crce.rest.internal.convertor.FilterParser;
 import static org.junit.Assert.assertTrue;

@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,10 +86,9 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
 
         try {
             if (filter != null) {
+                Requirement requirement = Activator.instance().getFilterParser().parse(filter, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
                 logger.debug("Filter used to get metadata: {}.", filter);
-                logger.warn("OBR filter is not supported in CRCE 2, all resources will be returned."); // TODO API incompatibility
-//                storeResources = Activator.instance().getStore().getResources(filter);
-                storeResources = Activator.instance().getStore().getResources();
+                storeResources = Activator.instance().getStore().getResources(requirement);
             } else {
                 storeResources = Activator.instance().getStore().getResources();
             }
@@ -104,13 +104,11 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             }
         } catch (WebApplicationException e) {
             return e.getResponse();
-
-//        } catch (InvalidSyntaxException e) {
-//            logger.warn("Request ({}) - Invalid syntax of request LDAP filter.", getRequestId());
-//            logger.debug(e.getMessage(), e);
-//            return Response.status(400).build();
+        } catch (InvalidSyntaxException e) {
+            logger.warn("Request ({}) - Invalid syntax of request LDAP filter.", getRequestId());
+            logger.debug(e.getMessage(), e);
+            return Response.status(400).build();
         }
-
     }
 
 
