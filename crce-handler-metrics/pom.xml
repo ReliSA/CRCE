@@ -19,18 +19,27 @@
     <properties>
         <bundle.symbolicName>${namespace}.handler.metrics</bundle.symbolicName>
         <bundle.namespace>${namespace}.handler.metrics</bundle.namespace>
-    </properties> 
+    </properties>     
   
     <dependencies>
     
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
-        </dependency>
+        </dependency>           
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.bundlerepository</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.utils</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>        
         
         <dependency>
             <groupId>${project.groupId}</groupId>

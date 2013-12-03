@@ -4,4 +4,4 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Export-Package:
+Embed-Dependency: org.apache.felix.utils
