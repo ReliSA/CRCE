@@ -130,6 +130,10 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-multipart</artifactId>
+        </dependency>
         
          <!-- Test dependencies -->		
         		

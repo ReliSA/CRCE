@@ -191,8 +191,6 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
     public Resource onUploadToBuffer(Resource resource, Buffer buffer, String name) throws RevokedArtifactException {
         logger.debug("Entering onUploadToBuffer");
 
-        checkAlreadyInBuffer(resource, buffer);
-
         if (!resource.hasCategory("osgi")) {
             logger.debug("Resource doesnt have category osgi");
             return resource;
@@ -215,13 +213,29 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
         return resource;
     }
 
-    private void checkAlreadyInBuffer(Resource resource, Buffer buffer) throws RevokedArtifactException {
+    @Override
+    public String beforeUploadToBuffer(String name, Buffer buffer) throws RevokedArtifactException {
+        logger.debug("entering beforeUploadToBuffer");
+        checkAlreadyInBuffer(name, buffer);
+        return super.beforeUploadToBuffer(name, buffer);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Checks there is no resource of the same name in the buffer.
+     * @param name filename of the uploaded file
+     * @param buffer the buffer
+     * @throws RevokedArtifactException
+     */
+    private void checkAlreadyInBuffer(String name, Buffer buffer) throws RevokedArtifactException {
         logger.debug("Checking for presence of a resource with the same symbolic name in the buffer.");
 
-        try {
-            String filter = "(symbolicname=" + resource.getSymbolicName() + ")";
+        //name is filename - including extension
+        String symbolicName = name.substring(0, name.lastIndexOf('.'));
 
-            logger.debug("Searching for previously buffered versions of: " + resource.getSymbolicName());
+        try {
+            String filter = "(symbolicname=" + symbolicName + ")";
+
+            logger.debug("Searching for previously buffered versions of: " + symbolicName);
 
             if (buffer.getRepository().getResources(filter).length != 0) {
                 logger.debug("Resource with the same symbolic name found!");
