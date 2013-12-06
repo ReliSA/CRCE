@@ -25,7 +25,7 @@ public class TaskRunner {
      */
     private static final Logger logger = LoggerFactory.getLogger(TaskRunner.class);
 
-    private static TaskRunner instance = null;
+    private static volatile TaskRunner instance = new TaskRunner();
 
     /**
      *
@@ -34,16 +34,20 @@ public class TaskRunner {
      *
      * @return singleton instance of TaskRunner
      */
-    public static TaskRunner get() {
-        if(instance == null) {
-            instance = new TaskRunner();
-        }
+    public synchronized static TaskRunner get() {
         return instance;
     }
 
-    public static void init(int maxThreads) {
+    /**
+     * This static method can be used to reinitialize TaskRunner queue. It will first call stop() on the
+     * current instance and then replace it with new instance.
+     * @param maxThreads
+     */
+    public static synchronized void init(int maxThreads) {
+        instance.stop();
         instance = new TaskRunner(maxThreads);
     }
+
 
     /*
             MEMBER CODE
@@ -56,8 +60,8 @@ public class TaskRunner {
      * Initializes TaskRunner to default configuration.
      */
     private TaskRunner() {
-        //TODO change this to configuration
-        this(5);
+        //TODO move this to configuration
+        this(1);
     }
 
     /**

@@ -28,7 +28,7 @@ public class DbContext {
      */
     public static MongoClient getConnection() throws UnknownHostException {
         if(client == null) {
-            client = new MongoClient("localhost");
+            client = new MongoClient("localhost", 27017);
         }
 
         return client;

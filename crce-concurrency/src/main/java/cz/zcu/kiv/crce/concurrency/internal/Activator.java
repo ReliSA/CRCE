@@ -23,8 +23,7 @@ public class Activator extends DependencyActivatorBase {
      */
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
-        //TODO change this to configuration
-        TaskRunner.init(5);
+
     }
 
     /**
