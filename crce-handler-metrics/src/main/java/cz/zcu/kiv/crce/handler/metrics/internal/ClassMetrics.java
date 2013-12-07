@@ -12,25 +12,21 @@ public class ClassMetrics {
 
 	private static final String DEFAULT_PACKAGE_NAME = "<default>";
 	
+	private static final double COMPLEX_PARAMETER_WEIGHT = 1.0;
+	
+	private static final int[] COMPLEX_TYPES = new int[] { Type.ARRAY, Type.OBJECT };
+	
 	private String packageName;
 	private String className;
 	
 	private boolean isPublic;
 	private boolean isInterface;
 	
-	private int numPublicMethods;
-	private int numAllMethods;
-	
-	private int parameterWeightedNumPublicMethods;
-	private int parameterWeightedNumAllMethods;	
+	private double methodsComplexity;
 	
 	public ClassMetrics(ClassNode byteCodeNode) {
 		
-		numPublicMethods = 0;
-		numAllMethods = 0;
-		
-		parameterWeightedNumPublicMethods = 0;
-		parameterWeightedNumAllMethods = 0;
+		methodsComplexity = 0;
 		
 		String fullClassName = byteCodeNode.name.replace('/','.');
 		
@@ -67,28 +63,46 @@ public class ClassMetrics {
 	private void parseMethod(MethodNode method) {
 		boolean isPublicMethod = Modifier.isPublic(method.access);
 		
-		numAllMethods++;
-		if (isPublicMethod) {
-			numPublicMethods++;
+		if (!isPublicMethod) {
+			return;
 		}
 		
-		int parametersCount = 0;
+		int simpleParametersCount = 0;
+		int complexParametersCount = 0;
+		
 		if (method.signature != null)
 		{
 			MetricsSignatureVisitor visitor = new MetricsSignatureVisitor();			
 			new SignatureReader(method.signature).accept(visitor);
-			parametersCount = visitor.getNumberOfMethodParametrs();
+			
+			simpleParametersCount = visitor.getNumberOfSimpleParametrs();
+			complexParametersCount = visitor.getNumberOfComplexParametrs();
 		}
 		else
 		{
-			parametersCount = Type.getArgumentTypes(method.desc).length;
+			for (Type parameterType : Type.getArgumentTypes(method.desc)) {
+				if (isComplexType(parameterType)) {
+					complexParametersCount++;
+				} 
+				else {
+					simpleParametersCount++;
+				}
+			}
+		}
+				
+		methodsComplexity += simpleParametersCount + complexParametersCount * COMPLEX_PARAMETER_WEIGHT;
+	}
+	
+	private boolean isComplexType(Type t) {
+		int typeInt = t.getSort();
+		
+		for (int type : COMPLEX_TYPES) {
+			if (type == typeInt) {
+				return true;
+			}
 		}
 		
-		
-		parameterWeightedNumAllMethods += parametersCount + 1;
-		if (isPublicMethod) {
-			parameterWeightedNumPublicMethods += parametersCount + 1;
-		}
+		return false;
 	}
 
 	public String getPackageName() {
@@ -107,19 +121,7 @@ public class ClassMetrics {
 		return isInterface;
 	}
 
-	public int getNumPublicMethods() {
-		return numPublicMethods;
-	}
-
-	public int getNumAllMethods() {
-		return numAllMethods;
-	}
-
-	public int getParameterWeightedNumPublicMethods() {
-		return parameterWeightedNumPublicMethods;
-	}
-
-	public int getParameterWeightedNumAllMethods() {
-		return parameterWeightedNumAllMethods;
+	public double getMethodsComplexity() {
+		return methodsComplexity;
 	}
 }

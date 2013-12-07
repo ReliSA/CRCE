@@ -132,28 +132,26 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		for (Clause exportPackageClause : exportPackageClauses) {
 			String packageName = exportPackageClause.getName();
 			
-			int weightedNumPublicMethods = 0;
-			int numOfClasses = 0;
+			int cmpC = 0; // TODO
+			int sumClassComplexity = 0; // TODO
+			int sumMethodComplexity = 0;
 			
 			for (ClassMetrics classMetric : classMetrics) {
-				if (classMetric.isPublic() && !classMetric.isInterface() && classMetric.getPackageName().compareTo(packageName) == 0) {
-					numOfClasses++;
-					weightedNumPublicMethods += classMetric.getParameterWeightedNumPublicMethods();
+				if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
+					sumMethodComplexity += classMetric.getMethodsComplexity();
 				}
 			}
 			
-			if (numOfClasses > 0) {			
-				double complexity = (double)weightedNumPublicMethods / numOfClasses;
+			double complexity = cmpC + sumClassComplexity + sumMethodComplexity;
 				
-				Capability capability = resourceFactory.createCapability("osgi.wiring.package");
-				capability.setAttribute("name", String.class, packageName);
-				metadataService.addRootCapability(resource, capability);
-				
-				Capability metricsCapability = resourceFactory.createCapability("crce.metric");
-				metricsCapability.setAttribute("name", String.class, "api-complexity");
-				metricsCapability.setAttribute("value", Double.class, complexity);		
-				metadataService.addChild(capability, metricsCapability);
-			}
+			Capability capability = resourceFactory.createCapability("osgi.wiring.package");
+			capability.setAttribute("name", String.class, packageName);
+			metadataService.addRootCapability(resource, capability);
+			
+			Capability metricsCapability = resourceFactory.createCapability("crce.metric");
+			metricsCapability.setAttribute("name", String.class, "api-complexity");
+			metricsCapability.setAttribute("value", Double.class, complexity);		
+			metadataService.addChild(capability, metricsCapability);
 		}
 	}
 	
