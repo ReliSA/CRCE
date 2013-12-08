@@ -133,11 +133,12 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 			String packageName = exportPackageClause.getName();
 			
 			int cmpC = 0; // TODO
-			int sumClassComplexity = 0; // TODO
+			int sumClassComplexity = 0; 
 			int sumMethodComplexity = 0;
 			
 			for (ClassMetrics classMetric : classMetrics) {
 				if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
+					sumClassComplexity += classMetric.getClassComplexity();
 					sumMethodComplexity += classMetric.getMethodsComplexity();
 				}
 			}
