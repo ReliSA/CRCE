@@ -32,6 +32,8 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 public class MetricsIndexer extends AbstractResourceIndexer {
 	
+	private static final double CLASS_WEIGHT = 1.0;
+	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
 	
 	private volatile ResourceFactory resourceFactory;
@@ -132,16 +134,32 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		for (Clause exportPackageClause : exportPackageClauses) {
 			String packageName = exportPackageClause.getName();
 			
-			int cmpC = 0; // TODO
-			int sumClassComplexity = 0; 
-			int sumMethodComplexity = 0;
+			double cmpC = 0; 
+			double sumClassComplexity = 0; 
+			double sumMethodComplexity = 0;
+			
+			int classCount = 0;
+			int interfaceCount = 0;
+			double weightedMethodCountSum = 0;
 			
 			for (ClassMetrics classMetric : classMetrics) {
 				if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
 					sumClassComplexity += classMetric.getClassComplexity();
+					
 					sumMethodComplexity += classMetric.getMethodsComplexity();
+					
+					weightedMethodCountSum += classMetric.getWeightedMethodCount();
+					
+					if (classMetric.isInterface()) {
+						interfaceCount++;
+					}
+					else {
+						classCount++;
+					}
 				}
 			}
+			
+			cmpC = classCount * CLASS_WEIGHT + interfaceCount + weightedMethodCountSum;
 			
 			double complexity = cmpC + sumClassComplexity + sumMethodComplexity;
 				

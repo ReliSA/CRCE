@@ -15,6 +15,7 @@ public class ClassMetrics {
 	
 	private static final double COMPLEX_FIELD_WEIGHT = 1.0;
 	private static final double COMPLEX_PARAMETER_WEIGHT = 1.0;
+	private static final double METHOD_WEIGHT = 1.0;
 	
 	private static final int[] COMPLEX_TYPES = new int[] { Type.ARRAY, Type.OBJECT };
 	
@@ -25,12 +26,14 @@ public class ClassMetrics {
 	private boolean isInterface;
 	
 	private double classComplexity;
-	private double methodsComplexity;		
+	private double methodsComplexity;	
+	private double weightedMethodCount;
 	
 	public ClassMetrics(ClassNode byteCodeNode) {
 		
 		classComplexity = 0;
 		methodsComplexity = 0;
+		weightedMethodCount = 0;
 		
 		String fullClassName = byteCodeNode.name.replace('/','.');
 		
@@ -109,6 +112,7 @@ public class ClassMetrics {
 		}
 				
 		methodsComplexity += simpleParametersCount + complexParametersCount * COMPLEX_PARAMETER_WEIGHT;
+		weightedMethodCount += METHOD_WEIGHT;
 	}
 	
 	private boolean isComplexType(Type t) {
@@ -145,5 +149,9 @@ public class ClassMetrics {
 
 	public double getMethodsComplexity() {
 		return methodsComplexity;
+	}
+	
+	public double getWeightedMethodCount() {
+		return weightedMethodCount;
 	}
 }
