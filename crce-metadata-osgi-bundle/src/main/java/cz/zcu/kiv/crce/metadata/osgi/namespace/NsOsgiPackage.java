@@ -10,7 +10,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  */
 public interface NsOsgiPackage {
 
-    String NAMESPACE__OSGI_PACKAGE = "osgi.package";
+    String NAMESPACE__OSGI_PACKAGE = "osgi.wiring.package";
 
     AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
 

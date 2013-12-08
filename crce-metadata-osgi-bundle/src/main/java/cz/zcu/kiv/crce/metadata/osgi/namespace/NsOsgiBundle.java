@@ -10,7 +10,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  */
 public interface NsOsgiBundle {
 
-    String NAMESPACE__OSGI_BUNDLE = "osgi.bundle";
+    String NAMESPACE__OSGI_BUNDLE = "osgi.wiring.bundle";
 
     AttributeType<String> ATTRIBUTE__SYMBOLIC_NAME =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.SYMBOLIC_NAME, String.class);

@@ -9,7 +9,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  */
 public interface NsOsgiService {
 
-    String NAMESPACE__OSGI_SERVICE = "osgi.service";
+    String NAMESPACE__OSGI_SERVICE = "osgi.wiring.service";
 
     AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
 
