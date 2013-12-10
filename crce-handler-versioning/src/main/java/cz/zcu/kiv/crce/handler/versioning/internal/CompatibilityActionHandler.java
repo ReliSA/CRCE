@@ -53,12 +53,25 @@ public class CompatibilityActionHandler extends AbstractActionHandler {
             return resources;
         }
         for(Resource resource : resources) {
-            Task compTask = new CompatibilityCalculationTask(resource.getId(), resource);
-            m_taskRunnerService.scheduleTask(compTask);
-            logger.debug("Task planned.");
+            if(versionable(resource)) {
+                Task compTask = new CompatibilityCalculationTask(resource.getId(), resource);
+                m_taskRunnerService.scheduleTask(compTask);
+                logger.debug("Task planned.");
+            } else {
+                logger.debug("Resource not versionable, skipping...");
+            }
         }
         return resources;
     }
 
+    private boolean versionable(Resource res) {
+        String categories[] = res.getCategories();
+        for (int i = 0; i < categories.length; i++) {
+            if(VersioningActionHandler.CATEGORY_VERSIONED.equals(categories[i])) {
+                return true;
+            }
+        }
 
+        return false;
+    }
 }

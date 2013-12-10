@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.metadata.dao.AbstractResourceDAO;
@@ -71,29 +72,34 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
 
         InputStreamReader reader = null;
         try {
-        try {
             reader = new InputStreamReader(metadataUri.toURL().openStream());
+
+            try {
+                return m_dataModelHelper.readMetadata(reader);
+            } catch (IOException e) {
+                throw new IOException("Can not read XML data", e);
+            } catch (Exception e) {
+                logger.error("Can not parse XML data (probably corrupted content): {}", e.getMessage());
+                return m_resourceCreator.createResource();
+            }
+
         } catch (MalformedURLException e) {
             throw new IOException("Malformed URL in URI: " + metadataUri.toString(), e);
         } catch (FileNotFoundException e) {
             Resource resource = m_resourceCreator.createResource();
             resource.setUri(uri);
             return resource;
-        }
-
-        try {
-            return m_dataModelHelper.readMetadata(reader);
-        } catch (IOException e) {
-            throw new IOException("Can not read XML data", e);
-        } catch (Exception e) {
-            logger.error("Can not parse XML data (probably corrupted content): {}", e.getMessage());
-            return m_resourceCreator.createResource();
-        }
         } finally {
-            if (reader !=  null) {
-                reader.close();
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+
+                }
             }
         }
+
+
     }
 
     @Override

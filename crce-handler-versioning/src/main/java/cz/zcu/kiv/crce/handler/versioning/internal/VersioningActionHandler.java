@@ -37,7 +37,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
 
     private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
 
-    private static final String CATEGORY_VERSIONED = "versioned";
+    public static final String CATEGORY_VERSIONED = "versioned";
 
     private volatile VersionService m_versionService;   /* injected by dependency manager */
     private volatile PluginManager m_pluginManager;     /* injected by dependency manager */
@@ -94,6 +94,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
     public Resource beforePutToStore(Resource resource, Store store) throws RevokedArtifactException {
         logger.debug("Entering beforePutToStore method");
 
+        boolean versioned = false;
         if (resource == null || !resource.hasCategory("osgi")) {
             logger.debug("Resource " + resource == null ? "is null." : "doesnt have category osgi.");
             return resource;
@@ -145,6 +146,7 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     versionedBundleIs = m_versionService.createVersionedBundle(candidateInputStream, resourceInputStream, options);
 
                     category = CATEGORY_VERSIONED;
+                    versioned = true;
                 } catch (IOException ex) {
                     logger.error("Could not update version due to I/O error", ex);
                     category = null;
@@ -159,33 +161,40 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                     category = null;
                 } finally {
                     try {
-                        candidateInputStream.close();
                         resourceInputStream.close();
                     } catch (IOException e) {
                         // nothing to do
                     }
+
+                    try {
+                        candidateInputStream.close();
+                    } catch (IOException e) {
+                        //nothing to do
+                    }
                 }
 
+                if(versioned) {
+                    ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
 
-                ResourceDAO creator = m_pluginManager.getPlugin(ResourceDAO.class);
-
-                try {
-                    //create resource from file with bundle with generated version
-                    File versionedBundleFile = fileFromStream(versionedBundleIs);
-
-                    resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
-                    logger.debug("Created resource from uploaded bundle:" + resource.getUri());
-                } catch (IOException e) {
-                    logger.error("Could not reload changed resource", e);
-                    throw new RevokedArtifactException("I/O error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
-                } catch (Exception e) {
-                    logger.error("Resource handling error", e);
-                    throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
-                } finally {
                     try {
-                        versionedBundleIs.close();
+                        //create resource from file with bundle with generated version
+                        //closes the input stream in the process
+                        File versionedBundleFile = fileFromStream(versionedBundleIs);
+
+                        resource = creator.getResource(versionedBundleFile.toURI());   // reload changed resource
+                        logger.debug("Created resource from uploaded bundle:" + resource.getUri());
                     } catch (IOException e) {
-                        // nothing to do
+                        logger.error("Could not reload changed resource", e);
+                        throw new RevokedArtifactException("I/O error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
+                    } catch (Exception e) {
+                        logger.error("Resource handling error", e);
+                        throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
+                    } finally {
+                        try {
+                            versionedBundleIs.close();
+                        } catch (IOException ex) {
+                            //nothing to do
+                        }
                     }
                 }
             }
