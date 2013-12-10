@@ -106,7 +106,12 @@ public class ExtraFuncRegistryServiceImpl implements ExtrafuncRegistryService {
      * @throws IOException 
      */
 	public void loadRegistryFromURL(URL P_url) throws IOException {
-		_fillRegistryLines(P_url.openStream());
+        InputStream stream = P_url.openStream();
+        try {
+            _fillRegistryLines(stream);
+        } finally {
+            stream.close();
+        }
 	}
 	
 	/**

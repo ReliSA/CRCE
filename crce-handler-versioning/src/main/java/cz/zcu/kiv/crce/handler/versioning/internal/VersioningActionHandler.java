@@ -128,12 +128,14 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
             } else {
                 logger.debug("Candidate found, commencing bundle comparison.");
                 InputStream versionedBundleIs = null;
+                InputStream candidateInputStream = null;
+                InputStream resourceInputStream = null;
                 try {
                     //candidate = base bundle for version generation
                     logger.debug("Candidate URI: {}", cand.getUri());
-                    InputStream candidateInputStream = new FileInputStream(new File(cand.getUri()));
+                    candidateInputStream = new FileInputStream(new File(cand.getUri()));
                     logger.debug("Uploaded bundle URI: {}", resource.getUri());
-                    InputStream resourceInputStream = new FileInputStream(new File(resource.getUri()));
+                    resourceInputStream = new FileInputStream(new File(resource.getUri()));
 
                     HashMap<String, String> options = new HashMap<String, String>();
 
@@ -155,6 +157,13 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 } catch (Exception e) {
                     logger.error("Could not update version (unknown error)", e);
                     category = null;
+                } finally {
+                    try {
+                        candidateInputStream.close();
+                        resourceInputStream.close();
+                    } catch (IOException e) {
+                        // nothing to do
+                    }
                 }
 
 
@@ -172,6 +181,12 @@ public class VersioningActionHandler extends AbstractActionHandler implements Ac
                 } catch (Exception e) {
                     logger.error("Resource handling error", e);
                     throw new RevokedArtifactException("Resource handling error when versioning " + resource.getId() + "(" + e.getMessage() + ")");
+                } finally {
+                    try {
+                        versionedBundleIs.close();
+                    } catch (IOException e) {
+                        // nothing to do
+                    }
                 }
             }
 

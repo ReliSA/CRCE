@@ -69,7 +69,8 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
     public Resource getResource(URI uri) throws IOException {
         URI metadataUri = getMetafileUri(uri);
 
-        InputStreamReader reader;
+        InputStreamReader reader = null;
+        try {
         try {
             reader = new InputStreamReader(metadataUri.toURL().openStream());
         } catch (MalformedURLException e) {
@@ -87,6 +88,11 @@ public class MetafileResourceDAO extends AbstractResourceDAO {
         } catch (Exception e) {
             logger.error("Can not parse XML data (probably corrupted content): {}", e.getMessage());
             return m_resourceCreator.createResource();
+        }
+        } finally {
+            if (reader !=  null) {
+                reader.close();
+            }
         }
     }
 
