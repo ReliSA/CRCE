@@ -117,20 +117,19 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
         newRequest();
         log.debug("Request ({}) - Get replace bundle request was received.", getRequestId());
 
-
         try {
             log.debug("Request ({}) -  Replace bundle with id: {}", getRequestId(), id);
 
-
             Resource clientResource = findResource(id);
-
             Resource resourceToReturn = findResourceToReturn(op, clientResource);
 
             if(resourceToReturn == null) {
+            	log.debug("Request ({}) -  No compatible replacement found for resource id: {}",
+						getRequestId(), id);
                 throw new WebApplicationException(404);
             }
 
-            Resource[] resourcesToReturn = new Resource[]{resourceToReturn};
+			Resource[] resourcesToReturn = new Resource[] { resourceToReturn };
 
             IncludeMetadata include = new IncludeMetadata();
             include.includeAll();
