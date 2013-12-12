@@ -98,14 +98,25 @@ public class CompatibilityServiceImpl implements CompatibilityService {
     }
 
     /**
-     * List all available compatibility data for the given resource.
+     * List all compatibility data of the given resource with higher versions.
      *
      * @param resource resource present in crce
      * @return list
      */
     @Override
-    public List<Compatibility> listCompatibilities(Resource resource) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public List<Compatibility> listUpperCompatibilities(Resource resource) {
+        return m_compatibilityDao.findHigher(resource.getSymbolicName(), resource.getVersion(), Arrays.asList(Difference.values()));
+    }
+
+    /**
+     * List all compatibility data of the given resource with lower versions.
+     *
+     * @param resource resource present in crce
+     * @return list
+     */
+    @Override
+    public List<Compatibility> listLowerCompatibilities(Resource resource) {
+        return m_compatibilityDao.findLower(resource.getSymbolicName(), resource.getVersion(), Arrays.asList(Difference.values()));
     }
 
     /**

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -14,10 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.framework.InvalidSyntaxException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.CompatibilityVersionComparator;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
@@ -164,6 +166,42 @@ public class ResourceServlet extends HttpServlet {
 
                 session.setAttribute("resources", filteredResourceList);
                 session.setAttribute("categoryList", categoryList);
+
+                return true;
+
+            case "compatibility":
+                String name = req.getParameter("name");
+                String version = req.getParameter("version");
+
+                List<Compatibility> lower = null;
+                List<Compatibility> upper = null;
+
+                if(name == null || name.isEmpty() || version == null || version.isEmpty()) {
+                    session.setAttribute("nodata", true);
+                    return true;
+                }
+                session.setAttribute("nodata", false);
+
+                String resFilter = "(&(symbolicName=" + name + ")(version=" + version + "))";
+                try {
+                    Resource res[] = Activator.instance().getStore().getRepository().getResources(resFilter);
+                    if(res.length > 0) {
+                        lower = Activator.instance().getCompatibilityService().listLowerCompatibilities(res[0]);
+                        Collections.sort(lower, CompatibilityVersionComparator.getBaseComparator());
+
+                        upper = Activator.instance().getCompatibilityService().listUpperCompatibilities(res[0]);
+                        Collections.sort(upper, CompatibilityVersionComparator.getUpperComparator());
+
+                    }
+                } catch (InvalidSyntaxException e) {
+                    logger.error("Invalid syntax when searching for compatibility resource using filter: {}", resFilter);
+                    return false;
+                }
+
+                session.setAttribute("pivotName", name);
+                session.setAttribute("pivotVersion", version);
+                session.setAttribute("lower", lower);
+                session.setAttribute("upper", upper);
 
                 return true;
                 

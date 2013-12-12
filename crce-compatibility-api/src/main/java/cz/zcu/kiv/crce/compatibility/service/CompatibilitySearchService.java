@@ -17,11 +17,18 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public interface CompatibilitySearchService {
 
     /**
-     * List all compatibility data the given resource owns.
+     * List all compatibility data of the given resource with upper version.
      * @param resource resource present in crce
      * @return list
      */
-    List<Compatibility> listCompatibilities(Resource resource);
+    List<Compatibility> listUpperCompatibilities(Resource resource);
+
+    /**
+     * List all compatibility data of the given resource with lower versions.
+     * @param resource resource present in crce
+     * @return list
+     */
+    List<Compatibility> listLowerCompatibilities(Resource resource);
 
     /**
      * Find the nearest version of the same resource name which is available for upgrade (has higher

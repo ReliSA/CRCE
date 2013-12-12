@@ -27,6 +27,7 @@ Import-Package: \
   org.xml.sax, \
   org.w3c.dom, \
   cz.zcu.kiv.crce.metadata, \
+  cz.zcu.kiv.typescmp, \
   *
 
 Dynamic-ImportPackage: *

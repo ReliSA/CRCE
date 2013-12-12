@@ -1,17 +1,15 @@
 package cz.zcu.kiv.crce.webui.internal;
 
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.ResourceCreator;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -35,6 +33,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile SessionRegister m_sessionRegister;   /* injected by dependency manager */
     private volatile Store m_store;                  	/* injected by dependency manager */
     private volatile ResourceCreator m_creator;        	/* injected by dependency manager */
+    private volatile CompatibilitySearchService m_compatibilityService; /* injected by dependency manager */
 
     /** MetadataIndexingResultService instance provides by simple way information
      * about metadata indexing process result. */
@@ -59,6 +58,11 @@ public final class Activator extends DependencyActivatorBase {
     public Store getStore(){
     	return m_store;
     }
+
+    public CompatibilitySearchService getCompatibilityService() {
+        return m_compatibilityService;
+    }
+
     public Buffer getBuffer(HttpServletRequest req) {
         if (req == null) {
             return null;
@@ -88,6 +92,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceCreator.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(true))
                 );
         
        

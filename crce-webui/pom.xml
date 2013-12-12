@@ -171,6 +171,22 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <!--other CZ.ZCU.KIV dependencies-->
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>types-cmp</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <!-- Test dependencies -->
         

@@ -1,12 +1,3 @@
-<%@page import="cz.zcu.kiv.crce.plugin.Plugin"%>
-<%@page import="cz.zcu.kiv.crce.metadata.Requirement"%>
-<%@page import="cz.zcu.kiv.crce.metadata.Property"%>
-<%@page import="cz.zcu.kiv.crce.metadata.Capability"%>
-<%@page import="cz.zcu.kiv.crce.repository.Buffer"%>
-<%@page import="cz.zcu.kiv.crce.webui.internal.Activator"%>
-<%@page import="cz.zcu.kiv.crce.metadata.Resource"%>
-<%@page import="cz.zcu.kiv.crce.metadata.Property"%>
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
    
@@ -44,6 +35,9 @@
 			<c:when test="${param.tags}">
 				<c:set scope="session" var="source" value="tags"/>		
 			</c:when>
+            <c:when test="${param.compatibility}">
+                <c:set scope="session" var="source" value="compatibility"/>
+            </c:when>
 		</c:choose>
 		
 		  	
@@ -71,6 +65,7 @@
 		    	<li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
 		    	<li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
 		    	<li><a <c:if test="${param.tags}"> class="aktivni"</c:if> href="resource?link=tags">Tags</a></li>
+                <li><a <c:if test="${param.compatibility}"> class="aktivni"</c:if> href="resource?link=compatibility">Compatibility</a></li>
 		    </ul>
 		    <div class="vyhledavani_h">
 			        <form method="post" action="resource">

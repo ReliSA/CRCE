@@ -596,3 +596,9 @@ color: #464a47;
 .execute_commit .tlacitko {
 	margin: 0 0 10px 10px;
 }
+
+
+/*------------------COMPATIBILITY-------------------------*/
+.pivot {
+    background-color: #FCFC55;
+}
