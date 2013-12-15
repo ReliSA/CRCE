@@ -5,6 +5,7 @@ import org.osgi.framework.Version;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
+
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
@@ -36,102 +37,128 @@ public class FilterParserImpl implements FilterParser {
             return requirement;
         }
 
-        int level;
-        try {
-            level = parse(filter, 0, requirement);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidSyntaxException(e.getMessage(), filter);
-        }
-
-        if (level > 0) {
-            throw new InvalidSyntaxException("Missing closing parenthesis", filter);
-        } else if (level < 0) {
-            throw new InvalidSyntaxException("Superfluous closing parenthesis", filter);
-        }
+        parseFilter(filter, requirement, 0);
 
         return requirement;
     }
 
-    @SuppressWarnings("fallthrough")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "SF_SWITCH_FALLTHROUGH", justification = "Fallthrough is intended.")
-    private int parse(String filter, int level, Requirement requirement) {
-        switch (filter.charAt(0)) {
-            case OPEN:
-                return parse(filter.substring(1), level + 1, requirement);
-
-            case CLOSE:
-                if (filter.length() > 1) {
-                    parse(filter.substring(1), level - 1, requirement);
-                }
-                return level - 1;
-
-            case OPERATOR_OR:
-                requirement.setDirective("operator", "or"); // TODO constants
-                // fallthrough intended
-            case OPERATOR_AND:
-                return parse(filter.substring(1), level, requirement) - 1;
-
-            case OPERATOR_NOT:
-            default:
-                int index = filter.indexOf(CLOSE);
-                if (index > 0) {
-                    parse(filter.substring(0, index), requirement);
-                    return parse(filter.substring(index), level, requirement);
-                }
-
+    private void parseFilter(String filter, Requirement requirement, int level) throws InvalidSyntaxException {
+        if (OPEN != filter.charAt(0)) {
+            throw new InvalidSyntaxException("Missing opening parenthesis: " + filter, filter);
         }
-
-        throw new UnsupportedOperationException("Not supported yet");
+        if (CLOSE != filter.charAt(filter.length() - 1)) {
+            throw new InvalidSyntaxException("Missing closing parenthesis: " + filter, filter);
+        }
+        parseFilterComp(filter.substring(1, filter.length() - 1), requirement, level);
     }
 
-    private void parse(String string, Requirement requirement) {
+    private void parseFilterComp(String filterComp, Requirement requirement, int level) throws InvalidSyntaxException {
+        switch (filterComp.charAt(0)) {
+            case OPERATOR_AND:
+                parseFilterList(filterComp.substring(1), nestRequirement(requirement, level), level + 1);
+                return;
+
+            case OPERATOR_OR: {
+                Requirement nested = nestRequirement(requirement, level);
+                nested.setDirective("operator", "or"); // TODO constants
+                parseFilterList(filterComp.substring(1), nested, level + 1);
+                return;
+            }
+
+            case OPERATOR_NOT: {
+                Requirement nested = nestRequirement(requirement, level);
+                nested.setDirective("operator", "not"); // TODO constants
+                parseFilter(filterComp.substring(1), nested, level + 1);
+                return;
+            }
+
+            default:
+                parseItem(filterComp, requirement);
+        }
+    }
+
+    private Requirement nestRequirement(Requirement parent, int level) {
+        if (level > 0) {
+            Requirement child = resourceFactory.createRequirement(parent.getNamespace());
+            parent.addChild(child);
+            child.setParent(parent);
+            return child;
+        }
+        return parent;
+    }
+
+    private void parseFilterList(String filterList, Requirement requirement, int level) throws InvalidSyntaxException {
+        int begin = 0;
+        int depth = 0;
+        for (int i = 0; i < filterList.length(); i++) {
+            if (filterList.charAt(i) == OPEN) {
+                depth++;
+                if (depth == 1) {
+                    begin = i;
+                }
+            } else  if (filterList.charAt(i) == CLOSE) {
+                depth--;
+                if (depth == 0) {
+                    parseFilter(filterList.substring(begin, i + 1), requirement, level);
+                }
+            }
+        }
+        if (depth < 0) {
+            throw new InvalidSyntaxException("Superfluous closing parenthesis: " + filterList, filterList);
+        }
+        if (depth > 0) {
+            throw new InvalidSyntaxException("Missing closing parenthesis: " + filterList, filterList);
+        }
+    }
+
+    private void parseItem(String item, Requirement requirement) {
         Operator operator;
         String[] split;
         op: {
             // two characters operator
-            split = string.split(">=");
+            split = item.split(">=");
             if (split.length == 2) {
                 operator = Operator.GREATER_EQUAL;
                 break op;
             }
-            split = string.split("<=");
+            split = item.split("<=");
             if (split.length == 2) {
                 operator = Operator.LESS_EQUAL;
                 break op;
             }
-            split = string.split("<\\*");
+            split = item.split("<\\*");
             if (split.length == 2) {
                 operator = Operator.SUBSET;
                 break op;
             }
-            split = string.split("\\*>");
+            split = item.split("\\*>");
             if (split.length == 2) {
                 operator = Operator.SUPERSET;
                 break op;
             }
-            split = string.split("~=");
+            split = item.split("~=");
             if (split.length == 2) {
                 operator = Operator.APPROX;
                 break op;
             }
             // one character operator
-            split = string.split("=");
+            split = item.split("=");
             if (split.length == 2) {
                 operator = Operator.EQUAL;
                 break op;
             }
-            split = string.split("<");
+            split = item.split("<");
             if (split.length == 2) {
                 operator = Operator.LESS;
                 break op;
             }
-            split = string.split(">");
+            split = item.split(">");
             if (split.length == 2) {
                 operator = Operator.GREATER;
                 break op;
             }
-            throw new IllegalArgumentException("Missing or superfluous operator: " + string);
-    // TODO   NOT_EQUAL("not-equal"),
+            throw new IllegalArgumentException("Missing or superfluous operator: " + item);
+            // TODO   NOT_EQUAL("not-equal"),
         }
 
         String name = split[0];

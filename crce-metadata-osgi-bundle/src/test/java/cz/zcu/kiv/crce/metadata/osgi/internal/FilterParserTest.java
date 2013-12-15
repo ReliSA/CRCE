@@ -8,7 +8,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.Version;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
@@ -183,21 +182,17 @@ public class FilterParserTest {
         assertEquals("2.0.0", version.getStringValue());
     }
 
-    @Ignore // TODO support of nested requirements from filter
     @Test
-    public void testNestedRequirement() throws InvalidSyntaxException {
-        String filter = "(&(package=cz.zcu.kiv.crce)(|(&(version>=1.0.0)(version<1.5.0))(&(version>=1.6.0)(version<2.0.0))))";
+    public void testPackageAndTwoVersionsDisjunction() throws InvalidSyntaxException {
+        String filter = "(&(package=cz.zcu.kiv.crce)(|(version=1.4.0)(version=1.6.0)))";
         String namespace = NsOsgiPackage.NAMESPACE__OSGI_PACKAGE;
 
         Requirement requirement = filterParser.parse(filter, namespace);
 
         assertEquals(namespace, requirement.getNamespace());
-        assertFalse(requirement.getChildren().isEmpty());
 
         assertFalse(requirement.getAttributes().isEmpty());
         assertEquals(1, requirement.getAttributes().size());
-
-        assertEquals(1, requirement.getChildren().size());
 
         // package (name)
 
@@ -216,11 +211,68 @@ public class FilterParserTest {
         List<Attribute<Version>> versions = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__VERSION);
         assertTrue(versions.isEmpty());
 
-
-        // --- 1. level nested requirement ---
+        assertEquals(1, requirement.getChildren().size());
 
         Requirement parent = requirement;
-        requirement = requirement.getChildren().get(0);
+        requirement = parent.getChildren().get(0);
+
+        assertEquals("or", requirement.getDirectives().get("operator"));
+
+        versions = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__VERSION);
+        assertEquals(2, versions.size());
+
+        Attribute<Version> version = versions.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__VERSION, version.getAttributeType());
+        assertEquals(Operator.EQUAL, version.getOperator());
+        assertEquals(new Version("1.4.0"), version.getValue());
+        assertEquals("1.4.0", version.getStringValue());
+
+        version = versions.get(1);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__VERSION, version.getAttributeType());
+        assertEquals(Operator.EQUAL, version.getOperator());
+        assertEquals(new Version("1.6.0"), version.getValue());
+        assertEquals("1.6.0", version.getStringValue());
+    }
+
+    @Test
+    public void testNestedRequirement() throws InvalidSyntaxException {
+        String filter = "(&(package=cz.zcu.kiv.crce)(|(&(version>=1.0.0)(version<1.5.0))(&(version>=1.6.0)(version<2.0.0))))";
+        String namespace = NsOsgiPackage.NAMESPACE__OSGI_PACKAGE;
+
+        Requirement requirement = filterParser.parse(filter, namespace);
+
+        assertEquals(namespace, requirement.getNamespace());
+        assertFalse(requirement.getChildren().isEmpty());
+
+        assertFalse(requirement.getAttributes().isEmpty());
+        assertEquals(1, requirement.getAttributes().size());
+
+        assertEquals(1, requirement.getChildren().size());
+
+        // package (name) - (package=cz.zcu.kiv.crce)
+
+        List<Attribute<String>> names = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__NAME);
+        assertEquals(1, names.size());
+
+        Attribute<String> name = names.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__NAME, name.getAttributeType());
+        assertEquals(Operator.EQUAL, name.getOperator());
+        assertEquals("cz.zcu.kiv.crce", name.getValue());
+        assertEquals("cz.zcu.kiv.crce", name.getStringValue());
+
+        // versions
+
+        List<Attribute<Version>> versions = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__VERSION);
+        assertTrue(versions.isEmpty());
+
+
+        // --- 1. level nested requirement --- - (|(&(version>=1.0.0)(version<1.5.0))(&(version>=1.6.0)(version<2.0.0)))
+
+        Requirement parent = requirement;
+        requirement = parent.getChildren().get(0);
 
         assertEquals(namespace, requirement.getNamespace());
         assertEquals(requirement.getParent(), parent);
@@ -228,7 +280,7 @@ public class FilterParserTest {
         assertTrue(requirement.getAttributes().isEmpty());
         assertEquals("or", requirement.getDirectives().get("operator"));
 
-        assertEquals(2, requirement.getChildren());
+        assertEquals(2, requirement.getChildren().size());
 
         // package (name)
 
@@ -241,7 +293,7 @@ public class FilterParserTest {
         assertTrue(versions.isEmpty());
 
 
-        // --- 2. level 1. nested requirement ---
+        // --- 2. level 1. nested requirement --- - (&(version>=1.0.0)(version<1.5.0))
 
         parent = requirement;
         requirement = parent.getChildren().get(0);
@@ -278,7 +330,7 @@ public class FilterParserTest {
         assertEquals("1.5.0", version.getStringValue());
 
 
-        // --- 2. level 2. nested requirement ---
+        // --- 2. level 2. nested requirement --- - (&(version>=1.6.0)(version<2.0.0))
 
         requirement = parent.getChildren().get(1);
 
