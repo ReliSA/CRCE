@@ -32,8 +32,6 @@
         <dependency>
             <groupId>cz.zcu.kiv.jacc</groupId>
             <artifactId>types-cmp</artifactId>
-            <version>1.0.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <!--CRCE dependencies-->

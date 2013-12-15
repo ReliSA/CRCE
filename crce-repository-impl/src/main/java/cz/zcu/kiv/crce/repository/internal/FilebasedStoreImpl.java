@@ -294,7 +294,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     @Override
     public List<Resource> getResources(Requirement requirement) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); // TODO implement with high priority (!)
     }
 
     private boolean isInStore(Resource resource) {
