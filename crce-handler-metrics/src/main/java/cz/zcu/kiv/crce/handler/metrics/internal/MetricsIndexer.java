@@ -24,6 +24,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
@@ -55,7 +56,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
             	
                 if (JarFile.MANIFEST_NAME.equalsIgnoreCase(e.getName())) {                   
-                    parseManifest(new Manifest(getEntryImputStream(jis)), resource);
+                    parseManifest(new Manifest(getEntryImputStream(jis)));
                 }
                 
                 if (e.getName().endsWith(".class")) {
@@ -73,6 +74,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		Capability identity = metadataService.getSingletonCapability(resource, "crce.content");
 		identity.setAttribute("size", Long.class, (long)size);
 		
+		numberOfImports(resource);
 		apiComplexity(resource);
 				
 		return Collections.emptyList();
@@ -89,27 +91,18 @@ public class MetricsIndexer extends AbstractResourceIndexer {
         return new ByteArrayInputStream(baos.toByteArray());
 	}
 	
-	private void parseManifest(Manifest manifest, Resource resource) {
-		int numOfImports = -1;
-        String importPackageHeader = null;
-        Clause[] importPackageClauses = null;
-		if (manifest != null)  {
-			importPackageHeader = manifest.getMainAttributes().getValue(Constants.IMPORT_PACKAGE);
-		}
-		if (importPackageHeader != null) {
-			importPackageClauses = Parser.parseHeader(importPackageHeader);				
-		}
-		if (importPackageClauses != null) {
-			numOfImports = importPackageClauses.length;
-		}
-		
-		if (numOfImports != -1) {
-			Capability numOfImportsCap = resourceFactory.createCapability("crce.metrics");
-			numOfImportsCap.setAttribute("name", String.class, "number-of-imports");
-			numOfImportsCap.setAttribute("value", Long.class, (long)numOfImports);
-			metadataService.addRootCapability(resource, numOfImportsCap);
-		}
-		
+	private void numberOfImports(Resource resource) {
+		List<Requirement> requirements = resource.getRequirements();
+				
+		int numOfImports = requirements.size();
+
+		Capability numOfImportsCap = resourceFactory.createCapability("crce.metrics");
+		numOfImportsCap.setAttribute("name", String.class, "number-of-imports");
+		numOfImportsCap.setAttribute("value", Long.class, (long)numOfImports);
+		metadataService.addRootCapability(resource, numOfImportsCap);
+	}
+	
+	private void parseManifest(Manifest manifest) {
         String exportPackageHeader = null;
 		if (manifest != null)  {
 			exportPackageHeader = manifest.getMainAttributes().getValue(Constants.EXPORT_PACKAGE);
