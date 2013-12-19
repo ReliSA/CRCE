@@ -8,26 +8,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.felix.utils.manifest.Clause;
-import org.apache.felix.utils.manifest.Parser;
-
-import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 
@@ -41,24 +37,19 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 	private volatile MetadataService metadataService;
 	
 	private List<ClassMetrics> classMetrics;
-	private Clause[] exportPackageClauses;
+	private List<Capability> exportPackageCapabilities;
 	
 	@Override
 	public List<String> index(final InputStream input, Resource resource) {
 		int size = 0;	
 		
 		classMetrics = new ArrayList<ClassMetrics>();
-		exportPackageClauses = null;
+		exportPackageCapabilities = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
 		
 		try {			
 			size = input.available();					
 			ZipInputStream jis = new ZipInputStream(input);			
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
-            	
-                if (JarFile.MANIFEST_NAME.equalsIgnoreCase(e.getName())) {                   
-                    parseManifest(new Manifest(getEntryImputStream(jis)));
-                }
-                
                 if (e.getName().endsWith(".class")) {
                 	parseClass(new ClassReader(getEntryImputStream(jis)));
                 }
@@ -75,7 +66,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		identity.setAttribute("size", Long.class, (long)size);
 		
 		numberOfImports(resource);
-		apiComplexity(resource);
+		apiComplexity();
 				
 		return Collections.emptyList();
 	}
@@ -96,22 +87,12 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 				
 		int numOfImports = requirements.size();
 
-		Capability numOfImportsCap = resourceFactory.createCapability("crce.metrics");
-		numOfImportsCap.setAttribute("name", String.class, "number-of-imports");
-		numOfImportsCap.setAttribute("value", Long.class, (long)numOfImports);
+		Capability numOfImportsCap = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
+		numOfImportsCap.setAttribute(NsMetrics.ATTRIBUTE__NAME, "number-of-imports");
+		numOfImportsCap.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (long)numOfImports);
 		metadataService.addRootCapability(resource, numOfImportsCap);
 	}
-	
-	private void parseManifest(Manifest manifest) {
-        String exportPackageHeader = null;
-		if (manifest != null)  {
-			exportPackageHeader = manifest.getMainAttributes().getValue(Constants.EXPORT_PACKAGE);
-		}
-		if (exportPackageHeader != null) {
-			exportPackageClauses = Parser.parseHeader(exportPackageHeader);				
-		}
-	}
-	
+		
 	private void parseClass(ClassReader classReader) {
         ClassNode byteCodeNode = new ClassNode();
         classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
@@ -119,51 +100,48 @@ public class MetricsIndexer extends AbstractResourceIndexer {
         classMetrics.add(new ClassMetrics(byteCodeNode));
 	}
 	
-	private void apiComplexity(Resource resource) {
-		if (exportPackageClauses == null) {
-			return;
-		}
+	private void apiComplexity() {	
+		for (Capability exportPackageCapability : exportPackageCapabilities) {
 		
-		for (Clause exportPackageClause : exportPackageClauses) {
-			String packageName = exportPackageClause.getName();
+			Attribute<String> packageNameAttribute = exportPackageCapability.getAttribute(NsOsgiPackage.ATTRIBUTE__NAME);
 			
-			double cmpC = 0; 
-			double sumClassComplexity = 0; 
-			double sumMethodComplexity = 0;
-			
-			int classCount = 0;
-			int interfaceCount = 0;
-			double weightedMethodCountSum = 0;
-			
-			for (ClassMetrics classMetric : classMetrics) {
-				if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
-					sumClassComplexity += classMetric.getClassComplexity();
-					
-					sumMethodComplexity += classMetric.getMethodsComplexity();
-					
-					weightedMethodCountSum += classMetric.getWeightedMethodCount();
-					
-					if (classMetric.isInterface()) {
-						interfaceCount++;
-					}
-					else {
-						classCount++;
+			if (packageNameAttribute != null) {			
+				String packageName = packageNameAttribute.getValue();
+				
+				double cmpC = 0; 
+				double sumClassComplexity = 0; 
+				double sumMethodComplexity = 0;
+				
+				int classCount = 0;
+				int interfaceCount = 0;
+				double weightedMethodCountSum = 0;
+				
+				for (ClassMetrics classMetric : classMetrics) {
+					if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
+						sumClassComplexity += classMetric.getClassComplexity();
+						
+						sumMethodComplexity += classMetric.getMethodsComplexity();
+						
+						weightedMethodCountSum += classMetric.getWeightedMethodCount();
+						
+						if (classMetric.isInterface()) {
+							interfaceCount++;
+						}
+						else {
+							classCount++;
+						}
 					}
 				}
-			}
-			
-			cmpC = classCount * CLASS_WEIGHT + interfaceCount + weightedMethodCountSum;
-			
-			double complexity = cmpC + sumClassComplexity + sumMethodComplexity;
 				
-			Capability capability = resourceFactory.createCapability("osgi.wiring.package");
-			capability.setAttribute("name", String.class, packageName);
-			metadataService.addRootCapability(resource, capability);
-			
-			Capability metricsCapability = resourceFactory.createCapability("crce.metric");
-			metricsCapability.setAttribute("name", String.class, "api-complexity");
-			metricsCapability.setAttribute("value", Double.class, complexity);		
-			metadataService.addChild(capability, metricsCapability);
+				cmpC = classCount * CLASS_WEIGHT + interfaceCount + weightedMethodCountSum;
+				
+				double complexity = cmpC + sumClassComplexity + sumMethodComplexity;
+								
+				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
+				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "api-complexity");
+				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, complexity);		
+				metadataService.addChild(exportPackageCapability, metricsCapability);
+			}
 		}
 	}
 	
