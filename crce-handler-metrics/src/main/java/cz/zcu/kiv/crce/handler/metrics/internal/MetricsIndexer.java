@@ -50,8 +50,6 @@ public class MetricsIndexer extends AbstractResourceIndexer {
                 	parseClass(new ClassReader(getEntryImputStream(jis)));
                 }
             }
-				
-			input.close(); // TODO close input stream by its creator.
 		} catch (IOException e) {
             
 			logger.error("Could not index resource.", e);
