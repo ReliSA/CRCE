@@ -98,6 +98,12 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 	
 	private void apiComplexity(List<Capability> exportPackageCapabilities) {	
 		
+		if (exportPackageCapabilities.isEmpty()) {
+			
+			logger.error("No export packages found in metadata capabilities.");			
+			return;
+		}
+		
 		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
 		
 		for (Capability exportPackageCapability : exportPackageCapabilities) {
