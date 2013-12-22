@@ -13,10 +13,6 @@ public class ClassMetrics {
 
 	private static final String DEFAULT_PACKAGE_NAME = "<default>";
 	
-	private static final double COMPLEX_FIELD_WEIGHT = 1.0;
-	private static final double COMPLEX_PARAMETER_WEIGHT = 1.0;
-	private static final double METHOD_WEIGHT = 1.0;
-	
 	private static final int[] COMPLEX_TYPES = new int[] { Type.ARRAY, Type.OBJECT };
 	
 	private String packageName;
@@ -25,15 +21,23 @@ public class ClassMetrics {
 	private boolean isPublic;
 	private boolean isInterface;
 	
-	private double classComplexity;
-	private double methodsComplexity;	
-	private double weightedMethodCount;
+	private double methodCount;
+	
+	private int simpleTypeFieldCount;
+	private int complexTypeFieldCount;
+	
+	private int simpleParametersCount;
+	private int complexParametersCount;
 	
 	public ClassMetrics(ClassNode byteCodeNode) {
 		
-		classComplexity = 0;
-		methodsComplexity = 0;
-		weightedMethodCount = 0;
+		methodCount = 0;
+		
+		simpleTypeFieldCount = 0;
+		complexTypeFieldCount = 0;
+		
+		simpleParametersCount = 0;
+		complexParametersCount = 0;
 		
 		String fullClassName = byteCodeNode.name.replace('/','.');
 		
@@ -42,9 +46,6 @@ public class ClassMetrics {
 		
 		isInterface = Modifier.isInterface(byteCodeNode.access);
 		isPublic = Modifier.isPublic(byteCodeNode.access);
-		
-		int simpleTypeFieldCount = 0;
-		int complexTypeFieldCount = 0;
 		
 		@SuppressWarnings("unchecked")
 		List<FieldNode> fields = byteCodeNode.fields;
@@ -58,9 +59,7 @@ public class ClassMetrics {
         		complexTypeFieldCount++;
         	}
         }
-        
-        classComplexity = simpleTypeFieldCount + COMPLEX_FIELD_WEIGHT * complexTypeFieldCount;
-		
+        	
         @SuppressWarnings("unchecked")
 		List<MethodNode> methods = byteCodeNode.methods;
         for (MethodNode method : methods) {
@@ -90,15 +89,12 @@ public class ClassMetrics {
 			return;
 		}
 		
-		int simpleParametersCount = 0;
-		int complexParametersCount = 0;
-		
 		if (method.signature != null) {
 			MetricsSignatureVisitor visitor = new MetricsSignatureVisitor();			
 			new SignatureReader(method.signature).accept(visitor);
 			
-			simpleParametersCount = visitor.getNumberOfSimpleParametrs();
-			complexParametersCount = visitor.getNumberOfComplexParametrs();
+			simpleParametersCount += visitor.getNumberOfSimpleParametrs();
+			complexParametersCount += visitor.getNumberOfComplexParametrs();
 		}
 		else {
 			for (Type parameterType : Type.getArgumentTypes(method.desc)) {
@@ -111,8 +107,7 @@ public class ClassMetrics {
 			}
 		}
 				
-		methodsComplexity += simpleParametersCount + complexParametersCount * COMPLEX_PARAMETER_WEIGHT;
-		weightedMethodCount += METHOD_WEIGHT;
+		methodCount++;
 	}
 	
 	private boolean isComplexType(Type t) {
@@ -142,16 +137,24 @@ public class ClassMetrics {
 	public boolean isInterface() {
 		return isInterface;
 	}
-	
-	public double getClassComplexity() {
-		return classComplexity;
+
+	public double getMethodCount() {
+		return methodCount;
 	}
 
-	public double getMethodsComplexity() {
-		return methodsComplexity;
+	public int getSimpleTypeFieldCount() {
+		return simpleTypeFieldCount;
 	}
-	
-	public double getWeightedMethodCount() {
-		return weightedMethodCount;
+
+	public int getComplexTypeFieldCount() {
+		return complexTypeFieldCount;
+	}
+
+	public int getSimpleParametersCount() {
+		return simpleParametersCount;
+	}
+
+	public int getComplexParametersCount() {
+		return complexParametersCount;
 	}
 }

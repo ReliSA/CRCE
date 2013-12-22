@@ -29,22 +29,18 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 public class MetricsIndexer extends AbstractResourceIndexer {
 	
-	private static final double CLASS_WEIGHT = 1.0;
-	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
 	
 	private volatile ResourceFactory resourceFactory;
 	private volatile MetadataService metadataService;
 	
-	private List<ClassMetrics> classMetrics;
-	private List<Capability> exportPackageCapabilities;
+	private List<ClassMetrics> classesMetrics;
 	
 	@Override
 	public List<String> index(final InputStream input, Resource resource) {
 		int size = 0;	
 		
-		classMetrics = new ArrayList<ClassMetrics>();
-		exportPackageCapabilities = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
+		classesMetrics = new ArrayList<ClassMetrics>();
 		
 		try {			
 			size = input.available();					
@@ -66,7 +62,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		identity.setAttribute("size", Long.class, (long)size);
 		
 		numberOfImports(resource);
-		apiComplexity();
+		apiComplexity(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 				
 		return Collections.emptyList();
 	}
@@ -97,45 +93,21 @@ public class MetricsIndexer extends AbstractResourceIndexer {
         ClassNode byteCodeNode = new ClassNode();
         classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
         
-        classMetrics.add(new ClassMetrics(byteCodeNode));
+        classesMetrics.add(new ClassMetrics(byteCodeNode));
 	}
 	
-	private void apiComplexity() {	
+	private void apiComplexity(List<Capability> exportPackageCapabilities) {	
+		
+		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
+		
 		for (Capability exportPackageCapability : exportPackageCapabilities) {
 		
 			Attribute<String> packageNameAttribute = exportPackageCapability.getAttribute(NsOsgiPackage.ATTRIBUTE__NAME);
 			
 			if (packageNameAttribute != null) {			
 				String packageName = packageNameAttribute.getValue();
-				
-				double cmpC = 0; 
-				double sumClassComplexity = 0; 
-				double sumMethodComplexity = 0;
-				
-				int classCount = 0;
-				int interfaceCount = 0;
-				double weightedMethodCountSum = 0;
-				
-				for (ClassMetrics classMetric : classMetrics) {
-					if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
-						sumClassComplexity += classMetric.getClassComplexity();
-						
-						sumMethodComplexity += classMetric.getMethodsComplexity();
-						
-						weightedMethodCountSum += classMetric.getWeightedMethodCount();
-						
-						if (classMetric.isInterface()) {
-							interfaceCount++;
-						}
-						else {
-							classCount++;
-						}
-					}
-				}
-				
-				cmpC = classCount * CLASS_WEIGHT + interfaceCount + weightedMethodCountSum;
-				
-				double complexity = cmpC + sumClassComplexity + sumMethodComplexity;
+								
+				double complexity = cpcMetrics.computeCpcForPackage(packageName);
 								
 				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
 				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "api-complexity");
