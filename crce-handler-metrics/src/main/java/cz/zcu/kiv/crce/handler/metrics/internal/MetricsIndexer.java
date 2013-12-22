@@ -26,7 +26,12 @@ import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
-
+/**
+ * Implementation of <code>AbstractResourceIndexer</code> which provides measurement
+ * of metrics computed on osgi bundle implementation (jar file).
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
 public class MetricsIndexer extends AbstractResourceIndexer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
@@ -42,6 +47,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		
 		classesMetrics = new ArrayList<ClassMetrics>();
 		
+		// parsing imput stream and collect class entry informations (ClassMetrics)
 		try {			
 			size = input.available();					
 			ZipInputStream jis = new ZipInputStream(input);			
@@ -56,15 +62,26 @@ public class MetricsIndexer extends AbstractResourceIndexer {
             return Collections.emptyList();
 		} 
 		
+		// save jar file size to crce.content
 		Capability identity = metadataService.getSingletonCapability(resource, "crce.content");
 		identity.setAttribute("size", Long.class, (long)size);
 		
+		// save number of imports
 		numberOfImports(resource);
+		
+		// save api complexity
 		apiComplexity(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 				
 		return Collections.emptyList();
 	}
 	
+	/**
+	 * Reading single entry from ZipInputStream.
+	 * 
+	 * @param jis ZipInputStream.
+	 * @return Single entry InputStream.
+	 * @throws IOException
+	 */
 	private InputStream getEntryImputStream(ZipInputStream jis) throws IOException	{		
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];
@@ -76,6 +93,23 @@ public class MetricsIndexer extends AbstractResourceIndexer {
         return new ByteArrayInputStream(baos.toByteArray());
 	}
 	
+	/**
+	 * Parse class metrics (data) from single ClassReader using ASM.
+	 * 
+	 * @param classReader ClassReader of single class node.
+	 */
+	private void parseClass(ClassReader classReader) {
+        ClassNode byteCodeNode = new ClassNode();
+        classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
+        
+        classesMetrics.add(new ClassMetrics(byteCodeNode));
+	}
+	
+	/**
+	 * Parse and save number of imports into resource.
+	 * 
+	 * @param resource Resource to update.
+	 */
 	private void numberOfImports(Resource resource) {
 		List<Requirement> requirements = resource.getRequirements();
 				
@@ -87,23 +121,24 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		metadataService.addRootCapability(resource, numOfImportsCap);
 	}
 		
-	private void parseClass(ClassReader classReader) {
-        ClassNode byteCodeNode = new ClassNode();
-        classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
-        
-        classesMetrics.add(new ClassMetrics(byteCodeNode));
-	}
-	
+	/**
+	 * Save complexity (CPC) to each export package node in Resource.
+	 * 
+	 * @param exportPackageCapabilities List of Capability with exported packages.
+	 */
 	private void apiComplexity(List<Capability> exportPackageCapabilities) {	
 		
+		// log if no export packages are set in Resources -> nothing to compute
 		if (exportPackageCapabilities.isEmpty()) {
 			
 			logger.error("No export packages found in metadata capabilities.");			
 			return;
 		}
 		
+		// create CpsMetrics from all parsed classes data
 		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
 		
+		// for each package
 		for (Capability exportPackageCapability : exportPackageCapabilities) {
 		
 			Attribute<String> packageNameAttribute = exportPackageCapability.getAttribute(NsOsgiPackage.ATTRIBUTE__NAME);
@@ -111,6 +146,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 			if (packageNameAttribute != null) {			
 				String packageName = packageNameAttribute.getValue();
 								
+				// get complexity for this package and save it into capability
 				double complexity = cpcMetrics.computeCpcForPackage(packageName);
 								
 				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);

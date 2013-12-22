@@ -9,7 +9,11 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 
 
-
+/**
+ * Activator of this plugin (indexer).
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
 public class Activator extends DependencyActivatorBase {
 
 	@Override
@@ -18,7 +22,7 @@ public class Activator extends DependencyActivatorBase {
 		manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(MetricsIndexer.class)
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 );
 	}
