@@ -442,7 +442,12 @@
                 <version>1.3.174</version>
                 <scope>provided</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.googlecode.flyway</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>2.3.1</version>
+                <scope>compile</scope> <!-- Embedded artifact because of OSGi classloader issues -->
+            </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>

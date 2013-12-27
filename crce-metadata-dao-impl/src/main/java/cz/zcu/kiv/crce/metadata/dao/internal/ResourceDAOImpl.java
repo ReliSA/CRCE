@@ -14,8 +14,6 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import org.apache.felix.dm.annotation.api.Component;
-import org.apache.felix.dm.annotation.api.Init;
-import org.apache.felix.dm.annotation.api.LifecycleController;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
@@ -61,32 +59,14 @@ public class ResourceDAOImpl implements ResourceDAO {
     @ServiceDependency private volatile SessionManager sessionManager;
     @ServiceDependency private volatile RepositoryDAOImpl repositoryDAOImpl;
 
-    @LifecycleController
-    Runnable lifeCycleController;
-
-    @Init
-    void init() {
-        logger.info("Starting CRCE Metadata DAO.");
-
-        try (SqlSession session = sessionManager.getSession()) {
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createTables");
-            session.update("cz.zcu.kiv.crce.metadata.dao.internal.mapper.InitDbMapper.createSequences");
-            session.commit();
-            // starts the component only if initialization is successful
-            lifeCycleController.run();
-        } catch (Exception e) {
-            logger.error("Could not initialize DB.", e);
-        }
-    }
-
     @Start
     void start() {
-        logger.info("CRCE Metadata DAO started.");
+        logger.info("CRCE Metadata DAO ResourceDAO started.");
     }
 
     @Stop
     synchronized void stop() {
-        logger.info("CRCE Metadata DAO finished.");
+        logger.info("CRCE Metadata DAO ResourceDAO finished.");
     }
 
     @Override

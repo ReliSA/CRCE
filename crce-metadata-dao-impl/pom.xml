@@ -57,6 +57,11 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.flyway</groupId>
+            <artifactId>flyway-core</artifactId>
+            <optional>true</optional> <!-- Embedded artifact because of OSGi classloader issues -->
+        </dependency>
 
         <!-- Optional dependencies -->
 

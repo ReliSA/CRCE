@@ -12,6 +12,9 @@ import org.osgi.service.cm.ManagedService;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ConfigurationDependency;
+import org.apache.felix.dm.annotation.api.Init;
+import org.apache.felix.dm.annotation.api.LifecycleController;
+import org.apache.felix.dm.annotation.api.Start;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -20,6 +23,9 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.googlecode.flyway.core.Flyway;
+import com.googlecode.flyway.core.api.FlywayException;
 
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
@@ -44,6 +50,43 @@ public class SessionManager implements ManagedService {
 
     private SqlSessionFactory factory;
     private Properties properties;
+
+    @LifecycleController
+    Runnable lifeCycleController;
+
+    /*
+     * Won't run until a configuration is passed to ManagedService
+     */
+    @Init
+    void init() {
+        logger.info("Initializing DB structure.");
+
+        try {
+            ClassLoader tmp = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            // ^ class loader workaround, see http://skysailserver.blogspot.cz/2013/11/using-flyway-with-osgi-part-one.html
+
+            Flyway flyway = new Flyway();
+            flyway.setDataSource(properties.getProperty("url"), properties.getProperty("username"), properties.getProperty("password"));
+
+            flyway.migrate();
+
+            // v class loader workaround
+            Thread.currentThread().setContextClassLoader(tmp);
+
+            // starts the component only if initialization is successful
+            lifeCycleController.run();
+        } catch (FlywayException e) {
+            logger.error("Could not initialize DB.", e);
+        }
+
+        logger.info("DB structure initialized.");
+    }
+
+    @Start
+    void start() {
+        logger.info("CRCE Metadata DAO SessionManager started.");
+    }
 
     /**
      * Opens and returns new session.
@@ -90,6 +133,7 @@ public class SessionManager implements ManagedService {
     @Override
     @ConfigurationDependency(pid = Activator.PID)
     public synchronized void updated(Dictionary<String, ?> dict) throws ConfigurationException {
+        logger.debug("Configuring CRCE SessionManager.");
 
         if (dict != null) {
             @SuppressWarnings("LocalVariableHidesMemberVariable")
@@ -125,6 +169,7 @@ public class SessionManager implements ManagedService {
                 throw new ConfigurationException(CFG__MYBATIS_CONFIG, "Could not open MyBatis configuration file.", e);
             }
         }
+        logger.debug("CRCE Metadata DAO SessionManager configured.");
     }
 
     /**

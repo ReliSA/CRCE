@@ -5,3 +5,13 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Export-Package:
+
+DynamicImport-Package: *
+
+Embed-Dependency: flyway-core
+
+Import-Package: \
+  !org.jboss.vfs, \
+  !org.springframework.jdbc.core, \
+  !org.springframework.jdbc.datasource, \
+  *

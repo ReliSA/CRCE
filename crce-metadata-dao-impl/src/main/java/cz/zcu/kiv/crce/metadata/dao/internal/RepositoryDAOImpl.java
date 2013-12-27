@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
+import org.apache.felix.dm.annotation.api.Start;
+import org.apache.felix.dm.annotation.api.Stop;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 
@@ -36,6 +38,16 @@ public class RepositoryDAOImpl implements RepositoryDAO {
     @ServiceDependency private volatile ResourceFactory resourceFactory;
     @ServiceDependency private volatile MetadataService metadataService; // NOPMD
     @ServiceDependency private volatile SessionManager sessionManager;
+
+    @Start
+    void start() {
+        logger.info("CRCE Metadata DAO RepositoryDAO started.");
+    }
+
+    @Stop
+    synchronized void stop() {
+        logger.info("CRCE Metadata DAO RepositoryDAO finished.");
+    }
 
     @Override
     public Repository loadRepository(URI uri) throws IOException {
