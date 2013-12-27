@@ -21,6 +21,15 @@
         <bundle.namespace>${namespace}.repository</bundle.namespace>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
     <dependencies>
 
         <!-- Felix -->
@@ -32,6 +41,10 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
         </dependency>
 
         <!-- 3rd party dependencies -->

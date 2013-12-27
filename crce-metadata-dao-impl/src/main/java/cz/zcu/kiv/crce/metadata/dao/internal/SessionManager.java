@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
+import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
 
 
 /**
@@ -82,6 +83,7 @@ public class SessionManager implements ManagedService {
     }
 
     private void factoryPostConfiguration(Configuration configuration) {
+        configuration.addMapper(ResolvingMapper.class);
         configuration.addMapper(SequenceMapper.class);
     }
 

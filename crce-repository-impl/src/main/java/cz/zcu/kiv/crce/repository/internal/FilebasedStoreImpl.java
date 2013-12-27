@@ -47,6 +47,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile ResourceFactory resourceFactory;
     private volatile MetadataService metadataService; // NOPMD
     private volatile MetadataValidator metadataValidator;
+    private volatile ResourceLoader resourceLoader;
 
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
@@ -293,8 +294,18 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     @Override
-    public List<Resource> getResources(Requirement requirement) {
-        throw new UnsupportedOperationException("Not supported yet."); // TODO implement with high priority (!)
+    public synchronized List<Resource> getResources(Requirement requirement) {
+        List<Resource> resources = Collections.emptyList();
+        try {
+            resources = resourceLoader.getResources(repository, requirement);
+        } catch (IOException e) {
+            logger.error("Could not load resources for requirement ({})", requirement.getNamespace(), e);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("getResources(requirement={}) returns {}", requirement.getNamespace(), resources.size());
+        }
+        return resources;
     }
 
     private boolean isInStore(Resource resource) {

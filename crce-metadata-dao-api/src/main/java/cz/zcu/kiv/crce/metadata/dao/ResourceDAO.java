@@ -37,6 +37,16 @@ public interface ResourceDAO {
     List<Resource> loadResources(@Nonnull Repository repository) throws IOException;
 
     /**
+     * Loads all resources in the given repository and whose capabilities match the given filter (at least one capability must match).
+     * @param repository
+     * @param filter
+     * @return
+     * @throws IOException
+     */
+    @Nonnull
+    List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceDAOFilter filter) throws IOException;
+
+    /**
      * Saves metadata of <code>Resource</code>.
      *
      * @param resource

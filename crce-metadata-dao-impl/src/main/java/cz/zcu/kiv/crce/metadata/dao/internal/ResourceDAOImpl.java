@@ -32,6 +32,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
@@ -39,6 +40,7 @@ import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
+import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -324,7 +326,57 @@ public class ResourceDAOImpl implements ResourceDAO {
         if (logger.isTraceEnabled()) {
             logger.trace("loadResources(repository={}) returns {}", repository, result);
         } else {
-            logger.debug("loadResources(repository) returns {}", result.size());
+            logger.debug("loadResources(repository={) returns {}", repository, result.size());
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceDAOFilter filter) throws IOException {
+        logger.debug("loadResources(repository={}, filter={})", repository,
+                logger.isTraceEnabled() ? filter : filter.getNamespace() + "(" + filter.getAttributes().size() + ")");
+
+        List<Resource> result = Collections.emptyList();
+        try (SqlSession session = sessionManager.getSession()) {
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+
+            if (repositoryId != null) {
+                List<DbResource> dbResources = null;
+                switch (filter.getOperator()) {
+                    case AND:
+                        dbResources = session
+                                .getMapper(ResolvingMapper.class)
+                                .getResourcesAnd(repositoryId, filter.getNamespace(), filter.getAttributes());
+                        break;
+
+                    case OR:
+                        dbResources = session
+                                .getMapper(ResolvingMapper.class)
+                                .getResourcesOr(repositoryId, filter.getNamespace(), filter.getAttributes());
+
+                }
+                if (dbResources != null && !dbResources.isEmpty()) {
+                    result = new ArrayList<>(dbResources.size());
+                    for (DbResource dbResource : dbResources) {
+                        // TODO optimize - select in loop
+                        Resource resource = loadResource(dbResource, session);
+                        resource.setRepository(repository);
+                        result.add(resource);
+                    }
+                }
+            }
+
+        } catch (PersistenceException e) {
+            throw new IOException("Could not load resources.", e);
+        }
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("loadResources(repository={}, filter={}) returns {}",
+                    repository, filter.getNamespace() + "(" + filter.getAttributes().size() + ")", result);
+        } else {
+            logger.debug("loadResources(repository={}, filter={}) returns {}",
+                    repository, filter.getNamespace() + "(" + filter.getAttributes().size() + ")", result.size());
         }
 
         return result;
