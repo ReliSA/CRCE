@@ -15,7 +15,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
-import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
@@ -29,7 +28,6 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
 
     private volatile PluginManager pluginManager;
     private volatile ResourceFactory resourceFactory; /* injected by dependency manager */
-    private volatile MetadataService metadataService;
 
     @Override
     public Resource indexResource(File file) throws IOException {
@@ -64,8 +62,6 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
                             logger.trace("Using indexer: {}", indexer.getPluginId());
                         }
                         newKeywords.addAll(indexer.index(fis, resource));
-//                        List<String> newKeywords = indexer.index(fis, resource);
-//                        keywords.addAll(newKeywords);
                     }
                     usedIndexers.add(indexer);
                 }
@@ -74,10 +70,6 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
             keywords.addAll(newKeywords);
             newKeywords = new HashSet<>();
         }
-
-        metadataService.setSize(resource, file.length());
-
-        metadataService.setUri(resource, file.toURI().normalize()); // TODO move to Store logic
 
         return resource;
     }

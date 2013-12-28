@@ -24,7 +24,6 @@ public class Activator extends DependencyActivatorBase {
                 .setImplementation(ResourceIndexerServiceImpl.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
-                .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(false).setCallbacks("add", "remove").setService(ResourceIndexer.class))
                 );
 

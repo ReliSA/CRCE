@@ -185,11 +185,10 @@ public class BufferImpl implements Buffer, EventHandler {
         }
         resource.setRepository(repository);
 
-        metadataService.setUri(resource, file.toURI().normalize());
-
         // TODO alternatively can be moved to some plugin
+        metadataService.setSize(resource, file.length());
+        metadataService.setUri(resource, file.toURI().normalize());
         metadataService.setFileName(resource, name2);
-//        metadataService.setPresentationName(resource, name2);
 
         String presentationName = metadataService.getPresentationName(resource);
         if (presentationName.trim().isEmpty()) {

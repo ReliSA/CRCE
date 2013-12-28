@@ -332,6 +332,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         for (File file : directory.listFiles()) {
             if (file.isFile()) {
                 try {
+                    if ("repository.xml".equals(file.getName())) {
+                        continue;
+                    }
                     if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
                         Resource resource;
                         try {
@@ -341,7 +344,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                             continue;
                         }
                         resource.setRepository(repository);
+
+                        // TODO alternatively can be moved to some plugin
+                        metadataService.setSize(resource, file.length());
                         metadataService.setUri(resource, file.toURI().normalize());
+                        metadataService.setFileName(resource, file.getName());
 
                         ResourceValidationResult validationResult = metadataValidator.validate(resource);
                         if (!validationResult.isContextValid()) {
