@@ -16,6 +16,7 @@ import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.webui.internal.legacy.Property;
 import cz.zcu.kiv.crce.webui.internal.legacy.Type;
@@ -78,7 +79,12 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public String getSymbolicName() {
-        return "unknown-symbolic-name";
+        String name = "unknown-symbolic-name";
+        List<Capability> capabilities = resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+        if (!capabilities.isEmpty()) {
+            name = capabilities.get(0).getAttributeValue(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME);
+        }
+        return name;
     }
 
     @Override
@@ -88,7 +94,12 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public Version getVersion() {
-        return new Version("0.0.0");
+        Version version = null;
+        List<Capability> capabilities = resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+        if (!capabilities.isEmpty()) {
+            version = capabilities.get(0).getAttributeValue(NsOsgiBundle.ATTRIBUTE__VERSION);
+        }
+        return version;
     }
 
     @Override
