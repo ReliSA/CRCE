@@ -35,10 +35,10 @@ import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostProviderOfCapability;
 import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
-import cz.zcu.kiv.crce.rest.internal.generated.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.generated.Tattribute;
-import cz.zcu.kiv.crce.rest.internal.generated.Trepository;
-import cz.zcu.kiv.crce.rest.internal.generated.Trequirement;
+import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tattribute;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trequirement;
 import cz.zcu.kiv.crce.rest.internal.structures.VersionDemand;
 
 @Path("/provider-of-capability")

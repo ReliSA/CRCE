@@ -21,12 +21,12 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.rest.internal.generated.Tattribute;
-import cz.zcu.kiv.crce.rest.internal.generated.Tcapability;
-import cz.zcu.kiv.crce.rest.internal.generated.Tdirective;
-import cz.zcu.kiv.crce.rest.internal.generated.Trepository;
-import cz.zcu.kiv.crce.rest.internal.generated.Trequirement;
-import cz.zcu.kiv.crce.rest.internal.generated.Tresource;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tattribute;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tcapability;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tdirective;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trequirement;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tresource;
 
 /**
  * Convert cz.zcu.kiv.crce.metadata.Resource to bean classes with JAXB annotations. These bean classes are ready to export metadata to xml.
@@ -131,8 +131,10 @@ public class ConvertorToBeans {
         if (value != null) {
             newAttributte.setValue(value);
         }
+        // TODO 'op' is not in current XSD, but it was in previously generated classes
         if (op != null) {
-            newAttributte.setOp(op);
+//            newAttributte.setOp(op);
+            logger.warn("'op' is not supported yet in XML format.");
         }
 
         list.add(newAttributte);

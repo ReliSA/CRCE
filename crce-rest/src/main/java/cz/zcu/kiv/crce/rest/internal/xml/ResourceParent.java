@@ -18,8 +18,8 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.generated.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.generated.Trepository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
 
 /**
  * Parent class for all resource classes, that implements REST operation.

@@ -22,7 +22,7 @@ import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetReplaceBundle;
 import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
-import cz.zcu.kiv.crce.rest.internal.generated.Trepository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
 
 @Path("/replace-bundle")
 public class ReplaceBundleResource extends ResourceParent implements GetReplaceBundle {
