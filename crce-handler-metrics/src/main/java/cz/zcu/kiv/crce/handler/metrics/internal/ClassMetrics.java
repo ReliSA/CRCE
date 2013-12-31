@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.handler.metrics.internal;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.Type;
@@ -21,6 +22,7 @@ public class ClassMetrics {
 	// definition of complex types
 	private static final int[] COMPLEX_TYPES = new int[] { Type.ARRAY, Type.OBJECT };
 	
+	private String fullClassName;
 	private String packageName;
 	private String className;
 	
@@ -35,12 +37,16 @@ public class ClassMetrics {
 	private int simpleParametersCount;
 	private int complexParametersCount;
 	
+	private List<IMethodMetrics> methods;
+	
 	/**
 	 * New instance.
 	 * 
 	 * @param byteCodeNode Asm ClassNode to parse information.
 	 */
 	public ClassMetrics(ClassNode byteCodeNode) {
+		
+		methods = new ArrayList<IMethodMetrics>();
 		
 		methodCount = 0;
 		
@@ -50,7 +56,7 @@ public class ClassMetrics {
 		simpleParametersCount = 0;
 		complexParametersCount = 0;
 		
-		String fullClassName = byteCodeNode.name.replace('/','.');
+		fullClassName = byteCodeNode.name.replace('/','.');
 		
 		// class and package name
 		className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
@@ -78,7 +84,7 @@ public class ClassMetrics {
         @SuppressWarnings("unchecked")
 		List<MethodNode> methods = byteCodeNode.methods;
         for (MethodNode method : methods) {
-        	parseMethod(method);
+        	parseMethod(fullClassName, method);
         }
 	}
 	
@@ -108,9 +114,11 @@ public class ClassMetrics {
 	 * 
 	 * @param method Asm MethodNode to parse.
 	 */
-	private void parseMethod(MethodNode method) {
+	private void parseMethod(String fullClassName, MethodNode method) {
 		// parsing method access
 		boolean isPublicMethod = Modifier.isPublic(method.access);
+		
+		methods.add(new MethodMetrics(fullClassName, isPublicMethod, method));
 		
 		// continue only for public methods
 		if (!isPublicMethod) {
@@ -156,6 +164,10 @@ public class ClassMetrics {
 		}
 		
 		return false;
+	}
+	
+	public String getFullClassName() {
+		return fullClassName;
 	}
 
 	/**
@@ -237,5 +249,9 @@ public class ClassMetrics {
 	 */
 	public int getComplexParametersCount() {
 		return complexParametersCount;
+	}
+	
+	public List<IMethodMetrics> getMethods() {
+		return methods;
 	}
 }

@@ -71,6 +71,8 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		
 		// save api complexity
 		apiComplexity(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
+		
+		rippleEffect(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 				
 		return Collections.emptyList();
 	}
@@ -152,6 +154,36 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
 				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "api-complexity");
 				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, complexity);		
+				metadataService.addChild(exportPackageCapability, metricsCapability);
+			}
+		}
+	}
+	
+	private void rippleEffect(List<Capability> exportPackageCapabilities) {	
+		
+		// log if no export packages are set in Resources -> nothing to compute
+		if (exportPackageCapabilities.isEmpty()) {
+			
+			logger.error("No export packages found in metadata capabilities.");			
+			return;
+		}
+		
+		RippleEffectMetrics rippleEffectMetrics = new RippleEffectMetrics(classesMetrics);
+		rippleEffectMetrics.init();
+		
+		for (Capability exportPackageCapability : exportPackageCapabilities) {
+		
+			Attribute<String> packageNameAttribute = exportPackageCapability.getAttribute(NsOsgiPackage.ATTRIBUTE__NAME);
+			
+			if (packageNameAttribute != null) {			
+				String packageName = packageNameAttribute.getValue();
+								
+				RippleEffect rippleEffect = rippleEffectMetrics.getRippleEffectForPackage(packageName);
+								
+				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
+				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "ripple-effect");
+				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, 
+						(long)(rippleEffect.getInternalMethodsCount() + rippleEffect.getExternalMethodsCount()));		
 				metadataService.addChild(exportPackageCapability, metricsCapability);
 			}
 		}
