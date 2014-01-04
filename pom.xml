@@ -53,18 +53,6 @@
              It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
         -->
 
-<!--        <org.osgi.framework.system.packages.extra>
-          com.sun.*,com.sun.org.apache.xerces.internal.*,com.sun.java_cup.internal,
-          javax.accessibility,javax.annotation,
-          javax.management,javax.management.modelmbean,javax.management.remote,
-          javax.naming,javax.script,javax.security.auth.x500,javax.servlet,
-          javax.servlet.jsp,javax.sql,
-          org.xml.sax.ext,org.xml.sax.helpers,
-          org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,
-
-           for crce-webui: javax.servlet,javax.servlet.http,javax.xml.*,org.w3c.dom,org.xml.sax,
-          com.sun.xml.internal.bind.v2
-        </org.osgi.framework.system.packages.extra>-->
         <version.org.slf4j>1.7.5</version.org.slf4j>
     </properties>
 
@@ -81,14 +69,12 @@
         <module>crce-metadata-service-api</module>
         <module>crce-repository-api</module>
         <module>crce-metadata-indexer-api</module>
-        <!--<module>crce-results-api</module>-->
 
         <!-- API Implementation -->
         <module>crce-metadata-impl</module>
         <module>crce-metadata-dao-impl</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-repository-impl</module>
-        <!--<module>crce-results-impl</module>-->
 
         <!-- Core Plugins -->
         <module>crce-metadata-indexer</module>
@@ -99,7 +85,7 @@
         <!--<module>crce-efp-indexer</module>-->
 
         <!-- Libraries -->
-        <!--<module>crce-efpAssignment</module>-->
+        <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
         <!--<module>crce-handler-versioning</module>-->
@@ -121,6 +107,12 @@
         <id>target</id>
         <modules>
           <module>crce-target</module>
+        </modules>
+      </profile>
+      <profile>
+        <id>run-it</id>
+        <modules>
+          <module>crce-integration-tests</module>
         </modules>
       </profile>
     </profiles>
