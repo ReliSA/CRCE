@@ -42,26 +42,27 @@ import cz.zcu.kiv.crce.it.Options;
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class CompatibilityDaoTest extends IntegrationTestBase {
+public class CompatibilityDaoIT extends IntegrationTestBase {
 
     private static final String TEST_DB = "compatibilityDaoImplIT";
 
     @Inject
-    private CompatibilityFactory m_factory;
+    private CompatibilityFactory compatibilityFactory;
 
     @Inject
-    private CompatibilityDao m_dao;
+    private CompatibilityDao compatibilityDao;
 
     @Inject
-    private ConfigurationAdmin m_config;
+    private ConfigurationAdmin configurationAdmin;
 
-    private MongoClient client;
+    private MongoClient mongoClient;
     private DB db;
 
     @Before
+    @Override
     public void before() throws Exception {
-        client = new MongoClient("localhost");
-        db = client.getDB(TEST_DB);
+        mongoClient = new MongoClient("localhost");
+        db = mongoClient.getDB(TEST_DB);
         configureDao();
         Thread.sleep(300); //wait for DAO configuration
     }
@@ -71,7 +72,7 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
      * @throws Exception
      */
     private void configureDao() throws Exception{
-        org.osgi.service.cm.Configuration config = m_config.getConfiguration("cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao", null);
+        org.osgi.service.cm.Configuration config = configurationAdmin.getConfiguration("cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao", null);
         Dictionary<String, Object> props = config.getProperties();
         if(props == null) {
             props = new Hashtable<>();
@@ -83,31 +84,29 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
     @After
     public void after() throws Exception {
         db.dropDatabase();
-        client.close();
+        mongoClient.close();
     }
 
     @Configuration
-    public Option[] configure() throws Exception {
+    public Option[] configuration() throws Exception {
         return options(
                 junitBundles(),
-                provision(
-                    Options.Crce.metadataApi(),
-                    Options.Crce.compatibilityApi(),
-                    Options.Crce.compatibilityDaoApi(),
-                    Options.Crce.compatibilityDaoMongo(),
-                    Options.Crce.compatibilityImpl(),
-                    Options.Felix.dependencyManager(),
-                    Options.Felix.configAdmin(),
-                    Options.Felix.bundleRepository(),
-                    Options.Osgi.compendium(),
+                Options.Felix.dependencyManager(),
+                Options.logging(),
+                Options.Osgi.compendium(),
+                Options.Felix.configAdmin(),
+                Options.Felix.bundleRepository(),
 
-                    mavenBundle("cz.zcu.kiv.jacc","types-cmp", "1.0.1"),
-                    mavenBundle("org.slf4j", "slf4j-api", "1.7.4"),
-                    mavenBundle("ch.qos.logback", "logback-core", "1.0.9"),
-                    mavenBundle("ch.qos.logback", "logback-classic", "1.0.9"),
-                    mavenBundle("org.mongodb", "mongo-java-driver", "2.11.3")
-                )
-            );
+                mavenBundle("org.mongodb", "mongo-java-driver"),
+
+                mavenBundle("cz.zcu.kiv.jacc", "types-cmp"),
+
+                Options.Crce.metadataApi(),
+                Options.Crce.compatibilityApi(),
+                Options.Crce.compatibilityDaoApi(),
+                Options.Crce.compatibilityDaoMongo(),
+                Options.Crce.compatibilityImpl()
+        );
     }
 
     /**
@@ -130,22 +129,22 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
      */
     @Test
     public void compatibilitySaveTest() throws Exception {
-        Compatibility test = m_factory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.save", new Version(1, 0, 0),
+        Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.save", new Version(1, 0, 0),
                                                             null, new Version(0, 1, 0), Difference.MUT, null);
 
-        test = m_dao.saveCompatibility(test);
-        Compatibility read = m_dao.readCompability(test.getId());
+        test = compatibilityDao.saveCompatibility(test);
+        Compatibility read = compatibilityDao.readCompability(test.getId());
 
         assertNotNull("Save must have failed. Read returned null.", read);
         assertEquals("Expected the compatibilities to be equal.", test, read);
 
         //creating new passed, now try update
 
-        test = m_factory.createCompatibility(test.getId(), "modified", test.getResourceVersion(),
+        test = compatibilityFactory.createCompatibility(test.getId(), "modified", test.getResourceVersion(),
                                                 test.getBaseResourceName(), test.getBaseResourceVersion(), test.getDiffValue(), null);
 
-        m_dao.saveCompatibility(test);
-        read = m_dao.readCompability(read.getId());
+        compatibilityDao.saveCompatibility(test);
+        read = compatibilityDao.readCompability(read.getId());
         assertEquals("Expected the compatibilities to be equal.", test, read);
     }
 
@@ -171,33 +170,33 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
         Compatibility test;
         int i = 0;
         for(Version version : VERSIONS) {
-            test = m_factory.createCompatibility(null, RESOURCE_NAME, RESOURCE_VERSION,
+            test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, RESOURCE_VERSION,
                     version, DIFFERENCES[i], null);
-            test = m_dao.saveCompatibility(test);
+            test = compatibilityDao.saveCompatibility(test);
             testData.add(test);
             i++;
         }
 
         //create one different resource and several different resource versions to check
         //the dao method doesnt return all it can find
-        test = m_factory.createCompatibility(null, "cz.zcu.kiv.unwanted.resource.name", RESOURCE_VERSION,
+        test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.unwanted.resource.name", RESOURCE_VERSION,
                 null, new Version(33,0,33), Difference.MUT, null);
-        test = m_dao.saveCompatibility(test);
+        test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
 
         //these test data are also used for higher-version search
-        test = m_factory.createCompatibility(null, RESOURCE_NAME, new Version(1,1,2),
+        test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,1,2),
                 VERSIONS[1], DIFFERENCES[1], null);
-        test = m_dao.saveCompatibility(test);
+        test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
-        test = m_factory.createCompatibility(null, RESOURCE_NAME, new Version(1,2,0),
+        test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,2,0),
                 VERSIONS[1], DIFFERENCES[1], null);
-        test = m_dao.saveCompatibility(test);
+        test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
-        test = m_factory.createCompatibility(null, RESOURCE_NAME, new Version(42,0,0),
+        test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(42,0,0),
                 VERSIONS[1], Difference.MUT, null);
-        test = m_dao.saveCompatibility(test);
+        test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
 
@@ -212,7 +211,7 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
     public void compatibilityListTest() throws Exception {
         List<Compatibility> testData = createTestDataForListing();
 
-        List<Compatibility> testee = m_dao.listCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
+        List<Compatibility> testee = compatibilityDao.listCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
 
         assertEquals("Expected to get same amount of results as VERSIONS", VERSIONS.length, testee.size());
         for(Compatibility test : testee) {
@@ -232,7 +231,7 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
         List<Difference> diffs = new ArrayList<>(1);
         diffs.add(DIFFERENCES[1]);
 
-        List<Compatibility> higher = m_dao.findHigher(RESOURCE_NAME, VERSIONS[1], diffs);
+        List<Compatibility> higher = compatibilityDao.findHigher(RESOURCE_NAME, VERSIONS[1], diffs);
         assertEquals("Expected to find exactly 3 resource!", 3, higher.size());
     }
 
@@ -252,7 +251,7 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
         vers.add(VERSIONS[0]);
         vers.add(VERSIONS[2]);
 
-        List<Compatibility> lower = m_dao.findLower(RESOURCE_NAME, RESOURCE_VERSION, diffs);
+        List<Compatibility> lower = compatibilityDao.findLower(RESOURCE_NAME, RESOURCE_VERSION, diffs);
         assertEquals("Expected to find exactly 2 resources!", 2, lower.size());
         assertTrue(vers.contains(lower.get(0).getBaseResourceVersion()));
         assertTrue(vers.contains(lower.get(1).getBaseResourceVersion()));
@@ -262,8 +261,8 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
     public void testNoDifferencesAllowed() throws Exception {
         createTestDataForListing();
 
-        List<Compatibility> lower = m_dao.findLower(RESOURCE_NAME, RESOURCE_VERSION, null);
-        List<Compatibility> higher = m_dao.findHigher(RESOURCE_NAME, VERSIONS[0], new ArrayList<Difference>());
+        List<Compatibility> lower = compatibilityDao.findLower(RESOURCE_NAME, RESOURCE_VERSION, null);
+        List<Compatibility> higher = compatibilityDao.findHigher(RESOURCE_NAME, VERSIONS[0], new ArrayList<Difference>());
 
         assertEquals("Expected no lower versions with null differences to be found!", 0, lower.size());
         assertEquals("Expected no higher versions with no differences to be found!", 0, higher.size());
@@ -279,15 +278,15 @@ public class CompatibilityDaoTest extends IntegrationTestBase {
      */
     @Test
     public void compatibilityDeleteTest() throws Exception {
-        Compatibility test = m_factory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.remove",new Version(1,0,0),
+        Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.remove",new Version(1,0,0),
                 null, new Version(0,1,0), Difference.MUT, null);
 
-        test = m_dao.saveCompatibility(test);
-        Compatibility read = m_dao.readCompability(test.getId());
+        test = compatibilityDao.saveCompatibility(test);
+        Compatibility read = compatibilityDao.readCompability(test.getId());
         assertNotNull("Save must have failed. Read returned null.", read);
 
-        m_dao.deleteCompatibility(read);
-        test = m_dao.readCompability(test.getId());
+        compatibilityDao.deleteCompatibility(read);
+        test = compatibilityDao.readCompability(test.getId());
         assertNull("Expected to find no results after removal.", test);
 
     }

@@ -38,11 +38,8 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- for VersioningBundleStore iface: -->
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.storage</artifactId>
-        </dependency>
+        <!-- CRCE dependencies -->
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>

@@ -47,6 +47,9 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
+
 /**
  * Base class for integration tests. There is no technical reason to use this, but it might make
  * your life easier.<br>
@@ -234,17 +237,21 @@ public class IntegrationTestBase extends TestCase {
             m_latch = new CountDownLatch(components.length);
         }
 
+        @Override
         public void starting(Component component) {
         }
 
+        @Override
         public void started(Component component) {
             m_components.remove(component);
             m_latch.countDown();
         }
 
+        @Override
         public void stopping(Component component) {
         }
 
+        @Override
         public void stopped(Component component) {
         }
 
@@ -269,4 +276,8 @@ public class IntegrationTestBase extends TestCase {
             return result.toString();
         }
     };
+
+    public MavenArtifactProvisionOption mavenBundle(String groupId, String artifactId) {
+        return CoreOptions.mavenBundle(groupId, artifactId).versionAsInProject();
+    }
 }

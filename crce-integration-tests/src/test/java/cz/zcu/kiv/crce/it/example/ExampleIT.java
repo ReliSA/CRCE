@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package cz.zcu.kiv.crce.it;
+package cz.zcu.kiv.crce.it.example;
 
+import cz.zcu.kiv.crce.it.IntegrationTestBase;
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
@@ -39,25 +40,25 @@ import org.ops4j.pax.exam.junit.PaxExam;
  * wrong with the environment
  */
 @RunWith(PaxExam.class)
-public class ExampleTest extends IntegrationTestBase {
+public class ExampleIT extends IntegrationTestBase {
 
     @Configuration
-    public Option[] configuration() {
+    public Option[] configuration() throws Exception {
         return options(
             // you can add additional directives, e.g. systemProperty or VMOptions here
             junitBundles(),
-            provision(
-                Osgi.compendium(),
-                Felix.dependencyManager()
-                // add additional bundles here
-            )
+            Felix.dependencyManager(),
+            Osgi.compendium()
         );
     }
 
+    @Override
     protected void before() throws IOException {
         // configure the services you need; you cannot use the injected members yet
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
     protected Component[] getDependencies() {
         return new Component[] {
                 // create Dependency Manager components that should be started before the
@@ -71,12 +72,12 @@ public class ExampleTest extends IntegrationTestBase {
     }
 
     // You can inject services as usual.
-    private volatile PackageAdmin m_packageAdmin;
+    @SuppressWarnings("deprecation")
+    private volatile PackageAdmin packageAdmin;
 
     @Test
     public void exampleTest() {
-        assertEquals("Hey, who stole my package!",
-                0,
-                m_packageAdmin.getExportedPackage("org.osgi.framework").getExportingBundle().getBundleId());
+        assertEquals("Hey, who stole my package!", 0, packageAdmin.getExportedPackage("org.osgi.framework").getExportingBundle().getBundleId());
     }
+
 }

@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.repository.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
@@ -38,8 +37,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     public static final String STORE_URI = "store.uri";
 
-    private volatile DependencyManager m_manager;   /* injected by dependency manager */
-    private volatile BundleContext m_context;       /* injected by dependency manager */
+    private volatile DependencyManager dependencyManager; /* injected by dependency manager */
+    private volatile BundleContext bundleContext;         /* injected by dependency manager */
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
@@ -64,20 +63,20 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     }
 
     @Override
-    public void updated(Dictionary<String, ?> dict) throws ConfigurationException {
-        logger.debug("Updating Repository Activator configuration: {}", dict);
+    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        logger.debug("Updating Repository Activator configuration: {}", properties);
 
-        if (dict == null) {
+        if (properties == null) {
             logger.warn("Repository configuration is empty!");
             return;
         }
 
-        if (m_context.getServiceReference(Store.class.getName()) != null) {
+        if (bundleContext.getServiceReference(Store.class.getName()) != null) {
             logger.warn("Store URI reconfiguration on runtime is not supported");
             return;
         }
 
-        String path = (String) dict.get(STORE_URI);
+        String path = (String) properties.get(STORE_URI);
 
         URI uri = null;
         File file = null;
@@ -87,52 +86,41 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 file = new File(path);
             } else if ("file".equals(uri.getScheme())) {
                 file = new File(uri);
+            } else {
+                throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
             }
         } catch (URISyntaxException ex) {
             // TODO verify this usecase and correctness
             file = new File(path);
         }
 
-        logger.debug("Repository Store URI: {}, file: {}", uri, file);
+        logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
 
         Component store;
 
-        if (file != null) {
-            if (!file.exists() && !file.mkdirs()) {
-                throw new ConfigurationException(STORE_URI, "Can not create directory on given path: " + path);
-            }
+        if (!file.exists() && !file.mkdirs()) {
+            throw new ConfigurationException(STORE_URI, "Can not create directory on given path: " + path);
+        }
 
-            try {
-                store = createComponent()
-                        .setInterface(Store.class.getName(), null)
-                        .setImplementation(new FilebasedStoreImpl(file))
-                        .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
-                        .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
-                        .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
-                        .add(createServiceDependency().setRequired(true).setService(RepositoryDAO.class))
-                        .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
-                        .add(createServiceDependency().setService(MetadataValidator.class).setRequired(true))
-                        .add(createServiceDependency().setService(ResourceLoader.class).setRequired(true))
-                        .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
-            } catch (IOException e) {
-                throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
-            }
-        } else if ("http".equals(uri.getScheme())) {
-            try {
-                store = createComponent()
-                        .setInterface(Store.class.getName(), null)
-                        .setImplementation(new ObrStoreImpl(uri.toURL()));
-            } catch (MalformedURLException ex) {
-                throw new ConfigurationException(STORE_URI, "OBR Store URI is not an URL: " + uri, ex);
-            }
-
-        } else {
-            throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
+        try {
+            store = createComponent()
+                    .setInterface(Store.class.getName(), null)
+                    .setImplementation(new FilebasedStoreImpl(file))
+                    .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
+                    .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
+                    .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
+                    .add(createServiceDependency().setRequired(true).setService(RepositoryDAO.class))
+                    .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
+                    .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))
+                    .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
+                    .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
+        } catch (IOException e) {
+            throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);
         }
 
         logger.debug("Registering Repository Store: {}", store);
 
-        m_manager.add(store);
+        dependencyManager.add(store);
 
         // for more instances of Store (e.g. user would like to choose a store for uploading resources)
         // th ManagedServiceFactory can be used, see:

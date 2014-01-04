@@ -17,7 +17,7 @@
     <name>CRCE - Plugin - Metadata Indexer Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.metadata.indexer</bundle.symbolicName>
+        <bundle.symbolicName>${namespace}.metadata.indexer.service</bundle.symbolicName>
         <bundle.namespace>${namespace}.metadata.indexer</bundle.namespace>
     </properties>
 

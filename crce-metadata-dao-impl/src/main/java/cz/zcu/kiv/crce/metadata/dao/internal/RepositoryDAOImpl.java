@@ -130,10 +130,19 @@ public class RepositoryDAOImpl implements RepositoryDAO {
     }
 
     @CheckForNull
-    public Repository loadRepository(long repositoryId, @Nonnull SqlSession session) {
+    public Repository loadRepository(long repositoryId, @Nonnull SqlSession session) throws IOException {
         logger.debug("getRepository(repositoryId={})", repositoryId);
 
-        Repository repository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByRepositoryId", repositoryId);
+        Repository repository = null;
+
+        DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByRepositoryId", repositoryId);
+        if (dbRepository != null) {
+            try {
+                repository = resourceFactory.createRepository(new URI(dbRepository.getUri()));
+            } catch (URISyntaxException e) {
+                throw new IOException("Invalid URI syntax of repository with ID: " + repositoryId + ", URI: " + dbRepository.getUri(), e);
+            }
+        }
 
         logger.debug("getRepository(repositoryId={}) returns {}", repositoryId, repository);
 

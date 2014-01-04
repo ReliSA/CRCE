@@ -3,16 +3,12 @@
 <mapper namespace="cz.zcu.kiv.crce.metadata.dao.internal.mapper.RepositoryMapper">
 
     <!-- Repository -->
-    <resultMap type="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository" id="repositoryResultMap">
-        <id property="repositoryId" column="repository_id"/>
-        <id property="uri" column="uri"/>
-    </resultMap>
-    <select id="selectRepositoryByUri" parameterType="String" resultMap="repositoryResultMap">
+    <select id="selectRepositoryByUri" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository">
         SELECT repository_id, uri
         FROM repository
         WHERE uri = #{uri}
     </select>
-    <select id="selectRepositoryByRepositoryId" parameterType="Long" resultMap="repositoryResultMap">
+    <select id="selectRepositoryByRepositoryId" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository">
         SELECT repository_id, uri
         FROM repository
         WHERE repository_id = #{repositoryId}

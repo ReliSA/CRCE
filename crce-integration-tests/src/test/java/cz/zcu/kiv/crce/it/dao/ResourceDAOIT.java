@@ -31,18 +31,23 @@ import org.apache.felix.dm.Component;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.junit.PaxExam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.it.Configuration;
 import cz.zcu.kiv.crce.it.IntegrationTestBase;
+import cz.zcu.kiv.crce.it.Options;
 import cz.zcu.kiv.crce.it.Options.Crce;
 import cz.zcu.kiv.crce.it.Options.Felix;
 import cz.zcu.kiv.crce.it.Options.Osgi;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
+import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -50,7 +55,9 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  * This class serves as a minimal example of our integration tests. Also, if this test fails, something is likely wrong with the environment
  */
 @RunWith(PaxExam.class)
-public class ResourceDAOTest extends IntegrationTestBase {
+public class ResourceDAOIT extends IntegrationTestBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(ResourceDAOIT.class);
 
     /*
     @Configuration
@@ -89,45 +96,30 @@ public class ResourceDAOTest extends IntegrationTestBase {
      *
      * @return the configuration
      */
-    @Configuration
+    @org.ops4j.pax.exam.Configuration
     public Option[] configuration() {
 
         return options(
-                 systemPackage(systemPackages),
-                 bootDelegationPackage(bootDelegationPackages),
-                 junitBundles(),
-                 provision(
-                    // DS support
-                    Osgi.compendium(),
-                    Felix.dependencyManager(),
-                    Felix.dependencyManagerRuntime(),
-                    Felix.configAdmin(),
-//                    mavenBundle("org.apache.felix", "org.apache.felix.scr"),
-                    mavenBundle("org.slf4j", "slf4j-api"),
-                    mavenBundle("ch.qos.logback", "logback-core"),
-                    mavenBundle("ch.qos.logback", "logback-classic"),
-                    mavenBundle("com.h2database", "h2").versionAsInProject(),
-                    mavenBundle("org.mybatis", "mybatis").versionAsInProject(),
-                    Crce.metadataApi(),
-                    Crce.pluginApi(),
-                    Crce.metadataServiceApi(),
-                    Crce.metadataDaoApi(),
-                    Crce.metadataImpl(),
-                    Crce.metadataServiceImpl(),
-                    Crce.metadataDaoImpl()
-                 )
-               );
+                systemPackage(systemPackages),
+                bootDelegationPackage(bootDelegationPackages),
+                junitBundles(),
+                Options.logging(),
+                Felix.dependencyManager(),
+
+                Osgi.compendium(),
+                Felix.configAdmin(),
+
+                Crce.pluginApi(),
+                Crce.metadata(),
+                Crce.metadataService(),
+                Crce.metadataDao()
+        );
     }
 
     @Override
     protected void before() throws IOException {
         // configure the services you need; you cannot use the injected members yet
-        configure("cz.zcu.kiv.crce.metadata.dao",
-                "jdbc.driver", "org.h2.Driver",
-                "jdbc.url", "jdbc:h2:mem:it;MODE=PostgreSQL",
-                "jdbc.username", "sa",
-                "jdbc.password", ""
-                );
+        Configuration.metadataDao(this);
     }
 
     @Override
@@ -136,25 +128,33 @@ public class ResourceDAOTest extends IntegrationTestBase {
             // create Dependency Manager components that should be started before the
             // test starts.
             createComponent()
-            .setImplementation(this)
-            .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
-            .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
-            .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-        };
+                .setImplementation(this)
+                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
+                .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+            };
     }
 
     // You can inject services as usual.
     private volatile ResourceFactory resourceFactory;  /* injected by dependency manager */
     private volatile ResourceDAO resourceDAO;          /* injected by dependency manager */
+    private volatile RepositoryDAO repositoryDAO;      /* injected by dependency manager */
     private volatile MetadataService metadataService;  /* injected by dependency manager */
 
 
     @Test
     public void testResourceDAOImp() throws IOException, URISyntaxException {
 
+        Repository repository = resourceFactory.createRepository(new URI("file://a/b"));
+
+        repositoryDAO.saveRepository(repository);
+
         URI uri = new URI("file://a/b/c");
 
         Resource expected = resourceFactory.createResource();
+
+        expected.setRepository(repository);
 
         assertNotNull(expected);
 

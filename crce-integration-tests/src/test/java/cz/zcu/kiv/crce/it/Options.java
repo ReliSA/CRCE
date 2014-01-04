@@ -19,38 +19,40 @@
 package cz.zcu.kiv.crce.it;
 
 
-import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
+import static org.ops4j.pax.exam.CoreOptions.composite;
 
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.extra.VMOption;
 
 /**
  * This class contains a set of Pax Exam options, intended for typo-free provisioning of bundles.
  */
 public class Options {
+
     public static class Osgi {
+
         public static MavenArtifactProvisionOption compendium() {
             return maven("org.osgi.compendium");
         }
 
         private static MavenArtifactProvisionOption maven(String artifactId) {
-            return Options.maven("org.osgi", artifactId);
+            return Options.mavenBundle("org.osgi", artifactId);
         }
     }
 
     public static class Felix {
+
         public static MavenArtifactProvisionOption preferences() {
             return maven("org.apache.felix.prefs");
         }
 
-        public static MavenArtifactProvisionOption dependencyManager() {
-            return maven("org.apache.felix.dependencymanager");
-        }
-
-        public static MavenArtifactProvisionOption dependencyManagerRuntime() {
-            return maven("org.apache.felix.dependencymanager.runtime");
+        public static Option dependencyManager() {
+            return composite(
+                    maven("org.apache.felix.dependencymanager"),
+                    maven("org.apache.felix.dependencymanager.runtime")
+            );
         }
 
         public static MavenArtifactProvisionOption configAdmin() {
@@ -70,28 +72,34 @@ public class Options {
         }
 
         private static MavenArtifactProvisionOption maven(String artifactId) {
-            return Options.maven("org.apache.felix", artifactId);
+            return Options.mavenBundle("org.apache.felix", artifactId);
         }
     }
 
     public static class Knopflerfish {
+
         public static MavenArtifactProvisionOption useradmin() {
-            return maven("org.knopflerfish.bundle", "useradmin");
+            return mavenBundle("org.knopflerfish.bundle", "useradmin");
         }
+
         public static MavenArtifactProvisionOption log() {
-            return maven("org.knopflerfish", "log");
+            return mavenBundle("org.knopflerfish", "log");
         }
     }
 
     public static MavenArtifactProvisionOption jetty() {
-        return maven("org.ops4j.pax.web", "pax-web-jetty-bundle");
+        return mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle");
+    }
+
+    public static Option logging() {
+        return composite(
+                    mavenBundle("org.slf4j", "slf4j-api"),
+                    mavenBundle("ch.qos.logback", "logback-core"),
+                    mavenBundle("ch.qos.logback", "logback-classic")
+        );
     }
 
     public static class Crce {
-//        public static WrappedUrlProvisionOption util() {
-            // we do this because we need access to some test classes that aren't exported
-//            return wrappedBundle(mavenBundle("org.apache.ace", "org.apache.ace.util")).overwriteManifest(WrappedUrlProvisionOption.OverwriteMode.FULL);
-//        }
 
         public static Option enableDebugger() {
             return enableDebugger(true, 65506);
@@ -101,32 +109,78 @@ public class Options {
             return new VMOption("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=" + (suspend ? "y" : "n") + ",address=" + port);
         }
 
-        public static MavenArtifactProvisionOption metadataApi() {
-            return maven("crce-metadata-api");
+        public static Option metadata() {
+            return composite(
+                    metadataApi(),
+                    metadataImpl()
+            );
         }
 
-        public static MavenArtifactProvisionOption pluginApi() {
-            return maven("crce-plugin-api");
+        public static Option metadataService() {
+            return composite(
+                    metadataServiceApi(),
+                    metadataServiceImpl()
+            );
+        }
+
+        public static Option metadataDao() {
+            return composite(
+                    metadataDaoApi(),
+                    metadataDaoImpl(),
+                    mavenBundle("com.h2database", "h2"),
+                    mavenBundle("org.mybatis", "mybatis")
+            );
+        }
+
+        public static Option repository() {
+            return composite(
+                    repositoryApi(),
+                    repositoryImpl()
+            );
         }
 
         public static MavenArtifactProvisionOption metadataServiceApi() {
             return maven("crce-metadata-service-api");
         }
 
+        public static MavenArtifactProvisionOption metadataServiceImpl() {
+            return maven("crce-metadata-service-impl");
+        }
+
         public static MavenArtifactProvisionOption metadataDaoApi() {
             return maven("crce-metadata-dao-api");
+        }
+
+        public static MavenArtifactProvisionOption metadataDaoImpl() {
+            return maven("crce-metadata-dao-impl");
+        }
+
+        public static MavenArtifactProvisionOption metadataApi() {
+            return maven("crce-metadata-api");
         }
 
         public static MavenArtifactProvisionOption metadataImpl() {
             return maven("crce-metadata-impl");
         }
 
-        public static MavenArtifactProvisionOption metadataServiceImpl() {
-            return maven("crce-metadata-service-impl");
+        public static MavenArtifactProvisionOption pluginApi() {
+            return maven("crce-plugin-api");
         }
 
-        public static MavenArtifactProvisionOption metadataDaoImpl() {
-            return maven("crce-metadata-dao-impl");
+        public static MavenArtifactProvisionOption repositoryApi() {
+            return maven("crce-repository-api");
+        }
+
+        public static MavenArtifactProvisionOption metadataIndexerApi() {
+            return maven("crce-metadata-indexer-api");
+        }
+
+        public static MavenArtifactProvisionOption metadataIndexer() {
+            return maven("crce-metadata-indexer");
+        }
+
+        public static MavenArtifactProvisionOption repositoryImpl() {
+            return maven("crce-repository-impl");
         }
 
         public static MavenArtifactProvisionOption compatibilityApi() {
@@ -146,11 +200,11 @@ public class Options {
         }
 
         public static MavenArtifactProvisionOption maven(String artifactId) {
-            return Options.maven("cz.zcu.kiv.crce", artifactId);
+            return Options.mavenBundle("cz.zcu.kiv.crce", artifactId);
         }
     }
 
-    private static MavenArtifactProvisionOption maven(String groupId, String artifactId) {
-        return mavenBundle().groupId(groupId).artifactId(artifactId).versionAsInProject();
+    private static MavenArtifactProvisionOption mavenBundle(String groupId, String artifactId) {
+        return CoreOptions.mavenBundle().groupId(groupId).artifactId(artifactId).versionAsInProject();
     }
 }
