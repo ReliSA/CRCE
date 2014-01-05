@@ -6,7 +6,6 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -33,6 +32,7 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Tests application context, starting of components and services, etc.
@@ -48,6 +48,7 @@ public class ContextIT extends IntegrationTestBase {
     private volatile ResourceFactory resourceFactory;
     private volatile ResourceDAO resourceDAO;
     private volatile RepositoryDAO repositoryDAO;
+    private volatile ResourceLoader resourceLoader;
     private volatile MetadataService metadataService;
     private volatile Store store;
 
@@ -76,6 +77,7 @@ public class ContextIT extends IntegrationTestBase {
                 Options.Crce.metadata(),
                 Options.Crce.metadataDao(),
                 Options.Crce.metadataService(),
+                Options.Crce.resolver(),
                 Options.Crce.repository(),
 
                 Options.Crce.metadataIndexerApi(),
@@ -100,6 +102,7 @@ public class ContextIT extends IntegrationTestBase {
                 .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceLoader.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
             };
     }
@@ -134,6 +137,7 @@ public class ContextIT extends IntegrationTestBase {
         assertNotNull(resourceFactory);
         assertNotNull(resourceDAO);
         assertNotNull(repositoryDAO);
+        assertNotNull(resourceLoader);
         assertNotNull(metadataService);
         assertNotNull(store);
     }

@@ -67,6 +67,7 @@
         <module>crce-metadata-api</module>
         <module>crce-metadata-dao-api</module>
         <module>crce-metadata-service-api</module>
+        <module>crce-resolver-api</module>
         <module>crce-repository-api</module>
         <module>crce-metadata-indexer-api</module>
 
@@ -74,6 +75,7 @@
         <module>crce-metadata-impl</module>
         <module>crce-metadata-dao-impl</module>
         <module>crce-metadata-service-impl</module>
+        <module>crce-resolver-impl</module>
         <module>crce-repository-impl</module>
 
         <!-- Core Plugins -->

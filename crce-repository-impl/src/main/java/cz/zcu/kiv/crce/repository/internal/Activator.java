@@ -26,6 +26,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Activator of this bundle.

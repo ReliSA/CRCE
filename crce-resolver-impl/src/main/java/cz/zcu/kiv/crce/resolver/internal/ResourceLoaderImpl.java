@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.resolver.internal;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -15,18 +15,20 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFilter;
+import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 @Component(provides = ResourceLoader.class)
-public class ResourceLoader {
+public class ResourceLoaderImpl implements ResourceLoader {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourceLoaderImpl.class);
 
     @ServiceDependency private volatile ResourceDAO resourceDAO;
 
+    @Override
     public List<Resource> getResources(Repository repository, Requirement requirement) throws IOException {
         if (!singleNamespace(requirement, requirement.getNamespace())) {
             logger.warn("Filtering of store resources by multiple namespaces is not supported.");
@@ -43,7 +45,7 @@ public class ResourceLoader {
             } else if (operator.equals("or")) {
                 filter.setOperator(ResourceDAOFilter.Operator.OR);
             }
-            
+
             resources = resourceDAO.loadResources(repository, filter);
         } catch (IOException e) {
             logger.error("Could not load resources for requirement ({})", requirement.getNamespace(), e);

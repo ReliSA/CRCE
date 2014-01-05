@@ -11,14 +11,14 @@
     </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
-    <artifactId>crce-repository-impl</artifactId>
+    <artifactId>crce-resolver-impl</artifactId>
     <packaging>bundle</packaging>
 
-    <name>CRCE - Repository Implementation</name>
+    <name>CRCE - Resolver Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository.impl</bundle.symbolicName>
-        <bundle.namespace>${namespace}.repository</bundle.namespace>
+        <bundle.symbolicName>${namespace}.resolver.impl</bundle.symbolicName>
+        <bundle.namespace>${namespace}.resolver</bundle.namespace>
     </properties>
 
     <build>
@@ -31,13 +31,13 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
 
         <!-- Felix -->
 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.osgi.service.obr</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.dependencymanager</artifactId>
@@ -54,8 +54,14 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Project dependencies -->
@@ -68,25 +74,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-service-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -96,21 +84,13 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- Test dependencies -->
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

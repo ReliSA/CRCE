@@ -132,6 +132,13 @@ public class Options {
             );
         }
 
+        public static Option resolver() {
+            return composite(
+                    resolverApi(),
+                    resolverImpl()
+            );
+        }
+
         public static Option repository() {
             return composite(
                     repositoryApi(),
@@ -167,6 +174,10 @@ public class Options {
             return maven("crce-plugin-api");
         }
 
+        public static MavenArtifactProvisionOption resolverApi() {
+            return maven("crce-resolver-api");
+        }
+
         public static MavenArtifactProvisionOption repositoryApi() {
             return maven("crce-repository-api");
         }
@@ -177,6 +188,10 @@ public class Options {
 
         public static MavenArtifactProvisionOption metadataIndexer() {
             return maven("crce-metadata-indexer");
+        }
+
+        public static MavenArtifactProvisionOption resolverImpl() {
+            return maven("crce-resolver-impl");
         }
 
         public static MavenArtifactProvisionOption repositoryImpl() {

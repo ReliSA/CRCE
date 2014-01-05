@@ -32,6 +32,7 @@ import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
+import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Filebased implementation of <code>Store</code>.

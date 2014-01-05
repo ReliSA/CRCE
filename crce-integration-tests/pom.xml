@@ -194,6 +194,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>crce-resolver-api</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -231,6 +237,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-resolver-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
