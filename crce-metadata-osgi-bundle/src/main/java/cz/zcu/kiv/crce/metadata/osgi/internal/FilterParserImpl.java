@@ -13,6 +13,8 @@ import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 
 /**
+ * Implementation is based on:
+ * http://www.ietf.org/rfc/rfc1960.txt
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
@@ -37,22 +39,23 @@ public class FilterParserImpl implements FilterParser {
             return requirement;
         }
 
-        parseFilter(filter, requirement, 0);
+        parseFilter(filter, requirement, 0, false);
 
         return requirement;
     }
 
-    private void parseFilter(String filter, Requirement requirement, int level) throws InvalidSyntaxException {
+    private void parseFilter(String filter, Requirement requirement, int level, boolean not) throws InvalidSyntaxException {
         if (OPEN != filter.charAt(0)) {
             throw new InvalidSyntaxException("Missing opening parenthesis: " + filter, filter);
         }
         if (CLOSE != filter.charAt(filter.length() - 1)) {
             throw new InvalidSyntaxException("Missing closing parenthesis: " + filter, filter);
         }
-        parseFilterComp(filter.substring(1, filter.length() - 1), requirement, level);
+        parseFilterComp(filter.substring(1, filter.length() - 1), requirement, level, not);
     }
 
-    private void parseFilterComp(String filterComp, Requirement requirement, int level) throws InvalidSyntaxException {
+    @SuppressWarnings("unchecked")
+    private void parseFilterComp(String filterComp, Requirement requirement, int level, boolean not) throws InvalidSyntaxException {
         switch (filterComp.charAt(0)) {
             case OPERATOR_AND:
                 parseFilterList(filterComp.substring(1), nestRequirement(requirement, level), level + 1);
@@ -66,14 +69,15 @@ public class FilterParserImpl implements FilterParser {
             }
 
             case OPERATOR_NOT: {
-                Requirement nested = nestRequirement(requirement, level);
-                nested.setDirective("operator", "not"); // TODO constants
-                parseFilter(filterComp.substring(1), nested, level + 1);
+                parseFilter(filterComp.substring(1), requirement, level + 1, !not);
+//                Requirement nested = nestRequirement(requirement, level);
+//                nested.setDirective("operator", "not"); // TODO constants
+//                parseFilter(filterComp.substring(1), nested, level + 1, false);
                 return;
             }
 
             default:
-                parseItem(filterComp, requirement);
+                parseItem(filterComp, requirement, not);
         }
     }
 
@@ -99,7 +103,7 @@ public class FilterParserImpl implements FilterParser {
             } else  if (filterList.charAt(i) == CLOSE) {
                 depth--;
                 if (depth == 0) {
-                    parseFilter(filterList.substring(begin, i + 1), requirement, level);
+                    parseFilter(filterList.substring(begin, i + 1), requirement, level, false);
                 }
             }
         }
@@ -111,50 +115,59 @@ public class FilterParserImpl implements FilterParser {
         }
     }
 
-    private void parseItem(String item, Requirement requirement) {
+    private void parseItem(String item, Requirement requirement, boolean not) {
         Operator operator;
         String[] split;
         op: {
             // two characters operator
             split = item.split(">=");
             if (split.length == 2) {
-                operator = Operator.GREATER_EQUAL;
+                operator = not ? Operator.LESS : Operator.GREATER_EQUAL;
                 break op;
             }
             split = item.split("<=");
             if (split.length == 2) {
-                operator = Operator.LESS_EQUAL;
+                operator = not ? Operator.GREATER : Operator.LESS_EQUAL;
                 break op;
             }
             split = item.split("<\\*");
             if (split.length == 2) {
+                if (not) {
+                    throw new IllegalArgumentException("Negation of SUBSET operator is not supported yet.");
+                }
                 operator = Operator.SUBSET;
                 break op;
             }
             split = item.split("\\*>");
             if (split.length == 2) {
+                if (not) {
+                    throw new IllegalArgumentException("Negation of SUPERSET operator is not supported yet.");
+                }
                 operator = Operator.SUPERSET;
                 break op;
             }
             split = item.split("~=");
             if (split.length == 2) {
+                if (not) {
+                    throw new IllegalArgumentException("Negation of APPROX operator is not supported yet.");
+                }
                 operator = Operator.APPROX;
                 break op;
             }
             // one character operator
             split = item.split("=");
             if (split.length == 2) {
-                operator = Operator.EQUAL;
+                operator = not ? Operator.NOT_EQUAL : Operator.EQUAL;
                 break op;
             }
             split = item.split("<");
             if (split.length == 2) {
-                operator = Operator.LESS;
+                operator = not ? Operator.GREATER_EQUAL : Operator.LESS;
                 break op;
             }
             split = item.split(">");
             if (split.length == 2) {
-                operator = Operator.GREATER;
+                operator = not ? Operator.LESS_EQUAL : Operator.GREATER;
                 break op;
             }
             throw new IllegalArgumentException("Missing or superfluous operator: " + item);

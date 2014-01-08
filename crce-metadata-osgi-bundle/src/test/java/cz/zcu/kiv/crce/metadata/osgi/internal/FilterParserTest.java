@@ -366,4 +366,86 @@ public class FilterParserTest {
         assertEquals("2.0.0", version.getStringValue());
     }
 
+    @Test
+    public void testPackageAndVersionNegationConjunction() throws InvalidSyntaxException {
+        String filter = "(&(package=cz.zcu.kiv.crce)(!(version=1.0.0)))";
+        String namespace = NsOsgiPackage.NAMESPACE__OSGI_PACKAGE;
+
+        Requirement requirement = filterParser.parse(filter, namespace);
+
+        assertEquals(namespace, requirement.getNamespace());
+        assertTrue(requirement.getChildren().isEmpty());
+
+        assertFalse(requirement.getAttributes().isEmpty());
+        assertEquals(2, requirement.getAttributes().size());
+
+        // package (name)
+
+        List<Attribute<String>> names = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__NAME);
+        assertEquals(1, names.size());
+
+        Attribute<String> name = names.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__NAME, name.getAttributeType());
+        assertEquals(Operator.EQUAL, name.getOperator());
+        assertEquals("cz.zcu.kiv.crce", name.getValue());
+        assertEquals("cz.zcu.kiv.crce", name.getStringValue());
+
+        // version
+
+        List<Attribute<Version>> versions = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__VERSION);
+        assertEquals(1, versions.size());
+
+        Attribute<Version> version = versions.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__VERSION, version.getAttributeType());
+        assertEquals(Operator.NOT_EQUAL, version.getOperator());
+        assertEquals(new Version("1.0.0"), version.getValue());
+        assertEquals("1.0.0", version.getStringValue());
+    }
+
+    @Test
+    public void testPackageAndNegationStyleVersionRangeConjunction() throws InvalidSyntaxException {
+        String filter = "(&(package=cz.zcu.kiv.crce)(version>=1.3.0)(!(version>=2.0.0)))";
+        String namespace = NsOsgiPackage.NAMESPACE__OSGI_PACKAGE;
+
+        Requirement requirement = filterParser.parse(filter, namespace);
+
+        assertEquals(namespace, requirement.getNamespace());
+        assertTrue(requirement.getChildren().isEmpty());
+
+        assertFalse(requirement.getAttributes().isEmpty());
+        assertEquals(3, requirement.getAttributes().size());
+
+        // package (name)
+
+        List<Attribute<String>> names = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__NAME);
+        assertEquals(1, names.size());
+
+        Attribute<String> name = names.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__NAME, name.getAttributeType());
+        assertEquals(Operator.EQUAL, name.getOperator());
+        assertEquals("cz.zcu.kiv.crce", name.getValue());
+        assertEquals("cz.zcu.kiv.crce", name.getStringValue());
+
+        // versions
+
+        List<Attribute<Version>> versions = requirement.getAttributes(NsOsgiPackage.ATTRIBUTE__VERSION);
+        assertEquals(2, versions.size());
+
+        Attribute<Version> version = versions.get(0);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__VERSION, version.getAttributeType());
+        assertEquals(Operator.GREATER_EQUAL, version.getOperator());
+        assertEquals(new Version("1.3.0"), version.getValue());
+        assertEquals("1.3.0", version.getStringValue());
+
+        version = versions.get(1);
+
+        assertEquals(NsOsgiPackage.ATTRIBUTE__VERSION, version.getAttributeType());
+        assertEquals(Operator.LESS, version.getOperator());
+        assertEquals(new Version("2.0.0"), version.getValue());
+        assertEquals("2.0.0", version.getStringValue());
+    }
 }
