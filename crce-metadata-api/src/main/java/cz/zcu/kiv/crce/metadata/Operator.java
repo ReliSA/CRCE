@@ -16,18 +16,22 @@ public enum Operator {
     SUPERSET("superset"),
     PRESENT("present"),
     APPROX("approx");
-    
+
     private final String value;
 
     private Operator(String value) {
         this.value = value;
     }
 
-    public String getValue(Operator operator) {
+    public String getValue() {
+        return value;
+    }
+
+    public static String getValue(Operator operator) {
         return operator.value;
     }
 
-    public Operator fromValue(String value) {
+    public static Operator fromValue(String value) {
         for (Operator operator : values()) {
             if (operator.value.equals(value)) {
                 return operator;
