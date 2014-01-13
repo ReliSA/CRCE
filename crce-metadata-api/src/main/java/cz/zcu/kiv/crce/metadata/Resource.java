@@ -49,7 +49,7 @@ public interface Resource extends PropertyProvider<Resource>, EqualityComparable
 
     /**
      * Adds the given capability to the list of all capabilities.
-     * <p>Note: This method doesn add the capability to the list of root capabilities.
+     * <p>Note: This method doesn't add the capability to the list of root capabilities.
      * @param capability Capability to be added.
      */
     void addCapability(@Nonnull Capability capability);

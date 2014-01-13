@@ -32,6 +32,16 @@ public class AttributeImpl<T> implements Attribute<T> {
     }
 
     @Override
+    public String getName() {
+        return type.getName();
+    }
+
+    @Override
+    public Class<T> getType() {
+        return type.getType();
+    }
+
+    @Override
     public T getValue() {
         if (value == null) {
             throw new IllegalStateException("Value is null for " + type.getName());

@@ -11,6 +11,12 @@ import javax.annotation.Nonnull;
 public interface Attribute<T> extends Serializable {
 
     @Nonnull
+    String getName();
+
+    @Nonnull
+    Class<T> getType();
+
+    @Nonnull
     T getValue();
 
     @Nonnull

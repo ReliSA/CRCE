@@ -27,6 +27,7 @@
         <version.com.sun.jersey>1.17</version.com.sun.jersey>
         <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web>
         <version.org.apache.felix.dependencymanager>3.1.0</version.org.apache.felix.dependencymanager>
+        <version.com.fasterxml.jackson>2.3.1</version.com.fasterxml.jackson>
     </properties>
 
     <modules>
@@ -573,6 +574,16 @@
                 <artifactId>annotations</artifactId>
                 <version>2.0.2</version>
                 <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
             </dependency>
 
             <!-- === Test dependencies ===-->
