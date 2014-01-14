@@ -70,9 +70,11 @@
         <module>crce-resolver-api</module>
         <module>crce-repository-api</module>
         <module>crce-metadata-indexer-api</module>
+        <module>crce-metadata-json-api</module>
 
         <!-- API Implementation -->
         <module>crce-metadata-impl</module>
+        <module>crce-metadata-json-impl</module>
         <module>crce-metadata-dao-impl</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-resolver-impl</module>

@@ -5,11 +5,16 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.osgi.framework.Version;
+
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
@@ -37,8 +42,7 @@ public class MetadataJsonMapperTest extends Assert {
     }
 
     @Test
-    @SuppressWarnings("CallToThreadDumpStack")
-    public void testSerialization() throws URISyntaxException {
+    public void testSerialization() throws URISyntaxException, JSONException {
         Repository repository = resourceFactory.createRepository(new URI("file://repository/path"));
 
         Resource resource = resourceFactory.createResource("res1");
@@ -133,25 +137,16 @@ public class MetadataJsonMapperTest extends Assert {
 
         requirement.addAttribute(new SimpleAttributeType<>("atr1", String.class), "a", Operator.GREATER);
 
+        // --- test ---
 
         String json = mapper.serialize(resource);
-
         assertNotNull(json);
 
-//        System.out.println("------------------------------------- Serialized --------------------------------------");
-//        System.out.println(json);
-//        System.out.println("---------------------------------------------------------------------------------------");
-//
-//        Resource result = mapper.deserialize(json);
-//        json = mapper.serialize(result);
-//
-//        System.out.println("------------------------------------ Deserialized -------------------------------------");
-//        System.out.println(json);
-//        System.out.println("---------------------------------------------------------------------------------------");
-//
-//
-//        assertTrue(result.equalsTo(resource, EqualityLevel.DEEP_WITH_KEY));
+        Resource actual = mapper.deserialize(json);
+        assertNotNull(actual);
 
+        assertTrue(actual.equalsTo(resource, EqualityLevel.DEEP_WITH_KEY));
 
+        JSONAssert.assertEquals(json, mapper.serialize(actual), JSONCompareMode.NON_EXTENSIBLE);
     }
 }
