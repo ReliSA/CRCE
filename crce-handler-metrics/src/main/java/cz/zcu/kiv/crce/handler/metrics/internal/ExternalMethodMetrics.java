@@ -49,4 +49,9 @@ public class ExternalMethodMetrics extends AbstractMethodMetrics {
 	public boolean isInternal() {
 		return false;
 	}	
+	
+	@Override
+	public boolean isAbstract() {
+		return true;
+	}	
 }

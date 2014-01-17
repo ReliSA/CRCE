@@ -16,6 +16,7 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 	private Type[] parameters;
 	
 	private boolean isPublic;
+	private boolean isAbstract;
 	
 	private IMethodMetrics[] methodCalls;
 
@@ -34,25 +35,32 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 		
 		@SuppressWarnings("unchecked")
 		ListIterator<AbstractInsnNode> instructions = methodNode.instructions.iterator();
-		while (instructions.hasNext()) {
+		if (instructions.hasNext()) {
+			isAbstract = false;
 			
-			AbstractInsnNode instruction = instructions.next();			
-			if (instruction.getType() == AbstractInsnNode.METHOD_INSN) {
-            	
-				MethodInsnNode callInstruction = (MethodInsnNode)instruction;
-            	
-            	String owner =  callInstruction.owner.replace('/','.');
-            	String name = callInstruction.name;
-            	String desc = callInstruction.desc;
-
-            	Type callMethodType = Type.getType(desc);
-
-            	IMethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
-            	
-            	calls.add(methodCall);
-			}
+			while (instructions.hasNext()) {
+				
+				AbstractInsnNode instruction = instructions.next();			
+				if (instruction.getType() == AbstractInsnNode.METHOD_INSN) {
+	            	
+					MethodInsnNode callInstruction = (MethodInsnNode)instruction;
+	            	
+	            	String owner =  callInstruction.owner.replace('/','.');
+	            	String name = callInstruction.name;
+	            	String desc = callInstruction.desc;
+	
+	            	Type callMethodType = Type.getType(desc);
+	
+	            	IMethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
+	            	
+	            	calls.add(methodCall);
+				}
+			}			
+		} 
+		else {
+			isAbstract = true;
 		}
-		
+
 		methodCalls = new IMethodMetrics[0];
 		if (calls.size() > 0) {
 			methodCalls = calls.toArray(methodCalls);
@@ -101,5 +109,10 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 	@Override
 	public boolean isInternal() {
 		return true;
+	}
+	
+	@Override
+	public boolean isAbstract() {
+		return isAbstract;
 	}
 }

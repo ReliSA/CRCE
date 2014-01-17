@@ -183,7 +183,9 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
 				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "ripple-effect");
 				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, 
-						(long)(rippleEffect.getInternalMethodsCount() + rippleEffect.getExternalMethodsCount()));		
+						(long)(rippleEffect.getInternalNonAbstractMethodsCount() 
+								+ rippleEffect.getInternalAbstractMethodsCount()
+								+ rippleEffect.getExternalMethodsCount()));		
 				metadataService.addChild(exportPackageCapability, metricsCapability);
 			}
 		}

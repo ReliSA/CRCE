@@ -18,5 +18,7 @@ public interface IMethodMetrics {
 	
 	boolean isInternal();
 	
+	boolean isAbstract();
+	
 	boolean equals(IMethodMetrics methodMetrics);
 }

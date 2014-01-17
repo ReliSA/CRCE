@@ -77,19 +77,25 @@ public class RippleEffectMetrics {
         	}
         }
         
-        int internal = 0;
+        int internalNonAbstract = 0;
+        int internalAbstract = 0;
         int external = 0;
         
         // count internal and external methods
         for (IMethodMetrics methodCall : collectedMethods) {
         	if (methodCall.isInternal()) {
-        		internal++;
+        		if (methodCall.isAbstract()) {
+        			internalAbstract++;
+        		} 
+        		else {
+        			internalNonAbstract++;
+        		}
         	}
         	else {
         		external++;
         	}
         }
         
-        return new RippleEffect(internal,  external);
+        return new RippleEffect(internalNonAbstract, internalAbstract, external);
 	}
 }
