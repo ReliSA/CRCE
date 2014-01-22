@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class RippleEffectMetrics {
+public class RippleEffectMetrics implements PackageMetrics {
 
 	private List<ClassMetrics> classMetrics;
 	
@@ -41,7 +41,7 @@ public class RippleEffectMetrics {
         }
 	}
 	
-	public RippleEffect getRippleEffectForPackage(String packageName) {
+	public Object computeValueForPackage(String packageName) {
 		
 		Set<IMethodMetrics> collectedMethods = new HashSet<IMethodMetrics>();
 		List<IMethodMetrics> methodsToVisit = new ArrayList<IMethodMetrics>();
@@ -96,6 +96,12 @@ public class RippleEffectMetrics {
         	}
         }
         
-        return new RippleEffect(internalNonAbstract, internalAbstract, external);
+        long rippleEffectValue = internalNonAbstract + internalAbstract + external;
+        
+        return rippleEffectValue;
+	}
+	
+	public String getName() {
+		return "ripple-effect";
 	}
 }

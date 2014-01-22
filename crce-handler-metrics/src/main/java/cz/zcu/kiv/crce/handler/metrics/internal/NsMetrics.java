@@ -17,5 +17,7 @@ public interface NsMetrics {
     AttributeType<Long> ATTRIBUTE__LONG__VALUE = new SimpleAttributeType<>("value", Long.class);
     
     AttributeType<Double> ATTRIBUTE__DOUBLE__VALUE = new SimpleAttributeType<>("value", Double.class);
-            
+    
+    AttributeType<String> ATTRIBUTE__STRING__VALUE = new SimpleAttributeType<>("value", String.class);
+    
 }

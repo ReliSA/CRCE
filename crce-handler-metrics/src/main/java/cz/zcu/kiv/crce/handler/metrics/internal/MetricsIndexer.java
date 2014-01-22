@@ -70,9 +70,13 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		numberOfImports(resource);
 		
 		// save api complexity
-		apiComplexity(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
+		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
+		computeMetricsForPackages(cpcMetrics, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 		
-		rippleEffect(resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
+		// save ripple effect
+		RippleEffectMetrics rippleEffectMetrics = new RippleEffectMetrics(classesMetrics);
+		rippleEffectMetrics.init();
+		computeMetricsForPackages(rippleEffectMetrics, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 				
 		return Collections.emptyList();
 	}
@@ -115,20 +119,14 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 	private void numberOfImports(Resource resource) {
 		List<Requirement> requirements = resource.getRequirements();
 				
-		int numOfImports = requirements.size();
+		long numOfImports = requirements.size();
 
-		Capability numOfImportsCap = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
-		numOfImportsCap.setAttribute(NsMetrics.ATTRIBUTE__NAME, "number-of-imports");
-		numOfImportsCap.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (long)numOfImports);
+		Capability numOfImportsCap = createMetricsCapability("number-of-imports", numOfImports);
+
 		metadataService.addRootCapability(resource, numOfImportsCap);
 	}
-		
-	/**
-	 * Save complexity (CPC) to each export package node in Resource.
-	 * 
-	 * @param exportPackageCapabilities List of Capability with exported packages.
-	 */
-	private void apiComplexity(List<Capability> exportPackageCapabilities) {	
+	
+	private void computeMetricsForPackages(PackageMetrics metrics, List<Capability> exportPackageCapabilities) {
 		
 		// log if no export packages are set in Resources -> nothing to compute
 		if (exportPackageCapabilities.isEmpty()) {
@@ -136,9 +134,6 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 			logger.error("No export packages found in metadata capabilities.");			
 			return;
 		}
-		
-		// create CpsMetrics from all parsed classes data
-		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
 		
 		// for each package
 		for (Capability exportPackageCapability : exportPackageCapabilities) {
@@ -147,48 +142,30 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 			
 			if (packageNameAttribute != null) {			
 				String packageName = packageNameAttribute.getValue();
-								
-				// get complexity for this package and save it into capability
-				double complexity = cpcMetrics.computeCpcForPackage(packageName);
-								
-				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
-				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "api-complexity");
-				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, complexity);		
+															
+				Capability metricsCapability = createMetricsCapability(metrics.getName(), 
+						metrics.computeValueForPackage(packageName));	
+				
 				metadataService.addChild(exportPackageCapability, metricsCapability);
 			}
 		}
 	}
-	
-	private void rippleEffect(List<Capability> exportPackageCapabilities) {	
 		
-		// log if no export packages are set in Resources -> nothing to compute
-		if (exportPackageCapabilities.isEmpty()) {
-			
-			logger.error("No export packages found in metadata capabilities.");			
-			return;
+	private Capability createMetricsCapability(String name, Object value) {
+		
+		Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
+		metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
+		if (value instanceof Long) {
+			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (Long)value);		
+		}
+		else if (value instanceof Double) {
+			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, (Double)value);	
+		}
+		else {
+			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__STRING__VALUE, value.toString());	
 		}
 		
-		RippleEffectMetrics rippleEffectMetrics = new RippleEffectMetrics(classesMetrics);
-		rippleEffectMetrics.init();
-		
-		for (Capability exportPackageCapability : exportPackageCapabilities) {
-		
-			Attribute<String> packageNameAttribute = exportPackageCapability.getAttribute(NsOsgiPackage.ATTRIBUTE__NAME);
-			
-			if (packageNameAttribute != null) {			
-				String packageName = packageNameAttribute.getValue();
-								
-				RippleEffect rippleEffect = rippleEffectMetrics.getRippleEffectForPackage(packageName);
-								
-				Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
-				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, "ripple-effect");
-				metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, 
-						(long)(rippleEffect.getInternalNonAbstractMethodsCount() 
-								+ rippleEffect.getInternalAbstractMethodsCount()
-								+ rippleEffect.getExternalMethodsCount()));		
-				metadataService.addChild(exportPackageCapability, metricsCapability);
-			}
-		}
+		return metricsCapability;
 	}
 	
     @Override

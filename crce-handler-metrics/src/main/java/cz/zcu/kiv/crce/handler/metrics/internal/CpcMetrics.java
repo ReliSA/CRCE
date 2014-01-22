@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @see <a href="http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=991509&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D991509">Component metrics to measure component quality</a>
  */
-public class CpcMetrics {
+public class CpcMetrics implements PackageMetrics {
 
 	// weights for weighted parametrs - static weighing
 	private static final double CLASS_WEIGHT = 1.0;
@@ -36,7 +36,7 @@ public class CpcMetrics {
 	 * @param packageName Specific package name.
 	 * @return Computed CPC (complexity) value.
 	 */
-	public double computeCpcForPackage(String packageName) {
+	public Object computeValueForPackage(String packageName) {
 		
 		double cmpC = 0; 
 		double sumClassComplexity = 0; 
@@ -77,6 +77,12 @@ public class CpcMetrics {
 		sumClassComplexity = simpleTypeFieldCount + COMPLEX_FIELD_WEIGHT * complexTypeFieldCount;
 		sumMethodComplexity = simpleParametersCount + complexParametersCount * COMPLEX_PARAMETER_WEIGHT;
 		
-		return cmpC + sumClassComplexity + sumMethodComplexity;
+		double cpc = cmpC + sumClassComplexity + sumMethodComplexity;
+		
+		return cpc;
+	}
+	
+	public String getName() {
+		return "api-complexity";
 	}
 }
