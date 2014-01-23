@@ -4,9 +4,13 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 
 
 /**
@@ -19,12 +23,17 @@ public class Activator extends DependencyActivatorBase {
 	@Override
 	public void init(BundleContext context, DependencyManager manager) throws Exception {
         
+		String services[] = { Plugin.class.getName(), ActionHandler.class.getName() };
+		
 		manager.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
-                .setImplementation(MetricsIndexer.class)
-                .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
+                .setInterface(services, null)
+                .setImplementation(MetricsIndexerActionHandler.class)
+                .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
-                );
+                .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))                
+                .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))                
+                .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))                
+                );		
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import java.util.zip.ZipEntry;
@@ -22,7 +21,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -32,22 +30,26 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  */
-public class MetricsIndexer extends AbstractResourceIndexer {
+public class MetricsIndexer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
 	
-	private volatile ResourceFactory resourceFactory;
-	private volatile MetadataService metadataService;
+	private ResourceFactory resourceFactory;
+	private MetadataService metadataService;
 	
 	private List<ClassMetrics> classesMetrics;
 	
-	@Override
-	public List<String> index(final InputStream input, Resource resource) {
+	public MetricsIndexer(ResourceFactory resourceFactory, MetadataService metadataService) {
+		this.resourceFactory = resourceFactory;
+		this.metadataService = metadataService;
+	}
+	
+	public void index(final InputStream input, Resource resource) {
 		int size = 0;	
 		
 		classesMetrics = new ArrayList<ClassMetrics>();
 		
-		// parsing imput stream and collect class entry informations (ClassMetrics)
+		// parsing input stream and collect class entry informations (ClassMetrics)
 		try {			
 			size = input.available();					
 			ZipInputStream jis = new ZipInputStream(input);			
@@ -59,7 +61,7 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		} catch (IOException e) {
             
 			logger.error("Could not index resource.", e);
-            return Collections.emptyList();
+            return;
 		} 
 		
 		// save jar file size to crce.content
@@ -77,8 +79,6 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		RippleEffectMetrics rippleEffectMetrics = new RippleEffectMetrics(classesMetrics);
 		rippleEffectMetrics.init();
 		computeMetricsForPackages(rippleEffectMetrics, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
-				
-		return Collections.emptyList();
 	}
 	
 	/**
@@ -167,9 +167,4 @@ public class MetricsIndexer extends AbstractResourceIndexer {
 		
 		return metricsCapability;
 	}
-	
-    @Override
-    public List<String> getRequiredCategories() {
-        return Collections.singletonList("osgi");
-    }
 }
