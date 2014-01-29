@@ -140,28 +140,15 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 //    }
 
     public synchronized Resource move(Resource resource) throws IOException, RefusedArtifactException {
-        Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
-        if (resource == null) {
-            return null;
-        }
-        if (tmp == null) {
-        	logger.error( "ActionHandler onPutToStore() returned null resource, using original");
-        } else {
-            resource = tmp;
-        }
-
-        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
-            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
-        }
-        if ("file".equals(metadataService.getUri(resource).getScheme())) {
-            return putFileResource(resource, true);
-        } else {
-            return putNonFileResource(resource, true);
-        }
+        return putInternal(resource, true);
     }
 
     @Override
     public synchronized Resource put(Resource resource) throws IOException, RefusedArtifactException {
+        return putInternal(resource, false);
+    }
+
+    private Resource putInternal(Resource resource, boolean move) throws IOException, RefusedArtifactException {
         Resource tmp = pluginManager.getPlugin(ActionHandler.class).beforePutToStore(resource, this);
         if (resource == null) {
             return null;
@@ -176,9 +163,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(metadataService.getUri(resource).getScheme())) {
-            resource = putFileResource(resource, false);
+            resource = putFileResource(resource, move);
         } else {
-            resource = putNonFileResource(resource, false);
+            resource = putNonFileResource(resource, move);
         }
         return pluginManager.getPlugin(ActionHandler.class).afterPutToStore(resource, this);
     }
