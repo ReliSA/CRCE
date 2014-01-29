@@ -1,10 +1,20 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.asm.impl;
+
+import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 
-public abstract class AbstractMethodMetrics implements IMethodMetrics {
+import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
+
+/**
+ * Abstract MethodMetrics class.
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
+public abstract class AbstractMethodMetrics implements MethodMetrics {
 	
-	public boolean equals(IMethodMetrics methodMetrics) {
+	@Override
+	public boolean equals(@Nonnull MethodMetrics methodMetrics) {
 		
 		if (!this.getClassName().equals(methodMetrics.getClassName())) {
 			return false;

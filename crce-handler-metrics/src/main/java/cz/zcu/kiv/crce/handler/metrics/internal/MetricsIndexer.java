@@ -10,12 +10,19 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
+import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.impl.ClassMetricsImpl;
+import cz.zcu.kiv.crce.handler.metrics.impl.CpcMetrics;
+import cz.zcu.kiv.crce.handler.metrics.impl.RippleEffectMetrics;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -25,8 +32,8 @@ import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
- * Implementation of <code>AbstractResourceIndexer</code> which provides measurement
- * of metrics computed on osgi bundle implementation (jar file).
+ * Measurement of metrics computed on OSGI bundle implementation (jar file). 
+ * Store computed values into Resources.
  * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  */
@@ -39,12 +46,24 @@ public class MetricsIndexer {
 	
 	private List<ClassMetrics> classesMetrics;
 	
-	public MetricsIndexer(ResourceFactory resourceFactory, MetadataService metadataService) {
+	/**
+	 * New instance.
+	 * 
+	 * @param resourceFactory ResourceFactory
+	 * @param metadataService MetadataService
+	 */
+	public MetricsIndexer(@Nonnull ResourceFactory resourceFactory, @Nonnull MetadataService metadataService) {
 		this.resourceFactory = resourceFactory;
 		this.metadataService = metadataService;
 	}
 	
-	public void index(final InputStream input, Resource resource) {
+	/**
+	 * Compute metrics for jar file (OSGI bundle).
+	 * 
+	 * @param input InputStream of jar file.
+	 * @param resource Resource to save computed data.
+	 */
+	public void index(final InputStream input, @Nonnull Resource resource) {
 		int size = 0;	
 		
 		classesMetrics = new ArrayList<ClassMetrics>();
@@ -108,7 +127,7 @@ public class MetricsIndexer {
         ClassNode byteCodeNode = new ClassNode();
         classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
         
-        classesMetrics.add(new ClassMetrics(byteCodeNode));
+        classesMetrics.add(new ClassMetricsImpl(byteCodeNode));
 	}
 	
 	/**
@@ -126,6 +145,12 @@ public class MetricsIndexer {
 		metadataService.addRootCapability(resource, numOfImportsCap);
 	}
 	
+	/**
+	 * Compute selected metrics for all packages and save it into corresponding capability.
+	 * 
+	 * @param metrics Object of metrics to be computed.
+	 * @param exportPackageCapabilities Package capabilities.
+	 */
 	private void computeMetricsForPackages(PackageMetrics metrics, List<Capability> exportPackageCapabilities) {
 		
 		// log if no export packages are set in Resources -> nothing to compute
@@ -151,6 +176,13 @@ public class MetricsIndexer {
 		}
 	}
 		
+	/**
+	 * Create metrics capability to be stored.
+	 * 
+	 * @param name Name of capability.
+	 * @param value Metrics value to be stored.
+	 * @return Created capability to be stored.
+	 */
 	private Capability createMetricsCapability(String name, Object value) {
 		
 		Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);

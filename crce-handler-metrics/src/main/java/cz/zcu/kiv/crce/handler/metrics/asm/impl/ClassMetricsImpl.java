@@ -1,8 +1,10 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.asm.impl;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureReader;
@@ -10,16 +12,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
+
 /**
  * Class computing information from ClassNode for future using in metrics computing.
  * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  */
-public class ClassMetrics {
+public class ClassMetricsImpl implements ClassMetrics {
 
 	private static final String DEFAULT_PACKAGE_NAME = "<default>";
 	
-	// definition of complex types
 	private static final int[] COMPLEX_TYPES = new int[] { Type.ARRAY, Type.OBJECT };
 	
 	private String fullClassName;
@@ -37,16 +41,16 @@ public class ClassMetrics {
 	private int simpleParametersCount;
 	private int complexParametersCount;
 	
-	private List<IMethodMetrics> methods;
+	private List<MethodMetrics> methods;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param byteCodeNode Asm ClassNode to parse information.
+	 * @param byteCodeNode ASM ClassNode to parse information.
 	 */
-	public ClassMetrics(ClassNode byteCodeNode) {
+	public ClassMetricsImpl(@Nonnull ClassNode byteCodeNode) {
 		
-		methods = new ArrayList<IMethodMetrics>();
+		methods = new ArrayList<MethodMetrics>();
 		
 		methodCount = 0;
 		
@@ -72,7 +76,6 @@ public class ClassMetrics {
         for (FieldNode field : fields) {
         	// no simple type field has signature
         	if (field.signature != null && !isComplexType(Type.getType(field.desc))) {
-    			// simple type field 
         		simpleTypeFieldCount++;
         	}
         	else {
@@ -98,8 +101,7 @@ public class ClassMetrics {
 		String packageName;
 		
 		int lastIndexOf = className.lastIndexOf(".");
-		if (lastIndexOf == -1) { 
-			// default package
+		if (lastIndexOf == -1) { 			
 			packageName = DEFAULT_PACKAGE_NAME;
 		}
 		else {
@@ -115,10 +117,10 @@ public class ClassMetrics {
 	 * @param method Asm MethodNode to parse.
 	 */
 	private void parseMethod(String fullClassName, MethodNode method) {
-		// parsing method access
+
 		boolean isPublicMethod = Modifier.isPublic(method.access);
 		
-		methods.add(new MethodMetrics(fullClassName, isPublicMethod, method));
+		methods.add(new MethodMetricsImpl(fullClassName, isPublicMethod, method));
 		
 		// continue only for public methods
 		if (!isPublicMethod) {
@@ -149,10 +151,10 @@ public class ClassMetrics {
 	}
 	
 	/**
-	 * Testing, if parametr type is complex.
+	 * Testing, if parameter type is complex.
 	 * 
 	 * @param t Type to test.
-	 * @return True, if parametr type is complex.
+	 * @return True, if parameter type is complex.
 	 */
 	private boolean isComplexType(Type t) {
 		int typeInt = t.getSort();
@@ -166,92 +168,62 @@ public class ClassMetrics {
 		return false;
 	}
 	
+	@Override
+	@Nonnull
 	public String getFullClassName() {
 		return fullClassName;
 	}
 
-	/**
-	 * Name of class (short).
-	 * 
-	 * @return Name of class.
-	 */
+	@Override
+	@Nonnull
 	public String getClassName() {
 		return className;
 	}
 
-	/**
-	 * Name of classes package.
-	 * 
-	 * @return Name of classes package.
-	 */
+	@Override
+	@Nonnull
 	public String getPackageName() {
 		return packageName;
 	}
 
-	/**
-	 * Indicator, if class (or interface) is public. 
-	 * 
-	 * @return True, if class(interface) is public.
-	 */
+	@Override
 	public boolean isPublic() {
 		return isPublic;
 	}
 
-	/**
-	 * Indicator, if this is interface instead of class.
-	 * 
-	 * @return True, if interface.
-	 */
+	@Override
 	public boolean isInterface() {
 		return isInterface;
 	}
 
-	/**
-	 * Count of all public methods.
-	 * 
-	 * @return Count of public methods.
-	 */
+	@Override
 	public double getMethodCount() {
 		return methodCount;
 	}
 
-	/**
-	 * Count of fields of simple type. 
-	 * 
-	 * @return Count of fields of simple type. 
-	 */
+	@Override
 	public int getSimpleTypeFieldCount() {
 		return simpleTypeFieldCount;
 	}
 
-	/**
-	 * Count of fields of complex type. 
-	 * 
-	 * @return Count of fields of complex type. 
-	 */
+	@Override
 	public int getComplexTypeFieldCount() {
 		return complexTypeFieldCount;
 	}
 
-	/**
-	 * Count of methods parametrs of simple type.
-	 * 
-	 * @return Count of methods parametrs of simple type.
-	 */
+	@Override
 	public int getSimpleParametersCount() {
 		return simpleParametersCount;
 	}
 
-	/**
-	 * Count of methods parametrs of complex type.
-	 * 
-	 * @return Count of methods parametrs of complex type.
-	 */
+	@Override
 	public int getComplexParametersCount() {
 		return complexParametersCount;
 	}
 	
-	public List<IMethodMetrics> getMethods() {
+	@Override
+	@Nonnull
+	public List<MethodMetrics> getMethods() {
 		return methods;
 	}
 }

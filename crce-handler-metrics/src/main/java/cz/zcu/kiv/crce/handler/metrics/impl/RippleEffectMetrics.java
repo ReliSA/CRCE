@@ -1,10 +1,20 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
+
+/**
+ * Implementation of computing ripple effect. Starting from public methods of export package classes 
+ * and expanding call tree until all out of components calls are found.  
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
 public class RippleEffectMetrics implements PackageMetrics {
 
 	private List<ClassMetrics> classMetrics;
@@ -14,18 +24,19 @@ public class RippleEffectMetrics implements PackageMetrics {
 		this.classMetrics = classMetrics;
 	}
 	
+	@Override
 	public void init() {
 		
         for (ClassMetrics classMetric : classMetrics) {        	
-        	for (IMethodMetrics methodMetrics : classMetric.getMethods()) {
+        	for (MethodMetrics methodMetrics : classMetric.getMethods()) {
         		
-        		IMethodMetrics[] methodCalls = methodMetrics.getMethodCalls();        		
+        		MethodMetrics[] methodCalls = methodMetrics.getMethodCalls();        		
         		for (int i = 0; i < methodCalls.length; i++) {
         			
         			for (ClassMetrics intermoduleClass : classMetrics) {        				
         				if (intermoduleClass.getFullClassName().equals(methodCalls[i].getClassName())) {
         					
-        					for (IMethodMetrics intermoduleClassMethod : classMetric.getMethods()) {
+        					for (MethodMetrics intermoduleClassMethod : classMetric.getMethods()) {
         						if (intermoduleClassMethod.equals(methodCalls[i])) {
         							methodMetrics.replaceMethodCall(i, intermoduleClassMethod);
         							
@@ -41,15 +52,29 @@ public class RippleEffectMetrics implements PackageMetrics {
         }
 	}
 	
+	@Override
+	public String getName() {
+		return "ripple-effect";
+	}
+	
+	@Override
+	@SuppressWarnings("rawtypes")
+	public Class getType() {
+		return Long.class;
+	}
+	
+	@Override
 	public Object computeValueForPackage(String packageName) {
 		
-		Set<IMethodMetrics> collectedMethods = new HashSet<IMethodMetrics>();
-		List<IMethodMetrics> methodsToVisit = new ArrayList<IMethodMetrics>();
+		// set of all methods
+		Set<MethodMetrics> collectedMethods = new HashSet<MethodMetrics>();
+		// in-jar methods, which can have other method call and should be investigated 
+		List<MethodMetrics> methodsToVisit = new ArrayList<MethodMetrics>();
 		
 		// first collect public method of public classes from package
         for (ClassMetrics classMetric : classMetrics) {
         	if (classMetric.isPublic() && classMetric.getPackageName().equals(packageName)) {
-        		for (IMethodMetrics method : classMetric.getMethods()) {
+        		for (MethodMetrics method : classMetric.getMethods()) {
         			if (method.isPublic()) {
         				collectedMethods.add(method);
         				methodsToVisit.add(method);
@@ -59,18 +84,12 @@ public class RippleEffectMetrics implements PackageMetrics {
         }
         
         // expand all internal methods (internal calls)
-        while (!methodsToVisit.isEmpty()) {
-        	
-        	IMethodMetrics investigatedMethod = methodsToVisit.remove(0);        	
-        	for (IMethodMetrics methodCall : investigatedMethod.getMethodCalls()) {
-        		
-        		// if method was not jet collected
+        while (!methodsToVisit.isEmpty()) {        	
+        	MethodMetrics investigatedMethod = methodsToVisit.remove(0);        	
+        	for (MethodMetrics methodCall : investigatedMethod.getMethodCalls()) {        		
         		if (!collectedMethods.contains(methodCall)) {
-        			// collect method
         			collectedMethods.add(methodCall);
-        			// and inter-jar methods collect for expanding 
         			if (methodCall.isInternal()) {
-        				// not discovered (not in collected) and internal (expandable) 
         				methodsToVisit.add(methodCall);
         			}
         		}	        			        		
@@ -82,7 +101,7 @@ public class RippleEffectMetrics implements PackageMetrics {
         int external = 0;
         
         // count internal and external methods
-        for (IMethodMetrics methodCall : collectedMethods) {
+        for (MethodMetrics methodCall : collectedMethods) {
         	if (methodCall.isInternal()) {
         		if (methodCall.isAbstract()) {
         			internalAbstract++;
@@ -98,10 +117,6 @@ public class RippleEffectMetrics implements PackageMetrics {
         
         long rippleEffectValue = internalNonAbstract + internalAbstract + external;
         
-        return rippleEffectValue;
-	}
-	
-	public String getName() {
-		return "ripple-effect";
+        return Long.valueOf(rippleEffectValue);
 	}
 }

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.asm.impl;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureVisitor;

@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,12 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 
+/**
+ * Implementation of <code>Task</code> which compute metrics for selected Resource.
+ *
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
+@SuppressWarnings("rawtypes")
 public class MetricsIndexerTask extends Task {
 
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexerTask.class);
@@ -25,8 +33,18 @@ public class MetricsIndexerTask extends Task {
 	private Resource resource;
 	private ResourceDAO resourceDAO;
 	
-	protected MetricsIndexerTask(String id, MetadataService metadataService, MetadataValidator metadataValidator,
-			MetricsIndexer metricsIndexer, Resource resource, ResourceDAO resourceDAO) {
+	/**
+	 * New instance.
+	 * 
+	 * @param id Job ID.
+	 * @param metadataService MetadataService.
+	 * @param metadataValidator MetadataValidator.
+	 * @param metricsIndexer MetricsIndexer.
+	 * @param resource Resource.
+	 * @param resourceDAO ResourceDAO.
+	 */
+	protected MetricsIndexerTask(@Nonnull String id, @Nonnull MetadataService metadataService, @Nonnull MetadataValidator metadataValidator,
+			@Nonnull MetricsIndexer metricsIndexer, @Nonnull Resource resource, @Nonnull ResourceDAO resourceDAO) {
 		
 		super(id, "Calculates metrics for a provided resource.", "crce-handler-metrics");
 

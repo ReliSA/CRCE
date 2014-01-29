@@ -1,15 +1,24 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.asm.impl;
 
 import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class MethodMetrics extends AbstractMethodMetrics  {
+import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
+
+/**
+ * MethodMetrics implementation class. Collecting information from MethodNode.
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
+public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	
 	private String className;
 	private String methodName;
@@ -18,9 +27,16 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 	private boolean isPublic;
 	private boolean isAbstract;
 	
-	private IMethodMetrics[] methodCalls;
+	private MethodMetrics[] methodCalls;
 
-	public MethodMetrics(String className, boolean isPublic, MethodNode methodNode) {
+	/**
+	 * New instance.
+	 * 
+	 * @param className Name of class (full) where method is defined.
+	 * @param isPublic Method public modifier.
+	 * @param methodNode ASM MethodNode to parse information.
+	 */
+	public MethodMetricsImpl(@Nonnull String className, boolean isPublic, @Nonnull MethodNode methodNode) {
 		
 		Type methodType = Type.getType(methodNode.desc);
 		
@@ -31,10 +47,12 @@ public class MethodMetrics extends AbstractMethodMetrics  {
     	
     	this.isPublic = isPublic;
 		
-		Set<IMethodMetrics> calls = new HashSet<IMethodMetrics>();
+		Set<MethodMetrics> calls = new HashSet<MethodMetrics>();
 		
+		// collecting method calls
 		@SuppressWarnings("unchecked")
 		ListIterator<AbstractInsnNode> instructions = methodNode.instructions.iterator();
+		// abstract method has no instruction. Each non-abstract method has at least return statement.
 		if (instructions.hasNext()) {
 			isAbstract = false;
 			
@@ -51,7 +69,8 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 	
 	            	Type callMethodType = Type.getType(desc);
 	
-	            	IMethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
+	            	// using placeholders for all method calls
+	            	MethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
 	            	
 	            	calls.add(methodCall);
 				}
@@ -61,43 +80,43 @@ public class MethodMetrics extends AbstractMethodMetrics  {
 			isAbstract = true;
 		}
 
-		methodCalls = new IMethodMetrics[0];
+		methodCalls = new MethodMetrics[0];
 		if (calls.size() > 0) {
 			methodCalls = calls.toArray(methodCalls);
 		}
 	}
 
 	@Override
+	@Nonnull
 	public String getClassName() {
 		return className;
 	}
 
 	@Override
+	@Nonnull
 	public String getName() {
 		return methodName;
 	}
 
 	@Override
+	@Nonnull
 	public Type[] getParameters() {
 		return (Type[])parameters.clone();
 	}
 
 	@Override
-	public IMethodMetrics[] getMethodCalls() {
-		return (IMethodMetrics[])methodCalls.clone();
+	@Nonnull
+	public MethodMetrics[] getMethodCalls() {
+		return (MethodMetrics[])methodCalls.clone();
 	}
 	
 	@Override
-	public void replaceMethodCall(int index, IMethodMetrics methodCall) {
+	public void replaceMethodCall(int index, @Nonnull MethodMetrics methodCall) {
 		
 		if (index < 0 || index >= methodCalls.length) {
 			throw new IndexOutOfBoundsException();
 		}
-		
-		if (methodCall == null) {
-			throw new NullPointerException();
-		}
-		
+	
 		methodCalls[index] = methodCall;
 	}
 	

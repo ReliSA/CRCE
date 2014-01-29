@@ -1,14 +1,30 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.asm.impl;
+
+import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 
+import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
+
+/**
+ * External MethodMetrics class. Representing methods out of jar or can be used as placeholder.
+ * 
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
 public class ExternalMethodMetrics extends AbstractMethodMetrics {
 
 	private final String className;
 	private final String methodName;
 	private final Type[] parameters;
 	
-	public ExternalMethodMetrics(String className, String methodName, Type[] parameters) {
+	/**
+	 * New instance.
+	 * 
+	 * @param className Name of class (full) where method is defined.
+	 * @param methodName Name of method.
+	 * @param parameters Array of parameters types.
+	 */
+	public ExternalMethodMetrics(@Nonnull String className, @Nonnull String methodName, @Nonnull Type[] parameters) {
 
 		this.className = className;
 		this.methodName = methodName;
@@ -31,12 +47,12 @@ public class ExternalMethodMetrics extends AbstractMethodMetrics {
 	}
 
 	@Override
-	public IMethodMetrics[] getMethodCalls() {
-		return new IMethodMetrics[0];
+	public MethodMetrics[] getMethodCalls() {
+		return new MethodMetrics[0];
 	}
 	
 	@Override
-	public void replaceMethodCall(int index, IMethodMetrics methodCall) {
+	public void replaceMethodCall(int index, MethodMetrics methodCall) {
 		throw new IndexOutOfBoundsException();
 	}
 	

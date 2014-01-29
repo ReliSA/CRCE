@@ -13,6 +13,11 @@ import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 
+/**
+ * Implementation of <code>AbstractActionHandler</code> which start MetricsIndexerTask.
+ *
+ * @author Jan Smajcl (smajcl@students.zcu.cz)
+ */
 public class MetricsIndexerActionHandler extends AbstractActionHandler {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexerActionHandler.class);
@@ -23,6 +28,7 @@ public class MetricsIndexerActionHandler extends AbstractActionHandler {
 	private volatile ResourceFactory resourceFactory;
 	private volatile ResourceDAO resourceDAO;
 	
+	@Override
 	public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
 		
 		logger.debug("afterUploadToBuffer called.");

@@ -1,6 +1,9 @@
-package cz.zcu.kiv.crce.handler.metrics.internal;
+package cz.zcu.kiv.crce.handler.metrics.impl;
 
 import java.util.List;
+
+import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
 
 /**
  * Implementation of computing class complexity metrics base on CPC metrics introduces in 
@@ -30,12 +33,23 @@ public class CpcMetrics implements PackageMetrics {
 		this.classMetrics = classMetrics;
 	}
 	
-	/**
-	 * Compute CPC metrics for specific package.
-	 * 
-	 * @param packageName Specific package name.
-	 * @return Computed CPC (complexity) value.
-	 */
+	@Override
+	public void init() {
+		// nothing to do here
+	}
+	
+	@Override
+	public String getName() {
+		return "api-complexity";
+	}
+	
+	@Override
+	@SuppressWarnings("rawtypes")
+	public Class getType() {
+		return Double.class;
+	}
+	
+	@Override
 	public Object computeValueForPackage(String packageName) {
 		
 		double cmpC = 0; 
@@ -53,7 +67,7 @@ public class CpcMetrics implements PackageMetrics {
 		int complexParametersCount = 0;
 		
 		for (ClassMetrics classMetric : classMetrics) {
-			// we are counting only public classes (or interfaces) from specific package
+
 			if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
 				
 				simpleTypeFieldCount += classMetric.getSimpleTypeFieldCount();
@@ -79,10 +93,6 @@ public class CpcMetrics implements PackageMetrics {
 		
 		double cpc = cmpC + sumClassComplexity + sumMethodComplexity;
 		
-		return cpc;
-	}
-	
-	public String getName() {
-		return "api-complexity";
+		return new Double(cpc);
 	}
 }
