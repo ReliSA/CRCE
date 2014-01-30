@@ -62,8 +62,9 @@ public class MetricsIndexerTask extends Task {
 		
 		if (metadataService.getCategories(resource).contains("osgi")) {
 			
-			URI uri = metadataService.getUri(resource);
+			URI uri = metadataService.getUri(resource);			
 			File file = new File(uri);
+			logger.debug("file name: {}", file.getName());
 	        try (FileInputStream fis = new FileInputStream(file)) {
 	        	metricsIndexer.index(fis, resource);
 	        }

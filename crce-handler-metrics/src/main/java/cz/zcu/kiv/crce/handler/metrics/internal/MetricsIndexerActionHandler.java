@@ -9,8 +9,8 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
-import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 
 /**
@@ -29,9 +29,9 @@ public class MetricsIndexerActionHandler extends AbstractActionHandler {
 	private volatile ResourceDAO resourceDAO;
 	
 	@Override
-	public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
+	public Resource afterPutToStore(Resource resource, Store store) throws RefusedArtifactException {
 		
-		logger.debug("afterUploadToBuffer called.");
+		logger.debug("afterPutToStore called.");
 		
 		MetricsIndexer metricsIndexer = new MetricsIndexer(resourceFactory, metadataService);
 		
