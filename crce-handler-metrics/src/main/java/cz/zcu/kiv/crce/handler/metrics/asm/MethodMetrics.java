@@ -81,4 +81,11 @@ public interface MethodMetrics {
 	 * @return True, if method is equal.
 	 */
 	boolean equals(@Nonnull MethodMetrics methodMetrics);
+	
+	/**
+	 * McCabe's Cyclomatic Complexity of method.
+	 * 
+	 * @return Cyclomatic complexity of method.
+	 */
+	int getCyclomaticComplexity();
 }

@@ -43,6 +43,8 @@ public class ClassMetricsImpl implements ClassMetrics {
 	
 	private List<MethodMetrics> methods;
 	
+	private double averageCyclomaticComplexity;
+	
 	/**
 	 * New instance.
 	 * 
@@ -88,6 +90,20 @@ public class ClassMetricsImpl implements ClassMetrics {
 		List<MethodNode> methods = byteCodeNode.methods;
         for (MethodNode method : methods) {
         	parseMethod(fullClassName, method);
+        }
+        
+        int cyclomaticComplexitySum = 0;
+        int nonAbstractMethodCount = 0;
+        for (MethodMetrics method : this.methods) {
+        	if (!method.isAbstract()) {
+        		cyclomaticComplexitySum += method.getCyclomaticComplexity();
+        		nonAbstractMethodCount++;
+        	}
+        }
+        
+        averageCyclomaticComplexity = 0;
+        if (nonAbstractMethodCount > 0) {
+        	averageCyclomaticComplexity = (double)cyclomaticComplexitySum / nonAbstractMethodCount;
         }
 	}
 	
@@ -225,5 +241,10 @@ public class ClassMetricsImpl implements ClassMetrics {
 	@Nonnull
 	public List<MethodMetrics> getMethods() {
 		return methods;
+	}
+	
+	@Override
+	public double getAverageCyclomaticComplexity() {
+		return averageCyclomaticComplexity;
 	}
 }

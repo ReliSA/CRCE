@@ -70,4 +70,9 @@ public class ExternalMethodMetrics extends AbstractMethodMetrics {
 	public boolean isAbstract() {
 		return true;
 	}	
+	
+	@Override
+	public int getCyclomaticComplexity() {
+		return 0;
+	}
 }

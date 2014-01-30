@@ -10,6 +10,10 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.Frame;
 
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
@@ -26,6 +30,8 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	
 	private boolean isPublic;
 	private boolean isAbstract;
+	
+	private int cyclomaticComplexity;
 	
 	private MethodMetrics[] methodCalls;
 
@@ -84,6 +90,16 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 		if (calls.size() > 0) {
 			methodCalls = calls.toArray(methodCalls);
 		}
+		
+		cyclomaticComplexity = 0;
+		if (!isAbstract) {
+			try {
+				cyclomaticComplexity = computeCyclomaticComplexity(className, methodNode);
+			}
+			catch (AnalyzerException e) {
+				cyclomaticComplexity = 0;
+			}
+		}
 	}
 
 	@Override
@@ -133,5 +149,42 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	@Override
 	public boolean isAbstract() {
 		return isAbstract;
+	}
+	
+	@Override
+	public int getCyclomaticComplexity() {
+		return cyclomaticComplexity;
+	}
+	
+	private int computeCyclomaticComplexity(String className, MethodNode methodNode) throws AnalyzerException {
+		
+		Analyzer a = new Analyzer(new BasicInterpreter()) {
+			protected Frame newFrame(int nLocals, int nStack) {
+				return new Node(nLocals, nStack);
+			}
+			protected Frame newFrame(Frame src) {
+				return new Node(src);
+			}
+			protected void newControlFlowEdge(int src, int dst) {
+				Node s = (Node) getFrames()[src];
+				s.successors.add((Node) getFrames()[dst]);
+			}
+		};
+		a.analyze(className, methodNode);
+		Frame[] frames = a.getFrames();
+		int edges = 0;
+		int nodes = 0;
+		int endNodes = 0;
+		for (int i = 0; i < frames.length; ++i) {
+			if (frames[i] != null) {
+				int numOutEdges = ((Node) frames[i]).successors.size();
+				edges += numOutEdges;
+				if (numOutEdges == 0) {
+					endNodes += 1;
+				}
+				nodes += 1;
+			}
+		}
+		return edges - nodes + 1 + endNodes;
 	}
 }

@@ -91,4 +91,11 @@ public interface ClassMetrics {
 	 */
 	@Nonnull
 	List<MethodMetrics> getMethods();
+	
+	/**
+	 * Average value of McCabe's Cyclomatic Complexity of method.
+	 * 
+	 * @return Cyclomatic complexity of class.
+	 */
+	double getAverageCyclomaticComplexity();
 }
