@@ -18,14 +18,16 @@ import org.slf4j.LoggerFactory;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
+import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
+import cz.zcu.kiv.crce.handler.metrics.Metrics;
 import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.impl.ClassMetricsImpl;
 import cz.zcu.kiv.crce.handler.metrics.impl.CpcMetrics;
+import cz.zcu.kiv.crce.handler.metrics.impl.NumberOfImportsMetrics;
 import cz.zcu.kiv.crce.handler.metrics.impl.RippleEffectMetrics;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
@@ -86,18 +88,47 @@ public class MetricsIndexer {
 		// save jar file size to crce.content
 		Capability identity = metadataService.getSingletonCapability(resource, "crce.content");
 		identity.setAttribute("size", Long.class, (long)size);
+	}
+	
+	/**
+	 * Create metrics objects, compute metrics and computed values put into Resource.
+	 * 
+	 * @param resource Resource to save computed data.
+	 */
+	public void computeAndSaveMetrics(Resource resource) {
 		
-		// save number of imports
-		numberOfImports(resource);
+		// create objects
+		List<Metrics> allMetrics = new ArrayList<Metrics>();
+		List<ComponentMetrics> componentMetrics = new ArrayList<ComponentMetrics>();
+		List<PackageMetrics> packageMetrics = new ArrayList<PackageMetrics>();
 		
-		// save api complexity
+		NumberOfImportsMetrics numberOfImportsMetrics = new NumberOfImportsMetrics(resource);
 		CpcMetrics cpcMetrics = new CpcMetrics(classesMetrics);
-		computeMetricsForPackages(cpcMetrics, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
-		
-		// save ripple effect
 		RippleEffectMetrics rippleEffectMetrics = new RippleEffectMetrics(classesMetrics);
-		rippleEffectMetrics.init();
-		computeMetricsForPackages(rippleEffectMetrics, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
+		
+		// fill metrics lists
+		allMetrics.add(numberOfImportsMetrics);
+		allMetrics.add(cpcMetrics);
+		allMetrics.add(rippleEffectMetrics);
+		
+		componentMetrics.add(numberOfImportsMetrics);
+		
+		packageMetrics.add(cpcMetrics);
+		packageMetrics.add(rippleEffectMetrics);
+		
+		// init metrics
+		for (Metrics metric : allMetrics) {
+			metric.init();
+		}
+		
+		// compute metrics
+		for (ComponentMetrics metric : componentMetrics) {
+			computeMetricsForComponent(metric, resource);
+		}
+		
+		for (PackageMetrics metric : packageMetrics) {
+			computeMetricsForPackages(metric, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
+		}
 	}
 	
 	/**
@@ -131,18 +162,16 @@ public class MetricsIndexer {
 	}
 	
 	/**
-	 * Parse and save number of imports into resource.
+	 * Compute selected metrics for entire component and save it into resource.
 	 * 
+	 * @param metrics Object of metrics to be computed.
 	 * @param resource Resource to update.
 	 */
-	private void numberOfImports(Resource resource) {
-		List<Requirement> requirements = resource.getRequirements();
-				
-		long numOfImports = requirements.size();
+	private void computeMetricsForComponent(ComponentMetrics metrics, Resource resource) {
+		
+		Capability metricsCapability = createMetricsCapability(metrics.getName(), metrics.computeValue());
 
-		Capability numOfImportsCap = createMetricsCapability("number-of-imports", numOfImports);
-
-		metadataService.addRootCapability(resource, numOfImportsCap);
+		metadataService.addRootCapability(resource, metricsCapability);
 	}
 	
 	/**

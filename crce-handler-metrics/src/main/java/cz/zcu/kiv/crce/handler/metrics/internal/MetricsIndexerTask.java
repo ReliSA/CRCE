@@ -69,6 +69,8 @@ public class MetricsIndexerTask extends Task {
 	        	metricsIndexer.index(fis, resource);
 	        }
 	        
+	        metricsIndexer.computeAndSaveMetrics(resource);
+	        
 	        ResourceValidationResult validationResult = metadataValidator.validate(resource);        
 	        if (!validationResult.isContextValid()) {
 	        	

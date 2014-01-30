@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.handler.metrics.impl;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
 
@@ -39,17 +41,20 @@ public class CpcMetrics implements PackageMetrics {
 	}
 	
 	@Override
+	@Nonnull
 	public String getName() {
 		return "api-complexity";
 	}
 	
 	@Override
+	@Nonnull
 	@SuppressWarnings("rawtypes")
 	public Class getType() {
 		return Double.class;
 	}
 	
 	@Override
+	@Nonnull
 	public Object computeValueForPackage(String packageName) {
 		
 		double cmpC = 0; 
