@@ -29,8 +29,8 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
 @Component(provides = ResourceFactory.class)
 public class ResourceFactoryImpl implements ResourceFactory {
 
-    @ServiceDependency
-    private LogHelper LogSerializer;
+    @ServiceDependency(required = false)
+    private static LogHelper logHelper;
 
     @Override
     public Resource createResource() {
@@ -49,7 +49,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
     @Override
     public Resource createResource(String id) {
-        return new ResourceImpl(id, LogSerializer);
+        return new ResourceImpl(id);
     }
 
     @Override
@@ -122,5 +122,12 @@ public class ResourceFactoryImpl implements ResourceFactory {
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static String toString(Resource resource) {
+        if (logHelper != null) {
+            return logHelper.toString(resource);
+        }
+        return "ResourceImpl{" + "id=" + resource.getId() + '}';
     }
 }
