@@ -86,14 +86,16 @@ public class AttributeImpl<T> implements Attribute<T> {
         if (!Objects.equals(this.type, other.type)) {
             return false;
         }
-        if (this.operator != other.operator) {
-            return false;
-        }
-        return true;
+        return this.operator == other.operator;
     }
 
     @Override
     public Operator getOperator() {
         return operator;
+    }
+
+    @Override
+    public String toString() {
+        return ResourceFactoryImpl.toString(this);
     }
 }

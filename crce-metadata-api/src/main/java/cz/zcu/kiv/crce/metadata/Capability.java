@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -13,7 +12,7 @@ import javax.annotation.Nullable;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public interface Capability
-        extends AttributeProvider, DirectiveProvider, PropertyProvider<Capability>, EqualityComparable<Capability>, Serializable {
+        extends AttributeProvider, DirectiveProvider, PropertyProvider<Capability>, EqualityComparable<Capability>, Entity {
 
     @Nonnull
     String getId();

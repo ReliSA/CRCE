@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -125,9 +126,37 @@ public class ResourceFactoryImpl implements ResourceFactory {
     }
 
     static String toString(Resource resource) {
-        if (logHelper != null) {
+        if (logHelper != null && logHelper.available()) {
             return logHelper.toString(resource);
         }
-        return "ResourceImpl{" + "id=" + resource.getId() + '}';
+        return "ResourceImpl{" + "id=" + resource.getId() + "}";
+    }
+
+    static String toString(Capability capability) {
+        if (logHelper != null && logHelper.available()) {
+            return logHelper.toString(capability);
+        }
+        return "CapabilityImpl{" + "id=" + capability.getId() + "}";
+    }
+
+    static String toString(Requirement requirement) {
+        if (logHelper != null && logHelper.available()) {
+            return logHelper.toString(requirement);
+        }
+        return "RequirementImpl{" + "id=" + requirement.getId() + "}";
+    }
+
+    static String toString(Property<?> property) {
+        if (logHelper != null && logHelper.available()) {
+            return logHelper.toString(property);
+        }
+        return "PropertyImpl{" + "id=" + property.getId() + "}";
+    }
+
+    static String toString(Attribute<?> attribute) {
+        if (logHelper != null && logHelper.available()) {
+            return logHelper.toString(attribute);
+        }
+        return "AttributeImpl{" + "name=" + attribute.getName() + ", type=" + attribute.getType().getName() + ", value=" + attribute.getStringValue() + "}";
     }
 }

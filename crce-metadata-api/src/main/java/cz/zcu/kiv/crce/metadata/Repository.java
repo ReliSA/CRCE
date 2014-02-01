@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.Serializable;
 import java.net.URI;
 
 import javax.annotation.Nonnull;
@@ -12,7 +11,7 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Repository extends Serializable {
+public interface Repository extends Entity {
 
     /**
      * Return the associated URL for the repository.

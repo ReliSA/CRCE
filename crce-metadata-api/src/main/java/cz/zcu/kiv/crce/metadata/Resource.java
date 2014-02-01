@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -15,7 +14,7 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Serializable {
+public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Entity {
 
     @Nonnull
     String getId();

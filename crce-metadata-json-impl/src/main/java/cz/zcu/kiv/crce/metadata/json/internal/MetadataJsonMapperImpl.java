@@ -1,16 +1,24 @@
 package cz.zcu.kiv.crce.metadata.json.internal;
 
 import java.io.IOException;
+import java.util.Dictionary;
+
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.Init;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Entity;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -21,11 +29,19 @@ import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-@Component(provides = MetadataJsonMapper.class)
-public class MetadataJsonMapperImpl implements MetadataJsonMapper {
+@Component(provides = {MetadataJsonMapper.class, ManagedService.class}, properties = {
+    @org.apache.felix.dm.annotation.api.Property(name = "service.pid", value = "cz.zcu.kiv.crce.metadata.json")
+})
+public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataJsonMapperImpl.class);
+
+    public static final String CFG__JSON_PRETTY_PRINT = "json.pretty-print";
 
     @ServiceDependency private volatile ResourceFactory resourceFactory;
     private ObjectMapper mapper;
+
+    private boolean prettyPrint = false;
 
     @Init
     @SuppressWarnings("unchecked")
@@ -45,9 +61,15 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper {
     }
 
     @Override
-    public String serialize(Resource resource) {
+    public String serialize(Entity entity) {
+        return serialize(entity, prettyPrint);
+    }
+
+    @Override
+    public String serialize(Entity entity, boolean prettyPrint) {
         try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resource);
+            ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
+            return writer.writeValueAsString(entity);
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException(ex);
         }
@@ -62,4 +84,13 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper {
         }
     }
 
+    @Override
+    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        if (properties != null) {
+            Object value = properties.get(CFG__JSON_PRETTY_PRINT);
+            prettyPrint = value != null && value instanceof String && Boolean.valueOf(((String) value).trim());
+            
+            logger.info("MetadataJsonMapper configured: pretty-print={}", prettyPrint);
+        }
+    }
 }

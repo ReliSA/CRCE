@@ -221,4 +221,9 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     public int compareTo(Capability o) {
         return id.compareTo(o.getId());
     }
+
+    @Override
+    public String toString() {
+        return ResourceFactoryImpl.toString(this);
+    }
 }

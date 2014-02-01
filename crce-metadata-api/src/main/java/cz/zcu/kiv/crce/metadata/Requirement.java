@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import javax.annotation.Nullable;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Requirement extends DirectiveProvider, EqualityComparable<Requirement>, Serializable {
+public interface Requirement extends DirectiveProvider, EqualityComparable<Requirement>, Entity {
 
     @Nonnull
     String getId();

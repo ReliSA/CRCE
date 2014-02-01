@@ -190,6 +190,5 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         assertTrue(actual.equalsTo(resource, EqualityLevel.DEEP_WITH_KEY));
 
         JSONAssert.assertEquals(json, mapper.serialize(actual), JSONCompareMode.NON_EXTENSIBLE);
-        System.out.println("json: " + json);
     }
 }

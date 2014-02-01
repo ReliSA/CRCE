@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.metadata;
 
-import java.io.Serializable;
-
 /**
  * A pair of requirement and resource indicating a reason why a resource has
  * been chosen by Resolver.
@@ -10,7 +8,7 @@ import java.io.Serializable;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface Reason extends Serializable {
+public interface Reason extends Entity {
 
     Resource getResource();
 

@@ -225,4 +225,9 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     public int compareTo(Requirement o) {
         return id.compareTo(o.getId());
     }
+
+    @Override
+    public String toString() {
+        return ResourceFactoryImpl.toString(this);
+    }
 }

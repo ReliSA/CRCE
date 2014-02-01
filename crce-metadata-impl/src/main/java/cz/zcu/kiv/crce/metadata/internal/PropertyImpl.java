@@ -112,4 +112,9 @@ public class PropertyImpl<T extends EqualityComparable<T>> extends AttributeProv
         hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
     }
+    
+    @Override
+    public String toString() {
+        return ResourceFactoryImpl.toString(this);
+    }
 }

@@ -1,10 +1,6 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
-import org.apache.felix.dm.annotation.api.Component;
-import org.apache.felix.dm.annotation.api.ServiceDependency;
-
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
+import cz.zcu.kiv.crce.metadata.Entity;
 
 /**
  * Wrapper for JSON serializer which allows to have an optional OSGi/DM dependency.
@@ -12,18 +8,19 @@ import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
  * then this class is not loaded. So metadata entities implementations
  * should not call this class directly.
  *
+ * TODO this could be put to public API - it would allow to have other than JSON implementation.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-@Component(provides = LogHelper.class)
-public class LogHelper {
+public interface LogHelper {
 
-    @ServiceDependency
-    private MetadataJsonMapper metadataJsonMapper;
+    String toString(Entity entity);
 
-    public String toString(Resource resource) {
-        if (metadataJsonMapper != null) {
-            return metadataJsonMapper.serialize(resource);
-        }
-        return "ResourceImpl{" + "id=" + resource.getId() + '}';
-    }
+    /**
+     * Regular implementation returns <code>true</code>, "null object" created by DM
+     * when optional dependency is not available returns <code>false</code>. This allows
+     * to decide whether or not to use the <code>LogHelper</code> to produce toString message.
+     *
+     * @return <code>true</code> if the interface implementation is available.
+     */
+    boolean available();
 }
