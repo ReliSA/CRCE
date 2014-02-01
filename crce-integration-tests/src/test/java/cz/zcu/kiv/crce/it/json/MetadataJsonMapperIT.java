@@ -1,18 +1,29 @@
-package cz.zcu.kiv.crce.metadata.json.internal;
+package cz.zcu.kiv.crce.it.json;
+
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.osgi.framework.Version;
 
-import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.apache.felix.dm.Component;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.CoreOptions;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
+
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.it.IntegrationTestBase;
+import cz.zcu.kiv.crce.it.Options;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
@@ -23,26 +34,57 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.ResourceFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
-import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class MetadataJsonMapperTest extends Assert {
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
+public class MetadataJsonMapperIT extends IntegrationTestBase {
 
-    private static MetadataJsonMapper mapper;
-    private static ResourceFactory resourceFactory;
+    private static final Logger logger = LoggerFactory.getLogger(MetadataJsonMapperIT.class);
 
-    @BeforeClass
-    public static void beforeClass() {
-        resourceFactory = new ResourceFactoryImpl();
-        mapper = new MetadataJsonMapperImpl(resourceFactory);
+    private volatile MetadataJsonMapper mapper;
+    private volatile ResourceFactory resourceFactory;
+
+    @org.ops4j.pax.exam.Configuration
+    public final Option[] configuration() {
+
+        logger.info("Option config");
+
+        return options(
+                CoreOptions.systemPackage("org.skyscreamer.jsonassert"),
+                junitBundles(),
+                Options.logging(),
+                Options.Osgi.compendium(),
+                Options.Felix.dependencyManager(),
+                Options.Felix.configAdmin(),
+
+                Options.Crce.metadata(),
+                Options.Crce.metadataJson()
+        );
+    }
+
+    @Override
+    protected Component[] getDependencies() {
+        return new Component[]{
+            createComponent()
+                .setImplementation(this)
+                .add(createServiceDependency().setService(MetadataJsonMapper.class).setRequired(true))
+                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+            };
     }
 
     @Test
-    public void testSerialization() throws URISyntaxException, JSONException {
+    public void testContext() {
+        assertNotNull(resourceFactory);
+        assertNotNull(mapper);
+    }
+
+    @Test
+    public void testSerialization() throws Exception {
         Repository repository = resourceFactory.createRepository(new URI("file://repository/path"));
 
         Resource resource = resourceFactory.createResource("res1");
@@ -148,5 +190,6 @@ public class MetadataJsonMapperTest extends Assert {
         assertTrue(actual.equalsTo(resource, EqualityLevel.DEEP_WITH_KEY));
 
         JSONAssert.assertEquals(json, mapper.serialize(actual), JSONCompareMode.NON_EXTENSIBLE);
+        System.out.println("json: " + json);
     }
 }

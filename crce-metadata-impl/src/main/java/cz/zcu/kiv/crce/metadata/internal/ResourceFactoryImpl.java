@@ -9,6 +9,9 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.UUID;
 
+import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.ServiceDependency;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -23,7 +26,11 @@ import cz.zcu.kiv.crce.metadata.ResourceFactory;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@Component(provides = ResourceFactory.class)
 public class ResourceFactoryImpl implements ResourceFactory {
+
+    @ServiceDependency
+    private LogHelper LogSerializer;
 
     @Override
     public Resource createResource() {
@@ -42,7 +49,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
     @Override
     public Resource createResource(String id) {
-        return new ResourceImpl(id);
+        return new ResourceImpl(id, LogSerializer);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.Init;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -24,17 +25,7 @@ import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 public class MetadataJsonMapperImpl implements MetadataJsonMapper {
 
     @ServiceDependency private volatile ResourceFactory resourceFactory;
-    ObjectMapper mapper;
-
-    public MetadataJsonMapperImpl() {
-
-    }
-
-    public MetadataJsonMapperImpl(ResourceFactory resourceFactory) {
-        this();
-        this.resourceFactory = resourceFactory;
-        init();
-    }
+    private ObjectMapper mapper;
 
     @Init
     @SuppressWarnings("unchecked")
@@ -56,10 +47,8 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper {
     @Override
     public String serialize(Resource resource) {
         try {
-            //        SimpleModule module = new SimpleModule(null, null);
-
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resource);
-        } catch (IOException ex) {
+        } catch (JsonProcessingException ex) {
             throw new IllegalStateException(ex);
         }
     }

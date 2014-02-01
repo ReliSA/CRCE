@@ -171,6 +171,11 @@
             <artifactId>types-cmp</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.skyscreamer</groupId>
+            <artifactId>jsonassert</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- CRCE dependecies -->
 
@@ -183,6 +188,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-json-api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -225,6 +236,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-json-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

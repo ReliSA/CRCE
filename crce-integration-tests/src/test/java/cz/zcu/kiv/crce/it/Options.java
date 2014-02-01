@@ -116,6 +116,16 @@ public class Options {
             );
         }
 
+        public static Option metadataJson() {
+            return composite(
+                    metadataJsonApi(),
+                    metadataJsonImpl(),
+                    mavenBundle("com.fasterxml.jackson.core", "jackson-core"),
+                    mavenBundle("com.fasterxml.jackson.core", "jackson-databind"),
+                    mavenBundle("com.fasterxml.jackson.core", "jackson-annotations")
+            );
+        }
+
         public static Option metadataService() {
             return composite(
                     metadataServiceApi(),
@@ -168,6 +178,14 @@ public class Options {
 
         public static MavenArtifactProvisionOption metadataImpl() {
             return maven("crce-metadata-impl");
+        }
+
+        public static MavenArtifactProvisionOption metadataJsonApi() {
+            return maven("crce-metadata-json-api");
+        }
+
+        public static MavenArtifactProvisionOption metadataJsonImpl() {
+            return maven("crce-metadata-json-impl");
         }
 
         public static MavenArtifactProvisionOption pluginApi() {

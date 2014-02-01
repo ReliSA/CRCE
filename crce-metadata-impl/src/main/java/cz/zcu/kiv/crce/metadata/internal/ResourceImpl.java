@@ -23,6 +23,7 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
 
     private static final long serialVersionUID = 2594634894045505360L;
 
+    private transient final LogHelper LogHelper; // TODO not prepared yet for deserialization
     private final String id;
     private Repository repository = null;
     /*
@@ -33,8 +34,9 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
     private final Map<String, List<Capability>> rootCapabilities = new HashMap<>();
     private final Map<String, List<Requirement>> allRequirements = new HashMap<>();
 
-    public ResourceImpl(@Nonnull String id) {
+    public ResourceImpl(@Nonnull String id, @Nonnull LogHelper logSerializer) {
         this.id = id;
+        this.LogHelper = logSerializer;
     }
 
     @Override
@@ -248,6 +250,6 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
 
     @Override
     public String toString() {
-        return "ResourceImpl{" + "id=" + id + '}';
+        return LogHelper.toString(this);
     }
 }
