@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -247,6 +248,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                         }
                     }
                 }
+                break;
             }
 
             default:
@@ -303,6 +305,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                         }
                     }
                 }
+                break;
             }
 
             default:
@@ -373,6 +376,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                     }
 
                 }
+                break;
             }
 
             default:
@@ -403,6 +407,9 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
             }
             return result;
         } else if (!root.isObject()) {
+            if (root.isTextual()) {
+                return Arrays.asList(root.asText().split(","));
+            }
             return Collections.singletonList(root.asText());
         }
         throw new IllegalArgumentException("Can't parse List value: " + root);

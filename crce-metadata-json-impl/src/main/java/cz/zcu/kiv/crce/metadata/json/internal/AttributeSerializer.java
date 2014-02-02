@@ -19,6 +19,12 @@ import cz.zcu.kiv.crce.metadata.Operator;
 @SuppressWarnings("unchecked")
 public class AttributeSerializer extends JsonSerializer<Attribute<?>> {
 
+    private final MetadataJsonMapperImpl metadataJsonMapperImpl;
+
+    public AttributeSerializer(MetadataJsonMapperImpl metadataJsonMapperImpl) {
+        this.metadataJsonMapperImpl = metadataJsonMapperImpl;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void serialize(Attribute<?> attribute, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
@@ -29,6 +35,17 @@ public class AttributeSerializer extends JsonSerializer<Attribute<?>> {
         if (!Operator.EQUAL.equals(attribute.getOperator())) {
             jgen.writeStringField(Constants.ATTRIBUTE__OPERATOR, attribute.getOperator().getValue());
         }
+
+        if (metadataJsonMapperImpl.expandAttributes()) {
+            serializeAsExpanded(attribute, jgen);
+        } else {
+            serializeAsString(attribute, jgen);
+        }
+
+        jgen.writeEndObject();
+    }
+
+    private void serializeAsExpanded(Attribute<?> attribute, JsonGenerator jgen) throws IOException, JsonProcessingException {
         Class<?> type = attribute.getAttributeType().getType();
         if (String.class.equals(type)) {
             jgen.writeStringField(Constants.ATTRIBUTE__VALUE, (String) attribute.getValue());
@@ -56,8 +73,9 @@ public class AttributeSerializer extends JsonSerializer<Attribute<?>> {
             }
             jgen.writeEndArray();
         }
-
-        jgen.writeEndObject();
     }
 
+    private void serializeAsString(Attribute<?> attribute, JsonGenerator jgen) throws IOException, JsonProcessingException {
+        jgen.writeStringField(Constants.ATTRIBUTE__VALUE, attribute.getStringValue());
+    }
 }

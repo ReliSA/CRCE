@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.metadata.internal;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,6 +55,17 @@ public class AttributeImpl<T> implements Attribute<T> {
     public String getStringValue() {
         if (value == null) {
             throw new IllegalStateException("Value is null for " + type.getName());
+        }
+        if (List.class.equals(type.getType())) {
+            StringBuilder sb = new StringBuilder();
+            Iterator<?> iterator = ((List<?>) value).iterator();
+            if (iterator.hasNext()) {
+                sb.append(iterator.next());
+            }
+            while (iterator.hasNext()) {
+                sb.append(",").append(iterator.next());
+            }
+            return sb.toString();
         }
         return String.valueOf(value);
     }

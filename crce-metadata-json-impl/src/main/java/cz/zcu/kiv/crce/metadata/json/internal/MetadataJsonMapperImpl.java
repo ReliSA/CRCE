@@ -37,11 +37,13 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
     private static final Logger logger = LoggerFactory.getLogger(MetadataJsonMapperImpl.class);
 
     public static final String CFG__JSON_PRETTY_PRINT = "json.pretty-print";
+    public static final String CFG__JSON_EXPAND_ATTRIBUTE_VALUES = "json.expand-attribute-values";
 
     @ServiceDependency private volatile ResourceFactory resourceFactory;
     private ObjectMapper mapper;
 
     private boolean prettyPrint = false;
+    private boolean expandAttributes = false;
 
     @Init
     @SuppressWarnings("unchecked")
@@ -53,7 +55,7 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
         module.addSerializer(Resource.class, new ResourceSerializer());
         module.addSerializer(Capability.class, new CapabilitySerializer());
         module.addSerializer(Requirement.class, new RequirementSerializer());
-        module.addSerializer((Class<Attribute<?>>) (Class<?>) Attribute.class, new AttributeSerializer());
+        module.addSerializer((Class<Attribute<?>>) (Class<?>) Attribute.class, new AttributeSerializer(this));
         module.addSerializer((Class<Property<?>>) (Class<?>) Property.class, new PropertySerializer());
 
         module.addDeserializer(Resource.class, new ResourceDeserializer(resourceFactory));
@@ -88,9 +90,16 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
     public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
         if (properties != null) {
             Object value = properties.get(CFG__JSON_PRETTY_PRINT);
-            prettyPrint = value != null && value instanceof String && Boolean.valueOf(((String) value).trim());
-            
+            prettyPrint = value != null && value instanceof String && Boolean.valueOf(((String) value).trim()); // default false
+
+            value = properties.get(CFG__JSON_EXPAND_ATTRIBUTE_VALUES);
+            expandAttributes = value != null && value instanceof String && Boolean.valueOf(((String) value).trim()); // default false
+
             logger.info("MetadataJsonMapper configured: pretty-print={}", prettyPrint);
         }
+    }
+
+    boolean expandAttributes() {
+        return expandAttributes;
     }
 }
