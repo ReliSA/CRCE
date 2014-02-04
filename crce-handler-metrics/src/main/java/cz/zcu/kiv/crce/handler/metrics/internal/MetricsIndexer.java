@@ -29,6 +29,7 @@ import cz.zcu.kiv.crce.handler.metrics.impl.MaximumCyclomaticComplexity;
 import cz.zcu.kiv.crce.handler.metrics.impl.MinimumCyclomaticComplexity;
 import cz.zcu.kiv.crce.handler.metrics.impl.NumberOfImportsMetrics;
 import cz.zcu.kiv.crce.handler.metrics.impl.RippleEffectMetrics;
+import cz.zcu.kiv.crce.handler.metrics.impl.WTCohMetrics;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -111,6 +112,7 @@ public class MetricsIndexer {
 		AverageCyclomaticComplexity averageCyclomaticComplexity = new AverageCyclomaticComplexity(classesMetrics);
 		MaximumCyclomaticComplexity maximumCyclomaticComplexity = new MaximumCyclomaticComplexity(classesMetrics);
 		MinimumCyclomaticComplexity minimumCyclomaticComplexity = new MinimumCyclomaticComplexity(classesMetrics);
+		WTCohMetrics wTCohMetrics = new WTCohMetrics(classesMetrics); 
 		
 		// fill metrics lists
 		allMetrics.add(numberOfImportsMetrics);
@@ -119,11 +121,13 @@ public class MetricsIndexer {
 		allMetrics.add(averageCyclomaticComplexity);
 		allMetrics.add(maximumCyclomaticComplexity);
 		allMetrics.add(minimumCyclomaticComplexity);
+		allMetrics.add(wTCohMetrics);
 		
 		componentMetrics.add(numberOfImportsMetrics);
 		componentMetrics.add(averageCyclomaticComplexity);
 		componentMetrics.add(maximumCyclomaticComplexity);
 		componentMetrics.add(minimumCyclomaticComplexity);
+		componentMetrics.add(wTCohMetrics);
 		
 		packageMetrics.add(cpcMetrics);
 		packageMetrics.add(rippleEffectMetrics);

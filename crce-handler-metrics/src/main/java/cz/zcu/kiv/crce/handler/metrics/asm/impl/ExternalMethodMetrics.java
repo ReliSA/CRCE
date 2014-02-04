@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 
+import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
 /**
@@ -44,6 +45,16 @@ public class ExternalMethodMetrics extends AbstractMethodMetrics {
 	@Override
 	public Type[] getParameters() {
 		return (Type[])parameters.clone();
+	}
+	
+	@Override
+	public FieldMetrics[] getUsedInClassFields() {
+		return new FieldMetrics[0];
+	}
+	
+	@Override
+	public FieldMetrics[] getUsedOutClassFields() {
+		return new FieldMetrics[0];
 	}
 
 	@Override

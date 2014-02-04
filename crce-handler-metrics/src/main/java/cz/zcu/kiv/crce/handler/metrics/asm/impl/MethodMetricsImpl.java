@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.Analyzer;
@@ -15,6 +16,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicInterpreter;
 import org.objectweb.asm.tree.analysis.Frame;
 
+import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
 /**
@@ -32,6 +34,9 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	private boolean isAbstract;
 	
 	private int cyclomaticComplexity;
+	
+	private FieldMetrics[] usedInClassFields;
+	private FieldMetrics[] usedOutClassFields;
 	
 	private MethodMetrics[] methodCalls;
 
@@ -53,6 +58,9 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
     	
     	this.isPublic = isPublic;
 		
+		Set<FieldMetrics> inClassFields = new HashSet<FieldMetrics>();
+		Set<FieldMetrics> outClassFields = new HashSet<FieldMetrics>();
+		
 		Set<MethodMetrics> calls = new HashSet<MethodMetrics>();
 		
 		// collecting method calls
@@ -64,26 +72,54 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 			
 			while (instructions.hasNext()) {
 				
-				AbstractInsnNode instruction = instructions.next();			
-				if (instruction.getType() == AbstractInsnNode.METHOD_INSN) {
+				AbstractInsnNode instruction = instructions.next();	
+				switch (instruction.getType()) {	            
+					case AbstractInsnNode.FIELD_INSN: { // field use
+			            
+		            	FieldInsnNode fieldInstruction = (FieldInsnNode)instruction;
+		            	
+		            	String owner = fieldInstruction.owner.replace('/','.');
+		            	
+		            	if (owner.equals(className)) {
+		            		inClassFields.add(new FieldMetricsImpl(owner, fieldInstruction.name));
+		            	}
+		            	else {
+		            		outClassFields.add(new FieldMetricsImpl(owner, fieldInstruction.name));
+		            	}
+		            	
+		            	break;
+		            }
+	            	case AbstractInsnNode.METHOD_INSN: { 
+            	
+						MethodInsnNode callInstruction = (MethodInsnNode)instruction;
 	            	
-					MethodInsnNode callInstruction = (MethodInsnNode)instruction;
-	            	
-	            	String owner =  callInstruction.owner.replace('/','.');
-	            	String name = callInstruction.name;
-	            	String desc = callInstruction.desc;
-	
-	            	Type callMethodType = Type.getType(desc);
-	
-	            	// using placeholders for all method calls
-	            	MethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
-	            	
-	            	calls.add(methodCall);
-				}
-			}			
+		            	String owner =  callInstruction.owner.replace('/','.');
+		            	String name = callInstruction.name;
+		            	String desc = callInstruction.desc;
+		
+		            	Type callMethodType = Type.getType(desc);
+		
+		            	// using placeholders for all method calls
+		            	MethodMetrics methodCall = new ExternalMethodMetrics(owner, name, callMethodType.getArgumentTypes());
+		            	
+		            	calls.add(methodCall);
+		            	break;
+					}
+				}	
+			}
 		} 
 		else {
 			isAbstract = true;
+		}
+		
+		usedInClassFields = new FieldMetrics[0];
+		if (inClassFields.size() > 0) {
+			usedInClassFields = inClassFields.toArray(usedInClassFields);
+		}
+		
+		usedOutClassFields = new FieldMetrics[0];
+		if (outClassFields.size() > 0) {
+			usedOutClassFields = outClassFields.toArray(usedOutClassFields);
 		}
 
 		methodCalls = new MethodMetrics[0];
@@ -118,6 +154,18 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	@Nonnull
 	public Type[] getParameters() {
 		return (Type[])parameters.clone();
+	}
+	
+	@Override
+	@Nonnull
+	public FieldMetrics[] getUsedInClassFields() {
+		return (FieldMetrics[])usedInClassFields.clone();
+	}
+	
+	@Override
+	@Nonnull
+	public FieldMetrics[] getUsedOutClassFields() {
+		return (FieldMetrics[])usedOutClassFields.clone();
 	}
 
 	@Override

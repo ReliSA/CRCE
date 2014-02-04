@@ -36,6 +36,22 @@ public interface MethodMetrics {
 	Type[] getParameters();
 	
 	/**
+	 * Array of used fields declared in this class.
+	 * 
+	 * @return Array of used fields.
+	 */
+	@Nonnull
+	FieldMetrics[] getUsedInClassFields();
+	
+	/**
+	 * Array of used fields declared in other classes.
+	 * 
+	 * @return Array of used fields.
+	 */
+	@Nonnull
+	FieldMetrics[] getUsedOutClassFields();
+	
+	/**
 	 * Array of methods (set - each method once) called by this method.
 	 * 
 	 * @return Array of called method.
