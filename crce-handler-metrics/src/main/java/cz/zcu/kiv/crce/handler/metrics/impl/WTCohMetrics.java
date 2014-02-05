@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
@@ -21,6 +24,8 @@ import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
  */
 public class WTCohMetrics implements ComponentMetrics {
 
+	private static final Logger logger = LoggerFactory.getLogger(WTCoupMetrics.class);
+	
 	private List<ClassMetrics> classMetrics;
 	
 	/**
@@ -76,7 +81,11 @@ public class WTCohMetrics implements ComponentMetrics {
             	}
             	else if (methodCount > 1) {
             		double[][] sim = new double[methodCount][methodCount];
-            		            		
+            		            
+            		for (int i = 0; i < methodCount; i++) {
+            			sim [i][i] = 0;
+            		}
+            		
             		// SimD
             		for (int j = 1; j < methodCount; j++) {
             			for (int i = 0; i < j; i++) {
@@ -91,13 +100,16 @@ public class WTCohMetrics implements ComponentMetrics {
             				int intersectionVIVJSize = 0;
             				
             				for (FieldMetrics fieldJ : vJ) {
+            					
             					boolean found = false;
+            					
             					for (FieldMetrics fieldI : vI) {
             						if (fieldJ.equals(fieldI)) {
             							found = true;
             							break;
             						}
             					}
+            					
             					if (found) {
             						intersectionVIVJSize += 1;
             					}
@@ -110,7 +122,7 @@ public class WTCohMetrics implements ComponentMetrics {
     						if (unificationVIVJSize != 0) {
     							simD = (double)intersectionVIVJSize / unificationVIVJSize;
     						}
-    						
+    						   						
     						sim[i][j] = sim[j][i] = simD;
             			}
             		}
@@ -137,7 +149,7 @@ public class WTCohMetrics implements ComponentMetrics {
             				simSum += sim[i][j];
             			}
             		}
-            		
+            		           		
             		classCohSum += simSum / (methodCount * methodCount - methodCount);
             		classCount += 1;
             	}
@@ -145,8 +157,9 @@ public class WTCohMetrics implements ComponentMetrics {
         }
         
         double wTCoh = (classCount == 0) ? 0 : classCohSum / classCount;
+                
+        logger.debug("WTCoh {} ", wTCoh);
         
 		return new Double(wTCoh);
 	}
-
 }

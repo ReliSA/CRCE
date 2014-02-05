@@ -39,4 +39,19 @@ public abstract class AbstractMethodMetrics implements MethodMetrics {
 
 		return true;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		
+		if (other instanceof MethodMetrics) {
+			return equals((MethodMetrics)other);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getClassName().hashCode() * 3 + this.getName().hashCode() * 11 + this.getParameters().length;
+	}
 }
