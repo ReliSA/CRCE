@@ -373,6 +373,14 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                         case "java.util.List":
                             callback.addAttribute(new ListAttributeType(name), deserializeList(valueNode), operator);
                             continue;
+
+                        case "URI":
+                        case "java.net.URI":
+                            try {
+                                callback.addAttribute(new SimpleAttributeType<>(name, URI.class), new URI(valueNode.asText()), operator);
+                            } catch (URISyntaxException ex) {
+                                throw new IllegalArgumentException("Invalid URI: " + valueNode.asText(), ex);
+                            }
                     }
 
                 }
