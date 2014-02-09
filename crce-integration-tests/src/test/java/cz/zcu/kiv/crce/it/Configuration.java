@@ -13,6 +13,7 @@ public class Configuration {
                 cz.zcu.kiv.crce.metadata.dao.internal.Activator.PID,
                 "jdbc.driver", "org.h2.Driver",
                 "jdbc.url", "jdbc:h2:mem:it;MODE=PostgreSQL;DB_CLOSE_DELAY=-1",
+//                "jdbc.url", "jdbc:h2:file:target/metadata/crce;MODE=PostgreSQL;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=19090",
                 "jdbc.username", "sa",
                 "jdbc.password", "");
     }

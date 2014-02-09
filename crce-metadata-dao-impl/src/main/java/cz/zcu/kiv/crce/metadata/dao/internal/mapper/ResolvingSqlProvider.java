@@ -42,9 +42,9 @@ public class ResolvingSqlProvider {
                     sb.append("  ON ", alias, ".capability_id = ca.capability_id");
                     sb.append("  AND ", alias, ".name = #{attributes[", String.valueOf(i), "].attributeType.name}");
 
-                    sb.append("  AND ", alias);
+                    sb.append("  AND ");
 
-                    evaluateAttribute(sb, attributes.get(i), i);
+                    evaluateAttribute(sb, attributes.get(i), i, alias);
 
                     INNER_JOIN(sb.toString());
                 }
@@ -58,30 +58,33 @@ public class ResolvingSqlProvider {
         return sql;
     }
 
-    private void evaluateAttribute(SimpleStringBuilder sb, Attribute<?> attribute, int index) {
+    private void evaluateAttribute(SimpleStringBuilder sb, Attribute<?> attribute, int index, String alias) {
         switch (DbAttributeType.fromClass(attribute.getAttributeType().getType())) {
             case DOUBLE:
-                sb.append(false, ".double_value");
+                sb.append(false, alias, ".double_value");
                 evaluateOperator(sb, attribute.getOperator(), index);
                 break;
 
             case LONG:
-                sb.append(false, ".long_value");
+                sb.append(false, alias, ".long_value");
                 evaluateOperator(sb, attribute.getOperator(), index);
                 break;
 
             case STRING:
-                sb.append(false, ".string_value");
+                sb.append(false, alias, ".string_value");
                 evaluateOperator(sb, attribute.getOperator(), index);
                 break;
 
             case URI:
-                sb.append(false, ".string_value");
+                sb.append(false, alias, ".string_value");
                 evaluateOperator(sb, attribute.getOperator(), index);
                 break;
 
             case VERSION:
-                throw new UnsupportedOperationException();
+                sb.append(false, "(");
+                evaluateVersion(sb, alias, attribute.getOperator(), index);
+                sb.append(false, ")");
+                break;
 
             case LIST:
                 throw new UnsupportedOperationException();
@@ -123,6 +126,85 @@ public class ResolvingSqlProvider {
                 throw new UnsupportedOperationException("Operator " + operator + " is not supported for ... type.");
 
         }
+    }
+
+    private void evaluateVersion(SimpleStringBuilder sb, String alias, Operator operator, int index) {
+        switch (operator) {
+            case EQUAL:
+                sb.append(false, alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " AND ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " AND ", alias, ".version_micro_value = #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " AND ", alias, ".string_value = #{attributes[", String.valueOf(index), "].value.qualifier}");
+                break;
+
+            case NOT_EQUAL:
+                sb.append(false, alias, ".version_major_value <> #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " OR ", alias, ".version_minor_value <> #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " OR ", alias, ".version_micro_value <> #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " OR ", alias, ".string_value <> #{attributes[", String.valueOf(index), "].value.qualifier}");
+                break;
+
+            case PRESENT:
+                sb.append(false, alias, ".version_major_value is not null");
+                sb.append(false, " AND ", alias, ".version_minor_value is not null");
+                sb.append(false, " AND ", alias, ".version_micro_value is not null");
+                sb.append(false, " AND ", alias, ".string_value is not null");
+                break;
+
+            case LESS:
+                sb.append(false, alias, ".version_major_value < #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " OR ", alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major} AND (");
+                sb.append(false, alias, ".version_minor_value < #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " OR ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor} AND (");
+                sb.append(false, alias, ".version_micro_value < #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " OR ", alias, ".version_micro_value = #{attributes[", String.valueOf(index), "].value.micro} AND (");
+                sb.append(false, alias, ".string_value < #{attributes[", String.valueOf(index), "].value.qualifier}");
+                sb.append(false, ")))");
+                break;
+
+            case LESS_EQUAL:
+                sb.append(false, alias, ".version_major_value < #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " OR ", alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major} AND (");
+                sb.append(false, alias, ".version_minor_value < #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " OR ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor} AND (");
+                sb.append(false, alias, ".version_micro_value < #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " OR ", alias, ".version_micro_value = #{attributes[", String.valueOf(index), "].value.micro} AND (");
+                sb.append(false, alias, ".string_value <= #{attributes[", String.valueOf(index), "].value.qualifier}");
+                sb.append(false, ")))");
+                break;
+
+            case GREATER:
+                sb.append(false, alias, ".version_major_value > #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " OR ", alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major} AND (");
+                sb.append(false, alias, ".version_minor_value > #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " OR ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor} AND (");
+                sb.append(false, alias, ".version_micro_value > #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " OR ", alias, ".version_micro_value = #{attributes[", String.valueOf(index), "].value.micro} AND (");
+                sb.append(false, alias, ".string_value > #{attributes[", String.valueOf(index), "].value.qualifier}");
+                sb.append(false, ")))");
+                break;
+
+            case GREATER_EQUAL:
+                sb.append(false, alias, ".version_major_value > #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " OR ", alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major} AND (");
+                sb.append(false, alias, ".version_minor_value > #{attributes[", String.valueOf(index), "].value.minor}");
+                sb.append(false, " OR ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor} AND (");
+                sb.append(false, alias, ".version_micro_value > #{attributes[", String.valueOf(index), "].value.micro}");
+                sb.append(false, " OR ", alias, ".version_micro_value = #{attributes[", String.valueOf(index), "].value.micro} AND (");
+                sb.append(false, alias, ".string_value >= #{attributes[", String.valueOf(index), "].value.qualifier}");
+                sb.append(false, ")))");
+                break;
+
+            case APPROX:
+                sb.append(false, alias, ".version_major_value = #{attributes[", String.valueOf(index), "].value.major}");
+                sb.append(false, " AND ", alias, ".version_minor_value = #{attributes[", String.valueOf(index), "].value.minor}");
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Operator " + operator + " is not supported for Version type.");
+
+        }
+
     }
 
     public String getResourcesOr(Map<String, Object> parameter) {
