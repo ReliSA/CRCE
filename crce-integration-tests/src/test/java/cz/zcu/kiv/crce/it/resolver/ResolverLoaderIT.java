@@ -280,4 +280,21 @@ public class ResolverLoaderIT extends IntegrationTestBase {
         assertTrue(resources.contains(resource2));
         assertFalse(resources.contains(resource3));
     }
+
+
+    @Test
+    public void testRequirementWithOrOperator() throws Exception {
+        Requirement requirement = resourceFactory.createRequirement("osgi.identity");
+
+        requirement.addAttribute("name", String.class, "cz.zcu.kiv.test-bundle-1.0.0", Operator.EQUAL);
+        requirement.addAttribute("name", String.class, "cz.zcu.kiv.other-test-bundle-1.0.0", Operator.EQUAL);
+        requirement.setDirective("operator", "or");
+
+        List<Resource> resources = resourceLoader.getResources(repository, requirement);
+
+        assertTrue(resources.contains(resource1));
+        assertFalse(resources.contains(resource2));
+        assertTrue(resources.contains(resource3));
+    }
+
 }

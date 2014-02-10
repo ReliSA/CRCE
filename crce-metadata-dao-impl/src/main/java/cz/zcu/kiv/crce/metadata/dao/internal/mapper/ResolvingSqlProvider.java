@@ -58,6 +58,44 @@ public class ResolvingSqlProvider {
         return sql;
     }
 
+    public String getResourcesOr(final Map<String, Object> parameter) {
+        logger.debug("getResourcesOr({})", parameter);
+
+        String sql = new SQL() {
+            {
+                @SuppressWarnings("unchecked")
+                List<Attribute<?>> attributes = (List<Attribute<?>>) parameter.get("attributes");
+
+                SELECT("DISTINCT r.resource_id, r.repository_id, r.id, r.uri");
+                FROM("resource r");
+                INNER_JOIN("capability c ON c.resource_id = r.resource_id");
+                INNER_JOIN("capability_attribute ca ON ca.capability_id = c.capability_id");
+                WHERE("c.namespace = #{namespace}");
+
+                SimpleStringBuilder sb = new SimpleStringBuilder();
+                sb.append("(");
+
+                String alias = "ca";
+                for (int i = 0; i < attributes.size(); i++) {
+                    if (i > 0) {
+                        sb.append("OR");
+                    }
+                    sb.append(alias, ".name = #{attributes[", String.valueOf(i), "].attributeType.name}");
+                    sb.append(false, "  AND ");
+                    evaluateAttribute(sb, attributes.get(i), i, alias);
+                }
+
+                sb.append(")");
+
+                WHERE(sb.toString());
+            }
+        }.toString();
+
+        logger.trace("getResourcesOr() query:\n{}", sql);
+
+        return sql;
+    }
+
     private void evaluateAttribute(SimpleStringBuilder sb, Attribute<?> attribute, int index, String alias) {
         switch (DbAttributeType.fromClass(attribute.getAttributeType().getType())) {
             case DOUBLE:
@@ -206,9 +244,4 @@ public class ResolvingSqlProvider {
         }
 
     }
-
-    public String getResourcesOr(Map<String, Object> parameter) {
-        throw new UnsupportedOperationException();
-    }
-
 }
