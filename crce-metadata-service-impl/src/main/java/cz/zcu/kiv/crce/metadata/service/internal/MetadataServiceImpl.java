@@ -26,7 +26,7 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -49,7 +49,7 @@ public class MetadataServiceImpl implements MetadataService {
 
 
     @ServiceDependency
-    private ResourceFactory resourceFactory;
+    private MetadataFactory metadataFactory;
 
     @Start
     public void activate() {
@@ -367,7 +367,7 @@ public class MetadataServiceImpl implements MetadataService {
 
         Capability capability;
         if (capabilities.isEmpty()) {
-            capability = resourceFactory.createCapability(namespace);
+            capability = metadataFactory.createCapability(namespace);
             capability.setResource(resource);
             resource.addCapability(capability);
             resource.addRootCapability(capability);

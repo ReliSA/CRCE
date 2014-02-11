@@ -28,7 +28,7 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
@@ -54,7 +54,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     private static final String RESOURCE_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResourceMapper.";
 
-    @ServiceDependency private volatile ResourceFactory resourceFactory;
+    @ServiceDependency private volatile MetadataFactory metadataFactory;
     @ServiceDependency private volatile MetadataService metadataService;
     @ServiceDependency private volatile SessionManager sessionManager;
     @ServiceDependency private volatile RepositoryDAOImpl repositoryDAOImpl;
@@ -97,7 +97,7 @@ public class ResourceDAOImpl implements ResourceDAO {
     }
 
     private Resource loadResource(@Nonnull DbResource dbResource, @Nonnull SqlSession session) {
-        Resource resource = resourceFactory.createResource(dbResource.getId());
+        Resource resource = metadataFactory.createResource(dbResource.getId());
 //        metadataService.setUri(resource, dbResource.getUri());
 
         loadCapabilities(resource, dbResource.getResourceId(), session);
@@ -120,7 +120,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         Map<Long, Long> unprocessedRequirements = new HashMap<>(dbRequirements.size()); // K: requirement ID, V: requirement parent ID
 
         for (DbRequirement dbRequirement : dbRequirements) {
-            Requirement requirement = resourceFactory.createRequirement(dbRequirement.getNamespace(), dbRequirement.getId());
+            Requirement requirement = metadataFactory.createRequirement(dbRequirement.getNamespace(), dbRequirement.getId());
 
             loadRequirementAttributes(requirement, dbRequirement.getRequirementId(), session);
             loadRequirementDirectives(requirement, dbRequirement.getRequirementId(), session);
@@ -170,7 +170,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         Map<Long, Long> unprocessedCapabilities = new HashMap<>(dbCapabilities.size()); // K: capability ID, V: capability parent ID
 
         for (DbCapability dbCapability : dbCapabilities) {
-            Capability capability = resourceFactory.createCapability(dbCapability.getNamespace(), dbCapability.getId());
+            Capability capability = metadataFactory.createCapability(dbCapability.getNamespace(), dbCapability.getId());
 
             loadCapabilityAttributes(capability, dbCapability.getCapabilityId(), session);
             loadCapabilityDirectives(capability, dbCapability.getCapabilityId(), session);
@@ -221,7 +221,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectResourceProperties", resourceId);
 
         for (DbProperty dbProperty : dbProperties) {
-            Property<Resource> property = resourceFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+            Property<Resource> property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
 
             loadResourcePropertyAttributes(property, dbProperty.getPropertyId(), session);
 
@@ -234,7 +234,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectCapabilityProperties", resourceId);
 
         for (DbProperty dbProperty : dbProperties) {
-            Property<Capability> property = resourceFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+            Property<Capability> property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
 
             loadCapabilityPropertyAttributes(property, dbProperty.getPropertyId(), session);
 

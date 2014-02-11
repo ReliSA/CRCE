@@ -160,7 +160,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
         }
 
         try {
-            Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+            Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
             requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
             List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);

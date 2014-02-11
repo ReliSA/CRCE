@@ -42,7 +42,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 	 * @throws WebApplicationException the resource was not found.
 	 */
 	private Resource findResource(String id) throws WebApplicationException {
-        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
         requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
 		return findSingleBundleByFilter(requirement);
@@ -146,7 +146,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
     private Resource findResourceToReturn(String op, Resource clientResource) throws WebApplicationException {
         Resource resourceToReturn = null;
 
-        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
         requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, getBundleSymbolicName(clientResource));
 
         List<Resource> resourcesWithSameName = findBundlesByFilter(requirement);

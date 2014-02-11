@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.felix.dm.DependencyManager;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
@@ -41,7 +41,7 @@ public class SessionRegisterImpl implements SessionRegister {
                         .setImplementation(buffer)
                         .add(dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
-                        .add(dependencyManager.createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataService.class).setRequired(true))

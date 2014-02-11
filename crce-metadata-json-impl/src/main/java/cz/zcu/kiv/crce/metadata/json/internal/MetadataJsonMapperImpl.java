@@ -22,7 +22,7 @@ import cz.zcu.kiv.crce.metadata.Entity;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 
 /**
@@ -39,7 +39,7 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
     public static final String CFG__JSON_PRETTY_PRINT = "json.pretty-print";
     public static final String CFG__JSON_EXPAND_ATTRIBUTE_VALUES = "json.expand-attribute-values";
 
-    @ServiceDependency private volatile ResourceFactory resourceFactory;
+    @ServiceDependency private volatile MetadataFactory metadataFactory;
     private ObjectMapper mapper;
 
     private boolean prettyPrint = false;
@@ -58,7 +58,7 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
         module.addSerializer((Class<Attribute<?>>) (Class<?>) Attribute.class, new AttributeSerializer(this));
         module.addSerializer((Class<Property<?>>) (Class<?>) Property.class, new PropertySerializer());
 
-        module.addDeserializer(Resource.class, new ResourceDeserializer(resourceFactory));
+        module.addDeserializer(Resource.class, new ResourceDeserializer(metadataFactory));
         mapper.registerModule(module);
     }
 

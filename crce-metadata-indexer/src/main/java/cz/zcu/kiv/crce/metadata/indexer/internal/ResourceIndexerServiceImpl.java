@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexer;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
@@ -27,13 +27,13 @@ public class ResourceIndexerServiceImpl implements ResourceIndexerService {
     private static final Logger logger = LoggerFactory.getLogger(ResourceIndexerServiceImpl.class);
 
     private volatile PluginManager pluginManager;
-    private volatile ResourceFactory resourceFactory; /* injected by dependency manager */
+    private volatile MetadataFactory metadataFactory; /* injected by dependency manager */
 
     @Override
     public Resource indexResource(File file) throws IOException {
         logger.debug("Indexing file {}", file);
 
-        Resource resource = resourceFactory.createResource();
+        Resource resource = metadataFactory.createResource();
 
         // TODO - may be optimized for remote protocols by copying resource to local file and opening local url
 

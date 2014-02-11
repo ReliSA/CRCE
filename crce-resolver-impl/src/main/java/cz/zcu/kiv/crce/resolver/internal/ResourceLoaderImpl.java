@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFilter;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
@@ -27,6 +28,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
     private static final Logger logger = LoggerFactory.getLogger(ResourceLoaderImpl.class);
 
     @ServiceDependency private volatile ResourceDAO resourceDAO;
+    @ServiceDependency private volatile MetadataFactory metadataFactory; // NOPMD will be used
 
     @Override
     public List<Resource> getResources(Repository repository, Requirement requirement) throws IOException {

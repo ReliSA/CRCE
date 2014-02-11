@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
@@ -35,7 +35,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
 
     private static final String REPOSITORY_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.RepositoryMapper.";
 
-    @ServiceDependency private volatile ResourceFactory resourceFactory;
+    @ServiceDependency private volatile MetadataFactory metadataFactory;
     @ServiceDependency private volatile MetadataService metadataService; // NOPMD
     @ServiceDependency private volatile SessionManager sessionManager;
 
@@ -71,7 +71,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByUri", uri.toString());
         if (dbRepository != null) {
             try {
-                repository = resourceFactory.createRepository(new URI(dbRepository.getUri()));
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()));
             } catch (URISyntaxException ex) {
                 throw new IllegalArgumentException("Invalid URI: " + dbRepository.getUri(), ex);
             }
@@ -138,7 +138,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByRepositoryId", repositoryId);
         if (dbRepository != null) {
             try {
-                repository = resourceFactory.createRepository(new URI(dbRepository.getUri()));
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()));
             } catch (URISyntaxException e) {
                 throw new IOException("Invalid URI syntax of repository with ID: " + repositoryId + ", URI: " + dbRepository.getUri(), e);
             }

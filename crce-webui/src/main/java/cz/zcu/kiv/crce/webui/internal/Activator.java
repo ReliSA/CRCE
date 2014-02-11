@@ -10,7 +10,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
@@ -30,7 +30,7 @@ public final class Activator extends DependencyActivatorBase {
 
     private static volatile Activator instance;
 
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile ResourceDAO resourceDAO;
     private volatile PluginManager pluginManager;     /* injected by dependency manager */
     private volatile SessionRegister sessionRegister;   /* injected by dependency manager */
@@ -65,8 +65,8 @@ public final class Activator extends DependencyActivatorBase {
         return resourceDAO;
     }
 
-    public ResourceFactory getResourceFactory() {
-        return resourceFactory;
+    public MetadataFactory getMetadataFactory() {
+        return metadataFactory;
     }
 
     public Store getStore() {
@@ -103,7 +103,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false)));
 

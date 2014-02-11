@@ -96,6 +96,11 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     }
 
     @Override
+    public <T> boolean addAttribute(String name, Class<T> type, T value) {
+        return addAttribute(name, type, value, Operator.EQUAL);
+    }
+
+    @Override
     public <T> boolean addAttribute(String name, Class<T> type, T value, Operator operator) {
         AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
         return addAttribute(attributeType, value, operator);
@@ -228,6 +233,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
 
     @Override
     public String toString() {
-        return ResourceFactoryImpl.toString(this);
+        return MetadataFactoryImpl.toString(this);
     }
 }

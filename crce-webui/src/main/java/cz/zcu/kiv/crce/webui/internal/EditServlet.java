@@ -155,8 +155,8 @@ public class EditServlet extends HttpServlet {
 //            String symbolicName = ((String[]) parameters.get("symbolicName"))[0];
 //            String version = ((String[]) parameters.get("version"))[0];
 
-//            LegacyMetadataHelper.setVersion(Activator.instance().getResourceFactory(), resource, new Version(version));
-//            LegacyMetadataHelper.setSymbolicName(Activator.instance().getResourceFactory(), resource, symbolicName);
+//            LegacyMetadataHelper.setVersion(Activator.instance().getMetadataFactory(), resource, new Version(version));
+//            LegacyMetadataHelper.setSymbolicName(Activator.instance().getMetadataFactory(), resource, symbolicName);
 
             Activator.instance().getResourceDAO().saveResource(resource);
         } catch (URISyntaxException e) {
@@ -251,7 +251,7 @@ public class EditServlet extends HttpServlet {
             }
             Resource resource = findResource(resURI, array);
             int lengthBefore = resource.getCapabilities().size();
-            resource.addCapability(Activator.instance().getResourceFactory().createCapability(capabilityName));
+            resource.addCapability(Activator.instance().getMetadataFactory().createCapability(capabilityName));
             if (lengthBefore == resource.getCapabilities().size()) {
                 resp.sendRedirect("resource");
                 return false;
@@ -319,7 +319,7 @@ public class EditServlet extends HttpServlet {
                     comment = ((String[]) parameters.get("comment"))[0];
                 }
                 int lengthBefore = resource.getRequirements().size();
-                requir = Activator.instance().getResourceFactory().createRequirement(name);
+                requir = Activator.instance().getMetadataFactory().createRequirement(name);
                 resource.addRequirement(requir);
                 if (lengthBefore == resource.getRequirements().size()) {
                     req.getSession().setAttribute("success", false);
@@ -480,7 +480,7 @@ public class EditServlet extends HttpServlet {
 //TODO						req.getSession().setAttribute("message", "Cannot change requirement.");
                         continue;
                     }
-                    requir = Activator.instance().getResourceFactory().createRequirement(name);
+                    requir = Activator.instance().getMetadataFactory().createRequirement(name);
                     resource.addRequirement(requir);
                     try {
                         logger.warn("OSGi filter is not supported yet with new Metadata API, setting as a directive to track it's usage: {}", filter);

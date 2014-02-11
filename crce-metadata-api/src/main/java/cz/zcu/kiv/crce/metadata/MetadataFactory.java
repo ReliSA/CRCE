@@ -5,11 +5,11 @@ import java.net.URI;
 import javax.annotation.Nonnull;
 
 /**
- * Creates empty OBR entities.
+ * Creates empty metadata entities.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public interface ResourceFactory {
+public interface MetadataFactory {
 
     /**
      * Creates an empty resource with generated unique ID.
@@ -55,6 +55,14 @@ public interface ResourceFactory {
     @Nonnull
     <T extends EqualityComparable<T>> Property<T>createProperty(@Nonnull String namespace, @Nonnull String id);
 
+    <T> Attribute<T> createAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
+
+    <T> Attribute<T> createAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
+
+    <T> Attribute<T> createAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
+
+    <T> Attribute<T> createAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
+
     @Nonnull
     Repository createRepository(@Nonnull URI uri);
 
@@ -85,6 +93,8 @@ public interface ResourceFactory {
 
     @Nonnull
     Requirement cloneRequirement(@Nonnull Requirement requirement);
+
+    <T> Attribute<T> cloneAttribute(@Nonnull Attribute<T> attribute);
 
     @Nonnull
     <T extends EqualityComparable<T>> Property<T> cloneProperty(@Nonnull Property<T> property);

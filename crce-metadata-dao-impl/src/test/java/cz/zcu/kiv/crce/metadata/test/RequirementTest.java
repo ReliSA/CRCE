@@ -7,9 +7,9 @@ import org.junit.*;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.internal.RequirementImpl;
-import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 
 /**
  *
@@ -20,11 +20,11 @@ public class RequirementTest {
     private Requirement r1;
     private Requirement r2;
     private Requirement r3;
-    private ResourceFactory rc;
+    private MetadataFactory rc;
 
     @Before
     public void before() {
-        rc = new ResourceFactoryImpl();
+        rc = new MetadataFactoryImpl();
         r1 = new RequirementImpl("req", "a");
         r2 = new RequirementImpl("req", "b");
         r3 = new RequirementImpl("req3", "c");

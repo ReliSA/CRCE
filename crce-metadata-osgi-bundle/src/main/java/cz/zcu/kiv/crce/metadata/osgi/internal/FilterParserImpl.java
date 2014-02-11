@@ -8,7 +8,7 @@ import org.apache.felix.dm.annotation.api.ServiceDependency;
 
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 
@@ -28,11 +28,11 @@ public class FilterParserImpl implements FilterParser {
     private static final char OPEN = '(';
     private static final char CLOSE = ')';
 
-    @ServiceDependency private volatile ResourceFactory resourceFactory;
+    @ServiceDependency private volatile MetadataFactory metadataFactory;
 
     @Override
     public Requirement parse(String filter, String namespace) throws InvalidSyntaxException {
-        Requirement requirement = resourceFactory.createRequirement(namespace);
+        Requirement requirement = metadataFactory.createRequirement(namespace);
 
         filter = filter.trim();
         if (filter.isEmpty()) {
@@ -83,7 +83,7 @@ public class FilterParserImpl implements FilterParser {
 
     private Requirement nestRequirement(Requirement parent, int level) {
         if (level > 0) {
-            Requirement child = resourceFactory.createRequirement(parent.getNamespace());
+            Requirement child = metadataFactory.createRequirement(parent.getNamespace());
             parent.addChild(child);
             child.setParent(parent);
             return child;

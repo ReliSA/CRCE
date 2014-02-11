@@ -31,7 +31,7 @@ import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
@@ -52,7 +52,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
     private volatile ResourceLoader resourceLoader;
     private volatile ResourceDAO resourceDAO;
     private volatile RepositoryDAO repositoryDAO;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService;
     private volatile MetadataJsonMapper metadataJsonMapper;
 
@@ -99,7 +99,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
                 .add(createServiceDependency().setService(ResourceLoader.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataJsonMapper.class).setRequired(true))
             };
@@ -155,14 +155,14 @@ public class ResolverLoaderIT extends IntegrationTestBase {
         assertNotNull(resourceLoader);
         assertNotNull(resourceDAO);
         assertNotNull(repositoryDAO);
-        assertNotNull(resourceFactory);
+        assertNotNull(metadataFactory);
         assertNotNull(metadataJsonMapper);
         assertNotNull(metadataService);
     }
 
     @Test
     public void testRequirementWithNoAttributes() throws Exception {
-        Requirement requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        Requirement requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         List<Resource> resources = resourceLoader.getResources(repository, requirement);
 
@@ -173,7 +173,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
     @Test
     public void testRequirementWithOneAttribute() throws Exception {
-        Requirement requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        Requirement requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test", Operator.EQUAL);
 
@@ -186,7 +186,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
     @Test
     public void testRequirementWithTwoAttributes() throws Exception {
-        Requirement requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        Requirement requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.0"), Operator.EQUAL);
@@ -204,7 +204,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
         List<Resource> resources;
 
         // GREATER
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.0"), Operator.GREATER);
@@ -217,7 +217,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
         // GREATER_EQUAL
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.1"), Operator.GREATER_EQUAL);
@@ -230,7 +230,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
         // LESS
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.1.0"), Operator.LESS);
@@ -243,7 +243,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
         // LESS_EQUAL
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.1"), Operator.LESS_EQUAL);
@@ -256,7 +256,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
         // NOT_EQUAL
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.1"), Operator.NOT_EQUAL);
@@ -269,7 +269,7 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
         // APPROX
-        requirement = resourceFactory.createRequirement("osgi.wiring.package");
+        requirement = metadataFactory.createRequirement("osgi.wiring.package");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
         requirement.addAttribute("version", Version.class, new Version("1.0.0"), Operator.APPROX);
@@ -283,8 +283,8 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
 
     @Test
-    public void testRequirementWithOrOperator() throws Exception {
-        Requirement requirement = resourceFactory.createRequirement("osgi.identity");
+    public void testRequirementWithOrOperatorDirective() throws Exception {
+        Requirement requirement = metadataFactory.createRequirement("osgi.identity");
 
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.test-bundle-1.0.0", Operator.EQUAL);
         requirement.addAttribute("name", String.class, "cz.zcu.kiv.other-test-bundle-1.0.0", Operator.EQUAL);

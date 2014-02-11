@@ -16,7 +16,7 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
@@ -111,7 +111,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                     .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                     .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
                     .add(createServiceDependency().setRequired(true).setService(RepositoryDAO.class))
-                    .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))
+                    .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
                     .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))
                     .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
                     .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));

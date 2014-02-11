@@ -26,7 +26,7 @@ import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import cz.zcu.kiv.crce.it.Configuration;
 import cz.zcu.kiv.crce.it.IntegrationTestBase;
 import cz.zcu.kiv.crce.it.Options;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -45,7 +45,7 @@ public class ContextIT extends IntegrationTestBase {
 
     // injected by dependency manager
     private volatile PluginManager pluginManager;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile ResourceDAO resourceDAO;
     private volatile RepositoryDAO repositoryDAO;
     private volatile ResourceLoader resourceLoader;
@@ -98,7 +98,7 @@ public class ContextIT extends IntegrationTestBase {
             createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
@@ -134,7 +134,7 @@ public class ContextIT extends IntegrationTestBase {
         }
 
         assertNotNull(pluginManager);
-        assertNotNull(resourceFactory);
+        assertNotNull(metadataFactory);
         assertNotNull(resourceDAO);
         assertNotNull(repositoryDAO);
         assertNotNull(resourceLoader);

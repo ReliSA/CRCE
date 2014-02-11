@@ -13,9 +13,9 @@ import org.junit.Test;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
-import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 
@@ -25,16 +25,16 @@ import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
  */
 public class FilterParserTest {
 
-    private static ResourceFactory resourceFactory;
+    private static MetadataFactory metadataFactory;
     private static FilterParser filterParser;
 
     @BeforeClass
     public static void beforeClass() throws NoSuchFieldException, IllegalAccessException {
-        resourceFactory = new ResourceFactoryImpl();
+        metadataFactory = new MetadataFactoryImpl();
         filterParser = new FilterParserImpl();
-        Field field = FilterParserImpl.class.getDeclaredField("resourceFactory");
+        Field field = FilterParserImpl.class.getDeclaredField("metadataFactory");
         field.setAccessible(true);
-        field.set(filterParser, resourceFactory);
+        field.set(filterParser, metadataFactory);
     }
 
     @Test

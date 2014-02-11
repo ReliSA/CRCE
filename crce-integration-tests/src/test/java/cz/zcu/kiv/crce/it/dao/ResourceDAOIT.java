@@ -15,6 +15,23 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *//*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package cz.zcu.kiv.crce.it.dao;
 
@@ -46,7 +63,7 @@ import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -129,7 +146,7 @@ public class ResourceDAOIT extends IntegrationTestBase {
             // test starts.
             createComponent()
                 .setImplementation(this)
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
@@ -137,7 +154,7 @@ public class ResourceDAOIT extends IntegrationTestBase {
     }
 
     // You can inject services as usual.
-    private volatile ResourceFactory resourceFactory;  /* injected by dependency manager */
+    private volatile MetadataFactory metadataFactory;  /* injected by dependency manager */
     private volatile ResourceDAO resourceDAO;          /* injected by dependency manager */
     private volatile RepositoryDAO repositoryDAO;      /* injected by dependency manager */
     private volatile MetadataService metadataService;  /* injected by dependency manager */
@@ -146,13 +163,13 @@ public class ResourceDAOIT extends IntegrationTestBase {
     @Test
     public void testResourceDAOImp() throws IOException, URISyntaxException {
 
-        Repository repository = resourceFactory.createRepository(new URI("file://a/b"));
+        Repository repository = metadataFactory.createRepository(new URI("file://a/b"));
 
         repositoryDAO.saveRepository(repository);
 
         URI uri = new URI("file://a/b/c");
 
-        Resource expected = resourceFactory.createResource();
+        Resource expected = metadataFactory.createResource();
 
         expected.setRepository(repository);
 
@@ -160,10 +177,10 @@ public class ResourceDAOIT extends IntegrationTestBase {
 
         metadataService.setUri(expected, uri);
 
-        Capability cap = resourceFactory.createCapability("nameSpace");
+        Capability cap = metadataFactory.createCapability("nameSpace");
         metadataService.addRootCapability(expected, cap);
 
-        Requirement req = resourceFactory.createRequirement("nameSpace");
+        Requirement req = metadataFactory.createRequirement("nameSpace");
         metadataService.addRequirement(expected, req);
 
         resourceDAO.saveResource(expected);

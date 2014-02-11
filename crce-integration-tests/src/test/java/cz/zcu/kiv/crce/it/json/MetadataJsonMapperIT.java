@@ -31,7 +31,7 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
@@ -47,7 +47,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
     private static final Logger logger = LoggerFactory.getLogger(MetadataJsonMapperIT.class);
 
     private volatile MetadataJsonMapper mapper;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
 
     @org.ops4j.pax.exam.Configuration
     public final Option[] configuration() {
@@ -73,25 +73,25 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
             createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(MetadataJsonMapper.class).setRequired(true))
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
             };
     }
 
     @Test
     public void testContext() {
-        assertNotNull(resourceFactory);
+        assertNotNull(metadataFactory);
         assertNotNull(mapper);
     }
 
     @Test
     public void testSerialization() throws Exception {
-        Repository repository = resourceFactory.createRepository(new URI("file://repository/path"));
+        Repository repository = metadataFactory.createRepository(new URI("file://repository/path"));
 
-        Resource resource = resourceFactory.createResource("res1");
+        Resource resource = metadataFactory.createResource("res1");
 
         resource.setRepository(repository);
 
-        Property<Resource> resourceProperty = resourceFactory.createProperty("prop.ns1", "prop1");
+        Property<Resource> resourceProperty = metadataFactory.createProperty("prop.ns1", "prop1");
         resourceProperty.setAttribute(new SimpleAttributeType<>("patr1", String.class), "pval1", Operator.NOT_EQUAL);
         resourceProperty.setAttribute(new SimpleAttributeType<>("patr2", Long.class), 123L, Operator.LESS);
 
@@ -100,7 +100,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
 
 
         {   // --- capability 1 ---
-            Capability capability = resourceFactory.createCapability("ns1", "cap1");
+            Capability capability = metadataFactory.createCapability("ns1", "cap1");
             resource.addCapability(capability);
             resource.addRootCapability(capability);
             capability.setResource(resource);
@@ -117,12 +117,12 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
             capability.setDirective("d2", "b");
 
             // properties
-            resourceFactory.createProperty("ns2", "prop1");
+            metadataFactory.createProperty("ns2", "prop1");
 
             // --- capability 1 children ---
 
             // child 1
-            Capability child = resourceFactory.createCapability("ns2", "cap2");
+            Capability child = metadataFactory.createCapability("ns2", "cap2");
             resource.addCapability(child);
             child.setResource(resource);
 
@@ -132,7 +132,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
             child.setAttribute(new SimpleAttributeType<>("c1atr1", String.class), "c1val1", Operator.EQUAL);
 
             // child 2
-            child = resourceFactory.createCapability("ns3", "cap3");
+            child = metadataFactory.createCapability("ns3", "cap3");
             resource.addCapability(child);
             child.setResource(resource);
 
@@ -143,14 +143,14 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         }
 
         // --- capability 2 ---
-        Capability capability = resourceFactory.createCapability("ns4", "cap4");
+        Capability capability = metadataFactory.createCapability("ns4", "cap4");
         resource.addCapability(capability);
         resource.addRootCapability(capability);
         capability.setResource(resource);
 
         // --- requirement 1 ---
         {
-            Requirement requirement = resourceFactory.createRequirement("ns5", "req1");
+            Requirement requirement = metadataFactory.createRequirement("ns5", "req1");
             requirement.setResource(resource);
             resource.addRequirement(requirement);
 
@@ -160,7 +160,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
             requirement.setDirective("dir1", "aa");
             requirement.setDirective("dir2", "bb");
 
-            Requirement child = resourceFactory.createRequirement("ns6", "req2");
+            Requirement child = metadataFactory.createRequirement("ns6", "req2");
             child.setResource(resource);
             requirement.addChild(child);
             child.setParent(requirement);
@@ -173,7 +173,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         }
 
         // --- requirement 2 ---
-        Requirement requirement = resourceFactory.createRequirement("ns7", "req3");
+        Requirement requirement = metadataFactory.createRequirement("ns7", "req3");
         requirement.setResource(resource);
         resource.addRequirement(requirement);
 

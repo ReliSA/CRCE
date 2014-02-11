@@ -17,7 +17,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class AttributeProviderImpl implements AttributeProvider {
-    
+
     private static final long serialVersionUID = 1L;
 
     protected final Map<String, Attribute<?>> attributesMap = new HashMap<>();
@@ -57,8 +57,13 @@ public class AttributeProviderImpl implements AttributeProvider {
 
     @Override
     public <T> boolean setAttribute(String name, Class<T> type, T value) {
+        return setAttribute(name, type, value, Operator.EQUAL);
+    }
+
+    @Override
+    public <T> boolean setAttribute(String name, Class<T> type, T value, Operator operator) {
         AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
-        Attribute<T> attribute = new AttributeImpl<>(attributeType, value);
+        Attribute<T> attribute = new AttributeImpl<>(attributeType, value, operator);
         attributesMap.put(attributeType.getName(), attribute);
         return true;
     }

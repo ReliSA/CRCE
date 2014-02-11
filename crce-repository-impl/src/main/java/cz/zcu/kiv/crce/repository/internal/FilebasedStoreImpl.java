@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
@@ -45,7 +45,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile ResourceDAO resourceDAO;
     private volatile RepositoryDAO repositoryDAO;
     private volatile ResourceIndexerService resourceIndexerService;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService; // NOPMD
     private volatile MetadataValidator metadataValidator;
     private volatile ResourceLoader resourceLoader;
@@ -92,7 +92,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
 
         if (repository == null) {
-            repository = resourceFactory.createRepository(baseDir.toURI());
+            repository = metadataFactory.createRepository(baseDir.toURI());
             try {
                 repositoryDAO.saveRepository(repository);
             } catch (IOException ex) {

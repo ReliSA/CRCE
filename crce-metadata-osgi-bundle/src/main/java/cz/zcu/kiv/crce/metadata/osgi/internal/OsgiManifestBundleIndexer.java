@@ -15,6 +15,23 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *//*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
@@ -58,7 +75,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -74,7 +91,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     public static final String BUNDLE_LICENSE = "Bundle-License";
     public static final String BUNDLE_SOURCE = "Bundle-Source";
 
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService;
 
     @Override
@@ -279,7 +296,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         Clause[] imports = Parser.parseHeader(headers.getHeader(Constants.IMPORT_SERVICE));
         for (int i = 0; imports != null && i < imports.length; i++) {
 //            RequirementImpl ri = new RequirementImpl(Capability.SERVICE);
-            Requirement ri = resourceFactory.createRequirement(NsOsgiService.NAMESPACE__OSGI_SERVICE);
+            Requirement ri = metadataFactory.createRequirement(NsOsgiService.NAMESPACE__OSGI_SERVICE);
             createServiceFilter(ri, imports[i]);
             ri.setDirective("text", "Import Service " + imports[i].getName()); // TODO constant
 
@@ -316,7 +333,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     private Capability createServiceCapability(Clause clause) {
-        Capability capability = resourceFactory.createCapability(NsOsgiService.NAMESPACE__OSGI_SERVICE);
+        Capability capability = metadataFactory.createCapability(NsOsgiService.NAMESPACE__OSGI_SERVICE);
         capability.setAttribute(NsOsgiService.ATTRIBUTE__NAME, clause.getName());
         Attribute[] attributes = clause.getAttributes();
         if (attributes != null) {
@@ -333,7 +350,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         if (clauses != null && clauses.length == 1) {
             // We are a fragment, create a requirement
             // to our host.
-            Requirement r = resourceFactory.createRequirement(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+            Requirement r = metadataFactory.createRequirement(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
             r.addAttribute(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME, clauses[0].getName());
             appendVersion(r, NsOsgiBundle.ATTRIBUTE__VERSION, VersionRange.parseVersionRange(clauses[0].getAttribute(Constants.BUNDLE_VERSION_ATTRIBUTE)));
             r.setDirective("text", "Required Host " + clauses[0].getName()); // TODO constant
@@ -345,7 +362,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
             // And insert a capability that we are available
             // as a fragment. ### Do we need that with extend?
-            Capability capability = resourceFactory.createCapability(NsOsgiFragment.NAMESPACE__OSGI_FRAGMENT);
+            Capability capability = metadataFactory.createCapability(NsOsgiFragment.NAMESPACE__OSGI_FRAGMENT);
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__HOST, clauses[0].getName());
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__VERSION, new Version(getVersion(clauses[0])));
             capability.setResource(resource);
@@ -358,7 +375,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private void doRequires(Resource resource, Headers headers) throws IOException {
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.REQUIRE_BUNDLE));
         for (int i = 0; clauses != null && i < clauses.length; i++) {
-            Requirement r = resourceFactory.createRequirement(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+            Requirement r = metadataFactory.createRequirement(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
 
             VersionRange v = VersionRange.parseVersionRange(clauses[i].getAttribute(Constants.BUNDLE_VERSION_ATTRIBUTE));
 
@@ -375,7 +392,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     private Capability doBundle(Resource resource, Headers headers) throws IOException {
-        Capability capability = resourceFactory.createCapability(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+        Capability capability = metadataFactory.createCapability(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
         capability.setAttribute(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME, getSymbolicName(headers));
         if (headers.getHeader(Constants.BUNDLE_NAME) != null) {
             capability.setAttribute(NsOsgiBundle.ATTRIBUTE__PRESENTATION_NAME, headers.getHeader(Constants.BUNDLE_NAME));
@@ -403,7 +420,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     @SuppressWarnings("deprecation")
     private Capability createCapability(Clause clause) {
-        Capability capability = resourceFactory.createCapability(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
+        Capability capability = metadataFactory.createCapability(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         capability.setAttribute(NsOsgiPackage.ATTRIBUTE__NAME, clause.getName());
         capability.setAttribute(NsOsgiPackage.ATTRIBUTE__VERSION, new Version(getVersion(clause)));
         Attribute[] attributes = clause.getAttributes();
@@ -426,7 +443,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private void doImports(Resource resource, Headers headers) throws IOException {
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.IMPORT_PACKAGE));
         for (int i = 0; clauses != null && i < clauses.length; i++) {
-            Requirement requirement = resourceFactory.createRequirement(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
+            Requirement requirement = metadataFactory.createRequirement(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
 
             createImportFilter(requirement, NsOsgiPackage.ATTRIBUTE__NAME, clauses[i]);
             requirement.setDirective("text", "Import package " + clauses[i]); // TODO constant
@@ -486,7 +503,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         @SuppressWarnings("deprecation")
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT));
         if (clauses != null && clauses.length > 0) {
-            Requirement req = resourceFactory.createRequirement(NsOsgiExecutionEnvironment.NAMESPACE__OSGI_EXECUTION_ENVIRONMENT);
+            Requirement req = metadataFactory.createRequirement(NsOsgiExecutionEnvironment.NAMESPACE__OSGI_EXECUTION_ENVIRONMENT);
             req.setDirective("operation", "or"); // TODO constant
 
             StringBuilder sb = new StringBuilder();

@@ -34,7 +34,7 @@ import cz.zcu.kiv.crce.handler.metrics.impl.WTCoupMetrics;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -48,7 +48,7 @@ public class MetricsIndexer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
 	
-	private ResourceFactory resourceFactory;
+	private MetadataFactory metadataFactory;
 	private MetadataService metadataService;
 	
 	private List<ClassMetrics> classesMetrics;
@@ -56,11 +56,11 @@ public class MetricsIndexer {
 	/**
 	 * New instance.
 	 * 
-	 * @param resourceFactory ResourceFactory
+	 * @param metadataFactory MetadataFactory
 	 * @param metadataService MetadataService
 	 */
-	public MetricsIndexer(@Nonnull ResourceFactory resourceFactory, @Nonnull MetadataService metadataService) {
-		this.resourceFactory = resourceFactory;
+	public MetricsIndexer(@Nonnull MetadataFactory metadataFactory, @Nonnull MetadataService metadataService) {
+		this.metadataFactory = metadataFactory;
 		this.metadataService = metadataService;
 	}
 	
@@ -234,7 +234,7 @@ public class MetricsIndexer {
 	 */
 	private Capability createMetricsCapability(String name, Object value) {
 		
-		Capability metricsCapability = resourceFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
+		Capability metricsCapability = metadataFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
 		metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
 		if (value instanceof Long) {
 			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (Long)value);		

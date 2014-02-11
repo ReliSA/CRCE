@@ -248,6 +248,6 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
 
     @Override
     public String toString() {
-        return ResourceFactoryImpl.toString(this);
+        return MetadataFactoryImpl.toString(this);
     }
 }

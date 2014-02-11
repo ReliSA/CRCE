@@ -46,11 +46,13 @@ public interface Requirement extends DirectiveProvider, EqualityComparable<Requi
     @Nonnull
     <T> List<Attribute<T>> getAttributes(@Nonnull AttributeType<T> type);
 
-    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value);
+    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
 
-    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @CheckForNull T value, @Nonnull Operator operator);
+    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
 
     // TODO is this method AttributeType implementation-safe?
+    <T> boolean addAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
+
     <T> boolean addAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
 
     <T> boolean addAttribute(@Nonnull Attribute<T> attribute);

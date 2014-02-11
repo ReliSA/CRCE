@@ -160,7 +160,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		newRequest();
 		logger.debug("Request ({}) - Get bundle by id request was received.", getRequestId());
 
-        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
         requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
 		try {
@@ -189,7 +189,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
 
 		logger.debug("Request ({}) - Get bundle by name and version request was received.", getRequestId());
 
-        Requirement requirement = Activator.instance().getResourceFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
 
         if (name == null) {
 			logger.debug("Request ({}) - Wrong request, name of requested bundle has to be set.", getRequestId());

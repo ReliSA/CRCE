@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
@@ -25,7 +25,7 @@ public class MetricsIndexerActionHandler extends AbstractActionHandler {
 	private volatile TaskRunnerService taskRunnerService;
 	private volatile MetadataService metadataService;
 	private volatile MetadataValidator metadataValidator;
-	private volatile ResourceFactory resourceFactory;
+	private volatile MetadataFactory metadataFactory;
 	private volatile ResourceDAO resourceDAO;
 	
 	@Override
@@ -33,7 +33,7 @@ public class MetricsIndexerActionHandler extends AbstractActionHandler {
 		
 		logger.debug("afterPutToStore called.");
 		
-		MetricsIndexer metricsIndexer = new MetricsIndexer(resourceFactory, metadataService);
+		MetricsIndexer metricsIndexer = new MetricsIndexer(metadataFactory, metadataService);
 		
 		MetricsIndexerTask task = new MetricsIndexerTask(resource.getId(), metadataService, metadataValidator, metricsIndexer, resource, resourceDAO);
 		

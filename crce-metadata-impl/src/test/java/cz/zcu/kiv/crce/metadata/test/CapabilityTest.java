@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
-import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -22,7 +22,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  */
 public class CapabilityTest {
 
-    private ResourceFactory factory;
+    private MetadataFactory factory;
 
     private final AttributeType<String> ATTR_P1 = new SimpleAttributeType<>("p1", String.class);
     private final AttributeType<Long> ATTR_P2 = new SimpleAttributeType<>("p2", Long.class);
@@ -30,7 +30,7 @@ public class CapabilityTest {
 
     @Before
     public void before(){
-        factory = new ResourceFactoryImpl();
+        factory = new MetadataFactoryImpl();
     }
 
     @Test

@@ -10,9 +10,9 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.internal.ResourceDAOImpl;
-import cz.zcu.kiv.crce.metadata.internal.ResourceFactoryImpl;
+import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 import java.io.IOException;
 import static junit.framework.TestCase.assertTrue;
 
@@ -25,11 +25,11 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class ResourceTest {
 
-    private ResourceFactory factory;
+    private MetadataFactory factory;
 
     @Before
     public void before() throws Exception {
-        factory = new ResourceFactoryImpl();
+        factory = new MetadataFactoryImpl();
     }
 
 

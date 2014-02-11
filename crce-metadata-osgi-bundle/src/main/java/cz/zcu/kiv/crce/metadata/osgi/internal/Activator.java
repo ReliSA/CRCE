@@ -5,7 +5,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -19,7 +19,7 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(OsgiManifestBundleIndexer.class)
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 );
     }

@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -23,13 +22,13 @@ public class AttributeImpl<T> implements Attribute<T> {
     private AttributeType<T> type;
     private Operator operator;
 
-    public AttributeImpl(AttributeType<T> type, T value, Operator operator) {
+    public AttributeImpl(@Nonnull AttributeType<T> type, @Nonnull T value, Operator operator) {
         this.value = value;
         this.type = type;
-        this.operator = operator;
+        this.operator = operator != null ? operator : Operator.EQUAL;
     }
 
-    public AttributeImpl(@Nonnull AttributeType<T> type, @Nullable T value) {
+    public AttributeImpl(@Nonnull AttributeType<T> type, @Nonnull T value) {
         this(type, value, Operator.EQUAL);
     }
 
@@ -109,6 +108,6 @@ public class AttributeImpl<T> implements Attribute<T> {
 
     @Override
     public String toString() {
-        return ResourceFactoryImpl.toString(this);
+        return MetadataFactoryImpl.toString(this);
     }
 }

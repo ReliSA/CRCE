@@ -13,22 +13,25 @@ import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
  * Implementation of
- * <code>ResourceFactory</code> interface.
+ * <code>MetadataFactory</code> interface.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-@Component(provides = ResourceFactory.class)
-public class ResourceFactoryImpl implements ResourceFactory {
+@Component(provides = MetadataFactory.class)
+public class MetadataFactoryImpl implements MetadataFactory {
 
     @ServiceDependency(required = false)
     private static LogHelper logHelper;
@@ -74,6 +77,27 @@ public class ResourceFactoryImpl implements ResourceFactory {
     }
 
     @Override
+    public <T> Attribute<T> createAttribute(AttributeType<T> type, T value) {
+        return createAttribute(type, value, Operator.EQUAL);
+    }
+
+    @Override
+    public <T> Attribute<T> createAttribute(AttributeType<T> type, T value, Operator operator) {
+        return new AttributeImpl<>(type, value, operator);
+    }
+
+    @Override
+    public <T> Attribute<T> createAttribute(String name, Class<T> type, T value) {
+        return createAttribute(name, type, value, Operator.EQUAL);
+    }
+
+    @Override
+    public <T> Attribute<T> createAttribute(String name, Class<T> type, T value, Operator operator) {
+        AttributeType<T> attributeType = new SimpleAttributeType<>(name, type);
+        return createAttribute(attributeType, value, operator);
+    }
+
+    @Override
     public Repository createRepository(URI uri) {
         return new RepositoryImpl(uri);
     }
@@ -96,6 +120,11 @@ public class ResourceFactoryImpl implements ResourceFactory {
     @Override
     public <T extends EqualityComparable<T>> Property<T> cloneProperty(Property<T> property) {
         return clone(property);
+    }
+
+    @Override
+    public <T> Attribute<T> cloneAttribute(Attribute<T> attribute) {
+        return clone(attribute);
     }
 
     private String generateId() {

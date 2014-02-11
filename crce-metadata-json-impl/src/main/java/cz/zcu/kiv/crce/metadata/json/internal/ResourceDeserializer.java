@@ -35,7 +35,7 @@ import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
@@ -47,10 +47,10 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceDeserializer.class);
 
-    private final ResourceFactory resourceFactory;
+    private final MetadataFactory metadataFactory;
 
-    public ResourceDeserializer(ResourceFactory resourceFactory) {
-        this.resourceFactory = resourceFactory;
+    public ResourceDeserializer(MetadataFactory metadataFactory) {
+        this.metadataFactory = metadataFactory;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
         JsonNode id = root.findValue(Constants.RESOURCE__ID);
         Resource resource =
-                id == null ? resourceFactory.createResource() : resourceFactory.createResource(id.asText());
+                id == null ? metadataFactory.createResource() : metadataFactory.createResource(id.asText());
 
         Iterator<Entry<String, JsonNode>> fields = root.fields();
         while (fields.hasNext()) {
@@ -98,7 +98,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                 case Constants.REPOSITORY__URI:
                     Repository repository;
                     try {
-                        repository = resourceFactory.createRepository(new URI(node.getValue().asText()));
+                        repository = metadataFactory.createRepository(new URI(node.getValue().asText()));
                     } catch (URISyntaxException ex) {
                         throw new IOException("Invalid URI: " + node.getValue().asText(), ex);
                     }
@@ -129,8 +129,8 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
                     final Capability capability =
                             id == null
-                            ? resourceFactory.createCapability(namespace.asText())
-                            : resourceFactory.createCapability(namespace.asText(), id.asText());
+                            ? metadataFactory.createCapability(namespace.asText())
+                            : metadataFactory.createCapability(namespace.asText(), id.asText());
 
                     resource.addCapability(capability);
                     capability.setResource(resource);
@@ -208,8 +208,8 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
                     final Requirement requirement =
                             id == null
-                            ? resourceFactory.createRequirement(namespace.asText())
-                            : resourceFactory.createRequirement(namespace.asText(), id.asText());
+                            ? metadataFactory.createRequirement(namespace.asText())
+                            : metadataFactory.createRequirement(namespace.asText(), id.asText());
 
                     requirement.setResource(resource);
                     if (parent == null) {
@@ -275,9 +275,9 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
                     final Property property;
                     if (id == null) {
-                        property = resourceFactory.createProperty(namespace.asText());
+                        property = metadataFactory.createProperty(namespace.asText());
                     } else {
-                        property = resourceFactory.createProperty(namespace.asText(), id.asText());
+                        property = metadataFactory.createProperty(namespace.asText(), id.asText());
                     }
 
                     property.setParent((EqualityComparable) parent); // TODO Property related genericity/interfaces are weird

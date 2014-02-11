@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
@@ -49,7 +49,7 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile BundleContext context;
     private volatile PluginManager pluginManager;
     private volatile Store store;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile ResourceDAO resourceDAO;
     private volatile RepositoryDAO repositoryDAO;
     private volatile ResourceIndexerService resourceIndexerService;
@@ -106,7 +106,7 @@ public class BufferImpl implements Buffer, EventHandler {
         }
 
         if (repository == null) {
-            repository = resourceFactory.createRepository(baseDir.toURI());
+            repository = metadataFactory.createRepository(baseDir.toURI());
             try {
                 repositoryDAO.saveRepository(repository);
             } catch (IOException ex) {
@@ -154,7 +154,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //            m_repository = rd.getRepository(m_baseDir.toURI());
 //        } catch (IOException ex) {
 //        	logger.error("Could not get repository for URI: {}", m_baseDir.toURI(), ex);
-//            m_repository = m_pluginManager.getPlugin(ResourceFactory.class).createRepository(m_baseDir.toURI());
+//            m_repository = m_pluginManager.getPlugin(MetadataFactory.class).createRepository(m_baseDir.toURI());
 //        }
     }
 
@@ -318,7 +318,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     // to keep consistency of repository with stored artifact files
 //                    if (!m_repository.removeResource(resource)) {
 //                        // cleanup (after renamed resource)
-//                        Resource fake = m_resourceFactory.createResource();
+//                        Resource fake = m_metadataFactory.createResource();
 //                        fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
 //                        fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
 //                        if (!m_repository.removeResource(fake)) {
@@ -330,7 +330,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 }
 //                if (!m_repository.removeResource(resource)) {
 //                    // cleanup (after renamed resource)
-//                    Resource fake = m_resourceFactory.createResource();
+//                    Resource fake = m_metadataFactory.createResource();
 //                    fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
 //                    fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
 //                    if (!m_repository.removeResource(fake)) {

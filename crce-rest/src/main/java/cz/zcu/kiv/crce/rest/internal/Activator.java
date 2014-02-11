@@ -5,7 +5,7 @@ import org.apache.felix.dm.DependencyManager;
 
 import org.osgi.framework.BundleContext;
 
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Store;
@@ -24,7 +24,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile MetadataService metadataService;
     private volatile ConvertorToBeans convertorToBeans;
     private volatile MimeTypeSelector mimeTypeSelector;
-    private volatile ResourceFactory resourceFactory;
+    private volatile MetadataFactory metadataFactory;
     private volatile FilterParser filterParser;
 
     public static Activator instance() {
@@ -47,8 +47,8 @@ public final class Activator extends DependencyActivatorBase {
         return mimeTypeSelector;
     }
 
-    public ResourceFactory getResourceFactory() {
-        return resourceFactory;
+    public MetadataFactory getMetadataFactory() {
+        return metadataFactory;
     }
 
     public FilterParser getFilterParser() {
@@ -72,7 +72,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(ConvertorToBeans.class).setRequired(true))
                 .add(createServiceDependency().setService(MimeTypeSelector.class).setRequired(true))
-                .add(createServiceDependency().setService(ResourceFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
         );
     }

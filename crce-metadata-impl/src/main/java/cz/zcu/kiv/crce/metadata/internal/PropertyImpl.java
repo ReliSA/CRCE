@@ -115,6 +115,6 @@ public class PropertyImpl<T extends EqualityComparable<T>> extends AttributeProv
     
     @Override
     public String toString() {
-        return ResourceFactoryImpl.toString(this);
+        return MetadataFactoryImpl.toString(this);
     }
 }

@@ -224,6 +224,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
 
     @Override
     public String toString() {
-        return ResourceFactoryImpl.toString(this);
+        return MetadataFactoryImpl.toString(this);
     }
 }

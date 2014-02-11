@@ -5,7 +5,7 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
 import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
-import cz.zcu.kiv.crce.metadata.ResourceFactory;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
@@ -31,7 +31,7 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))                
-                .add(createServiceDependency().setRequired(true).setService(ResourceFactory.class))                
+                .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))                
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))                
                 );		
 	}
