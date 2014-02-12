@@ -297,18 +297,4 @@ public class ResolverLoaderIT extends IntegrationTestBase {
         assertTrue(resources.contains(resource3));
     }
 
-    @Test
-    public void testRequirementWithNotOperatorDirective() throws Exception {
-        Requirement requirement = metadataFactory.createRequirement("osgi.wiring.package");
-
-        requirement.addAttribute("name", String.class, "cz.zcu.kiv.test.helper", Operator.EQUAL);
-        requirement.addAttribute("version", Version.class, new Version("1.0.0"), Operator.EQUAL);
-        requirement.setDirective("operator", "not");
-
-        List<Resource> resources = resourceLoader.getResources(repository, requirement);
-
-        assertFalse(resources.contains(resource1));
-        assertTrue(resources.contains(resource2));
-        assertTrue(resources.contains(resource3));
-    }
 }
