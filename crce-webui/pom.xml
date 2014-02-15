@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +19,8 @@
 
     <properties>
         <bundle.symbolicName>${namespace}.webui</bundle.symbolicName>
-        <bundle.namespace>${namespace}.webui</bundle.namespace>  <!-- !!! -->
+        <bundle.namespace>${namespace}.webui</bundle.namespace>
+        <!-- !!! -->
     </properties>
 
 
@@ -28,7 +30,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>WEB-INF/web.xml</packagingExcludes>
-<!--                    <warSourceExcludes>WEB-INF/lib/ace-*.jar,WEB-INF/lib/xpp3-1.1.4c.jar,WEB-INF/lib/gwt-dnd-2.6.5.jar</warSourceExcludes>-->
+                    <!--                    <warSourceExcludes>WEB-INF/lib/ace-*.jar,WEB-INF/lib/xpp3-1.1.4c.jar,WEB-INF/lib/gwt-dnd-2.6.5.jar</warSourceExcludes>-->
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
@@ -162,37 +164,31 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-service-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
