@@ -96,7 +96,7 @@ public class WTCohMetrics implements ComponentMetrics {
             				FieldMetrics[] vI = methodI.getUsedInClassFields();
             				FieldMetrics[] vJ = methodJ.getUsedInClassFields();
             				
-            				int unificationVIVJSize = vI.length;
+            				int unionVIVJSize = vI.length;
             				int intersectionVIVJSize = 0;
             				
             				for (FieldMetrics fieldJ : vJ) {
@@ -114,13 +114,13 @@ public class WTCohMetrics implements ComponentMetrics {
             						intersectionVIVJSize += 1;
             					}
             					else {
-            						unificationVIVJSize += 1;
+            						unionVIVJSize += 1;
             					}
             				}
             				
     						double simD = 0;
-    						if (unificationVIVJSize != 0) {
-    							simD = (double)intersectionVIVJSize / unificationVIVJSize;
+    						if (unionVIVJSize != 0) {
+    							simD = (double)intersectionVIVJSize / unionVIVJSize;
     						}
     						   						
     						sim[i][j] = sim[j][i] = simD;

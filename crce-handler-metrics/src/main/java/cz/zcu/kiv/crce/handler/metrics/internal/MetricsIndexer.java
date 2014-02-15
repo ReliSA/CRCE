@@ -98,6 +98,10 @@ public class MetricsIndexer {
 	/**
 	 * Create metrics objects, compute metrics and computed values put into Resource.
 	 * 
+	 * This method is a point, where to add new implemented metrics. You should create metrics computing object
+	 * and add it to at least 'allMetrics' collection (init call). You probably will add it to at least one other
+	 * metrics collection to compute values and add it into metadata.   
+	 * 
 	 * @param resource Resource to save computed data.
 	 */
 	public void computeAndSaveMetrics(Resource resource) {

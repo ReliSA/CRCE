@@ -204,6 +204,20 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 		return cyclomaticComplexity;
 	}
 	
+	/**
+	 * Implementation of method complexity metrics introduced in 
+	 * 'A Complexity Measure' - McCabe, T.J. (1976)
+	 * 
+	 * In this implementation, we assume, that all end-nodes (e.g. return) are equal
+	 * and are connected to one imaginary end-node.
+	 * 
+	 * @see <a href="http://ieeexplore.ieee.org/xpl/login.jsp?tp=&arnumber=1702388&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D1702388">A Complexity Measure</a>
+	 * 
+	 * @param className Name of class (full) where method is defined.
+	 * @param methodNode ASM MethodNode to parse code.
+	 * @return McCabe's Cyclomatic Complexity.
+	 * @throws AnalyzerException ASM exception, thrown if a problem occurs during the analysis.
+	 */
 	private int computeCyclomaticComplexity(String className, MethodNode methodNode) throws AnalyzerException {
 		
 		Analyzer a = new Analyzer(new BasicInterpreter()) {
@@ -233,6 +247,6 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 				nodes += 1;
 			}
 		}
-		return edges - nodes + 1 + endNodes;
+		return edges - nodes + 2 + endNodes - 1;
 	}
 }
