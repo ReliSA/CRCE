@@ -17,14 +17,14 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  *
  * @author Jakub Danek
  */
-public class CompatibilityCalculationTask extends Task {
+public class CompatibilityCalculationTask extends Task<Object> {
     private static final Logger logger = LoggerFactory.getLogger(CompatibilityCalculationTask.class);
 
-    private volatile CompatibilityService m_compatibilityService;      //injected by dependency manager
+    private volatile CompatibilityService compatibilityService;      //injected by dependency manager
 
-    private volatile MetadataService m_metadataService; //injected by dependency manager
+    private volatile MetadataService metadataService; //injected by dependency manager
 
-    private Resource resource;
+    private final Resource resource;
 
     /**
      *
@@ -38,9 +38,9 @@ public class CompatibilityCalculationTask extends Task {
 
     @Override
     protected Object run() throws Exception {
-        String symbolicName = m_metadataService.getPresentationName(resource);
+        String symbolicName = metadataService.getPresentationName(resource);
         logger.debug("Started calculation of Compatibility data for resource {}", symbolicName);
-        Object o = m_compatibilityService.calculateCompatibilities(resource);
+        Object o = compatibilityService.calculateCompatibilities(resource);
         logger.debug("Finished calculation of Compatibility data for resource {}", symbolicName);
         return o;
     }
