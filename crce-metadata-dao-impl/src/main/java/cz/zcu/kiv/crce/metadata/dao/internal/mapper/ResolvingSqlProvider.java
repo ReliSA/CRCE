@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.jdbc.SQL;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.dao.internal.helper.SimpleStringBuilder;
@@ -50,6 +50,7 @@ public class ResolvingSqlProvider {
                 }
 
                 WHERE("c.namespace = #{namespace}");
+                WHERE("r.repository_id = #{repositoryId}");
             }
         }.toString();
 
@@ -71,6 +72,7 @@ public class ResolvingSqlProvider {
                 INNER_JOIN("capability c ON c.resource_id = r.resource_id");
                 INNER_JOIN("capability_attribute ca ON ca.capability_id = c.capability_id");
                 WHERE("c.namespace = #{namespace}");
+                WHERE("r.repository_id = #{repositoryId}");
 
                 SimpleStringBuilder sb = new SimpleStringBuilder();
                 sb.append("(");
