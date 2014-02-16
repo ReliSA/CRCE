@@ -17,4 +17,6 @@ public interface MetadataJsonMapper {
     String serialize(Entity entity, boolean prettyPrint);
 
     Resource deserialize(String json);
+
+    <T extends Entity> T deserialize(String json, Class<T> entity);
 }

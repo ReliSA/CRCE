@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -39,28 +37,37 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
-/**
- *
- * @author Jiri Kucera (jiri.kucera@kalwi.eu)
- */
-public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceDeserializer.class);
+@ParametersAreNonnullByDefault
+public class MetadataDeserializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataDeserializer.class);
 
     private final MetadataFactory metadataFactory;
 
-    public ResourceDeserializer(MetadataFactory metadataFactory) {
+    public MetadataDeserializer(MetadataFactory metadataFactory) {
         this.metadataFactory = metadataFactory;
     }
 
-    @Override
-    public Resource deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        ObjectCodec codec = jp.getCodec();
-        JsonNode root = codec.readTree(jp);
+    Resource deserializeResource(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        return deserializeResource((JsonNode) jp.getCodec().readTree(jp));
+    }
 
+    Requirement deserializeRequirement(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        return deserializeRequirement((JsonNode) jp.getCodec().readTree(jp), null, null);
+    }
+
+    Capability deserializeCapability(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        return deserializeCapability((JsonNode) jp.getCodec().readTree(jp), null, null);
+    }
+
+    Property deserializeProperty(JsonParser jp, DeserializationContext ctxt) throws IOException {
+        return deserializeProperty((JsonNode) jp.getCodec().readTree(jp), null);
+    }
+
+    private Resource deserializeResource(JsonNode root) throws IOException, JsonProcessingException {
         JsonNode id = root.findValue(Constants.RESOURCE__ID);
-        Resource resource =
-                id == null ? metadataFactory.createResource() : metadataFactory.createResource(id.asText());
+        Resource resource = id == null ? metadataFactory.createResource() : metadataFactory.createResource(id.asText());
 
         Iterator<Entry<String, JsonNode>> fields = root.fields();
         while (fields.hasNext()) {
@@ -90,7 +97,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
         return resource;
     }
 
-    private void deserializeRepository(Resource resource, JsonNode root) throws IOException, JsonProcessingException {
+    private void deserializeRepository(Resource resource, JsonNode root) throws IOException {
         Iterator<Entry<String, JsonNode>> fields = root.fields();
         while (fields.hasNext()) {
             Entry<String, JsonNode> node = fields.next();
@@ -111,7 +118,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
     }
 
     @SuppressWarnings("unchecked")
-    private void deserializeCapabilities(@Nonnull Resource resource, @CheckForNull Capability parent, @Nonnull JsonNode root) {
+    private void deserializeCapabilities(@CheckForNull Resource resource, @CheckForNull Capability parent, JsonNode root) {
         switch (root.getNodeType()) {
             case NULL:
                 return;
@@ -119,61 +126,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
             case ARRAY: {
                 Iterator<JsonNode> capabilityNodes = root.elements();
                 while (capabilityNodes.hasNext()) {
-                    JsonNode capabilityNode = capabilityNodes.next();
-
-                    JsonNode namespace = capabilityNode.findValue(Constants.CAPABILITY__NAMESPACE);
-                    if (namespace == null || !namespace.isTextual()) {
-                        throw new IllegalArgumentException("Textual namespace is mandatory for capability: " + capabilityNode);
-                    }
-                    JsonNode id = capabilityNode.findValue(Constants.CAPABILITY__ID);
-
-                    final Capability capability =
-                            id == null
-                            ? metadataFactory.createCapability(namespace.asText())
-                            : metadataFactory.createCapability(namespace.asText(), id.asText());
-
-                    resource.addCapability(capability);
-                    capability.setResource(resource);
-                    if (parent == null) {
-                        resource.addRootCapability(capability);
-                    } else {
-                        parent.addChild(capability);
-                        capability.setParent(parent);
-                    }
-
-                    Iterator<Entry<String, JsonNode>> fields = capabilityNode.fields();
-                    while (fields.hasNext()) {
-                        Entry<String, JsonNode> node = fields.next();
-                        switch (node.getKey()) {
-                            case Constants.CAPABILITY__ATTRIBUTES:
-                                deserializeAttributes(
-                                        new AttributeProviderCallback() {
-
-                                            @Override
-                                            public void addAttribute(AttributeType type, Object value, Operator operator) {
-                                                capability.setAttribute(type, value, operator);
-                                            }
-                                        },
-                                        node.getValue()
-                                );
-                                continue;
-
-                            case Constants.CAPABILITY__DIRECTIVES:
-                                deserializeDirectives(capability, node.getValue());
-                                continue;
-
-                            case Constants.CAPABILITY__PROPERTIES:
-                                deserializeProperties(capability, node.getValue());
-                                continue;
-
-                            case Constants.CAPABILITY__CHILDREN:
-                                deserializeCapabilities(resource, capability, node.getValue());
-                                continue;
-
-                            default:
-                                logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
-                        }
-                    }
+                    deserializeCapability(capabilityNodes.next(), resource, parent);
                 }
                 break;
             }
@@ -184,13 +137,76 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
 
     }
 
+    private Capability deserializeCapability(JsonNode capabilityNode, @CheckForNull Resource resource, @CheckForNull Capability parent)
+            throws IllegalArgumentException {
+
+        JsonNode namespace = capabilityNode.findValue(Constants.CAPABILITY__NAMESPACE);
+        if (namespace == null || !namespace.isTextual()) {
+            throw new IllegalArgumentException("Textual namespace is mandatory for capability: " + capabilityNode);
+        }
+        JsonNode id = capabilityNode.findValue(Constants.CAPABILITY__ID);
+
+        final Capability capability =
+                id == null
+                ? metadataFactory.createCapability(namespace.asText())
+                : metadataFactory.createCapability(namespace.asText(), id.asText());
+
+        if (resource != null) {
+            resource.addCapability(capability);
+            capability.setResource(resource);
+        }
+        if (parent == null) {
+            if (resource != null) {
+                resource.addRootCapability(capability);
+            }
+        } else {
+            parent.addChild(capability);
+            capability.setParent(parent);
+        }
+
+        Iterator<Entry<String, JsonNode>> fields = capabilityNode.fields();
+        while (fields.hasNext()) {
+            Entry<String, JsonNode> node = fields.next();
+            switch (node.getKey()) {
+                case Constants.CAPABILITY__ATTRIBUTES:
+                    deserializeAttributes(
+                            new AttributeProviderCallback() {
+
+                                @Override
+                                public void addAttribute(AttributeType type, Object value, Operator operator) {
+                                    capability.setAttribute(type, value, operator);
+                                }
+                            },
+                            node.getValue()
+                    );
+                    continue;
+
+                case Constants.CAPABILITY__DIRECTIVES:
+                    deserializeDirectives(capability, node.getValue());
+                    continue;
+
+                case Constants.CAPABILITY__PROPERTIES:
+                    deserializeProperties(capability, node.getValue());
+                    continue;
+
+                case Constants.CAPABILITY__CHILDREN:
+                    deserializeCapabilities(resource, capability, node.getValue());
+                    continue;
+
+                default:
+                    logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
+            }
+        }
+        return capability;
+    }
+
     private interface AttributeProviderCallback {
 
-        <T> void addAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
+        <T> void addAttribute(AttributeType<T> type, T value, Operator operator);
     }
 
     @SuppressWarnings("unchecked")
-    private void deserializeRequirements(@Nonnull Resource resource, @CheckForNull Requirement parent, @Nonnull JsonNode root) {
+    private void deserializeRequirements(@CheckForNull Resource resource, @CheckForNull Requirement parent, JsonNode root) {
         switch (root.getNodeType()) {
             case NULL:
                 return;
@@ -200,53 +216,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                 while (requirementNodes.hasNext()) {
                     JsonNode requirementNode = requirementNodes.next();
 
-                    JsonNode namespace = requirementNode.findValue(Constants.REQUIREMENT__NAMESPACE);
-                    if (namespace == null || !namespace.isTextual()) {
-                        throw new IllegalArgumentException("Textual namespace is mandatory for requirement: " + requirementNode);
-                    }
-                    JsonNode id = requirementNode.findValue(Constants.REQUIREMENT__ID);
-
-                    final Requirement requirement =
-                            id == null
-                            ? metadataFactory.createRequirement(namespace.asText())
-                            : metadataFactory.createRequirement(namespace.asText(), id.asText());
-
-                    requirement.setResource(resource);
-                    if (parent == null) {
-                        resource.addRequirement(requirement);
-                    } else {
-                        parent.addChild(requirement);
-                        requirement.setParent(parent);
-                    }
-                    Iterator<Entry<String, JsonNode>> fields = requirementNode.fields();
-                    while (fields.hasNext()) {
-                        Entry<String, JsonNode> node = fields.next();
-                        switch (node.getKey()) {
-                            case Constants.REQUIREMENT__ATTRIBUTES:
-                                deserializeAttributes(
-                                        new AttributeProviderCallback() {
-
-                                            @Override
-                                            public void addAttribute(AttributeType type, Object value, Operator operator) {
-                                                requirement.addAttribute(type, value, operator);
-                                            }
-                                        },
-                                        node.getValue()
-                                );
-                                continue;
-
-                            case Constants.REQUIREMENT__DIRECTIVES:
-                                deserializeDirectives(requirement, node.getValue());
-                                continue;
-
-                            case Constants.REQUIREMENT__CHILDREN:
-                                deserializeRequirements(resource, requirement, node.getValue());
-                                continue;
-
-                            default:
-                                logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
-                        }
-                    }
+                    deserializeRequirement(requirementNode, resource, parent);
                 }
                 break;
             }
@@ -256,8 +226,65 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
         }
     }
 
+    private Requirement deserializeRequirement(JsonNode requirementNode, @CheckForNull Resource resource, @CheckForNull Requirement parent)
+            throws IllegalArgumentException {
+
+        JsonNode namespace = requirementNode.findValue(Constants.REQUIREMENT__NAMESPACE);
+        if (namespace == null || !namespace.isTextual()) {
+            throw new IllegalArgumentException("Textual namespace is mandatory for requirement: " + requirementNode);
+        }
+        JsonNode id = requirementNode.findValue(Constants.REQUIREMENT__ID);
+
+        final Requirement requirement =
+                id == null
+                ? metadataFactory.createRequirement(namespace.asText())
+                : metadataFactory.createRequirement(namespace.asText(), id.asText());
+
+        if (resource != null) {
+            requirement.setResource(resource);
+        }
+        if (parent == null) {
+            if (resource != null) {
+                resource.addRequirement(requirement);
+            }
+        } else {
+            parent.addChild(requirement);
+            requirement.setParent(parent);
+        }
+        Iterator<Entry<String, JsonNode>> fields = requirementNode.fields();
+        while (fields.hasNext()) {
+            Entry<String, JsonNode> node = fields.next();
+            switch (node.getKey()) {
+                case Constants.REQUIREMENT__ATTRIBUTES:
+                    deserializeAttributes(
+                            new AttributeProviderCallback() {
+
+                                @Override
+                                public void addAttribute(AttributeType type, Object value, Operator operator) {
+                                    requirement.addAttribute(type, value, operator);
+                                }
+                            },
+                            node.getValue()
+                    );
+                    continue;
+
+                case Constants.REQUIREMENT__DIRECTIVES:
+                    deserializeDirectives(requirement, node.getValue());
+                    continue;
+
+                case Constants.REQUIREMENT__CHILDREN:
+                    deserializeRequirements(resource, requirement, node.getValue());
+                    continue;
+
+                default:
+                    logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
+            }
+        }
+        return requirement;
+    }
+
     @SuppressWarnings("unchecked")
-    private void deserializeProperties(@Nonnull PropertyProvider parent, @Nonnull JsonNode root) {
+    private void deserializeProperties(@CheckForNull PropertyProvider parent, JsonNode root) {
         switch (root.getNodeType()) {
             case NULL:
                 return;
@@ -267,43 +294,7 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
                 while (propertyNodes.hasNext()) {
                     JsonNode propertyNode = propertyNodes.next();
 
-                    JsonNode namespace = propertyNode.findValue(Constants.PROPERTY__NAMESPACE);
-                    if (namespace == null || !namespace.isTextual()) {
-                        throw new IllegalArgumentException("Textual namespace is mandatory for requirement: " + propertyNode);
-                    }
-                    JsonNode id = propertyNode.findValue(Constants.PROPERTY__ID);
-
-                    final Property property;
-                    if (id == null) {
-                        property = metadataFactory.createProperty(namespace.asText());
-                    } else {
-                        property = metadataFactory.createProperty(namespace.asText(), id.asText());
-                    }
-
-                    property.setParent((EqualityComparable) parent); // TODO Property related genericity/interfaces are weird
-                    parent.addProperty(property);
-
-                    Iterator<Entry<String, JsonNode>> fields = propertyNode.fields();
-                    while (fields.hasNext()) {
-                        Entry<String, JsonNode> node = fields.next();
-                        switch (node.getKey()) {
-                            case Constants.PROPERTY__ATTRIBUTES:
-                                deserializeAttributes(
-                                        new AttributeProviderCallback() {
-
-                                            @Override
-                                            public void addAttribute(AttributeType type, Object value, Operator operator) {
-                                                property.setAttribute(type, value, operator);
-                                            }
-                                        },
-                                        node.getValue()
-                                );
-                                continue;
-
-                            default:
-                                logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
-                        }
-                    }
+                    deserializeProperty(propertyNode, parent);
                 }
                 break;
             }
@@ -311,6 +302,49 @@ public class ResourceDeserializer extends JsonDeserializer<Resource> {
             default:
                 logger.warn("Array of capabilities was expected: {}", root);
         }
+    }
+
+    private Property deserializeProperty(JsonNode propertyNode, @CheckForNull PropertyProvider parent) throws IllegalArgumentException {
+        JsonNode namespace = propertyNode.findValue(Constants.PROPERTY__NAMESPACE);
+        if (namespace == null || !namespace.isTextual()) {
+            throw new IllegalArgumentException("Textual namespace is mandatory for requirement: " + propertyNode);
+        }
+        JsonNode id = propertyNode.findValue(Constants.PROPERTY__ID);
+
+        final Property property;
+        if (id == null) {
+            property = metadataFactory.createProperty(namespace.asText());
+        } else {
+            property = metadataFactory.createProperty(namespace.asText(), id.asText());
+        }
+
+        if (parent != null) {
+            property.setParent((EqualityComparable) parent); // TODO Property related genericity/interfaces are weird
+            parent.addProperty(property);
+        }
+
+        Iterator<Entry<String, JsonNode>> fields = propertyNode.fields();
+        while (fields.hasNext()) {
+            Entry<String, JsonNode> node = fields.next();
+            switch (node.getKey()) {
+                case Constants.PROPERTY__ATTRIBUTES:
+                    deserializeAttributes(
+                            new AttributeProviderCallback() {
+
+                                @Override
+                                public void addAttribute(AttributeType type, Object value, Operator operator) {
+                                    property.setAttribute(type, value, operator);
+                                }
+                            },
+                            node.getValue()
+                    );
+                    continue;
+
+                default:
+                    logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
+            }
+        }
+        return property;
     }
 
     private <T> void deserializeAttributes(AttributeProviderCallback callback, JsonNode root) {
