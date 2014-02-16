@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.Version;
@@ -44,15 +45,16 @@ import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  * @author Jan Reznicek
  */
+@ParametersAreNonnullByDefault
 public class VersioningActionHandler extends AbstractActionHandler {
 
-    private TaskRunnerService taskRunnerService;   /* injected by dependency manager */
 
     private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
 
     private static final String CATEGORY_VERSIONED = "versioned";
 
-    private volatile VersionService versionService;   /* injected by dependency manager */
+    private volatile TaskRunnerService taskRunnerService;   // injected by dependency manager
+    private volatile VersionService versionService;   // injected by dependency manager
     //private volatile ResourceDAO m_resourceDao;         //injected by dependency manager
     private volatile MetadataService metadataService; //injected by dependency manager
     private volatile MetadataFactory metadataFactory; //injected by dependency manager
@@ -69,33 +71,10 @@ public class VersioningActionHandler extends AbstractActionHandler {
      */
     private File copyFromStream(InputStream bundleAsStream, URI newLocation) throws IOException {
 
-        if (null == bundleAsStream) {
-            throw new IllegalArgumentException("'null' passed as input stream");
-        }
-
-        OutputStream output = null;
-        File bundleFile;
-        try {
-            bundleFile = new File(newLocation);
-            output = new FileOutputStream(bundleFile);
-            /*byte[] readBuffer = new byte[BUFFER_SIZE];
-            for (int count = bundleAsStream.read(readBuffer); count != -1; count = bundleAsStream.read(readBuffer)) {
-                output.write(readBuffer, 0, count);
-            }*/
+        File bundleFile = new File(newLocation);
+        try (OutputStream output = new FileOutputStream(bundleFile)) {
             IOUtils.copy(bundleAsStream, output);
-        } finally {
-            if (output != null) {
-                try {
-                    output.flush();
-                } catch (IOException e) {
-                    //ignore
-                    logger.debug(e.getMessage(), e);
-                } finally {
-                    IOUtils.closeQuietly(output);
-                }
-            }
         }
-
 
         return bundleFile;
     }
@@ -159,7 +138,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
                 logger.debug("No candidate found");
                 metadataService.addCategory(resource, CATEGORY_VERSIONED);
-                metadataService.addCategory(resource, "initial-version");
+                metadataService.addCategory(resource, "initial-version"); // TODO constant
 
             } else {
 
@@ -182,7 +161,9 @@ public class VersioningActionHandler extends AbstractActionHandler {
                     try (InputStream versionedBundleIs =
                             versionService.createVersionedBundle(baseInputStream, resourceInputStream, options)) {
 
-                        updateResourceMetadata(resource, versionedBundleIs);
+                        if (versionedBundleIs != null) {
+                            updateResourceMetadata(resource, versionedBundleIs);
+                        }
 
                     } catch (IOException e) {
                         logger.error("Could not reload changed resource", e);
@@ -214,7 +195,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
      * @param versionedBundleIs input stream of the newly versioned bundle
      * @throws IOException
      */
-    private void updateResourceMetadata(Resource resource, InputStream versionedBundleIs) throws IOException {
+    private void updateResourceMetadata(Resource resource, @Nonnull InputStream versionedBundleIs) throws IOException {
         //create resource from file with bundle with generated version
         URI resourceURI = metadataService.getUri(resource);
         File versionedBundleFile = copyFromStream(versionedBundleIs, resourceURI);
@@ -264,8 +245,8 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
             String ext = name.substring(name.lastIndexOf("."));
 
-            List<Capability> caps = resource.getCapabilities("file");
-            Capability cap = caps.isEmpty() ? metadataFactory.createCapability("file") : caps.get(0);
+            List<Capability> caps = resource.getCapabilities("file"); // TODO constant
+            Capability cap = caps.isEmpty() ? metadataFactory.createCapability("file") : caps.get(0); // TODO constant
             cap.setAttribute("original-name", String.class, name); // TODO constant
             cap.setAttribute("name", String.class, osgiName + "-" + (osgiVersion != null ? osgiVersion : "0.0.0") + ext); // TODO constant
             // TODO composition of name could be done in some service (maybe some OSGi service similar to MetadataService)

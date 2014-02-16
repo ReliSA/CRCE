@@ -4,6 +4,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
@@ -23,6 +24,7 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(VersioningActionHandler.class)
+                .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
                 .add(createServiceDependency().setRequired(true).setService(VersionService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class))
