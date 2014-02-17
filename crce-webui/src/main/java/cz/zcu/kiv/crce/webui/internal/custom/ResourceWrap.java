@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import org.osgi.framework.Version;
 
@@ -167,6 +168,16 @@ abstract class ResourceWrap extends ResourceAdapter {
         @Override
         public String getName() {
             return capability.getNamespace();
+        }
+        
+        @Override
+        @CheckForNull
+        public cz.zcu.kiv.crce.webui.internal.legacy.Capability getParent() {        	
+        	Capability parentCapability = capability.getParent();
+        	if (parentCapability == null) {
+        		return null;
+        	}
+        	return new CapabilityImpl(parentCapability);
         }
 
         @Override

@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.webui.internal.legacy;
 
+import javax.annotation.CheckForNull;
+
 /**
  * Represents an OBR Capability.
  * 
@@ -8,4 +10,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 public interface Capability extends PropertyProvider<Capability> {
 
     String getName();
+    
+    @CheckForNull
+    Capability getParent();
 }

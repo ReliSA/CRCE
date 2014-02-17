@@ -66,6 +66,13 @@
 	  							<li>
 	  								${capability.name} <a href="edit?type=capability&uri=${resource.uri}&capabilityId=${capabilityId.count}" title="edit capability" class="edit"><!-- <img src="graphic/edit.png" alt="edit capability" title="edit capability" />--> [edit]</a>
 	  								<table class="poskytuje">
+		  								<c:if test="${not empty capability.parent}">
+		  								  <c:forEach items="${capability.parent.properties}" var="property">
+                          <c:if test="${property.name == 'name'}">
+		  									    <tr><td class="jmeno">parent</td><td class="typ">${capability.parent.name}</td><td class="hodnota">${property.value}</td></tr>
+                          </c:if>
+		  								  </c:forEach>                                            
+		  								</c:if>
 		  								<c:forEach items="${capability.properties}" var="property">
 		  									<tr><td class="jmeno">${property.name}</td><td class="typ">${property.type}</td><td class="hodnota">${property.value}</td></tr>
 		  								</c:forEach>
