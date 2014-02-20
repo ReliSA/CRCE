@@ -15,6 +15,7 @@ import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -27,6 +28,7 @@ import cz.zcu.kiv.crce.rest.internal.jaxb.Tdirective;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Trequirement;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Tresource;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Tproperty;
 
 /**
  * Convert cz.zcu.kiv.crce.metadata.Resource to bean classes with JAXB annotations. These bean classes are ready to export metadata to xml.
@@ -43,6 +45,8 @@ public class ConvertorToBeans {
     public static final String OSGI_CONTENT_CAP_NAME = "osgi.content";
     public static final String CRCE_IDENTITY_CAP_NAME = "crce.identity";
     public static final String OSGI_WIRING_NAME = "osgi.wiring.package";
+	public static final String OSGI_WIRING_BUNDLE = "osgi.wiring.bundle";
+	public static final String CRCE_METRICS_NAME = "crce.metrics";
 
     @ServiceDependency private volatile MetadataService metadataService;
     @ServiceDependency private volatile MimeTypeSelector mimeTypeSelector;
@@ -232,7 +236,7 @@ public class ConvertorToBeans {
      */
     private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource) {
         List<Capability> caps = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
-        for (Capability cap : caps) {
+        for (Capability cap : caps) {        	
 
             Tcapability newCapBean = new Tcapability();
             List<Object> attributes = newCapBean.getDirectiveOrAttributeOrCapability();
@@ -255,12 +259,42 @@ public class ConvertorToBeans {
                 versAtr.setValue(packageVersion.toString());
                 attributes.add(versAtr);
             }
+            
+            for (Capability childCapability : cap.getChildren()) {
+            	if (childCapability.getNamespace().equals(CRCE_METRICS_NAME)) {
+            		attributes.add(createCrceMetrics(childCapability));
+            	}
+            }
 
             // TODO directives
 
             capabilities.add(newCapBean);
 
         }
+    }
+    
+    private void addRootCrceMetrics(List<Tproperty> properties, Resource resource) {
+    	List<Capability> caps = resource.getRootCapabilities(CRCE_METRICS_NAME);
+	    	
+    	for (Capability cap : caps) { 
+   			properties.add(createCrceMetrics(cap));
+    	}
+    }
+
+    private Tproperty createCrceMetrics(Capability crceMetricsCapability) {
+    	
+    	Tproperty newCapBean = new Tproperty();
+        List<Object> attributes = newCapBean.getDirectiveOrAttributeOrLink();
+        newCapBean.setNamespace(CRCE_METRICS_NAME);
+        
+        for (Attribute atr : crceMetricsCapability.getAttributes()) {
+            Tattribute metricsAtr = new Tattribute();
+            metricsAtr.setName(atr.getName());
+            metricsAtr.setValue(atr.getValue().toString());
+            attributes.add(metricsAtr);
+        }
+
+        return newCapBean;
     }
 
     /**
@@ -319,6 +353,7 @@ public class ConvertorToBeans {
 
         List<Tcapability> caps = newResource.getCapability();
         List<Trequirement> reqs = newResource.getRequirement();
+        List<Tproperty> prop = newResource.getProperty();
 
         //core capabilities
         if (include.shloudIncludeCap(OSGI_IDENTITY_CAP_NAME)) {
@@ -338,6 +373,9 @@ public class ConvertorToBeans {
         if (include.shloudIncludeReq(OSGI_WIRING_NAME)) {
             addRequirementWirings(reqs, resource);
         }
+                
+        // metrics
+        addRootCrceMetrics(prop, resource);
 
         return newResource;
     }

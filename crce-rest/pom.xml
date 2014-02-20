@@ -166,7 +166,6 @@
             <scope>provided</scope>
         </dependency>
 
-
         <!-- 3rd party dependencies -->
 
         <dependency>
