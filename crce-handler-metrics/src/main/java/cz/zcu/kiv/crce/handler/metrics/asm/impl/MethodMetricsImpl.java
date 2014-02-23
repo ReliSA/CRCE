@@ -84,7 +84,8 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 		            		inClassFields.add(new FieldMetricsImpl(owner, fieldInstruction.name));
 		            	}
 		            	else {
-		            		outClassFields.add(new FieldMetricsImpl(owner, fieldInstruction.name));
+		            		// using placeholders for out class field use
+		            		outClassFields.add(new ExternalFieldMetrics(owner, fieldInstruction.name));
 		            	}
 		            	
 		            	break;
@@ -172,6 +173,16 @@ public class MethodMetricsImpl extends AbstractMethodMetrics  {
 	@Nonnull
 	public MethodMetrics[] getMethodCalls() {
 		return (MethodMetrics[])methodCalls.clone();
+	}
+	
+	@Override
+	public void replaceUsedOutClassField(int index, FieldMetrics usedOutClassField) {
+
+		if (index < 0 || index >= usedOutClassFields.length) {
+			throw new IndexOutOfBoundsException();
+		}
+	
+		usedOutClassFields[index] = usedOutClassField;
 	}
 	
 	@Override

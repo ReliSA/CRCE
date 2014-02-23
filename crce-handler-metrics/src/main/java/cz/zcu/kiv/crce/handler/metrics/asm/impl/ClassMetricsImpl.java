@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
 /**
@@ -41,6 +42,7 @@ public class ClassMetricsImpl implements ClassMetrics {
 	private int simpleParametersCount;
 	private int complexParametersCount;
 	
+	private List<FieldMetrics> fields;
 	private List<MethodMetrics> methods;
 	
 	private double averageCyclomaticComplexity;
@@ -52,6 +54,7 @@ public class ClassMetricsImpl implements ClassMetrics {
 	 */
 	public ClassMetricsImpl(@Nonnull ClassNode byteCodeNode) {
 		
+		fields = new ArrayList<FieldMetrics>();
 		methods = new ArrayList<MethodMetrics>();
 		
 		methodCount = 0;
@@ -74,8 +77,8 @@ public class ClassMetricsImpl implements ClassMetrics {
 		
 		// filed informations
 		@SuppressWarnings("unchecked")
-		List<FieldNode> fields = byteCodeNode.fields;
-        for (FieldNode field : fields) {
+		List<FieldNode> fieldNodes = byteCodeNode.fields;
+        for (FieldNode field : fieldNodes) {
         	// no simple type field has signature
         	if (field.signature != null && !isComplexType(Type.getType(field.desc))) {
         		simpleTypeFieldCount++;
@@ -83,12 +86,14 @@ public class ClassMetricsImpl implements ClassMetrics {
         	else {
         		complexTypeFieldCount++;
         	}
+        	
+        	fields.add(new FieldMetricsImpl(fullClassName, field.name));
         }
         	
         // methods informations
         @SuppressWarnings("unchecked")
-		List<MethodNode> methods = byteCodeNode.methods;
-        for (MethodNode method : methods) {
+		List<MethodNode> methodNodes = byteCodeNode.methods;
+        for (MethodNode method : methodNodes) {
         	parseMethod(fullClassName, method);
         }
         
@@ -236,6 +241,12 @@ public class ClassMetricsImpl implements ClassMetrics {
 	public int getComplexParametersCount() {
 		return complexParametersCount;
 	}
+	
+	@Override
+	@Nonnull
+	public List<FieldMetrics> getFields() {
+		return fields;
+	}	
 	
 	@Override
 	@Nonnull

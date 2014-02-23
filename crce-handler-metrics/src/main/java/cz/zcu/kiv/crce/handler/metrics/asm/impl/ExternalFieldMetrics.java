@@ -3,12 +3,12 @@ package cz.zcu.kiv.crce.handler.metrics.asm.impl;
 import javax.annotation.Nonnull;
 
 /**
- * FieldMetrics implementation class.
+ * External FieldMetrics class. Representing fields out of jar or can be used as placeholder.
  * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  */
-public class FieldMetricsImpl extends AbstractFieldMetrics
-{
+public class ExternalFieldMetrics extends AbstractFieldMetrics {
+
 	private String className;
 	private String name;
 	
@@ -18,30 +18,24 @@ public class FieldMetricsImpl extends AbstractFieldMetrics
 	 * @param className Name of class (full) where field is defined.
 	 * @param name Name of field.
 	 */
-	public FieldMetricsImpl(String className, String name) {
+	public ExternalFieldMetrics(@Nonnull String className, @Nonnull String name) {
 		
 		this.className = className;
 		this.name = name;
 	}
 	
 	@Override
-	@Nonnull
-	public String getClassName()
-	{
+	public String getClassName() {
 		return className;
 	}
 
 	@Override
-	@Nonnull
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public boolean isInternal() {
-		return true;
+		return false;
 	}
-
 }
-

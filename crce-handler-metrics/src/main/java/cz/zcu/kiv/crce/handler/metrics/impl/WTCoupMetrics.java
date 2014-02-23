@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
@@ -28,20 +29,22 @@ public class WTCoupMetrics implements ComponentMetrics {
 
 	private static final Logger logger = LoggerFactory.getLogger(WTCoupMetrics.class);
 	
-	private List<ClassMetrics> classMetrics;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param classMetrics List of parsed ClassMetrics.
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
 	 */
-	public WTCoupMetrics(List<ClassMetrics> classMetrics) {
-		this.classMetrics = classMetrics;
+	public WTCoupMetrics(ClassesMetrics classesMetrics) {
+		this.classesMetrics = classesMetrics;
 	}
 	
 	@Override
 	public void init() {
-		// nothing to do here		
+
+		classesMetrics.connectUsedOutClassFields();
+		classesMetrics.connectCalledMethods();	
 	}
 
 	@Override
@@ -62,7 +65,7 @@ public class WTCoupMetrics implements ComponentMetrics {
 	public Object computeValue() {
 
 		List<ClassMetrics> classes = new ArrayList<ClassMetrics>();        
-    	for (ClassMetrics classMetric : classMetrics) {
+    	for (ClassMetrics classMetric : classesMetrics.getClassMetricsList()) {
 			if (!classMetric.isInterface()) {
 				classes.add(classMetric);
 			}
@@ -74,15 +77,16 @@ public class WTCoupMetrics implements ComponentMetrics {
     	if (classCount > 1) {
     		
     		double[][] coup = new double[classCount][classCount];
+    		double[] outJarCoup = new double[classCount];
     		            		
     		Set<MethodMetrics> calledMethods = new HashSet<MethodMetrics>();
-    		Set<FieldMetrics> usedExternalFields = new HashSet<FieldMetrics>();
+    		Set<FieldMetrics> usedOutClassFields = new HashSet<FieldMetrics>();
     		
     		// CoupD
     		for (int i = 0; i < classCount; i++) {
     			
     			calledMethods.clear();
-    			usedExternalFields.clear();
+    			usedOutClassFields.clear();
     			
     			ClassMetrics classI = classes.get(i);
     			
@@ -93,13 +97,13 @@ public class WTCoupMetrics implements ComponentMetrics {
     				}
 
     				for (FieldMetrics usedField : method.getUsedOutClassFields()) {
-    					usedExternalFields.add(usedField);
+    					usedOutClassFields.add(usedField);
     				}
     			}
     			
-    			int mVICount = calledMethods.size() + usedExternalFields.size();
+    			int mVICount = calledMethods.size() + usedOutClassFields.size();
     			int mICount = classI.getMethods().size();
-    			int vICount = classI.getSimpleTypeFieldCount() + classI.getComplexTypeFieldCount();
+    			int vICount = classI.getFields().size();
     			
     			int denominator = mVICount +  mICount + vICount;
     		
@@ -119,7 +123,7 @@ public class WTCoupMetrics implements ComponentMetrics {
         					}
         				}
         				
-        				for (FieldMetrics usedField : usedExternalFields) {
+        				for (FieldMetrics usedField : usedOutClassFields) {
         					if (usedField.getClassName().equals(classJName)) {
         						mVIJ += 1;
         					}
@@ -130,6 +134,23 @@ public class WTCoupMetrics implements ComponentMetrics {
     				
     				coup[i][j] = coupD;
     			}
+    			
+				// out jar coup
+    			int outJarMV = 0;
+    			
+    			for (MethodMetrics calledMethod : calledMethods) {
+    				if (!calledMethod.isInternal()) {
+    					outJarMV += 1;
+    				}
+    			}
+    			
+    			for (FieldMetrics usedField : usedOutClassFields) {
+    				if (!usedField.isInternal()) {
+    					outJarMV += 1;
+    				}
+    			}
+    			
+    			outJarCoup[i] = (double)outJarMV / denominator;
     		}
     		
     		// CoupT - modified Floyd–Warshall algorithm
@@ -153,6 +174,12 @@ public class WTCoupMetrics implements ComponentMetrics {
     			
     				coupSum += coup[i][j] + coup[j][i];
     			}
+    		}
+    		
+    		// out jar coup
+    		for (int i = 0; i < classCount; i++) {
+    			
+    			coupSum += outJarCoup[i];
     		}
     		
     		wTCoup = coupSum / (classCount * classCount - classCount);

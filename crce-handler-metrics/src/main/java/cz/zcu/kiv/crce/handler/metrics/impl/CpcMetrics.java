@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.handler.metrics.impl;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 
 /**
  * Implementation of computing class complexity metrics base on CPC metrics introduces in 
@@ -23,16 +22,16 @@ public class CpcMetrics implements PackageMetrics {
 	private static final double COMPLEX_FIELD_WEIGHT = 1.0;
 	private static final double COMPLEX_PARAMETER_WEIGHT = 1.0;
 	
-	private List<ClassMetrics> classMetrics;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param classMetrics List of parsed ClassMetrics.
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
 	 */
-	public CpcMetrics(List<ClassMetrics> classMetrics) {
+	public CpcMetrics(ClassesMetrics classesMetrics) {
 		
-		this.classMetrics = classMetrics;
+		this.classesMetrics = classesMetrics;
 	}
 	
 	@Override
@@ -71,7 +70,7 @@ public class CpcMetrics implements PackageMetrics {
 		int simpleParametersCount = 0;
 		int complexParametersCount = 0;
 		
-		for (ClassMetrics classMetric : classMetrics) {
+		for (ClassMetrics classMetric : classesMetrics.getClassMetricsList()) {
 
 			if (classMetric.isPublic() && classMetric.getPackageName().compareTo(packageName) == 0) {
 				

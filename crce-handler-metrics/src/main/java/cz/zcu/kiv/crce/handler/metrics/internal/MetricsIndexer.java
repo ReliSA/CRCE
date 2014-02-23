@@ -22,7 +22,9 @@ import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.Metrics;
 import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.impl.ClassMetricsImpl;
+import cz.zcu.kiv.crce.handler.metrics.asm.impl.ClassesMetricsImpl;
 import cz.zcu.kiv.crce.handler.metrics.impl.AverageCyclomaticComplexity;
 import cz.zcu.kiv.crce.handler.metrics.impl.CpcMetrics;
 import cz.zcu.kiv.crce.handler.metrics.impl.MaximumCyclomaticComplexity;
@@ -51,7 +53,8 @@ public class MetricsIndexer {
 	private MetadataFactory metadataFactory;
 	private MetadataService metadataService;
 	
-	private List<ClassMetrics> classesMetrics;
+	private List<ClassMetrics> classMetricsList;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
@@ -73,7 +76,7 @@ public class MetricsIndexer {
 	public void index(final InputStream input, @Nonnull Resource resource) {
 		int size = 0;	
 		
-		classesMetrics = new ArrayList<ClassMetrics>();
+		classMetricsList = new ArrayList<ClassMetrics>();
 		
 		// parsing input stream and collect class entry informations (ClassMetrics)
 		try {			
@@ -89,6 +92,8 @@ public class MetricsIndexer {
 			logger.error("Could not index resource.", e);
             return;
 		} 
+		
+		classesMetrics = new ClassesMetricsImpl(classMetricsList);
 		
 		// save jar file size to crce.content
 		Capability identity = metadataService.getSingletonCapability(resource, "crce.content");
@@ -182,7 +187,7 @@ public class MetricsIndexer {
         ClassNode byteCodeNode = new ClassNode();
         classReader.accept(byteCodeNode, ClassReader.SKIP_DEBUG);
         
-        classesMetrics.add(new ClassMetricsImpl(byteCodeNode));
+        classMetricsList.add(new ClassMetricsImpl(byteCodeNode));
 	}
 	
 	/**

@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.handler.metrics.impl;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 
 /**
  * Implementation of minimum of McCabe's Cyclomatic Complexity for all classes, 
@@ -19,14 +18,14 @@ import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
  */
 public class MinimumCyclomaticComplexity implements ComponentMetrics {
 
-	private List<ClassMetrics> classesMetrics;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param classMetrics List of parsed ClassMetrics.
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
 	 */
-	public MinimumCyclomaticComplexity(List<ClassMetrics> classesMetrics) {
+	public MinimumCyclomaticComplexity(ClassesMetrics classesMetrics) {
 		
 		this.classesMetrics = classesMetrics;
 	}
@@ -54,7 +53,7 @@ public class MinimumCyclomaticComplexity implements ComponentMetrics {
 	public Object computeValue() {
 
         double minimumCyclomaticComplexity = Double.MAX_VALUE;
-        for (ClassMetrics classMetrics : classesMetrics) {
+        for (ClassMetrics classMetrics : classesMetrics.getClassMetricsList()) {
         	if (!classMetrics.isInterface() &&  
         			minimumCyclomaticComplexity > classMetrics.getAverageCyclomaticComplexity()) {
         			

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.FieldMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
@@ -26,15 +27,15 @@ public class WTCohMetrics implements ComponentMetrics {
 
 	private static final Logger logger = LoggerFactory.getLogger(WTCoupMetrics.class);
 	
-	private List<ClassMetrics> classMetrics;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param classMetrics List of parsed ClassMetrics.
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
 	 */
-	public WTCohMetrics(List<ClassMetrics> classMetrics) {
-		this.classMetrics = classMetrics;
+	public WTCohMetrics(ClassesMetrics classesMetrics) {
+		this.classesMetrics = classesMetrics;
 	}
 	
 	@Override
@@ -63,7 +64,7 @@ public class WTCohMetrics implements ComponentMetrics {
         int classCount = 0;
         double classCohSum = 0;
         
-        for (ClassMetrics classMetric : classMetrics) {
+        for (ClassMetrics classMetric : classesMetrics.getClassMetricsList()) {
         	
         	methods.clear();
         	if (!classMetric.isInterface()) {

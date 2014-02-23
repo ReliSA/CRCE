@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.handler.metrics.PackageMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
 
 /**
@@ -17,53 +20,40 @@ import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
  */
 public class RippleEffectMetrics implements PackageMetrics {
 
-	private List<ClassMetrics> classMetrics;
+	private ClassesMetrics classesMetrics;
 	
-	public RippleEffectMetrics(List<ClassMetrics> classMetrics) {
+	/**
+	 * New instance.
+	 * 
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
+	 */
+	public RippleEffectMetrics(ClassesMetrics classesMetrics) {
 		
-		this.classMetrics = classMetrics;
+		this.classesMetrics = classesMetrics;
 	}
 	
 	@Override
 	public void init() {
 		
-        for (ClassMetrics classMetric : classMetrics) {        	
-        	for (MethodMetrics methodMetrics : classMetric.getMethods()) {
-        		
-        		MethodMetrics[] methodCalls = methodMetrics.getMethodCalls();        		
-        		for (int i = 0; i < methodCalls.length; i++) {
-        			
-        			for (ClassMetrics intermoduleClass : classMetrics) {        				
-        				if (intermoduleClass.getFullClassName().equals(methodCalls[i].getClassName())) {
-        					
-        					for (MethodMetrics intermoduleClassMethod : classMetric.getMethods()) {
-        						if (intermoduleClassMethod.equals(methodCalls[i])) {
-        							methodMetrics.replaceMethodCall(i, intermoduleClassMethod);
-        							
-        							break;
-        						}
-        					}
-        					
-        					break;
-        				}
-        			}
-        		}
-        	}
-        }
+        classesMetrics.connectCalledMethods();
 	}
 	
 	@Override
+	@Nonnull
 	public String getName() {
 		return "ripple-effect";
 	}
 	
 	@Override
+	@Nonnull
 	@SuppressWarnings("rawtypes")
 	public Class getType() {
 		return Long.class;
 	}
 	
+	
 	@Override
+	@Nonnull
 	public Object computeValueForPackage(String packageName) {
 		
 		// set of all methods
@@ -72,7 +62,7 @@ public class RippleEffectMetrics implements PackageMetrics {
 		List<MethodMetrics> methodsToVisit = new ArrayList<MethodMetrics>();
 		
 		// first collect public method of public classes from package
-        for (ClassMetrics classMetric : classMetrics) {
+        for (ClassMetrics classMetric : classesMetrics.getClassMetricsList()) {
         	if (classMetric.isPublic() && classMetric.getPackageName().equals(packageName)) {
         		for (MethodMetrics method : classMetric.getMethods()) {
         			if (method.isPublic()) {

@@ -85,6 +85,14 @@ public interface ClassMetrics {
 	int getComplexParametersCount();
 
 	/**
+	 * List of classes FieldMetrics.
+	 * 
+	 * @return List of classes FieldMetrics.
+	 */
+	@Nonnull
+	List<FieldMetrics> getFields();
+	
+	/**
 	 * List of classes MethodMetrics.
 	 * 
 	 * @return List of classes MethodMetrics.

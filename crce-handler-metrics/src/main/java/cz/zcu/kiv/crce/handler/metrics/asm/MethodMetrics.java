@@ -60,6 +60,15 @@ public interface MethodMetrics {
 	MethodMetrics[] getMethodCalls();
 	
 	/**
+	 * Replace one use of out class field by another. This should be used only for replacing 
+	 * placeholders (build internal references)
+	 * 
+	 * @param index Index of field to be replaced.
+	 * @param usedOutClassField New field.
+	 */
+	void replaceUsedOutClassField(int index, FieldMetrics usedOutClassField);
+	
+	/**
 	 * Replace one method call by another. This should be used only for replacing 
 	 * placeholders (build internal references)
 	 * 

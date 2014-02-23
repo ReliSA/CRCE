@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.handler.metrics.impl;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.handler.metrics.ComponentMetrics;
 import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
+import cz.zcu.kiv.crce.handler.metrics.asm.ClassesMetrics;
 
 /**
  * Implementation of average McCabe's Cyclomatic Complexity for all classes, 
@@ -19,14 +18,14 @@ import cz.zcu.kiv.crce.handler.metrics.asm.ClassMetrics;
  */
 public class AverageCyclomaticComplexity implements ComponentMetrics {
 
-	private List<ClassMetrics> classesMetrics;
+	private ClassesMetrics classesMetrics;
 	
 	/**
 	 * New instance.
 	 * 
-	 * @param classMetrics List of parsed ClassMetrics.
+	 * @param classesMetrics Wrapper of parsed ClassMetrics list.
 	 */
-	public AverageCyclomaticComplexity(List<ClassMetrics> classesMetrics) {
+	public AverageCyclomaticComplexity(ClassesMetrics classesMetrics) {
 		
 		this.classesMetrics = classesMetrics;
 	}
@@ -55,7 +54,7 @@ public class AverageCyclomaticComplexity implements ComponentMetrics {
 
         double cyclomaticComplexitySum = 0;
         int nonInterfaceClassCount = 0;
-        for (ClassMetrics classMetrics : classesMetrics) {
+        for (ClassMetrics classMetrics : classesMetrics.getClassMetricsList()) {
         	if (!classMetrics.isInterface()) {
         		cyclomaticComplexitySum += classMetrics.getAverageCyclomaticComplexity();
         		nonInterfaceClassCount++;

@@ -26,6 +26,13 @@ public interface FieldMetrics {
 	String getName();
 	
 	/**
+	 * Indicates, if field is in investigated jar file.
+	 * 
+	 * @return True, if field is in jar file.
+	 */	
+	boolean isInternal();
+	
+	/**
 	 * Indicate, if two fields are equal. Field is equal, if belongs to same class, 
 	 * has same name.
 	 * 

@@ -63,6 +63,11 @@ public class ExternalMethodMetrics extends AbstractMethodMetrics {
 	}
 	
 	@Override
+	public void replaceUsedOutClassField(int index, FieldMetrics usedOutClassField) {
+		throw new IndexOutOfBoundsException();
+	}
+	
+	@Override
 	public void replaceMethodCall(int index, MethodMetrics methodCall) {
 		throw new IndexOutOfBoundsException();
 	}
