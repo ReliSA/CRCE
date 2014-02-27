@@ -53,7 +53,7 @@
              It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
         -->
 
-        <version.org.slf4j>1.7.5</version.org.slf4j>
+        <version.org.slf4j>1.7.6</version.org.slf4j>
     </properties>
 
     <modules>
@@ -137,7 +137,6 @@
                         <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
-                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:ch.qos.logback/logback-core@1</param>
                         <param>mvn:ch.qos.logback/logback-classic@1</param>

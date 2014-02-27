@@ -197,8 +197,6 @@
         <dependency> <!-- Required by pax-web-extender-war -->
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-finder</artifactId>
-            <version>3.13</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
