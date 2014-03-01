@@ -35,8 +35,10 @@ import cz.zcu.kiv.crce.handler.metrics.impl.WTCohMetrics;
 import cz.zcu.kiv.crce.handler.metrics.impl.WTCoupMetrics;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -152,7 +154,7 @@ public class MetricsIndexer {
 		
 		// compute metrics
 		for (ComponentMetrics metric : componentMetrics) {
-			computeMetricsForComponent(metric, resource);
+			computeMetricsForComponent(metric, resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE));
 		}
 		
 		for (PackageMetrics metric : packageMetrics) {
@@ -191,16 +193,28 @@ public class MetricsIndexer {
 	}
 	
 	/**
-	 * Compute selected metrics for entire component and save it into resource.
+	 * Compute selected metrics for entire component (OSGi bundle) and save it into corresponding capability.
 	 * 
 	 * @param metrics Object of metrics to be computed.
-	 * @param resource Resource to update.
+	 * @param osgiBundleCapabilities OSGi bundle capabilities.
 	 */
-	private void computeMetricsForComponent(ComponentMetrics metrics, Resource resource) {
+	private void computeMetricsForComponent(ComponentMetrics metrics, List<Capability> osgiBundleCapabilities) {
 		
-		Capability metricsCapability = createMetricsCapability(metrics.getName(), metrics.computeValue());
+		if (osgiBundleCapabilities.size() == 0) {
+			
+			logger.error("No OSGi bundles.");
+			return;
+		}
+		
+		if (osgiBundleCapabilities.size() > 1) {
+			
+			logger.error("More then one OSGi bundle in jar file.");
+			return;
+		}
+				
+		Property<Capability> metricsProperty = createMetricsProperty(metrics.getName(), metrics.computeValue());
 
-		metadataService.addRootCapability(resource, metricsCapability);
+		osgiBundleCapabilities.get(0).addProperty(metricsProperty);
 	}
 	
 	/**
@@ -226,35 +240,35 @@ public class MetricsIndexer {
 			if (packageNameAttribute != null) {			
 				String packageName = packageNameAttribute.getValue();
 															
-				Capability metricsCapability = createMetricsCapability(metrics.getName(), 
+				Property<Capability> metricsProperty = createMetricsProperty(metrics.getName(), 
 						metrics.computeValueForPackage(packageName));	
 				
-				metadataService.addChild(exportPackageCapability, metricsCapability);
+				exportPackageCapability.addProperty(metricsProperty);
 			}
 		}
 	}
 		
 	/**
-	 * Create metrics capability to be stored.
+	 * Create metrics property to be stored.
 	 * 
 	 * @param name Name of capability.
 	 * @param value Metrics value to be stored.
-	 * @return Created capability to be stored.
+	 * @return Created property to be stored.
 	 */
-	private Capability createMetricsCapability(String name, Object value) {
+	private Property<Capability> createMetricsProperty(String name, Object value) {
 		
-		Capability metricsCapability = metadataFactory.createCapability(NsMetrics.NAMESPACE__METRICS);
-		metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
+		Property<Capability> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
+		metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
 		if (value instanceof Long) {
-			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (Long)value);		
+			metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (Long)value);		
 		}
 		else if (value instanceof Double) {
-			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, (Double)value);	
+			metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__DOUBLE__VALUE, (Double)value);	
 		}
 		else {
-			metricsCapability.setAttribute(NsMetrics.ATTRIBUTE__STRING__VALUE, value.toString());	
+			metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__STRING__VALUE, value.toString());	
 		}
 		
-		return metricsCapability;
+		return metricsProperty;
 	}
 }
