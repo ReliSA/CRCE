@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
@@ -227,6 +228,49 @@ public class ConvertorToBeans {
         return crceIdentity;
 
     }
+    
+    /**
+     * Add all capabilities with OSGi bundle wiring to the resource
+     *
+     * @param capabilities list of capabilities of the resourceBean
+     * @param resource resource
+     */
+    private void addBundleWirings(List<Tcapability> capabilities, Resource resource) {
+        List<Capability> caps = resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
+        for (Capability cap : caps) {        	
+
+            Tcapability newCapBean = new Tcapability();
+            List<Object> attributes = newCapBean.getDirectiveOrAttributeOrCapability();
+            newCapBean.setNamespace(OSGI_WIRING_BUNDLE);
+            // package attribute
+            String manifestVersion = cap.getAttributeValue(NsOsgiBundle.ATTRIBUTE__MANIFEST_VERSION);
+            if (manifestVersion != null) {
+            	addAttribute(attributes, "manifest-version", null, manifestVersion, null);
+            }
+            String presentationName = cap.getAttributeValue(NsOsgiBundle.ATTRIBUTE__PRESENTATION_NAME);
+            if (presentationName != null) {
+            	addAttribute(attributes, "presentation-name", null, presentationName, null);
+            }
+            String symbolicName = cap.getAttributeValue(NsOsgiBundle.ATTRIBUTE__SYMBOLIC_NAME);
+            if (symbolicName != null) {
+            	addAttribute(attributes, "symbolic-name", null, symbolicName, null);
+            }
+            Version version = cap.getAttributeValue(NsOsgiBundle.ATTRIBUTE__VERSION);
+            if (manifestVersion != null) {
+            	addAttribute(attributes, "manifest-version", "Version", String.valueOf(version), null);
+            }
+            
+            for (Property<Capability> property : cap.getProperties()) {
+            	if (property.getNamespace().equals(CRCE_METRICS_NAME)) {
+            		attributes.add(createCrceMetrics(property));
+            	}
+            }
+
+            // TODO directives
+
+            capabilities.add(newCapBean);
+        }
+    }
 
     /**
      * Add all capabilities with package wiring to the resource
@@ -260,9 +304,9 @@ public class ConvertorToBeans {
                 attributes.add(versAtr);
             }
             
-            for (Capability childCapability : cap.getChildren()) {
-            	if (childCapability.getNamespace().equals(CRCE_METRICS_NAME)) {
-            		attributes.add(createCrceMetrics(childCapability));
+            for (Property<Capability> property : cap.getProperties()) {
+            	if (property.getNamespace().equals(CRCE_METRICS_NAME)) {
+            		attributes.add(createCrceMetrics(property));
             	}
             }
 
@@ -273,21 +317,13 @@ public class ConvertorToBeans {
         }
     }
     
-    private void addRootCrceMetrics(List<Tproperty> properties, Resource resource) {
-    	List<Capability> caps = resource.getRootCapabilities(CRCE_METRICS_NAME);
-	    	
-    	for (Capability cap : caps) { 
-   			properties.add(createCrceMetrics(cap));
-    	}
-    }
-
-    private Tproperty createCrceMetrics(Capability crceMetricsCapability) {
+    private Tproperty createCrceMetrics(Property<Capability> crceMetricsProperty) {
     	
     	Tproperty newCapBean = new Tproperty();
         List<Object> attributes = newCapBean.getDirectiveOrAttributeOrLink();
         newCapBean.setNamespace(CRCE_METRICS_NAME);
         
-        for (Attribute atr : crceMetricsCapability.getAttributes()) {
+        for (Attribute<?> atr : crceMetricsProperty.getAttributes()) {
             Tattribute metricsAtr = new Tattribute();
             metricsAtr.setName(atr.getName());
             metricsAtr.setValue(atr.getValue().toString());
@@ -353,7 +389,6 @@ public class ConvertorToBeans {
 
         List<Tcapability> caps = newResource.getCapability();
         List<Trequirement> reqs = newResource.getRequirement();
-        List<Tproperty> prop = newResource.getProperty();
 
         //core capabilities
         if (include.shloudIncludeCap(OSGI_IDENTITY_CAP_NAME)) {
@@ -366,16 +401,18 @@ public class ConvertorToBeans {
             caps.add(prepareCrceIdentity(resource));
         }
 
+        // osgi.wiring.bundle
+        if (include.shloudIncludeCap(OSGI_WIRING_BUNDLE)) {
+        	addBundleWirings(caps, resource);
+        }
+
         //wirings
         if (include.shloudIncludeCap(OSGI_WIRING_NAME)) {
             addCapabilityWirings(caps, resource);
         }
         if (include.shloudIncludeReq(OSGI_WIRING_NAME)) {
             addRequirementWirings(reqs, resource);
-        }
-                
-        // metrics
-        addRootCrceMetrics(prop, resource);
+        }                
 
         return newResource;
     }
