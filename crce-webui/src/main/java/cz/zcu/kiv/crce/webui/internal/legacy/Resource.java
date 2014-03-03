@@ -28,6 +28,8 @@ public interface Resource extends PropertyProvider<Resource> {
     URI getRelativeUri();
 
 //    Repository getRepository();
+    
+    NewProperty[] getNewProperties();
 
     /**
      * Returns the resource size in bytes or -1 if size is unknown.

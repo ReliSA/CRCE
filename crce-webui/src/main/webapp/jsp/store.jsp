@@ -51,6 +51,18 @@
 	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
 	  						<li><strong>Size:</strong> ${resource.size}</li>
 	  					</ul>
+              <ul>
+                <c:forEach items="${resource.newProperties}" var="newProperty">
+                  <li>
+                    ${newProperty.name}
+	  								<table class="poskytuje">                           
+		  								<c:forEach items="${newProperty.properties}" var="property">
+		  									<tr><td class="jmeno">${property.name}</td><td class="typ">${property.type}</td><td class="hodnota">${property.value}</td></tr>
+		  								</c:forEach>
+							      </table>
+                  </li>  
+								</c:forEach>   
+              </ul>
 	  				</div>
 	  				<div class="polozka"><strong>Categories: </strong> <a class="edit" href="edit?type=category&uri=${resource.uri}" title="edit categories"><!-- <img src="graphic/edit.png" alt="edit categories" title="edit categories" /> -->[edit]</a> 
 	  					<ul class="inline">
@@ -73,12 +85,14 @@
                     
                     <ul>
                       <c:forEach items="${capability.newProperties}" var="newProperty">
+                        <li>
                           ${newProperty.name}
       	  								<table class="poskytuje">                           
       		  								<c:forEach items="${newProperty.properties}" var="property">
       		  									<tr><td class="jmeno">${property.name}</td><td class="typ">${property.type}</td><td class="hodnota">${property.value}</td></tr>
       		  								</c:forEach>
-	  								     </table>
+	  								      </table>
+                        </li>  
 		  								</c:forEach>   
                     </ul>
                     

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.osgi.framework.Version;
 
 import cz.zcu.kiv.crce.webui.internal.legacy.Capability;
+import cz.zcu.kiv.crce.webui.internal.legacy.NewProperty;
 import cz.zcu.kiv.crce.webui.internal.legacy.Property;
 import cz.zcu.kiv.crce.webui.internal.legacy.Requirement;
 import cz.zcu.kiv.crce.webui.internal.legacy.Resource;
@@ -128,7 +129,13 @@ public class ResourceAdapter implements Resource {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	@Override
+	public NewProperty[] getNewProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	@Override
 	public long getSize() {
 		// TODO Auto-generated method stub

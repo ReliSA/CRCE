@@ -50,6 +50,17 @@ abstract class ResourceWrap extends ResourceAdapter {
         }
         return properties;
     }
+    
+    @Override
+    public NewProperty[] getNewProperties() {        	
+        List<? extends cz.zcu.kiv.crce.metadata.Property<?>> newProperties = resource.getProperties();
+        NewProperty[] properties = new NewProperty[newProperties.size()];
+        int i = 0;
+        for (cz.zcu.kiv.crce.metadata.Property<?> newProperty : newProperties) {
+            properties[i++] = new NewPropertyImpl(newProperty);
+        }
+        return properties;
+    }
 
     @Override
     public cz.zcu.kiv.crce.webui.internal.legacy.Capability[] getCapabilities() {
