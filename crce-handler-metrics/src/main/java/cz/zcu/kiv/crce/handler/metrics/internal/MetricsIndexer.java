@@ -38,7 +38,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -154,7 +153,7 @@ public class MetricsIndexer {
 		
 		// compute metrics
 		for (ComponentMetrics metric : componentMetrics) {
-			computeMetricsForComponent(metric, resource.getCapabilities(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE));
+			computeMetricsForComponent(metric, resource);
 		}
 		
 		for (PackageMetrics metric : packageMetrics) {
@@ -193,28 +192,17 @@ public class MetricsIndexer {
 	}
 	
 	/**
-	 * Compute selected metrics for entire component (OSGi bundle) and save it into corresponding capability.
+	 * Compute selected metrics for entire component and save it into resource.
 	 * 
 	 * @param metrics Object of metrics to be computed.
-	 * @param osgiBundleCapabilities OSGi bundle capabilities.
+	 * @param resource Resource to save computed metrics property.
 	 */
-	private void computeMetricsForComponent(ComponentMetrics metrics, List<Capability> osgiBundleCapabilities) {
-		
-		if (osgiBundleCapabilities.size() == 0) {
-			
-			logger.error("No OSGi bundles.");
-			return;
-		}
-		
-		if (osgiBundleCapabilities.size() > 1) {
-			
-			logger.error("More then one OSGi bundle in jar file.");
-			return;
-		}
+	private void computeMetricsForComponent(ComponentMetrics metrics, Resource resource) {
 				
-		Property<Capability> metricsProperty = createMetricsProperty(metrics.getName(), metrics.computeValue());
-
-		osgiBundleCapabilities.get(0).addProperty(metricsProperty);
+		Property<Resource> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
+		addAtrributesToMetricsProperty(metricsProperty, metrics.getName(), metrics.computeValue());
+		
+		resource.addProperty(metricsProperty);
 	}
 	
 	/**
@@ -240,8 +228,8 @@ public class MetricsIndexer {
 			if (packageNameAttribute != null) {			
 				String packageName = packageNameAttribute.getValue();
 															
-				Property<Capability> metricsProperty = createMetricsProperty(metrics.getName(), 
-						metrics.computeValueForPackage(packageName));	
+				Property<Capability> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
+				addAtrributesToMetricsProperty(metricsProperty, metrics.getName(), metrics.computeValueForPackage(packageName));	
 				
 				exportPackageCapability.addProperty(metricsProperty);
 			}
@@ -249,15 +237,14 @@ public class MetricsIndexer {
 	}
 		
 	/**
-	 * Create metrics property to be stored.
+	 * Fill metrics property with metrics values.
 	 * 
-	 * @param name Name of capability.
-	 * @param value Metrics value to be stored.
-	 * @return Created property to be stored.
+	 * @param metricsProperty Metrics property.
+	 * @param name Name of property.
+	 * @param value Metrics value.
 	 */
-	private Property<Capability> createMetricsProperty(String name, Object value) {
+	private void addAtrributesToMetricsProperty(Property<?> metricsProperty, String name, Object value) {
 		
-		Property<Capability> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
 		metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
 		if (value instanceof Long) {
 			metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__LONG__VALUE, (Long)value);		
@@ -268,7 +255,5 @@ public class MetricsIndexer {
 		else {
 			metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__STRING__VALUE, value.toString());	
 		}
-		
-		return metricsProperty;
 	}
 }
