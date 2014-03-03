@@ -277,8 +277,9 @@ public class ConvertorToBeans {
      *
      * @param capabilities list of capabilities of the resourceBean
      * @param resource resource
+     * @param include what part of metadata should be included
      */
-    private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource) {
+    private void addCapabilityWirings(List<Tcapability> capabilities, Resource resource, IncludeMetadata include) {
         List<Capability> caps = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         for (Capability cap : caps) {        	
 
@@ -304,10 +305,13 @@ public class ConvertorToBeans {
                 attributes.add(versAtr);
             }
             
-            for (Property<Capability> property : cap.getProperties()) {
-            	if (property.getNamespace().equals(CRCE_METRICS_NAME)) {
-            		attributes.add(createCrceMetrics(property));
-            	}
+            // crce.metrics
+            if (include.shloudIncludeProp(CRCE_METRICS_NAME)) {
+	            for (Property<Capability> property : cap.getProperties()) {
+	            	if (property.getNamespace().equals(CRCE_METRICS_NAME)) {
+	            		attributes.add(createCrceMetrics(property));
+	            	}
+	            }
             }
 
             // TODO directives
@@ -317,7 +321,28 @@ public class ConvertorToBeans {
         }
     }
     
-    private Tproperty createCrceMetrics(Property<Capability> crceMetricsProperty) {
+    /**
+     * Add crce.metrics properties of Resource.
+     * 
+     * @param prop List of properties of the resourceBean
+     * @param resource Resource
+     */
+    private void addResourceCrceMetricsProperties(List<Tproperty> prop, Resource resource) {
+    	
+        for (Property<Resource> property : resource.getProperties()) {
+        	if (property.getNamespace().equals(CRCE_METRICS_NAME)) {
+        		prop.add(createCrceMetrics(property));
+        	}
+        }
+    }
+    
+    /**
+     * Create <code>Tproperty</code> bean of crce.metrics property.
+     * 
+     * @param crceMetricsProperty Property of crce.metrics to convert to bean.
+     * @return Created crce.metrics <code>Tproperty</code> 
+     */
+    private Tproperty createCrceMetrics(Property<?> crceMetricsProperty) {
     	
     	Tproperty newCapBean = new Tproperty();
         List<Object> attributes = newCapBean.getDirectiveOrAttributeOrLink();
@@ -389,6 +414,7 @@ public class ConvertorToBeans {
 
         List<Tcapability> caps = newResource.getCapability();
         List<Trequirement> reqs = newResource.getRequirement();
+        List<Tproperty> prop = newResource.getProperty();
 
         //core capabilities
         if (include.shloudIncludeCap(OSGI_IDENTITY_CAP_NAME)) {
@@ -408,12 +434,17 @@ public class ConvertorToBeans {
 
         //wirings
         if (include.shloudIncludeCap(OSGI_WIRING_NAME)) {
-            addCapabilityWirings(caps, resource);
+            addCapabilityWirings(caps, resource, include);
         }
         if (include.shloudIncludeReq(OSGI_WIRING_NAME)) {
             addRequirementWirings(reqs, resource);
-        }                
-
+        }   
+        
+        // crce.metrics
+        if (include.shloudIncludeProp(CRCE_METRICS_NAME)) {
+        	addResourceCrceMetricsProperties(prop, resource);
+        }
+        
         return newResource;
     }
 
