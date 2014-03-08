@@ -16,7 +16,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
@@ -126,14 +125,14 @@ public class UploadServlet extends HttpServlet {
         if (success) {
             message = "Upload was succesful.";
 
-            MetadataIndexingResultService indexerResult = Activator.instance().getMetadataIndexerResult();
-            if (!indexerResult.isEmpty()) {
-                String[] metadataIndexerMessages = indexerResult.getMessages();
-                for (String indexerMessage : metadataIndexerMessages) {
-                    metadataIndexerResult.append("<BR>").append(indexerMessage);
-                }
-                indexerResult.removeAllMessages();
-            }
+//            MetadataIndexingResultService indexerResult = Activator.instance().getMetadataIndexerResult();
+//            if (!indexerResult.isEmpty()) {
+//                String[] metadataIndexerMessages = indexerResult.getMessages();
+//                for (String indexerMessage : metadataIndexerMessages) {
+//                    metadataIndexerResult.append("<BR>").append(indexerMessage);
+//                }
+//                indexerResult.removeAllMessages();
+//            }
         } else {
             message = "Upload failed.";
         }

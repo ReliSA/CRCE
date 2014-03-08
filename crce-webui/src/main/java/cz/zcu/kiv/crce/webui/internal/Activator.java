@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.plugin.MetadataIndexingResultService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
@@ -36,12 +35,6 @@ public final class Activator extends DependencyActivatorBase {
     private volatile SessionRegister sessionRegister;   /* injected by dependency manager */
     private volatile Store store;                  	/* injected by dependency manager */
     private volatile MetadataService metadataService;
-
-    /**
-     * MetadataIndexingResultService instance provides by simple way information about metadata indexing process result.
-     */
-    private volatile MetadataIndexingResultService m_metadataIndexingResult;    /* injected by dependency manager */
-
 
     public static Activator instance() {
         if (instance == null) {
@@ -86,13 +79,6 @@ public final class Activator extends DependencyActivatorBase {
         return metadataService;
     }
 
-    /**
-     * @return instance of MetadataIndexingResultService provides info about metadata indexing process.
-     */
-    public MetadataIndexingResultService getMetadataIndexerResult() {
-        return m_metadataIndexingResult;
-    }
-
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
@@ -104,8 +90,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
-                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-                .add(createServiceDependency().setService(MetadataIndexingResultService.class).setRequired(false)));
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true)));
 
 
         logger.debug("Webui activator initialized.");
