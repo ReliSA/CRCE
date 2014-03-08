@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -19,7 +18,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**
  * Parent class for all resource classes, that implements REST operation.
@@ -41,15 +40,16 @@ public abstract class ResourceParent {
 
 	/**
      * Create XML String from repository.
-     * @param repositoryBean repository contains metadata about resources
+     * @param repository repository contains metadata about resources
      * @return XML String with exported metadata
      * @throws WebApplicationException XML export failed
      */
-    protected String createXML(Trepository repositoryBean) throws WebApplicationException {
+    protected String createXML(Repository repository) throws WebApplicationException {
         try {
-            ObjectFactory objectFactory = new ObjectFactory();
-            JAXBElement<?> repository = objectFactory.createRepository(repositoryBean);
-            Class<?> clazz = repository.getValue().getClass();
+//            ObjectFactory objectFactory = new ObjectFactory();
+//            JAXBElement<?> repository = objectFactory.createRepository(repositoryBean);
+//            Class<?> clazz = repository.getValue().getClass();
+            Class<?> clazz = repository.getClass();
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ClassLoader cl = ObjectFactory.class.getClassLoader();

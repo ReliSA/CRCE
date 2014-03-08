@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    version="2.0"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    jaxb:extensionBindingPrefixes="xjc"
+    xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xsi:schemaLocation="
+        http://java.sun.com/xml/ns/jaxb
+        http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+    ">
+
+    <jaxb:globalBindings>
+        <xjc:simple />
+    </jaxb:globalBindings>
+
+    <jaxb:bindings schemaLocation="../../../../target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd">
+        <jaxb:bindings node="//xs:complexType[@name='Tattribute']">
+            <jaxb:class name="Attribute"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Tcapability']">
+            <jaxb:class name="Capability"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Tdirective']">
+            <jaxb:class name="Directive"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Tlink']">
+            <jaxb:class name="Link"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Tproperty']">
+            <jaxb:class name="Property"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Trequirement']">
+            <jaxb:class name="Requirement"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="//xs:complexType[@name='Tresource']">
+            <jaxb:class name="Resource"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>

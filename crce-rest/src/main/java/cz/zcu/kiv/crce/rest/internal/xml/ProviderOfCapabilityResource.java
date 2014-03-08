@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.osgi.framework.Version;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -34,11 +35,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostProviderOfCapability;
-import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
+import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Attribute;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Tattribute;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trequirement;
 import cz.zcu.kiv.crce.rest.internal.structures.VersionDemand;
 
 @Path("/provider-of-capability")
@@ -53,7 +52,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
      * @return requirement
      * @throws WebApplicationException unmarshal of xml failed.
      */
-	private Trequirement unmarshalRequirent(String requirement) throws WebApplicationException {
+	private cz.zcu.kiv.crce.rest.internal.jaxb.Requirement unmarshalRequirent(String requirement) throws WebApplicationException {
 
 		try {
 			ClassLoader cl = ObjectFactory.class.getClassLoader();
@@ -71,12 +70,12 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 			 log.info("node: " + requirementSubtree.getLocalName());
 
 
-			Object obj = unmarshaller.unmarshal(requirementSubtree, Trequirement.class);
+			Object obj = unmarshaller.unmarshal(requirementSubtree, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement.class);
 
 
 			JAXBElement<?> jxbE = (JAXBElement<?>) obj;
 
-			Trequirement req = (Trequirement) jxbE.getValue();
+			cz.zcu.kiv.crce.rest.internal.jaxb.Requirement req = (cz.zcu.kiv.crce.rest.internal.jaxb.Requirement) jxbE.getValue();
 
 			return req;
 
@@ -113,15 +112,12 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return name attribute of the requirement
 	 */
-	private String getRequirementName(Trequirement requirement) {
-		List<Object> dirAtrReq = requirement.getDirectiveOrAttributeOrRequirement();
+	private String getRequirementName(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+        List<Attribute> attributes = requirement.getAttributes();
 
-        for (Object obj : dirAtrReq) {
-            if (obj instanceof Tattribute) {
-                Tattribute atr = (Tattribute) obj;
-                if (atr.getName().equals("name")) {
-                    return atr.getValue();
-                }
+        for (Attribute attribute : attributes) {
+            if (attribute.getName().equals("name")) {
+                return attribute.getValue();
             }
         }
 
@@ -133,7 +129,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return list of resources, that has capability, that matches the requirement.
 	 */
-    private List<Resource> matchingResources(Trequirement requirement) {
+    private List<Resource> matchingResources(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
         String reqName = getRequirementName(requirement);
         if (reqName == null) {
             log.info("Request ({}) - No name found in the input requierment.", getRequestId());
@@ -160,23 +156,20 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return list of version demands
 	 */
-    private List<VersionDemand> prepareVersionDemandsList(Trequirement requirement) {
+    private List<VersionDemand> prepareVersionDemandsList(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
 
         List<VersionDemand> versionDemandsList = new ArrayList<>();
 
-        List<Object> dirAtrReq = requirement.getDirectiveOrAttributeOrRequirement();
-        for (Object obj : dirAtrReq) {
-            if (obj instanceof Tattribute) {
-                Tattribute atr = (Tattribute) obj;
-                if (atr.getName().equals("version")) {
-                    if (atr.getValue() != null && atr.getType() != null) {
-                        VersionDemand verDemand = new VersionDemand();
-                        verDemand.setVersion(new Version(atr.getValue()));
-                        verDemand.setOperation(atr.getType());
-                        versionDemandsList.add(verDemand);
-                    } else {
-                        log.warn("Request ({}) - Requirement version attribute has not set value or type and will be skipped", getRequestId());
-                    }
+        List<Attribute> attributes = requirement.getAttributes();
+        for (Attribute attribute : attributes) {
+            if (attribute.getName().equals("version")) {
+                if (attribute.getValue() != null && attribute.getType() != null) {
+                    VersionDemand verDemand = new VersionDemand();
+                    verDemand.setVersion(new Version(attribute.getValue()));
+                    verDemand.setOperation(attribute.getType());
+                    versionDemandsList.add(verDemand);
+                } else {
+                    log.warn("Request ({}) - Requirement version attribute has not set value or type and will be skipped", getRequestId());
                 }
             }
         }
@@ -241,7 +234,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return boolean, if the capability matches the version demands of the requirement.
 	 */
-    private boolean checkVersionMatching(Capability capability, Trequirement requirement) {
+    private boolean checkVersionMatching(Capability capability, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
         Version capabilityVersion = capability.getAttributeValue(NsOsgiPackage.ATTRIBUTE__VERSION);
         List<VersionDemand> verDemands = prepareVersionDemandsList(requirement);
         //log.info("version demands size " + verDemands.size());
@@ -266,7 +259,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return boolean, if one of the resource's capabilities matches requirements
 	 */
-    private boolean checkIfMatchRequirement(Resource resource, String reqName, Trequirement requirement) {
+    private boolean checkIfMatchRequirement(Resource resource, String reqName, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
 
         List<Capability> capabilities = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         for (Capability cap : capabilities) {
@@ -290,16 +283,17 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 	 * @param requirement the requirement
 	 * @return repository of resources, that have a capability, that matches the requirement
 	 */
-	private Trepository findProviders(Trequirement requirement) {
+	private cz.zcu.kiv.crce.rest.internal.jaxb.Repository findProviders(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
 
 		List<Resource> matchingResources = matchingResources(requirement);
 
 		//log.info("Matching resources size " + matchingResources.length);
 
-		IncludeMetadata include = new IncludeMetadata();
+		MetadataFilter include = new MetadataFilter();
 		include.includeAll();
 
-		Trepository repo = Activator.instance().getConvertorToBeans().convertRepository(matchingResources, include, null);
+		cz.zcu.kiv.crce.rest.internal.jaxb.Repository repo =
+                Activator.instance().getConvertorToBeans().convertRepository(matchingResources, include, null);
 
 		return repo;
 	}
@@ -316,10 +310,10 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 		log.debug("Request ({}) - Provider of capability request was received.", getRequestId());
 		log.debug("Request ({}) - Requirement received: {}", getRequestId(), requirement);
 		try {
-			Trequirement req = unmarshalRequirent(requirement);
+			cz.zcu.kiv.crce.rest.internal.jaxb.Requirement req = unmarshalRequirent(requirement);
 			log.debug("Request ({}) - Requirement was unmashaled.", getRequestId());
 
-			Trepository repositoryBean = findProviders(req);
+			cz.zcu.kiv.crce.rest.internal.jaxb.Repository repositoryBean = findProviders(req);
 
 			Response response = Response.ok(createXML(repositoryBean)).build();
 			log.debug("Request ({}) - Response was successfully created.", getRequestId());

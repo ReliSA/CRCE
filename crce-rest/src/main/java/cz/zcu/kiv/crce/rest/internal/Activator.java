@@ -9,7 +9,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.rest.internal.convertor.ConvertorToBeans;
+import cz.zcu.kiv.crce.rest.internal.convertor.JaxbMapping;
 import cz.zcu.kiv.crce.rest.internal.convertor.MimeTypeSelector;
 
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
@@ -22,7 +22,7 @@ public final class Activator extends DependencyActivatorBase {
      */
     private volatile Store store;
     private volatile MetadataService metadataService;
-    private volatile ConvertorToBeans convertorToBeans;
+    private volatile JaxbMapping convertorToBeans;
     private volatile MimeTypeSelector mimeTypeSelector;
     private volatile MetadataFactory metadataFactory;
     private volatile FilterParser filterParser;
@@ -39,7 +39,7 @@ public final class Activator extends DependencyActivatorBase {
         return metadataService;
     }
 
-    public ConvertorToBeans getConvertorToBeans() {
+    public JaxbMapping getConvertorToBeans() {
         return convertorToBeans;
     }
 
@@ -70,7 +70,7 @@ public final class Activator extends DependencyActivatorBase {
                 .setImplementation(this)
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-                .add(createServiceDependency().setService(ConvertorToBeans.class).setRequired(true))
+                .add(createServiceDependency().setService(JaxbMapping.class).setRequired(true))
                 .add(createServiceDependency().setService(MimeTypeSelector.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))

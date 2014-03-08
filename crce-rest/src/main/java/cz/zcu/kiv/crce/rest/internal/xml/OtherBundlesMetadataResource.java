@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostOtherBundlesMetadata;
-import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
+import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Tresource;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**
  * Server provide metadata about other bundles (repository contents diff).
@@ -65,7 +64,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
      * @return XML String with exported metadata
      * @throws WebApplicationException unmarshal of xml failed.
      */
-	public Trepository unmarshalXML(String repository) throws WebApplicationException {
+	public Repository unmarshalXML(String repository) throws WebApplicationException {
 
 		try {
 			ClassLoader cl = ObjectFactory.class.getClassLoader();
@@ -78,7 +77,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 
 			JAXBElement<?> jxbE = (JAXBElement<?>) obj;
 
-			Trepository rep = (Trepository) jxbE.getValue();
+			Repository rep = (Repository) jxbE.getValue();
 
 			return rep;
 
@@ -100,11 +99,11 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	 * @param resources repository.
 	 * @return set of id
 	 */
-    private Set<String> createIdSet(Trepository resources) {
-        List<Tresource> resList = resources.getResource();
+    private Set<String> createIdSet(Repository resources) {
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> resList = resources.getResources();
         Set<String> idSet = new HashSet<>();
 
-        for (Tresource res : resList) {
+        for (cz.zcu.kiv.crce.rest.internal.jaxb.Resource res : resList) {
             idSet.add(res.getId());
         }
 
@@ -155,10 +154,11 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	 * @param storeIdSet set of id of bundles in the store
 	 * @return list of bundles, that have was deleted from store.
 	 */
-	private List<Tresource> determineUnknownResources(List<Tresource> clientResources, Set<String> storeIdSet) {
+	private List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> determineUnknownResources(
+            List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> clientResources, Set<String> storeIdSet) {
 
-		List<Tresource> unknownResources = new ArrayList<>();
-        for (Tresource res : clientResources) {
+		List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> unknownResources = new ArrayList<>();
+        for (cz.zcu.kiv.crce.rest.internal.jaxb.Resource res : clientResources) {
             if (!storeIdSet.contains(res.getId())) {
                 unknownResources.add(Activator.instance().getConvertorToBeans().getResourceWithUnknownStatus(res.getId()));
             }
@@ -180,7 +180,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 	 * @param ui contextual info about URI
 	 * @return repositoty with other bundles
 	 */
-    private Trepository findOtherBundles(Trepository clientBundles, UriInfo ui) {
+    private Repository findOtherBundles(Repository clientBundles, UriInfo ui) {
 
         List<Resource> storeResources = Activator.instance().getStore().getResources();
 
@@ -188,15 +188,15 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
         Set<String> storeIdSet = createIdSet(storeResources);
 
         List<Resource> newResources = findNewResources(storeResources, clientBundlesIdSet);
-        List<Tresource> unknownResources = determineUnknownResources(clientBundles.getResource(), storeIdSet);
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> unknownResources = determineUnknownResources(clientBundles.getResources(), storeIdSet);
 
         //convert new resources to repository
-        IncludeMetadata include = new IncludeMetadata();
+        MetadataFilter include = new MetadataFilter();
         include.includeAll();
-        Trepository repository = Activator.instance().getConvertorToBeans().convertRepository(newResources, include, ui);
+        Repository repository = Activator.instance().getConvertorToBeans().convertRepository(newResources, include, ui);
 
         //add unknown resources
-        repository.getResource().addAll(unknownResources);
+        repository.getResources().addAll(unknownResources);
 
         return repository;
     }
@@ -214,8 +214,8 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
         newRequest();
         log.debug("Request ({}) - Post other bundles request was received.", getRequestId());
         try {
-            Trepository clientBundles = unmarshalXML(knownBundles);
-            Trepository otherBundles = findOtherBundles(clientBundles, ui);
+            Repository clientBundles = unmarshalXML(knownBundles);
+            Repository otherBundles = findOtherBundles(clientBundles, ui);
 
             Response response = Response.ok(createXML(otherBundles)).build();
             log.debug("Request ({}) - Response was successfully created.", getRequestId());

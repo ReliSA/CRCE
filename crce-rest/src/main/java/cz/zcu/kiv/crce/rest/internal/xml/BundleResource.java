@@ -51,34 +51,22 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		return new StreamingOutput() {
             @Override
 		    public void write(OutputStream output) throws IOException, WebApplicationException {
-		    	DataInputStream resourceInput = null;
-		    	OutputStream resourceOutput = null;
-				try {
-					resourceInput = new DataInputStream(new FileInputStream(resourceFile));
-					resourceOutput = new BufferedOutputStream(output);
 
-					byte[] buffer = new byte[BUFSIZE];
-					int bytesRead;
-					while ((bytesRead = resourceInput.read(buffer)) != -1) {
-						resourceOutput.write(buffer, 0, bytesRead);
-					}
-					resourceOutput.flush();
-				} catch (RuntimeException e) {
+                try (DataInputStream resourceInput = new DataInputStream(new FileInputStream(resourceFile));
+                        OutputStream resourceOutput = new BufferedOutputStream(output)) {
 
-					logger.warn("Request ({}) - Converting bundle to output stream failed.", getRequestId());
+                    byte[] buffer = new byte[BUFSIZE];
+                    int bytesRead;
+                    while ((bytesRead = resourceInput.read(buffer)) != -1) {
+                        resourceOutput.write(buffer, 0, bytesRead);
+                    }
+                    resourceOutput.flush();
+                } catch (RuntimeException e) {
 
-					throw new WebApplicationException(e, 500);
-				}
+                    logger.warn("Request ({}) - Converting bundle to output stream failed.", getRequestId());
 
-
-				finally {
-					if (resourceInput != null) {
-						resourceInput.close();
-					}
-					if (resourceOutput != null) {
-						resourceOutput.close();
-					}
-				}
+                    throw new WebApplicationException(e, 500);
+                }
 		    }
 		};
 	}

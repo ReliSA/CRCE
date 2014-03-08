@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.rest.internal.xml;
 
 import java.util.Collections;
 import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.Version;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +23,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetReplaceBundle;
-import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
+import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 @Path("/replace-bundle")
 public class ReplaceBundleResource extends ResourceParent implements GetReplaceBundle {
@@ -206,10 +208,10 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 
             List<Resource> resourcesToReturn = Collections.singletonList(resourceToReturn);
 
-            IncludeMetadata include = new IncludeMetadata();
+            MetadataFilter include = new MetadataFilter();
             include.includeAll();
 
-            Trepository repositoryBean = Activator.instance().getConvertorToBeans().convertRepository(resourcesToReturn, include, ui);
+            Repository repositoryBean = Activator.instance().getConvertorToBeans().convertRepository(resourcesToReturn, include, ui);
 
             Response response = Response.ok(createXML(repositoryBean)).build();
             log.debug("Request ({}) - Response was successfully created.", getRequestId());

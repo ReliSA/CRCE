@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.xml;
 
 import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.InvalidSyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +23,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetMetadata;
-import cz.zcu.kiv.crce.rest.internal.convertor.IncludeMetadata;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Trepository;
+import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**
  * Server will provide a metadata information about resources in the repository.
@@ -35,9 +37,6 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
 	private static final Logger logger = LoggerFactory.getLogger(MetadataResource.class);
 
 
-	/**
-	  * {@inheritDoc}
-	  */
     @GET
     @Produces({MediaType.APPLICATION_XML })
     @Override
@@ -54,31 +53,31 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
 
     	List<Resource> storeResources;
 
-    	IncludeMetadata include = new IncludeMetadata();
+    	MetadataFilter include = new MetadataFilter();
 
         if (core == null && cap == null && req == null && prop == null) {
             //include all
             include.includeAll();
         } else {
             if (core != null) {
-                include.setIncludeCore(true);
+                include.setCoreCapabilities(true);
             }
             if (cap != null) {
-                include.setIncludeCaps(true);
+                include.setIncludeCapabilities(true);
                 if (cap.length() > 0) {
-                    include.setIncludeCapByName(cap);
+                    include.setCapabilityNamespace(cap);
                 }
             }
             if (req != null) {
-                include.setIncludeReqs(true);
+                include.setIncludeRequirements(true);
                 if (req.length() > 0) {
-                    include.setIncludeReqByName(req);
+                    include.setRequirementNamespace(req);
                 }
             }
             if (prop != null) {
-                include.setIncludeProps(true);
+                include.setIncludeProperties(true);
                 if (prop.length() > 0) {
-                    include.setIncludePropByName(prop);
+                    include.setPropertyNamespace(prop);
                 }
             }
         }
@@ -94,7 +93,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             }
 
             if (!storeResources.isEmpty()) {
-                Trepository repository = Activator.instance().getConvertorToBeans().convertRepository(storeResources, include, ui);
+                Repository repository = Activator.instance().getConvertorToBeans().mapRepository(storeResources, include, ui);
                 Response response = Response.ok(createXML(repository)).build();
                 logger.debug("Request ({}) - Response was successfully created.", getRequestId());
                 return response;
@@ -112,9 +111,6 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
     }
 
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@GET
 	@Path("{id}")
 	@Produces({ MediaType.APPLICATION_XML })
@@ -125,36 +121,36 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             @QueryParam("cap") String cap,
             @QueryParam("req") String req,
             @QueryParam("prop") String prop,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
 
     	newRequest();
         logger.debug("Request ({}) - Get metadata request for resource with id {} was received.", getRequestId(), id);
 
-    	IncludeMetadata include = new IncludeMetadata();
+    	MetadataFilter filter = new MetadataFilter();
 
         if (core == null && cap == null && req == null && prop == null) {
             //include all
-            include.includeAll();
+            filter.includeAll();
         } else {
             if (core != null) {
-                include.setIncludeCore(true);
+                filter.setCoreCapabilities(true);
             }
             if (cap != null) {
-                include.setIncludeCaps(true);
+                filter.setIncludeCapabilities(true);
                 if (cap.length() > 0) {
-                    include.setIncludeCapByName(cap);
+                    filter.setCapabilityNamespace(cap);
                 }
             }
             if (req != null) {
-                include.setIncludeReqs(true);
+                filter.setIncludeRequirements(true);
                 if (req.length() > 0) {
-                    include.setIncludeReqByName(req);
+                    filter.setRequirementNamespace(req);
                 }
             }
             if (prop != null) {
-                include.setIncludeProps(true);
+                filter.setIncludeProperties(true);
                 if (prop.length() > 0) {
-                    include.setIncludePropByName(prop);
+                    filter.setPropertyNamespace(prop);
                 }
             }
         }
@@ -163,11 +159,11 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             Requirement requirement = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
             requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, id);
 
-            List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
+            List<Resource> resources = Activator.instance().getStore().getResources(requirement);
 
             try {
-                if (!storeResources.isEmpty()) {
-                    Trepository repository = Activator.instance().getConvertorToBeans().convertRepository(storeResources, include, ui);
+                if (!resources.isEmpty()) {
+                    Repository repository = Activator.instance().getConvertorToBeans().mapRepository(resources, filter, uriInfo);
                     Response response = Response.ok(createXML(repository)).build();
                     logger.debug("Request ({}) - Response was successfully created.", getRequestId());
                     return response;

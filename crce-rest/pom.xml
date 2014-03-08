@@ -106,7 +106,9 @@
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/jaxb/metadata.xjb</bindingFile>
                                     <packagename>cz.zcu.kiv.crce.rest.internal.jaxb</packagename>
+                                    <extension>true</extension>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
