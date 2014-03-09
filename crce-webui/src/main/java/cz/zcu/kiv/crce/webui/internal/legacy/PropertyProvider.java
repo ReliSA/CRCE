@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 import java.net.URI;
 import java.net.URL;
 import java.util.Set;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Common interface for subclasses that can provide Properties.

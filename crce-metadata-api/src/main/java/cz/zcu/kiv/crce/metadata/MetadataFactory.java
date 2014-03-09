@@ -50,10 +50,10 @@ public interface MetadataFactory {
     Capability createCapability(@Nonnull String namespace, @Nonnull String id);
 
     @Nonnull
-    <T extends EqualityComparable<T>> Property<T>createProperty(@Nonnull String namespace);
+    <T extends PropertyProvider<T>> Property<T> createProperty(@Nonnull String namespace);
 
     @Nonnull
-    <T extends EqualityComparable<T>> Property<T>createProperty(@Nonnull String namespace, @Nonnull String id);
+    <T extends PropertyProvider<T>> Property<T> createProperty(@Nonnull String namespace, @Nonnull String id);
 
     <T> Attribute<T> createAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
 
@@ -97,5 +97,5 @@ public interface MetadataFactory {
     <T> Attribute<T> cloneAttribute(@Nonnull Attribute<T> attribute);
 
     @Nonnull
-    <T extends EqualityComparable<T>> Property<T> cloneProperty(@Nonnull Property<T> property);
+    <T extends PropertyProvider<T>> Property<T> cloneProperty(@Nonnull Property<T> property);
 }

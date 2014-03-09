@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
+import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
@@ -15,7 +15,7 @@ import cz.zcu.kiv.crce.metadata.PropertyProvider;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyProviderImpl<T extends EqualityComparable<T>> implements PropertyProvider<T> {
+public class PropertyProviderImpl<T extends PropertyProvider<T>> implements PropertyProvider<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,5 +64,10 @@ public class PropertyProviderImpl<T extends EqualityComparable<T>> implements Pr
         if (properties != null) {
             properties.remove(property);
         }
+    }
+
+    @Override
+    public boolean equalsTo(T other, EqualityLevel level) {
+        throw new UnsupportedOperationException("Not intended to be called explicitely.");
     }
 }

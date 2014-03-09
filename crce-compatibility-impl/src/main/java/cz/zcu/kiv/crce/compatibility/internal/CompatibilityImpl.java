@@ -1,11 +1,10 @@
 package cz.zcu.kiv.crce.compatibility.internal;
 
-import org.osgi.framework.Version;
-
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Diff;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Default implementation of Compatibility interface.

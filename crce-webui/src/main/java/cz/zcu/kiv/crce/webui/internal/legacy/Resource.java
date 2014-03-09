@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 
 import java.net.URI;
 import java.util.Map;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Resource represents an artifact and it's OBR metadata.

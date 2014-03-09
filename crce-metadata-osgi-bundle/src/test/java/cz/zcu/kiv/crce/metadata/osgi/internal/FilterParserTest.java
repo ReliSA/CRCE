@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Field;
 import java.util.List;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

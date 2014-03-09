@@ -65,7 +65,6 @@ import org.apache.felix.utils.manifest.Parser;
 import org.apache.felix.utils.version.VersionCleaner;
 import org.apache.felix.utils.version.VersionRange;
 import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +78,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * This is original class DataModelHelperImpl adopted from org.apache.felix.bundlerepository.
@@ -576,18 +576,18 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private static void appendVersion(Requirement requirement, AttributeType<Version> type, VersionRange version) {
         if (version != null) {
             if (!version.isOpenFloor()) {
-                if (!Version.emptyVersion.equals(version.getFloor())) {
-                    requirement.addAttribute(type, version.getFloor(), Operator.GREATER_EQUAL);
+                if (!Version.emptyVersion.equals(new Version(version.getFloor().toString()))) {
+                    requirement.addAttribute(type, new Version(version.getFloor().toString()), Operator.GREATER_EQUAL);
                 }
             } else {
-                requirement.addAttribute(type, version.getFloor(), Operator.GREATER);
+                requirement.addAttribute(type, new Version(version.getFloor().toString()), Operator.GREATER);
             }
 
             if (!VersionRange.INFINITE_VERSION.equals(version.getCeiling())) {
                 if (!version.isOpenCeiling()) {
-                    requirement.addAttribute(type, version.getCeiling(), Operator.LESS_EQUAL);
+                    requirement.addAttribute(type, new Version(version.getCeiling().toString()), Operator.LESS_EQUAL);
                 } else {
-                    requirement.addAttribute(type, version.getCeiling(), Operator.LESS);
+                    requirement.addAttribute(type, new Version(version.getCeiling().toString()), Operator.LESS);
                 }
             }
         }

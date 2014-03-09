@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

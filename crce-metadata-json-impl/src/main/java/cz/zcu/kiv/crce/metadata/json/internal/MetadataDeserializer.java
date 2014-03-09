@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import javax.annotation.CheckForNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.DirectiveProvider;
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
@@ -36,6 +34,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 
 @ParametersAreNonnullByDefault
@@ -319,7 +318,7 @@ public class MetadataDeserializer {
         }
 
         if (parent != null) {
-            property.setParent((EqualityComparable) parent); // TODO Property related genericity/interfaces are weird
+            property.setParent(parent);
             parent.addProperty(property);
         }
 
@@ -399,7 +398,7 @@ public class MetadataDeserializer {
                             continue;
 
                         case "Version":
-                        case "org.osgi.framework.Version":
+                        case "cz.zcu.kiv.crce.metadata.type.Version":
                             callback.addAttribute(new SimpleAttributeType<>(name, Version.class), deserializeVersion(valueNode), operator);
                             continue;
 

@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.rest.internal.structures;
 
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Representation one of requirement's version demands.

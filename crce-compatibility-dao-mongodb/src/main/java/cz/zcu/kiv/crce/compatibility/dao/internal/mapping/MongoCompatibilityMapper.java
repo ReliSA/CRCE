@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.osgi.framework.Version;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Serialization/Deserialization support class between Compatibility and MongoDB.

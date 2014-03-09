@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 import cz.zcu.kiv.crce.webui.internal.legacy.Capability;
 import cz.zcu.kiv.crce.webui.internal.legacy.NewProperty;

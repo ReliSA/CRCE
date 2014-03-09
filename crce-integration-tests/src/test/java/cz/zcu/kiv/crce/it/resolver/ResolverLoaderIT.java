@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.osgi.framework.Version;
 import org.apache.commons.io.FileUtils;
 import org.apache.felix.dm.Component;
 
@@ -36,6 +35,7 @@ import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -280,7 +280,6 @@ public class ResolverLoaderIT extends IntegrationTestBase {
         assertTrue(resources.contains(resource2));
         assertFalse(resources.contains(resource3));
     }
-
 
     @Test
     public void testRequirementWithOrOperatorDirective() throws Exception {

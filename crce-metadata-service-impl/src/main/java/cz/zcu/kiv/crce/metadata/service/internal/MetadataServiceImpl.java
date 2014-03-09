@@ -14,15 +14,16 @@ import javax.annotation.Nonnull;
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -131,7 +132,7 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public <T extends EqualityComparable<T>> String getPresentationName(Property<T> property) {
+    public <T extends PropertyProvider<T>> String getPresentationName(Property<T> property) {
         if (property == null) {
             throw new IllegalArgumentException("Attribute is null.");
         }

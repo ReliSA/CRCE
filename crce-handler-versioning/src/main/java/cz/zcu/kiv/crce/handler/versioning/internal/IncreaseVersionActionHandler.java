@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.handler.versioning.internal;
 
-//import org.osgi.framework.Version;
+//import cz.zcu.kiv.crce.metadata.type.Version;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //

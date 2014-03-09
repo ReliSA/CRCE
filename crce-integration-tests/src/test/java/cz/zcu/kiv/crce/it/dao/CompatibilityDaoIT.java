@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.it.dao;
 
-import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.osgi.framework.Version;
+
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.mongodb.BasicDBObject;
@@ -27,11 +26,13 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.it.IntegrationTestBase;
 import cz.zcu.kiv.crce.it.Options;
 

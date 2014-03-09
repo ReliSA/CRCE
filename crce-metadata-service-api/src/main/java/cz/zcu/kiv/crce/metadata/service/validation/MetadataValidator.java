@@ -3,8 +3,8 @@ package cz.zcu.kiv.crce.metadata.service.validation;
 import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -75,5 +75,5 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    <T extends EqualityComparable<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property);
+    <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property);
 }

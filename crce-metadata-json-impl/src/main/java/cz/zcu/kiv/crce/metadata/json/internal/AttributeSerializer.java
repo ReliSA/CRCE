@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.metadata.json.internal;
 import java.io.IOException;
 import java.util.List;
 
-import org.osgi.framework.Version;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -11,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *

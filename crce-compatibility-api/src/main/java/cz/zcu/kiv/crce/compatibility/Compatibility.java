@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.compatibility;
 
-import org.osgi.framework.Version;
-
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.typescmp.Difference;
 
 /**

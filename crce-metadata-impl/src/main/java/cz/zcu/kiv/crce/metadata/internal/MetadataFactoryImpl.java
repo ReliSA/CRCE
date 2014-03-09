@@ -15,13 +15,13 @@ import org.apache.felix.dm.annotation.api.ServiceDependency;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
@@ -67,12 +67,12 @@ public class MetadataFactoryImpl implements MetadataFactory {
     }
 
     @Override
-    public <T extends EqualityComparable<T>> Property<T> createProperty(String namespace) {
+    public <T extends PropertyProvider<T>> Property<T> createProperty(String namespace) {
         return createProperty(namespace, generateId());
     }
 
     @Override
-    public <T extends EqualityComparable<T>> Property<T> createProperty(String namespace, String id) {
+    public <T extends PropertyProvider<T>> Property<T> createProperty(String namespace, String id) {
         return new PropertyImpl<>(namespace, id);
     }
 
@@ -118,7 +118,7 @@ public class MetadataFactoryImpl implements MetadataFactory {
     }
 
     @Override
-    public <T extends EqualityComparable<T>> Property<T> cloneProperty(Property<T> property) {
+    public <T extends PropertyProvider<T>> Property<T> cloneProperty(Property<T> property) {
         return clone(property);
     }
 

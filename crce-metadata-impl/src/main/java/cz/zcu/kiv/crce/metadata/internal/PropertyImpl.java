@@ -4,16 +4,16 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyImpl<T extends EqualityComparable<T>> extends AttributeProviderImpl implements Property<T> {
+public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProviderImpl implements Property<T>, Comparable<Property<T>> {
 
     private static final long serialVersionUID = -7003533524061344584L;
 
@@ -112,9 +112,14 @@ public class PropertyImpl<T extends EqualityComparable<T>> extends AttributeProv
         hash = 37 * hash + Objects.hashCode(this.id);
         return hash;
     }
-    
+
     @Override
     public String toString() {
         return MetadataFactoryImpl.toString(this);
+    }
+
+    @Override
+    public int compareTo(Property<T> o) {
+        return id.compareTo(o.getId());
     }
 }

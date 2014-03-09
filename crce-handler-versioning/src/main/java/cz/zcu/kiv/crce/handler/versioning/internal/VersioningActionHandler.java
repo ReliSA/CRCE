@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.io.IOUtils;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

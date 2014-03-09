@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 
 import java.util.Arrays;
 import java.util.List;
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * This enumeration indicates the type of Properties.

@@ -3,7 +3,8 @@ package cz.zcu.kiv.crce.metadata.dao.internal.type;
 import java.net.URI;
 import java.util.List;
 
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
+
 
 /**
  *

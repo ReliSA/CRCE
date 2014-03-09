@@ -222,6 +222,9 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
                 if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_NO_KEY)) {
                     return false;
                 }
+                if (!Util.equalsTo(getProperties(), other.getProperties(), EqualityLevel.DEEP_NO_KEY)) {
+                    return false;
+                }
                 return true;
 
             case DEEP_WITH_KEY:
@@ -232,6 +235,9 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
                     return false;
                 }
                 if (!Util.equalsTo(getCapabilities(), other.getCapabilities(), EqualityLevel.DEEP_WITH_KEY)) {
+                    return false;
+                }
+                if (!Util.equalsTo(getProperties(), other.getProperties(), EqualityLevel.DEEP_WITH_KEY)) {
                     return false;
                 }
                 return true;

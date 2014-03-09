@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
-import org.osgi.framework.Version;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -29,6 +28,7 @@ import cz.zcu.kiv.crce.metadata.dao.internal.type.DbOperator;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *

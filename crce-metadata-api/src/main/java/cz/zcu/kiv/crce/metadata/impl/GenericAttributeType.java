@@ -2,15 +2,16 @@ package cz.zcu.kiv.crce.metadata.impl;
 
 import java.util.List;
 import java.util.Objects;
-import org.osgi.framework.Version;
+
 import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 public class GenericAttributeType implements AttributeType<Object> {
-    
+
     private static final long serialVersionUID = -4513168310428826310L;
 
     private String name;
@@ -36,7 +37,7 @@ public class GenericAttributeType implements AttributeType<Object> {
                 break;
 
             case "Version":
-            case "org.osgi.framework.Version":
+            case "cz.zcu.kiv.crce.metadata.type.Version":
                 this.type = Version.class;
                 break;
 

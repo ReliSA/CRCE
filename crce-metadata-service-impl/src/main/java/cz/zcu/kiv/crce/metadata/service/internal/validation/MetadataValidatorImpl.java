@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.EqualityComparable;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.validation.CapabilityValidationResult;
@@ -227,13 +227,13 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
     }
 
     @Override
-    public <T extends EqualityComparable<T>> PropertyValidationResult<T> validate(Property<T> property) {
+    public <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(Property<T> property) {
         PropertyValidationResult<T> result = validate(property, null);
         return result;
     }
 
     @Nonnull
-    private <T extends EqualityComparable<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property, @CheckForNull T parent) {
+    private <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property, @CheckForNull T parent) {
         PropertyValidationResult<T> result = new PropertyValidationResultImpl<>();
         result.setProperty(property);
 

@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
-import org.osgi.framework.Version;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;

@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public interface PropertyProvider<T extends EqualityComparable<T>> extends Serializable {
+public interface PropertyProvider<T extends PropertyProvider<T>> extends EqualityComparable<T>, Entity, Serializable {
 
     @Nonnull
     List<Property<T>> getProperties();

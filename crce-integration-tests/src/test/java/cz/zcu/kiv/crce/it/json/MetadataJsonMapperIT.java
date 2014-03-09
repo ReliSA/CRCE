@@ -7,9 +7,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.osgi.framework.Version;
-
 import org.apache.felix.dm.Component;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.CoreOptions;
@@ -36,6 +35,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *

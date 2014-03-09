@@ -2,11 +2,10 @@ package cz.zcu.kiv.crce.compatibility.dao;
 
 import java.util.List;
 
-import org.osgi.framework.Version;
-
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Interface for Compatibility DAO object.
