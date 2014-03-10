@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.rest.internal.convertor;
 
+import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +25,7 @@ public class ConvertorToBeansTest {
     private static final String TEST_ID_1 = "testid-1.0.0";
     private static final String EXPECTED_UNKNOWN_STATUS = "unknown";
     private static final String CRCE_ID_CAP = "crce.identity";
-    private static final String CRCE_STATUS = "crce.status";
+    private static final String CRCE_STATUS = "status";
 
     public Capability getCapability(List<Capability> caps, String namespace) {
         for (Capability cap : caps) {

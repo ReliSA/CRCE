@@ -13,15 +13,21 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetBundle;
 
@@ -124,11 +130,13 @@ public class BundleResource extends ResourceParent implements GetBundle {
 
 		StreamingOutput output = getBundleAsStream(resourceFile);
 
-
+        MetadataService metadataService = Activator.instance().getMetadataService();
+        Capability capability = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
+        Attribute<String> attribute = capability.getAttribute(new SimpleAttributeType<>("mime", String.class)); // TODO create attribute type
 
         Response response =
             Response.ok(output)
-                .type(Activator.instance().getMimeTypeSelector().selectMimeType(resource))
+                .type(attribute != null ? attribute.getValue() : MediaType.APPLICATION_OCTET_STREAM)
                 .header("content-disposition", "attachment; filename = " + getFileName(resource))
                 .build();
 
@@ -187,7 +195,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
         requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);
 
         if (version != null) {
-            requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, version);
+            requirement.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, new Version(version));
         }
 
 		try {

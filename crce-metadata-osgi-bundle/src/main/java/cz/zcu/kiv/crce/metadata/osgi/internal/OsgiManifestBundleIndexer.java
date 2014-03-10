@@ -41,8 +41,11 @@ import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiExecutionEnvironment;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiService;
+
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
@@ -64,6 +67,7 @@ import org.apache.felix.utils.manifest.Directive;
 import org.apache.felix.utils.manifest.Parser;
 import org.apache.felix.utils.version.VersionCleaner;
 import org.apache.felix.utils.version.VersionRange;
+
 import org.osgi.framework.Constants;
 
 import org.slf4j.Logger;
@@ -88,6 +92,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
     private static final Logger logger = LoggerFactory.getLogger(OsgiManifestBundleIndexer.class);
 
+	public static final String MIME__APPLICATION_OSGI_BUNDLE = "application/vnd.osgi.bundle";
     public static final String BUNDLE_LICENSE = "Bundle-License";
     public static final String BUNDLE_SOURCE = "Bundle-Source";
 
@@ -131,18 +136,21 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             return Collections.emptyList();
         }
 
-        Capability identity = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+        Capability osgiIdentity = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
 
-        if (identity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME) == null) {
+        if (osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME) == null) {
             return Collections.emptyList();
         }
 
-        cz.zcu.kiv.crce.metadata.Attribute<String> pn = identity.getAttribute(NsOsgiIdentity.ATTRIBUTE__PRESENTATION_NAME);
+        cz.zcu.kiv.crce.metadata.Attribute<String> pn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__PRESENTATION_NAME);
         if (pn != null) {
             metadataService.setPresentationName(resource, pn.getValue());
         }
 
         metadataService.addCategory(resource, "osgi");
+
+        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                .setAttribute("mime", String.class, MIME__APPLICATION_OSGI_BUNDLE); // TODO hardcoded
 
         return Collections.singletonList("osgi");
     }
@@ -245,7 +253,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
         identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__NAME, bsn + "-" + v);
         identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, bsn);
-        identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, v);
+        identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, new Version(v));
         if (headers.getHeader(Constants.BUNDLE_NAME) != null) {
             identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__PRESENTATION_NAME, headers.getHeader(Constants.BUNDLE_NAME));
         }
@@ -253,16 +261,28 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__DESCRIPTION, headers.getHeader(Constants.BUNDLE_DESCRIPTION));
         }
         if (headers.getHeader(BUNDLE_LICENSE) != null) {
-            identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__LICENSE_URI, headers.getHeader(BUNDLE_LICENSE));
+            try {
+                identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__LICENSE_URI, new URI(headers.getHeader(BUNDLE_LICENSE)));
+            } catch (URISyntaxException e) {
+                logger.error("Invalid license URI of OSGi resource: {}", headers.getHeader(BUNDLE_LICENSE), e);
+            }
         }
         if (headers.getHeader(Constants.BUNDLE_COPYRIGHT) != null) {
             identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__COPYRIGHT, headers.getHeader(Constants.BUNDLE_COPYRIGHT));
         }
         if (headers.getHeader(Constants.BUNDLE_DOCURL) != null) {
-            identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__DOCUMENTATION_URI, headers.getHeader(Constants.BUNDLE_DOCURL));
+            try {
+                identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__DOCUMENTATION_URI, new URI(headers.getHeader(Constants.BUNDLE_DOCURL)));
+            } catch (URISyntaxException e) {
+                logger.error("Invalid documentation URI of OSGi resource: {}", headers.getHeader(Constants.BUNDLE_DOCURL), e);
+            }
         }
         if (headers.getHeader(BUNDLE_SOURCE) != null) {
-            identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__SOURCE_URI, headers.getHeader(BUNDLE_SOURCE));
+            try {
+                identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__SOURCE_URI, new URI(headers.getHeader(BUNDLE_SOURCE)));
+            } catch (URISyntaxException e) {
+                logger.error("Invalid sources URI of OSGi resource: {}", headers.getHeader(BUNDLE_SOURCE), e);
+            }
         }
 
         doCategories(resource, headers);
@@ -447,8 +467,9 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
             createImportFilter(requirement, NsOsgiPackage.ATTRIBUTE__NAME, clauses[i]);
             requirement.setDirective("text", "Import package " + clauses[i]); // TODO constant
-            requirement.setDirective("optional", Boolean.toString( // TODO constant
-                    Constants.RESOLUTION_OPTIONAL.equalsIgnoreCase(clauses[i].getDirective(Constants.RESOLUTION_DIRECTIVE))));
+            if (Constants.RESOLUTION_OPTIONAL.equalsIgnoreCase(clauses[i].getDirective(Constants.RESOLUTION_DIRECTIVE))) {
+                requirement.setDirective("optional", Boolean.toString(true)); // TODO constant
+            }
             requirement.setResource(resource);
             resource.addRequirement(requirement);
         }

@@ -114,6 +114,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                     .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
                     .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))
                     .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
+                    .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
                     .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class));
         } catch (IOException e) {
             throw new ConfigurationException(STORE_URI, "Can not create store on given base directory: " + uri, e);

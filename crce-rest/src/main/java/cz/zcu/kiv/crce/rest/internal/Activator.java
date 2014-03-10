@@ -9,8 +9,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.rest.internal.convertor.JaxbMapping;
-import cz.zcu.kiv.crce.rest.internal.convertor.MimeTypeSelector;
+import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
 
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
 public final class Activator extends DependencyActivatorBase {
@@ -23,7 +22,6 @@ public final class Activator extends DependencyActivatorBase {
     private volatile Store store;
     private volatile MetadataService metadataService;
     private volatile JaxbMapping convertorToBeans;
-    private volatile MimeTypeSelector mimeTypeSelector;
     private volatile MetadataFactory metadataFactory;
     private volatile FilterParser filterParser;
 
@@ -41,10 +39,6 @@ public final class Activator extends DependencyActivatorBase {
 
     public JaxbMapping getConvertorToBeans() {
         return convertorToBeans;
-    }
-
-    public MimeTypeSelector getMimeTypeSelector() {
-        return mimeTypeSelector;
     }
 
     public MetadataFactory getMetadataFactory() {
@@ -71,7 +65,6 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(JaxbMapping.class).setRequired(true))
-                .add(createServiceDependency().setService(MimeTypeSelector.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
         );

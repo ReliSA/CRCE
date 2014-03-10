@@ -35,7 +35,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostProviderOfCapability;
-import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Attribute;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.structures.VersionDemand;
@@ -293,7 +293,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 		include.includeAll();
 
 		cz.zcu.kiv.crce.rest.internal.jaxb.Repository repo =
-                Activator.instance().getConvertorToBeans().convertRepository(matchingResources, include, null);
+                Activator.instance().getConvertorToBeans().mapRepository(matchingResources, include, null);
 
 		return repo;
 	}

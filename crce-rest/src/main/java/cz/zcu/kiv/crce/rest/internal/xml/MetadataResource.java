@@ -23,7 +23,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetMetadata;
-import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**

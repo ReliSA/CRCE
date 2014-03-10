@@ -14,9 +14,11 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
 import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -49,6 +51,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private volatile MetadataService metadataService; // NOPMD
     private volatile MetadataValidator metadataValidator;
     private volatile ResourceLoader resourceLoader;
+    private volatile IdentityIndexer identityIndexer;
 
     private static final Logger logger = LoggerFactory.getLogger(FilebasedStoreImpl.class);
 
@@ -201,6 +204,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }
 
         logger.info("Saved resource {} is valid.", resource.getId());
+
+        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
+        identity.setAttribute("status", String.class, "stored");
+
         resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
@@ -333,10 +340,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                         }
                         resource.setRepository(repository);
 
-                        // TODO alternatively can be moved to some plugin
-                        metadataService.setSize(resource, file.length());
-                        metadataService.setUri(resource, file.toURI().normalize());
-                        metadataService.setFileName(resource, file.getName());
+                        identityIndexer.preIndex(file, file.getName(), resource);
 
                         ResourceValidationResult validationResult = metadataValidator.validate(resource);
                         if (!validationResult.isContextValid()) {

@@ -123,7 +123,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
                 for (Resource i : store.getResources(filterByName)) {
                     Capability iCapability = metadataService.getSingletonCapability(i, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
                     String iName = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
-                    Version iVersion = new Version(iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION));
+                    Version iVersion = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION);
 
                     logger.debug("Candidate: {}", iName);
                     if (baseResource == null || candVersion == null || candVersion.compareTo(iVersion) < 0) {
@@ -233,7 +233,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
         Capability osgiIdentity = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
         String osgiName = osgiIdentity.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
-        String osgiVersion = osgiIdentity.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION);
+        Version osgiVersion = osgiIdentity.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION);
         checkAlreadyInBuffer(osgiName, buffer);
 
         if (!categories.contains("osgi")) { // TODO constant
@@ -251,7 +251,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
             cap.setAttribute("name", String.class, osgiName + "-" + (osgiVersion != null ? osgiVersion : "0.0.0") + ext); // TODO constant
             // TODO composition of name could be done in some service (maybe some OSGi service similar to MetadataService)
 
-            cap.setAttribute("original-version", String.class, osgiVersion != null ? osgiVersion : "unknown"); // TODO constant
+            cap.setAttribute("original-version", Version.class, osgiVersion != null ? osgiVersion : Version.emptyVersion); // TODO constant
 
         }
         return resource;

@@ -12,16 +12,13 @@ public interface NsOsgiBundle {
 
     String NAMESPACE__OSGI_BUNDLE = "osgi.wiring.bundle";
 
-    AttributeType<String> ATTRIBUTE__SYMBOLIC_NAME =
-            new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.SYMBOLIC_NAME, String.class);
+    AttributeType<String> ATTRIBUTE__SYMBOLIC_NAME = new SimpleAttributeType<>("symbolic-name", String.class);
 
-    AttributeType<String> ATTRIBUTE__PRESENTATION_NAME =
-            new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.PRESENTATION_NAME, String.class);
+    AttributeType<String> ATTRIBUTE__PRESENTATION_NAME = new SimpleAttributeType<>("presentation-name", String.class);
 
     AttributeType<Version> ATTRIBUTE__VERSION =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.VERSION, Version.class);
 
-    AttributeType<String> ATTRIBUTE__MANIFEST_VERSION =
-            new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.MANIFEST_VERSION, String.class);
+    AttributeType<String> ATTRIBUTE__MANIFEST_VERSION = new SimpleAttributeType<>("manifest-version", String.class);
 
 }

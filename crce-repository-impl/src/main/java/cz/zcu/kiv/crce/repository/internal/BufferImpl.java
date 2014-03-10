@@ -20,6 +20,7 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -55,6 +56,7 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile MetadataService metadataService;
     private volatile MetadataValidator metadataValidator;
+    private volatile IdentityIndexer identityIndexer;
     // injected by dependency manager
 
     private final int BUFFER_SIZE = 8 * 1024;
@@ -185,10 +187,7 @@ public class BufferImpl implements Buffer, EventHandler {
         }
         resource.setRepository(repository);
 
-        // TODO alternatively can be moved to some plugin
-        metadataService.setSize(resource, file.length());
-        metadataService.setUri(resource, file.toURI().normalize());
-        metadataService.setFileName(resource, name2);
+        identityIndexer.preIndex(file, name2, resource);
 
         String presentationName = metadataService.getPresentationName(resource);
         if (presentationName.trim().isEmpty()) {
@@ -205,6 +204,8 @@ public class BufferImpl implements Buffer, EventHandler {
             throw e;
         }
 
+        identityIndexer.postIndex(file, resource);
+
         if (tmp == null) {
         	logger.error( "ActionHandler onUploadToBuffer returned null resource, using original");
         } else {
@@ -218,6 +219,9 @@ public class BufferImpl implements Buffer, EventHandler {
         }
 
         logger.info("Uploaded resource {} is valid.", resource.getId());
+
+        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
+        identity.setAttribute("status", String.class, "buffered");
 
         resourceDAO.saveResource(resource);
 

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.internal.convertor;
+package cz.zcu.kiv.crce.rest.internal.mapping;
 
 /**
  * Filter criteria for GET Metadata operation.

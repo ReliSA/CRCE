@@ -23,7 +23,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetReplaceBundle;
-import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 @Path("/replace-bundle")
@@ -211,7 +211,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
             MetadataFilter include = new MetadataFilter();
             include.includeAll();
 
-            Repository repositoryBean = Activator.instance().getConvertorToBeans().convertRepository(resourcesToReturn, include, ui);
+            Repository repositoryBean = Activator.instance().getConvertorToBeans().mapRepository(resourcesToReturn, include, ui);
 
             Response response = Response.ok(createXML(repositoryBean)).build();
             log.debug("Request ({}) - Response was successfully created.", getRequestId());

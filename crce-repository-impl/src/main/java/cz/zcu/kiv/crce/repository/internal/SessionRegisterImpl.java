@@ -46,6 +46,7 @@ public class SessionRegisterImpl implements SessionRegister {
                         .add(dependencyManager.createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataService.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataValidator.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(IdentityIndexer.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(ResourceIndexerService.class).setRequired(true));
 
                 dependencyManager.add(sd.bufferComponent);

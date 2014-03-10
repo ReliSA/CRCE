@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostOtherBundlesMetadata;
-import cz.zcu.kiv.crce.rest.internal.convertor.MetadataFilter;
+import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
@@ -193,7 +193,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
         //convert new resources to repository
         MetadataFilter include = new MetadataFilter();
         include.includeAll();
-        Repository repository = Activator.instance().getConvertorToBeans().convertRepository(newResources, include, ui);
+        Repository repository = Activator.instance().getConvertorToBeans().mapRepository(newResources, include, ui);
 
         //add unknown resources
         repository.getResources().addAll(unknownResources);

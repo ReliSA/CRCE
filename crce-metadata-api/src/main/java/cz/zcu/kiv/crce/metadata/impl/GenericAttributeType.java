@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.metadata.impl;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +45,11 @@ public class GenericAttributeType implements AttributeType<Object> {
             case "List":
             case "java.util.List":
                 this.type = List.class;
+                break;
+
+            case "URI":
+            case "java.net.URI":
+                this.type = URI.class;
                 break;
         }
     }
