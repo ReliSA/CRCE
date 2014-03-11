@@ -50,9 +50,9 @@ abstract class ResourceWrap extends ResourceAdapter {
         }
         return properties;
     }
-    
+
     @Override
-    public NewProperty[] getNewProperties() {        	
+    public NewProperty[] getNewProperties() {
         List<? extends cz.zcu.kiv.crce.metadata.Property<?>> newProperties = resource.getProperties();
         NewProperty[] properties = new NewProperty[newProperties.size()];
         int i = 0;
@@ -126,7 +126,7 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public URI getRelativeUri() {
-        return metadataService.getRelativeUri(resource);
+        return metadataService.getUri(resource);
     }
 
     @Override
@@ -167,20 +167,20 @@ abstract class ResourceWrap extends ResourceAdapter {
             return true;
         }
     }
-    
+
     private static class NewPropertyImpl implements NewProperty {
 
     	private final cz.zcu.kiv.crce.metadata.Property<?> property;
-    	
+
         public NewPropertyImpl(cz.zcu.kiv.crce.metadata.Property<?> property) {
             this.property = property;
         }
-        
+
         @Override
         public String getName() {
             return property.getNamespace();
         }
-    	
+
 		@Override
 		public Property[] getProperties() {
             List<? extends Attribute<?>> attributes = property.getAttributes();
@@ -272,7 +272,7 @@ abstract class ResourceWrap extends ResourceAdapter {
 			this.property.removeAttribute(name);
             return this;
 		}
-    	
+
     }
 
     private static class CapabilityImpl implements cz.zcu.kiv.crce.webui.internal.legacy.Capability {
@@ -287,9 +287,9 @@ abstract class ResourceWrap extends ResourceAdapter {
         public String getName() {
             return capability.getNamespace();
         }
-               
+
         @Override
-        public NewProperty[] getNewProperties() {        	
+        public NewProperty[] getNewProperties() {
             List<? extends cz.zcu.kiv.crce.metadata.Property<?>> newProperties = capability.getProperties();
             NewProperty[] properties = new NewProperty[newProperties.size()];
             int i = 0;

@@ -5,6 +5,7 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -114,27 +115,27 @@ public class ResolverLoaderIT extends IntegrationTestBase {
 
         assertNotNull(resource1);
 
-        repository = resource1.getRepository();
+        repository = metadataFactory.createRepository(new URI("file:/C:/some/repository/path/"), "d9e321fc-7e2d-a123-bc9f-f2ead3d5ac88");
         assertNotNull(repository);
-        assertNotNull(repository.getURI());
+        assertNotNull(repository.getUri());
 
         json = FileUtils.readFileToString(new File("src/test/resources/resolver/Resource2.json"));
         resource2 = metadataJsonMapper.deserialize(json);
         assertNotNull(resource2);
-        assertNotNull(resource2.getRepository());
-        assertNotNull(resource2.getRepository().getURI());
+//        assertNotNull(resource2.getRepository());
+//        assertNotNull(resource2.getRepository().getURI());
 
-        assertEquals(repository.getURI(), resource2.getRepository().getURI());
+//        assertEquals(repository.getUri(), resource2.getRepository().getURI());
         assertFalse(resource1.equalsTo(resource2, EqualityLevel.KEY));
         assertFalse(resource1.equalsTo(resource2, EqualityLevel.DEEP_WITH_KEY));
 
         json = FileUtils.readFileToString(new File("src/test/resources/resolver/Resource3.json"));
         resource3 = metadataJsonMapper.deserialize(json);
         assertNotNull(resource3);
-        assertNotNull(resource3.getRepository());
-        assertNotNull(resource3.getRepository().getURI());
+//        assertNotNull(resource3.getRepository());
+//        assertNotNull(resource3.getRepository().getURI());
 
-        assertEquals(repository.getURI(), resource3.getRepository().getURI());
+//        assertEquals(repository.getUri(), resource3.getRepository().getURI());
         assertFalse(resource1.equalsTo(resource3, EqualityLevel.KEY));
         assertFalse(resource1.equalsTo(resource3, EqualityLevel.DEEP_WITH_KEY));
         assertFalse(resource2.equalsTo(resource3, EqualityLevel.KEY));

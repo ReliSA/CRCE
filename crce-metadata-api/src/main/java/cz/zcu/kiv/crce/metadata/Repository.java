@@ -13,11 +13,14 @@ import javax.annotation.Nonnull;
  */
 public interface Repository extends Entity {
 
+    @Nonnull
+    String getId();
+
     /**
      * Return the associated URL for the repository.
      *
      * @return
      */
     @Nonnull
-    URI getURI();
+    URI getUri();
 }

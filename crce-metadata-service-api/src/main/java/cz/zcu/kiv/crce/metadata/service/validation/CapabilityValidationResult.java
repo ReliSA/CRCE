@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 
@@ -11,9 +12,10 @@ import cz.zcu.kiv.crce.metadata.Capability;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface CapabilityValidationResult extends ValidationResult {
 
-    void setCapability(@Nonnull Capability capability);
+    void setCapability(Capability capability);
 
     @Nullable
     Capability getCapability();
@@ -21,5 +23,5 @@ public interface CapabilityValidationResult extends ValidationResult {
     @Nonnull
     List<CapabilityValidationResult> getChildResults();
 
-    void addChildResult(@Nonnull CapabilityValidationResult result);
+    void addChildResult(CapabilityValidationResult result);
 }

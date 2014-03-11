@@ -178,7 +178,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         if (!sourceFile.exists()) {
             throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
-        resource.setRepository(repository);
+        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                .setAttribute("repository-id", String.class, repository.getId());
 
         File targetFile = new File(baseDir, resource.getId());
 
@@ -338,7 +339,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                             logger.error("Could not index file {}", file, e);
                             continue;
                         }
-                        resource.setRepository(repository);
+                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                                .setAttribute("repository-id", String.class, repository.getId());
 
                         identityIndexer.preIndex(file, file.getName(), resource);
 

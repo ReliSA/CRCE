@@ -103,11 +103,11 @@ public class DownloadServlet extends HttpServlet {
 
     private void doDownload(HttpServletRequest req, HttpServletResponse resp, Resource found) throws IOException { // NOPMD req would be used in the future
 
-        File f = new File(Activator.instance().getMetadataService().getRelativeUri(found));
+        File f = new File(Activator.instance().getMetadataService().getUri(found));
         int length = 0;
         try (ServletOutputStream op = resp.getOutputStream()) {
             ServletContext context = getServletConfig().getServletContext();
-            String mimetype = context.getMimeType(Activator.instance().getMetadataService().getRelativeUri(found).toString());
+            String mimetype = context.getMimeType(Activator.instance().getMetadataService().getUri(found).toString());
 
             //
             //  Set the response and go!

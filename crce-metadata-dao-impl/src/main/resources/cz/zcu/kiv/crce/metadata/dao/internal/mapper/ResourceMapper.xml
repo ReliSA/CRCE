@@ -4,9 +4,11 @@
 
     <!-- Resource -->
     <select id="selectResourceByUri" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
-        SELECT resource_id, repository_id, id, uri
-        FROM resource
-        WHERE uri = #{uri}
+        SELECT r.resource_id, r.repository_id, r.id, r.uri, rp.id AS repository_uuid
+        FROM resource r
+        JOIN repository rp
+          ON rp.repository_id = r.repository_id
+        WHERE r.uri = #{uri}
     </select>
 
     <select id="selectResourcesByRepositoryId" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
@@ -138,31 +140,31 @@
     <!-- Inserts -->
 
     <insert id="insertResource" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
-        insert into resource (resource_id, repository_id, id, uri) values (
+        INSERT INTO resource (resource_id, repository_id, id, uri) VALUES (
           #{resourceId}, #{repositoryId}, #{id}, #{uri}
         )
     </insert>
 
     <insert id="insertCapability" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability">
-        insert into capability (capability_id, parent_capability_id, resource_id, level, id, namespace) values (
+        INSERT INTO capability (capability_id, parent_capability_id, resource_id, level, id, namespace) VALUES (
           #{capabilityId}, #{parentCapabilityId}, #{resourceId}, #{level}, #{id}, #{namespace}
         )
     </insert>
 
     <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
-        insert into requirement (requirement_id, parent_requirement_id, resource_id, level, id, namespace) values (
+        INSERT INTO requirement (requirement_id, parent_requirement_id, resource_id, level, id, namespace) VALUES (
           #{requirementId}, #{parentRequirementId}, #{resourceId}, #{level}, #{id}, #{namespace}
         )
     </insert>
 
     <insert id="insertResourceProperty" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty">
-        insert into resource_property (property_id, resource_id, id, namespace) values (
+        INSERT INTO resource_property (property_id, resource_id, id, namespace) VALUES (
           #{propertyId}, #{parentId}, #{id}, #{namespace}
         )
     </insert>
 
     <insert id="insertCapabilityProperty" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty">
-        insert into capability_property (property_id, capability_id, id, namespace) values (
+        INSERT INTO capability_property (property_id, capability_id, id, namespace) VALUES (
           #{propertyId}, #{parentId}, #{id}, #{namespace}
         )
     </insert>

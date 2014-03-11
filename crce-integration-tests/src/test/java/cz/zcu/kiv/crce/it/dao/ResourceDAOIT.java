@@ -171,7 +171,8 @@ public class ResourceDAOIT extends IntegrationTestBase {
 
         Resource expected = metadataFactory.createResource();
 
-        expected.setRepository(repository);
+        metadataService.getSingletonCapability(expected, metadataService.getIdentityNamespace())
+                .setAttribute("repository-id", String.class, repository.getId());
 
         assertNotNull(expected);
 
@@ -193,6 +194,10 @@ public class ResourceDAOIT extends IntegrationTestBase {
         assertTrue(expected.equalsTo(actual, EqualityLevel.KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.SHALLOW_NO_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.SHALLOW_WITH_KEY));
+        System.out.println("expected:");
+        System.out.println(expected);
+        System.out.println("actual:");
+        System.out.println(actual);
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_NO_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_WITH_KEY));
     }

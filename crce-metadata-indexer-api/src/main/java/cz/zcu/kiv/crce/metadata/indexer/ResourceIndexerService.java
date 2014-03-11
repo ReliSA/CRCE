@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -11,6 +13,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface ResourceIndexerService {
 
     /**
@@ -22,5 +25,5 @@ public interface ResourceIndexerService {
      * @throws IOException If indexing fails on I/O error.
      */
     @Nonnull
-    Resource indexResource(@Nonnull File resource) throws IOException;
+    Resource indexResource(File resource) throws IOException;
 }

@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.metadata.service.validation;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -13,6 +14,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface MetadataValidator {
 
     /**
@@ -22,7 +24,7 @@ public interface MetadataValidator {
      * @return Validation result.
      */
     @Nonnull
-    ResourceValidationResult validate(@Nonnull Resource resource);
+    ResourceValidationResult validate(Resource resource);
 
     /**
      * Validates the given resource and optionally validates its child entities (capabilities, requirements, properties).
@@ -32,7 +34,7 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    ResourceValidationResult validate(@Nonnull Resource resource, boolean includeChildren);
+    ResourceValidationResult validate(Resource resource, boolean includeChildren);
 
     /**
      * Validates the given capability including child capabilities.
@@ -40,7 +42,7 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    CapabilityValidationResult validate(@Nonnull Capability capability);
+    CapabilityValidationResult validate(Capability capability);
 
     /**
      * Validates the given capability and optionally validates its child capabilities.
@@ -49,7 +51,7 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    CapabilityValidationResult validate(@Nonnull Capability capability, boolean includeChildren);
+    CapabilityValidationResult validate(Capability capability, boolean includeChildren);
 
     /**
      * Validates the given requirement including child requirements.
@@ -57,7 +59,7 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    RequirementValidationResult validate(@Nonnull Requirement requirement);
+    RequirementValidationResult validate(Requirement requirement);
 
     /**
      * Validates the given requirement and optionally validates its child requirements.
@@ -66,7 +68,7 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    RequirementValidationResult validate(@Nonnull Requirement requirement, boolean includeChildren);
+    RequirementValidationResult validate(Requirement requirement, boolean includeChildren);
 
     /**
      * Validates the given property including child properties.
@@ -75,5 +77,5 @@ public interface MetadataValidator {
      * @return
      */
     @Nonnull
-    <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property);
+    <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(Property<T> property);
 }

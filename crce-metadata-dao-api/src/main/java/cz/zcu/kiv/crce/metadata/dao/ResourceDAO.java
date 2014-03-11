@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -20,6 +21,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface ResourceDAO {
 
     /**
@@ -31,10 +33,10 @@ public interface ResourceDAO {
      * @throws IOException
      */
     @CheckForNull
-    Resource loadResource(@Nonnull URI uri) throws IOException;
+    Resource loadResource(URI uri) throws IOException;
 
     @Nonnull
-    List<Resource> loadResources(@Nonnull Repository repository) throws IOException;
+    List<Resource> loadResources(Repository repository) throws IOException;
 
     /**
      * Loads all resources in the given repository and whose capabilities match the given filter (at least one capability must match).
@@ -44,7 +46,7 @@ public interface ResourceDAO {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceDAOFilter filter) throws IOException;
+    List<Resource> loadResources(Repository repository, ResourceDAOFilter filter) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.
@@ -52,16 +54,16 @@ public interface ResourceDAO {
      * @param resource
      * @throws IOException
      */
-    void saveResource(@Nonnull Resource resource) throws IOException;
+    void saveResource(Resource resource) throws IOException;
 
     /**
      * Removes metadata of <code>Resource</code>.
      * @param uri
      * @throws IOException
      */
-    void deleteResource(@Nonnull URI uri) throws IOException;
+    void deleteResource(URI uri) throws IOException;
 
-    boolean existsResource(@Nonnull URI uri) throws IOException;
+    boolean existsResource(URI uri) throws IOException;
 
-    boolean existsResource(@Nonnull URI uri, @Nonnull Repository repository) throws IOException;
+    boolean existsResource(URI uri, Repository repository) throws IOException;
 }

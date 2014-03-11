@@ -2,13 +2,16 @@ package cz.zcu.kiv.crce.metadata;
 
 
 import java.net.URI;
+
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Creates empty metadata entities.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface MetadataFactory {
 
     /**
@@ -24,7 +27,7 @@ public interface MetadataFactory {
      * @return An empty resource.
      */
     @Nonnull
-    Resource createResource(@Nonnull String id);
+    Resource createResource(String id);
 
     /**
      * Creates an empty requirement with given name.
@@ -32,7 +35,7 @@ public interface MetadataFactory {
      * @return An empty capability.
      */
     @Nonnull
-    Requirement createRequirement(@Nonnull String namespace);
+    Requirement createRequirement(String namespace);
 
     /**
      * Creates an empty requirement with given name.
@@ -41,30 +44,33 @@ public interface MetadataFactory {
      * @return An empty capability.
      */
     @Nonnull
-    Requirement createRequirement(@Nonnull String namespace, @Nonnull String id);
+    Requirement createRequirement(String namespace, String id);
 
     @Nonnull
-    Capability createCapability(@Nonnull String namespace);
+    Capability createCapability(String namespace);
 
     @Nonnull
-    Capability createCapability(@Nonnull String namespace, @Nonnull String id);
+    Capability createCapability(String namespace, String id);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> createProperty(@Nonnull String namespace);
+    <T extends PropertyProvider<T>> Property<T> createProperty(String namespace);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> createProperty(@Nonnull String namespace, @Nonnull String id);
+    <T extends PropertyProvider<T>> Property<T> createProperty(String namespace, String id);
 
-    <T> Attribute<T> createAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
+    <T> Attribute<T> createAttribute(AttributeType<T> type, T value);
 
-    <T> Attribute<T> createAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
+    <T> Attribute<T> createAttribute(AttributeType<T> type, T value, Operator operator);
 
-    <T> Attribute<T> createAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
+    <T> Attribute<T> createAttribute(String name, Class<T> type, T value);
 
-    <T> Attribute<T> createAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
+    <T> Attribute<T> createAttribute(String name, Class<T> type, T value, Operator operator);
 
     @Nonnull
-    Repository createRepository(@Nonnull URI uri);
+    Repository createRepository(URI uri);
+
+    @Nonnull
+    Repository createRepository(URI uri, String id);
 
     /**
      * Clone the given resource and return it's deep copy.
@@ -81,7 +87,7 @@ public interface MetadataFactory {
      * @return deep copy of resource.
      */
     @Nonnull
-    Resource cloneResource(@Nonnull Resource resource);
+    Resource cloneResource(Resource resource);
 
     /**
      * Creates an empty capability with given name.
@@ -89,13 +95,13 @@ public interface MetadataFactory {
      * @return An empty capability.
      */
     @Nonnull
-    Capability cloneCapability(@Nonnull Capability capability);
+    Capability cloneCapability(Capability capability);
 
     @Nonnull
-    Requirement cloneRequirement(@Nonnull Requirement requirement);
+    Requirement cloneRequirement(Requirement requirement);
 
-    <T> Attribute<T> cloneAttribute(@Nonnull Attribute<T> attribute);
+    <T> Attribute<T> cloneAttribute(Attribute<T> attribute);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> cloneProperty(@Nonnull Property<T> property);
+    <T extends PropertyProvider<T>> Property<T> cloneProperty(Property<T> property);
 }

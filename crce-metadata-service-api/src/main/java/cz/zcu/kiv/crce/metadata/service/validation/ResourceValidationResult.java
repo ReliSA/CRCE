@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -11,9 +12,10 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface ResourceValidationResult extends ValidationResult {
 
-    void setResource(@Nonnull Resource resource);
+    void setResource(Resource resource);
 
     @Nullable
     Resource getResource();
@@ -21,15 +23,15 @@ public interface ResourceValidationResult extends ValidationResult {
     @Nonnull
     List<CapabilityValidationResult> getCapabilityValidationResults();
 
-    void addCapabilityValidationResult(@Nonnull CapabilityValidationResult result);
+    void addCapabilityValidationResult(CapabilityValidationResult result);
 
     @Nonnull
     List<RequirementValidationResult> getRequirementValidationResults();
 
-    void addRequirementValidationResult(@Nonnull RequirementValidationResult result);
+    void addRequirementValidationResult(RequirementValidationResult result);
 
     @Nonnull
-    List<PropertyValidationResult> getPropertyValidationResults();
+    List<PropertyValidationResult<Resource>> getPropertyValidationResults();
 
-    void addPropertyValidationResult(@Nonnull PropertyValidationResult result);
+    void addPropertyValidationResult(PropertyValidationResult<Resource> result);
 }

@@ -24,7 +24,7 @@ public class ResourceSerializer extends JsonSerializer<Resource> {
         jgen.writeStartObject();
 
         jgen.writeStringField(Constants.RESOURCE__ID, resource.getId());
-        jgen.writeObjectField(Constants.RESOURCE__REPOSITORY, resource.getRepository());
+//        jgen.writeObjectField(Constants.RESOURCE__REPOSITORY, resource.getRepository());
 
         // capabilities
         List<Capability> capabilities = resource.getRootCapabilities();

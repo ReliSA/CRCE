@@ -34,8 +34,10 @@ import java.util.StringTokenizer;
  *
  * <p>
  * {@code Version} objects are immutable.
- *
- * @since 1.3
+ * <p>
+ * Based on {@code org.osgi.framework.Version}
+ * 
+ * @since 2.0.0
  * @Immutable
  * @version $Id: a71e2e2d7685e65b5bbe375efdf97fda16eff0a5 $
  */

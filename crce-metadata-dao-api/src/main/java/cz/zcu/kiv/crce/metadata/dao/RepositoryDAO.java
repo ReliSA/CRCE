@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import cz.zcu.kiv.crce.metadata.Repository;
 
 /**
@@ -13,6 +14,7 @@ import cz.zcu.kiv.crce.metadata.Repository;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface RepositoryDAO {
 
     /**
@@ -22,14 +24,14 @@ public interface RepositoryDAO {
      * @throws IOException
      */
     @CheckForNull
-    Repository loadRepository(@Nonnull URI uri) throws IOException;
+    Repository loadRepository(URI uri) throws IOException;
 
     /**
      * Deletes existing repository (if it exists) including all contained resources.
      * @param repository
      * @throws IOException
      */
-    void deleteRepository(@Nonnull Repository repository) throws IOException;
+    void deleteRepository(Repository repository) throws IOException;
 
     /**
      * Stores metadata of resources stored in the given repository. Typical
@@ -37,5 +39,5 @@ public interface RepositoryDAO {
      * @param repository
      * @throws IOException
      */
-    void saveRepository(@Nonnull Repository repository) throws IOException;
+    void saveRepository(Repository repository) throws IOException;
 }

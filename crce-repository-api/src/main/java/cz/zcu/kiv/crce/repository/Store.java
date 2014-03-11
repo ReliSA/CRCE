@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -15,6 +16,7 @@ import cz.zcu.kiv.crce.repository.plugins.Executable;
  * This interface defines permanent store for artifacts.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface Store {
 
     /**
@@ -26,7 +28,7 @@ public interface Store {
      * @throws RefusedArtifactException
      */
     @Nonnull
-    Resource put(@Nonnull Resource resource) throws IOException, RefusedArtifactException;
+    Resource put(Resource resource) throws IOException, RefusedArtifactException;
 
     /**
      * Removes the resource from this buffer and returns <code>true</code>, if
@@ -38,7 +40,7 @@ public interface Store {
      * removing.
      * @throws IOException
      */
-    boolean remove(@Nonnull Resource resource) throws IOException;
+    boolean remove(Resource resource) throws IOException;
 
     /**
      * Returns list of resources stored in the Store.
@@ -57,5 +59,5 @@ public interface Store {
      * @param executable
      * @param properties
      */
-    void execute(@Nonnull List<Resource> resources, @Nonnull Executable executable, @CheckForNull Properties properties);
+    void execute(List<Resource> resources, Executable executable, @CheckForNull Properties properties);
 }

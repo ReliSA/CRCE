@@ -7,6 +7,7 @@ package cz.zcu.kiv.crce.metadata.dao.internal.db;
 public class DbRepository {
 
     private long repositoryId;
+    private String id;
     private String uri;
 
     public long getRepositoryId() {
@@ -23,5 +24,13 @@ public class DbRepository {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

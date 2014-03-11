@@ -4,12 +4,12 @@
 
     <!-- Repository -->
     <select id="selectRepositoryByUri" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository">
-        SELECT repository_id, uri
+        SELECT repository_id, uri, id
         FROM repository
         WHERE uri = #{uri}
     </select>
     <select id="selectRepositoryByRepositoryId" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository">
-        SELECT repository_id, uri
+        SELECT repository_id, uri, id
         FROM repository
         WHERE repository_id = #{repositoryId}
     </select>
@@ -17,12 +17,12 @@
     <select id="selectRepositoryId" parameterType="String" resultType="Long">
         SELECT repository_id
         FROM repository
-        WHERE uri = #{uri}
+        WHERE id = #{id}
     </select>
 
     <insert id="insertRepository" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository">
-        insert into repository (repository_id, uri) values (
-          #{repositoryId}, #{uri}
+        insert into repository (repository_id, uri, id) values (
+          #{repositoryId}, #{uri}, #{id}
         )
     </insert>
 

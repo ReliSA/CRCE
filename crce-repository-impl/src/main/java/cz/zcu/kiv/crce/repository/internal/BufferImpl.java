@@ -185,7 +185,8 @@ public class BufferImpl implements Buffer, EventHandler {
         if (resource == null) {
             resource = resourceIndexerService.indexResource(file);
         }
-        resource.setRepository(repository);
+        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                .setAttribute("repository-id", String.class, repository.getId());
 
         identityIndexer.preIndex(file, name2, resource);
 

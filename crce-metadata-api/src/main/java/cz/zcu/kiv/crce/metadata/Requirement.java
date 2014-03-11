@@ -6,12 +6,14 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents a requirement to a capability with the same name.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface Requirement extends DirectiveProvider, EqualityComparable<Requirement>, Entity {
 
     @Nonnull
@@ -30,9 +32,9 @@ public interface Requirement extends DirectiveProvider, EqualityComparable<Requi
 
     boolean setParent(@Nullable Requirement parent);
 
-    boolean addChild(@Nonnull Requirement requirement);
+    boolean addChild(Requirement requirement);
 
-    boolean removeChild(@Nonnull Requirement requirement);
+    boolean removeChild(Requirement requirement);
 
     @Nonnull
     List<Requirement> getChildren();
@@ -44,16 +46,16 @@ public interface Requirement extends DirectiveProvider, EqualityComparable<Requi
     Map<String, List<Attribute<?>>> getAttributesMap();
 
     @Nonnull
-    <T> List<Attribute<T>> getAttributes(@Nonnull AttributeType<T> type);
+    <T> List<Attribute<T>> getAttributes(AttributeType<T> type);
 
-    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @Nonnull T value);
+    <T> boolean addAttribute(AttributeType<T> type, T value);
 
-    <T> boolean addAttribute(@Nonnull AttributeType<T> type, @Nonnull T value, @Nonnull Operator operator);
+    <T> boolean addAttribute(AttributeType<T> type, T value, Operator operator);
 
     // TODO is this method AttributeType implementation-safe?
-    <T> boolean addAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value);
+    <T> boolean addAttribute(String name, Class<T> type, T value);
 
-    <T> boolean addAttribute(@Nonnull String name, @Nonnull Class<T> type, @Nonnull T value, @Nonnull Operator operator);
+    <T> boolean addAttribute(String name, Class<T> type, T value, Operator operator);
 
-    <T> boolean addAttribute(@Nonnull Attribute<T> attribute);
+    <T> boolean addAttribute(Attribute<T> attribute);
 }

@@ -8,6 +8,7 @@ public class DbResource {
 
     private long resourceId;
     private long repositoryId;
+    private String repositoryUuid;
     private String id;
     private String uri;
 
@@ -41,5 +42,13 @@ public class DbResource {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getRepositoryUuid() {
+        return repositoryUuid;
+    }
+
+    public void setRepositoryUuid(String repositoryUuid) {
+        this.repositoryUuid = repositoryUuid;
     }
 }

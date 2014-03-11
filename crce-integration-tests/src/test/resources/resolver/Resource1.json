@@ -1,8 +1,5 @@
 {
     "id": "ba106815-232c-478b-92e8-87b3dz99dhrf",
-    "repository": {
-        "uri": "file:/C:/some/repository/path/"
-    },
     "capabilities": [{
             "id": "58d2e3a7-f3a1-4fa3-b033-461ecba3e193",
             "namespace": "osgi.wiring.bundle",
@@ -74,6 +71,10 @@
                     "name": "size",
                     "type": "Long",
                     "value": "990836"
+                }, {
+                    "name": "repository-id",
+                    "type": "String",
+                    "value": "d9e321fc-7e2d-a123-bc9f-f2ead3d5ac88"
                 }]
         }, {
             "id": "dd8e5t22-1c0a-4672-8901-e65022bf03fd",

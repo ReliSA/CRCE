@@ -71,7 +71,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByUri", uri.toString());
         if (dbRepository != null) {
             try {
-                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()));
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()), dbRepository.getId());
             } catch (URISyntaxException ex) {
                 throw new IllegalArgumentException("Invalid URI: " + dbRepository.getUri(), ex);
             }
@@ -84,7 +84,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         logger.debug("deleteRepository(repository={})", repository);
 
         try (SqlSession session = sessionManager.getSession()) {
-            session.delete(REPOSITORY_MAPPER + "deleteRepository", repository.getURI().toString());
+            session.delete(REPOSITORY_MAPPER + "deleteRepository", repository.getUri().toString());
         }
 
         logger.debug("deleteRepository(repository={}) returns", repository);
@@ -95,7 +95,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         logger.debug("saveRepository(repository={})", repository);
 
         try (SqlSession session = sessionManager.getSession()) {
-            if (loadRepository(repository.getURI()) == null) {
+            if (loadRepository(repository.getUri()) == null) {
                 SequenceMapper seqMapper = session.getMapper(SequenceMapper.class);
 
                 DbRepository dbRepository = new DbRepository();
@@ -103,7 +103,8 @@ public class RepositoryDAOImpl implements RepositoryDAO {
                 long repositoryId = seqMapper.nextVal("resource_seq");
 
                 dbRepository.setRepositoryId(repositoryId);
-                dbRepository.setUri(repository.getURI().toString());
+                dbRepository.setUri(repository.getUri().toString());
+                dbRepository.setId(repository.getId());
 
                 session.insert(REPOSITORY_MAPPER + "insertRepository", dbRepository);
 
@@ -119,12 +120,12 @@ public class RepositoryDAOImpl implements RepositoryDAO {
     /* Internal public methods */
 
     @CheckForNull
-    public Long getRepositoryId(@Nonnull Repository repository, @Nonnull SqlSession session) {
-        logger.debug("getRepositoryId(repository={})", repository);
+    public Long getRepositoryId(@Nonnull String uuid, @Nonnull SqlSession session) {
+        logger.debug("getRepositoryId(uuid={})", uuid);
 
-        Long repositoryId = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryId", repository.getURI().toString());
+        Long repositoryId = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryId", uuid);
 
-        logger.debug("getRepositoryId(repository={}) returns {}", repository, repositoryId);
+        logger.debug("getRepositoryId(uuid={}) returns {}", uuid, repositoryId);
 
         return repositoryId;
     }
@@ -138,7 +139,7 @@ public class RepositoryDAOImpl implements RepositoryDAO {
         DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByRepositoryId", repositoryId);
         if (dbRepository != null) {
             try {
-                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()));
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()), dbRepository.getId());
             } catch (URISyntaxException e) {
                 throw new IOException("Invalid URI syntax of repository with ID: " + repositoryId + ", URI: " + dbRepository.getUri(), e);
             }

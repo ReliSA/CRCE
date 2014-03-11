@@ -3,6 +3,8 @@ package cz.zcu.kiv.crce.metadata.indexer;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
 
@@ -25,6 +27,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface ResourceIndexer extends Plugin {
 
     /**

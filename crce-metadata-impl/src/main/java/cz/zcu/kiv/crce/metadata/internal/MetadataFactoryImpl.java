@@ -99,7 +99,12 @@ public class MetadataFactoryImpl implements MetadataFactory {
 
     @Override
     public Repository createRepository(URI uri) {
-        return new RepositoryImpl(uri);
+        return createRepository(uri, generateId());
+    }
+
+    @Override
+    public Repository createRepository(URI uri, String id) {
+        return new RepositoryImpl(uri, id);
     }
 
     @Override

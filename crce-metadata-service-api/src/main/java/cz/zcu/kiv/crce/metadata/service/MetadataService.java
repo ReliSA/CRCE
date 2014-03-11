@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -16,35 +17,33 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface MetadataService {
 
     @Nonnull
     String getIdentityNamespace();
 
     @Nonnull
-    String getPresentationName(@Nonnull Resource resource);
+    String getPresentationName(Resource resource);
 
-    void setPresentationName(@Nonnull Resource resource, @Nonnull String name);
-
-    @Nonnull
-    String getPresentationName(@Nonnull Capability capability);
+    void setPresentationName(Resource resource, String name);
 
     @Nonnull
-    String getPresentationName(@Nonnull Requirement requirement);
+    String getPresentationName(Capability capability);
 
     @Nonnull
-    <T extends PropertyProvider<T>> String getPresentationName(@Nonnull Property<T> property);
+    String getPresentationName(Requirement requirement);
 
     @Nonnull
-    String getPresentationName(@Nonnull Attribute<?> attribute);
+    <T extends PropertyProvider<T>> String getPresentationName(Property<T> property);
 
     @Nonnull
-    URI getUri(@Nonnull Resource resource);
+    String getPresentationName(Attribute<?> attribute);
 
     @Nonnull
-    URI getRelativeUri(@Nonnull Resource resource);
+    URI getUri(Resource resource);
 
-    void setUri(@Nonnull Resource resource, @Nonnull URI uri);
+    void setUri(Resource resource, URI uri);
 
     /**
      *
@@ -52,37 +51,37 @@ public interface MetadataService {
      * @param uri
      * @throws IllegalArgumentException If the given URI syntax is not valid.
      */
-    void setUri(@Nonnull Resource resource, @Nonnull String uri) throws IllegalArgumentException;
+    void setUri(Resource resource, String uri) throws IllegalArgumentException;
 
     @Nonnull
-    String getFileName(@Nonnull Resource resource);
+    String getFileName(Resource resource);
 
-    void setFileName(@Nonnull Resource resource, @Nonnull String fileName);
+    void setFileName(Resource resource, String fileName);
 
-    long getSize(@Nonnull Resource resource);
+    long getSize(Resource resource);
 
-    void setSize(@Nonnull Resource resource, long size);
+    void setSize(Resource resource, long size);
 
     @Nonnull
-    List<String> getCategories(@Nonnull Resource resource);
+    List<String> getCategories(Resource resource);
 
-    void addCategory(@Nonnull Resource resource, @Nonnull String category);
+    void addCategory(Resource resource, String category);
 
-    void removeCategory(@Nonnull Resource resource, @Nonnull String category);
+    void removeCategory(Resource resource, String category);
 
     /**
      * Safely adds the given capability to the resource including capability children.
      * @param resource
      * @param capability
      */
-    void addRootCapability(@Nonnull Resource resource, @Nonnull Capability capability);
+    void addRootCapability(Resource resource, Capability capability);
 
     /**
      * Safely removes capability from the resource including capability children.
      * @param resource
      * @param capability
      */
-    void removeCapability(@Nonnull Resource resource, @Nonnull Capability capability);
+    void removeCapability(Resource resource, Capability capability);
 
     /**
      * Safely adds the given child capability into children of the parent one including
@@ -90,11 +89,11 @@ public interface MetadataService {
      * @param parent
      * @param child
      */
-    void addChild(@Nonnull Capability parent, @Nonnull Capability child);
+    void addChild(Capability parent, Capability child);
 
-    void addRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
+    void addRequirement(Resource resource, Requirement requirement);
 
-    void removeRequirement(@Nonnull Resource resource, @Nonnull Requirement requirement);
+    void removeRequirement(Resource resource, Requirement requirement);
 
     /**
      * Returns a capability of the given namespace which exists only as a singleton
@@ -107,5 +106,5 @@ public interface MetadataService {
      * @return
      */
     @Nonnull
-    Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace);
+    Capability getSingletonCapability(Resource resource, String namespace);
 }

@@ -24,7 +24,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
@@ -41,7 +40,7 @@ public class MetadataServiceImpl implements MetadataService {
     private static final Logger logger = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
     public static final String NAMESPACE__CRCE_IDENTITY = "crce.identity";
-    
+
     public static final AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
     public static final AttributeType<URI> ATTRIBUTE__URI = new SimpleAttributeType<>("uri", URI.class);
     public static final AttributeType<String> ATTRIBUTE__FILE_NAME = new SimpleAttributeType<>("file-name", String.class);
@@ -163,16 +162,16 @@ public class MetadataServiceImpl implements MetadataService {
         return uri;
     }
 
-    @Override
-    public URI getRelativeUri(Resource resource) {
-        URI absolute = getUri(resource);
-        Repository repository = resource.getRepository();
-        if (repository != null) {
-            URI repositoryUri = repository.getURI();
-            return repositoryUri.relativize(absolute);
-        }
-        return absolute;
-    }
+//    @Override
+//    public URI getRelativeUri(Resource resource) {
+//        URI absolute = getUri(resource);
+//        Repository repository = resource.getRepository();
+//        if (repository != null) {
+//            URI repositoryUri = repository.getUri();
+//            return repositoryUri.relativize(absolute);
+//        }
+//        return absolute;
+//    }
 
     @Override
     public void setUri(Resource resource, URI uri) {

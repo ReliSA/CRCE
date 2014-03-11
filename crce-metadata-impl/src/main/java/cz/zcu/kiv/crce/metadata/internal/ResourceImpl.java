@@ -9,7 +9,6 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -24,7 +23,6 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
     private static final long serialVersionUID = 2594634894045505360L;
 
     private final String id;
-    private Repository repository = null;
     /*
      * All maps:
      * Key: namespace, value: list of entities.
@@ -40,16 +38,6 @@ public class ResourceImpl extends PropertyProviderImpl<Resource> implements Reso
     @Override
     public String getId() {
         return id;
-    }
-
-    @Override
-    public Repository getRepository() {
-        return repository;
-    }
-
-    @Override
-    public void setRepository(Repository repository) {
-        this.repository = repository;
     }
 
     @Override

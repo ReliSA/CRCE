@@ -3,12 +3,14 @@ package cz.zcu.kiv.crce.metadata.service.validation;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Common validation result interface.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface ValidationResult {
 
     String getEntityId();
@@ -40,5 +42,5 @@ public interface ValidationResult {
     @Nonnull
     List<Reason> getReasons();
 
-    void addReason(@Nonnull Reason reason);
+    void addReason(Reason reason);
 }

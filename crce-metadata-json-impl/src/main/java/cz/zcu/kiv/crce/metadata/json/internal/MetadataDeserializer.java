@@ -28,7 +28,6 @@ import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
@@ -72,9 +71,9 @@ public class MetadataDeserializer {
         while (fields.hasNext()) {
             Entry<String, JsonNode> node = fields.next();
             switch (node.getKey()) {
-                case Constants.RESOURCE__REPOSITORY:
-                    deserializeRepository(resource, node.getValue());
-                    continue;
+//                case Constants.RESOURCE__REPOSITORY:
+//                    deserializeRepository(resource, node.getValue());
+//                    continue;
 
                 case Constants.RESOURCE__CAPABILITIES:
                     deserializeCapabilities(resource, null, node.getValue());
@@ -96,25 +95,25 @@ public class MetadataDeserializer {
         return resource;
     }
 
-    private void deserializeRepository(Resource resource, JsonNode root) throws IOException {
-        Iterator<Entry<String, JsonNode>> fields = root.fields();
-        while (fields.hasNext()) {
-            Entry<String, JsonNode> node = fields.next();
-            switch (node.getKey()) {
-                case Constants.REPOSITORY__URI:
-                    Repository repository;
-                    try {
-                        repository = metadataFactory.createRepository(new URI(node.getValue().asText()));
-                    } catch (URISyntaxException ex) {
-                        throw new IOException("Invalid URI: " + node.getValue().asText(), ex);
-                    }
-                    resource.setRepository(repository);
-                    return;
-
-                default:
-            }
-        }
-    }
+//    private void deserializeRepository(Resource resource, JsonNode root) throws IOException {
+//        Iterator<Entry<String, JsonNode>> fields = root.fields();
+//        while (fields.hasNext()) {
+//            Entry<String, JsonNode> node = fields.next();
+//            switch (node.getKey()) {
+//                case Constants.REPOSITORY__URI:
+//                    Repository repository;
+//                    try {
+//                        repository = metadataFactory.createRepository(new URI(node.getValue().asText()));
+//                    } catch (URISyntaxException ex) {
+//                        throw new IOException("Invalid URI: " + node.getValue().asText(), ex);
+//                    }
+//                    resource.setRepository(repository);
+//                    return;
+//
+//                default:
+//            }
+//        }
+//    }
 
     @SuppressWarnings("unchecked")
     private void deserializeCapabilities(@CheckForNull Resource resource, @CheckForNull Capability parent, JsonNode root) {

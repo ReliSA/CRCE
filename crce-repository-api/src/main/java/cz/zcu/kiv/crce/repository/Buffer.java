@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -13,6 +14,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * them to the permanent store.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface Buffer extends Store {
 
     /**
@@ -25,7 +27,7 @@ public interface Buffer extends Store {
      * @throws RefusedArtifactException
      */
     @Nonnull
-    Resource put(@Nonnull String name, @Nonnull InputStream resource) throws IOException, RefusedArtifactException;
+    Resource put(String name, InputStream resource) throws IOException, RefusedArtifactException;
 
     /**
      * Commits uploaded resources to the configured store.
@@ -53,5 +55,5 @@ public interface Buffer extends Store {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> commit(@Nonnull List<Resource> resources, boolean move) throws IOException;
+    List<Resource> commit(List<Resource> resources, boolean move) throws IOException;
 }

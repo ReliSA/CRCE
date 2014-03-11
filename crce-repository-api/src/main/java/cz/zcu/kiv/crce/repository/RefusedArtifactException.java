@@ -1,12 +1,13 @@
 package cz.zcu.kiv.crce.repository;
 
-import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Throwed if artifact put into the Buffer or Store is revoked and can not be stored.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public class RefusedArtifactException extends Exception {
 
     private static final long serialVersionUID = 3732119005799739933L;
@@ -25,11 +26,11 @@ public class RefusedArtifactException extends Exception {
 
     private REASON reason;
 
-    public RefusedArtifactException(@Nonnull String reason) {
+    public RefusedArtifactException(String reason) {
         this(reason, REASON.UNSPECIFIED);
     }
 
-    public RefusedArtifactException(@Nonnull String reasonDesc, @Nonnull REASON reason) {
+    public RefusedArtifactException(String reasonDesc, REASON reason) {
         super(reasonDesc);
         this.reason = reason;
     }

@@ -154,11 +154,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
     }
 
     private Resource createResource() throws Exception {
-        Repository repository = metadataFactory.createRepository(new URI("file://repository/path"));
-
         Resource resource = metadataFactory.createResource("res1");
-
-        resource.setRepository(repository);
 
         createProperty1(resource);
 

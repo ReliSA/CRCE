@@ -39,6 +39,7 @@ import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -80,13 +81,6 @@ public class ResourceDAOImpl implements ResourceDAO {
 
             if (dbResource != null) {
                 result = loadResource(dbResource, session);
-
-                Repository repository = repositoryDAOImpl.loadRepository(dbResource.getRepositoryId(), session);
-                if (repository != null) {
-                    result.setRepository(repository);
-                } else {
-                    logger.warn("Could not load repository for resource {}", result);
-                }
             }
         } catch (PersistenceException e) {
             throw new IOException("Could not load resource.", e);
@@ -98,7 +92,10 @@ public class ResourceDAOImpl implements ResourceDAO {
 
     private Resource loadResource(@Nonnull DbResource dbResource, @Nonnull SqlSession session) {
         Resource resource = metadataFactory.createResource(dbResource.getId());
+        // loaded from DB as part of capabilities:
 //        metadataService.setUri(resource, dbResource.getUri());
+//        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+//                .setAttribute("repository-id", String.class, dbResource.getRepositoryUuid());
 
         loadCapabilities(resource, dbResource.getResourceId(), session);
         loadRequirements(resource, dbResource.getResourceId(), session);
@@ -285,7 +282,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         List<Resource> result = Collections.emptyList();
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
 
             if (repositoryId != null) {
                 List<DbResource> dbResources = session.selectList(RESOURCE_MAPPER + "selectResourcesByRepositoryId", repositoryId);
@@ -294,7 +291,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                     for (DbResource dbResource : dbResources) {
                         // TODO optimize - select in loop
                         Resource resource = loadResource(dbResource, session);
-                        resource.setRepository(repository);
+                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                                .setAttribute("repository-id", String.class, repository.getId());
                         result.add(resource);
                     }
                 }
@@ -319,7 +317,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         List<Resource> result = Collections.emptyList();
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
 
             if (repositoryId != null) {
                 List<DbResource> dbResources = null;
@@ -341,7 +339,8 @@ public class ResourceDAOImpl implements ResourceDAO {
                     for (DbResource dbResource : dbResources) {
                         // TODO optimize - select in loop
                         Resource resource = loadResource(dbResource, session);
-                        resource.setRepository(repository);
+                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                                .setAttribute("repository-id", String.class, repository.getId());
                         result.add(resource);
                     }
                 }
@@ -384,14 +383,18 @@ public class ResourceDAOImpl implements ResourceDAO {
             long resourceId = seqMapper.nextVal("resource_seq");
             dbResource.setResourceId(resourceId);
 
-            Repository repository = resource.getRepository();
-            if (repository == null) {
+            String repositoryUuid = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
+                            .getAttributeValue(new SimpleAttributeType<>("repository-id", String.class));
+
+            if (repositoryUuid == null) {
                 throw new IllegalArgumentException("Repository is not set on resource: " + resource.getId());
             }
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repositoryUuid, session);
             if (repositoryId == null) {
-                throw new IllegalStateException("Repository doesn't exist: " + repository.getURI());
+                throw new IllegalArgumentException("Repository doesn't exist: " + repositoryUuid);
             }
+
             dbResource.setRepositoryId(repositoryId);
 
             session.insert(RESOURCE_MAPPER + "insertResource", dbResource);
@@ -546,7 +549,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         boolean result = false;
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository, session);
+            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
 
             DbResource dbResource = session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString());
             if (dbResource != null && dbResource.getRepositoryId() == repositoryId) {

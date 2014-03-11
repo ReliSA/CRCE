@@ -18,7 +18,7 @@ public class ResourceValidationResultImpl extends AbstractValidationResult imple
 
     private final List<CapabilityValidationResult> capabilityValidationResults = new ArrayList<>();
     private final List<RequirementValidationResult> requirementValidationResults = new ArrayList<>();
-    private final List<PropertyValidationResult> propertyValidationResults = new ArrayList<>();
+    private final List<PropertyValidationResult<Resource>> propertyValidationResults = new ArrayList<>();
     private Resource resource;
 
     @Override
@@ -52,12 +52,12 @@ public class ResourceValidationResultImpl extends AbstractValidationResult imple
     }
 
     @Override
-    public List<PropertyValidationResult> getPropertyValidationResults() {
+    public List<PropertyValidationResult<Resource>> getPropertyValidationResults() {
         return propertyValidationResults;
     }
 
     @Override
-    public void addPropertyValidationResult(PropertyValidationResult result) {
+    public void addPropertyValidationResult(PropertyValidationResult<Resource> result) {
         propertyValidationResults.add(result);
     }
 
@@ -79,7 +79,7 @@ public class ResourceValidationResultImpl extends AbstractValidationResult imple
         for (RequirementValidationResult requirementValidationResult : requirementValidationResults) {
             sb.append(requirementValidationResult.toString());
         }
-        for (PropertyValidationResult propertyValidationResult : propertyValidationResults) {
+        for (PropertyValidationResult<Resource> propertyValidationResult : propertyValidationResults) {
             sb.append(propertyValidationResult.toString());
         }
         return sb.toString();

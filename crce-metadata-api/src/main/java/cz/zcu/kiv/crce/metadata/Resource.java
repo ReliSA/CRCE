@@ -2,8 +2,8 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.util.List;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Resource represents an artifact and it's metadata.
@@ -14,35 +14,33 @@ import javax.annotation.Nonnull;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Entity {
 
     @Nonnull
     String getId();
 
-    @CheckForNull
-    Repository getRepository();
-
     @Nonnull
     List<Capability> getCapabilities();
 
     @Nonnull
-    List<Capability> getCapabilities(@Nonnull String namespace);
+    List<Capability> getCapabilities(String namespace);
 
     @Nonnull
     List<Capability> getRootCapabilities();
 
     @Nonnull
-    List<Capability> getRootCapabilities(@Nonnull String namespace);
+    List<Capability> getRootCapabilities(String namespace);
 
     @Nonnull
     List<Requirement> getRequirements();
 
     @Nonnull
-    List<Requirement> getRequirements(@Nonnull String namespace);
+    List<Requirement> getRequirements(String namespace);
 
-    boolean hasCapability(@Nonnull Capability capability);
+    boolean hasCapability(Capability capability);
 
-    boolean hasRequirement(@Nonnull Requirement requirement);
+    boolean hasRequirement(Requirement requirement);
 
     /* --- setters --- */
 
@@ -51,21 +49,19 @@ public interface Resource extends PropertyProvider<Resource>, EqualityComparable
      * <p>Note: This method doesn't add the capability to the list of root capabilities.
      * @param capability Capability to be added.
      */
-    void addCapability(@Nonnull Capability capability);
+    void addCapability(Capability capability);
 
     /**
      * Adds the given capability to the list of root capabilities.
      * @param capability Capability to be added.
      */
-    void addRootCapability(@Nonnull Capability capability);
+    void addRootCapability(Capability capability);
 
-    void addRequirement(@Nonnull Requirement requirement);
+    void addRequirement(Requirement requirement);
 
-    void removeCapability(@Nonnull Capability capability);
+    void removeCapability(Capability capability);
 
-    void removeRootCapability(@Nonnull Capability capability);
+    void removeRootCapability(Capability capability);
 
-    void removeRequirement(@Nonnull Requirement requirement);
-
-    void setRepository(@Nonnull Repository repository);
+    void removeRequirement(Requirement requirement);
 }

@@ -5,12 +5,14 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents an Capability.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface Capability
         extends AttributeProvider, DirectiveProvider, PropertyProvider<Capability>, EqualityComparable<Capability>, Entity {
 
@@ -30,9 +32,9 @@ public interface Capability
 
     boolean setParent(@Nullable Capability parent);
 
-    boolean addChild(@Nonnull Capability capability);
+    boolean addChild(Capability capability);
 
-    boolean removeChild(@Nonnull Capability capability);
+    boolean removeChild(Capability capability);
 
     @Nonnull
     List<Capability> getChildren();

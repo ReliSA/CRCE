@@ -5,20 +5,22 @@ import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface DirectiveProvider extends Serializable {
 
     @CheckForNull
-    String getDirective(@Nonnull String name);
+    String getDirective(String name);
 
     @Nonnull
     Map<String, String> getDirectives();
 
-    boolean setDirective(@Nonnull String name, @Nonnull String directive);
+    boolean setDirective(String name, String directive);
 
-    boolean unsetDirective(@Nonnull String name);
+    boolean unsetDirective(String name);
 }

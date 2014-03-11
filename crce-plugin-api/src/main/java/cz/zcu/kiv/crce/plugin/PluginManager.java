@@ -4,12 +4,14 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Plugin manager is responsible to register, unregister and provide plugins.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@ParametersAreNonnullByDefault
 public interface PluginManager {
 
     String NO_KEYWORDS = "";
@@ -52,7 +54,7 @@ public interface PluginManager {
      * @return the array with plugins of given type.
      */
     @Nonnull
-    <T extends Plugin> List<T> getPlugins(@Nonnull Class<T> type);
+    <T extends Plugin> List<T> getPlugins(Class<T> type);
 
 
         // TODO is the following necessary? should be inclusive or exclusive regarding keywords?
@@ -92,7 +94,7 @@ public interface PluginManager {
      * @return the array with plugins of specified type and with given keyword.
      */
     @Nonnull
-    <T extends Plugin> List<T> getPlugins(@Nonnull Class<T> type, @Nullable String keyword);
+    <T extends Plugin> List<T> getPlugins(Class<T> type, @Nullable String keyword);
 
     /**
      * Returns an instance of preferred plugin implementation of specified type.
@@ -106,7 +108,7 @@ public interface PluginManager {
      * @return the instance of plugin.
      */
     @Nonnull
-    <T extends Plugin> T getPlugin(@Nonnull Class<T> type);
+    <T extends Plugin> T getPlugin(Class<T> type);
 
     /**
      * Returns an instance of preferred plugin implementation of specified type
@@ -122,5 +124,5 @@ public interface PluginManager {
      * @return the instance of plugin.
      */
     @Nonnull
-    <T extends Plugin> T getPlugin(@Nonnull Class<T> type, @Nullable String keyword);
+    <T extends Plugin> T getPlugin(Class<T> type, @Nullable String keyword);
 }
