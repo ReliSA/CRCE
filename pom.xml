@@ -179,6 +179,10 @@
         </extensions>
     </build>
 
+    <scm>
+        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/trunk/</developerConnection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>relisa-release</id>
@@ -204,7 +208,6 @@
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
         </repository>
-
     </repositories>
 
 </project>
