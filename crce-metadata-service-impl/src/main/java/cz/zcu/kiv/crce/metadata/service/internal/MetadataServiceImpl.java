@@ -57,8 +57,8 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public String getIdentityNamespace() {
-        return NAMESPACE__CRCE_IDENTITY;
+    public Capability getIdentity(Resource resource) {
+        return getSingletonCapability(resource, NAMESPACE__CRCE_IDENTITY);
     }
 
     @Override

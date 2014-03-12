@@ -21,7 +21,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public interface MetadataService {
 
     @Nonnull
-    String getIdentityNamespace();
+    Capability getIdentity(Resource resource);
 
     @Nonnull
     String getPresentationName(Resource resource);

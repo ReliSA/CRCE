@@ -149,8 +149,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
         metadataService.addCategory(resource, "osgi");
 
-        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                .setAttribute("mime", String.class, MIME__APPLICATION_OSGI_BUNDLE); // TODO hardcoded
+        metadataService.getIdentity(resource).setAttribute("mime", String.class, MIME__APPLICATION_OSGI_BUNDLE); // TODO hardcoded
 
         return Collections.singletonList("osgi");
     }

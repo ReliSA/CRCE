@@ -115,8 +115,7 @@ public class DownloadServlet extends HttpServlet {
             //
             resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
             resp.setContentLength((int) f.length());
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + Activator.instance().getMetadataService().getFileName(found)
-                    + chooseCategory(Activator.instance().getMetadataService().getCategories(found)) + "\"");
+            resp.setHeader("Content-Disposition", "attachment; filename=\"" + Activator.instance().getMetadataService().getFileName(found) + "\"");
 
             //
             //  Stream to the requester.
@@ -129,22 +128,5 @@ public class DownloadServlet extends HttpServlet {
                 op.flush();
             }
         }
-    }
-
-    private String chooseCategory(List<String> strings) {
-        String suffix = "";
-        for (String string : strings) {
-            if (string.equals("jpeg")) {
-                return ".jpg";
-            }
-            if (string.equals("zip")) {
-                suffix = ".zip";
-            }
-            if (string.equals("osgi") || string.equals("cosi")) {
-                return ".jar";
-            }
-
-        }
-        return suffix;
     }
 }

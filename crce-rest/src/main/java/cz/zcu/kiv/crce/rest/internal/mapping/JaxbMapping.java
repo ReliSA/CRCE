@@ -19,6 +19,9 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
 
 /**
@@ -55,11 +58,19 @@ public class JaxbMapping {
      * @return URL of the resource
      */
     private String getURL(Resource resource, UriInfo ui) {
+        MetadataService metadataService = Activator.instance().getMetadataService();
+        String name = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY)
+                .getAttributeValue(NsOsgiIdentity.ATTRIBUTE__NAME);
+
+        if (name == null) {
+            return null;
+        }
+
         if (ui == null) {
-            return DEFAULT_HOST + "bundle/" + resource.getId();
+            return DEFAULT_HOST + "bundle/" + name;
         }
         String url = ui.getBaseUri().toString();
-        return url + "bundle/" + resource.getId();
+        return url + "bundle/" + name;
     }
 
 
@@ -144,10 +155,13 @@ public class JaxbMapping {
                 cz.zcu.kiv.crce.rest.internal.jaxb.Capability jaxbCapability = mapCapability(capability);
 
                 if ("crce.identity".equals(capability.getNamespace())) {
-                    cz.zcu.kiv.crce.rest.internal.jaxb.Attribute attribute = objectFactory.createAttribute();
-                    attribute.setName("url");
-                    attribute.setValue(getURL(resource, uriInfo));
-                    jaxbCapability.getAttributes().add(attribute);
+                    String url = getURL(resource, uriInfo);
+                    if (url != null) {
+                        cz.zcu.kiv.crce.rest.internal.jaxb.Attribute attribute = objectFactory.createAttribute();
+                        attribute.setName("url");
+                        attribute.setValue(url);
+                        jaxbCapability.getAttributes().add(attribute);
+                    }
                 }
 
                 jaxbCapabilities.add(jaxbCapability);

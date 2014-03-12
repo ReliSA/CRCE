@@ -20,7 +20,6 @@ import org.osgi.service.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -185,13 +184,12 @@ public class BufferImpl implements Buffer, EventHandler {
         if (resource == null) {
             resource = resourceIndexerService.indexResource(file);
         }
-        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                .setAttribute("repository-id", String.class, repository.getId());
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
         identityIndexer.preIndex(file, name2, resource);
 
         String presentationName = metadataService.getPresentationName(resource);
-        if (presentationName.trim().isEmpty()) {
+        if (presentationName.trim().isEmpty() || presentationName.startsWith("unknown-name:")) {
             metadataService.setPresentationName(resource, name2);
         }
 
@@ -221,8 +219,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
         logger.info("Uploaded resource {} is valid.", resource.getId());
 
-        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
-        identity.setAttribute("status", String.class, "buffered");
+        metadataService.getIdentity(resource).setAttribute("status", String.class, "buffered");
 
         resourceDAO.saveResource(resource);
 

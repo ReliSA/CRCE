@@ -37,7 +37,6 @@ package cz.zcu.kiv.crce.it.dao;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.IOException;
@@ -45,6 +44,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.felix.dm.Component;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -171,8 +171,7 @@ public class ResourceDAOIT extends IntegrationTestBase {
 
         Resource expected = metadataFactory.createResource();
 
-        metadataService.getSingletonCapability(expected, metadataService.getIdentityNamespace())
-                .setAttribute("repository-id", String.class, repository.getId());
+        metadataService.getIdentity(expected).setAttribute("repository-id", String.class, repository.getId());
 
         assertNotNull(expected);
 

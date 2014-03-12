@@ -33,7 +33,7 @@ public class IdentityIndexer {
     @ServiceDependency private volatile MetadataService metadataService;
 
     public void preIndex(File file, String name, Resource resource) {
-        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
+        Capability identity = metadataService.getIdentity(resource);
 
         metadataService.setUri(resource, file.toURI().normalize());
         metadataService.setFileName(resource, name);
@@ -42,7 +42,7 @@ public class IdentityIndexer {
     }
 
     public void postIndex(File file, Resource resource) {
-        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
+        Capability identity = metadataService.getIdentity(resource);
 
         metadataService.setSize(resource, file.length());
         String hash = getSHA(file);
@@ -55,7 +55,6 @@ public class IdentityIndexer {
         if (attribute == null) {
             identity.setAttribute(mime, MIME__APPLICATION_OCTET_STREAM);
         }
-
     }
 
     /**

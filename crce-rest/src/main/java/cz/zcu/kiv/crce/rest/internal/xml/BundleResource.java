@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
@@ -131,8 +130,8 @@ public class BundleResource extends ResourceParent implements GetBundle {
 		StreamingOutput output = getBundleAsStream(resourceFile);
 
         MetadataService metadataService = Activator.instance().getMetadataService();
-        Capability capability = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
-        Attribute<String> attribute = capability.getAttribute(new SimpleAttributeType<>("mime", String.class)); // TODO create attribute type
+        Attribute<String> attribute = metadataService.getIdentity(resource)
+                .getAttribute(new SimpleAttributeType<>("mime", String.class)); // TODO create attribute type
 
         Response response =
             Response.ok(output)

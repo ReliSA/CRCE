@@ -18,7 +18,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -178,8 +177,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         if (!sourceFile.exists()) {
             throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
         }
-        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                .setAttribute("repository-id", String.class, repository.getId());
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
         File targetFile = new File(baseDir, resource.getId());
 
@@ -206,8 +204,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
         logger.info("Saved resource {} is valid.", resource.getId());
 
-        Capability identity = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace());
-        identity.setAttribute("status", String.class, "stored");
+        metadataService.getIdentity(resource).setAttribute("status", String.class, "stored");
 
         resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
 
@@ -339,10 +336,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                             logger.error("Could not index file {}", file, e);
                             continue;
                         }
-                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                                .setAttribute("repository-id", String.class, repository.getId());
+                        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
                         identityIndexer.preIndex(file, file.getName(), resource);
+                        identityIndexer.postIndex(file, resource);
 
                         ResourceValidationResult validationResult = metadataValidator.validate(resource);
                         if (!validationResult.isContextValid()) {

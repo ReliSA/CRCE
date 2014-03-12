@@ -291,8 +291,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                     for (DbResource dbResource : dbResources) {
                         // TODO optimize - select in loop
                         Resource resource = loadResource(dbResource, session);
-                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                                .setAttribute("repository-id", String.class, repository.getId());
+                        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
                         result.add(resource);
                     }
                 }
@@ -339,8 +338,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                     for (DbResource dbResource : dbResources) {
                         // TODO optimize - select in loop
                         Resource resource = loadResource(dbResource, session);
-                        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                                .setAttribute("repository-id", String.class, repository.getId());
+                        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
                         result.add(resource);
                     }
                 }
@@ -383,8 +381,8 @@ public class ResourceDAOImpl implements ResourceDAO {
             long resourceId = seqMapper.nextVal("resource_seq");
             dbResource.setResourceId(resourceId);
 
-            String repositoryUuid = metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
-                            .getAttributeValue(new SimpleAttributeType<>("repository-id", String.class));
+            String repositoryUuid = metadataService.getIdentity(resource)
+                    .getAttributeValue(new SimpleAttributeType<>("repository-id", String.class));
 
             if (repositoryUuid == null) {
                 throw new IllegalArgumentException("Repository is not set on resource: " + resource.getId());

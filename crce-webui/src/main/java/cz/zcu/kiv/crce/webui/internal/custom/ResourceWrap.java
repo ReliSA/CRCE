@@ -3,10 +3,12 @@ package cz.zcu.kiv.crce.webui.internal.custom;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 import org.slf4j.Logger;
@@ -37,7 +39,7 @@ abstract class ResourceWrap extends ResourceAdapter {
     @Override
     public Property[] getProperties() {
         Property[] properties;
-        List<Capability> crceCapabilities = resource.getCapabilities(metadataService.getIdentityNamespace());
+        List<Capability> crceCapabilities = Collections.singletonList(metadataService.getIdentity(resource));
 
         int crceSize = crceCapabilities.size() > 0 ? crceCapabilities.get(0).getAttributes().size() : 0;
 
