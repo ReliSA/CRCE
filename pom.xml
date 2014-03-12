@@ -5,7 +5,7 @@
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-reactor</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>CRCE - Reactor</name>
@@ -180,7 +180,7 @@
     </build>
 
     <scm>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/tags/crce-2.0.0</developerConnection>
+        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/trunk/</developerConnection>
     </scm>
 
     <distributionManagement>
