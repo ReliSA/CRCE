@@ -1,11 +1,12 @@
 package cz.zcu.kiv.crce.compatibility;
 
-import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.typescmp.Difference;
+
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Interface representing Compability metadata for a pair of bundles.
- *
+ * <p/>
  * Date: 16.11.13
  *
  * @author Jakub Danek
@@ -21,13 +22,14 @@ public interface Compatibility {
 
     /**
      * Name of the resource (crce.identity namespace) which has been compared to the Base resource
+     *
      * @return unique name
      */
     String getResourceName();
 
     /**
      * Version of the resource which was compared to the Base resource.
-     *
+     * <p/>
      * Implemented according to the OSGi versioning scheme:
      * major.minor.micor-qualifier
      *
@@ -37,13 +39,14 @@ public interface Compatibility {
 
     /**
      * Name of the resource (crce.identity namespace) which was the Resource has been compared to
+     *
      * @return unique name
      */
     String getBaseResourceName();
 
     /**
      * Version of the resource which the resource has been compared to.
-     *
+     * <p/>
      * Implemented according to the OSGi versioning scheme:
      * major.minor.micor-qualifier
      *
@@ -53,12 +56,12 @@ public interface Compatibility {
 
     /**
      * Difference value for the two resources aggregated from the DiffDetails.
+     *
      * @return {@link Difference} value
      */
     Difference getDiffValue();
 
     /**
-     *
      * @return Complete diff of the two resources.
      */
     Diff getDiffDetails();

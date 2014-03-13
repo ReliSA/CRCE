@@ -4,12 +4,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -35,6 +34,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile SessionRegister sessionRegister;   /* injected by dependency manager */
     private volatile Store store;                  	/* injected by dependency manager */
     private volatile MetadataService metadataService;
+    private volatile CompatibilitySearchService compatibilityService; /* injected by dependency manager */
 
     public static Activator instance() {
         if (instance == null) {
@@ -66,6 +66,10 @@ public final class Activator extends DependencyActivatorBase {
         return store;
     }
 
+    public CompatibilitySearchService getCompatibilityService() {
+        return compatibilityService;
+    }
+
     public Buffer getBuffer(HttpServletRequest req) {
         if (req == null) {
             return null;
@@ -90,7 +94,9 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
-                .add(createServiceDependency().setService(MetadataService.class).setRequired(true)));
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(true))
+        );
 
 
         logger.debug("Webui activator initialized.");

@@ -37,6 +37,10 @@ public class Options {
             return maven("org.osgi.compendium");
         }
 
+        public static MavenArtifactProvisionOption core() {
+            return maven("org.osgi.core");
+        }
+
         private static MavenArtifactProvisionOption maven(String artifactId) {
             return Options.mavenBundle("org.osgi", artifactId);
         }
@@ -186,6 +190,10 @@ public class Options {
 
         public static MavenArtifactProvisionOption metadataJsonImpl() {
             return maven("crce-metadata-json-impl");
+        }
+
+        public static MavenArtifactProvisionOption metadataOsgiBundle() {
+            return maven("crce-metadata-osgi-bundle");
         }
 
         public static MavenArtifactProvisionOption pluginApi() {

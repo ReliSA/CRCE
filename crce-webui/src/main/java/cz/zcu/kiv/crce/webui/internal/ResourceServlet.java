@@ -13,12 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.CompatibilityVersionComparator;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.webui.internal.bean.Category;
 import cz.zcu.kiv.crce.webui.internal.custom.ResourceExt;
@@ -183,6 +186,41 @@ public class ResourceServlet extends HttpServlet {
 
                 return true;
 
+            case "compatibility":
+                String name = req.getParameter("name");
+                String version = req.getParameter("version");
+
+                List<Compatibility> lower = null;
+                List<Compatibility> upper = null;
+
+                if (name == null || name.isEmpty() || version == null || version.isEmpty()) {
+                    session.setAttribute("nodata", true);
+                    return true;
+                }
+                session.setAttribute("nodata", false);
+
+                Requirement resFilter = Activator.instance().getMetadataFactory().createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+                resFilter.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);
+                Version v = new Version(version);
+                resFilter.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, v);
+
+                List<Resource> res = Activator.instance().getStore().getResources(resFilter);
+                if (res.size() > 0) {
+                    lower = Activator.instance().getCompatibilityService().listLowerCompatibilities(res.get(0));
+                    Collections.sort(lower, CompatibilityVersionComparator.getBaseComparator());
+
+                    upper = Activator.instance().getCompatibilityService().listUpperCompatibilities(res.get(0));
+                    Collections.sort(upper, CompatibilityVersionComparator.getUpperComparator());
+
+                }
+
+                session.setAttribute("pivotName", name);
+                session.setAttribute("pivotVersion", version);
+                session.setAttribute("lower", lower);
+                session.setAttribute("upper", upper);
+
+                return true;
+
             default:
                 return false;
         }
@@ -193,7 +231,7 @@ public class ResourceServlet extends HttpServlet {
      * <code>store</code> is "yes". Buffer resources are added, if request parameter
      * <code>buffer</code> is "yes".
      *
-     * @param req request with parameters
+     * @param req    request with parameters
      * @param filter possible filter of resources
      * @return array of resources
      */
@@ -288,7 +326,7 @@ public class ResourceServlet extends HttpServlet {
      * Filter resources according some category. Output list contains only resources that have required category.
      *
      * @param filterCategory required category
-     * @param resources resources
+     * @param resources      resources
      * @return filtered resources list
      */
     private ArrayList<ResourceExt> filterResources(String filterCategory, List<Resource> resources) {

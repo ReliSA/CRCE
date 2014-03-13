@@ -7,9 +7,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Service for searching compatibilities or resources by compatibility criteria.
- *
+ * <p/>
  * Doesnt contain services for modification of compatibility data.
- *
+ * <p/>
  * Date: 20.11.13
  *
  * @author Jakub Danek
@@ -17,11 +17,20 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public interface CompatibilitySearchService {
 
     /**
-     * List all available compatibility data for the given resource.
+     * List all compatibility data of the given resource with upper version.
+     *
      * @param resource resource present in crce
      * @return list
      */
-    List<Compatibility> listCompatibilities(Resource resource);
+    List<Compatibility> listUpperCompatibilities(Resource resource);
+
+    /**
+     * List all compatibility data of the given resource with lower versions.
+     *
+     * @param resource resource present in crce
+     * @return list
+     */
+    List<Compatibility> listLowerCompatibilities(Resource resource);
 
     /**
      * Find the nearest version of the same resource name which is available for upgrade (has higher

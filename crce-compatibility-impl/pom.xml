@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <relativePath>../poms/compiled/</relativePath>
         <groupId>cz.zcu.kiv.crce.build</groupId>
@@ -42,18 +43,57 @@
             <groupId>cz.zcu.kiv.jacc</groupId>
             <artifactId>types-cmp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-types</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-loader</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-cmp</artifactId>
+        </dependency>
+
         <!-- CRCE dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-osgi-bundle</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

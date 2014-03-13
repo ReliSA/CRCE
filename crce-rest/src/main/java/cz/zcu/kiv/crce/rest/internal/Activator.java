@@ -1,13 +1,17 @@
 package cz.zcu.kiv.crce.rest.internal;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
 
@@ -24,6 +28,8 @@ public final class Activator extends DependencyActivatorBase {
     private volatile JaxbMapping convertorToBeans;
     private volatile MetadataFactory metadataFactory;
     private volatile FilterParser filterParser;
+    private volatile CompatibilityService compatibilityService;
+    private volatile SessionRegister sessionRegister;
 
     public static Activator instance() {
         return instance;
@@ -49,6 +55,19 @@ public final class Activator extends DependencyActivatorBase {
         return filterParser;
     }
 
+    public CompatibilityService getCompatibilityService() {
+        return compatibilityService;
+    }
+
+    public Buffer getBuffer(HttpServletRequest req) {
+        if (req == null) {
+            return null;
+        }
+
+        String sid = req.getSession(true).getId();
+        return sessionRegister.getSessionData(sid).getBuffer();
+    }
+
     @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
 
@@ -67,6 +86,8 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(JaxbMapping.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
+                .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilityService.class).setRequired(true))
         );
     }
 }

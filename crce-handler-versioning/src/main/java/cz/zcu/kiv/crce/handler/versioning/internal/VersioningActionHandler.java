@@ -15,15 +15,12 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.apache.commons.io.IOUtils;
-import cz.zcu.kiv.crce.metadata.type.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.osgi.versionGenerator.exceptions.BundlesIncomparableException;
 import cz.zcu.kiv.osgi.versionGenerator.service.VersionService;
 
-import cz.zcu.kiv.crce.concurrency.model.Task;
-import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -32,6 +29,7 @@ import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
@@ -44,6 +42,7 @@ import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
  *
  * @author Jiri Kucera (kalwi@students.zcu.cz, jiri.kucera@kalwi.eu)
  * @author Jan Reznicek
+ * @author Jakub Danek (danek.ja@gmail.com)
  */
 @ParametersAreNonnullByDefault
 public class VersioningActionHandler extends AbstractActionHandler {
@@ -51,16 +50,15 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(VersioningActionHandler.class);
 
-    private static final String CATEGORY_VERSIONED = "versioned";
+    static final String CATEGORY_VERSIONED = "versioned";
+    static final String CATEGORY_INITIAL = "initial-version";
+    static final String CATEGORY_NON_VERSIONABLE = "non-versionable";
+    static final String VERSIONING_OPTIONS_KEEP_MICRO = "keep-micro-if-identical";
 
-    private volatile TaskRunnerService taskRunnerService;   // injected by dependency manager
     private volatile VersionService versionService;   // injected by dependency manager
-    //private volatile ResourceDAO m_resourceDao;         //injected by dependency manager
     private volatile MetadataService metadataService; //injected by dependency manager
     private volatile MetadataFactory metadataFactory; //injected by dependency manager
     private volatile ResourceIndexerService resourceIndexer; //injected by dependency manager
-
-    //private int BUFFER_SIZE = 8 * 1024;
 
     /**
      * Create file from bundle in form of InputSteam.
@@ -69,7 +67,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
      * @return file with bundle
      * @throws IOException reading from stream or creation of file or write to file failed
      */
-    private File copyFromStream(InputStream bundleAsStream, URI newLocation) throws IOException {
+    private File copyFromStream(@Nonnull InputStream bundleAsStream, @Nonnull URI newLocation) throws IOException {
 
         File bundleFile = new File(newLocation);
         try (OutputStream output = new FileOutputStream(bundleFile)) {
@@ -83,6 +81,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
      * Create version of the OSGi bundle, before is committed to the Store.
      * Before resource is committed to the Store, check if the resource is unversioned OSGi bundle.
      * If resource is OSGi bundle, generate its version based on difference from previous bundle with same name in repository.
+     *
      * @param resource
      * @param store
      * @return
@@ -112,18 +111,21 @@ public class VersioningActionHandler extends AbstractActionHandler {
             Resource baseResource = null;
             if (name != null) {
                 Requirement filterByName = metadataFactory.createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
-                filterByName.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);
+                filterByName.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);                    
 
                 /*
                  * candidate for base resource is selected as bundle with same symbolic name and highest version in repository.
                  */
                 logger.debug("Searching for previous versions of: {}", name);
-                Version candVersion = null;
 
+                Version candVersion = null;
+                Version iVersion;
+                String iName;
+                Capability iCapability;
                 for (Resource i : store.getResources(filterByName)) {
-                    Capability iCapability = metadataService.getSingletonCapability(i, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
-                    String iName = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
-                    Version iVersion = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION);
+                    iCapability = metadataService.getSingletonCapability(i, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
+                    iName = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
+                    iVersion = iCapability.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__VERSION);
 
                     logger.debug("Candidate: {}", iName);
                     if (baseResource == null || candVersion == null || candVersion.compareTo(iVersion) < 0) {
@@ -138,7 +140,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
                 logger.debug("No candidate found");
                 metadataService.addCategory(resource, CATEGORY_VERSIONED);
-                metadataService.addCategory(resource, "initial-version"); // TODO constant
+                metadataService.addCategory(resource, CATEGORY_INITIAL);
 
             } else {
 
@@ -151,15 +153,15 @@ public class VersioningActionHandler extends AbstractActionHandler {
                 logger.debug("Uploaded bundle URI: {}", resourceUri);
 
                 try (InputStream baseInputStream = new FileInputStream(new File(baseUri));
-                    InputStream resourceInputStream = new FileInputStream(new File(resourceUri))) {
+                     InputStream resourceInputStream = new FileInputStream(new File(resourceUri))) {
 
                     HashMap<String, String> options = new HashMap<>();
 
                     //micro part of version is generated too
-                    options.put("keep-micro-if-identical", "false"); // TODO constant
+                    options.put(VERSIONING_OPTIONS_KEEP_MICRO, "false");
 
                     try (InputStream versionedBundleIs =
-                            versionService.createVersionedBundle(baseInputStream, resourceInputStream, options)) {
+                                 versionService.createVersionedBundle(baseInputStream, resourceInputStream, options)) {
 
                         if (versionedBundleIs != null) {
                             updateResourceMetadata(resource, versionedBundleIs);
@@ -175,10 +177,10 @@ public class VersioningActionHandler extends AbstractActionHandler {
                     logger.error("Could not update version due to I/O error", ex);
                 } catch (IllegalArgumentException e) {
                     logger.warn("Could not update version (Not osgi bundle): {}", e.getMessage());
-                    metadataService.addCategory(resource, "non-versionable"); // TODO constant
+                    metadataService.addCategory(resource, CATEGORY_NON_VERSIONABLE);
                 } catch (BundlesIncomparableException e) {
                     logger.warn("Could not update version (incomparable bundles): {}", e.getMessage());
-                    metadataService.addCategory(resource, "non-versionable"); // TODO constant
+                    metadataService.addCategory(resource, CATEGORY_NON_VERSIONABLE);
                 } catch (Exception e) {
                     logger.error("Could not update version (unknown error)", e);
                 }
@@ -191,11 +193,12 @@ public class VersioningActionHandler extends AbstractActionHandler {
     /**
      * Copy versioned bundle from temp into buffer (replace uploaded bundle) and update related
      * metadata.
-     * @param resource reference to the resource in the buffer
+     *
+     * @param resource          reference to the resource in the buffer
      * @param versionedBundleIs input stream of the newly versioned bundle
      * @throws IOException
      */
-    private void updateResourceMetadata(Resource resource, @Nonnull InputStream versionedBundleIs) throws IOException {
+    private void updateResourceMetadata(@Nonnull Resource resource, @Nonnull InputStream versionedBundleIs) throws IOException {
         //create resource from file with bundle with generated version
         URI resourceURI = metadataService.getUri(resource);
         File versionedBundleFile = copyFromStream(versionedBundleIs, resourceURI);
@@ -220,6 +223,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
     /**
      * Save an original file name and version to metadata (as resource capability) when resource is uploaded to Buffer.
      * Activate only for unversioned osgi resources
+     *
      * @param resource
      * @param buffer
      * @param name
@@ -240,7 +244,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
             logger.debug("Resource doesnt have category osgi");
             return resource;
         }
-        if (!categories.contains("versioned")) { // TODO constant
+        if (!categories.contains(CATEGORY_VERSIONED)) {
             logger.debug("Resource doesnt have category versioned.");
 
             String ext = name.substring(name.lastIndexOf("."));
@@ -253,22 +257,6 @@ public class VersioningActionHandler extends AbstractActionHandler {
 
             cap.setAttribute("original-version", Version.class, osgiVersion != null ? osgiVersion : Version.emptyVersion); // TODO constant
 
-        }
-        return resource;
-    }
-
-    @Override
-    public Resource afterPutToStore(Resource resource, Store store) throws RefusedArtifactException {
-        /*
-            After the resource is put to store, start calculation of its compatibility data.
-         */
-        if (resource == null) {
-            return resource;
-        }
-
-        if (store == null) { //temporary disabled until migration finished
-            Task<Object> compTask = new CompatibilityCalculationTask(resource.getId(), resource);
-            taskRunnerService.scheduleTask(compTask);
         }
         return resource;
     }

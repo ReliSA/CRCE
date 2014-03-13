@@ -5,10 +5,8 @@ import java.util.Dictionary;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +18,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.QueryBuilder;
-
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
@@ -93,7 +90,7 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
      */
     private MongoClient client;
 
-    private CompatibilityFactory m_factory; /*injected by DependencyManager*/
+    private CompatibilityFactory factory; /*injected by DependencyManager*/
 
     /**
      * Creates new CompatibilityDao implementation for MongoDB
@@ -124,7 +121,7 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
 
         DBObject ret = col.findOne(query);
 
-        return MongoCompatibilityMapper.mapToCompatibility(ret, m_factory);
+        return MongoCompatibilityMapper.mapToCompatibility(ret, factory);
     }
 
     @Override
@@ -134,7 +131,7 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
         //TODO catch MONGO exception for failure handling
         col.save(cmp);
         logger.debug("Saved compatibility: {}", cmp);
-        return MongoCompatibilityMapper.mapToCompatibility(cmp, m_factory);
+        return MongoCompatibilityMapper.mapToCompatibility(cmp, factory);
     }
 
     @Override
@@ -147,7 +144,21 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
     }
 
     @Override
-    public List<Compatibility> listCompatibilities(String resourceName, Version resourceVersion) {
+    public void deleteAllRelatedCompabilities(String resourceName, Version resourceVersion) {
+        logger.debug("Deleting all compatibility data related to {}-{}", resourceName, resourceVersion);
+        DBObject qRes = QueryBuilder.start(MongoCompatibilityMapper.C_RESOURCE_NAME).is(resourceName)
+                .and(MongoCompatibilityMapper.C_RESOURCE_VERSION).is(MongoCompatibilityMapper.mapVersion(resourceVersion))
+                .get();
+        DBObject qBase = QueryBuilder.start(MongoCompatibilityMapper.C_BASE_NAME).is(resourceName)
+                .and(MongoCompatibilityMapper.C_BASE_VERSION).is(MongoCompatibilityMapper.mapVersion(resourceVersion))
+                .get();
+        DBObject q = QueryBuilder.start().or(qRes, qBase).get();
+
+        col.remove(q);
+    }
+
+    @Override
+    public List<Compatibility> listOwnedCompatibilities(String resourceName, Version resourceVersion) {
         DBObject query = BasicDBObjectBuilder.start(MongoCompatibilityMapper.C_RESOURCE_NAME, resourceName)
                                                     .add(MongoCompatibilityMapper.C_RESOURCE_VERSION, MongoCompatibilityMapper.mapVersion(resourceVersion)).get();
 
@@ -229,7 +240,7 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
         DBObject tmp;
         while(cursor.hasNext()) {
             tmp = cursor.next();
-            retList.add(MongoCompatibilityMapper.mapToCompatibility(tmp, m_factory));
+            retList.add(MongoCompatibilityMapper.mapToCompatibility(tmp, factory));
         }
 
         return retList;

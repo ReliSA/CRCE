@@ -13,8 +13,8 @@ import cz.zcu.kiv.crce.concurrency.model.Task;
 
 /**
  * TaskRunner class using FixedThreadPool to control crce's thread resources.
- *
- *
+ * <p/>
+ * <p/>
  * Date: 11.11.13
  *
  * @author Jakub Danek
@@ -25,22 +25,22 @@ public class TaskRunner {
      */
     private static final Logger logger = LoggerFactory.getLogger(TaskRunner.class);
 
-    private static TaskRunner instance = new TaskRunner();
+    private volatile static TaskRunner instance = new TaskRunner();
 
     /**
-     *
      * TaskRunner.init(threadCount) must be run before the instance can be recovered. If not, TaskRunner initializes
      * to default thread count.
      *
      * @return singleton instance of TaskRunner
      */
-    public static TaskRunner get() {
+    public synchronized static TaskRunner get() {
         return instance;
     }
 
     /**
      * This static method can be used to reinitialize TaskRunner queue. It will first call stop() on the
      * current instance and then replace it with new instance.
+     *
      * @param maxThreads
      */
     public static synchronized void init(int maxThreads) {
@@ -60,11 +60,10 @@ public class TaskRunner {
      */
     private TaskRunner() {
         //TODO change this to configuration
-        this(5);
+        this(4);
     }
 
     /**
-     *
      * @param maxThreads maximum number of threads the pool will be able to spawn
      */
     private TaskRunner(int maxThreads) {
@@ -73,7 +72,6 @@ public class TaskRunner {
     }
 
     /**
-     *
      * @return maximum number of allowed threads for this TaskRunner
      */
     public int getMaxThreads() {
@@ -82,7 +80,7 @@ public class TaskRunner {
 
     /**
      * Attempts to stop the TaskRunner.
-     *
+     * <p/>
      * First waits for running and scheduled tasks to finish, while not accepting any other tasks. In case some of the
      * running tasks wont finish in time, attempts to interrupt them.
      */
@@ -92,14 +90,14 @@ public class TaskRunner {
             this.executor.shutdown();
             boolean shutdown = this.executor.awaitTermination(10, TimeUnit.SECONDS);
 
-            if(!shutdown) {
+            if (!shutdown) {
                 logger.warn("All tasks did not finish in time. Interrupting...");
                 int number = this.executor.shutdownNow().size();
                 shutdown = this.executor.awaitTermination(2, TimeUnit.SECONDS);
-                if(number > 0) {
+                if (number > 0) {
                     logger.warn("{} tasks were scheduled but never run.", number);
                 }
-                if(!shutdown) {
+                if (!shutdown) {
                     logger.warn("Failed to interrupt all tasks before quitting.");
                 }
             }
@@ -113,6 +111,7 @@ public class TaskRunner {
 
     /**
      * Schedules new task to be run
+     *
      * @param task task to be scheduled
      * @return Future reference which can be used to gain results after the Task has finished
      */

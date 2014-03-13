@@ -6,9 +6,9 @@ import com.mongodb.MongoClient;
 
 /**
  * Context class responsible for connection management to MongoDB.
- *
+ * <p/>
  * Probably should be relocated to a public place in case more modules started using the database.
- *
+ * <p/>
  * Date: 17.11.13
  *
  * @author Jakub Danek
@@ -27,8 +27,8 @@ public class DbContext {
      * should be used as singleton within the application
      */
     public static MongoClient getConnection() throws UnknownHostException {
-        if(client == null) {
-            client = new MongoClient("localhost");
+        if (client == null) {
+            client = new MongoClient("localhost", 27017);
         }
 
         return client;
@@ -38,7 +38,7 @@ public class DbContext {
      * Close current connection. Probably used only on bundle shutdown.
      */
     public static void stop() {
-        if(client != null) {
+        if (client != null) {
             client.close();
         }
     }

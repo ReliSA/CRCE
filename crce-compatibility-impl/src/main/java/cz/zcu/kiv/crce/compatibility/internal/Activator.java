@@ -5,6 +5,13 @@ import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
+import cz.zcu.kiv.crce.compatibility.internal.service.CompatibilityServiceImpl;
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
+import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.repository.Store;
 
 /**
  * Date: 17.11.13
@@ -28,6 +35,18 @@ public class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                 .setInterface(CompatibilityFactory.class.getName(), null)
                 .setImplementation(CompatibilityFactoryImpl.class));
+
+
+        String services[] = {CompatibilityService.class.getName(), CompatibilitySearchService.class.getName()};
+        manager.add(createComponent()
+                .setInterface(services, null)
+                .setImplementation(CompatibilityServiceImpl.class)
+                .add(createServiceDependency().setService(CompatibilityDao.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilityFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(Store.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+        );
     }
 
     /**

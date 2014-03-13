@@ -47,6 +47,26 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
 
     private static final String TEST_DB = "compatibilityDaoImplIT";
 
+    /**
+     * Container includes and provides these packages when container is started.
+     */
+    private static final String systemPackages
+            = "com.sun.*,javax.xml.*,com.sun.org.apache.xerces.internal.*,"
+            + "javax.accessibility,javax.annotation,javax.inject,javax.jmdns,javax.jms,javax.mail,"
+            + "javax.mail.internet,javax.management,javax.management.modelmbean,javax.management.remote,"
+            + "javax.microedition.io,javax.naming,javax.naming.spi,javax.script,javax.security.auth.x500,javax.servlet,"
+            + "javax.servlet.http,javax.servlet.jsp,javax.sql,"
+            + "org.w3c.dom,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers,"
+            + "org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,"
+            + "com.sun.java_cup.internal,com.sun.xml.internal.bind.v2,"
+            + "javax.net,javax.net.ssl,javax.transaction.xa,com.jcraft.jsch,"
+            + "org.apache.commons.collections.map,org.apache.commons.httpclient,"
+            + "org.apache.commons.httpclient.auth,org.apache.commons.httpclient.methods,"
+            + "org.apache.commons.httpclient.params,org.apache.commons.httpclient.util,"
+            + "org.apache.jackrabbit.webdav,org.apache.jackrabbit.webdav.client.methods,"
+            + "org.apache.jackrabbit.webdav.property,org.apache.jackrabbit.webdav.version,"
+            + "org.apache.jackrabbit.webdav.xml,org.apache.tools.ant";
+
     @Inject
     private CompatibilityFactory compatibilityFactory;
 
@@ -91,18 +111,37 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
     @Configuration
     public Option[] configuration() throws Exception {
         return options(
+                systemPackage(systemPackages),
                 junitBundles(),
                 Options.Felix.dependencyManager(),
                 Options.logging(),
                 Options.Osgi.compendium(),
+                //Options.Osgi.core(),
                 Options.Felix.configAdmin(),
                 Options.Felix.bundleRepository(),
 
                 mavenBundle("org.mongodb", "mongo-java-driver"),
 
-                mavenBundle("cz.zcu.kiv.jacc", "types-cmp"),
+                mavenBundle("commons-io", "commons-io"),
+                mavenBundle("commons-net", "commons-net"),
+                mavenBundle("org.apache.commons", "commons-vfs2"),
+                mavenBundle("org.ow2.asm", "asm-all"),
+                mavenBundle("org.apache.commons", "commons-lang3"),
 
+                mavenBundle("cz.zcu.kiv.jacc", "types-cmp"),
+                mavenBundle("cz.zcu.kiv.jacc", "javatypes"),
+                mavenBundle("cz.zcu.kiv.jacc", "javatypes-cmp"),
+                mavenBundle("cz.zcu.kiv.jacc", "javatypes-loader"),
+                mavenBundle("cz.zcu.kiv.obcc", "bundle-loader"),
+                mavenBundle("cz.zcu.kiv.obcc", "bundle-cmp"),
+                mavenBundle("cz.zcu.kiv.obcc", "bundle-types"),
+
+                Options.Crce.pluginApi(),
                 Options.Crce.metadataApi(),
+                Options.Crce.metadataServiceApi(),
+                Options.Crce.metadataIndexer(),
+                Options.Crce.metadataOsgiBundle(),
+                Options.Crce.repositoryApi(),
                 Options.Crce.compatibilityApi(),
                 Options.Crce.compatibilityDaoApi(),
                 Options.Crce.compatibilityDaoMongo(),
@@ -212,7 +251,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
     public void compatibilityListTest() throws Exception {
         List<Compatibility> testData = createTestDataForListing();
 
-        List<Compatibility> testee = compatibilityDao.listCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
+        List<Compatibility> testee = compatibilityDao.listOwnedCompatibilities(RESOURCE_NAME, RESOURCE_VERSION);
 
         assertEquals("Expected to get same amount of results as VERSIONS", VERSIONS.length, testee.size());
         for(Compatibility test : testee) {

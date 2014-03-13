@@ -79,55 +79,46 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-concurrency</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-service-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-repository-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-indexer-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -359,7 +360,6 @@
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>types-cmp</artifactId>
                 <version>1.0.1</version>
-                <scope>provided</scope>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -447,19 +447,21 @@
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
                 <version>${version.com.sun.jersey}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-servlet</artifactId>
                 <version>${version.com.sun.jersey}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-json</artifactId>
                 <version>${version.com.sun.jersey}</version>
-                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey.contribs</groupId>
+                <artifactId>jersey-multipart</artifactId>
+                <version>${version.com.sun.jersey}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
@@ -511,6 +513,7 @@
                 <type>jar</type>
                 <scope>provided</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.utils</artifactId>
@@ -573,6 +576,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>de.twentyeleven.skysail</groupId>
                 <artifactId>org.json-osgi</artifactId>
                 <version>20080701</version>
@@ -581,7 +590,8 @@
             <dependency> <!-- Required by pax-web-extender-war -->
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-finder</artifactId>
-                <version>3.13</version> <!-- 3.14 - 3.16 doesn't work-->
+                <version>3.13</version>
+                <!-- 3.14 - 3.16 doesn't work-->
                 <scope>provided</scope>
             </dependency>
             <dependency>
