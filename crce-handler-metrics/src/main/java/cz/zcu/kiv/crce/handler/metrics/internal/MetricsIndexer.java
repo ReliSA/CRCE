@@ -52,7 +52,7 @@ public class MetricsIndexer {
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexer.class);
 
 	private MetadataFactory metadataFactory;
-	private MetadataService metadataService; // NOPMD
+	private MetadataService metadataService;
 
 	private List<ClassMetrics> classMetricsList;
 	private ClassesMetrics classesMetrics;
@@ -75,13 +75,11 @@ public class MetricsIndexer {
 	 * @param resource Resource to save computed data.
 	 */
 	public void index(final InputStream input, @Nonnull Resource resource) {
-//		int size = 0;
 
 		classMetricsList = new ArrayList<ClassMetrics>();
 
 		// parsing input stream and collect class entry informations (ClassMetrics)
 		try {
-//			size = input.available();
 			ZipInputStream jis = new ZipInputStream(input);
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
                 if (e.getName().endsWith(".class")) {
@@ -95,10 +93,6 @@ public class MetricsIndexer {
 		}
 
 		classesMetrics = new ClassesMetricsImpl(classMetricsList);
-
-		// save jar file size to crce.content
-//		Capability identity = metadataService.getSingletonCapability(resource, "crce.content");
-//		identity.setAttribute("size", Long.class, (long)size);
 	}
 
 	/**
@@ -159,6 +153,9 @@ public class MetricsIndexer {
 		for (PackageMetrics metric : packageMetrics) {
 			computeMetricsForPackages(metric, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 		}
+		
+		// "metrics" tag indicate, that the resource has been measured
+		metadataService.addCategory(resource, "metrics");
 	}
 
 	/**
