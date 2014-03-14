@@ -156,6 +156,12 @@ abstract class ResourceWrap extends ResourceAdapter {
 
         @Override
         public String getValue() {
+        	
+        	Object value = attribute.getValue();
+        	if (value instanceof Double) {
+        		return String.format("%.3f", value);
+        	}
+        	
             return attribute.getStringValue();
         }
 
