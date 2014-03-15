@@ -24,6 +24,7 @@ import cz.zcu.kiv.typescmp.Difference;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.CompatibilityVersionComparator;
+import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -242,7 +243,7 @@ public class CompatibilityServiceImpl implements CompatibilityService {
         logger.debug("Lower bundle representation acquired.");
 
         JOSGiComparatorState state = new DefaultJOSGiComparatorState();
-        CmpResult<JOSGiBundle> res = comparator.compare(lowerBundle, upperBundle, state);
+        CmpResult res = comparator.compare(lowerBundle, upperBundle, state);
         logger.debug("Bundles compared successfully.");
 
         Version upperVersion = upperIdentity.version;
@@ -250,7 +251,9 @@ public class CompatibilityServiceImpl implements CompatibilityService {
 
         Difference diffValue = res.getDiff();
 
-        Compatibility comp = compatibilityFactory.createCompatibility(null, upperIdentity.symbolicName, upperVersion, lowerIdentity.symbolicName, lowerVersion, diffValue, null);
+        List<Diff> diffDetails = null;
+
+        Compatibility comp = compatibilityFactory.createCompatibility(null, upperIdentity.symbolicName, upperVersion, lowerIdentity.symbolicName, lowerVersion, diffValue, diffDetails);
         comp = compatibilityDao.saveCompatibility(comp);
         logger.debug("Compatibility saved successfully with id: {}", comp.getId());
         return comp;

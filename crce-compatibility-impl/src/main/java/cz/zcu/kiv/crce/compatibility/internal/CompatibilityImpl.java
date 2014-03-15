@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.compatibility.internal;
 
+import java.util.List;
+
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
@@ -21,7 +23,7 @@ public class CompatibilityImpl implements Compatibility {
     private String baseResourceName;
     private Version baseResourceVersion;
     private Difference diffValue;
-    private Diff diffDetails;
+    private List<Diff> diffDetails;
 
     /**
      * Empty constructor, creates uninitialized instance.
@@ -45,7 +47,7 @@ public class CompatibilityImpl implements Compatibility {
      */
     CompatibilityImpl(String id, String resourceName, Version resourceVersion,
                              String baseResourceName, Version baseResourceVersion,
-                             Difference diffValue, Diff diffDetails) {
+                             Difference diffValue, List<Diff> diffDetails) {
         this.id = id;
         this.resourceName = resourceName;
         this.resourceVersion = resourceVersion;
@@ -113,11 +115,11 @@ public class CompatibilityImpl implements Compatibility {
     }
 
     @Override
-    public Diff getDiffDetails() {
+    public List<Diff> getDiffDetails() {
         return diffDetails;
     }
 
-    public void setDiffDetails(Diff diffDetails) {
+    public void setDiffDetails(List<Diff> diffDetails) {
         this.diffDetails = diffDetails;
     }
 
