@@ -18,7 +18,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.mongodb.BasicDBObject;
@@ -26,15 +25,17 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
-
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.Diff;
+import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
+import cz.zcu.kiv.crce.compatibility.DifferenceRole;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
-import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.it.IntegrationTestBase;
 import cz.zcu.kiv.crce.it.Options;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Date: 17.11.13
@@ -169,8 +170,35 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
      */
     @Test
     public void compatibilitySaveTest() throws Exception {
+        Diff root = compatibilityFactory.createEmptyDiff();
+        root.setLevel(DifferenceLevel.PACKAGE);
+        ;
+        root.setNamespace("osgi.wiring.package");
+        root.setName("cz.zcu.kiv");
+        root.setRole(DifferenceRole.CAPABILITY);
+        root.setValue(Difference.MUT);
+
+        Diff child = compatibilityFactory.createEmptyDiff();
+        root.setLevel(DifferenceLevel.TYPE);
+        ;
+        root.setName("cz.zcu.kiv.Clazz1");
+        root.setValue(Difference.DEL);
+        root.addChild(child);
+
+        child = compatibilityFactory.createEmptyDiff();
+        root.setLevel(DifferenceLevel.TYPE);
+        ;
+        root.setName("cz.zcu.kiv.Clazz2");
+        root.setValue(Difference.INS);
+        root.addChild(child);
+
+        List<Diff> diffs = new ArrayList<>();
+        diffs.add(root);
+
+
         Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.save", new Version(1, 0, 0),
-                                                            null, new Version(0, 1, 0), Difference.MUT, null);
+                null, new Version(0, 1, 0), Difference.MUT, diffs);
+
 
         test = compatibilityDao.saveCompatibility(test);
         Compatibility read = compatibilityDao.readCompability(test.getId());
@@ -181,7 +209,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         //creating new passed, now try update
 
         test = compatibilityFactory.createCompatibility(test.getId(), "modified", test.getResourceVersion(),
-                                                test.getBaseResourceName(), test.getBaseResourceVersion(), test.getDiffValue(), null);
+                test.getBaseResourceName(), test.getBaseResourceVersion(), test.getDiffValue(), new ArrayList<Diff>());
 
         compatibilityDao.saveCompatibility(test);
         read = compatibilityDao.readCompability(read.getId());
@@ -211,7 +239,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         int i = 0;
         for(Version version : VERSIONS) {
             test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, RESOURCE_VERSION,
-                    version, DIFFERENCES[i], null);
+                    version, DIFFERENCES[i], new ArrayList<Diff>());
             test = compatibilityDao.saveCompatibility(test);
             testData.add(test);
             i++;
@@ -220,22 +248,22 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         //create one different resource and several different resource versions to check
         //the dao method doesnt return all it can find
         test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.unwanted.resource.name", RESOURCE_VERSION,
-                null, new Version(33,0,33), Difference.MUT, null);
+                null, new Version(33, 0, 33), Difference.MUT, new ArrayList<Diff>());
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
 
         //these test data are also used for higher-version search
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,1,2),
-                VERSIONS[1], DIFFERENCES[1], null);
+                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>());
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,2,0),
-                VERSIONS[1], DIFFERENCES[1], null);
+                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>());
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(42,0,0),
-                VERSIONS[1], Difference.MUT, null);
+                VERSIONS[1], Difference.MUT, new ArrayList<Diff>());
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
@@ -319,7 +347,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
     @Test
     public void compatibilityDeleteTest() throws Exception {
         Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.remove",new Version(1,0,0),
-                null, new Version(0,1,0), Difference.MUT, null);
+                null, new Version(0, 1, 0), Difference.MUT, new ArrayList<Diff>());
 
         test = compatibilityDao.saveCompatibility(test);
         Compatibility read = compatibilityDao.readCompability(test.getId());
