@@ -46,17 +46,17 @@ public class CompatibilityServiceImpl implements CompatibilityService {
 
     private static final Logger logger = LoggerFactory.getLogger(CompatibilityServiceImpl.class);
 
-    private final JOSGiComparator<JOSGiBundle> comparator = new DefaultJOSGiComparatorFactory().getBundleComparator();
-    private final JOSGiBundleLoader loader = new JOSGiBundleLoaderImpl(JClassLoaderCreator.JAR_ASM_LOADER, BundleMetadataReaderCreator.JAR_FILE_READER);
-
-    private static final List<Difference> UPGRADE_DIFFS = Arrays.asList(Difference.INS, Difference.NON);
-    private static final List<Difference> DOWNGRADE_DIFFS = Arrays.asList(Difference.DEL, Difference.NON);
-
     private CompatibilityFactory compatibilityFactory;     //injected by dependency manager
     private Store store;                                   //injected by dependency manager
     private CompatibilityDao compatibilityDao;             //injected by dependency manager
     private MetadataService metadataService;               //injected by dependency manager
     private MetadataFactory metadataFactory;               //injected by dependency manager
+
+    private final JOSGiComparator<JOSGiBundle> comparator = new DefaultJOSGiComparatorFactory().getBundleComparator();
+    private final JOSGiBundleLoader loader = new JOSGiBundleLoaderImpl(JClassLoaderCreator.JAR_ASM_LOADER, BundleMetadataReaderCreator.JAR_FILE_READER);
+
+    private static final List<Difference> UPGRADE_DIFFS = Arrays.asList(Difference.INS, Difference.NON);
+    private static final List<Difference> DOWNGRADE_DIFFS = Arrays.asList(Difference.DEL, Difference.NON);
 
     /**
      * Calculates Compatibility data between the {@code resource} and the list of {@code additionalBaseResources}
@@ -243,7 +243,7 @@ public class CompatibilityServiceImpl implements CompatibilityService {
         logger.debug("Lower bundle representation acquired.");
 
         JOSGiComparatorState state = new DefaultJOSGiComparatorState();
-        CmpResult res = comparator.compare(lowerBundle, upperBundle, state);
+        CmpResult<JOSGiBundle> res = comparator.compare(lowerBundle, upperBundle, state);
         logger.debug("Bundles compared successfully.");
 
         Version upperVersion = upperIdentity.version;
@@ -251,7 +251,8 @@ public class CompatibilityServiceImpl implements CompatibilityService {
 
         Difference diffValue = res.getDiff();
 
-        List<Diff> diffDetails = null;
+        CmpResultParser parser = new CmpResultParser(compatibilityFactory);
+        List<Diff> diffDetails = parser.extractDiffDetails(res);
 
         Compatibility comp = compatibilityFactory.createCompatibility(null, upperIdentity.symbolicName, upperVersion, lowerIdentity.symbolicName, lowerVersion, diffValue, diffDetails);
         comp = compatibilityDao.saveCompatibility(comp);
