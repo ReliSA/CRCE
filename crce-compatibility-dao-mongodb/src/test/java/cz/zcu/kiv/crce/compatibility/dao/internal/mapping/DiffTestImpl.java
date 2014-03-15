@@ -1,9 +1,7 @@
-package cz.zcu.kiv.crce.compatibility.internal;
+package cz.zcu.kiv.crce.compatibility.dao.internal.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.typescmp.Difference;
 
@@ -12,12 +10,13 @@ import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.DifferenceRole;
 
 /**
- * Date: 13.3.14
+ * Implementation of Diff interface for testing purposes.
+ * <p/>
+ * Date: 15.3.14
  *
  * @author Jakub Danek
  */
-public class DiffImpl implements Diff {
-
+public class DiffTestImpl implements Diff {
     private String name;
     private Difference value;
     private DifferenceLevel level;
@@ -25,7 +24,7 @@ public class DiffImpl implements Diff {
     private List<Diff> children;
     private String namespace;
 
-    public DiffImpl() {
+    public DiffTestImpl() {
         this.children = new ArrayList<>();
         this.name = "";
         this.value = Difference.UNK;
@@ -48,12 +47,12 @@ public class DiffImpl implements Diff {
     }
 
     @Override
-    public void addChild(@Nonnull Diff child) {
+    public void addChild(Diff child) {
         this.children.add(child);
     }
 
     @Override
-    public void addChildren(@Nonnull List<Diff> children) {
+    public void addChildren(List<Diff> children) {
         this.children.addAll(children);
     }
 
@@ -102,7 +101,7 @@ public class DiffImpl implements Diff {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DiffImpl diff = (DiffImpl) o;
+        DiffTestImpl diff = (DiffTestImpl) o;
 
         if (children != null ? !children.equals(diff.children) : diff.children != null) return false;
         if (level != diff.level) return false;

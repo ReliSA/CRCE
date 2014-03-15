@@ -55,6 +55,11 @@
             <groupId>cz.zcu.kiv.jacc</groupId>
             <artifactId>types-cmp</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
