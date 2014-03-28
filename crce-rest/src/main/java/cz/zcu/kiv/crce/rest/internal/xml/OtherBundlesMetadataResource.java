@@ -28,18 +28,18 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostOtherBundlesMetadata;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository;
 import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
-import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**
  * Server provide metadata about other bundles (repository contents diff).
- *
+ * <p/>
  * When the client asks CRCE to provide bundle metadata of those bundles which
  * it does not know about and sends a list of bundle identifiers (= those
  * bundles it knows about) and optionally sends a filter criteria specifying
  * which subset of metadata it is interested in
- *
+ * <p/>
  * Then CRCE sends that (subset of) metadata only for the following bundles
  * currently available in repository in "stored" state:
  * <ul>
@@ -49,72 +49,73 @@ import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
  * </ul>
  *
  * @author Jan Reznicek
- *
  */
 @Path("/other-bundles-metadata")
 public class OtherBundlesMetadataResource extends ResourceParent implements PostOtherBundlesMetadata {
 
-	private static final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
+    private static final Logger log = LoggerFactory.getLogger(OtherBundlesMetadataResource.class);
 
 
-
-	/**
+    /**
      * Create XML String from repository.
+     *
      * @param repository repository contains metadata about resources
      * @return XML String with exported metadata
      * @throws WebApplicationException unmarshal of xml failed.
      */
-	public Repository unmarshalXML(String repository) throws WebApplicationException {
+    public Repository unmarshalXML(String repository) throws WebApplicationException {
 
-		try {
-			ClassLoader cl = ObjectFactory.class.getClassLoader();
-			JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName(), cl);
+        try {
+            ClassLoader cl = ObjectFactory.class.getClassLoader();
+            JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName(), cl);
 
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-			InputStream repositoryStream = new ByteArrayInputStream(repository.getBytes(DEF_ENCODING));
-			Object obj = unmarshaller.unmarshal(repositoryStream);
+            InputStream repositoryStream = new ByteArrayInputStream(repository.getBytes(DEF_ENCODING));
+            Object obj = unmarshaller.unmarshal(repositoryStream);
 
-			JAXBElement<?> jxbE = (JAXBElement<?>) obj;
+            JAXBElement<?> jxbE = (JAXBElement<?>) obj;
 
-			Repository rep = (Repository) jxbE.getValue();
+            Repository rep = (Repository) jxbE.getValue();
 
-			return rep;
+            return rep;
 
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
-			log.debug(e.getMessage(), e);
-			throw new WebApplicationException(500);
+        } catch (UnsupportedEncodingException e) {
+            log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(500);
 
-		} catch (JAXBException e) {
-			log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
-			log.debug(e.getMessage(), e);
-			throw new WebApplicationException(400);
-		}
+        } catch (JAXBException e) {
+            log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(400);
+        }
 
-	}
+    }
 
-	/**
-	 * Create a set of id of all resources from repository.
-	 * @param resources repository.
-	 * @return set of id
-	 */
+    /**
+     * Create a set of id of all resources from repository.
+     *
+     * @param resources repository.
+     * @return set of id
+     */
     private Set<String> createIdSet(Repository resources) {
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> resList = resources.getResources();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource> resList = resources.getResources();
         Set<String> idSet = new HashSet<>();
 
-        for (cz.zcu.kiv.crce.rest.internal.jaxb.Resource res : resList) {
+        for (cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource res : resList) {
             idSet.add(res.getId());
         }
 
         return idSet;
     }
 
-	/**
-	 * Create a set of id of all resources from list of resources.
-	 * @param resources list of resources.
-	 * @return set of id
-	 */
+    /**
+     * Create a set of id of all resources from list of resources.
+     *
+     * @param resources list of resources.
+     * @return set of id
+     */
     private Set<String> createIdSet(List<Resource> resources) {
 
         Set<String> idSet = new HashSet<>();
@@ -126,13 +127,14 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
         return idSet;
     }
 
-	/**
-	 *  Returns list of bundles, that are in storeResources, but not in clientBundlesIdSet.
-	 *  These bundles are new on store since last update of client bundles.
-	 * @param storeResources list of bundles in  the store
-	 * @param clientBundlesIdSet set of id of bundles in the client
-	 * @return list of bundles, that are new on store.
-	 */
+    /**
+     * Returns list of bundles, that are in storeResources, but not in clientBundlesIdSet.
+     * These bundles are new on store since last update of client bundles.
+     *
+     * @param storeResources     list of bundles in  the store
+     * @param clientBundlesIdSet set of id of bundles in the client
+     * @return list of bundles, that are new on store.
+     */
     private List<Resource> findNewResources(List<Resource> storeResources, Set<String> clientBundlesIdSet) {
 
         List<Resource> newResources = new ArrayList<>();
@@ -147,39 +149,40 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
     }
 
 
-	/**
-	 * Returns list of bundles, that are in clientResources, but not in storeIdset.
-	 * These bundles was deleted from store since last update of client bundles.
-	 * @param clientResources list of bundles in the client
-	 * @param storeIdSet set of id of bundles in the store
-	 * @return list of bundles, that have was deleted from store.
-	 */
-	private List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> determineUnknownResources(
-            List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> clientResources, Set<String> storeIdSet) {
+    /**
+     * Returns list of bundles, that are in clientResources, but not in storeIdset.
+     * These bundles was deleted from store since last update of client bundles.
+     *
+     * @param clientResources list of bundles in the client
+     * @param storeIdSet      set of id of bundles in the store
+     * @return list of bundles, that have was deleted from store.
+     */
+    private List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource> determineUnknownResources(
+            List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource> clientResources, Set<String> storeIdSet) {
 
-		List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> unknownResources = new ArrayList<>();
-        for (cz.zcu.kiv.crce.rest.internal.jaxb.Resource res : clientResources) {
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource> unknownResources = new ArrayList<>();
+        for (cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource res : clientResources) {
             if (!storeIdSet.contains(res.getId())) {
                 unknownResources.add(Activator.instance().getConvertorToBeans().getResourceWithUnknownStatus(res.getId()));
             }
         }
 
-		return unknownResources;
-	}
+        return unknownResources;
+    }
 
 
-	/**
-	 * Return repository with other bundles (new to client).
-	 * Other bundles are bundles currently available in repository in "stored" state:
-	 * <ul>
-     *  <li> are not in the list sent by client ("new bundles")
-     *  <li> are in the list but have been removed from the repository ("deleted bundles" - just a list of bundle identifiers).
-	 * </ul>
-	 *
-	 * @param clientBundles
-	 * @param ui contextual info about URI
-	 * @return repositoty with other bundles
-	 */
+    /**
+     * Return repository with other bundles (new to client).
+     * Other bundles are bundles currently available in repository in "stored" state:
+     * <ul>
+     * <li> are not in the list sent by client ("new bundles")
+     * <li> are in the list but have been removed from the repository ("deleted bundles" - just a list of bundle identifiers).
+     * </ul>
+     *
+     * @param clientBundles
+     * @param ui            contextual info about URI
+     * @return repositoty with other bundles
+     */
     private Repository findOtherBundles(Repository clientBundles, UriInfo ui) {
 
         List<Resource> storeResources = Activator.instance().getStore().getResources();
@@ -188,7 +191,7 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
         Set<String> storeIdSet = createIdSet(storeResources);
 
         List<Resource> newResources = findNewResources(storeResources, clientBundlesIdSet);
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Resource> unknownResources = determineUnknownResources(clientBundles.getResources(), storeIdSet);
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource> unknownResources = determineUnknownResources(clientBundles.getResources(), storeIdSet);
 
         //convert new resources to repository
         MetadataFilter include = new MetadataFilter();
@@ -202,13 +205,12 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
     }
 
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@POST
-	@Consumes(MediaType.APPLICATION_XML)
-	@Produces({MediaType.APPLICATION_XML })
+    /**
+     * {@inheritDoc}
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML})
     @Override
     public Response otherBundles(String knownBundles, @Context UriInfo ui) {
         newRequest();
@@ -225,5 +227,5 @@ public class OtherBundlesMetadataResource extends ResourceParent implements Post
 
             return e.getResponse();
         }
-	}
+    }
 }

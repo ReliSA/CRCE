@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.rest.internal.convertor;
 
-import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -9,16 +7,15 @@ import java.util.List;
 
 import org.junit.Test;
 
-import cz.zcu.kiv.crce.rest.internal.jaxb.Attribute;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Capability;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Resource;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource;
+import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
 
 /**
- *
  * Test {@link JaxbMapping}.
  *
  * @author Jan Reznicek
- *
  */
 public class ConvertorToBeansTest {
 

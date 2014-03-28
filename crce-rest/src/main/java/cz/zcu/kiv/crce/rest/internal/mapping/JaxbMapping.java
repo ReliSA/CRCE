@@ -5,13 +5,11 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 
-import cz.zcu.kiv.crce.metadata.type.Version;
-
 import org.apache.felix.dm.annotation.api.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.namespace.NsCrceCompatibility;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Operator;
@@ -21,8 +19,9 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory;
 
 /**
  * Convert cz.zcu.kiv.crce.metadata.Resource to bean classes with JAXB annotations. These bean classes are ready to export metadata to xml.
@@ -42,7 +41,9 @@ public class JaxbMapping {
 	public static final String OSGI_WIRING_BUNDLE = "osgi.wiring.bundle";
 	public static final String CRCE_METRICS_NAME = "crce.metrics";
 
-    private final ObjectFactory objectFactory = new ObjectFactory();
+    private final ObjectFactory metadataObjectFactory = new ObjectFactory();
+
+    private final CompatibilityMapper compatibilityMapper = new CompatibilityMapper();
 
     /**
      * Default host, should not be needed, information is gained from request context. But is there for sure TODO: add default rest host to
@@ -75,30 +76,30 @@ public class JaxbMapping {
 
 
     /**
-     * Get cz.zcu.kiv.crce.rest.internal.jaxb.Resource with unknown crce.status.
-     * This cz.zcu.kiv.crce.rest.internal.jaxb.Resource contains only id and capability crce.identity with attribute crce.status, that
+     * Get cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource with unknown crce.status.
+     * This cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource contains only id and capability crce.identity with attribute crce.status, that
      * is "unknown"
      *
      * @param id the resource id
      * @return information about unknown resource
      */
-    public cz.zcu.kiv.crce.rest.internal.jaxb.Resource getResourceWithUnknownStatus(String id) { // TODO check purpose of this method
-        cz.zcu.kiv.crce.rest.internal.jaxb.Resource resource = new cz.zcu.kiv.crce.rest.internal.jaxb.Resource();
+    public cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource getResourceWithUnknownStatus(String id) { // TODO check purpose of this method
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource resource = new cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource();
 
         resource.setId(id);
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Capability> caps = resource.getCapabilities();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability> caps = resource.getCapabilities();
 
-        cz.zcu.kiv.crce.rest.internal.jaxb.Capability crceIdentity = new cz.zcu.kiv.crce.rest.internal.jaxb.Capability();
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability crceIdentity = new cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability();
         crceIdentity.setNamespace("crce.identity");
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Attribute> attributes = crceIdentity.getAttributes();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute> attributes = crceIdentity.getAttributes();
 
-        cz.zcu.kiv.crce.rest.internal.jaxb.Attribute jaxbAttribute = objectFactory.createAttribute();
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute jaxbAttribute = metadataObjectFactory.createAttribute();
         jaxbAttribute.setName("name");
         jaxbAttribute.setValue(resource.getId());
         attributes.add(jaxbAttribute);
 
-        jaxbAttribute = objectFactory.createAttribute();
+        jaxbAttribute = metadataObjectFactory.createAttribute();
         jaxbAttribute.setName("status");
         jaxbAttribute.setValue("unknown");
         attributes.add(jaxbAttribute);
@@ -132,8 +133,8 @@ public class JaxbMapping {
 
     // new mappings
 
-    public cz.zcu.kiv.crce.rest.internal.jaxb.Repository mapRepository(List<Resource> resources, MetadataFilter filter, UriInfo uriInfo) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Repository jaxbRepository = objectFactory.createRepository();
+    public cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository mapRepository(List<Resource> resources, MetadataFilter filter, UriInfo uriInfo) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository jaxbRepository = metadataObjectFactory.createRepository();
 
         jaxbRepository.setIncrement(0L);
         jaxbRepository.setName("store");
@@ -144,20 +145,20 @@ public class JaxbMapping {
         return jaxbRepository;
     }
 
-    public cz.zcu.kiv.crce.rest.internal.jaxb.Resource mapResource(Resource resource, MetadataFilter filter, UriInfo uriInfo) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Resource jaxbResource = objectFactory.createResource();
+    public cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource mapResource(Resource resource, MetadataFilter filter, UriInfo uriInfo) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Resource jaxbResource = metadataObjectFactory.createResource();
 
         jaxbResource.setId(resource.getId());
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Capability> jaxbCapabilities = jaxbResource.getCapabilities();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability> jaxbCapabilities = jaxbResource.getCapabilities();
         for (Capability capability : resource.getRootCapabilities()) {
             if (includeCapability(capability.getNamespace(), filter)) {
-                cz.zcu.kiv.crce.rest.internal.jaxb.Capability jaxbCapability = mapCapability(capability);
+                cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability jaxbCapability = mapCapability(capability);
 
                 if ("crce.identity".equals(capability.getNamespace())) {
                     String url = getURL(resource, uriInfo);
                     if (url != null) {
-                        cz.zcu.kiv.crce.rest.internal.jaxb.Attribute attribute = objectFactory.createAttribute();
+                        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute attribute = metadataObjectFactory.createAttribute();
                         attribute.setName("url");
                         attribute.setValue(url);
                         jaxbCapability.getAttributes().add(attribute);
@@ -168,45 +169,52 @@ public class JaxbMapping {
             }
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Requirement> jaxbRequirements = jaxbResource.getRequirements();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement> jaxbRequirements = jaxbResource.getRequirements();
         for (Requirement requirement : resource.getRequirements()) {
             if (includeRequirement(requirement.getNamespace(), filter)) {
                 jaxbRequirements.add(mapRequirement(requirement));
             }
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Property> jaxbProperties = jaxbResource.getProperties();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property> jaxbProperties = jaxbResource.getProperties();
         for (Property<Resource> property : resource.getProperties()) {
             if (includeProperty(property.getNamespace(), filter)) {
                 jaxbProperties.add(mapProperty(property));
             }
         }
+        if (includeProperty(NsCrceCompatibility.NAMESPACE__CRCE_COMPATIBILITY, filter)) {
+            cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property p = compatibilityMapper.mapCompatibility(resource);
+            if (p != null) {
+                jaxbProperties.add(p);
+            }
+        }
+
 
         return jaxbResource;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.Capability mapCapability(Capability capability) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Capability jaxbCapability = objectFactory.createCapability();
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability mapCapability(Capability capability) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability jaxbCapability = metadataObjectFactory.createCapability();
 
         jaxbCapability.setNamespace(capability.getNamespace());
         jaxbCapability.setId(capability.getId());
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Directive> directives = jaxbCapability.getDirectives();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Directive> directives = jaxbCapability.getDirectives();
         for (Map.Entry<String, String> entry : capability.getDirectives().entrySet()) {
             directives.add(mapDirective(entry));
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Attribute> attributes = jaxbCapability.getAttributes();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute> attributes = jaxbCapability.getAttributes();
         for (Attribute<?> attribute : capability.getAttributes()) {
             attributes.add(mapAttribute(attribute));
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Capability> capabilities = jaxbCapability.getCapabilities();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability> capabilities = jaxbCapability.getCapabilities();
         for (Capability child : capability.getChildren()) {
             capabilities.add(mapCapability(child));
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Property> properties = jaxbCapability.getProperties();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property> properties = jaxbCapability.getProperties();
         for (Property<Capability> property : capability.getProperties()) {
             properties.add(mapProperty(property));
         }
@@ -214,23 +222,23 @@ public class JaxbMapping {
         return jaxbCapability;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.Requirement mapRequirement(Requirement requirement) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Requirement jaxbRequirement = objectFactory.createRequirement();
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement mapRequirement(Requirement requirement) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement jaxbRequirement = metadataObjectFactory.createRequirement();
 
         jaxbRequirement.setNamespace(requirement.getNamespace());
         jaxbRequirement.setId(requirement.getId());
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Directive> directives = jaxbRequirement.getDirectives();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Directive> directives = jaxbRequirement.getDirectives();
         for (Map.Entry<String, String> entry : requirement.getDirectives().entrySet()) {
             directives.add(mapDirective(entry));
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Attribute> attributes = jaxbRequirement.getAttributes();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute> attributes = jaxbRequirement.getAttributes();
         for (Attribute<?> attribute : requirement.getAttributes()) {
             attributes.add(mapAttribute(attribute));
         }
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Requirement> requirements = jaxbRequirement.getRequirements();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement> requirements = jaxbRequirement.getRequirements();
         for (Requirement child : requirement.getChildren()) {
             requirements.add(mapRequirement(child));
         }
@@ -238,13 +246,13 @@ public class JaxbMapping {
         return jaxbRequirement;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.Property mapProperty(Property<?> property) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Property jaxbProperty = objectFactory.createProperty();
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property mapProperty(Property<?> property) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property jaxbProperty = metadataObjectFactory.createProperty();
 
         jaxbProperty.setNamespace(property.getNamespace());
         jaxbProperty.setId(property.getId());
 
-        List<cz.zcu.kiv.crce.rest.internal.jaxb.Attribute> attributes = jaxbProperty.getAttributes();
+        List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute> attributes = jaxbProperty.getAttributes();
         for (Attribute<?> attribute : property.getAttributes()) {
             attributes.add(mapAttribute(attribute));
         }
@@ -254,8 +262,8 @@ public class JaxbMapping {
         return jaxbProperty;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.Directive mapDirective(Map.Entry<String, String> entry) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Directive jaxbDirective = objectFactory.createDirective();
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Directive mapDirective(Map.Entry<String, String> entry) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Directive jaxbDirective = metadataObjectFactory.createDirective();
 
         jaxbDirective.setName(entry.getKey());
         jaxbDirective.setValue(entry.getValue());
@@ -263,8 +271,8 @@ public class JaxbMapping {
         return jaxbDirective;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.Attribute mapAttribute(Attribute<?> attribute) {
-        cz.zcu.kiv.crce.rest.internal.jaxb.Attribute jaxbAttribute = objectFactory.createAttribute();
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute mapAttribute(Attribute<?> attribute) {
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute jaxbAttribute = metadataObjectFactory.createAttribute();
 
         jaxbAttribute.setName(attribute.getName());
         jaxbAttribute.setValue(attribute.getStringValue());

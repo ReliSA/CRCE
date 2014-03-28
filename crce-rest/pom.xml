@@ -85,6 +85,12 @@
                                     <version>${project.version}</version>
                                     <outputDirectory>${basedir}/target/xsd</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>crce-compatibility-api</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${basedir}/target/xsd</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                             <includes>**/*.xsd</includes>
                         </configuration>
@@ -93,28 +99,45 @@
             </plugin>
             <!-- Generate JAXB classes from metadata XSD -->
             <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-xjc-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.6</version>
                 <executions>
                     <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
+                        <id>xjc-metadata</id>
                         <goals>
-                            <goal>xsdtojava</goal>
+                            <goal>xjc</goal>
                         </goals>
                         <configuration>
-                            <sourceRoot>${basedir}/target/generated-sources/jaxb</sourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd</xsd>
-                                    <bindingFile>${basedir}/src/main/resources/jaxb/metadata.xjb</bindingFile>
-                                    <packagename>cz.zcu.kiv.crce.rest.internal.jaxb</packagename>
-                                    <extension>true</extension>
-                                </xsdOption>
-                            </xsdOptions>
+                            <schemaFiles>cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd</schemaFiles>
+                            <bindingFiles>metadata.xjb</bindingFiles>
+                            <packageName>cz.zcu.kiv.crce.rest.internal.jaxb.metadata</packageName>
+                            <arguments>-episode
+                                ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>xjc-compatibility</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <schemaFiles>cz/zcu/kiv/crce/compatibility/schema/v1.0.0/compatibility.xsd</schemaFiles>
+                            <bindingFiles>compatibility.xjb</bindingFiles>
+                            <packageName>cz.zcu.kiv.crce.rest.internal.jaxb.compatibility</packageName>
+                            <arguments>-b
+                                ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode
+                            </arguments>
+                            <clearOutputDir>false</clearOutputDir>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <schemaDirectory>${basedir}/target/xsd/</schemaDirectory>
+                    <bindingDirectory>${basedir}/src/main/resources/jaxb/</bindingDirectory>
+                    <extension>true</extension>
+                </configuration>
             </plugin>
         </plugins>
     </build>

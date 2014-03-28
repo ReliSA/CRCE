@@ -1,0 +1,110 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:crce="http://relisa-dev.kiv.zcu.cz/schema/crce/metadata/1.0.0"
+        xmlns:c="http://relisa-dev.kiv.zcu.czu/schema/crce/compatibility/1.0.0"
+        targetNamespace="http://relisa-dev.kiv.zcu.czu/schema/crce/compatibility/1.0.0"
+        elementFormDefault="unqualified"
+        attributeFormDefault="unqualified"
+        version="1.0.0"
+    >
+    <import namespace="http://relisa-dev.kiv.zcu.cz/schema/crce/metadata/1.0.0"
+            schemaLocation="../../../metadata/schema/v1.0.0/metadata.xsd"/>
+    <element xml:space="preserve" name="compatibility">
+        <complexType>
+            <annotation>
+                <documentation xml:lang="en">
+                    Information about resource compatibility with another resource. Difference
+                    meta-data included.
+                </documentation>
+            </annotation>
+            <sequence>
+                <element name="property" type="crce:Tproperty" minOccurs="0" maxOccurs="unbounded"/>
+                <element name="diff" type="c:Tdiff" minOccurs="0" maxOccurs="unbounded"/>
+                <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="base-name" type="string">
+                <annotation>
+                    <documentation xml:lang="en">
+                        Name of the base resource which this compatibility instance relates to.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="base-version" type="string">
+                <annotation>
+                    <documentation xml:lang="en">
+                        Version of the base resource which this compatibility instance relates to.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="contract" type="string">
+                <annotation>
+                    <documentation xml:lang="en">
+                        Area of the compatibility - e.g. syntax
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="value" type="string">
+                <annotation>
+                    <documentation xml:lang="en">
+                        Aggregated difference value between the two resources.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>
+
+    <complexType name="Tdiff">
+        <annotation>
+            <documentation xml:lang="en">
+                Piece of difference metadata between resource contents. E.g. changes of a
+                class, method, etc.
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="diff" type="c:Tdiff" minOccurs="0" maxOccurs="unbounded"/>
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="level" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Type of element this diff is related to - e.g. package, class or method.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="role" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Role of the element this diff is related to - e.g. a capability or requirement
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="namespace" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Namespace of the diff.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="name" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Name of the element this diff is related to.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="syntax" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Language syntax the element is consistent with (e.g. if it is a Java class, then
+                    syntax is Java)
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="value" type="string">
+            <annotation>
+                <documentation xml:lang="en">
+                    Aggregated difference value for the element.
+                </documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+</schema>

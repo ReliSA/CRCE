@@ -6,7 +6,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
-import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
@@ -28,7 +28,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile JaxbMapping convertorToBeans;
     private volatile MetadataFactory metadataFactory;
     private volatile FilterParser filterParser;
-    private volatile CompatibilityService compatibilityService;
+    private volatile CompatibilitySearchService compatibilityService;
     private volatile SessionRegister sessionRegister;
 
     public static Activator instance() {
@@ -55,7 +55,7 @@ public final class Activator extends DependencyActivatorBase {
         return filterParser;
     }
 
-    public CompatibilityService getCompatibilityService() {
+    public CompatibilitySearchService getCompatibilityService() {
         return compatibilityService;
     }
 
@@ -87,7 +87,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilityService.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(true))
         );
     }
 }

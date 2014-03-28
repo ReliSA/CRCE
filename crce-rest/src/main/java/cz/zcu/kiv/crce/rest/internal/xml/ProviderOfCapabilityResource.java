@@ -22,8 +22,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import cz.zcu.kiv.crce.metadata.type.Version;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -33,86 +31,88 @@ import org.xml.sax.SAXException;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.PostProviderOfCapability;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Attribute;
-import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
 import cz.zcu.kiv.crce.rest.internal.structures.VersionDemand;
 
 @Path("/provider-of-capability")
 public class ProviderOfCapabilityResource extends ResourceParent implements PostProviderOfCapability {
 
-	private static final Logger log = LoggerFactory.getLogger(PostProviderOfCapability.class);
+    private static final Logger log = LoggerFactory.getLogger(PostProviderOfCapability.class);
 
-	/**
+    /**
      * Unmarshal requirement.
      *
-     * @param requiremnt XML representation of requirement
+     * @param requirement XML representation of requirement
      * @return requirement
      * @throws WebApplicationException unmarshal of xml failed.
      */
-	private cz.zcu.kiv.crce.rest.internal.jaxb.Requirement unmarshalRequirent(String requirement) throws WebApplicationException {
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement unmarshalRequirent(String requirement) throws WebApplicationException {
 
-		try {
-			ClassLoader cl = ObjectFactory.class.getClassLoader();
-			JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName(), cl);
+        try {
+            ClassLoader cl = ObjectFactory.class.getClassLoader();
+            JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class.getPackage().getName(), cl);
 
-			Unmarshaller unmarshaller = jc.createUnmarshaller();
+            Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-			InputStream requirementStream = new ByteArrayInputStream(requirement.getBytes(DEF_ENCODING));
+            InputStream requirementStream = new ByteArrayInputStream(requirement.getBytes(DEF_ENCODING));
 
-			 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			 dbf.setNamespaceAware(true);
-			 DocumentBuilder db = dbf.newDocumentBuilder();
-			 Document doc = db.parse(requirementStream);
-			 Node requirementSubtree = doc.getFirstChild();
-			 log.info("node: " + requirementSubtree.getLocalName());
-
-
-			Object obj = unmarshaller.unmarshal(requirementSubtree, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement.class);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(requirementStream);
+            Node requirementSubtree = doc.getFirstChild();
+            log.info("node: " + requirementSubtree.getLocalName());
 
 
-			JAXBElement<?> jxbE = (JAXBElement<?>) obj;
+            Object obj = unmarshaller.unmarshal(requirementSubtree, cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement.class);
 
-			cz.zcu.kiv.crce.rest.internal.jaxb.Requirement req = (cz.zcu.kiv.crce.rest.internal.jaxb.Requirement) jxbE.getValue();
 
-			return req;
+            JAXBElement<?> jxbE = (JAXBElement<?>) obj;
 
-		} catch (UnsupportedEncodingException e) {
-			log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
-			log.debug(e.getMessage(), e);
-			throw new WebApplicationException(500);
+            cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement req = (cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement) jxbE.getValue();
 
-		} catch (JAXBException e) {
-			log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
-			log.debug(e.getMessage(), e);
-			throw new WebApplicationException(400);
+            return req;
 
-		} catch (ParserConfigurationException e) {
-			log.warn("Request ({}) - ParserConfigurationException during unmarshal", getRequestId());
-			log.debug(e.getMessage(),e);
-			throw new WebApplicationException(500);
+        } catch (UnsupportedEncodingException e) {
+            log.warn("Request ({}) - Unsuported encoding {}", getRequestId(), DEF_ENCODING);
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(500);
 
-		} catch (IOException e) {
-			log.warn("Request ({}) - IOException during unmarshal", getRequestId());
-			log.debug(e.getMessage(),e);
-			throw new WebApplicationException(500);
+        } catch (JAXBException e) {
+            log.info("Request ({}) - Post request XML unmarshal failed.", getRequestId());
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(400);
 
-		} catch (SAXException e) {
-			log.info("Request ({}) - XMLParser exception during unmarshal - {}", getRequestId(), e.getMessage());
-			log.debug(e.getMessage(),e);
-			throw new WebApplicationException(400);
-		}
+        } catch (ParserConfigurationException e) {
+            log.warn("Request ({}) - ParserConfigurationException during unmarshal", getRequestId());
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(500);
 
-	}
+        } catch (IOException e) {
+            log.warn("Request ({}) - IOException during unmarshal", getRequestId());
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(500);
 
-	/**
-	 * Get name attribute of the requirement.
-	 * @param requirement the requirement
-	 * @return name attribute of the requirement
-	 */
-	private String getRequirementName(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+        } catch (SAXException e) {
+            log.info("Request ({}) - XMLParser exception during unmarshal - {}", getRequestId(), e.getMessage());
+            log.debug(e.getMessage(), e);
+            throw new WebApplicationException(400);
+        }
+
+    }
+
+    /**
+     * Get name attribute of the requirement.
+     *
+     * @param requirement the requirement
+     * @return name attribute of the requirement
+     */
+    private String getRequirementName(cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
         List<Attribute> attributes = requirement.getAttributes();
 
         for (Attribute attribute : attributes) {
@@ -121,15 +121,16 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
             }
         }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Return list of resources, that has capability, that matches the requirement.
-	 * @param requirement the requirement
-	 * @return list of resources, that has capability, that matches the requirement.
-	 */
-    private List<Resource> matchingResources(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+    /**
+     * Return list of resources, that has capability, that matches the requirement.
+     *
+     * @param requirement the requirement
+     * @return list of resources, that has capability, that matches the requirement.
+     */
+    private List<Resource> matchingResources(cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
         String reqName = getRequirementName(requirement);
         if (reqName == null) {
             log.info("Request ({}) - No name found in the input requierment.", getRequestId());
@@ -151,12 +152,13 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
         return matchingResources;
     }
 
-	/**
-	 * Prepare list of version demands from the requirement
-	 * @param requirement the requirement
-	 * @return list of version demands
-	 */
-    private List<VersionDemand> prepareVersionDemandsList(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+    /**
+     * Prepare list of version demands from the requirement
+     *
+     * @param requirement the requirement
+     * @return list of version demands
+     */
+    private List<VersionDemand> prepareVersionDemandsList(cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
 
         List<VersionDemand> versionDemandsList = new ArrayList<>();
 
@@ -177,16 +179,17 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
         return versionDemandsList;
     }
 
-	/**
-	 * Check if the version demand match the capability version.
-	 * @param verDemand the version demand
-	 * @param capabilityVersion the capability version
-	 * @return boolean, if the version demand match the capability version.
-	 */
-	private boolean checkVersionDemand(VersionDemand verDemand, Version capabilityVersion) {
-		String operation = verDemand.getOperation();
+    /**
+     * Check if the version demand match the capability version.
+     *
+     * @param verDemand         the version demand
+     * @param capabilityVersion the capability version
+     * @return boolean, if the version demand match the capability version.
+     */
+    private boolean checkVersionDemand(VersionDemand verDemand, Version capabilityVersion) {
+        String operation = verDemand.getOperation();
 
-		int compareVersions = capabilityVersion.compareTo(verDemand.getVersion());
+        int compareVersions = capabilityVersion.compareTo(verDemand.getVersion());
 
         switch (operation) {
             case VersionDemand.EQUEAL:
@@ -226,15 +229,15 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
         return false;
     }
 
-	/**
-	 * Check if the capability matches the version demands of the requirement.
-	 * Requirement can have more version demands and all must match.
-	 *
-	 * @param capability the capability
-	 * @param requirement the requirement
-	 * @return boolean, if the capability matches the version demands of the requirement.
-	 */
-    private boolean checkVersionMatching(Capability capability, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+    /**
+     * Check if the capability matches the version demands of the requirement.
+     * Requirement can have more version demands and all must match.
+     *
+     * @param capability  the capability
+     * @param requirement the requirement
+     * @return boolean, if the capability matches the version demands of the requirement.
+     */
+    private boolean checkVersionMatching(Capability capability, cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
         Version capabilityVersion = capability.getAttributeValue(NsOsgiPackage.ATTRIBUTE__VERSION);
         List<VersionDemand> verDemands = prepareVersionDemandsList(requirement);
         //log.info("version demands size " + verDemands.size());
@@ -252,14 +255,15 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
         return true;
     }
 
-	/**
-	 * Check if one of the resource's capabilities matches requirements.
-	 * @param resource the resource
-	 * @param reqName the name of requirement
-	 * @param requirement the requirement
-	 * @return boolean, if one of the resource's capabilities matches requirements
-	 */
-    private boolean checkIfMatchRequirement(Resource resource, String reqName, cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+    /**
+     * Check if one of the resource's capabilities matches requirements.
+     *
+     * @param resource    the resource
+     * @param reqName     the name of requirement
+     * @param requirement the requirement
+     * @return boolean, if one of the resource's capabilities matches requirements
+     */
+    private boolean checkIfMatchRequirement(Resource resource, String reqName, cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
 
         List<Capability> capabilities = resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         for (Capability cap : capabilities) {
@@ -268,7 +272,7 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
             if (reqName != null && reqName.equals(cap.getAttributeValue(NsOsgiPackage.ATTRIBUTE__NAME))
                     && checkVersionMatching(cap, requirement)) {
                 //check if version demands matches
-                    //one of capabilities matches
+                //one of capabilities matches
                 return true;
             }
 
@@ -278,50 +282,51 @@ public class ProviderOfCapabilityResource extends ResourceParent implements Post
 
     }
 
-	/**
-	 * Find all resources, that have a capability, that matches the requirement
-	 * @param requirement the requirement
-	 * @return repository of resources, that have a capability, that matches the requirement
-	 */
-	private cz.zcu.kiv.crce.rest.internal.jaxb.Repository findProviders(cz.zcu.kiv.crce.rest.internal.jaxb.Requirement requirement) {
+    /**
+     * Find all resources, that have a capability, that matches the requirement
+     *
+     * @param requirement the requirement
+     * @return repository of resources, that have a capability, that matches the requirement
+     */
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository findProviders(cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement requirement) {
 
-		List<Resource> matchingResources = matchingResources(requirement);
+        List<Resource> matchingResources = matchingResources(requirement);
 
-		//log.info("Matching resources size " + matchingResources.length);
+        //log.info("Matching resources size " + matchingResources.length);
 
-		MetadataFilter include = new MetadataFilter();
-		include.includeAll();
+        MetadataFilter include = new MetadataFilter();
+        include.includeAll();
 
-		cz.zcu.kiv.crce.rest.internal.jaxb.Repository repo =
+        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository repo =
                 Activator.instance().getConvertorToBeans().mapRepository(matchingResources, include, null);
 
-		return repo;
-	}
+        return repo;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@POST
-	@Consumes(MediaType.APPLICATION_XML)
-	@Produces({MediaType.APPLICATION_XML })
-	public Response providerOfCapability(String requirement) {
-		newRequest();
-		log.debug("Request ({}) - Provider of capability request was received.", getRequestId());
-		log.debug("Request ({}) - Requirement received: {}", getRequestId(), requirement);
-		try {
-			cz.zcu.kiv.crce.rest.internal.jaxb.Requirement req = unmarshalRequirent(requirement);
-			log.debug("Request ({}) - Requirement was unmashaled.", getRequestId());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces({MediaType.APPLICATION_XML})
+    public Response providerOfCapability(String requirement) {
+        newRequest();
+        log.debug("Request ({}) - Provider of capability request was received.", getRequestId());
+        log.debug("Request ({}) - Requirement received: {}", getRequestId(), requirement);
+        try {
+            cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Requirement req = unmarshalRequirent(requirement);
+            log.debug("Request ({}) - Requirement was unmashaled.", getRequestId());
 
-			cz.zcu.kiv.crce.rest.internal.jaxb.Repository repositoryBean = findProviders(req);
+            cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository repositoryBean = findProviders(req);
 
-			Response response = Response.ok(createXML(repositoryBean)).build();
-			log.debug("Request ({}) - Response was successfully created.", getRequestId());
-			return response;
-		} catch (WebApplicationException e) {
+            Response response = Response.ok(createXML(repositoryBean)).build();
+            log.debug("Request ({}) - Response was successfully created.", getRequestId());
+            return response;
+        } catch (WebApplicationException e) {
 
-			return e.getResponse();
-		}
-	}
+            return e.getResponse();
+        }
+    }
 
 }

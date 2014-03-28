@@ -21,19 +21,19 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetReplaceBundle;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository;
 import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
 
 @Path("/replace-bundle")
 public class ReplaceBundleResource extends ResourceParent implements GetReplaceBundle {
 
-	private static final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
+    private static final Logger log = LoggerFactory.getLogger(ReplaceBundleResource.class);
 
-	public static final String UPGRADE_OP = "upgrade";
-	public static final String DOWNGRADE_OP = "downgrade";
-	public static final String LOWEST_OP = "lowest";
-	public static final String HIGHEST_OP = "highest";
-	public static final String ANY_OP =  "any";
+    public static final String UPGRADE_OP = "upgrade";
+    public static final String DOWNGRADE_OP = "downgrade";
+    public static final String LOWEST_OP = "lowest";
+    public static final String HIGHEST_OP = "highest";
+    public static final String ANY_OP = "any";
 
     /**
      * Find resource in repository by its id.
@@ -64,7 +64,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
      * </ul>
      * If no wanted version if available (ex no higher in upgrade op), resource from client is returned to client.
      *
-     * @param op     operation
+     * @param op             operation
      * @param clientResource resource to replace
      * @return resource, that could replace client bundle.
      * @throws WebApplicationException unsupported operation
@@ -106,12 +106,13 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
     }
 
 
-	/**
-	 * In current version return resource with same name as in id and highest possible version.
-	 * @param id
+    /**
+     * In current version return resource with same name as in id and highest possible version.
+     *
+     * @param id
      * @param op
-	 * @return resource
-	 */
+     * @return resource
+     */
     @GET
     @Produces({MediaType.APPLICATION_XML})
     @Override

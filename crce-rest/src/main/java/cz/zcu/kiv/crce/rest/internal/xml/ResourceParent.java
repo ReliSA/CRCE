@@ -9,37 +9,37 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import cz.zcu.kiv.crce.metadata.type.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.rest.internal.Activator;
-import cz.zcu.kiv.crce.rest.internal.jaxb.ObjectFactory;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository;
 
 /**
  * Parent class for all resource classes, that implements REST operation.
  * This class contains common methods, that all offsprings can use.
  *
  * @author Jan Reznicek
- *
  */
 public abstract class ResourceParent {
 
-	/**
-	 * Id of actual HTTP request
-	 */
-	private int requestId = 0;
+    /**
+     * Id of actual HTTP request
+     */
+    private int requestId = 0;
 
-	protected static final String DEF_ENCODING = "UTF-8";
+    protected static final String DEF_ENCODING = "UTF-8";
 
-	private static final Logger logger = LoggerFactory.getLogger(ResourceParent.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResourceParent.class);
 
-	/**
+    /**
      * Create XML String from repository.
+     *
      * @param repository repository contains metadata about resources
      * @return XML String with exported metadata
      * @throws WebApplicationException XML export failed
@@ -68,11 +68,12 @@ public abstract class ResourceParent {
         }
     }
 
-	/**
-	 * Select from array of resources the one with highest version
-	 * @param storeResources array of resources
-	 * @return resource with highest version
-	 */
+    /**
+     * Select from array of resources the one with highest version
+     *
+     * @param storeResources array of resources
+     * @return resource with highest version
+     */
     protected Resource resourceWithHighestVersion(List<Resource> storeResources) {
         if (storeResources.isEmpty()) {
             return null;
@@ -83,7 +84,7 @@ public abstract class ResourceParent {
             Version highestVersion = getBundleVersion(resourceWithHighestVersion);
             Version resVersion = getBundleVersion(res);
 
-            if (resVersion != null && highestVersion !=null
+            if (resVersion != null && highestVersion != null
                     && highestVersion.compareTo(resVersion) < 0) {
                 resourceWithHighestVersion = res;
             }
@@ -95,11 +96,12 @@ public abstract class ResourceParent {
     }
 
 
-	/**
-	 * Select from array of resources the one with lowest version
-	 * @param storeResources array of resources
-	 * @return resource with highest version
-	 */
+    /**
+     * Select from array of resources the one with lowest version
+     *
+     * @param storeResources array of resources
+     * @return resource with highest version
+     */
     protected Resource resourceWithLowestVersion(List<Resource> storeResources) {
         if (storeResources.isEmpty()) {
             return null;
@@ -120,17 +122,18 @@ public abstract class ResourceParent {
     }
 
 
-	/**
-	 * Find a single bundle in repository by LDAP filter.
-	 * If are more bundle found, return first of them.
-	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
-	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+    /**
+     * Find a single bundle in repository by LDAP filter.
+     * If are more bundle found, return first of them.
+     * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
+     * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+     *
      * @param requirement Resource requirement.
-	 * @return founded bundle.
-	 * @throws WebApplicationException
-	 */
+     * @return founded bundle.
+     * @throws WebApplicationException
+     */
     @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
-	protected Resource findSingleBundleByFilter(Requirement requirement) throws WebApplicationException {
+    protected Resource findSingleBundleByFilter(Requirement requirement) throws WebApplicationException {
         try {
             List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
@@ -144,20 +147,21 @@ public abstract class ResourceParent {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
-			throw new WebApplicationException(500);
-		}
-	}
+            logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+            throw new WebApplicationException(500);
+        }
+    }
 
-	/**
-	 * Find a single bundle in repository by LDAP filter.
-	 * If are more bundle found, return the one with the highest version.
-	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
-	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
-	 * @param requirement Resource requirement.
-	 * @return Found bundle.
-	 * @throws WebApplicationException
-	 */
+    /**
+     * Find a single bundle in repository by LDAP filter.
+     * If are more bundle found, return the one with the highest version.
+     * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
+     * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+     *
+     * @param requirement Resource requirement.
+     * @return Found bundle.
+     * @throws WebApplicationException
+     */
     @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
     protected Resource findSingleBundleByFilterWithHighestVersion(Requirement requirement) throws WebApplicationException {
         try {
@@ -182,20 +186,21 @@ public abstract class ResourceParent {
         } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
-			throw new WebApplicationException(500);
-		}
+            logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+            throw new WebApplicationException(500);
+        }
     }
 
-	/**
-	 * Find a single bundle in repository by LDAP filter.
-	 * If are more bundle found, return the one with the lowest version.
-	 * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
-	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+    /**
+     * Find a single bundle in repository by LDAP filter.
+     * If are more bundle found, return the one with the lowest version.
+     * If a no bundle was found, throw {@link WebApplicationException} with status 404 - Not found.
+     * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+     *
      * @param requirement Resource requirement.
-	 * @return founded bundle.
-	 * @throws WebApplicationException
-	 */
+     * @return founded bundle.
+     * @throws WebApplicationException
+     */
     @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
     protected Resource findSingleBundleByFilterWithLowestVersion(Requirement requirement) throws WebApplicationException {
         try {
@@ -217,54 +222,56 @@ public abstract class ResourceParent {
             }
 
             return resource;
-		} catch (WebApplicationException e) {
+        } catch (WebApplicationException e) {
             throw e;
         } catch (Exception e) {
-			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
-			throw new WebApplicationException(500);
-		}
+            logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+            throw new WebApplicationException(500);
+        }
     }
 
 
-	/**
-	 * Find bundles by filter
-	 * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+    /**
+     * Find bundles by filter
+     * If the syntax of the LDAP filter is wrong, throw  {@link WebApplicationException} with status 400 - Bad request.
+     *
      * @param requirement Resource requirement.
-	 * @return founded bundles.
-	 * @throws WebApplicationException
-	 */
-	protected List<Resource> findBundlesByFilter(Requirement requirement) throws WebApplicationException {
-		try {
+     * @return founded bundles.
+     * @throws WebApplicationException
+     */
+    protected List<Resource> findBundlesByFilter(Requirement requirement) throws WebApplicationException {
+        try {
             List<Resource> storeResources = Activator.instance().getStore().getResources(requirement);
 
             // TODO check list size?
 
-			return storeResources;
-		} catch (Exception e) {
-			logger.error("Request ({}) - Could not get resources from store.", requestId, e);
-			throw new WebApplicationException(500);
-		}
-	}
+            return storeResources;
+        } catch (Exception e) {
+            logger.error("Request ({}) - Could not get resources from store.", requestId, e);
+            throw new WebApplicationException(500);
+        }
+    }
 
     protected List<Resource> findAllBundles() throws WebApplicationException {
         return Activator.instance().getStore().getResources();
     }
 
-	/**
-	 * Indicate that new request came to server.
-	 * Id of new request is determined.
-	 */
-	protected void newRequest() {
-		requestId++;
-	}
+    /**
+     * Indicate that new request came to server.
+     * Id of new request is determined.
+     */
+    protected void newRequest() {
+        requestId++;
+    }
 
-	/**
-	 * Get id of actual request
-	 * @return id of actual request.
-	 */
-	protected int getRequestId() {
-		return requestId;
-	}
+    /**
+     * Get id of actual request
+     *
+     * @return id of actual request.
+     */
+    protected int getRequestId() {
+        return requestId;
+    }
 
     // TODO the following methods are candidates for a common OSGi service
 

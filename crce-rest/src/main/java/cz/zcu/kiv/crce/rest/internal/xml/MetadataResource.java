@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.osgi.framework.InvalidSyntaxException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,22 +22,22 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.GetMetadata;
+import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Repository;
 import cz.zcu.kiv.crce.rest.internal.mapping.MetadataFilter;
-import cz.zcu.kiv.crce.rest.internal.jaxb.Repository;
 
 /**
  * Server will provide a metadata information about resources in the repository.
- * @author Jan Reznicek
  *
+ * @author Jan Reznicek
  */
 @Path("/metadata")
 public class MetadataResource extends ResourceParent implements GetMetadata {
 
-	private static final Logger logger = LoggerFactory.getLogger(MetadataResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetadataResource.class);
 
 
     @GET
-    @Produces({MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_XML})
     @Override
     public Response getMetadata(
             @QueryParam("filter") String filter,
@@ -48,12 +47,12 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             @QueryParam("prop") String prop,
             @Context UriInfo ui) {
 
-    	newRequest();
-    	logger.debug("Request ({}) - Get metadata request was received.", getRequestId());
+        newRequest();
+        logger.debug("Request ({}) - Get metadata request was received.", getRequestId());
 
-    	List<Resource> storeResources;
+        List<Resource> storeResources;
 
-    	MetadataFilter include = new MetadataFilter();
+        MetadataFilter include = new MetadataFilter();
 
         if (core == null && cap == null && req == null && prop == null) {
             //include all
@@ -111,9 +110,9 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
     }
 
 
-	@GET
-	@Path("{id}")
-	@Produces({ MediaType.APPLICATION_XML })
+    @GET
+    @Path("{id}")
+    @Produces({MediaType.APPLICATION_XML})
     @Override
     public Response getMetadataById(
             @PathParam("id") String id,
@@ -123,10 +122,10 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             @QueryParam("prop") String prop,
             @Context UriInfo uriInfo) {
 
-    	newRequest();
+        newRequest();
         logger.debug("Request ({}) - Get metadata request for resource with id {} was received.", getRequestId(), id);
 
-    	MetadataFilter filter = new MetadataFilter();
+        MetadataFilter filter = new MetadataFilter();
 
         if (core == null && cap == null && req == null && prop == null) {
             //include all
@@ -175,8 +174,8 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
                 return e.getResponse();
             }
         } catch (Exception e) {
-			logger.error("Request ({}) - Could not get resources from store.", getRequestId(), e);
-			throw new WebApplicationException(500);
-		}
+            logger.error("Request ({}) - Could not get resources from store.", getRequestId(), e);
+            throw new WebApplicationException(500);
+        }
     }
 }
