@@ -112,9 +112,7 @@
                             <schemaFiles>cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd</schemaFiles>
                             <bindingFiles>metadata.xjb</bindingFiles>
                             <packageName>cz.zcu.kiv.crce.rest.internal.jaxb.metadata</packageName>
-                            <arguments>-episode
-                                ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode
-                            </arguments>
+                            <arguments>-episode ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode</arguments>
                         </configuration>
                     </execution>
                     <execution>
@@ -126,9 +124,7 @@
                             <schemaFiles>cz/zcu/kiv/crce/compatibility/schema/v1.0.0/compatibility.xsd</schemaFiles>
                             <bindingFiles>compatibility.xjb</bindingFiles>
                             <packageName>cz.zcu.kiv.crce.rest.internal.jaxb.compatibility</packageName>
-                            <arguments>-b
-                                ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode
-                            </arguments>
+                            <arguments>-b ${basedir}/target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.episode</arguments>
                             <clearOutputDir>false</clearOutputDir>
                         </configuration>
                     </execution>
