@@ -149,6 +149,7 @@ class CmpResultParser {
 
         List<Diff> ret = new ArrayList<>();
 
+        Diff tmp;
         switch (i.getContentCode()) {
             case "cmp.child.osgi.package.type":
 
@@ -156,7 +157,10 @@ class CmpResultParser {
                     ret.addAll(parseCmpResultInfoList(res.getChildren(), role, namespace));
                 } else {
                     //hierarchy ends here, just parse the OSGi package
-                    ret.add(parseCmpResultInfo(i, role, namespace));
+                    tmp = parseCmpResultInfo(i, role, namespace);
+                    if (tmp != null) {
+                        ret.add(tmp);
+                    }
                 }
 
                 break;
@@ -166,7 +170,11 @@ class CmpResultParser {
                 ret.addAll(parseCmpResultInfoList(res.getChildren(), role, namespace));
                 break;
             default:
-                ret.add(parseCmpResultInfo(i, role, namespace));
+
+                tmp = parseCmpResultInfo(i, role, namespace);
+                if (tmp != null) {
+                    ret.add(tmp);
+                }
                 break;
         }
 
