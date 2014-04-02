@@ -151,20 +151,29 @@ public class JaxbMapping {
         jaxbResource.setId(resource.getId());
 
         List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability> jaxbCapabilities = jaxbResource.getCapabilities();
+
+        // #81: 'crce.identity' must precede all remaining capabilities
+        if (includeCapability(CRCE_IDENTITY_CAP_NAME, filter)) {
+            List<Capability> capabilities = resource.getCapabilities(CRCE_IDENTITY_CAP_NAME);
+            if (!capabilities.isEmpty()) {
+                cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability jaxbCapability = mapCapability(capabilities.get(0));
+                String url = getURL(resource, uriInfo);
+                if (url != null) {
+                    cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute attribute = metadataObjectFactory.createAttribute();
+                    attribute.setName("url"); // TODO hardcoded
+                    attribute.setValue(url);
+                    jaxbCapability.getAttributes().add(attribute);
+                }
+                jaxbCapabilities.add(jaxbCapability);
+            }
+        }
+
         for (Capability capability : resource.getRootCapabilities()) {
+            if (CRCE_IDENTITY_CAP_NAME.equals(capability.getNamespace())) {
+                continue;
+            }
             if (includeCapability(capability.getNamespace(), filter)) {
                 cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Capability jaxbCapability = mapCapability(capability);
-
-                if ("crce.identity".equals(capability.getNamespace())) {
-                    String url = getURL(resource, uriInfo);
-                    if (url != null) {
-                        cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Attribute attribute = metadataObjectFactory.createAttribute();
-                        attribute.setName("url");
-                        attribute.setValue(url);
-                        jaxbCapability.getAttributes().add(attribute);
-                    }
-                }
-
                 jaxbCapabilities.add(jaxbCapability);
             }
         }
