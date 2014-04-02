@@ -286,14 +286,14 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
 
         doCategories(resource, headers);
 
-        Capability bundle = doBundle(resource, headers);
+        doBundle(resource, headers);
 
-        doExportServices(resource, bundle, headers);
-        doExports(resource, bundle, headers);
-        doImports(resource, headers);
+        doExportServices(resource, null, headers);
+        doExportPackages(resource, null, headers);
+        doImportPackages(resource, headers);
         doImportServices(resource, headers);
-        doRequires(resource, headers);
-        doFragment(resource, bundle, headers);
+        doRequireBundles(resource, headers);
+        doFragmentsHosts(resource, null, headers);
         doExecutionEnvironment(resource, headers);
     }
 
@@ -335,9 +335,13 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             for (Clause export : exports) {
                 Capability cap = createServiceCapability(export);
                 cap.setResource(resource);
-                cap.setParent(root);
-                root.addChild(cap);
                 resource.addCapability(cap);
+                if (root != null) {
+                    cap.setParent(root);
+                    root.addChild(cap);
+                } else {
+                    resource.addRootCapability(cap);
+                }
             }
         }
     }
@@ -363,7 +367,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         return capability;
     }
 
-    private void doFragment(Resource resource, Capability root, Headers headers) throws IOException {
+    private void doFragmentsHosts(Resource resource, Capability root, Headers headers) throws IOException {
         // Check if we are a fragment
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.FRAGMENT_HOST));
         if (clauses != null && clauses.length == 1) {
@@ -385,13 +389,18 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__HOST, clauses[0].getName());
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__VERSION, new Version(getVersion(clauses[0])));
             capability.setResource(resource);
-            capability.setParent(root);
-            root.addChild(capability);
             resource.addCapability(capability);
+            if (root != null) {
+                capability.setParent(root);
+                root.addChild(capability);
+            } else {
+                resource.addRootCapability(capability);
+            }
+
         }
     }
 
-    private void doRequires(Resource resource, Headers headers) throws IOException {
+    private void doRequireBundles(Resource resource, Headers headers) throws IOException {
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.REQUIRE_BUNDLE));
         for (int i = 0; clauses != null && i < clauses.length; i++) {
             Requirement r = metadataFactory.createRequirement(NsOsgiBundle.NAMESPACE__OSGI_BUNDLE);
@@ -424,15 +433,19 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         return capability;
     }
 
-    private void doExports(Resource resource, Capability root, Headers headers) throws IOException {
+    private void doExportPackages(Resource resource, Capability root, Headers headers) throws IOException {
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.EXPORT_PACKAGE));
         if (clauses != null) {
             for (Clause clause : clauses) {
                 Capability capability = createCapability(clause); // Capability.PACKAGE,
                 capability.setResource(resource);
-                capability.setParent(root);
-                root.addChild(capability);
                 resource.addCapability(capability);
+                if (root != null) {
+                    capability.setParent(root);
+                    root.addChild(capability);
+                } else {
+                    resource.addRootCapability(capability);
+                }
             }
         }
     }
@@ -459,7 +472,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         return capability;
     }
 
-    private void doImports(Resource resource, Headers headers) throws IOException {
+    private void doImportPackages(Resource resource, Headers headers) throws IOException {
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.IMPORT_PACKAGE));
         for (int i = 0; clauses != null && i < clauses.length; i++) {
             Requirement requirement = metadataFactory.createRequirement(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
