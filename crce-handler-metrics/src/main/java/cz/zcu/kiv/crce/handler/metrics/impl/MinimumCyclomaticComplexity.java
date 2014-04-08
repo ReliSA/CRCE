@@ -60,7 +60,11 @@ public class MinimumCyclomaticComplexity implements ComponentMetrics {
         		minimumCyclomaticComplexity = classMetrics.getAverageCyclomaticComplexity();
         	}
         }
-
+       
+        if (minimumCyclomaticComplexity == Double.MAX_VALUE) {
+        	minimumCyclomaticComplexity = 0;
+        }
+        	
 		return Double.valueOf(minimumCyclomaticComplexity);
 	}
 }
