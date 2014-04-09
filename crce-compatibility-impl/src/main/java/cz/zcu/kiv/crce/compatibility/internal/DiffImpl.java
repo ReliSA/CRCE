@@ -24,6 +24,7 @@ public class DiffImpl implements Diff {
     private DifferenceRole role;
     private List<Diff> children;
     private String namespace;
+    private String syntax;
 
     public DiffImpl() {
         this.children = new ArrayList<>();
@@ -98,6 +99,16 @@ public class DiffImpl implements Diff {
     }
 
     @Override
+    public String getSyntax() {
+        return syntax;
+    }
+
+    @Override
+    public void setSyntax(String syntax) {
+        this.syntax = syntax;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -108,6 +119,7 @@ public class DiffImpl implements Diff {
         if (level != diff.level) return false;
         if (name != null ? !name.equals(diff.name) : diff.name != null) return false;
         if (namespace != null ? !namespace.equals(diff.namespace) : diff.namespace != null) return false;
+        if (syntax != null ? !syntax.equals(diff.syntax) : diff.syntax != null) return false;
         if (role != diff.role) return false;
         if (value != diff.value) return false;
 
@@ -122,6 +134,7 @@ public class DiffImpl implements Diff {
         result = 31 * result + (role != null ? role.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
+        result = 31 * result + (syntax != null ? syntax.hashCode() : 0);
         return result;
     }
 }

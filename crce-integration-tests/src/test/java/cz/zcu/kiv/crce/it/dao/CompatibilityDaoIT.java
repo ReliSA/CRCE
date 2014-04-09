@@ -29,6 +29,7 @@ import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.DifferenceRole;
@@ -197,7 +198,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
 
 
         Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.save", new Version(1, 0, 0),
-                null, new Version(0, 1, 0), Difference.MUT, diffs);
+                null, new Version(0, 1, 0), Difference.MUT, diffs, Contract.SYNTAX);
 
 
         test = compatibilityDao.saveCompatibility(test);
@@ -209,7 +210,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         //creating new passed, now try update
 
         test = compatibilityFactory.createCompatibility(test.getId(), "modified", test.getResourceVersion(),
-                test.getBaseResourceName(), test.getBaseResourceVersion(), test.getDiffValue(), new ArrayList<Diff>());
+                test.getBaseResourceName(), test.getBaseResourceVersion(), test.getDiffValue(), new ArrayList<Diff>(), Contract.SYNTAX);
 
         compatibilityDao.saveCompatibility(test);
         read = compatibilityDao.readCompability(read.getId());
@@ -239,7 +240,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         int i = 0;
         for(Version version : VERSIONS) {
             test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, RESOURCE_VERSION,
-                    version, DIFFERENCES[i], new ArrayList<Diff>());
+                    version, DIFFERENCES[i], new ArrayList<Diff>(), Contract.SYNTAX);
             test = compatibilityDao.saveCompatibility(test);
             testData.add(test);
             i++;
@@ -248,22 +249,22 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
         //create one different resource and several different resource versions to check
         //the dao method doesnt return all it can find
         test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.unwanted.resource.name", RESOURCE_VERSION,
-                null, new Version(33, 0, 33), Difference.MUT, new ArrayList<Diff>());
+                null, new Version(33, 0, 33), Difference.MUT, new ArrayList<Diff>(), Contract.SYNTAX);
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
 
         //these test data are also used for higher-version search
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,1,2),
-                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>());
+                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>(), Contract.SYNTAX);
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(1,2,0),
-                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>());
+                VERSIONS[1], DIFFERENCES[1], new ArrayList<Diff>(), Contract.SYNTAX);
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
         test = compatibilityFactory.createCompatibility(null, RESOURCE_NAME, new Version(42,0,0),
-                VERSIONS[1], Difference.MUT, new ArrayList<Diff>());
+                VERSIONS[1], Difference.MUT, new ArrayList<Diff>(), Contract.SYNTAX);
         test = compatibilityDao.saveCompatibility(test);
         testData.add(test);
 
@@ -347,7 +348,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
     @Test
     public void compatibilityDeleteTest() throws Exception {
         Compatibility test = compatibilityFactory.createCompatibility(null, "cz.zcu.kiv.crce.compatibility.dao.test.remove",new Version(1,0,0),
-                null, new Version(0, 1, 0), Difference.MUT, new ArrayList<Diff>());
+                null, new Version(0, 1, 0), Difference.MUT, new ArrayList<Diff>(), Contract.SYNTAX);
 
         test = compatibilityDao.saveCompatibility(test);
         Compatibility read = compatibilityDao.readCompability(test.getId());

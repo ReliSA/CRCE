@@ -144,7 +144,7 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
     }
 
     @Override
-    public void deleteAllRelatedCompabilities(String resourceName, Version resourceVersion) {
+    public void deleteAllRelatedCompatibilities(String resourceName, Version resourceVersion) {
         logger.debug("Deleting all compatibility data related to {}-{}", resourceName, resourceVersion);
         DBObject qRes = QueryBuilder.start(MongoCompatibilityMapper.C_RESOURCE_NAME).is(resourceName)
                 .and(MongoCompatibilityMapper.C_RESOURCE_VERSION).is(MongoCompatibilityMapper.mapVersion(resourceVersion))

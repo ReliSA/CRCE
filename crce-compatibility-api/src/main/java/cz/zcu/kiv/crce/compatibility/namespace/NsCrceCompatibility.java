@@ -13,4 +13,6 @@ public class NsCrceCompatibility {
      * CRCE Compatibility namespace identifier
      */
     public static final String NAMESPACE__CRCE_COMPATIBILITY = "crce.compatibility";
+
+    public static final String DIFF_SYNTAX_JAVA = "java";
 }

@@ -2,6 +2,9 @@ package cz.zcu.kiv.crce.compatibility;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.metadata.type.Version;
@@ -27,6 +30,7 @@ public interface Compatibility {
      *
      * @return unique name
      */
+    @Nonnull
     String getResourceName();
 
     /**
@@ -37,6 +41,7 @@ public interface Compatibility {
      *
      * @return version object
      */
+    @Nonnull
     Version getResourceVersion();
 
     /**
@@ -44,6 +49,7 @@ public interface Compatibility {
      *
      * @return unique name
      */
+    @Nullable
     String getBaseResourceName();
 
     /**
@@ -54,6 +60,7 @@ public interface Compatibility {
      *
      * @return version object
      */
+    @Nonnull
     Version getBaseResourceVersion();
 
     /**
@@ -61,11 +68,20 @@ public interface Compatibility {
      *
      * @return {@link Difference} value
      */
+    @Nonnull
     Difference getDiffValue();
 
     /**
      * @return Complete diff of the two resources.
      */
+    @Nullable
     List<Diff> getDiffDetails();
+
+    /**
+     *
+     * @return contract the compatibility instance is related to
+     */
+    @Nonnull
+    Contract getContract();
 
 }

@@ -103,8 +103,8 @@ public class CompatibilityMapper {
             jaxbCompatibility.setBaseName(compatibility.getBaseResourceName());
         }
         jaxbCompatibility.setBaseVersion(compatibility.getBaseResourceVersion().toString());
-        jaxbCompatibility.setContract("syntax"); //TODO incorporate into Compatibility data
-        jaxbCompatibility.setValue(compatibility.getDiffValue().toString());
+        jaxbCompatibility.setContract(compatibility.getContract().getValue());
+        jaxbCompatibility.setValue(compatibility.getDiffValue().name());
 
         List<cz.zcu.kiv.crce.rest.internal.jaxb.compatibility.Diff> jaxbDiffs = jaxbCompatibility.getDifves();
         for (Diff d : compatibility.getDiffDetails()) {
@@ -127,9 +127,9 @@ public class CompatibilityMapper {
         jaxbDiff.setNamespace(diff.getNamespace());
         //display only on package level
         if (diff.getLevel() == DifferenceLevel.PACKAGE) {
-            jaxbDiff.setSyntax("java"); //TODO make part of Diff data
+            jaxbDiff.setSyntax(diff.getSyntax());
         }
-        jaxbDiff.setValue(diff.getValue().toString());
+        jaxbDiff.setValue(diff.getValue().name());
         jaxbDiff.setLevel(diff.getLevel().toString());
         if (diff.getRole() != null) {
             jaxbDiff.setRole(diff.getRole().toString());

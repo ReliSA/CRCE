@@ -26,10 +26,11 @@ public interface CompatibilityFactory {
      * @param baseVersion OSGi representation of the version of the resource used as base
      * @param diffValue aggregated difference value of the two resources
      * @param diffValues complete diff of the two resources
+     * @param contract contract the instance is related to
      * @return new Compatibility instance
      */
     Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName,
-                                      Version baseVersion, Difference diffValue, List<Diff> diffValues);
+                                      Version baseVersion, Difference diffValue, List<Diff> diffValues, Contract contract);
 
     /**
      *
@@ -42,10 +43,11 @@ public interface CompatibilityFactory {
      * @param baseVersion OSGi representation of the version of the resource used as base
      * @param diffValue aggregated difference value of the two resources
      * @param diffValues complete diff of the two resources
+     * @param contract contract the instance is related to
      * @return new Compatibility instance
      */
     Compatibility createCompatibility(String id, String resourceName, Version resourceVersion,
-                                      Version baseVersion, Difference diffValue, List<Diff> diffValues);
+                                      Version baseVersion, Difference diffValue, List<Diff> diffValues, Contract contract);
 
     /**
      * Create blank diff instance.

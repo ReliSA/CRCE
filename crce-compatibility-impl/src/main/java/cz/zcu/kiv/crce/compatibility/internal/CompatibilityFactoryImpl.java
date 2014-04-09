@@ -6,6 +6,7 @@ import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
@@ -16,13 +17,13 @@ import cz.zcu.kiv.crce.metadata.type.Version;
  */
 public class CompatibilityFactoryImpl implements CompatibilityFactory {
     @Override
-    public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName, Version baseVersion, Difference diffValue, List<Diff> diffTree) {
-        return new CompatibilityImpl(id, resourceName, resourceVersion, baseName, baseVersion, diffValue, diffTree);
+    public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName, Version baseVersion, Difference diffValue, List<Diff> diffTree, Contract contract) {
+        return new CompatibilityImpl(id, resourceName, resourceVersion, baseName, baseVersion, diffValue, diffTree, contract);
     }
 
     @Override
-    public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, Version baseVersion, Difference diffValue, List<Diff> diffTree) {
-        return this.createCompatibility(id, resourceName, resourceVersion, resourceName, baseVersion, diffValue, diffTree);
+    public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, Version baseVersion, Difference diffValue, List<Diff> diffTree, Contract contract) {
+        return this.createCompatibility(id, resourceName, resourceVersion, resourceName, baseVersion, diffValue, diffTree, contract);
     }
 
     @Override

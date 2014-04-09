@@ -11,6 +11,7 @@ import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.DifferenceRole;
@@ -33,6 +34,7 @@ public class MongoCompatibilityMapper {
     public static final String C_BASE_NAME = "baseName";
     public static final String C_BASE_VERSION = "baseVersion";
     public static final String C_BUNDLE_DIFF = "bundleDifference";
+    public static final String C_CONTRACT = "contract";
 
     public static final String C_VERSION_MAJOR = "major";
     public static final String C_VERSION_MINOR = "minor";
@@ -46,6 +48,7 @@ public class MongoCompatibilityMapper {
     public static final String C_DETAILS_NAMESPACE = "namespace";
     public static final String C_DETAILS_ROLE = "role";
     public static final String C_DETAILS_VALUE = "value";
+    public static final String C_DETAILS_SYNTAX = "syntax";
 
 
     /**
@@ -79,6 +82,8 @@ public class MongoCompatibilityMapper {
 
         obj.put(C_BUNDLE_DIFF, compatibility.getDiffValue().name());
 
+        obj.put(C_CONTRACT, compatibility.getContract().name());
+
         List<DBObject> details = new ArrayList<>(compatibility.getDiffDetails().size());
         for (Diff detail : compatibility.getDiffDetails()) {
             details.add(mapDifferenceDetails(detail));
@@ -105,6 +110,7 @@ public class MongoCompatibilityMapper {
         String resourceName = (String) source.get(C_RESOURCE_NAME);
         Version resrouceVersion = mapToVersion((DBObject) source.get(C_RESOURCE_VERSION));
         Difference diffValue = getEnumFromValue(Difference.class, (String) source.get(C_BUNDLE_DIFF));
+        Contract contract = getEnumFromValue(Contract.class, (String) source.get(C_CONTRACT));
 
         List<Diff> diffDetails = new ArrayList<>();
         List<DBObject> children = (List<DBObject>) source.get(C_DETAILS);
@@ -114,7 +120,7 @@ public class MongoCompatibilityMapper {
             }
         }
 
-        return factory.createCompatibility(id, resourceName, resrouceVersion, baseName, baseVersion, diffValue, diffDetails);
+        return factory.createCompatibility(id, resourceName, resrouceVersion, baseName, baseVersion, diffValue, diffDetails, contract);
     }
 
     /**
@@ -155,6 +161,7 @@ public class MongoCompatibilityMapper {
         obj.put(C_DETAILS_LEVEL, details.getLevel().name());
         obj.put(C_DETAILS_VALUE, details.getValue().name());
         obj.put(C_DETAILS_NAMESPACE, details.getNamespace());
+        obj.put(C_DETAILS_SYNTAX, details.getSyntax());
 
         if (details.getRole() != null) {
             obj.put(C_DETAILS_ROLE, details.getRole().name());
@@ -184,6 +191,8 @@ public class MongoCompatibilityMapper {
         d.setName(tmp);
         tmp = (String) obj.get(C_DETAILS_NAMESPACE);
         d.setNamespace(tmp);
+        tmp = (String) obj.get(C_DETAILS_SYNTAX);
+        d.setSyntax(tmp);
 
         //enums
         Difference value = getEnumFromValue(Difference.class, (String) obj.get(C_DETAILS_VALUE));

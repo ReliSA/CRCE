@@ -24,6 +24,7 @@ import cz.zcu.kiv.typescmp.Difference;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.CompatibilityVersionComparator;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
@@ -104,7 +105,7 @@ public class CompatibilityServiceImpl implements CompatibilityService {
     @Override
     public void removeCompatibilities(Resource resource) {
         OsgiIdentity identity = loadOsgiIdentity(resource);
-        compatibilityDao.deleteAllRelatedCompabilities(identity.symbolicName, identity.version);
+        compatibilityDao.deleteAllRelatedCompatibilities(identity.symbolicName, identity.version);
     }
 
     /**
@@ -254,7 +255,7 @@ public class CompatibilityServiceImpl implements CompatibilityService {
         CmpResultParser parser = new CmpResultParser(compatibilityFactory);
         List<Diff> diffDetails = parser.extractDiffDetails(res);
 
-        Compatibility comp = compatibilityFactory.createCompatibility(null, upperIdentity.symbolicName, upperVersion, lowerIdentity.symbolicName, lowerVersion, diffValue, diffDetails);
+        Compatibility comp = compatibilityFactory.createCompatibility(null, upperIdentity.symbolicName, upperVersion, lowerIdentity.symbolicName, lowerVersion, diffValue, diffDetails, Contract.SYNTAX);
         comp = compatibilityDao.saveCompatibility(comp);
         logger.debug("Compatibility saved successfully with id: {}", comp.getId());
         return comp;

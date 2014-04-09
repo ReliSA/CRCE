@@ -13,6 +13,7 @@ import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.DifferenceRole;
@@ -30,13 +31,13 @@ public class MongoCompatibilityMapperTest {
      */
     static class CompatibilityFactoryTestImpl implements CompatibilityFactory {
         @Override
-        public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName, Version baseVersion, Difference diffValue, List<Diff> diffValues) {
-            return new CompatibilityTestImpl(id, resourceName, resourceVersion, baseName, baseVersion, diffValue, diffValues);
+        public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, String baseName, Version baseVersion, Difference diffValue, List<Diff> diffValues, Contract contract) {
+            return new CompatibilityTestImpl(id, resourceName, resourceVersion, baseName, baseVersion, diffValue, diffValues, contract);
         }
 
         @Override
-        public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, Version baseVersion, Difference diffValue, List<Diff> diffValues) {
-            return new CompatibilityTestImpl(id, resourceName, resourceVersion, resourceName, baseVersion, diffValue, diffValues);
+        public Compatibility createCompatibility(String id, String resourceName, Version resourceVersion, Version baseVersion, Difference diffValue, List<Diff> diffValues, Contract contract) {
+            return new CompatibilityTestImpl(id, resourceName, resourceVersion, resourceName, baseVersion, diffValue, diffValues, contract);
         }
 
         @Override
@@ -80,7 +81,7 @@ public class MongoCompatibilityMapperTest {
         diffs.add(root);
 
         Compatibility toMap = factory.createCompatibility(null, "cz.kiv.zcu.TestName",
-                new Version(1, 25, 33, "ahoj"), new Version(2, 0, 55), Difference.MUT, diffs);
+                new Version(1, 25, 33, "ahoj"), new Version(2, 0, 55), Difference.MUT, diffs, Contract.SYNTAX);
 
         DBObject obj = MongoCompatibilityMapper.mapToDbObject(toMap);
 

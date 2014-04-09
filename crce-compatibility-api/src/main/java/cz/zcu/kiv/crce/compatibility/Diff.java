@@ -86,4 +86,9 @@ public interface Diff {
 
     void setNamespace(@Nullable String namespace);
 
+    @Nullable
+    String getSyntax();
+
+    void setSyntax(@Nullable String syntax);
+
 }

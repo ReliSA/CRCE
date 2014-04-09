@@ -5,6 +5,7 @@ import java.util.List;
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
@@ -24,6 +25,7 @@ public class CompatibilityImpl implements Compatibility {
     private Version baseResourceVersion;
     private Difference diffValue;
     private List<Diff> diffDetails;
+    private Contract contract;
 
     /**
      * Empty constructor, creates uninitialized instance.
@@ -47,7 +49,7 @@ public class CompatibilityImpl implements Compatibility {
      */
     CompatibilityImpl(String id, String resourceName, Version resourceVersion,
                              String baseResourceName, Version baseResourceVersion,
-                             Difference diffValue, List<Diff> diffDetails) {
+                             Difference diffValue, List<Diff> diffDetails, Contract contract) {
         this.id = id;
         this.resourceName = resourceName;
         this.resourceVersion = resourceVersion;
@@ -55,6 +57,7 @@ public class CompatibilityImpl implements Compatibility {
         this.baseResourceVersion = baseResourceVersion;
         this.diffValue = diffValue;
         this.diffDetails = diffDetails;
+        this.contract = contract;
     }
 
     @Override
@@ -121,6 +124,15 @@ public class CompatibilityImpl implements Compatibility {
 
     public void setDiffDetails(List<Diff> diffDetails) {
         this.diffDetails = diffDetails;
+    }
+
+    @Override
+    public Contract getContract() {
+        return contract;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract = contract;
     }
 
     @Override

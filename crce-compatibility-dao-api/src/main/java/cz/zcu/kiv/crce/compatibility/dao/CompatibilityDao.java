@@ -44,7 +44,7 @@ public interface CompatibilityDao {
      * @param resourceName    symbolic name
      * @param resourceVersion version
      */
-    void deleteAllRelatedCompabilities(String resourceName, Version resourceVersion);
+    void deleteAllRelatedCompatibilities(String resourceName, Version resourceVersion);
 
     /**
      * List of all compatibilities owned by a resource with the given name and version

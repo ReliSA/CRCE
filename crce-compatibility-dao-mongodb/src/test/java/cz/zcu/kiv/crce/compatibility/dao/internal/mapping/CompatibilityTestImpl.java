@@ -5,6 +5,7 @@ import java.util.List;
 import cz.zcu.kiv.typescmp.Difference;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
@@ -23,6 +24,7 @@ public class CompatibilityTestImpl implements Compatibility {
     private Version baseResourceVersion;
     private Difference diffValue;
     private List<Diff> diffDetails;
+    private Contract contract;
 
     /**
      * Empty constructor, creates uninitialized instance.
@@ -38,7 +40,7 @@ public class CompatibilityTestImpl implements Compatibility {
      */
     CompatibilityTestImpl(String id, String resourceName, Version resourceVersion,
                           String baseResourceName, Version baseResourceVersion,
-                          Difference diffValue, List<Diff> diffDetails) {
+                          Difference diffValue, List<Diff> diffDetails, Contract contract) {
         this.id = id;
         this.resourceName = resourceName;
         this.resourceVersion = resourceVersion;
@@ -46,6 +48,7 @@ public class CompatibilityTestImpl implements Compatibility {
         this.baseResourceVersion = baseResourceVersion;
         this.diffValue = diffValue;
         this.diffDetails = diffDetails;
+        this.contract = contract;
     }
 
     @Override
@@ -115,6 +118,15 @@ public class CompatibilityTestImpl implements Compatibility {
     }
 
     @Override
+    public Contract getContract() {
+        return contract;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract = contract;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -127,6 +139,7 @@ public class CompatibilityTestImpl implements Compatibility {
             return false;
         if (diffDetails != null ? !diffDetails.equals(that.diffDetails) : that.diffDetails != null) return false;
         if (diffValue != that.diffValue) return false;
+        if (contract != that.contract) return false;
         if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null) return false;
         if (resourceVersion != null ? !resourceVersion.equals(that.resourceVersion) : that.resourceVersion != null)
             return false;
@@ -142,6 +155,7 @@ public class CompatibilityTestImpl implements Compatibility {
         result = 31 * result + (baseResourceVersion != null ? baseResourceVersion.hashCode() : 0);
         result = 31 * result + (diffValue != null ? diffValue.hashCode() : 0);
         result = 31 * result + (diffDetails != null ? diffDetails.hashCode() : 0);
+        result = 31 * result + (contract != null ? contract.hashCode() : 0);
         return result;
     }
 
