@@ -55,13 +55,13 @@ public class AverageCyclomaticComplexity implements ComponentMetrics {
         double cyclomaticComplexitySum = 0;
         int nonInterfaceClassCount = 0;
         for (ClassMetrics classMetrics : classesMetrics.getClassMetricsList()) {
-        	if (!classMetrics.isInterface()) {
+        	if (!Double.isNaN(classMetrics.getAverageCyclomaticComplexity())) {
         		cyclomaticComplexitySum += classMetrics.getAverageCyclomaticComplexity();
         		nonInterfaceClassCount++;
         	}
         }
         
-        double averageCyclomaticComplexity = 0;        
+        double averageCyclomaticComplexity = Double.NaN;        
         if (nonInterfaceClassCount != 0) { 
         	averageCyclomaticComplexity = cyclomaticComplexitySum / nonInterfaceClassCount;
         }

@@ -106,7 +106,7 @@ public class ClassMetricsImpl implements ClassMetrics {
         	}
         }
         
-        averageCyclomaticComplexity = 0;
+        averageCyclomaticComplexity = Double.NaN;
         if (nonAbstractMethodCount > 0) {
         	averageCyclomaticComplexity = (double)cyclomaticComplexitySum / nonAbstractMethodCount;
         }

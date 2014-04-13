@@ -54,15 +54,18 @@ public class MinimumCyclomaticComplexity implements ComponentMetrics {
 
         double minimumCyclomaticComplexity = Double.MAX_VALUE;
         for (ClassMetrics classMetrics : classesMetrics.getClassMetricsList()) {
-        	if (!classMetrics.isInterface() &&  
-        			minimumCyclomaticComplexity > classMetrics.getAverageCyclomaticComplexity()) {
+        	
+        	double averageCyclomaticComplexity = classMetrics.getAverageCyclomaticComplexity();
+        	if (!Double.isNaN(averageCyclomaticComplexity) && minimumCyclomaticComplexity > averageCyclomaticComplexity) {
         			
-        		minimumCyclomaticComplexity = classMetrics.getAverageCyclomaticComplexity();
+        		minimumCyclomaticComplexity = averageCyclomaticComplexity;
         	}
         }
        
+        // we didn't find min value
         if (minimumCyclomaticComplexity == Double.MAX_VALUE) {
-        	minimumCyclomaticComplexity = 0;
+        	
+        	minimumCyclomaticComplexity = Double.NaN;
         }
         	
 		return Double.valueOf(minimumCyclomaticComplexity);

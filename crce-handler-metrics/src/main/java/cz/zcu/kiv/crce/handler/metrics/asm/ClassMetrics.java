@@ -102,6 +102,7 @@ public interface ClassMetrics {
 	
 	/**
 	 * Average value of McCabe's Cyclomatic Complexity of method.
+	 * May be NaN, if class has no implemented method.
 	 * 
 	 * @return Cyclomatic complexity of class.
 	 */

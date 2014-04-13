@@ -54,13 +54,20 @@ public class MaximumCyclomaticComplexity implements ComponentMetrics {
 
         double maximumCyclomaticComplexity = 0;
         for (ClassMetrics classMetrics : classesMetrics.getClassMetricsList()) {
-        	if (!classMetrics.isInterface() &&  
-        			maximumCyclomaticComplexity < classMetrics.getAverageCyclomaticComplexity()) {
+        	
+        	double averageCyclomaticComplexity = classMetrics.getAverageCyclomaticComplexity();
+        	if (!Double.isNaN(averageCyclomaticComplexity) && maximumCyclomaticComplexity < averageCyclomaticComplexity) {
         			
-        		maximumCyclomaticComplexity = classMetrics.getAverageCyclomaticComplexity();
+        		maximumCyclomaticComplexity = averageCyclomaticComplexity;
         	}
         }
 
+        // we didn't find max value, defined Cyclomatic Complexity have to be more than 0
+        if (maximumCyclomaticComplexity == 0) {
+        	
+        	maximumCyclomaticComplexity = Double.NaN;
+        }
+        
 		return Double.valueOf(maximumCyclomaticComplexity);
 	}
 }
