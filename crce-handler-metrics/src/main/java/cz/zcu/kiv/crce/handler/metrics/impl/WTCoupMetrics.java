@@ -21,6 +21,8 @@ import cz.zcu.kiv.crce.handler.metrics.asm.MethodMetrics;
  * 'Measuring Software Component Reusability by Coupling and Cohesion Metrics' 
  * - Gui Gui, Paul D. Scott (2009)
  * 
+ * This implementation include static fields and methods.
+ * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  *
  * @see <a href="http://ojs.academypublisher.com/index.php/jcp/article/viewFile/0409797805/579">Measuring Software Component Reusability by Coupling and Cohesion Metrics</a>
@@ -66,12 +68,19 @@ public class WTCoupMetrics implements ComponentMetrics {
 
 		List<ClassMetrics> classes = new ArrayList<ClassMetrics>();        
     	for (ClassMetrics classMetric : classesMetrics.getClassMetricsList()) {
-			if (!classMetric.isInterface()) {
-				classes.add(classMetric);
-			}
+    		
+    		// include only classes with at least one non-abstract method 
+    		for (MethodMetrics method : classMetric.getMethods()) {
+    			if (!method.isAbstract()) {
+    				
+    				classes.add(classMetric);
+    				break;
+    			}
+    		}
     	}
-            		
-    	double wTCoup = 0;
+          
+    	// if is only 1 or no classes with implemented methods, WTCoup not defined 
+    	double wTCoup = Double.NaN;
     	
     	int classCount = classes.size();
     	if (classCount > 1) {
