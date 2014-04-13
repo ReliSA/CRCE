@@ -50,6 +50,7 @@
 	  						<li><strong>Id:</strong> ${resource.id}</li>
 	  						<li><strong>Symbolic name:</strong> ${resource.symbolicName}</li>
 	  						<li><strong>Size:</strong> ${resource.size}</li>
+                            <li><strong>Export Meta-Data:</strong> <a href="../rest/metadata/${resource.symbolicName}-${resource.version}">LINK</a></li>
 	  					</ul>
               <ul>
                 <c:forEach items="${resource.newProperties}" var="newProperty">
