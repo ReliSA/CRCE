@@ -76,11 +76,9 @@ public class WTCohMetrics implements ComponentMetrics {
             	}
             	
             	int methodCount = methods.size();
-            	if (methodCount == 1) {
-            		classCohSum += 1;
-            		classCount += 1;
-            	}
-            	else if (methodCount > 1) {
+            	
+            	// Cohesion is defined only for classes with 2 or more methods 
+            	if (methodCount > 1) {
             		double[][] sim = new double[methodCount][methodCount];
             		            
             		for (int i = 0; i < methodCount; i++) {
@@ -157,7 +155,8 @@ public class WTCohMetrics implements ComponentMetrics {
         	}
         }
         
-        double wTCoh = (classCount == 0) ? 0 : classCohSum / classCount;
+        // If no implemented classes in component, WTCoh is not defined 
+        double wTCoh = (classCount == 0) ? Double.NaN : classCohSum / classCount;
                 
         logger.debug("WTCoh {} ", wTCoh);
         
