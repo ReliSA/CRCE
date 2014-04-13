@@ -42,6 +42,7 @@ public class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
                 .add(createServiceDependency().setRequired(true).setService(CompatibilityService.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
+                .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
         );
     }
 

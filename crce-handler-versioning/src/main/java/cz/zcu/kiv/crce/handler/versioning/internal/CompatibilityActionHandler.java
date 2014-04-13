@@ -32,6 +32,8 @@ public class CompatibilityActionHandler extends AbstractActionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CompatibilityActionHandler.class);
 
+    static final String CATEGORY_COMPARED = "compared";
+
     private volatile CompatibilityService compatibilityService; //injected by dependency manager
     private volatile TaskRunnerService taskRunnerService;   /* injected by dependency manager */
     private volatile MetadataService metadataService; //injected by dependency manager

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.compatibility.service.CompatibilityService;
 import cz.zcu.kiv.crce.concurrency.model.Task;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -40,6 +41,13 @@ public class CompatibilityCalculationTask extends Task<Object> {
         logger.debug("Started calculation of Compatibility data for resource {}", symbolicName);
         Object o = getCompatibilityService().calculateCompatibilities(resource);
         logger.debug("Finished calculation of Compatibility data for resource {}", symbolicName);
+
+        //TODO thread unsafe, this needs to be solved on architecture level!!!
+        resource = getResourceDao().loadResource(getMetadataService().getUri(resource));
+        getMetadataService().addCategory(resource, CompatibilityActionHandler.CATEGORY_COMPARED);
+        getResourceDao().saveResource(resource);
+
+        logger.debug("Category \"compared\" set for resource {}", symbolicName);
         return o;
     }
 
@@ -49,6 +57,10 @@ public class CompatibilityCalculationTask extends Task<Object> {
 
     private MetadataService getMetadataService() {
         return getService(MetadataService.class);
+    }
+
+    private ResourceDAO getResourceDao() {
+        return getService(ResourceDAO.class);
     }
 
     private <S> S getService(Class<S> clazz) {
