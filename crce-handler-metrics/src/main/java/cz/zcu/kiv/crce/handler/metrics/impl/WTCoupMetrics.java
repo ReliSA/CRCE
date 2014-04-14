@@ -159,7 +159,12 @@ public class WTCoupMetrics implements ComponentMetrics {
     				}
     			}
     			
-    			outJarCoup[i] = (double)outJarMV / denominator;
+    			if (denominator != 0) {
+    				outJarCoup[i] = (double)outJarMV / denominator;
+    			}
+    			else {
+    				outJarCoup[i] = 0;
+    			}
     		}
     		
     		// CoupT - modified Floyd–Warshall algorithm
