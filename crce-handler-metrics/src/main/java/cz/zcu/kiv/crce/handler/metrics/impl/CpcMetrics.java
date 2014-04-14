@@ -78,7 +78,7 @@ public class CpcMetrics implements PackageMetrics {
 				complexTypeFieldCount += classMetric.getComplexTypeFieldCount();
 				
 				simpleParametersCount += classMetric.getSimpleParametersCount();
-				simpleParametersCount += classMetric.getComplexParametersCount();
+				complexParametersCount += classMetric.getComplexParametersCount();
 				
 				methodCount += classMetric.getMethodCount();
 				
