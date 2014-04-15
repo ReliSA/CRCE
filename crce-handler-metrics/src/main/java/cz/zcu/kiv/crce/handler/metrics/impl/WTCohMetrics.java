@@ -147,11 +147,12 @@ public class WTCohMetrics implements ComponentMetrics {
             		for (int j = 1; j < methodCount; j++) {
             			for (int i = 0; i < j; i++) {
             			
-            				simSum += sim[i][j];
+            				simSum += sim[i][j] + sim[j][i];
             			}
             		}
-            		           		
-            		classCohSum += simSum / (methodCount * methodCount - methodCount);
+            		      
+            		double classCohT = simSum / (methodCount * methodCount - methodCount);
+            		classCohSum += classCohT;
             		classCount += 1;
             	}
         	}
