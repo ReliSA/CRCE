@@ -12,7 +12,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -231,7 +231,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
      * @param req                 request
      * @return OK if success, 403 otherwise
      */
-    @PUT
+    @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadBundle(@FormDataParam("file") InputStream uploadedInputStream,
                                  @FormDataParam("file") FormDataContentDisposition fileDetail,
