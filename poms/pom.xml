@@ -375,6 +375,16 @@
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>javatypes</artifactId>
                 <version>1.0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>cz.zcu.kiv.jacc</groupId>
@@ -400,7 +410,31 @@
                 <groupId>cz.zcu.kiv.osgi</groupId>
                 <artifactId>version-generator</artifactId>
                 <version>1.0.1-SNAPSHOT</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+                <optional>true</optional> <!-- Dependency of JaCC excluded from provision -->
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.6.3</version>
+                <optional>true</optional> <!-- Dependency of JaCC excluded from provision -->
+            </dependency>
+
 
             <!-- Servlet API -->
             <dependency>
@@ -481,7 +515,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.3.175</version>
+                <version>1.3.176</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

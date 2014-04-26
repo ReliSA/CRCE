@@ -30,6 +30,7 @@
                             org.objectweb.asm.signature,
                         </Import-Package>
                         <Fragment-Host>com.sun.jersey.jersey-server</Fragment-Host>
+                        <Private-Package/>
                     </instructions>
                 </configuration>
             </plugin>

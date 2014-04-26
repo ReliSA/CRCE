@@ -61,8 +61,8 @@ public class GenericAttributeType implements AttributeType<Object> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class getType() {
-        return type;
+    public Class<Object> getType() {
+        return (Class) type;
     }
 
     @Override

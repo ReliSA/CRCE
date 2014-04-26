@@ -3,5 +3,3 @@
 #-----------------------------------------------------------------
 
 Embed-Dependency: org.apache.felix.utils
-
-Export-Package: cz.zcu.kiv.crce.metadata.wrapper.*

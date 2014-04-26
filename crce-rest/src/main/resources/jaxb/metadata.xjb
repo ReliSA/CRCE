@@ -15,7 +15,7 @@
         <xjc:simple />
     </jaxb:globalBindings>
 
-    <jaxb:bindings schemaLocation="../../../../target/xsd/cz/zcu/kiv/crce/metadata/schema/v1.0.0/metadata.xsd">
+    <jaxb:bindings schemaLocation="../../../../target/xsd/cz/zcu/kiv/crce/metadata/schema/v1_0_0/metadata.xsd">
         <jaxb:bindings node="//xs:complexType[@name='Tattribute']">
             <jaxb:class name="Attribute"/>
         </jaxb:bindings>

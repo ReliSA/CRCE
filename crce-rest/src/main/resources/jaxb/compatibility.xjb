@@ -16,7 +16,7 @@
     </jaxb:globalBindings>
 
     <jaxb:bindings
-        schemaLocation="../../../../target/xsd/cz/zcu/kiv/crce/compatibility/schema/v1.0.0/compatibility.xsd">
+        schemaLocation="../../../../target/xsd/cz/zcu/kiv/crce/compatibility/schema/v1_0_0/compatibility.xsd">
         <jaxb:bindings node="//xs:element[@name='compatibility']">
             <jaxb:class name="Compatibility"/>
         </jaxb:bindings>

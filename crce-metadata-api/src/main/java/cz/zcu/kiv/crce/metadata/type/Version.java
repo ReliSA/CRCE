@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
  * {@code Version} objects are immutable.
  * <p>
  * Based on {@code org.osgi.framework.Version}
- * 
+ *
  * @since 2.0.0
  * @Immutable
  * @version $Id: a71e2e2d7685e65b5bbe375efdf97fda16eff0a5 $
@@ -358,21 +358,21 @@ public class Version implements Comparable<Version> {
 			return 0;
 		}
 
-		int result = major - other.major;
+		int result = major - (other != null ? other.major : 0);
 		if (result != 0) {
 			return result;
 		}
 
-		result = minor - other.minor;
+		result = minor - (other != null ? other.minor : 0);
 		if (result != 0) {
 			return result;
 		}
 
-		result = micro - other.micro;
+		result = micro - (other != null ? other.micro : 0);
 		if (result != 0) {
 			return result;
 		}
 
-		return qualifier.compareTo(other.qualifier);
+		return qualifier.compareTo(other != null ? other.qualifier : "");
 	}
 }
