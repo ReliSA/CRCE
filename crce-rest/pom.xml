@@ -27,7 +27,10 @@
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <packagingExcludes>WEB-INF/web.xml</packagingExcludes>
+                    <packagingExcludes>
+                        <!--%regex[WEB-INF/lib/(?!jstl-|standard-).*.jar]-->
+                        WEB-INF/lib/*.jar
+                    </packagingExcludes>
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>

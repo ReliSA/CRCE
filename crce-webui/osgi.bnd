@@ -12,6 +12,8 @@ Bundle-Name: CRCE - Web UI
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
+Export-Package:
+
 Import-Package: \
   javax.servlet, \
   javax.servlet.http, \

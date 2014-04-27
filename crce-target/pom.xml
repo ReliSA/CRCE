@@ -17,6 +17,14 @@
 
     <name>CRCE - Target</name>
 
+    <!--
+        Scope of dependencies currently handles only placement of the artifact, but not the transitive resolution:
+        - runtime: artifact is placed to 'crce-bundles' folder,
+        - provided: artifact is placed to 'required-bundles' folder.
+
+        This behaviour will be redesigned in the next release after cleanup and stabilisation of dependencies.
+        Temporarily declared transitive not directly used dependencies have fixed version in this POM (not in shared dependency management).
+    -->
     <dependencies>
         <dependency>
             <groupId>org.ops4j.pax.runner</groupId>
@@ -144,34 +152,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- ACE -->
-
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.httplistener</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.storage</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.servlet</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.metadata</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- OTHER -->
 
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm-all</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
@@ -181,14 +167,17 @@
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.bcel</artifactId> <!-- 4 -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-vfs</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
            <groupId>commons-io</groupId>
@@ -198,14 +187,17 @@
         <dependency>
             <groupId>de.twentyeleven.skysail</groupId>
             <artifactId>org.json-osgi</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency> <!-- Required by pax-web-extender-war -->
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-finder</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.xbean</groupId>
@@ -216,30 +208,137 @@
         <dependency>
             <groupId>cz.zcu.kiv.jacc</groupId>
             <artifactId>types-cmp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-cmp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.jacc</groupId>
+            <artifactId>javatypes-loader</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-types</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-cmp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.obcc</groupId>
+            <artifactId>bundle-loader</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.osgi</groupId>
+            <artifactId>version-generator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by obcc.bundle-loader and jacc.javatypes-loader -->
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by obcc.bundle-loader -->
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.jsch</artifactId>
+            <version>0.1.49_1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
+            <version>3.2.1_3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
+            <version>3.1_7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-net</artifactId>
+            <version>1.4.1_6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.ant</artifactId>
+            <version>1.8.4_1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-vfs2 -->
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by commons-httpclient -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-codec</artifactId>
+            <version>1.3_2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-servlet</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Required by jersey-multipart -->
+            <groupId>org.jvnet</groupId>
+            <artifactId>mimepull</artifactId>
+            <version>1.6</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -427,6 +526,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-handler-metrics</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-handler-versioning</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>

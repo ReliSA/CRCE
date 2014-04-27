@@ -54,7 +54,7 @@
              It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
         -->
 
-        <version.org.slf4j>1.7.6</version.org.slf4j>
+        <version.org.slf4j>1.7.7</version.org.slf4j>
     </properties>
 
     <modules>

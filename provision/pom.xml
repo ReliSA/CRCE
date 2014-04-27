@@ -100,63 +100,7 @@
             <artifactId>org.osgi.service.obr</artifactId>
         </dependency>
 
-        <!-- === ACE === -->
-
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.httplistener</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.storage</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.servlet</artifactId>
-        </dependency>
-        <dependency><!-- TODO temporary provision - in 1.0.0 provided by crce-metadata-metafile -->
-            <groupId>org.apache.ace</groupId>
-            <artifactId>org.apache.ace.obr.metadata</artifactId>
-        </dependency>
-
-        <!--        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jsp-api</artifactId>
-            <type>jar</type>
-            <optional>true</optional>
-        </dependency>-->
-
         <!-- === JaCC / OBCC === -->
-
-<!--        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>types-cmp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>javatypes</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>javatypes-cmp</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cz.zcu.kiv.osgi</groupId>
-            <artifactId>bundle-types</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.osgi</groupId>
-            <artifactId>bundle-loader</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.osgi</groupId>
-            <artifactId>bundle-cmp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.osgi</groupId>
-            <artifactId>version-generator</artifactId>
-        </dependency>-->
 
         <dependency>
             <groupId>asm</groupId>
