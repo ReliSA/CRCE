@@ -1,8 +1,11 @@
-			</div>
-  
-  			<div id="paticka">CRCE version 2.0.0 -- &copy; 2011-2012 University of West Bohemia, Department of Computer Science --
+<%@ page import="cz.zcu.kiv.crce.webui.internal.VersionInfo" %>
+</div>
+<% VersionInfo versionInfo = VersionInfo.getVersionInfo(getServletContext()); %>
+
+<div id="paticka">CRCE version <%= versionInfo.getProductVersion() %> build rev. <%= versionInfo.getBuildRevision() %>
+-- &copy; 2011-2012 University of West Bohemia, Department of Computer Science --
 <a href="http://relisa.kiv.zcu.cz/">ReliSA research group</a></div>
 
-  		
+
 	</body>
 </html>
