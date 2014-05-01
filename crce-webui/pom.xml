@@ -29,34 +29,14 @@
             <plugin>
                 <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
                 <artifactId>svn-revision-number-maven-plugin</artifactId>
-                <version>1.13</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <entries>
                         <entry>
                             <path>${project.basedir}/..</path>
                             <prefix>crce-product</prefix>
-                            <depth>infinity</depth>
-<!--                            <reportUnversioned>true</reportUnversioned>
-                            <reportIgnored>false</reportIgnored>
-                            <reportOutOfDate>false</reportOutOfDate>-->
                         </entry>
                     </entries>
                 </configuration>
-                <dependencies>
-					<dependency>
-                        <groupId>org.tmatesoft.svnkit</groupId>
-                        <artifactId>svnkit</artifactId>
-                        <version>1.8.3-1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
