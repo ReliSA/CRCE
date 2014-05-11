@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-parent</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Parent</name>
+
+    <description>Component Repository supporting Compatibility Evaluation</description>
+
+    <url>https://www.assembla.com/spaces/crce</url>
+
+    <organization>
+        <name>ZČU KIV</name>
+        <url>http://www.kiv.zcu.cz</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>kalwi</id>
+            <name>Jiří Kučera</name>
+        </developer>
+    </developers>
+
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>com.google.code.maven-svn-wagon</groupId>
+                <artifactId>maven-svn-wagon</artifactId>
+                <version>1.4</version>
+            </extension>
+        </extensions>
+    </build>
+
+    <scm>
+        <developerConnection>scm:svn:https://subversion.assembla.com/svn/crce/branches/new-structure/pom</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>relisa-release</id>
+            <name>ReliSA Internal Releases</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>relisa-snapshots</id>
+            <name>ReliSA Internal Snapshots</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <!-- Central repository - must be listed first as a default repo for downloading of artifacts -->
+        <repository>
+            <id>central</id>
+            <url>http://uk.maven.org/maven2</url>
+        </repository>
+
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
+</project>
