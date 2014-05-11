@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>crce-metadata-indexer</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>CRCE - Core - Metadata Indexer Implementation</name>
+
+    <scm>
+        <developerConnection>scm:svn:https://subversion.assembla.com/svn/crce/branches/new-structure/core/crce-metadata-indexer</developerConnection>
+    </scm>
+
+    <properties>
+        <bundle.symbolicName>${namespace}.metadata.indexer.service</bundle.symbolicName>
+        <bundle.namespace>${namespace}.metadata.indexer</bundle.namespace>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-plugin-api</artifactId>
+            <version>${version.crce-plugin-api}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>${version.crce-metadata-api}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>${version.crce-metadata-service-api}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-indexer-api</artifactId>
+            <version>${version.crce-metadata-indexer-api}</version>
+        </dependency>
+    </dependencies>
+
+</project>

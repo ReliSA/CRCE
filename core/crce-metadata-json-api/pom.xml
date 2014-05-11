@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>crce-metadata-json-api</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>CRCE - Core - Metadata JSON API</name>
+
+    <scm>
+        <developerConnection>scm:svn:https://subversion.assembla.com/svn/crce/branches/new-structure/core/crce-metadata-json-api</developerConnection>
+    </scm>
+
+    <properties>
+        <bundle.symbolicName>${namespace}.metadata.json.api</bundle.symbolicName>
+        <bundle.namespace>${namespace}.metadata.json</bundle.namespace>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>${version.crce-metadata-api}</version>
+        </dependency>
+    </dependencies>
+
+</project>
