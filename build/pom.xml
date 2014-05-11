@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-parent</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>shared-build-settings</artifactId>
+
+    <name>CRCE - Build - Shared build configuration</name>
+
+    <packaging>pom</packaging>
+
+    <properties>
+        <namespace>cz.zcu.kiv.crce</namespace>
+        <version.jdk>1.7</version.jdk>
+        <version.maven>3.0.4</version.maven>
+        <version.mongodb>2.11.3</version.mongodb>
+        <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
+        <version.org.osgi>4.3.1</version.org.osgi>
+        <version.com.sun.jersey>1.17</version.com.sun.jersey>
+        <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web>
+        <version.org.apache.felix.dependencymanager>3.1.0</version.org.apache.felix.dependencymanager>
+        <version.com.fasterxml.jackson>2.3.1</version.com.fasterxml.jackson>
+        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
+        <version.org.slf4j>1.7.7</version.org.slf4j>
+        <!-- CRCE Core versions -->
+        <version.crce-plugin-api>2.1.0-SNAPSHOT</version.crce-plugin-api>
+        <version.crce-metadata-api>2.1.0-SNAPSHOT</version.crce-metadata-api>
+        <version.crce-metadata-impl>2.1.0-SNAPSHOT</version.crce-metadata-impl>
+        <version.crce-metadata-json-api>2.1.0-SNAPSHOT</version.crce-metadata-json-api>
+        <version.crce-metadata-json-impl>2.1.0-SNAPSHOT</version.crce-metadata-json-impl>
+        <version.crce-metadata-service-api>2.1.0-SNAPSHOT</version.crce-metadata-service-api>
+        <version.crce-metadata-service-impl>2.1.0-SNAPSHOT</version.crce-metadata-service-impl>
+        <version.crce-metadata-dao-api>2.1.0-SNAPSHOT</version.crce-metadata-dao-api>
+        <version.crce-metadata-dao-impl>2.1.0-SNAPSHOT</version.crce-metadata-dao-impl>
+        <version.crce-repository-api>2.1.0-SNAPSHOT</version.crce-repository-api>
+        <version.crce-repository-impl>2.1.0-SNAPSHOT</version.crce-repository-impl>
+        <version.crce-metadata-indexer-api>2.1.0-SNAPSHOT</version.crce-metadata-indexer-api>
+        <version.crce-metadata-indexer-impl>2.1.0-SNAPSHOT</version.crce-metadata-indexer-impl>
+        <version.crce-resolver-api>2.1.0-SNAPSHOT</version.crce-resolver-api>
+        <version.crce-resolver-impl>2.1.0-SNAPSHOT</version.crce-resolver-impl>
+    </properties>
+
+    <scm>
+        <developerConnection>scm:svn:https://subversion.assembla.com/svn/crce/branches/new-structure/build</developerConnection>
+    </scm>
+
+    <modules>
+        <module>wrappers</module>
+        <module>compiled</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.ops4j</groupId>
+                    <artifactId>maven-pax-plugin</artifactId>
+                    <!--
+                     | enable improved OSGi compilation support for the bundle life-cycle.
+                     | to switch back to the standard bundle life-cycle, move this setting
+                     | down to the maven-bundle-plugin section
+                    -->
+                </plugin>
+                <plugin>
+                    <groupId>org.ops4j.pax.exam</groupId>
+                    <artifactId>exam-maven-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.16</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.16</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.servicemix.tooling</groupId>
+                    <artifactId>depends-maven-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>2.4.0</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.1</version>
+                    <configuration>
+                        <source>${version.jdk}</source>
+                        <target>${version.jdk}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.3.1</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-versions</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireJavaVersion>
+                                        <version>${version.jdk}</version>
+                                    </requireJavaVersion>
+                                    <requireMavenVersion>
+                                        <version>${version.maven}</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                    <version>${version.org.apache.felix.dependencymanager}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>scan</goal>
+                            </goals>
+                            <configuration>
+                                <log>info</log>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-xjc-plugin</artifactId>
+                    <version>2.7.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                    <artifactId>svn-revision-number-maven-plugin</artifactId>
+                    <version>1.13</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <!-- Workaround for support of SVN 1.8 -->
+                        <dependency>
+                            <groupId>org.tmatesoft.svnkit</groupId>
+                            <artifactId>svnkit</artifactId>
+                            <version>1.8.3-1</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+<!--            <dependency>
+
+                 | dependency pom representing the global classpath of imported bundles
+
+                <type>pom</type>
+                <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
+                <artifactId>provision</artifactId>
+                <version>2.0.1-SNAPSHOT</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>-->
+
+            <!-- === Provided dependencies === -->
+
+            <dependency>
+                <groupId>org.ops4j.pax.runner</groupId>
+                <artifactId>pax-runner</artifactId>
+                <version>1.8.5</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- === OSGi === -->
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${version.org.osgi}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>${version.org.osgi}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <!-- PAX-WEB -->
+
+            <dependency>
+                <groupId>org.ops4j.pax.web</groupId>
+                <artifactId>pax-web-extender-war</artifactId>
+                <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.web</groupId>
+                <artifactId>pax-web-jetty-bundle</artifactId>
+                <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.web</groupId>
+                <artifactId>pax-web-jsp</artifactId>
+                <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.web</groupId>
+                <artifactId>pax-web-spi</artifactId>
+                <version>${version.org.ops4j.pax.web}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- === LOGGING === -->
+
+            <!-- API -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.org.slf4j}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Bridges -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>osgi-over-slf4j</artifactId>
+                <version>${version.org.slf4j}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${version.org.slf4j}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${version.org.slf4j}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${version.org.slf4j}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Implementation -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- === APACHE FELIX === -->
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>4.0.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.eventadmin</artifactId>
+                <version>1.3.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager</artifactId>
+                <version>${version.org.apache.felix.dependencymanager}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.shell</artifactId>
+                <version>3.0.1</version>
+                <!-- 3.1.0 version is not available yet -->
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                <version>${version.org.apache.felix.dependencymanager}</version>
+                <scope>compile</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>biz.aQute</groupId>
+                        <artifactId>bndlib</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.runtime</artifactId>
+                <version>${version.org.apache.felix.dependencymanager}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.configadmin</artifactId>
+                <version>1.8.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.bundlerepository</artifactId>
+                <version>1.6.6</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.osgi.service.obr</artifactId>
+                <version>1.0.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr</artifactId>
+                <version>1.8.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.webconsole</artifactId>
+                <version>4.2.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.shell</artifactId>
+                <version>1.4.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.fileinstall</artifactId>
+                <version>3.2.6</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- JaCC / OBCC / EFPs -->
+            <dependency>
+                <groupId>cz.zcu.kiv.jacc</groupId>
+                <artifactId>types-cmp</artifactId>
+                <version>1.0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.jacc</groupId>
+                <artifactId>javatypes</artifactId>
+                <version>1.0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.jacc</groupId>
+                <artifactId>javatypes-cmp</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.jacc</groupId>
+                <artifactId>javatypes-loader</artifactId>
+                <version>1.0.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.obcc</groupId>
+                <artifactId>bundle-types</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.obcc</groupId>
+                <artifactId>bundle-loader</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.obcc</groupId>
+                <artifactId>bundle-cmp</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.osgi</groupId>
+                <artifactId>version-generator</artifactId>
+                <version>1.0.1-SNAPSHOT</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+                <optional>true</optional> <!-- Dependency of JaCC excluded from provision -->
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.6.3</version>
+                <optional>true</optional> <!-- Dependency of JaCC excluded from provision -->
+            </dependency>
+
+
+            <!-- Servlet API -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>2.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Apache ACE -->
+            <dependency>
+                <groupId>org.apache.ace</groupId>
+                <artifactId>org.apache.ace.httplistener</artifactId>
+                <version>${version.org.apache.ace}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ace</groupId>
+                <artifactId>org.apache.ace.obr.metadata</artifactId>
+                <version>${version.org.apache.ace}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ace</groupId>
+                <artifactId>org.apache.ace.obr.storage</artifactId>
+                <version>${version.org.apache.ace}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ace</groupId>
+                <artifactId>org.apache.ace.obr.servlet</artifactId>
+                <version>${version.org.apache.ace}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Jersey -->
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${version.com.sun.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-servlet</artifactId>
+                <version>${version.com.sun.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>${version.com.sun.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey.contribs</groupId>
+                <artifactId>jersey-multipart</artifactId>
+                <version>${version.com.sun.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-core</artifactId>
+                <version>${version.com.sun.jersey}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Persistence -->
+
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.3.176</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.flyway</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>2.3.1</version>
+                <scope>compile</scope>
+                <!-- Embedded artifact because of OSGi classloader issues -->
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${version.mongodb}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Other 3rd party dependencies -->
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.0.15</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.3.2</version>
+                <type>jar</type>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.utils</artifactId>
+                <version>1.4.0</version>
+                <type>jar</type>
+                <scope>compile</scope>
+                <!-- Not a bundle -->
+            </dependency>
+            <dependency>
+                <groupId>asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>3.3.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-all</artifactId>
+                <version>4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.commons-vfs</artifactId>
+                <version>1.0_6</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.bcel</artifactId>
+                <version>5.2_4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.servicemix.bundles</groupId>
+                <artifactId>org.apache.servicemix.bundles.jaxp-ri</artifactId>
+                <version>1.4.5_1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.2.4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>2.2.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>3.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>de.twentyeleven.skysail</groupId>
+                <artifactId>org.json-osgi</artifactId>
+                <version>20080701</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency> <!-- Required by pax-web-extender-war -->
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-finder</artifactId>
+                <version>3.13</version>
+                <!-- 3.14 - 3.16 doesn't work-->
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xbean</groupId>
+                <artifactId>xbean-bundleutils</artifactId>
+                <version>3.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>2.0.2</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>2.0.2</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${version.org.codehaus.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-jaxrs</artifactId>
+                <version>${version.org.codehaus.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${version.org.codehaus.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-xc</artifactId>
+                <version>${version.org.codehaus.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.3.4</version>
+            </dependency>
+
+            <!-- === Test dependencies ===-->
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
