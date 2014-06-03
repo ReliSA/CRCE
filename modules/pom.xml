@@ -65,7 +65,7 @@
         <module>crce-handler-metrics</module>
         <module>crce-webui</module>
 
-        <!--<module>crce-jersey-hack</module>-->
+        <module>crce-jersey-hack</module>
         <module>crce-rest</module>
 
         <module>crce-compatibility-api</module>
