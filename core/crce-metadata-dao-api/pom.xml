@@ -32,11 +32,6 @@
             <artifactId>crce-metadata-api</artifactId>
             <version>${version.crce-metadata-api}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${version.crce-plugin-api}</version>
-        </dependency>
     </dependencies>
 
 </project>

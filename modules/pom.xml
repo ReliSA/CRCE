@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <relativePath>pom</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>crce-reactor</artifactId>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Reactor</name>
+
+    <description>Component Repository supporting Compatibility Evaluation</description>
+
+    <prerequisites>
+        <maven>3.0.4</maven>
+    </prerequisites>
+
+    <properties>
+        <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
+        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
+        <felix.fileinstall.poll>2000</felix.fileinstall.poll>
+        <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
+        <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
+        <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
+        <org.osgi.framework.system.packages.extra>
+            javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
+        </org.osgi.framework.system.packages.extra>
+        <org.osgi.framework.bootdelegation>
+            sun.*,com.sun.*
+        </org.osgi.framework.bootdelegation>
+        <!--
+             The following packages are not imported by any bundle,
+             but they may be used by some efp assignment wrapped library, check it and remove them.
+
+             It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
+        -->
+
+        <version.org.slf4j>1.7.7</version.org.slf4j>
+    </properties>
+
+    <modules>
+        <module>pom</module>
+        <module>provision</module>
+
+        <!-- Indexers -->
+        <module>crce-metadata-osgi-bundle</module>
+        <!--<module>crce-metadata-cosi-bundle</module>-->
+        <!--<module>crce-efp-indexer</module>-->
+
+        <!-- Libraries -->
+        <!--<module>crce-efp-assignment</module>-->
+
+        <!-- UI & Optional Plugins -->
+        <module>crce-handler-versioning</module>
+        <module>crce-handler-metrics</module>
+        <module>crce-webui</module>
+
+        <!--<module>crce-jersey-hack</module>-->
+        <module>crce-rest</module>
+
+        <module>crce-compatibility-api</module>
+        <module>crce-compatibility-impl</module>
+        <module>crce-compatibility-dao-api</module>
+        <module>crce-compatibility-dao-mongodb</module>
+        <module>crce-concurrency</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>target</id>
+            <modules>
+                <module>crce-target</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>run-it</id>
+            <modules>
+                <module>crce-integration-tests</module>
+            </modules>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <configuration>
+                    <provision>
+                        <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=65505
+                        </param>
+                        <param>--platform=felix</param>
+                        <param>
+                            --repositories=http://uk.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
+                        </param>
+                        <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
+                        <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:ch.qos.logback/logback-core@1</param>
+                        <param>mvn:ch.qos.logback/logback-classic@1</param>
+                    </provision>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>conf.default</directory>
+                                </resource>
+                            </resources>
+                            <overwrite>false</overwrite>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <extensions>
+            <extension>
+                <groupId>com.google.code.maven-svn-wagon</groupId>
+                <artifactId>maven-svn-wagon</artifactId>
+                <version>1.4</version>
+            </extension>
+        </extensions>
+    </build>
+
+    <scm>
+        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/trunk/</developerConnection>
+    </scm>
+
+</project>

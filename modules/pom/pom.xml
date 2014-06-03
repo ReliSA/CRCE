@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <relativePath>../../build/compiled</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-modules-parent</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Modules Parent</name>
+
+    <description>Component Repository supporting Compatibility Evaluation</description>
+
+    <properties>
+    </properties>
+
+
+    <scm>
+        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/trunk/</developerConnection>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-plugin-api</artifactId>
+                <version>${version.crce-plugin-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-api</artifactId>
+                <version>${version.crce-metadata-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-repository-api</artifactId>
+                <version>${version.crce-repository-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-service-api</artifactId>
+                <version>${version.crce-metadata-service-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-json-api</artifactId>
+                <version>${version.crce-metadata-json-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-resolver-api</artifactId>
+                <version>${version.crce-resolver-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-dao-api</artifactId>
+                <version>${version.crce-metadata-dao-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-indexer-api</artifactId>
+                <version>${version.crce-metadata-indexer-api}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-indexer</artifactId>
+                <version>${version.crce-metadata-indexer-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-impl</artifactId>
+                <version>${version.crce-metadata-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-json-impl</artifactId>
+                <version>${version.crce-metadata-json-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-service-impl</artifactId>
+                <version>${version.crce-metadata-service-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-metadata-dao-impl</artifactId>
+                <version>${version.crce-metadata-dao-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-resolver-impl</artifactId>
+                <version>${version.crce-resolver-impl}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-repository-impl</artifactId>
+                <version>${version.crce-repository-impl}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Define repositories also there to allow to download paren POM even if it is not checked out -->
+
+    <repositories>
+        <!-- Central repository - must be listed first as a default repo for downloading artifacts -->
+        <repository>
+            <id>central</id>
+            <url>http://uk.maven.org/maven2/</url>
+        </repository>
+
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+</project>
