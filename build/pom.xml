@@ -23,7 +23,6 @@
         <version.mongodb>2.11.3</version.mongodb>
         <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
-        <version.com.sun.jersey>1.17</version.com.sun.jersey>
         <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web>
         <version.org.apache.felix.dependencymanager>3.1.0</version.org.apache.felix.dependencymanager>
         <version.com.fasterxml.jackson>2.3.1</version.com.fasterxml.jackson>
@@ -300,13 +299,13 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.1.1</version>
+                <version>1.1.2</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.1.1</version>
+                <version>1.1.2</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -524,34 +523,6 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Jersey -->
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-server</artifactId>
-                <version>${version.com.sun.jersey}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-servlet</artifactId>
-                <version>${version.com.sun.jersey}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-json</artifactId>
-                <version>${version.com.sun.jersey}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey.contribs</groupId>
-                <artifactId>jersey-multipart</artifactId>
-                <version>${version.com.sun.jersey}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.jersey</groupId>
-                <artifactId>jersey-core</artifactId>
-                <version>${version.com.sun.jersey}</version>
-                <scope>provided</scope>
-            </dependency>
-
             <!-- Persistence -->
 
             <dependency>
@@ -751,6 +722,7 @@
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
                 <version>1.2.3</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>

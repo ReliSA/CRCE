@@ -128,6 +128,12 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.scr</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>animal-sniffer-annotations</artifactId>
+                    <groupId>org.codehaus.mojo</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -143,6 +149,12 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.bundlerepository</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>easymock</artifactId>
+                    <groupId>org.easymock</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -171,6 +183,12 @@
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-vfs</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -186,6 +204,12 @@
             <groupId>de.twentyeleven.skysail</groupId>
             <artifactId>org.json-osgi</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -203,81 +227,49 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>types-cmp</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>javatypes</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>javatypes-cmp</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>javatypes-loader</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.obcc</groupId>
-            <artifactId>bundle-types</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.obcc</groupId>
-            <artifactId>bundle-cmp</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.obcc</groupId>
-            <artifactId>bundle-loader</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.osgi</groupId>
-            <artifactId>version-generator</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency> <!-- Required by obcc.bundle-loader and jacc.javatypes-loader -->
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency> <!-- Required by obcc.bundle-loader -->
+        <dependency><!-- Required by obcc.bundle-loader -->
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
             <version>2.0</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency> <!-- Required by commons-vfs2 -->
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.jsch</artifactId>
-            <version>0.1.49_1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency> <!-- Required by commons-vfs2 -->
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.commons-collections</artifactId>
-            <version>3.2.1_3</version>
-            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-scm-api</artifactId>
+                    <groupId>org.apache.maven.scm</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-scm-provider-svnexe</artifactId>
+                    <groupId>org.apache.maven.scm</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency> <!-- Required by commons-vfs2 -->
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
             <version>3.1_7</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency> <!-- Required by commons-vfs2 -->
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.commons-net</artifactId>
             <version>1.4.1_6</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>oro</artifactId>
+                    <groupId>oro</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency> <!-- Required by commons-vfs2 -->
             <groupId>org.apache.servicemix.bundles</groupId>
@@ -290,6 +282,16 @@
             <artifactId>jackrabbit-webdav</artifactId>
             <version>2.6.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-codec</artifactId>
+                    <groupId>commons-codec</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-httpclient</artifactId>
+                    <groupId>commons-httpclient</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency> <!-- Required by commons-httpclient -->
             <groupId>org.apache.servicemix.bundles</groupId>
@@ -303,46 +305,29 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-multipart</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-servlet</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency> <!-- Required by jersey-multipart -->
-            <groupId>org.jvnet</groupId>
-            <artifactId>mimepull</artifactId>
-            <version>1.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
+        </dependency><dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
+        </dependency><dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -373,24 +358,31 @@
             <artifactId>jackson-xc</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- CRCE -->
-
+            <exclusions>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
+        </dependency><dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- CRCE core -->
+
+
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-dao-api</artifactId>
@@ -425,6 +417,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-impl</artifactId>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>org.apache.felix.utils</artifactId>
+                    <groupId>org.apache.felix</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -455,25 +453,35 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-service-impl</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
+        </dependency><dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
+        </dependency><dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-api</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- CRCE -->
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>kxml2</artifactId>
+                    <groupId>net.sf.kxml</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.apache.felix.utils</artifactId>
+                    <groupId>org.apache.felix</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -500,6 +508,32 @@
             <artifactId>crce-compatibility-impl</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hamcrest-all</artifactId>
+                    <groupId>org.hamcrest</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>test-data</artifactId>
+                    <groupId>cz.zcu.kiv.jacc</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcel</artifactId>
+                    <groupId>org.apache.bcel</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-vfs2</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -518,14 +552,57 @@
             <artifactId>crce-handler-versioning</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>plexus-utils</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>bcel</artifactId>
+                    <groupId>org.apache.bcel</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-vfs2</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-jersey-hack</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
+            <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            <groupId>org.apache.felix</groupId>
+            <type>jar</type>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>classworlds</artifactId>
+                    <groupId>classworlds</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-project</artifactId>
+                    <groupId>org.apache.maven</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-artifact</artifactId>
+                    <groupId>org.apache.maven</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>plexus-utils</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.json</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>plexus-utils</artifactId>
+                    <groupId>org.codehaus.plexus</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>maven-plugin-api</artifactId>
+                    <groupId>org.apache.maven</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
     </dependencies>
 
     <build>

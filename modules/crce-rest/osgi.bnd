@@ -7,23 +7,24 @@ Bundle-Version>: \
 
 Bundle-SymbolicName: \
   ${bundle.symbolicName}
-  
+
 Bundle-Name: CRCE - Rest
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Import-Package: \
+  !javax.annotation, \
   javax.servlet, \
   javax.servlet.http, \
   org.osgi.framework, \
   org.osgi.service.log, \
   org.osgi.service.useradmin, \
-  com.sun.jersey.spi.container.servlet, \
+  org.glassfish.jersey.servlet, \
   cz.zcu.kiv.crce.repository, \
   *
 
-Export-Package: 
-  
+Export-Package:
+
 Dynamic-ImportPackage: *
 
 Bundle-ClassPath: .,WEB-INF/classes

@@ -62,7 +62,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <useTransitiveDependencies>false</useTransitiveDependencies>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
             <outputDirectory>crce-bundles</outputDirectory>
         </dependencySet>
         <dependencySet>
@@ -72,6 +72,8 @@
             <outputDirectory>required-bundles</outputDirectory>
             <excludes>
                 <exclude>org.ops4j.pax.runner:pax-runner</exclude>
+                <exclude>org.apache.felix:org.apache.felix.dependencymanager.annotation</exclude>
+                <exclude>com.google.code.findbugs:jsr305</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>

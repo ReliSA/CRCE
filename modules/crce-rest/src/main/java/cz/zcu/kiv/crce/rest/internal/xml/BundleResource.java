@@ -25,8 +25,8 @@ import javax.ws.rs.core.StreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -245,10 +245,7 @@ public class BundleResource extends ResourceParent implements GetBundle {
         try {
             b.put(filename, uploadedInputStream);
             b.commit(true);
-        } catch (IOException e) {
-            logger.error("Error during resource upload.", e);
-            return Response.status(403).build();
-        } catch (RefusedArtifactException e) {
+        } catch (IOException | RefusedArtifactException e) {
             logger.error("Error during resource upload.", e);
             return Response.status(403).build();
         }
