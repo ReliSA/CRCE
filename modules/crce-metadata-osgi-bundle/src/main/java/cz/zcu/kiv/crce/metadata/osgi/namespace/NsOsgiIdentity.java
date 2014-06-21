@@ -30,8 +30,15 @@ public interface NsOsgiIdentity {
     AttributeType<String> ATTRIBUTE__DESCRIPTION =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.DESCRIPTION, String.class);
 
+    /**
+     * @deprecated The attribute is no more used, use {@link NsOsgiIdentity#ATTRIBUTE__LICENSES} instead.
+     */
+    @Deprecated
     AttributeType<URI> ATTRIBUTE__LICENSE_URI =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.LICENSE_URI, URI.class);
+
+    AttributeType<List<String>> ATTRIBUTE__LICENSES =
+            new ListAttributeType("licenses");
 
     AttributeType<String> ATTRIBUTE__COPYRIGHT =
             new SimpleAttributeType<>(org.apache.felix.bundlerepository.Resource.COPYRIGHT, String.class);

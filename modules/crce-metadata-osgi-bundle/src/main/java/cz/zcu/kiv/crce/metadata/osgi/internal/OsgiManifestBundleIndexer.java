@@ -260,10 +260,14 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__DESCRIPTION, headers.getHeader(Constants.BUNDLE_DESCRIPTION));
         }
         if (headers.getHeader(BUNDLE_LICENSE) != null) {
-            try {
-                identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__LICENSE_URI, new URI(headers.getHeader(BUNDLE_LICENSE)));
-            } catch (URISyntaxException e) {
-                logger.error("Invalid license URI of OSGi resource: {}", headers.getHeader(BUNDLE_LICENSE), e);
+            String[] licenses = headers.getHeader(BUNDLE_LICENSE).split("[,\\s]+");
+            for (String license : licenses) {
+                List<String> licenseAttributes = identity.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__LICENSES);
+                if (licenseAttributes == null) {
+                    licenseAttributes = new ArrayList<>(licenses.length);
+                    identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__LICENSES, licenseAttributes);
+                }
+                licenseAttributes.add(license);
             }
         }
         if (headers.getHeader(Constants.BUNDLE_COPYRIGHT) != null) {
@@ -300,13 +304,13 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private void doCategories(Resource resource, Headers headers) throws IOException {
         Capability identity = metadataService.getSingletonCapability(resource, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
         Clause[] clauses = Parser.parseHeader(headers.getHeader(Constants.BUNDLE_CATEGORY));
-        for (int i = 0; clauses != null && i < clauses.length; i++) {
+        for (Clause clause : clauses) {
             List<String> categories = identity.getAttributeValue(NsOsgiIdentity.ATTRIBUTE__CATEGORY);
             if (categories == null) {
-                categories = new ArrayList<>();
+                categories = new ArrayList<>(clauses.length);
                 identity.setAttribute(NsOsgiIdentity.ATTRIBUTE__CATEGORY, categories);
             }
-            categories.add(clauses[i].getName());
+            categories.add(clause.getName());
         }
     }
 
