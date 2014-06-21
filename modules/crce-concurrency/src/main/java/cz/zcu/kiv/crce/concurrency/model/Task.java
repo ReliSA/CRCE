@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author Jakub Danek
  */
 public abstract class Task<T> implements Callable<T> {
+    
     private static final Logger logger = LoggerFactory.getLogger(Task.class);
 
     private final String id;
@@ -58,7 +59,7 @@ public abstract class Task<T> implements Callable<T> {
         return state;
     }
 
-    public synchronized void setState(TaskState state) {
+    public final synchronized void setState(TaskState state) {
         this.state = state;
     }
 
@@ -69,11 +70,18 @@ public abstract class Task<T> implements Callable<T> {
      * @throws Exception if unable to compute a result
      */
     @Override
+    @SuppressWarnings({"BroadCatchBlock", "TooBroadCatch"})
     public final T call() throws Exception {
         setState(TaskState.RUNNING);
         logger.info("Task {} called by {} has been started.", id, caller);
         logger.debug("Task description: {}", description);
-        T obj = run();
+        T obj;
+        try {
+            obj = run();
+        } catch (Throwable t) {
+            logger.error("Error while executing task {}", id, t);
+            throw t;
+        }
         setState(TaskState.FINISHED);   //should be set AFTER returning the object
         // probably will require listener thread for the TaskRunner
         logger.info("Task {} called by {} has finished.", id, caller);
