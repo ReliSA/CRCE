@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>wrapper-bundle-settings</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+    <artifactId>org.apache.httpcomponents.httpcore</artifactId>
+    <version>4.2.5</version>
+    <packaging>bundle</packaging>
+
+    <name>${bundle.symbolicName} ${wrapped.version} [osgi]</name>
+
+    <properties>
+        <bundle.symbolicName>org.apache.httpcomponents.httpcore</bundle.symbolicName>
+        <wrapped.groupId>org.apache.httpcomponents</wrapped.groupId>
+        <wrapped.artifactId>httpcore</wrapped.artifactId>
+        <wrapped.version>4.2.5</wrapped.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${wrapped.groupId}</groupId>
+            <artifactId>${wrapped.artifactId}</artifactId>
+            <version>${wrapped.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>

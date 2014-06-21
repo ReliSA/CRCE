@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>wrapper-bundle-settings</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+    <artifactId>org.codehaus.plexus.plexus-utils</artifactId>
+    <version>3.0.17</version>
+    <packaging>bundle</packaging>
+
+    <name>${bundle.symbolicName} ${wrapped.version} [osgi]</name>
+
+    <properties>
+        <bundle.symbolicName>org.codehaus.plexus.plexus-utils</bundle.symbolicName>
+        <wrapped.groupId>org.codehaus.plexus</wrapped.groupId>
+        <wrapped.artifactId>plexus-utils</wrapped.artifactId>
+        <wrapped.version>3.0.17</wrapped.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${wrapped.groupId}</groupId>
+            <artifactId>${wrapped.artifactId}</artifactId>
+            <version>${wrapped.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>
