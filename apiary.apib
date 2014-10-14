@@ -1,0 +1,97 @@
+FORMAT: 1A
+
+# CRCE API
+Web Service API specification for **C**omponent **R**epository supporting **C**ompabitility **E**valuation.
+
+Project URL: https://www.assembla.com/spaces/crce
+
+Source Code: http://github.com/ReliSA/crce/
+
+# Group Bundles
+Bundle resources of the CRCE API represent the actual component binaries.
+
+## Bundles Collection [/bundles]
+### List all Bundles [GET]
++ Response 200 (application/xml)
+
+        <resources>
+            <resource>
+                <name>org.obcc.parking.gate</name>
+                <version>1.0.0</version>
+                <_links>
+                    <self>/bundles/org.obcc.parking.gate/1.0.0</self>
+                </_links>
+            </resource>
+            <resource>
+                <name>org.obcc.parking.gate</name>
+                <version>1.1.0</version>
+                <_links>
+                    <self>/bundles/org.obcc.parking.gate/1.1.0</self>
+                </_links>
+            </resource>
+            <resource>
+                <name>org.obcc.parking.statistics</name>
+                <version>1.0.0</version>
+                <_links>
+                    <self>/bundles/org.obcc.parking.statistics/1.0.0</self>
+                </_links>
+            </resource>
+        </resources>
+        <_links>
+            <self>/bundles</self>
+        </_links>
+
+### Upload a Bundle [POST]
++ Request (multipart/form-data)
+
+        *Component binary file*
+
++ Response 202 (application/xml)
+
+        <message>The bundle has been accepted for storage. This may take a while.</message>
+
+## Bundle's Versions [/bundles/{name}]
+All versions of a particular component binary present in the repository.
+
++ Parameters
+    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+
+### List all versions of the bundle [GET]
++ Response 200 (application/xml)
+
+        <resources>
+            <resource>
+                <name>org.obcc.parking.gate</name>
+                <version>1.0.0</version>
+                <_links>
+                    <self>/bundles/org.obcc.parking.gate/1.0.0</self>
+                </_links>
+            </resource>
+            <resource>
+                <name>org.obcc.parking.gate</name>
+                <version>1.1.0</version>
+                <_links>
+                    <self>/bundles/org.obcc.parking.gate/1.1.0</self>
+                </_links>
+            </resource>
+        </resources>
+        <_links>
+            <self>/bundles/org.obcc.parking.gate</self>
+        </_links>
+
+## Bundle [/bundles/{name}/{version}]
+A particular component revision.
+
++ Parameters
+    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + version (required, Version, `1.0.4`) ... Version identifier;
+    
+### Download binary [GET]
++ Response 200 (application/octet-stream)
+
+    + Headers
+    
+            Content-Disposition: attachement; filename="org-obcc-parking-gate-1.0.4.jar"
+    + Body
+            
+            ***component binary***
