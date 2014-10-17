@@ -10,36 +10,48 @@ Source Code: http://github.com/ReliSA/crce/
 # Group Bundles
 Bundle resources of the CRCE API represent the actual component binaries.
 
-## Bundles Collection [/bundles]
-### List all Bundles [GET]
-+ Response 200 (application/xml)
+## Bundles Collection [/bundles/{name}]
 
-        <resources>
-            <resource>
-                <name>org.obcc.parking.gate</name>
-                <version>1.0.0</version>
-                <_links>
-                    <self>/bundles/org.obcc.parking.gate/1.0.0</self>
-                </_links>
-            </resource>
-            <resource>
-                <name>org.obcc.parking.gate</name>
-                <version>1.1.0</version>
-                <_links>
-                    <self>/bundles/org.obcc.parking.gate/1.1.0</self>
-                </_links>
-            </resource>
-            <resource>
-                <name>org.obcc.parking.statistics</name>
-                <version>1.0.0</version>
-                <_links>
-                    <self>/bundles/org.obcc.parking.statistics/1.0.0</self>
-                </_links>
-            </resource>
-            <_links>
-                <self>/bundles</self>
-            </_links>
-        </resources>
++ Parameters
+    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    
++ Model (application/xml)
+   
+   + Body
+   
+            <resources>
+                <resource>
+                    <name>org.obcc.parking.gate</name>
+                    <version>1.0.0</version>
+                    
+                    <link rel="self" href="/bundles/org.obcc.parking.gate/1.0.0"/>
+                    <link rel="meta-data" href="/meta-data/org.obcc.parking.gate/1.0.0"/>                
+                </resource>
+                <resource>
+                    <name>org.obcc.parking.gate</name>
+                    <version>1.1.0</version>
+                    
+                    <link rel="self" href="/bundles/org.obcc.parking.gate/1.1.0"/>
+                    <link rel="meta-data" href="/meta-data/org.obcc.parking.gate/1.1.0"/>                
+                </resource>
+                <resource>
+                    <name>org.obcc.parking.statistics</name>
+                    <version>1.0.0</version>
+                    
+                    <link rel="self" href="/bundles/org.obcc.parking.statistics/1.0.0"/>
+                    <link rel="meta-data" href="/meta-data/org.obcc.parking.statistics/1.0.0"/>                
+                </resource>
+                
+                <link rel="self" href="/bundles"/>            
+            </resources>                
+
+### List all Bundles [GET]
+Returns list of all components in the repository with links to their binaries. Same view as /meta-data collection, just from different
+perspective.
+
++ Response 200
+
+    [Bundles Collection][]
 
 ### Upload a Bundle [POST]
 + Request (multipart/form-data)
@@ -49,35 +61,6 @@ Bundle resources of the CRCE API represent the actual component binaries.
 + Response 202 (application/xml)
 
         <message>The bundle has been accepted for storage. This may take a while.</message>
-
-## Bundle's Versions [/bundles/{name}]
-All versions of a particular component binary present in the repository.
-
-+ Parameters
-    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
-
-### List all versions of the bundle [GET]
-+ Response 200 (application/xml)
-
-        <resources>
-            <resource>
-                <name>org.obcc.parking.gate</name>
-                <version>1.0.0</version>
-                <_links>
-                    <self>/bundles/org.obcc.parking.gate/1.0.0</self>
-                </_links>
-            </resource>
-            <resource>
-                <name>org.obcc.parking.gate</name>
-                <version>1.1.0</version>
-                <_links>
-                    <self>/bundles/org.obcc.parking.gate/1.1.0</self>
-                </_links>
-            </resource>
-            <_links>
-                <self>/bundles/org.obcc.parking.gate</self>
-            </_links>
-        </resources>
 
 ## Bundle [/bundles/{name}/{version}]
 A particular component revision.
@@ -95,3 +78,117 @@ A particular component revision.
     + Body
             
             ***component binary***
+            
+# Group Meta-Data
+Meta-Data describing bundles stored within the repository. Their capabilities, requirements and other vital pieces of information.
+
+## Bundle Meta-Data [/meta-data/{name}/{version}]
+A particular component revision.
+
++ Model (application/xml)
+
+    Model for meta-data of a single resource.
+    
+    + Body
+    
+            <resource>
+
+                <!-- Resource meta-data as defined at https://www.assembla.com/spaces/crce/wiki/Metadata_example_-_core -->
+                
+                <link rel="self" href="/meta-data/org.obcc.parking.gate/1.0.4"/>
+                <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.0.4"/>
+                <link rel="diffs" href="/meta-data/org.obcc.parking.gate/1.0.4/diffs"/>
+                <link rel="compatible" href="/meta-data/org.obcc.parking.gate/1.0.4/compatible"/>            
+            </resource>            
+
++ Parameters
+    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + version (required, Version, `1.0.4`) ... Version identifier;
+                
+### Get Meta-Data for Bundle [GET]
++ Response 200 
+
+    [Bundle Meta-Data][]       
+
+## Meta-Data Collection [/meta-data/{name}]
+
++ Parameters
+    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+
++ Model (application/xml)
+    
+    Meta-Data Collection sample model.
+    
+    + Body
+    
+            <resources>
+                <resource>
+                    <name>org.obcc.parking.gate</name>
+                    <version>1.0.0</version>
+                    
+                    <link rel="self" href="/meta-data/org.obcc.parking.gate/1.0.0"/>
+                    <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.0.0"/>                    
+                </resource>
+                <resource>
+                    <name>org.obcc.parking.gate</name>
+                    <version>1.1.0</version>
+                    
+                    <link rel="self" href="/meta-data/org.obcc.parking.gate/1.1.0"/>
+                    <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.1.0"/>                                    
+                </resource>
+                <resource>
+                    <name>org.obcc.parking.statistics</name>
+                    <version>1.0.0</version>
+                    
+                    <link rel="self" href="/meta-data/org.obcc.parking.statistics/1.0.0"/>
+                    <link rel="bundle" href="/bundles/org.obcc.parking.statistics/1.0.0"/>                     
+                </resource>
+                
+                <link rel="self" href="/meta-data"/>
+            </resources>
+
+### List All Meta-Data [GET]
+Returns list of all components in the repository with links to their meta-data. Same view as /bundles collection, just from different
+perspective.
+
++ Response 200
+
+    [Meta-Data Collection][]
+                  
+## Meta-Data describing differences between Bundles [/meta-data/{name}/{version}/diffs{?otherName}{?otherVersion}]
+Meta-Data with information about API differences between bundles.
+
++ Parameters
+    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + version (required, Version, `1.0.4`) ... Version identifier;
+    + otherName (optional, string, 'com.kknd.park.gate`) ... Name of the other compared component;
+    + otherVersion (optional, Version, `1.0.0`) ... Version identifier of the second component;
+     
+
+### Get Diffs for Bundle [GET]
++ Response 200 (application/xml)
+
+        <diffs>
+            <!-- Diff meta-data as defined at https://www.assembla.com/spaces/crce/wiki/Metadata_example_-_compatibility -->
+        </diffs>
+        
+## Meta-Data for a compatible Bundle [/meta-data/{name}/{version}/compatible{?operation}]
+Returns meta-data for a bundle compatible with the one specified using `name` and `version` parameters. While
+there might be many compatible bundles in the repository, at most one is returned. Rule, by which the bundle
+is chosen is determined by the `operation` parameter, which can have the following values:
+
+- any               any compatible bundle is returned, no specification of the relationship between the original and returned version
+- lowest            lowest compatible version is returned
+- downgrade         nearest compatible version lower than the original is returned
+- upgrade (default) nearest compatible version higher than the original is returned   
+- highest           highest compatible version is returned
+
++ Parameters
+    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + version (required, Version, `1.0.4`) ... Version identifier;
+    + operation (optional, string) ... Specification of the operation you want the compatible bundle for;
+
+### Get Compatible Bundle Meta-Data [GET]
++ Response 200
+    
+    [Bundle Meta-Data][]
