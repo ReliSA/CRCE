@@ -10,11 +10,8 @@ Source Code: http://github.com/ReliSA/crce/
 # Group Bundles
 Bundle resources of the CRCE API represent the actual component binaries.
 
-## Bundles Collection [/bundles/{name}]
+## Bundles Collection [/bundles]
 
-+ Parameters
-    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
-    
 + Model (application/xml)
    
    + Body
@@ -63,6 +60,18 @@ Bundle resources of the CRCE API represent the actual component binaries.
                 <link rel="self" href="/bundles"/>            
             </resources>                
 
+### Upload a Bundle [POST]
++ Request (multipart/form-data)
+
+        *Component binary file*
+
++ Response 202
+
+## Bundles Collection [/bundles/{name}]
+
++ Parameters
+    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    
 ### List all Bundles [GET]
 Returns list of all components in the repository with links to their binaries. Same view as /meta-data collection, just from different
 perspective.
@@ -70,15 +79,6 @@ perspective.
 + Response 200
 
     [Bundles Collection][]
-
-### Upload a Bundle [POST]
-+ Request (multipart/form-data)
-
-        *Component binary file*
-
-+ Response 202 (application/xml)
-
-        <message>The bundle has been accepted for storage. This may take a while.</message>
 
 ## Bundle [/bundles/{name}/{version}]
 A particular component revision.
