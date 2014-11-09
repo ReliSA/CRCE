@@ -28,6 +28,7 @@
     </developers>
 
     <prerequisites>
+        <!-- Note: Jenkins build uses the latest available stable Maven version -->
         <maven>3.0.4</maven>
     </prerequisites>
 
@@ -35,21 +36,30 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <build>
-<!-- Will be this needed for GIT?
-        <extensions>
-            <extension>
-                <groupId>com.google.code.maven-svn-wagon</groupId>
-                <artifactId>maven-svn-wagon</artifactId>
-                <version>1.4</version>
-            </extension>
-        </extensions>-->
-    </build>
-
     <scm>
-        <developerConnection>scm:git:ssh://git@github.com:ReliSA/crce.git</developerConnection>
+        <url>https://github.com/ReliSA/crce/tree/master/pom</url>
+        <connection>https://github.com/ReliSA/crce.git</connection>
+        <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
 
+    <build>
+        <extensions>
+            <!-- For upload to fallback DAV repository -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <!-- https://jira.codehaus.org/browse/MRELEASE-812 -->
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
+        </plugins>
+    </build>
 
     <distributionManagement>
         <repository>
@@ -77,7 +87,7 @@
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository>
 
-        <!-- Temporary backup repositories -->
+        <!-- Fallback repositories -->
         <repository>
             <id>maven.kalwi.eu.snapshots</id>
             <name>kalwi.eu snapshots repository</name>

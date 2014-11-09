@@ -24,27 +24,8 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-service-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-dao-api</artifactId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
         </dependency>
 
         <!-- CRCE dependencies -->

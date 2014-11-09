@@ -157,31 +157,8 @@
 
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-dao-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-indexer</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-json-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-service-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-repository-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-resolver-impl</artifactId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
         </dependency>
     </dependencies>
 

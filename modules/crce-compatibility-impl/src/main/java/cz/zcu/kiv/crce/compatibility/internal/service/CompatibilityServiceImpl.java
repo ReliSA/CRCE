@@ -54,7 +54,7 @@ public class CompatibilityServiceImpl implements CompatibilityService {
     private MetadataFactory metadataFactory;               //injected by dependency manager
 
     private final JOSGiComparator<JOSGiBundle> comparator = new DefaultJOSGiComparatorFactory().getBundleComparator();
-    private final JOSGiBundleLoader loader = new JOSGiBundleLoaderImpl(JClassLoaderCreator.JAR_ASM_LOADER, BundleMetadataReaderCreator.JAR_FILE_READER);
+    private final JOSGiBundleLoader loader = new JOSGiBundleLoaderImpl(JClassLoaderCreator.JAR_MEMORY_LOADER, BundleMetadataReaderCreator.JAR_FILE_READER);
 
     private static final List<Difference> UPGRADE_DIFFS = Arrays.asList(Difference.INS, Difference.NON);
     private static final List<Difference> DOWNGRADE_DIFFS = Arrays.asList(Difference.DEL, Difference.NON);

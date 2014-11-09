@@ -11,10 +11,10 @@
         <version>2.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>crce-reactor</artifactId>
+    <artifactId>crce-modules-reactor</artifactId>
     <packaging>pom</packaging>
 
-    <name>CRCE - Reactor</name>
+    <name>CRCE - Modules - Reactor</name>
 
     <description>Component Repository supporting Compatibility Evaluation</description>
 
@@ -140,17 +140,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>com.google.code.maven-svn-wagon</groupId>
-                <artifactId>maven-svn-wagon</artifactId>
-                <version>1.4</version>
-            </extension>
-        </extensions>
     </build>
-
-    <scm>
-        <developerConnection>scm:svn:http://subversion.assembla.com/svn/crce/trunk/</developerConnection>
-    </scm>
 
 </project>

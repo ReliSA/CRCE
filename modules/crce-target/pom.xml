@@ -358,107 +358,23 @@
             <artifactId>jackson-xc</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>stax-api</artifactId>
-                    <groupId>stax</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <scope>runtime</scope>
-        </dependency><dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
         <!-- CRCE core -->
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
+            <scope>runtime</scope>
+        </dependency>
 
-
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-dao-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-service-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-resolver-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-json-api</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-impl</artifactId>
-            <scope>runtime</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.apache.felix.utils</artifactId>
-                    <groupId>org.apache.felix</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-repository-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-resolver-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-dao-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-json-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-service-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency><dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
-        </dependency><dependency>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-api</artifactId>
             <version>${project.version}</version>
@@ -547,7 +463,7 @@
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-handler-versioning</artifactId>
             <version>${project.version}</version>
@@ -566,7 +482,7 @@
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <dependency>
             <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
             <groupId>org.apache.felix</groupId>

@@ -28,26 +28,13 @@
         <version.com.fasterxml.jackson>2.3.1</version.com.fasterxml.jackson>
         <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
         <version.org.slf4j>1.7.7</version.org.slf4j>
-        <!-- CRCE Core versions -->
-        <version.crce-plugin-api>2.1.0-SNAPSHOT</version.crce-plugin-api>
-        <version.crce-metadata-api>2.1.0-SNAPSHOT</version.crce-metadata-api>
-        <version.crce-metadata-impl>2.1.0-SNAPSHOT</version.crce-metadata-impl>
-        <version.crce-metadata-json-api>2.1.0-SNAPSHOT</version.crce-metadata-json-api>
-        <version.crce-metadata-json-impl>2.1.0-SNAPSHOT</version.crce-metadata-json-impl>
-        <version.crce-metadata-service-api>2.1.0-SNAPSHOT</version.crce-metadata-service-api>
-        <version.crce-metadata-service-impl>2.1.0-SNAPSHOT</version.crce-metadata-service-impl>
-        <version.crce-metadata-dao-api>2.1.0-SNAPSHOT</version.crce-metadata-dao-api>
-        <version.crce-metadata-dao-impl>2.1.0-SNAPSHOT</version.crce-metadata-dao-impl>
-        <version.crce-repository-api>2.1.0-SNAPSHOT</version.crce-repository-api>
-        <version.crce-repository-impl>2.1.0-SNAPSHOT</version.crce-repository-impl>
-        <version.crce-metadata-indexer-api>2.1.0-SNAPSHOT</version.crce-metadata-indexer-api>
-        <version.crce-metadata-indexer-impl>2.1.0-SNAPSHOT</version.crce-metadata-indexer-impl>
-        <version.crce-resolver-api>2.1.0-SNAPSHOT</version.crce-resolver-api>
-        <version.crce-resolver-impl>2.1.0-SNAPSHOT</version.crce-resolver-impl>
     </properties>
 
     <scm>
-        <developerConnection>scm:svn:https://subversion.assembla.com/svn/crce/branches/new-structure/build</developerConnection>
+        <url>https://github.com/ReliSA/crce/tree/master/build</url>
+        <connection>https://github.com/ReliSA/crce.git</connection>
+        <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
@@ -400,7 +387,7 @@
             <dependency>
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>types-cmp</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -415,7 +402,7 @@
             <dependency>
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>javatypes</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -430,12 +417,12 @@
             <dependency>
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>javatypes-cmp</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cz.zcu.kiv.jacc</groupId>
                 <artifactId>javatypes-loader</artifactId>
-                <version>1.0.1</version>
+                <version>1.0.2-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -727,5 +714,19 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
+    <repositories>
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+    </repositories>
 
 </project>
