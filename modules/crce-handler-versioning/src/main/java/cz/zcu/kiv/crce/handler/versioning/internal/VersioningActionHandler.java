@@ -91,12 +91,17 @@ public class VersioningActionHandler extends AbstractActionHandler {
     public Resource beforePutToStore(Resource resource, Store store) throws RefusedArtifactException {
         logger.debug("Entering beforePutToStore method");
 
+        if (resource == null) {
+            logger.warn("Resource is null.");
+            return null;
+        }
+
         //get all categories of the resource
         List<String> categories = metadataService.getCategories(resource);
 
         //not available for versioning
-        if (resource == null || !categories.contains("osgi")) { // TODO constant
-            logger.debug("Resource " + (resource == null ? "is null." : "doesnt have category osgi."));
+        if (!categories.contains("osgi")) { // TODO constant
+            logger.debug("Resource doesn't have category 'osgi'.");
             return resource;
         }
 
@@ -111,7 +116,7 @@ public class VersioningActionHandler extends AbstractActionHandler {
             Resource baseResource = null;
             if (name != null) {
                 Requirement filterByName = metadataFactory.createRequirement(NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
-                filterByName.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);                    
+                filterByName.addAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME, name);
 
                 /*
                  * candidate for base resource is selected as bundle with same symbolic name and highest version in repository.

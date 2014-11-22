@@ -15,7 +15,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings(value={"DLS_DEAD_LOCAL_STORE", "NP_ALWAYS_NULL"}, justification="Just a non-runnable example.")
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value={"DLS_DEAD_LOCAL_STORE", "NP_ALWAYS_NULL"}, justification="Just a non-runnable example.")
 public class Example {
 
     private static final AttributeType<Long> ATTRIBUTE_A = new SimpleAttributeType<>("long.attribute", Long.class);

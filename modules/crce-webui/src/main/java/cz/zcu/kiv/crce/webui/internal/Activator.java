@@ -83,7 +83,7 @@ public final class Activator extends DependencyActivatorBase {
         return metadataService;
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
     @Override
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         instance = this;
@@ -95,7 +95,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)) // FIXME 'not required' is only a temporary solution to make the component startable
         );
 
 

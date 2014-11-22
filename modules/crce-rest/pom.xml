@@ -64,6 +64,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                <version>3.1.0</version> <!-- 3.2.0 doesn't work for WAR (a bug?) -->
                 <configuration>
                     <m_artifactExtension>war</m_artifactExtension>
                 </configuration>

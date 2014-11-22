@@ -25,7 +25,7 @@ import org.osgi.service.event.EventAdmin;
  */
 public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, ManagedService {
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
+    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
     private volatile BundleContext context;
 
     @SuppressWarnings("UseOfObsoleteCollectionType")

@@ -15,7 +15,7 @@ import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
 
-@edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
 public final class Activator extends DependencyActivatorBase {
 
     private static volatile Activator instance;
@@ -75,7 +75,7 @@ public final class Activator extends DependencyActivatorBase {
 
     @Override
     @edu.umd.cs.findbugs.annotations
-            .SuppressWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Dependency manager workaround.")
+            .SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Dependency manager workaround.")
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         instance = this;
 
@@ -87,7 +87,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(true))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)) // FIXME 'not required' is only a temporary solution to make the component startable
         );
     }
 }

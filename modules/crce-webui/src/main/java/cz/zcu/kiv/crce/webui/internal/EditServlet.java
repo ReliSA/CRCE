@@ -194,7 +194,7 @@ public class EditServlet extends HttpServlet {
                 return false;
             }
             Resource resource = findResource(resURI, array);
-            Capability capability = resource.getCapabilities().get(Integer.valueOf(id) - 1);
+            Capability capability = resource.getCapabilities().get(Integer.parseInt(id) - 1);
             String name = ((String[]) parameters.get("name"))[0];
             String type = ((String[]) parameters.get("propertyType"))[0];
             Object value = ((String[]) parameters.get("value"))[0];
@@ -360,7 +360,7 @@ public class EditServlet extends HttpServlet {
         String uri;
         if (parameters.containsKey("uri") && parameters.containsKey("capabilityId")) {
             uri = ((String[]) parameters.get("uri"))[0];
-            capabilityId = Integer.valueOf(((String[]) parameters.get("capabilityId"))[0]);
+            capabilityId = Integer.parseInt(((String[]) parameters.get("capabilityId"))[0]);
         } else {
             return false;
         }
@@ -865,7 +865,7 @@ public class EditServlet extends HttpServlet {
 
             req.getSession().setAttribute("resource", resource);
             req.getSession().setAttribute("types", Type.values());
-            req.getSession().setAttribute("capability", resource.getCapabilities().get(Integer.valueOf(id) - 1));
+            req.getSession().setAttribute("capability", resource.getCapabilities().get(Integer.parseInt(id) - 1));
             req.getSession().setAttribute("capabilityId", id);
             req.getRequestDispatcher("jsp/forms/capabilitiesForm.jsp").forward(req, resp); // FIXME hardcoded
         } catch (URISyntaxException e) {
