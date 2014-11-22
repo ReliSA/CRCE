@@ -46,7 +46,7 @@
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                         <manifestEntries>
-                            <Product-Version>${parent.version}</Product-Version>
+                            <Product-Version>${project.parent.version}</Product-Version>
                             <Implementation-Build>${crce-product.revision}</Implementation-Build>
                         </manifestEntries>
                     </archive>
@@ -131,7 +131,7 @@
             <artifactId>crce-core</artifactId>
             <type>pom</type>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-osgi-bundle</artifactId>
