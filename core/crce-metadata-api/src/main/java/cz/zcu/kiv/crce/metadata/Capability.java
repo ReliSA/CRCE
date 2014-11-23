@@ -38,4 +38,16 @@ public interface Capability
 
     @Nonnull
     List<Capability> getChildren();
+
+    @Nonnull
+    List<Requirement> getRequirements();
+
+    @Nonnull
+    List<Requirement> getRequirements(String namespace);
+
+    boolean hasRequirement(Requirement requirement);
+
+    void addRequirement(Requirement requirement);
+
+    void removeRequirement(Requirement requirement);
 }
