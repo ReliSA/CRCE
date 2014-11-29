@@ -6,20 +6,18 @@ import javax.annotation.Nonnull;
 
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  * @param <T>
  */
-public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProviderImpl implements Property<T>, Comparable<Property<T>> {
+public class PropertyImpl extends AttributeProviderImpl implements Property, Comparable<Property> {
 
     private static final long serialVersionUID = -7003533524061344584L;
 
     private final String id;
     private String namespace = null;
-    private T parent;
 
     public PropertyImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace;
@@ -37,17 +35,7 @@ public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProvid
     }
 
     @Override
-    public T getParent() {
-        return parent;
-    }
-
-    @Override
-    public void setParent(T parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public boolean equalsTo(Property<T> other, EqualityLevel level) {
+    public boolean equalsTo(Property other, EqualityLevel level) {
         if (other == null) {
             return false;
         }
@@ -74,16 +62,10 @@ public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProvid
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
-                    return false;
-                }
                 return true;
 
             case DEEP_WITH_KEY:
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
-                    return false;
-                }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
                     return false;
                 }
                 return true;
@@ -102,7 +84,7 @@ public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProvid
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final PropertyImpl<?> other = (PropertyImpl<?>) obj;
+        final PropertyImpl other = (PropertyImpl) obj;
         return Objects.equals(this.id, other.id);
     }
 
@@ -119,7 +101,7 @@ public class PropertyImpl<T extends PropertyProvider<T>> extends AttributeProvid
     }
 
     @Override
-    public int compareTo(Property<T> o) {
+    public int compareTo(Property o) {
         return id.compareTo(o.getId());
     }
 }

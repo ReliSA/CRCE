@@ -52,7 +52,7 @@ public class MetadataDeserializer {
     }
 
     Requirement deserializeRequirement(JsonParser jp, DeserializationContext ctxt) throws IOException {
-        return deserializeRequirement((JsonNode) jp.getCodec().readTree(jp), null, null);
+        return deserializeRequirement((JsonNode) jp.getCodec().readTree(jp), null, null, null);
     }
 
     Capability deserializeCapability(JsonParser jp, DeserializationContext ctxt) throws IOException {
@@ -80,7 +80,7 @@ public class MetadataDeserializer {
                     continue;
 
                 case Constants.RESOURCE__REQUIREMENTS:
-                    deserializeRequirements(resource, null, node.getValue());
+                    deserializeRequirements(resource, null, null, node.getValue());
                     continue;
 
                 case Constants.RESOURCE__PROPERTIES:
@@ -151,7 +151,6 @@ public class MetadataDeserializer {
 
         if (resource != null) {
             resource.addCapability(capability);
-            capability.setResource(resource);
         }
         if (parent == null) {
             if (resource != null) {
@@ -171,6 +170,7 @@ public class MetadataDeserializer {
                             new AttributeProviderCallback() {
 
                                 @Override
+                                @SuppressWarnings("unchecked")
                                 public void addAttribute(AttributeType type, Object value, Operator operator) {
                                     capability.setAttribute(type, value, operator);
                                 }
@@ -183,12 +183,20 @@ public class MetadataDeserializer {
                     deserializeDirectives(capability, node.getValue());
                     continue;
 
+                case Constants.CAPABILITY__REQUIREMENTS:
+                    deserializeRequirements(null, capability, null, node.getValue());
+                    continue;
+
                 case Constants.CAPABILITY__PROPERTIES:
                     deserializeProperties(capability, node.getValue());
                     continue;
 
                 case Constants.CAPABILITY__CHILDREN:
                     deserializeCapabilities(resource, capability, node.getValue());
+                    continue;
+
+                case Constants.CAPABILITY__ID:
+                case Constants.CAPABILITY__NAMESPACE:
                     continue;
 
                 default:
@@ -204,7 +212,7 @@ public class MetadataDeserializer {
     }
 
     @SuppressWarnings("unchecked")
-    private void deserializeRequirements(@CheckForNull Resource resource, @CheckForNull Requirement parent, JsonNode root) {
+    private void deserializeRequirements(@CheckForNull Resource resource, @CheckForNull Capability capability, @CheckForNull Requirement parent, JsonNode root) {
         switch (root.getNodeType()) {
             case NULL:
                 return;
@@ -214,7 +222,7 @@ public class MetadataDeserializer {
                 while (requirementNodes.hasNext()) {
                     JsonNode requirementNode = requirementNodes.next();
 
-                    deserializeRequirement(requirementNode, resource, parent);
+                    deserializeRequirement(requirementNode, resource, capability, parent);
                 }
                 break;
             }
@@ -224,7 +232,7 @@ public class MetadataDeserializer {
         }
     }
 
-    private Requirement deserializeRequirement(JsonNode requirementNode, @CheckForNull Resource resource, @CheckForNull Requirement parent)
+    private Requirement deserializeRequirement(JsonNode requirementNode, @CheckForNull Resource resource, @CheckForNull Capability capability, @CheckForNull Requirement parent)
             throws IllegalArgumentException {
 
         JsonNode namespace = requirementNode.findValue(Constants.REQUIREMENT__NAMESPACE);
@@ -238,12 +246,12 @@ public class MetadataDeserializer {
                 ? metadataFactory.createRequirement(namespace.asText())
                 : metadataFactory.createRequirement(namespace.asText(), id.asText());
 
-        if (resource != null) {
-            requirement.setResource(resource);
-        }
         if (parent == null) {
             if (resource != null) {
                 resource.addRequirement(requirement);
+            }
+            if (capability != null) {
+                capability.addRequirement(requirement);
             }
         } else {
             parent.addChild(requirement);
@@ -258,6 +266,7 @@ public class MetadataDeserializer {
                             new AttributeProviderCallback() {
 
                                 @Override
+                                @SuppressWarnings("unchecked")
                                 public void addAttribute(AttributeType type, Object value, Operator operator) {
                                     requirement.addAttribute(type, value, operator);
                                 }
@@ -271,11 +280,15 @@ public class MetadataDeserializer {
                     continue;
 
                 case Constants.REQUIREMENT__CHILDREN:
-                    deserializeRequirements(resource, requirement, node.getValue());
+                    deserializeRequirements(resource, capability, requirement, node.getValue());
+                    continue;
+
+                case Constants.REQUIREMENT__ID:
+                case Constants.REQUIREMENT__NAMESPACE:
                     continue;
 
                 default:
-                    logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
+                    logger.debug("Ignoring unknow requirement subnode, key: {}, value: {}", node.getKey(), node.getValue());
             }
         }
         return requirement;
@@ -317,7 +330,6 @@ public class MetadataDeserializer {
         }
 
         if (parent != null) {
-            property.setParent(parent);
             parent.addProperty(property);
         }
 
@@ -330,6 +342,7 @@ public class MetadataDeserializer {
                             new AttributeProviderCallback() {
 
                                 @Override
+                                @SuppressWarnings("unchecked")
                                 public void addAttribute(AttributeType type, Object value, Operator operator) {
                                     property.setAttribute(type, value, operator);
                                 }
@@ -338,8 +351,12 @@ public class MetadataDeserializer {
                     );
                     continue;
 
+                case Constants.PROPERTY__ID:
+                case Constants.PROPERTY__NAMESPACE:
+                    continue;
+
                 default:
-                    logger.debug("Ignoring unknow capability subnode, key: {}, value: {}", node.getKey(), node.getValue());
+                    logger.debug("Ignoring unknow property subnode, key: {}, value: {}", node.getKey(), node.getValue());
             }
         }
         return property;

@@ -14,18 +14,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public interface Capability
-        extends AttributeProvider, DirectiveProvider, PropertyProvider<Capability>, EqualityComparable<Capability>, Entity {
+        extends AttributeProvider, DirectiveProvider, PropertyProvider, RequirementProvider, EqualityComparable<Capability>, Entity {
 
     @Nonnull
     String getId();
 
     @Nonnull
     String getNamespace();
-
-    @CheckForNull
-    Resource getResource();
-
-    void setResource(@Nullable Resource resource);
 
     @CheckForNull
     Capability getParent();
@@ -38,16 +33,4 @@ public interface Capability
 
     @Nonnull
     List<Capability> getChildren();
-
-    @Nonnull
-    List<Requirement> getRequirements();
-
-    @Nonnull
-    List<Requirement> getRequirements(String namespace);
-
-    boolean hasRequirement(Requirement requirement);
-
-    void addRequirement(Requirement requirement);
-
-    void removeRequirement(Requirement requirement);
 }

@@ -55,10 +55,10 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     @Override
     public NewProperty[] getNewProperties() {
-        List<? extends cz.zcu.kiv.crce.metadata.Property<?>> newProperties = resource.getProperties();
+        List<? extends cz.zcu.kiv.crce.metadata.Property> newProperties = resource.getProperties();
         NewProperty[] properties = new NewProperty[newProperties.size()];
         int i = 0;
-        for (cz.zcu.kiv.crce.metadata.Property<?> newProperty : newProperties) {
+        for (cz.zcu.kiv.crce.metadata.Property newProperty : newProperties) {
             properties[i++] = new NewPropertyImpl(newProperty);
         }
         return properties;
@@ -156,12 +156,12 @@ abstract class ResourceWrap extends ResourceAdapter {
 
         @Override
         public String getValue() {
-        	
+
         	Object value = attribute.getValue();
         	if (value instanceof Double) {
         		return String.format("%.3f", value);
         	}
-        	
+
             return attribute.getStringValue();
         }
 
@@ -178,9 +178,9 @@ abstract class ResourceWrap extends ResourceAdapter {
 
     private static class NewPropertyImpl implements NewProperty {
 
-    	private final cz.zcu.kiv.crce.metadata.Property<?> property;
+    	private final cz.zcu.kiv.crce.metadata.Property property;
 
-        public NewPropertyImpl(cz.zcu.kiv.crce.metadata.Property<?> property) {
+        public NewPropertyImpl(cz.zcu.kiv.crce.metadata.Property property) {
             this.property = property;
         }
 
@@ -298,10 +298,10 @@ abstract class ResourceWrap extends ResourceAdapter {
 
         @Override
         public NewProperty[] getNewProperties() {
-            List<? extends cz.zcu.kiv.crce.metadata.Property<?>> newProperties = capability.getProperties();
+            List<? extends cz.zcu.kiv.crce.metadata.Property> newProperties = capability.getProperties();
             NewProperty[] properties = new NewProperty[newProperties.size()];
             int i = 0;
-            for (cz.zcu.kiv.crce.metadata.Property<?> newProperty : newProperties) {
+            for (cz.zcu.kiv.crce.metadata.Property newProperty : newProperties) {
                 properties[i++] = new NewPropertyImpl(newProperty);
             }
             return properties;

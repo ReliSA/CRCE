@@ -53,10 +53,10 @@ public interface MetadataFactory {
     Capability createCapability(String namespace, String id);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> createProperty(String namespace);
+    Property createProperty(String namespace);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> createProperty(String namespace, String id);
+    Property createProperty(String namespace, String id);
 
     <T> Attribute<T> createAttribute(AttributeType<T> type, T value);
 
@@ -103,5 +103,5 @@ public interface MetadataFactory {
     <T> Attribute<T> cloneAttribute(Attribute<T> attribute);
 
     @Nonnull
-    <T extends PropertyProvider<T>> Property<T> cloneProperty(Property<T> property);
+    Property cloneProperty(Property property);
 }

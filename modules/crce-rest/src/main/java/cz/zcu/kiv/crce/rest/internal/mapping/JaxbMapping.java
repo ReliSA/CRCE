@@ -186,7 +186,7 @@ public class JaxbMapping {
         }
 
         List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property> jaxbProperties = jaxbResource.getProperties();
-        for (Property<Resource> property : resource.getProperties()) {
+        for (Property property : resource.getProperties()) {
             if (includeProperty(property.getNamespace(), filter)) {
                 jaxbProperties.add(mapProperty(property));
             }
@@ -224,7 +224,7 @@ public class JaxbMapping {
         }
 
         List<cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property> properties = jaxbCapability.getProperties();
-        for (Property<Capability> property : capability.getProperties()) {
+        for (Property property : capability.getProperties()) {
             properties.add(mapProperty(property));
         }
 
@@ -255,7 +255,7 @@ public class JaxbMapping {
         return jaxbRequirement;
     }
 
-    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property mapProperty(Property<?> property) {
+    private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property mapProperty(Property property) {
         cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property jaxbProperty = metadataObjectFactory.createProperty();
 
         jaxbProperty.setNamespace(property.getNamespace());

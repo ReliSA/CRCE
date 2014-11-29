@@ -9,20 +9,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
- * @param <T>
  */
 @ParametersAreNonnullByDefault
-public interface PropertyProvider<T extends PropertyProvider<T>> extends EqualityComparable<T>, Entity, Serializable {
+public interface PropertyProvider extends Entity, Serializable {
 
     @Nonnull
-    List<Property<T>> getProperties();
+    List<Property> getProperties();
 
     @Nonnull
-    List<Property<T>> getProperties(String namespace);
+    List<Property> getProperties(String namespace);
 
-    boolean hasProperty(Property<T> property);
+    boolean hasProperty(Property property);
 
-    void addProperty(Property<T> property);
+    void addProperty(Property property);
 
-    void removeProperty(Property<T> property);
+    void removeProperty(Property property);
 }

@@ -153,7 +153,7 @@ public class MetricsIndexer {
 		for (PackageMetrics metric : packageMetrics) {
 			computeMetricsForPackages(metric, resource.getCapabilities(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE));
 		}
-		
+
 		// "metrics" tag indicate, that the resource has been measured
 		metadataService.addCategory(resource, "metrics");
 	}
@@ -196,7 +196,7 @@ public class MetricsIndexer {
 	 */
 	private void computeMetricsForComponent(ComponentMetrics metrics, Resource resource) {
 
-		Property<Resource> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
+		Property metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
 		addAtrributesToMetricsProperty(metricsProperty, metrics.getName(), metrics.computeValue());
 
 		resource.addProperty(metricsProperty);
@@ -225,7 +225,7 @@ public class MetricsIndexer {
 			if (packageNameAttribute != null) {
 				String packageName = packageNameAttribute.getValue();
 
-				Property<Capability> metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
+				Property metricsProperty = metadataFactory.createProperty(NsMetrics.NAMESPACE__METRICS);
 				addAtrributesToMetricsProperty(metricsProperty, metrics.getName(), metrics.computeValueForPackage(packageName));
 
 				exportPackageCapability.addProperty(metricsProperty);
@@ -240,7 +240,7 @@ public class MetricsIndexer {
 	 * @param name Name of property.
 	 * @param value Metrics value.
 	 */
-	private void addAtrributesToMetricsProperty(Property<?> metricsProperty, String name, Object value) {
+	private void addAtrributesToMetricsProperty(Property metricsProperty, String name, Object value) {
 
 		metricsProperty.setAttribute(NsMetrics.ATTRIBUTE__NAME, name);
 		if (value instanceof Long) {

@@ -14,7 +14,6 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
@@ -30,7 +29,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     protected final Map<String, List<Attribute<?>>> attributesMap = new HashMap<>();
 
     private String namespace = null;
-    private Resource resource = null;
     private Requirement parent = null;
 
     public RequirementImpl(@Nonnull String namespace, @Nonnull String id) {
@@ -46,16 +44,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     @Override
     public String getNamespace() {
         return namespace;
-    }
-
-    @Override
-    public Resource getResource() {
-        return resource;
-    }
-
-    @Override
-    public void setResource(Resource resource) {
-        this.resource = resource;
     }
 
     @Override
@@ -194,9 +182,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
-                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_NO_KEY)) {
-                    return false;
-                }
                 if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
@@ -207,9 +192,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
 
             case DEEP_WITH_KEY:
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
-                    return false;
-                }
-                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_WITH_KEY)) {
                     return false;
                 }
                 if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {

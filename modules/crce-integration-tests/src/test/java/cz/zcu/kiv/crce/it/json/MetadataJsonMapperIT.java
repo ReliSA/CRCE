@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.it.json;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
@@ -112,7 +110,7 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
             Capability actual = mapper.deserialize(json, Capability.class);
             assertNotNull(actual);
 
-            assertTrue(actual.equalsTo(capability, EqualityLevel.DEEP_WITH_KEY));
+            assertTrue(capability.getNamespace(), actual.equalsTo(capability, EqualityLevel.DEEP_WITH_KEY));
 
             JSONAssert.assertEquals(json, mapper.serialize(actual), JSONCompareMode.NON_EXTENSIBLE);
         }
@@ -169,14 +167,13 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         return resource;
     }
 
-    private Property<?> createProperty1(Resource resource) {
-        Property<Resource> resourceProperty = metadataFactory.createProperty("prop.ns1", "prop1");
+    private Property createProperty1(Resource resource) {
+        Property resourceProperty = metadataFactory.createProperty("prop.ns1", "prop1");
         resourceProperty.setAttribute(new SimpleAttributeType<>("patr1", String.class), "pval1", Operator.NOT_EQUAL);
         resourceProperty.setAttribute(new SimpleAttributeType<>("patr2", Long.class), 123L, Operator.LESS);
 
         if (resource != null) {
             resource.addProperty(resourceProperty);
-            resourceProperty.setParent(resource);
         }
         return resourceProperty;
     }
@@ -185,7 +182,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         // --- requirement 2 ---
         Requirement requirement = metadataFactory.createRequirement("ns7", "req3");
         if (resource != null) {
-            requirement.setResource(resource);
             resource.addRequirement(requirement);
         }
 
@@ -197,7 +193,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
     private Requirement createRequirement1(Resource resource) {
         Requirement requirement = metadataFactory.createRequirement("ns5", "req1");
         if (resource != null) {
-            requirement.setResource(resource);
             resource.addRequirement(requirement);
         }
 
@@ -208,9 +203,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         requirement.setDirective("dir2", "bb");
 
         Requirement child = metadataFactory.createRequirement("ns6", "req2");
-        if (resource != null) {
-            child.setResource(resource);
-        }
         requirement.addChild(child);
         child.setParent(requirement);
 
@@ -228,7 +220,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         if (resource != null) {
             resource.addCapability(capability);
             resource.addRootCapability(capability);
-            capability.setResource(resource);
         }
 
         // attributes
@@ -249,7 +240,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         Capability child = metadataFactory.createCapability("ns2", "cap2");
         if (resource != null) {
             resource.addCapability(child);
-            child.setResource(resource);
         }
 
         capability.addChild(child);
@@ -261,7 +251,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         child = metadataFactory.createCapability("ns3", "cap3");
         if (resource != null) {
             resource.addCapability(child);
-            child.setResource(resource);
         }
 
         capability.addChild(child);
@@ -269,18 +258,31 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
 
         child.setAttribute(new SimpleAttributeType<>("c2atr1", String.class), "c2val1", Operator.EQUAL);
 
+        // requirements
+        Requirement requirement1 = metadataFactory.createRequirement("ns8", "c2req1");
+        requirement1.addAttribute("c2req1atr1", String.class, "c2req1atr1val");
+        requirement1.addAttribute("c2req1atr2", String.class, "c2req1atr2val");
+
+        capability.addRequirement(requirement1);
+
+        Requirement requirement2 = metadataFactory.createRequirement("ns8", "c2req2");
+        requirement2.addAttribute("c2req2atr1", String.class, "c2req2atr1val");
+        requirement2.addAttribute("c2req2atr2", Long.class, 123L);
+
+        requirement1.addChild(requirement2);
+        requirement2.setParent(requirement1);
+
         return capability;
     }
 
-    private Property<?> createProperty2(Capability capability) {
+    private Property createProperty2(Capability capability) {
         // properties
-        Property<Capability> property = metadataFactory.createProperty("ns2", "prop1");
+        Property property = metadataFactory.createProperty("ns2", "prop1");
         property.setAttribute("atr6", String.class, "pval1");
         property.setAttribute("atr7", String.class, "pval2");
 
         if (capability != null) {
             capability.addProperty(property);
-            property.setParent(capability);
         }
 
         return property;
@@ -291,7 +293,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         if (resource != null) {
             resource.addCapability(capability);
             resource.addRootCapability(capability);
-            capability.setResource(resource);
         }
         return capability;
     }

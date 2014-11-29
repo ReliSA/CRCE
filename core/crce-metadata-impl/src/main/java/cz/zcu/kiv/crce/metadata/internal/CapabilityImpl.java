@@ -15,7 +15,6 @@ import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Implementation of metadata <code>Capability</code> interface.
@@ -30,11 +29,10 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     private final List<Capability> children = new ArrayList<>();
 
     private final Map<String, List<Requirement>> allRequirements = new HashMap<>();
-    private final PropertyProvider<Capability> propertyProvider = new PropertyProviderImpl<>();
+    private final PropertyProvider propertyProvider = new PropertyProviderImpl();
     private final DirectiveProvider directiveProvider = new DirectiveProviderImpl();
 
     private String namespace = null;
-    private Resource resource = null;
     private Capability parent = null;
 
     public CapabilityImpl(@Nonnull String namespace, @Nonnull String id) {
@@ -50,16 +48,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     @Override
     public String getNamespace() {
         return namespace;
-    }
-
-    @Override
-    public Resource getResource() {
-        return resource;
-    }
-
-    @Override
-    public void setResource(Resource resource) {
-        this.resource = resource;
     }
 
     @Override
@@ -91,27 +79,27 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     // delegated methods
 
     @Override
-    public List<Property<Capability>> getProperties() {
+    public List<Property> getProperties() {
         return propertyProvider.getProperties();
     }
 
     @Override
-    public List<Property<Capability>> getProperties(String namespace) {
+    public List<Property> getProperties(String namespace) {
         return propertyProvider.getProperties(namespace);
     }
 
     @Override
-    public boolean hasProperty(Property<Capability> property) {
+    public boolean hasProperty(Property property) {
         return propertyProvider.hasProperty(property);
     }
 
     @Override
-    public void addProperty(Property<Capability> property) {
+    public void addProperty(Property property) {
         propertyProvider.addProperty(property);
     }
 
     @Override
-    public void removeProperty(Property<Capability> property) {
+    public void removeProperty(Property property) {
         propertyProvider.removeProperty(property);
     }
 
@@ -234,9 +222,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
-                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_NO_KEY)) {
-                    return false;
-                }
                 if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
@@ -250,9 +235,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
 
             case DEEP_WITH_KEY:
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
-                    return false;
-                }
-                if (!Util.equalsTo(resource, other.getResource(), EqualityLevel.SHALLOW_WITH_KEY)) {
                     return false;
                 }
                 if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {

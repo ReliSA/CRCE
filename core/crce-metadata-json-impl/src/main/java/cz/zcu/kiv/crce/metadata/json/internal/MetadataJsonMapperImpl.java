@@ -60,7 +60,7 @@ public class MetadataJsonMapperImpl implements MetadataJsonMapper, ManagedServic
         module.addSerializer(Capability.class, new CapabilitySerializer());
         module.addSerializer(Requirement.class, new RequirementSerializer());
         module.addSerializer((Class<Attribute<?>>) (Class<?>) Attribute.class, new AttributeSerializer(this));
-        module.addSerializer((Class<Property<?>>) (Class<?>) Property.class, new PropertySerializer());
+        module.addSerializer((Class<Property>) (Class<?>) Property.class, new PropertySerializer());
 
         final MetadataDeserializer deserializer = new MetadataDeserializer(metadataFactory);
 

@@ -23,11 +23,6 @@ public interface Requirement extends DirectiveProvider, EqualityComparable<Requi
     String getNamespace();
 
     @CheckForNull
-    Resource getResource();
-
-    void setResource(@Nullable Resource resource);
-
-    @CheckForNull
     Requirement getParent();
 
     boolean setParent(@Nullable Requirement parent);
