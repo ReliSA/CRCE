@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.internal;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import cz.zcu.kiv.crce.metadata.EqualityComparable;
@@ -27,24 +28,14 @@ public class Util {
         if (a.size() != b.size()) {
             return false;
         }
-        Iterator<T> it1;
-        Iterator<T> it2;
-        if (level == EqualityLevel.SHALLOW_WITH_KEY || level == EqualityLevel.DEEP_WITH_KEY) {
-            TreeSet<T> set1 = new TreeSet<>(a);
-            TreeSet<T> set2 = new TreeSet<>(b);
-            if (set1.size() != set2.size()) {
-                return false;
-            }
-            it1 = set1.iterator();
-            it2 = set2.iterator();
-        } else {
-            it1 = a.iterator();
-            it2 = b.iterator();
+        SortedSet<T> set1 = new TreeSet<>(a);
+        SortedSet<T> set2 = new TreeSet<>(b);
+        if (set1.size() != set2.size()) {
+            return false;
         }
-        /*
-         * FIXME this way of comparison requires the same order of list elements in case of "no key" comparison depth level which is wrong,
-         * another algorithm needs to be used.
-         */
+        Iterator<T> it1 = set1.iterator();
+        Iterator<T> it2 = set2.iterator();
+
         while (it1.hasNext() && it2.hasNext()) {
             T o1 = it1.next();
             T o2 = it2.next();
