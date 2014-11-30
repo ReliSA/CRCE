@@ -9,7 +9,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -35,7 +34,7 @@ public interface MetadataService {
     String getPresentationName(Requirement requirement);
 
     @Nonnull
-    <T extends PropertyProvider<T>> String getPresentationName(Property<T> property);
+    String getPresentationName(Property property);
 
     @Nonnull
     String getPresentationName(Attribute<?> attribute);
@@ -89,7 +88,7 @@ public interface MetadataService {
      * @param parent
      * @param child
      */
-    void addChild(Capability parent, Capability child);
+//    void addChild(Capability parent, Capability child);
 
     void addRequirement(Resource resource, Requirement requirement);
 

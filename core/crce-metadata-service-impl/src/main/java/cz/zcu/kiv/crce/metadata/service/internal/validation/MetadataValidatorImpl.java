@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.validation.CapabilityValidationResult;
@@ -150,14 +149,6 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
                 result.setEntityValid(false);
                 result.setContextValid(false);
             }
-            if (resource != null && !resource.equals(capability.getResource())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.RESOURCE_REFERENCE, capability.getId(),
-                        "Wrong reference to resource: " + capability.getResource()));
-
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
         }
 
         if (includeChildren) {
@@ -195,23 +186,13 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
         RequirementValidationResult result = new RequirementValidationResultImpl();
         result.setRequirement(requirement);
 
-        if (structureValidationEnabled) {
-            if (parent != null && !parent.equals(requirement.getParent())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.PARENT_REFERENCE, requirement.getId(),
-                        "Wrong reference to parent: " + requirement.getParent()));
+        if (structureValidationEnabled && parent != null && !parent.equals(requirement.getParent())) {
+            result.addReason(
+                    new ReasonImpl(ReasonType.PARENT_REFERENCE, requirement.getId(),
+                            "Wrong reference to parent: " + requirement.getParent()));
 
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
-            if (resource != null && !resource.equals(requirement.getResource())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.RESOURCE_REFERENCE, requirement.getId(),
-                        "Wrong reference to resource: " + requirement.getResource()));
-
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
+            result.setEntityValid(false);
+            result.setContextValid(false);
         }
 
         if (includeChildren) {
@@ -227,24 +208,10 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
     }
 
     @Override
-    public <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(Property<T> property) {
-        PropertyValidationResult<T> result = validate(property, null);
-        return result;
-    }
+    public PropertyValidationResult validate(Property property) {
+        PropertyValidationResult result = new PropertyValidationResultImpl();
 
-    @Nonnull
-    private <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(@Nonnull Property<T> property, @CheckForNull T parent) {
-        PropertyValidationResult<T> result = new PropertyValidationResultImpl<>();
         result.setProperty(property);
-
-        if (structureValidationEnabled && parent != null && !parent.equals(property.getParent())) {
-            result.addReason(
-                    new ReasonImpl(ReasonType.PARENT_REFERENCE, property.getId(),
-                            "Wrong reference to resource: " + property.getParent()));
-
-            result.setEntityValid(false);
-            result.setContextValid(false);
-        }
 
         return result;
     }

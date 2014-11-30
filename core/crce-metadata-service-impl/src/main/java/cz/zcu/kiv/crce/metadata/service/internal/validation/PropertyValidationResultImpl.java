@@ -2,26 +2,24 @@ package cz.zcu.kiv.crce.metadata.service.internal.validation;
 
 
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.service.validation.PropertyValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.Reason;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
- * @param <T>
  */
-public class PropertyValidationResultImpl<T extends PropertyProvider<T>> extends AbstractValidationResult implements PropertyValidationResult<T> {
+public class PropertyValidationResultImpl extends AbstractValidationResult implements PropertyValidationResult {
 
-    private Property<T> property;
+    private Property property;
 
     @Override
-    public void setProperty(Property<T> property) {
+    public void setProperty(Property property) {
         this.property = property;
     }
 
     @Override
-    public Property<T> getProperty() {
+    public Property getProperty() {
         return property;
     }
 

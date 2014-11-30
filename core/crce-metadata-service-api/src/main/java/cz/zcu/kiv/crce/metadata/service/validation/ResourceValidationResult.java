@@ -31,7 +31,7 @@ public interface ResourceValidationResult extends ValidationResult {
     void addRequirementValidationResult(RequirementValidationResult result);
 
     @Nonnull
-    List<PropertyValidationResult<Resource>> getPropertyValidationResults();
+    List<PropertyValidationResult> getPropertyValidationResults();
 
-    void addPropertyValidationResult(PropertyValidationResult<Resource> result);
+    void addPropertyValidationResult(PropertyValidationResult result);
 }
