@@ -81,7 +81,7 @@ public class ContextIT extends IntegrationTestBase {
                 Options.Crce.repository(),
 
                 Options.Crce.metadataIndexerApi(),
-                Options.Crce.metadataIndexer()
+                Options.Crce.metadataIndexerImpl()
 
         );
     }

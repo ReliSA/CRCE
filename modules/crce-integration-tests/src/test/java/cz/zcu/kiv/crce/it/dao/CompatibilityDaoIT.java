@@ -141,7 +141,7 @@ public class CompatibilityDaoIT extends IntegrationTestBase {
                 Options.Crce.pluginApi(),
                 Options.Crce.metadataApi(),
                 Options.Crce.metadataServiceApi(),
-                Options.Crce.metadataIndexer(),
+                Options.Crce.metadataIndexerImpl(),
                 Options.Crce.metadataOsgiBundle(),
                 Options.Crce.repositoryApi(),
                 Options.Crce.compatibilityApi(),

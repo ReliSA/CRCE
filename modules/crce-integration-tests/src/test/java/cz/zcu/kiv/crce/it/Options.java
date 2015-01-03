@@ -212,8 +212,8 @@ public class Options {
             return maven("crce-metadata-indexer-api");
         }
 
-        public static MavenArtifactProvisionOption metadataIndexer() {
-            return maven("crce-metadata-indexer");
+        public static MavenArtifactProvisionOption metadataIndexerImpl() {
+            return maven("crce-metadata-indexer-impl");
         }
 
         public static MavenArtifactProvisionOption resolverImpl() {
