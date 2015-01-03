@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>shared-build-settings</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1-SNAPSHOT</version>
 
     <name>CRCE - Build - Shared build configuration</name>
 
@@ -35,7 +35,7 @@
         <url>https://github.com/ReliSA/crce/tree/master/build</url>
         <connection>https://github.com/ReliSA/crce.git</connection>
         <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
-        <tag>shared-build-settings-2.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
