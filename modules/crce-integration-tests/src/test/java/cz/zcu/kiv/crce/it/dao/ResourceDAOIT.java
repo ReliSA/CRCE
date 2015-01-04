@@ -39,10 +39,12 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.felix.dm.Component;
 
 import org.junit.Test;
@@ -58,14 +60,13 @@ import cz.zcu.kiv.crce.it.Options;
 import cz.zcu.kiv.crce.it.Options.Crce;
 import cz.zcu.kiv.crce.it.Options.Felix;
 import cz.zcu.kiv.crce.it.Options.Osgi;
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Repository;
-import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
 /**
@@ -103,7 +104,8 @@ public class ResourceDAOIT extends IntegrationTestBase {
             + "org.w3c.dom,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers,"
             + "org.w3c.dom.xpath,sun.io,org.w3c.dom.ls,"
             + "com.sun.java_cup.internal,com.sun.xml.internal.bind.v2,"
-            + "javax.net,javax.net.ssl,javax.transaction.xa";
+            + "javax.net,javax.net.ssl,javax.transaction.xa,"
+            + "org.apache.commons.io";
 
     // This allows delegation of XPathFactory implementation to MyBatis.
     private final String bootDelegationPackages = "sun.*,com.sun.*";
@@ -127,8 +129,10 @@ public class ResourceDAOIT extends IntegrationTestBase {
                 Felix.configAdmin(),
 
                 Crce.pluginApi(),
+
                 Crce.metadata(),
                 Crce.metadataService(),
+                Crce.metadataJson(),
                 Crce.metadataDao()
         );
     }
@@ -150,6 +154,7 @@ public class ResourceDAOIT extends IntegrationTestBase {
                 .add(createServiceDependency().setService(ResourceDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+                .add(createServiceDependency().setService(MetadataJsonMapper.class).setRequired(true))
             };
     }
 
@@ -158,6 +163,7 @@ public class ResourceDAOIT extends IntegrationTestBase {
     private volatile ResourceDAO resourceDAO;          /* injected by dependency manager */
     private volatile RepositoryDAO repositoryDAO;      /* injected by dependency manager */
     private volatile MetadataService metadataService;  /* injected by dependency manager */
+    private volatile MetadataJsonMapper metadataJsonMapper;
 
 
     @Test
@@ -167,21 +173,12 @@ public class ResourceDAOIT extends IntegrationTestBase {
 
         repositoryDAO.saveRepository(repository);
 
-        URI uri = new URI("file://a/b/c");
-
-        Resource expected = metadataFactory.createResource();
+        Resource expected = metadataJsonMapper.deserialize(FileUtils.readFileToString(new File("src/test/resources/dao/Resource1.json")));
+        assertNotNull(expected);
 
         metadataService.getIdentity(expected).setAttribute("repository-id", String.class, repository.getId());
 
-        assertNotNull(expected);
-
-        metadataService.setUri(expected, uri);
-
-        Capability cap = metadataFactory.createCapability("nameSpace");
-        metadataService.addRootCapability(expected, cap);
-
-        Requirement req = metadataFactory.createRequirement("nameSpace");
-        metadataService.addRequirement(expected, req);
+        URI uri = metadataService.getUri(expected);
 
         resourceDAO.saveResource(expected);
         Resource actual = resourceDAO.loadResource(uri);
@@ -193,10 +190,6 @@ public class ResourceDAOIT extends IntegrationTestBase {
         assertTrue(expected.equalsTo(actual, EqualityLevel.KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.SHALLOW_NO_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.SHALLOW_WITH_KEY));
-        System.out.println("expected:");
-        System.out.println(expected);
-        System.out.println("actual:");
-        System.out.println(actual);
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_NO_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_WITH_KEY));
     }

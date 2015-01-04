@@ -15,10 +15,10 @@ import cz.zcu.kiv.crce.metadata.Property;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class PropertySerializer extends JsonSerializer<Property<?>> {
+public class PropertySerializer extends JsonSerializer<Property> {
 
     @Override
-    public void serialize(Property<?> property, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+    public void serialize(Property property, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
         jgen.writeStartObject();
 
         jgen.writeStringField(Constants.PROPERTY__ID, property.getId());

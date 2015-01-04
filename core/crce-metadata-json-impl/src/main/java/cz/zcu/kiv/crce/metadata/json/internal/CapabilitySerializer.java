@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Requirement;
 
 /**
  *
@@ -47,11 +48,21 @@ public class CapabilitySerializer extends JsonSerializer<Capability> {
             jgen.writeEndObject();
         }
 
+        // requirements
+        List<Requirement> requirements = capability.getRequirements();
+        if (!requirements.isEmpty()) {
+            jgen.writeArrayFieldStart(Constants.CAPABILITY__REQUIREMENTS);
+            for (Requirement requirement : requirements) {
+                jgen.writeObject(requirement);
+            }
+            jgen.writeEndArray();
+        }
+
         // properties
-        List<Property<Capability>> properties = capability.getProperties();
+        List<Property> properties = capability.getProperties();
         if (!properties.isEmpty()) {
             jgen.writeArrayFieldStart(Constants.CAPABILITY__PROPERTIES);
-            for (Property<Capability> property : properties) {
+            for (Property property : properties) {
                 jgen.writeObject(property);
             }
             jgen.writeEndArray();

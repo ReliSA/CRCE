@@ -47,10 +47,10 @@ public class ResourceSerializer extends JsonSerializer<Resource> {
         }
 
         // properties
-        List<Property<Resource>> properties = resource.getProperties();
+        List<Property> properties = resource.getProperties();
         if (!properties.isEmpty()) {
             jgen.writeArrayFieldStart(Constants.RESOURCE__PROPERTIES);
-            for (Property<Resource> property : properties) {
+            for (Property property : properties) {
                 jgen.writeObject(property);
             }
             jgen.writeEndArray();

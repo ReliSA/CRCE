@@ -26,18 +26,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
-                <artifactId>svn-revision-number-maven-plugin</artifactId>
-                <configuration>
-                    <entries>
-                        <entry>
-                            <path>${project.basedir}/..</path>
-                            <prefix>crce-product</prefix>
-                        </entry>
-                    </entries>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>

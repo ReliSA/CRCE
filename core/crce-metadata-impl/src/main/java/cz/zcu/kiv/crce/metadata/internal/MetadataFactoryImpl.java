@@ -21,7 +21,6 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Operator;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 
 /**
@@ -67,13 +66,13 @@ public class MetadataFactoryImpl implements MetadataFactory {
     }
 
     @Override
-    public <T extends PropertyProvider<T>> Property<T> createProperty(String namespace) {
+    public Property createProperty(String namespace) {
         return createProperty(namespace, generateId());
     }
 
     @Override
-    public <T extends PropertyProvider<T>> Property<T> createProperty(String namespace, String id) {
-        return new PropertyImpl<>(namespace, id);
+    public Property createProperty(String namespace, String id) {
+        return new PropertyImpl(namespace, id);
     }
 
     @Override
@@ -123,7 +122,7 @@ public class MetadataFactoryImpl implements MetadataFactory {
     }
 
     @Override
-    public <T extends PropertyProvider<T>> Property<T> cloneProperty(Property<T> property) {
+    public Property cloneProperty(Property property) {
         return clone(property);
     }
 
@@ -180,7 +179,7 @@ public class MetadataFactoryImpl implements MetadataFactory {
         return "RequirementImpl{" + "id=" + requirement.getId() + "}";
     }
 
-    static String toString(Property<?> property) {
+    static String toString(Property property) {
         if (logHelper != null && logHelper.available()) {
             return logHelper.toString(property);
         }

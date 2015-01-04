@@ -96,9 +96,8 @@ public class ResourceDAOImpl implements ResourceDAO {
 //        metadataService.setUri(resource, dbResource.getUri());
 //        metadataService.getSingletonCapability(resource, metadataService.getIdentityNamespace())
 //                .setAttribute("repository-id", String.class, dbResource.getRepositoryUuid());
-
-        loadCapabilities(resource, dbResource.getResourceId(), session);
-        loadRequirements(resource, dbResource.getResourceId(), session);
+        Map<Long, Requirement> requirements = loadRequirements(resource, dbResource.getResourceId(), session);
+        loadCapabilities(resource, dbResource.getResourceId(), requirements, session);
         loadProperties(resource, dbResource.getResourceId(), session);
 
         try {
@@ -110,10 +109,12 @@ public class ResourceDAOImpl implements ResourceDAO {
         return resource;
     }
 
-    void loadRequirements(Resource resource, long resourceId, SqlSession session) {
+
+    Map<Long, Requirement> loadRequirements(Resource resource, long resourceId, SqlSession session) {
         List<DbRequirement> dbRequirements = session.selectList(RESOURCE_MAPPER + "selectRequirements", resourceId);
 
         Map<Long, Requirement> requirements = new HashMap<>(dbRequirements.size());
+        Map<Long, Requirement> capabilityRequirements = new HashMap<>(dbRequirements.size());
         Map<Long, Long> unprocessedRequirements = new HashMap<>(dbRequirements.size()); // K: requirement ID, V: requirement parent ID
 
         for (DbRequirement dbRequirement : dbRequirements) {
@@ -122,14 +123,16 @@ public class ResourceDAOImpl implements ResourceDAO {
             loadRequirementAttributes(requirement, dbRequirement.getRequirementId(), session);
             loadRequirementDirectives(requirement, dbRequirement.getRequirementId(), session);
 
-            requirement.setResource(resource);
-
             requirements.put(dbRequirement.getRequirementId(), requirement);
 
             if (dbRequirement.getRequirementId() == dbRequirement.getParentRequirementId()) {
                 assert dbRequirement.getLevel() == 0;
 
-                resource.addRequirement(requirement);
+                if (dbRequirement.getCapabilityId() != null) {
+                    capabilityRequirements.put(dbRequirement.getCapabilityId(), requirement);
+                } else {
+                    resource.addRequirement(requirement);
+                }
             } else {
                 Requirement parent = requirements.get(dbRequirement.getParentRequirementId());
                 if (parent != null) {
@@ -158,9 +161,11 @@ public class ResourceDAOImpl implements ResourceDAO {
                 }
             }
         }
+
+        return capabilityRequirements;
     }
 
-    void loadCapabilities(Resource resource, long resourceId, SqlSession session) {
+    void loadCapabilities(Resource resource, long resourceId, Map<Long, Requirement> requirements, SqlSession session) {
         List<DbCapability> dbCapabilities = session.selectList(RESOURCE_MAPPER + "selectCapabilities", resourceId);
 
         Map<Long, Capability> capabilities = new HashMap<>(dbCapabilities.size());
@@ -173,7 +178,11 @@ public class ResourceDAOImpl implements ResourceDAO {
             loadCapabilityDirectives(capability, dbCapability.getCapabilityId(), session);
             loadProperties(capability, dbCapability.getCapabilityId(), session);
 
-            capability.setResource(resource);
+            Requirement requirement = requirements.get(dbCapability.getCapabilityId());
+            if (requirement != null) {
+                capability.addRequirement(requirement);
+            }
+
             resource.addCapability(capability);
 
             capabilities.put(dbCapability.getCapabilityId(), capability);
@@ -218,11 +227,10 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectResourceProperties", resourceId);
 
         for (DbProperty dbProperty : dbProperties) {
-            Property<Resource> property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+            Property property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
 
             loadResourcePropertyAttributes(property, dbProperty.getPropertyId(), session);
 
-            property.setParent(resource);
             resource.addProperty(property);
         }
     }
@@ -231,11 +239,10 @@ public class ResourceDAOImpl implements ResourceDAO {
         List<DbProperty> dbProperties = session.selectList(RESOURCE_MAPPER + "selectCapabilityProperties", resourceId);
 
         for (DbProperty dbProperty : dbProperties) {
-            Property<Capability> property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
+            Property property = metadataFactory.createProperty(dbProperty.getNamespace(), dbProperty.getId());
 
             loadCapabilityPropertyAttributes(property, dbProperty.getPropertyId(), session);
 
-            property.setParent(capability);
             capability.addProperty(property);
         }
     }
@@ -264,13 +271,13 @@ public class ResourceDAOImpl implements ResourceDAO {
         MetadataMapping.mapDbDirectives2Requirement(dbDirectives, requirement);
     }
 
-    void loadResourcePropertyAttributes(Property<Resource> property, long propertyId, SqlSession session) {
+    void loadResourcePropertyAttributes(Property property, long propertyId, SqlSession session) {
         List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectResourcePropertyAttributes", propertyId);
 
         MetadataMapping.mapDbAttributes2Property(dbAttributes, property);
     }
 
-    void loadCapabilityPropertyAttributes(Property<Capability> property, long propertyId, SqlSession session) {
+    void loadCapabilityPropertyAttributes(Property property, long propertyId, SqlSession session) {
         List<DbAttribute> dbAttributes = session.selectList(RESOURCE_MAPPER + "selectCapabilityPropertyAttributes", propertyId);
 
         MetadataMapping.mapDbAttributes2Property(dbAttributes, property);
@@ -404,11 +411,11 @@ public class ResourceDAOImpl implements ResourceDAO {
 
             // requirements
             for (Requirement requirement : resource.getRequirements()) {
-                saveRequirementRecursive(requirement, resourceId, null, 0, session, seqMapper);
+                saveRequirementRecursive(requirement, resourceId, null, null, 0, session, seqMapper);
             }
 
             // properties
-            for (Property<Resource> property : resource.getProperties()) {
+            for (Property property : resource.getProperties()) {
                 saveResourceProperty(property, resourceId, session, seqMapper);
             }
 
@@ -443,7 +450,11 @@ public class ResourceDAOImpl implements ResourceDAO {
             session.insert(RESOURCE_MAPPER + "insertCapabilityDirectives", dbDirectives);
         }
 
-        for (Property<Capability> property : capability.getProperties()) {
+        for (Requirement requirement : capability.getRequirements()) {
+            saveRequirementRecursive(requirement, resourceId, null, capabilityId, 0, session, seqMapper);
+        }
+
+        for (Property property : capability.getProperties()) {
             saveCapabilityProperty(property, capabilityId, session, seqMapper);
         }
 
@@ -452,11 +463,12 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
     }
 
-    private void saveRequirementRecursive(Requirement requirement, long resourceId, Long parentId, int level,
+    private void saveRequirementRecursive(Requirement requirement, long resourceId, Long parentId, Long capabilityId, int level,
             SqlSession session, SequenceMapper seqMapper) {
 
         DbRequirement dbRequirement = MetadataMapping.mapRequirement2DbRequirement(requirement, metadataService);
         dbRequirement.setResourceId(resourceId);
+        dbRequirement.setCapabilityId(capabilityId);
         dbRequirement.setLevel(level);
 
         long requirementId = seqMapper.nextVal("requirement_seq");
@@ -476,11 +488,11 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
 
         for (Requirement child : requirement.getChildren()) {
-            saveRequirementRecursive(child, resourceId, requirementId, level + 1, session, seqMapper);
+            saveRequirementRecursive(child, resourceId, requirementId, capabilityId, level + 1, session, seqMapper);
         }
     }
 
-    private void saveResourceProperty(Property<Resource> property, long resourceId, SqlSession session, SequenceMapper seqMapper) {
+    private void saveResourceProperty(Property property, long resourceId, SqlSession session, SequenceMapper seqMapper) {
         long propertyId = seqMapper.nextVal("resource_property_seq");
         DbProperty dbProperty = MetadataMapping.mapProperty2DbProperty(property, propertyId, resourceId, metadataService);
 
@@ -492,7 +504,7 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
     }
 
-    private void saveCapabilityProperty(Property<Capability> property, long capabilityId, SqlSession session, SequenceMapper seqMapper) {
+    private void saveCapabilityProperty(Property property, long capabilityId, SqlSession session, SequenceMapper seqMapper) {
         long propertyId = seqMapper.nextVal("capability_property_seq");
         DbProperty dbProperty = MetadataMapping.mapProperty2DbProperty(property, propertyId, capabilityId, metadataService);
 

@@ -5,7 +5,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -72,10 +71,9 @@ public interface MetadataValidator {
 
     /**
      * Validates the given property including child properties.
-     * @param <T>
      * @param property
      * @return
      */
     @Nonnull
-    <T extends PropertyProvider<T>> PropertyValidationResult<T> validate(Property<T> property);
+    PropertyValidationResult validate(Property property);
 }

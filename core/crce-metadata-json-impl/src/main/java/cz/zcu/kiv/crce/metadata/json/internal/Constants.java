@@ -27,6 +27,7 @@ public interface Constants {
     String CAPABILITY__NAMESPACE = "namespace";
     String CAPABILITY__ATTRIBUTES = "attributes";
     String CAPABILITY__DIRECTIVES = "directives";
+    String CAPABILITY__REQUIREMENTS = "requirements";
     String CAPABILITY__PROPERTIES = "properties";
     String CAPABILITY__CHILDREN = "children";
 

@@ -6,33 +6,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cz.zcu.kiv.crce.metadata.EqualityLevel;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
- * @param <T>
  */
-public class PropertyProviderImpl<T extends PropertyProvider<T>> implements PropertyProvider<T> {
+public class PropertyProviderImpl implements PropertyProvider {
 
     private static final long serialVersionUID = 1L;
 
-    private final Map<String, List<Property<T>>> allProperties = new HashMap<>();
+    private final Map<String, List<Property>> allProperties = new HashMap<>();
 
     @Override
-    public List<Property<T>> getProperties() {
-        List<Property<T>> result = new ArrayList<>();
-        for (List<Property<T>> properties : allProperties.values()) {
+    public List<Property> getProperties() {
+        List<Property> result = new ArrayList<>();
+        for (List<Property> properties : allProperties.values()) {
             result.addAll(properties);
         }
         return result;
     }
 
     @Override
-    public List<Property<T>> getProperties(String namespace) {
-        List<Property<T>> result = allProperties.get(namespace);
+    public List<Property> getProperties(String namespace) {
+        List<Property> result = allProperties.get(namespace);
         if (result == null) {
             result = Collections.emptyList();
         }
@@ -40,8 +38,8 @@ public class PropertyProviderImpl<T extends PropertyProvider<T>> implements Prop
     }
 
     @Override
-    public boolean hasProperty(Property<T> property) {
-        List<Property<T>> properties = allProperties.get(property.getNamespace());
+    public boolean hasProperty(Property property) {
+        List<Property> properties = allProperties.get(property.getNamespace());
         if (properties != null) {
             return properties.contains(property);
         }
@@ -49,8 +47,8 @@ public class PropertyProviderImpl<T extends PropertyProvider<T>> implements Prop
     }
 
     @Override
-    public void addProperty(Property<T> property) {
-        List<Property<T>> properties = allProperties.get(property.getNamespace());
+    public void addProperty(Property property) {
+        List<Property> properties = allProperties.get(property.getNamespace());
         if (properties == null) {
             properties = new ArrayList<>();
             allProperties.put(property.getNamespace(), properties);
@@ -59,15 +57,11 @@ public class PropertyProviderImpl<T extends PropertyProvider<T>> implements Prop
     }
 
     @Override
-    public void removeProperty(Property<T> property) {
-        List<Property<T>> properties = allProperties.get(property.getNamespace());
+    public void removeProperty(Property property) {
+        List<Property> properties = allProperties.get(property.getNamespace());
         if (properties != null) {
             properties.remove(property);
         }
     }
 
-    @Override
-    public boolean equalsTo(T other, EqualityLevel level) {
-        throw new UnsupportedOperationException("Not intended to be called explicitely.");
-    }
 }

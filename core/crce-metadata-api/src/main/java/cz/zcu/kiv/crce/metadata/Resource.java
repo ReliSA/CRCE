@@ -15,7 +15,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
 @ParametersAreNonnullByDefault
-public interface Resource extends PropertyProvider<Resource>, EqualityComparable<Resource>, Entity {
+public interface Resource extends PropertyProvider, RequirementProvider, EqualityComparable<Resource>, Entity {
 
     @Nonnull
     String getId();
@@ -32,15 +32,7 @@ public interface Resource extends PropertyProvider<Resource>, EqualityComparable
     @Nonnull
     List<Capability> getRootCapabilities(String namespace);
 
-    @Nonnull
-    List<Requirement> getRequirements();
-
-    @Nonnull
-    List<Requirement> getRequirements(String namespace);
-
     boolean hasCapability(Capability capability);
-
-    boolean hasRequirement(Requirement requirement);
 
     /* --- setters --- */
 
@@ -57,11 +49,7 @@ public interface Resource extends PropertyProvider<Resource>, EqualityComparable
      */
     void addRootCapability(Capability capability);
 
-    void addRequirement(Requirement requirement);
-
     void removeCapability(Capability capability);
 
     void removeRootCapability(Capability capability);
-
-    void removeRequirement(Requirement requirement);
 }

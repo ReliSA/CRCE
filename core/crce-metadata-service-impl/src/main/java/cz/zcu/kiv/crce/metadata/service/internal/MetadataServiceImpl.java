@@ -23,7 +23,6 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.PropertyProvider;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
@@ -132,7 +131,7 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
-    public <T extends PropertyProvider<T>> String getPresentationName(Property<T> property) {
+    public String getPresentationName(Property property) {
         if (property == null) {
             throw new IllegalArgumentException("Attribute is null.");
         }
@@ -262,13 +261,6 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     private void addCapabilityTree(@Nonnull Resource resource, @Nonnull Capability capability) {
-        Resource old = capability.getResource();
-        if (old != null && !old.equals(resource)) {
-            old.removeCapability(capability);
-            old.removeRootCapability(capability);
-        }
-
-        capability.setResource(resource);
         List<Capability> capabilities = resource.getCapabilities(capability.getNamespace());
         if (!capabilities.contains(capability)) {
             resource.addCapability(capability);
@@ -285,34 +277,32 @@ public class MetadataServiceImpl implements MetadataService {
         resource.removeCapability(capability);
         resource.removeRootCapability(capability);
 
-        capability.setResource(null);
-
         for (Capability child : capability.getChildren()) {
             removeCapability(resource, child);
         }
     }
 
-    @Override
-    public void addChild(Capability parent, Capability child) {
-        if (!parent.getChildren().contains(child)) {
-            parent.addChild(child);
-            child.setParent(parent);
-            Resource resource = parent.getResource();
-            if (resource != null) {
-                addChildTree(resource, child);
-            }
-        }
-    }
+//    @Override
+//    public void addChild(Capability parent, Capability child) {
+//        if (!parent.getChildren().contains(child)) {
+//            parent.addChild(child);
+//            child.setParent(parent);
+//            Resource resource = parent.getResource();
+//            if (resource != null) {
+//                addChildTree(resource, child);
+//            }
+//        }
+//    }
 
-    private void addChildTree(@Nonnull Resource resource, @Nonnull Capability capability) {
-        if (!resource.getCapabilities(capability.getNamespace()).contains(capability)) {
-            resource.addCapability(capability);
-        }
-        capability.setResource(resource);
-        for (Capability child : capability.getChildren()) {
-            addChildTree(resource, child);
-        }
-    }
+//    private void addChildTree(@Nonnull Resource resource, @Nonnull Capability capability) {
+//        if (!resource.getCapabilities(capability.getNamespace()).contains(capability)) {
+//            resource.addCapability(capability);
+//        }
+//        capability.setResource(resource);
+//        for (Capability child : capability.getChildren()) {
+//            addChildTree(resource, child);
+//        }
+//    }
 
     @Override
     public void addRequirement(Resource resource, Requirement requirement) {
@@ -320,11 +310,6 @@ public class MetadataServiceImpl implements MetadataService {
         if (parent != null && !requirement.equals(parent)) {
             throw new IllegalStateException("The requirement " + requirement.getId()
                     + " can't be added to the resource. It is a child of " + parent.getId());
-        }
-
-        Resource old = requirement.getResource();
-        if (old != null && !old.equals(resource)) {
-            old.removeRequirement(requirement);
         }
 
         List<Requirement> requirements = resource.getRequirements(requirement.getNamespace());
@@ -336,8 +321,6 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     private void addRequirementTree(@Nonnull Resource resource, @Nonnull Requirement requirement) {
-        requirement.setResource(resource);
-
         for (Requirement child : requirement.getChildren()) {
             addRequirementTree(resource, child);
         }
@@ -350,7 +333,6 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     private void removeRequirementTree(@Nonnull Requirement requirement) {
-        requirement.setResource(null);
         for (Requirement child : requirement.getChildren()) {
             removeRequirementTree(child);
         }
@@ -368,7 +350,6 @@ public class MetadataServiceImpl implements MetadataService {
         Capability capability;
         if (capabilities.isEmpty()) {
             capability = metadataFactory.createCapability(namespace);
-            capability.setResource(resource);
             resource.addCapability(capability);
             resource.addRootCapability(capability);
         } else {

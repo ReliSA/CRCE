@@ -18,7 +18,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * Implementation of <code>Resource</code> interface.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
-public class ResourceImpl extends PropertyProviderImpl<Resource> implements Resource, Comparable<Resource> {
+public class ResourceImpl extends PropertyProviderImpl implements Resource, Comparable<Resource> {
 
     private static final long serialVersionUID = 2594634894045505360L;
 

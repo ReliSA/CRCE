@@ -55,7 +55,7 @@
 
     <!-- Requirement -->
     <select id="selectRequirements" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
-        SELECT requirement_id, parent_requirement_id, resource_id, level, id, namespace
+        SELECT requirement_id, parent_requirement_id, resource_id, level, id, namespace, capability_id
         FROM requirement
         WHERE resource_id = #{resourceId}
         ORDER BY level
@@ -152,8 +152,8 @@
     </insert>
 
     <insert id="insertRequirement" parameterType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement">
-        INSERT INTO requirement (requirement_id, parent_requirement_id, resource_id, level, id, namespace) VALUES (
-          #{requirementId}, #{parentRequirementId}, #{resourceId}, #{level}, #{id}, #{namespace}
+        INSERT INTO requirement (requirement_id, parent_requirement_id, resource_id, level, id, namespace, capability_id) VALUES (
+          #{requirementId}, #{parentRequirementId}, #{resourceId}, #{level}, #{id}, #{namespace}, #{capabilityId}
         )
     </insert>
 

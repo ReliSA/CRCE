@@ -327,7 +327,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             String mult = imports[i].getDirective("multiple");
             ri.setDirective("optional", Boolean.toString("optional".equalsIgnoreCase(avail))); // TODO constant
             ri.setDirective("multiple", Boolean.toString(!"false".equalsIgnoreCase(mult))); // TODO constant
-            ri.setResource(resource);
             resource.addRequirement(ri);
         }
     }
@@ -338,7 +337,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         if (exports != null) {
             for (Clause export : exports) {
                 Capability cap = createServiceCapability(export);
-                cap.setResource(resource);
                 resource.addCapability(cap);
                 if (root != null) {
                     cap.setParent(root);
@@ -384,7 +382,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             r.setDirective("extend", "true"); // TODO constant
             r.setDirective("optional", "false"); // TODO constant
             r.setDirective("multiple", "false"); // TODO constant
-            r.setResource(resource);
             resource.addRequirement(r);
 
             // And insert a capability that we are available
@@ -392,7 +389,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             Capability capability = metadataFactory.createCapability(NsOsgiFragment.NAMESPACE__OSGI_FRAGMENT);
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__HOST, clauses[0].getName());
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__VERSION, new Version(getVersion(clauses[0])));
-            capability.setResource(resource);
             resource.addCapability(capability);
             if (root != null) {
                 capability.setParent(root);
@@ -418,7 +414,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             r.setDirective("text", "Require Bundle " + clauses[i].getName() + "; " + v); // TODO constant
             r.setDirective("optional", Boolean.toString( // TODO constant
                     Constants.RESOLUTION_OPTIONAL.equalsIgnoreCase(clauses[i].getDirective(Constants.RESOLUTION_DIRECTIVE))));
-            r.setResource(resource);
             resource.addRequirement(r);
         }
     }
@@ -431,7 +426,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         }
         capability.setAttribute(NsOsgiBundle.ATTRIBUTE__VERSION, new Version(getVersion(headers)));
         capability.setAttribute(NsOsgiBundle.ATTRIBUTE__MANIFEST_VERSION, getManifestVersion(headers));
-        capability.setResource(resource);
         resource.addCapability(capability);
         resource.addRootCapability(capability);
         return capability;
@@ -442,7 +436,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         if (clauses != null) {
             for (Clause clause : clauses) {
                 Capability capability = createCapability(clause); // Capability.PACKAGE,
-                capability.setResource(resource);
                 resource.addCapability(capability);
                 if (root != null) {
                     capability.setParent(root);
@@ -486,7 +479,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             if (Constants.RESOLUTION_OPTIONAL.equalsIgnoreCase(clauses[i].getDirective(Constants.RESOLUTION_DIRECTIVE))) {
                 requirement.setDirective("optional", Boolean.toString(true)); // TODO constant
             }
-            requirement.setResource(resource);
             resource.addRequirement(requirement);
         }
     }
@@ -556,7 +548,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             sb.append(")");
 
             req.setDirective("text", "Execution Environment " + sb.toString());
-            req.setResource(resource);
             resource.addRequirement(req);
         }
     }

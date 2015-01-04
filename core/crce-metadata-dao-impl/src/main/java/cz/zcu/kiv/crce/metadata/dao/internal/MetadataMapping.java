@@ -67,7 +67,7 @@ public class MetadataMapping {
         return dbRequirement;
     }
 
-    static DbProperty mapProperty2DbProperty(Property<?> property, long propertyId, long parentId, MetadataService metadataService) {
+    static DbProperty mapProperty2DbProperty(Property property, long propertyId, long parentId, MetadataService metadataService) {
         DbProperty dbProperty = new DbProperty();
 
         dbProperty.setPropertyId(propertyId);
@@ -189,7 +189,7 @@ public class MetadataMapping {
         }, false);
     }
 
-    static void mapDbAttributes2Property(List<DbAttribute> dbAttributes, final Property<?> property) {
+    static void mapDbAttributes2Property(List<DbAttribute> dbAttributes, final Property property) {
         mapDbAttributes2Entity(dbAttributes, new Entity() {
 
             @Override

@@ -7,7 +7,7 @@
         version="1.0.0"
     >
     <import namespace="http://relisa-dev.kiv.zcu.cz/schema/crce/metadata/1.0.0"
-            schemaLocation="../../../metadata/schema/v1_0_0/metadata.xsd"/>
+            schemaLocation="http://relisa-dev.kiv.zcu.cz/schema/crce/metadata/1.0.0"/>
     <element xml:space="preserve" name="compatibility">
         <complexType>
             <annotation>
