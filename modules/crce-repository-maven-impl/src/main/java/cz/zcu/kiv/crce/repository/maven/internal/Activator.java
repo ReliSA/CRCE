@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.repository.maven.internal;
 
 import java.io.File;
 import java.net.URI;
@@ -11,12 +11,10 @@ import java.util.Properties;
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +33,13 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Activator of this bundle.
- * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @author MBr
  */
 public class Activator extends DependencyActivatorBase implements ManagedServiceFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
-    public static final String PID = "cz.zcu.kiv.crce.repository";
+    public static final String PID = "cz.zcu.kiv.crce.repository.maven";
 
     public static final String STORE_URI = "store.uri";
 
@@ -52,6 +50,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
+    	logger.debug("Maven repo activator init");
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, PID);
         dm.add(createComponent()
@@ -117,7 +116,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
 
-        Component component = createComponent()
+        Component mavenStore = createComponent()
                 .setInterface(Store.class.getName(), null)
                 .setImplementation(new MavenStoreImpl(uri))
                 .add(dependencyManager.createConfigurationDependency().setPid(pid))
@@ -133,10 +132,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                     .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))
                 ;
 
-        logger.debug("Registering Repository Store: {}", component);
+        logger.debug("Registering Repository Store: {}", mavenStore);
 
-        components.put(pid, component);
-        dependencyManager.add(component);
+        components.put(pid, mavenStore);
+        dependencyManager.add(mavenStore);
     }
 
     @Override

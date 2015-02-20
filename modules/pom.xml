@@ -72,6 +72,7 @@
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>
         <module>crce-concurrency</module>
+		<module>crce-repository-maven-impl</module>
     </modules>
 
     <profiles>
@@ -96,7 +97,7 @@
                 <artifactId>maven-pax-plugin</artifactId>
                 <configuration>
                     <provision>
-                        <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=65505
+                        <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=65505
                         </param>
                         <param>--platform=felix</param>
                         <param>

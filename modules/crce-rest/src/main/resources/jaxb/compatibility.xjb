@@ -6,10 +6,7 @@
     jaxb:extensionBindingPrefixes="xjc"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    xsi:schemaLocation="
-        http://java.sun.com/xml/ns/jaxb
-        http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
-    ">
+  >
 
     <jaxb:globalBindings>
         <xjc:simple/>

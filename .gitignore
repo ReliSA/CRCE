@@ -26,6 +26,12 @@ tmp/
 local.properties
 .settings/
 .loadpath
+*.classpath
+*.settings
+*.project
+target/
+modules/crce-rest/src/main/java/cz/zcu/kiv/crce/rest/internal/jaxb/
+
 
 # Locally stored "Eclipse launch configurations"
 *.launch

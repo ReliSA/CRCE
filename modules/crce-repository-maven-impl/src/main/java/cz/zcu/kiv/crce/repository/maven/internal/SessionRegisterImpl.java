@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.repository.maven.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
