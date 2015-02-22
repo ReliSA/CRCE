@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.repository.maven.internal;
 
 import java.io.File;
 import java.net.URI;
@@ -52,12 +52,13 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
+        logger.debug("Initializing Maven Repository.");
+
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, PID);
         dm.add(createComponent()
                 .setInterface(ManagedServiceFactory.class.getName(), props)
                 .setImplementation(this)
-                .add(createConfigurationDependency().setPid(PID))
                 );
 
         dm.add(createComponent()
@@ -74,6 +75,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void destroy(BundleContext bc, DependencyManager dm) throws Exception {
+        logger.debug("Maven Repository destroyed.");
     }
 
     @Override
@@ -83,7 +85,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
-        logger.debug("Updating Maven repository ({}) configuration: {}", properties);
+        logger.debug("Updating Maven Repository ({}) configuration: {}", properties);
 
         if (components.containsKey(pid)) {
             logger.info("Repository ({}) is already configured.", pid);

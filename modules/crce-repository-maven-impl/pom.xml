@@ -16,8 +16,8 @@
     <name>CRCE - Maven Repository Implementation</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository.impl</bundle.symbolicName>
-        <bundle.namespace>${namespace}.repository</bundle.namespace>
+        <bundle.symbolicName>${namespace}.repository.maven.impl</bundle.symbolicName>
+        <bundle.namespace>${namespace}.repository.maven</bundle.namespace>
         <version.org.apache.maven.indexer>5.1.1</version.org.apache.maven.indexer>
         <version.org.eclipse.aether>0.9.1.v20140329</version.org.eclipse.aether>
         <version.org.apache.maven>3.2.1</version.org.apache.maven>
