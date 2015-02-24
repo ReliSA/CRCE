@@ -55,8 +55,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         props.put(Constants.SERVICE_PID, PID);
         dm.add(createComponent()
                 .setInterface(ManagedServiceFactory.class.getName(), props)
-                .setImplementation(this)
-                .add(createConfigurationDependency().setPid(PID))
+                .setImplementation(this)                
                 );
 
         dm.add(createComponent()
