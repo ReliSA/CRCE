@@ -28,27 +28,39 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  *
- * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @author Miroslav Brozek
  */
 public class MavenStoreImpl implements Store {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
 
-	private volatile MetadataFactory metadataFactory;
 	private volatile RepositoryDAO repositoryDAO;
 	private volatile ResourceDAO resourceDAO;
 	private volatile TaskRunnerService taskRunnerService;
     private volatile ResourceIndexerService resourceIndexerService;
-    private volatile ResourceLoader resourceLoader;
+    private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService;
-    private volatile IdentityIndexer identityIndexer;
     private volatile MetadataValidator metadataValidator;
+    private volatile IdentityIndexer identityIndexer;
+    private volatile ResourceLoader resourceLoader;
 
     private Repository repository;
     private final URI baseUri;
 
-    MavenStoreImpl(URI baseUri) {
+    MavenStoreImpl(URI baseUri) throws IOException {
         this.baseUri = baseUri;
+        File mvnStorePath = new File(baseUri);
+       
+        if (!mvnStorePath.exists()) {
+            if (!mvnStorePath.mkdirs()) {
+                logger.error("Could not create store directory {}", mvnStorePath);
+            }
+        } else if (!mvnStorePath.isDirectory()) {
+            throw new IOException("Base directory is not a directory: " + mvnStorePath);
+        }
+        if (!mvnStorePath.exists()) {
+            throw new IllegalStateException("Base directory for Buffer was not created: " + mvnStorePath, new IOException("Can not create directory"));
+        }
     }
 
     @Override
@@ -99,15 +111,16 @@ public class MavenStoreImpl implements Store {
             logger.error("Could not load repository for {}", baseUri, ex);
         }
 
-        if (repository == null) { // TODO this is wrong when indexing fails
+        if (repository == null) {
             repository = metadataFactory.createRepository(baseUri);
             try {
                 repositoryDAO.saveRepository(repository);
             } catch (IOException ex) {
                 logger.error("Could not save repository for {}", baseUri, ex);
             }
-            index();
-        }
+        }               
+        
+        index();             
     }
 
     private void index() {

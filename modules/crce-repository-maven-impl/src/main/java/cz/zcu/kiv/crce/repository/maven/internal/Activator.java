@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
@@ -115,23 +116,27 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
 
-        Component mavenStore = createComponent()
-                .setInterface(Store.class.getName(), null)
-                .setImplementation(new MavenStoreImpl(uri))
-                .add(dependencyManager.createConfigurationDependency().setPid(pid))
-                    .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
-                    .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
-                    .add(createServiceDependency().setRequired(true).setService(RepositoryDAO.class))
-                    .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
-                    .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
-                    .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
-                    .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class))
-                    .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
-                    .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
-                    .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class))
-                ;
+        Component mavenStore;
+		try {
+			mavenStore = createComponent()
+			        .setInterface(Store.class.getName(), null)
+			        .setImplementation(new MavenStoreImpl(uri))
+			        .add(dependencyManager.createConfigurationDependency().setPid(pid))
+			            .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
+			            .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
+			            .add(createServiceDependency().setRequired(true).setService(RepositoryDAO.class))
+			            .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
+			            .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
+			            .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
+			            .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class))
+			            .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
+			            .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
+			            .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class));
+		} catch (IOException e) {
+			 throw new ConfigurationException(STORE_URI, "Can not create maven store on given base directory: " + uri, e);
+		}
 
-        logger.debug("Registering Repository Store: {}", mavenStore);
+        logger.debug("Registering Repository Maven Store: {}", mavenStore);
 
         components.put(pid, mavenStore);
         dependencyManager.add(mavenStore);
