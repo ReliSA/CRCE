@@ -8,38 +8,22 @@ import java.util.List;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
-import org.apache.maven.index.MAVEN;
-import org.apache.maven.index.expr.SourcedSearchExpression;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
-
-import org.apache.lucene.store.FSDirectory;
-import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.Indexer;
 import org.apache.maven.index.IndexerEngine;
+import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.Scanner;
 import org.apache.maven.index.ScanningRequest;
 import org.apache.maven.index.context.DefaultIndexingContext;
 import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
-
+import org.apache.maven.index.expr.SourcedSearchExpression;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -48,8 +32,20 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
+import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +53,7 @@ import cz.zcu.kiv.crce.concurrency.model.Task;
 
 /**
  *
- * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @author Miroslav Brožek
  */
 public class LocalRepositoryIndexer extends Task<Object> {
 
@@ -78,7 +74,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
 
         logger.debug("Updating Maven repository index.");
         FlatSearchResponse response;
-        try (CloseableIndexingContext indexingContext = index("local", new File(uri), new File("target/mavenindex"), true)) {
+        try (CloseableIndexingContext indexingContext = index("mvnStoreLocal", new File(uri), new File("target/mavenindex"), true)) {
             Indexer indexer = indexingContext.getIndexer();
 
             BooleanQuery query = new BooleanQuery();

@@ -34,7 +34,7 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Activator of this bundle.
- * @author MBr
+ * @author Miroslav Brozek
  */
 public class Activator extends DependencyActivatorBase implements ManagedServiceFactory {
 
@@ -42,7 +42,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     public static final String PID = "cz.zcu.kiv.crce.repository.maven";
 
-    public static final String STORE_URI = "store.uri";
+    public static final String STORE_URI = "maven.store.uri";
 
     private final Map<String, Component> components = new HashMap<>();
 
@@ -51,7 +51,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
-    	logger.debug("Maven repo activator init");
+    	logger.debug("Maven repository activator init method started");
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, PID);
         dm.add(createComponent()
@@ -69,6 +69,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .setImplementation(PriorityActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
+        logger.debug("Maven repository activator init method ended");
     }
 
     @Override
@@ -95,6 +96,11 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         }
 
         String path = (String) properties.get(STORE_URI);
+        
+        if(path==null){
+        	logger.debug("Check configuration file!!, paramater ({}) is empty or no such parameter is defined", STORE_URI);
+        	return;
+        }
 
         URI uri = null;
         File file = null;

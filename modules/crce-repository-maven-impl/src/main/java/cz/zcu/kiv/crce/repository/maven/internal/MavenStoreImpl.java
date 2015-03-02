@@ -53,13 +53,13 @@ public class MavenStoreImpl implements Store {
        
         if (!mvnStorePath.exists()) {
             if (!mvnStorePath.mkdirs()) {
-                logger.error("Could not create store directory {}", mvnStorePath);
+                logger.error("Could not create maven store directory {}", mvnStorePath);
             }
         } else if (!mvnStorePath.isDirectory()) {
             throw new IOException("Base directory is not a directory: " + mvnStorePath);
         }
         if (!mvnStorePath.exists()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + mvnStorePath, new IOException("Can not create directory"));
+            throw new IllegalStateException("Base direcotory could be not created: " + mvnStorePath, new IOException("Can not create directory"));
         }
     }
 
@@ -103,7 +103,9 @@ public class MavenStoreImpl implements Store {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-
+    /**
+     * Called by dependency manager.
+     */
     synchronized void start() {
         try {
             repository = repositoryDAO.loadRepository(baseUri);
@@ -121,8 +123,11 @@ public class MavenStoreImpl implements Store {
         }               
         
         index();             
-    }
+    }    
 
+    /**
+     * Main method for start indexing local maven repository
+     */    
     private void index() {
         taskRunnerService.scheduleTask(new LocalRepositoryIndexer(baseUri, new MetadataIndexerCallback() {
 
