@@ -29,6 +29,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
@@ -72,9 +73,9 @@ public class LocalRepositoryIndexer extends Task<Object> {
     protected Object run() throws Exception {
         logger.info("Indexing local Maven repository started: {}", uri);
 
-        logger.debug("Updating Maven repository index.");
+        logger.debug("Updating Maven repository index started.");
         FlatSearchResponse response;
-        try (CloseableIndexingContext indexingContext = index("mvnStoreLocal", new File(uri), new File("target/mavenindex"), true)) {
+        try (CloseableIndexingContext indexingContext = index("localMavenStore", new File(uri), new File("mvn_store_index"), true)) {
             Indexer indexer = indexingContext.getIndexer();
 
             BooleanQuery query = new BooleanQuery();
@@ -85,7 +86,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
             logger.error("Error updating Maven repository index.", e);
             return null;
         }
-        logger.debug("Updating Maven repository index done.");
+        logger.debug("Updating Maven repository index finished.");
 
         RepositorySystem repositorySystem = newRepositorySystem();
         RepositorySystemSession session = newSession(repositorySystem, uri);
@@ -136,13 +137,14 @@ public class LocalRepositoryIndexer extends Task<Object> {
 
     private CloseableIndexingContext index(String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {
-        logger.trace("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
+        logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
         if (repository == null || indexParentDir == null) {
+        	logger.debug("Mvn repository '{}' or index parent dir '{}' is null. Indexing could not be started!", repository, indexParentDir);
             return null;
         }
 
         if (!repository.exists()) {
-            throw new IOException("Repository directory " + repository + " does not exist");
+            throw new IOException("Mvn repository directory " + repository + " does not exist");
         }
 
         if (!indexParentDir.exists() && !indexParentDir.mkdirs()) {
@@ -156,7 +158,8 @@ public class LocalRepositoryIndexer extends Task<Object> {
         try {
             ContainerConfiguration configuration = new DefaultContainerConfiguration();
 
-            ClassRealm classRealm = new ClassRealm(null, "crce-maven-repo-indexer", getClass().getClassLoader());
+            ClassWorld classWorld = new ClassWorld();
+            ClassRealm classRealm = new ClassRealm(classWorld, "crce-maven-repo-indexer", getClass().getClassLoader());
             configuration.setRealm(classRealm);
 
             plexusContainer = new DefaultPlexusContainer(configuration);
@@ -171,7 +174,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
 //        indexers.add(plexusContainer.lookup(IndexCreator.class, "jarContent")); // indexes classes
 
-        logger.trace("Creating indexing context.");
+        logger.info("Creating indexing context of local maven store.");
 
         IndexingContext indexingContext = indexer.createIndexingContext(
                         name + "-context",
@@ -192,7 +195,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
             throw new IOException("Cannot create temporary directory: " + tmpDir);
         }
 
-        logger.trace("Temporary dir: " + tmpDir);
+        logger.debug("Temporary dir '{}' created." + tmpDir);
 
         try {
             Scanner scanner = plexusContainer.lookup(Scanner.class);
@@ -203,9 +206,10 @@ public class LocalRepositoryIndexer extends Task<Object> {
                 IndexUtils.copyDirectory(indexingContext.getIndexDirectory(), directory);
             }
 
-            logger.trace("Creating temporary indexing context.");
+            logger.debug("Creating temporary mvn store indexing context.");
 
-            try (CloseableIndexingContext tmpContext = new CloseableIndexingContext(
+            try (@SuppressWarnings("deprecation")
+			CloseableIndexingContext tmpContext = new CloseableIndexingContext(
                     new DefaultIndexingContext(
                         indexingContext.getId() + "-tmp",
                         indexingContext.getRepositoryId(),
@@ -219,7 +223,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
                     null)
             ) {
 
-                logger.trace("Scanning.");
+                logger.debug("Mvn local store scanning started.");
 
                 ScanningRequest scanningRequest = new ScanningRequest(
                         tmpContext,
@@ -230,7 +234,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
                 scanner.scan(scanningRequest);
                 tmpContext.updateTimestamp(true);
 
-                logger.trace("Replacing contexts.");
+                logger.debug("Replacing contexts from temporary to origin.");
 
                 indexingContext.replace(tmpContext.getIndexDirectory());
             } catch (Throwable t) {
@@ -251,7 +255,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
             }
         }
 
-        logger.trace("Indexing done.");
+        logger.debug("Indexing local mvn store '{}' finished.", repository);
 
         return new CloseableIndexingContext(indexingContext, indexer);
     }
