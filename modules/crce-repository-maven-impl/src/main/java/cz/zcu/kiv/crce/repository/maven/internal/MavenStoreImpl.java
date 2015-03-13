@@ -110,6 +110,10 @@ public class MavenStoreImpl implements Store {
         }
     }
 
+    void stop() {
+        logger.info("Stopping DM component {}", this);
+    }
+    
     private void index() {
         taskRunnerService.scheduleTask(new LocalRepositoryIndexer(baseUri, new MetadataIndexerCallback() {
 
@@ -147,5 +151,10 @@ public class MavenStoreImpl implements Store {
                 }
             }
         }));
+    }
+
+    @Override
+    public String toString() {
+        return "MavenStoreImpl{" + "baseUri=" + baseUri + '}';
     }
 }

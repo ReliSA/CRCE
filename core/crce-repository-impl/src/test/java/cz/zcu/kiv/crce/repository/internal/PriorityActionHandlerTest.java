@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.repository.internal;
 
+import cz.zcu.kiv.crce.repository.filebased.internal.PriorityActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
+
 import org.junit.*;
 
 /**

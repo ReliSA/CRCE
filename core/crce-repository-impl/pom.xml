@@ -24,8 +24,8 @@
     </scm>
 
     <properties>
-        <bundle.symbolicName>${namespace}.repository.impl</bundle.symbolicName>
-        <bundle.namespace>${namespace}.repository</bundle.namespace>
+        <bundle.symbolicName>${namespace}.repository.filebased.impl</bundle.symbolicName>
+        <bundle.namespace>${namespace}.repository.filebased</bundle.namespace>
     </properties>
 
     <build>

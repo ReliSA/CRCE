@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.repository.filebased.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,18 +58,8 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     private final File baseDir;
 
 
-    public FilebasedStoreImpl(File baseDir) throws IOException {
+    public FilebasedStoreImpl(File baseDir) {
         this.baseDir = baseDir;
-        if (!baseDir.exists()) {
-            if (!baseDir.mkdirs()) {
-                logger.error("Could not create store directory {}", baseDir);
-            }
-        } else if (!baseDir.isDirectory()) {
-            throw new IOException("Base directory is not a directory: " + baseDir);
-        }
-        if (!baseDir.exists()) {
-            throw new IllegalStateException("Base directory for Buffer was not created: " + baseDir, new IOException("Can not create directory"));
-        }
     }
 
     /*
@@ -113,6 +103,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             }
         }).start();
 
+    }
+    
+    void stop() {
+        logger.info("Stopping DM component {}", this);
     }
 
     @Override

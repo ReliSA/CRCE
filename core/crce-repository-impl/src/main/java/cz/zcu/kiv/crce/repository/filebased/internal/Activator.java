@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.maven.internal;
+package cz.zcu.kiv.crce.repository.filebased.internal;
 
 import java.io.File;
 import java.net.URI;
@@ -20,7 +20,6 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -41,7 +40,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
-    public static final String PID = "cz.zcu.kiv.crce.repository.maven";
+    public static final String PID = "cz.zcu.kiv.crce.repository.filebased";
 
     public static final String CFG_PROPERTY__STORE_URI = "store.uri";
 
@@ -58,7 +57,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
-        logger.debug("Initializing maven repository.");
+        logger.debug("Initializing filebased repository.");
 
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, PID);
@@ -84,12 +83,12 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Component component : components.values()) {
             dependencyManager.remove(component);
         }
-        logger.debug("Maven repository destroyed.");
+        logger.debug("Filebased repository destroyed.");
     }
 
     @Override
     public String getName() {
-        return "Maven repository store factory.";
+        return "Filebased repository store factory.";
     }
 
     @Override
@@ -101,7 +100,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             return;
         }
 
-        logger.debug("Updating maven repository ({}) configuration: {}", properties);
+        logger.debug("Updating filebased repository ({}) configuration: {}", properties);
 
         String path = (String) properties.get(CFG_PROPERTY__STORE_URI);
 
@@ -127,6 +126,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Repository URI: {}, file: {}", uri, absolutePath);
 
+        if (!file.exists() && !file.mkdirs()) {
+            throw new ConfigurationException(CFG_PROPERTY__STORE_URI, "Can not create directory on the given path: " + path);
+        }
+
         if (!file.isDirectory()) {
             throw new ConfigurationException(CFG_PROPERTY__STORE_URI, "Store URI is not a directory: " + path);
         }
@@ -150,7 +153,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         Component storeComponent = createComponent()
                 .setInterface(Store.class.getName(), null)
-                .setImplementation(new MavenStoreImpl(uri))
+                .setImplementation(new FilebasedStoreImpl(file))
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
@@ -160,7 +163,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
                 .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class))
-                .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class));
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class));
 
         logger.debug("Registering repository store: {}", storeComponent);
 
