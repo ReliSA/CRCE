@@ -41,7 +41,7 @@ abstract class ResourceWrap extends ResourceAdapter {
         Property[] properties;
         List<Capability> crceCapabilities = Collections.singletonList(metadataService.getIdentity(resource));
 
-        int crceSize = crceCapabilities.size() > 0 ? crceCapabilities.get(0).getAttributes().size() : 0;
+        int crceSize = crceCapabilities.isEmpty() ? 0 : crceCapabilities.get(0).getAttributes().size();
 
         properties = new Property[crceSize];
         int i = 0;

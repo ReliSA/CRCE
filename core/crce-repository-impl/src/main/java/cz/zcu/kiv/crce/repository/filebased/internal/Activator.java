@@ -151,8 +151,12 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             }
         }
 
+        Properties props = new Properties();
+        props.put("id", pid);
+        props.put("name", "Filebased: " + file.getName());
+        
         Component storeComponent = createComponent()
-                .setInterface(Store.class.getName(), null)
+                .setInterface(Store.class.getName(), props)
                 .setImplementation(new FilebasedStoreImpl(file))
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))

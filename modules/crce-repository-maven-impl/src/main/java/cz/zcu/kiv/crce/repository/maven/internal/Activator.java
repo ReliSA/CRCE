@@ -148,8 +148,12 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             }
         }
 
+        Properties props = new Properties();
+        props.put("id", pid);
+        props.put("name", "Maven: " + uri);
+        
         Component storeComponent = createComponent()
-                .setInterface(Store.class.getName(), null)
+                .setInterface(Store.class.getName(), props)
                 .setImplementation(new MavenStoreImpl(uri))
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))

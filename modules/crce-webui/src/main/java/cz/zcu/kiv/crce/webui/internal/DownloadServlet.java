@@ -61,7 +61,7 @@ public class DownloadServlet extends HttpServlet {
                 if (link != null) {
                     switch (link) {
                         case "store": {
-                            List<Resource> resources = Activator.instance().getStore().getResources();
+                            List<Resource> resources = Activator.instance().getStore(null).getResources();
                             Resource found = EditServlet.findResource(fileUri, resources);
                             doDownload(req, resp, found);
                             break;

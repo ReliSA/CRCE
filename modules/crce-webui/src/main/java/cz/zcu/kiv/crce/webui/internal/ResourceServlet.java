@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -147,16 +148,20 @@ public class ResourceServlet extends HttpServlet {
                 session.setAttribute("plugins", pluginWrappers);
                 return true;
 
-            case "store":
+            case "store": {
+                String id = getStoreId(req);
+                if (id == null) {
+                    return true;
+                }
                 List<Resource> storeResources;
                 if (filter == null) {
-                    storeResources = Activator.instance().getStore().getResources();
+                    storeResources = Activator.instance().getStore(id).getResources();
                 } else {
                     try {
-                        storeResources = Activator.instance().getStore().getResources(filter);
+                        storeResources = Activator.instance().getStore(id).getResources(filter);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        storeResources = Activator.instance().getStore().getResources();
+                        storeResources = Activator.instance().getStore(id).getResources();
                     }
                 }
                 List<ResourceExt> storeResourcesExt = new ArrayList<>(storeResources.size());
@@ -165,6 +170,7 @@ public class ResourceServlet extends HttpServlet {
                 }
                 session.setAttribute("store", storeResourcesExt);
                 return true;
+            }
 
             case "tags":
                 List<Resource> resources = prepareResources(req, filter);
@@ -189,11 +195,12 @@ public class ResourceServlet extends HttpServlet {
             case "compatibility":
                 String name = req.getParameter("name");
                 String version = req.getParameter("version");
-
+                String id = getStoreId(req);
+                
                 List<Compatibility> lower = null;
                 List<Compatibility> upper = null;
 
-                if (name == null || name.isEmpty() || version == null || version.isEmpty()) {
+                if (name == null || name.isEmpty() || version == null || version.isEmpty() || id == null) {
                     session.setAttribute("nodata", true);
                     return true;
                 }
@@ -204,8 +211,8 @@ public class ResourceServlet extends HttpServlet {
                 Version v = new Version(version);
                 resFilter.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, v);
 
-                List<Resource> res = Activator.instance().getStore().getResources(resFilter);
-                if (res.size() > 0) {
+                List<Resource> res = Activator.instance().getStore(id).getResources(resFilter);
+                if (!res.isEmpty()) {
                     lower = Activator.instance().getCompatibilityService().listLowerCompatibilities(res.get(0));
                     Collections.sort(lower, CompatibilityVersionComparator.getBaseComparator());
 
@@ -236,30 +243,27 @@ public class ResourceServlet extends HttpServlet {
      * @return array of resources
      */
     private List<Resource> prepareResources(HttpServletRequest req, Requirement filter) {
-        String errorMessage = filter + " is not a valid filter";
         HttpSession session = req.getSession();
-        List<Resource> storeResources, bufferResources, resources;
-        storeResources = Collections.emptyList();
-        bufferResources = Collections.emptyList();
 
-        String sessStoreAtr = (String) session.getAttribute("showStoreTag");
-        String sessBufferAtr = (String) session.getAttribute("showBufferTag");
+        List<Resource> storeResources = Collections.emptyList();
+        List<Resource> bufferResources = Collections.emptyList();
 
-        if ("yes".equalsIgnoreCase(sessStoreAtr)) {
+        String id = getStoreId(req);
+        if (id != null && "yes".equalsIgnoreCase((String) session.getAttribute("showStoreTag"))) {
             if (filter == null) {
-                storeResources = Activator.instance().getStore().getResources();
+                storeResources = Activator.instance().getStore(id).getResources();
             } else {
                 try {
-                    storeResources = Activator.instance().getStore().getResources(filter);
+                    storeResources = Activator.instance().getStore(id).getResources(filter);
                 } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
-                    setError(session, false, errorMessage);
-                    storeResources = Activator.instance().getStore().getResources();
+                    setError(session, false, filter + " is not a valid filter");
+                    storeResources = Activator.instance().getStore(id).getResources();
                 }
             }
         }
 
-        if ("yes".equals(sessBufferAtr)) {
+        if ("yes".equals((String) session.getAttribute("showBufferTag"))) {
             if (filter == null) {
                 bufferResources = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -267,14 +271,14 @@ public class ResourceServlet extends HttpServlet {
                     bufferResources = Activator.instance().getBuffer(req).getResources(filter);
                 } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
-                    setError(session, false, errorMessage);
+                    setError(session, false, filter + " is not a valid filter");
                     bufferResources = Activator.instance().getBuffer(req).getResources();
                 }
             }
         }
 
         //merge two resources arrays
-        resources = new ArrayList<>(storeResources.size() + bufferResources.size());
+        List<Resource> resources = new ArrayList<>(storeResources.size() + bufferResources.size());
         resources.addAll(storeResources);
         resources.addAll(bufferResources);
 
@@ -297,7 +301,7 @@ public class ResourceServlet extends HttpServlet {
             for (String category : categories) {
                 if (categoryMap.containsKey(category)) {
                     //category is already contained, increase count
-                    categoryMap.put(category, Integer.valueOf(categoryMap.get(category).intValue() + 1));
+                    categoryMap.put(category, categoryMap.get(category) + 1);
                 } else {
                     //add new category
                     categoryMap.put(category, 1);
@@ -342,5 +346,19 @@ public class ResourceServlet extends HttpServlet {
         }
 
         return filteredResourceList;
+    }
+    
+    @CheckForNull
+    private String getStoreId(HttpServletRequest req) {
+        String id = req.getParameter("id");
+        if (id == null) {
+            Map<String, String> stores = Activator.instance().getStores();
+            if (stores.isEmpty()) {
+                return null;
+            }
+            id = stores.keySet().iterator().next();
+            logger.trace("Store ID not specified, using the first store found: " + id);
+        }
+        return id;
     }
 }

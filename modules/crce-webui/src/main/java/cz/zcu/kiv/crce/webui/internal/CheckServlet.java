@@ -43,7 +43,7 @@ public class CheckServlet extends HttpServlet {
         } else if (source.equals("buffer")) {
             return doCheck(Activator.instance().getBuffer(req).getResources());
         } else if (source.equals("store")) {
-            return doCheck(Activator.instance().getStore().getResources());
+            return doCheck(Activator.instance().getStore(null).getResources());
         } else {
             return null;
         }

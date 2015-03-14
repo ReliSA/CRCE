@@ -1,10 +1,17 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,19 +29,21 @@ import cz.zcu.kiv.crce.repository.Store;
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@SuppressWarnings("FinalClass")
 public final class Activator extends DependencyActivatorBase {
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
     private static volatile Activator instance;
 
+    // injected by dependency manager:
+    private volatile BundleContext bundleContext;
     private volatile MetadataFactory metadataFactory;
     private volatile ResourceDAO resourceDAO;
-    private volatile PluginManager pluginManager;     /* injected by dependency manager */
-    private volatile SessionRegister sessionRegister;   /* injected by dependency manager */
-    private volatile Store store;                  	/* injected by dependency manager */
+    private volatile PluginManager pluginManager;
+    private volatile SessionRegister sessionRegister;
     private volatile MetadataService metadataService;
-    private volatile CompatibilitySearchService compatibilityService; /* injected by dependency manager */
+    private volatile CompatibilitySearchService compatibilityService;
 
     public static Activator instance() {
         if (instance == null) {
@@ -62,8 +71,55 @@ public final class Activator extends DependencyActivatorBase {
         return metadataFactory;
     }
 
-    public Store getStore() {
-        return store;
+    @Nonnull
+    public Map<String, String> getStores() {
+        Map<String, String> stores = new HashMap<>();
+        
+        Collection<ServiceReference<Store>> serviceReferences;
+        try {
+            serviceReferences = bundleContext.getServiceReferences(Store.class, null);
+        } catch (InvalidSyntaxException e) {
+            logger.error("Invalid filter.", e); // this should not happen
+            return stores;
+        }
+        
+        if (serviceReferences == null) {
+            logger.trace("No stores found.");
+            return stores;
+        }
+        
+        for (ServiceReference<Store> serviceReference : serviceReferences) {
+            String id = (String) serviceReference.getProperty("id");
+            String name = (String) serviceReference.getProperty("name");
+            if (id != null) {
+                stores.put(id, name != null ? name : id);
+            }
+        }
+        
+        return stores;
+    }
+    
+    public Store getStore(String storeId) {
+        String filter = "(id=" + storeId + ")";
+        
+        Collection<ServiceReference<Store>> serviceReferences;
+        try {
+            serviceReferences = bundleContext.getServiceReferences(Store.class, filter);
+        } catch (InvalidSyntaxException ex) {
+            logger.error("Invalid filter: " + filter);
+            return null;
+        }
+        
+        if (serviceReferences == null || serviceReferences.isEmpty()) {
+            logger.warn("Store not found for ID: {}", storeId);
+            return null;
+        }
+        
+        if (serviceReferences.size() > 1) {
+            logger.warn("More than one stores found for ID: {}, using the first one.", storeId);
+        }
+        
+        return bundleContext.getService(serviceReferences.iterator().next());
     }
 
     public CompatibilitySearchService getCompatibilityService() {
@@ -92,7 +148,6 @@ public final class Activator extends DependencyActivatorBase {
                 .setImplementation(this)
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
-                .add(createServiceDependency().setService(Store.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)) // FIXME 'not required' is only a temporary solution to make the component startable
