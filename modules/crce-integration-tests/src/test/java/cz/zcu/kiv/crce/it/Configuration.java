@@ -19,9 +19,9 @@ public class Configuration {
     }
 
     public static void repository(IntegrationTestBase integrationTestBase) throws IOException {
-        integrationTestBase.configure(
-                cz.zcu.kiv.crce.repository.internal.Activator.PID,
-                cz.zcu.kiv.crce.repository.internal.Activator.STORE_URI, "target/store"
+        integrationTestBase.configureFactory(
+                cz.zcu.kiv.crce.repository.filebased.internal.Activator.PID,
+                cz.zcu.kiv.crce.repository.filebased.internal.Activator.CFG_PROPERTY__STORE_URI, "target/store"
         );
     }
 }
