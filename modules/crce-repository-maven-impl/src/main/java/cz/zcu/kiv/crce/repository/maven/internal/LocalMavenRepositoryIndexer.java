@@ -36,6 +36,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
@@ -50,32 +51,29 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.concurrency.model.Task;
-
 /**
  *
  * @author Miroslav Brožek
  */
-public class LocalRepositoryIndexer extends Task<Object> {
+public class LocalMavenRepositoryIndexer{
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalRepositoryIndexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalMavenRepositoryIndexer.class);
 
     private final URI uri;
-    private final MetadataIndexerCallback metadataIndexerCallback;
+    private CloseableIndexingContext indexingContext;
 
-    public LocalRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
-        super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
+
+    public LocalMavenRepositoryIndexer(URI uri) {       
         this.uri = uri;
-        this.metadataIndexerCallback = metadataIndexerCallback;
     }
 
-    @Override
-    protected Object run() throws Exception {
+    public List<Artifact> getArtifacts(){
         logger.info("Indexing local Maven repository started: {}", uri);
 
         logger.debug("Updating Maven repository index started.");
         FlatSearchResponse response;
-        try (CloseableIndexingContext indexingContext = index("localMavenStore", new File(uri), new File("mvn_store_index"), true)) {
+        try {
+        	indexingContext = initIndexingContext("localMavenStore", new File(uri), new File("mvn_store_index"), true);
             Indexer indexer = indexingContext.getIndexer();
 
             BooleanQuery query = new BooleanQuery();
@@ -88,31 +86,32 @@ public class LocalRepositoryIndexer extends Task<Object> {
         }
         logger.debug("Updating Maven repository index finished.");
 
-        RepositorySystem repositorySystem = newRepositorySystem();
+        RepositorySystem repositorySystem = newRepositorySystem(); //Aether
         RepositorySystemSession session = newSession(repositorySystem, uri);
 
         logger.debug("Indexing artifacts (amount: {}).", response.getTotalHitsCount());
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
+        List<Artifact> artifacts = new ArrayList<Artifact>();
         for (ArtifactInfo ai : response.getResults()) {
             artifactRequest.setArtifact(new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version));
             ArtifactResult result;
             try {
+            	//TODO aether? need refactoring
                 result = repositorySystem.resolveArtifact(session, artifactRequest);
             } catch (ArtifactResolutionException e) {
                 logger.info("Artifact is not present in local repository: " + artifactRequest.toString());
+                System.out.println("Artifact error: "+artifactRequest.getArtifact().getGroupId()+"-"+artifactRequest.getArtifact().getArtifactId());
                 // TODO optionally download the artifact from a remote repository
                 continue;
             }
-            File artifact = result.getArtifact().getFile().getAbsoluteFile();
-
-            logger.trace("Indexing artifact {}", artifact);
-
-            metadataIndexerCallback.index(artifact);
+            
+            artifacts.add(result.getArtifact());
+                 
         }
 
         logger.info("Indexing local Maven repository finished: {}", uri);
-        return null;
+        return artifacts;
     }
 
 
@@ -135,7 +134,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
     }
 
 
-    private CloseableIndexingContext index(String name, File repository, File indexParentDir, boolean update)
+    private CloseableIndexingContext initIndexingContext (String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {
         logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
         if (repository == null || indexParentDir == null) {
@@ -172,7 +171,8 @@ public class LocalRepositoryIndexer extends Task<Object> {
 
         List<IndexCreator> indexers = new ArrayList<>();
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
-//        indexers.add(plexusContainer.lookup(IndexCreator.class, "jarContent")); // indexes classes
+        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype" ) );
+        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) );        
 
         logger.info("Creating indexing context of local maven store.");
 
@@ -195,7 +195,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
             throw new IOException("Cannot create temporary directory: " + tmpDir);
         }
 
-        logger.debug("Temporary dir '{}' created." + tmpDir);
+        logger.debug("Temporary dir '{}' created.", tmpDir);
 
         try {
             Scanner scanner = plexusContainer.lookup(Scanner.class);
@@ -208,7 +208,7 @@ public class LocalRepositoryIndexer extends Task<Object> {
 
             logger.debug("Creating temporary mvn store indexing context.");
 
-            try (@SuppressWarnings("deprecation")
+            try(@SuppressWarnings("deprecation")
 			CloseableIndexingContext tmpContext = new CloseableIndexingContext(
                     new DefaultIndexingContext(
                         indexingContext.getId() + "-tmp",
@@ -230,10 +230,16 @@ public class LocalRepositoryIndexer extends Task<Object> {
                         new DefaultScannerListener(tmpContext, indexerEngine, update, null),
                         null
                 );
-
+                
+                long start_time = System.nanoTime();          
+               
                 scanner.scan(scanningRequest);
-                tmpContext.updateTimestamp(true);
-
+                
+                long end_time = System.nanoTime();
+                double difference = (end_time - start_time)/1e6;
+                logger.debug("{} nanoseconds to index local maven repository", difference);
+                
+                tmpContext.updateTimestamp(true);      
                 logger.debug("Replacing contexts from temporary to origin.");
 
                 indexingContext.replace(tmpContext.getIndexDirectory());
@@ -259,5 +265,9 @@ public class LocalRepositoryIndexer extends Task<Object> {
 
         return new CloseableIndexingContext(indexingContext, indexer);
     }
+    
+    public IndexingContext getIndexingContext() {
+    	return indexingContext;		
+	}
 
 }

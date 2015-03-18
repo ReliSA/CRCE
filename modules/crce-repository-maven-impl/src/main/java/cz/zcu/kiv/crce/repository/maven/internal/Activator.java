@@ -69,6 +69,14 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .setImplementation(PriorityActionHandler.class)
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
+        
+        //maven Artifact Metadata Indexer
+        dm.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(MavenArtifactMetadataIndexer.class)
+                .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
+                );
+        
         logger.debug("Maven repository activator init method ended");
     }
 
