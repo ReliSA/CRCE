@@ -4,9 +4,12 @@ import java.io.File;
 
 /**
  *
- * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @author Miroslav Brozek
  */
 public interface MetadataIndexerCallback {
 
     void index(File file);
+    
+    void setIndexer(Object indexer);
+    
 }
