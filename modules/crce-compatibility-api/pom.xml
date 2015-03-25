@@ -30,13 +30,6 @@
             <type>pom</type>
         </dependency>
 
-        <!-- KIV dependencies -->
-
-        <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>types-cmp</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

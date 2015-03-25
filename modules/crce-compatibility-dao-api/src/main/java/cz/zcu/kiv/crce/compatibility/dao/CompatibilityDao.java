@@ -2,9 +2,8 @@ package cz.zcu.kiv.crce.compatibility.dao;
 
 import java.util.List;
 
-import cz.zcu.kiv.typescmp.Difference;
-
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**

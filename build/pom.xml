@@ -364,77 +364,7 @@
             </dependency>
 
             <!-- JaCC / OBCC / EFPs -->
-            <dependency>
-                <groupId>cz.zcu.kiv.jacc</groupId>
-                <artifactId>types-cmp</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.jacc</groupId>
-                <artifactId>javatypes</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.jacc</groupId>
-                <artifactId>javatypes-cmp</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.jacc</groupId>
-                <artifactId>javatypes-loader</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.obcc</groupId>
-                <artifactId>bundle-types</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.obcc</groupId>
-                <artifactId>bundle-loader</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.obcc</groupId>
-                <artifactId>bundle-cmp</artifactId>
-                <version>1.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>cz.zcu.kiv.osgi</groupId>
-                <artifactId>version-generator</artifactId>
-                <version>1.0.1-SNAPSHOT</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+
 
             <dependency>
                 <groupId>log4j</groupId>
