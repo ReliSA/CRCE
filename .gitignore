@@ -38,3 +38,7 @@ local.properties
 
 # sbteclipse plugin 
 .target
+
+### IDEA ###
+.idea/
+*.iml
