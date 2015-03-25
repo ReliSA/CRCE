@@ -187,6 +187,9 @@ public class ResourceServlet extends HttpServlet {
                 return true;
 
             case "compatibility":
+                if(!Activator.instance().isCompatibilityServicePresent()) {
+                    return false;
+                }
                 String name = req.getParameter("name");
                 String version = req.getParameter("version");
 

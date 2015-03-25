@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.blueprint.container.ServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,15 @@ public final class Activator extends DependencyActivatorBase {
     }
 
     public CompatibilitySearchService getCompatibilityService() {
-        return compatibilityService;
+        if(compatibilityService != null) {
+            return compatibilityService;
+        } else {
+            throw new ServiceUnavailableException("This installation does not support compatibility services!", "");
+        }
+    }
+
+    public boolean isCompatibilityServicePresent() {
+        return compatibilityService != null;
     }
 
     public Buffer getBuffer(HttpServletRequest req) {

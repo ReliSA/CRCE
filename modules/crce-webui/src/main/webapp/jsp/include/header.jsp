@@ -65,7 +65,9 @@
             <li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
             <li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
             <li><a <c:if test="${param.tags}"> class="aktivni"</c:if> href="resource?link=tags">Tags</a></li>
-            <li><a <c:if test="${param.compatibility}"> class="aktivni"</c:if> href="resource?link=compatibility">Compatibility</a>
+            <c:if test="${param.hasCompatInfo}">
+                <li><a <c:if test="${param.compatibility}"> class="aktivni"</c:if> href="resource?link=compatibility">Compatibility</a>
+            </c:if>
             </li>
         </ul>
         <div class="vyhledavani_h">
