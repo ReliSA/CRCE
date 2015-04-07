@@ -63,8 +63,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext indexingContext;
-
-
+    
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
         this.uri = uri;
@@ -102,21 +101,18 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
             ArtifactResult result;
             try {
                 result = repositorySystem.resolveArtifact(session, artifactRequest);
+                metadataIndexerCallback.index(result, this);
             } catch (ArtifactResolutionException e) {
                 logger.info("Artifact is not present in local repository: " + artifactRequest.toString());
                 // TODO optionally download the artifact from a remote repository
                 continue;
-            }
-            File artifact = result.getArtifact().getFile().getAbsoluteFile();
-
-            logger.debug("Indexing artifact {}", artifact);
-
-            metadataIndexerCallback.index(artifact);
+            }           
+            
         }
 
         logger.info("Indexing local Maven repository finished: {}", uri);
         
-        metadataIndexerCallback.setIndexer(this);
+        
         return null;
     }
 
@@ -178,8 +174,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         List<IndexCreator> indexers = new ArrayList<>();
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
         indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype" ) );
-        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) ); 
-//        
+        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) );       
 
         logger.info("Creating indexing context of local maven store.");
 

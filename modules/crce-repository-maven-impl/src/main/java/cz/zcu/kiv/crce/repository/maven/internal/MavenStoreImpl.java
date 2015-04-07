@@ -20,7 +20,6 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
-import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
@@ -32,7 +31,10 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
  */
 public class MavenStoreImpl implements Store {
 
-    private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
+    
+
+
+	private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
 
 	private volatile RepositoryDAO repositoryDAO;
 	private volatile ResourceDAO resourceDAO;
@@ -70,8 +72,9 @@ public class MavenStoreImpl implements Store {
     }
 
     @Override
-    public boolean remove(Resource resource) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public boolean remove(Resource resource) throws IOException 
+    {
+    	throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -129,49 +132,9 @@ public class MavenStoreImpl implements Store {
     /**
      * Main method for start indexing local maven repository
      */    
-    private void index() {
-        taskRunnerService.scheduleTask(new LocalMavenRepositoryIndexer(baseUri, new MetadataIndexerCallback() {
+	private void index() {
+		taskRunnerService.scheduleTask(new LocalMavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
+				resourceIndexerService, metadataService, metadataValidator, identityIndexer, repositoryIndexer, repository)));
+	}
 
-            @Override
-            public void index(File file) {
-                try {
-                    if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
-                        Resource resource;
-                        try {
-                            resource = resourceIndexerService.indexResource(file);
-                        } catch (IOException e) {
-                            logger.error("Could not index file {}", file, e);
-                            return;
-                        }
-                        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
-
-                        identityIndexer.preIndex(file, file.getName(), resource);
-                        identityIndexer.postIndex(file, resource);
-
-                        ResourceValidationResult validationResult = metadataValidator.validate(resource);
-                        if (!validationResult.isContextValid()) {
-                            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
-                            return;
-                        }
-                        logger.info("Indexed resource {} is valid.", resource.getId());
-
-                        try {
-                            resourceDAO.saveResource(resource);
-                        } catch (IOException e) {
-                            logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
-                        }
-                    }
-                } catch (IOException e) {
-                    logger.error("Could not check that resource exists: {}", file, e);
-                }
-            }
-
-			@Override
-			public void setIndexer(Object indexer) {
-				repositoryIndexer = (LocalMavenRepositoryIndexer)indexer;
-				logger.debug("Maven Repository Indexer created: {}",repositoryIndexer.getClass() );
-			}
-        }));     
-   
-    }
 }

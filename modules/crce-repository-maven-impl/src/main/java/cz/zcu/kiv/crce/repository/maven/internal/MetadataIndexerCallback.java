@@ -1,15 +1,15 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
-import java.io.File;
+import org.eclipse.aether.resolution.ArtifactResult;
+
+
 
 /**
  *
  * @author Miroslav Brozek
  */
-public interface MetadataIndexerCallback {
-
-    void index(File file);
+public interface MetadataIndexerCallback {    
     
-    void setIndexer(Object indexer);
+    void index(ArtifactResult result, LocalMavenRepositoryIndexer caller);   
     
 }

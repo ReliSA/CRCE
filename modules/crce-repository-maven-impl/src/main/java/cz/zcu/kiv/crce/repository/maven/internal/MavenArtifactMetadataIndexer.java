@@ -7,6 +7,8 @@ import java.util.List;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 
+
+
 public class MavenArtifactMetadataIndexer extends AbstractResourceIndexer {
 
 	@Override
