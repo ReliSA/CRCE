@@ -23,6 +23,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     private volatile MetadataService metadataService;
     private volatile MetadataValidator metadataValidator;
     private volatile IdentityIndexer identityIndexer;    
+    private MavenArtifactMetadataIndexer mami;
     
     Logger logger;    
     private Repository repository;
@@ -31,13 +32,14 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 	public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
 			MetadataService metadataService, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
 			LocalMavenRepositoryIndexer repositoryIndexer, Repository repository) {
-		super();
 		this.resourceDAO = resourceDAO;
 		this.resourceIndexerService = resourceIndexerService;
 		this.metadataService = metadataService;
 		this.metadataValidator = metadataValidator;
 		this.identityIndexer = identityIndexer;		
 		this.logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
+		this.repository = repository;
+		this.mami = new MavenArtifactMetadataIndexer();
 	}	
 
 	private void postProcessing(File file, Resource resource) {
@@ -93,8 +95,8 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		}
 	}
 
-	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, ArtifactResult result) {
-		logger.debug("Mira to zatim neumi");
+	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, ArtifactResult result) {		
+		mami.setMavenArtifactMetadata(caller, result, resource);
 
 	} 		
 	

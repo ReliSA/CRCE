@@ -59,16 +59,16 @@
 		<!--<module>crce-efp-assignment</module> -->
 
 		<!-- UI & Optional Plugins -->
-		<module>crce-handler-versioning</module>
+		<!-- <module>crce-handler-versioning</module> -->
 		<module>crce-handler-metrics</module>
 		<module>crce-webui</module>
 
 		<module>crce-rest</module>
 
 		<module>crce-compatibility-api</module>
-		<module>crce-compatibility-impl</module>
+		<!-- <module>crce-compatibility-impl</module> -->
 		<module>crce-compatibility-dao-api</module>
-		<module>crce-compatibility-dao-mongodb</module>
+		<!-- <module>crce-compatibility-dao-mongodb</module> -->
 		<module>crce-concurrency</module>
 		<module>crce-repository-maven-impl</module>
 	</modules>

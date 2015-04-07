@@ -267,11 +267,5 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
         return new CloseableIndexingContext(indexingContext, indexer);
     }
-    
-    public IndexingContext getIndexingContext() {
-    	return indexingContext;		
-	}
-
-
 
 }
