@@ -3,10 +3,11 @@ package cz.zcu.kiv.crce.repository.maven.internal;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -14,10 +15,14 @@ import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactMetadataIndexer;
 
+/**
+* Implementation class of MetadataaIndexerCallback interface
+* @author Miroslav Brožek
+*/
 public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
-	
-	
+		
 	private volatile ResourceDAO resourceDAO;	
     private volatile ResourceIndexerService resourceIndexerService;    
     private volatile MetadataService metadataService;
@@ -30,7 +35,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     
     
 	public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
-			MetadataService metadataService, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
+			MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
 			LocalMavenRepositoryIndexer repositoryIndexer, Repository repository) {
 		this.resourceDAO = resourceDAO;
 		this.resourceIndexerService = resourceIndexerService;
@@ -39,7 +44,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		this.identityIndexer = identityIndexer;		
 		this.logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
 		this.repository = repository;
-		this.mami = new MavenArtifactMetadataIndexer();
+		this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
 	}	
 
 	private void postProcessing(File file, Resource resource) {
@@ -70,8 +75,8 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 	}	
 
 	@Override
-	public void index(ArtifactResult result, LocalMavenRepositoryIndexer caller) {
-		File file = result.getArtifact().getFile().getAbsoluteFile();
+	public void index(Artifact artifact, LocalMavenRepositoryIndexer caller) {
+		File file = artifact.getFile().getAbsoluteFile();
 		try {
 
 			logger.debug("Indexing artifact {}", file);
@@ -81,7 +86,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 
 				resource = resourceIndexerService.indexResource(file);
 
-				updateResourceMetadataFromAether(resource, caller, result);
+				updateResourceMetadataFromAether(resource, caller, artifact);
 
 				postProcessing(file, resource);
 
@@ -95,8 +100,8 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		}
 	}
 
-	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, ArtifactResult result) {		
-		mami.setMavenArtifactMetadata(caller, result, resource);
+	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, Artifact artifact) {		
+		mami.setMavenArtifactMetadata(caller, artifact, resource);
 
 	} 		
 	

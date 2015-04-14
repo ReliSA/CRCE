@@ -101,7 +101,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
             ArtifactResult result;
             try {
                 result = repositorySystem.resolveArtifact(session, artifactRequest);
-                metadataIndexerCallback.index(result, this);
+                metadataIndexerCallback.index(result.getArtifact(), this);
             } catch (ArtifactResolutionException e) {
                 logger.info("Artifact is not present in local repository: " + artifactRequest.toString());
                 // TODO optionally download the artifact from a remote repository

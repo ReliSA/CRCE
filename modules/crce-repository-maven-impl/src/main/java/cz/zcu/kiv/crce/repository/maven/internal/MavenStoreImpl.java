@@ -31,9 +31,6 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
  */
 public class MavenStoreImpl implements Store {
 
-    
-
-
 	private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
 
 	private volatile RepositoryDAO repositoryDAO;
@@ -134,7 +131,7 @@ public class MavenStoreImpl implements Store {
      */    
 	private void index() {
 		taskRunnerService.scheduleTask(new LocalMavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
-				resourceIndexerService, metadataService, metadataValidator, identityIndexer, repositoryIndexer, repository)));
+				resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repositoryIndexer, repository)));
 	}
 
 }
