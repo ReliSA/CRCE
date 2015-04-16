@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -54,6 +53,9 @@ public class MavenArtifactMetadataIndexer {
 	public static final AttributeType<String> ATTRIBUTE__PACKAGING = new SimpleAttributeType<>("packaging", String.class);
 	public static final AttributeType<String> ATTRIBUTE__CLASSIFIER = new SimpleAttributeType<>("classifier", String.class);
 	public static final AttributeType<String> ATTRIBUTE__EXTENSION = new SimpleAttributeType<>("extension", String.class);
+	
+	public static final String DEPENDENCY_SCOPE = "scope";
+	public static final String DEPENDENCY_OPTIONAL = "optional";
 
 	public MavenArtifactMetadataIndexer(MetadataService metadataService, MetadataFactory metadaFactory) {
 		this.metadataService = metadataService;
@@ -77,8 +79,8 @@ public class MavenArtifactMetadataIndexer {
 	private void addArtifactCapability(Artifact a, Resource resource) throws Exception {
 		Capability cap = metadataFactory.createCapability(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 		cap.setAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
-		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());
-		cap.setAttribute(ATTRIBUTE__VERSION, convertVersion(new DefaultArtifactVersion(a.getBaseVersion())));	
+		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());		
+		cap.setAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(a.getBaseVersion())));	
 				
 		//empty string make no sense to store				
 		if(!(a.getClassifier().equals(""))){
@@ -123,18 +125,20 @@ public class MavenArtifactMetadataIndexer {
 
         CollectResult collectResult = system.collectDependencies( session, collectRequest );   
         
-        //solving inherited depencies
+        //solving children dependencies
         createReqHierarchy(collectResult.getRoot().getChildren(), resource);
         logger.debug(artifact.toString() + " - Dependencies search finished");
 	}
 
+	/**
+	 * Adding Dependency info to Resource requirements
+	 * @param list of Node Dependencies
+	 * @param resource is Artifact Node
+	 */
 	private void createReqHierarchy(List<DependencyNode> list, Resource resource) {
 		for (DependencyNode dn : list) {
-			Artifact a = dn.getArtifact();
 			Requirement requirement = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
-			requirement.addAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
-			requirement.addAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());	
-			requirement.addAttribute(ATTRIBUTE__VERSION, convertVersion(new DefaultArtifactVersion(a.getBaseVersion())));
+			createDependencyRequirement(dn, requirement);
 			
 			//any existing children dependcies?
 			Iterator<DependencyNode> it = dn.getChildren().iterator(); 					
@@ -145,23 +149,27 @@ public class MavenArtifactMetadataIndexer {
 			resource.addRequirement(requirement);
 		}		
 	}
-
-	private void solveChildren(DependencyNode dn, Requirement requirement) {
+	
+	
+	private void createDependencyRequirement(DependencyNode dn, Requirement requirement) {
 		Artifact a = dn.getArtifact();
-		Requirement child = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
-		child.addAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
-		child.addAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());
-		
-		DefaultArtifactVersion v = new DefaultArtifactVersion(a.getBaseVersion());
-		
-		if (v.getQualifier() != null) {
-			if (v.getQualifier().contains("1.1.3.1") || v.getQualifier().contains("1.2_Java1.3")) {
-				System.out.println("STOP, check debug");
-
-			}
+		requirement.addAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
+		requirement.addAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());	
+		requirement.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(a.getBaseVersion())));
+					
+		String scope = dn.getDependency().getScope();
+		if(scope != null && !scope.isEmpty() && !scope.equals("compile")){
+			requirement.setDirective(DEPENDENCY_SCOPE, scope);				
 		}
 		
-		child.addAttribute(ATTRIBUTE__VERSION, convertVersion(new DefaultArtifactVersion(a.getBaseVersion())));
+		if( dn.getDependency().getOptional() ){
+			requirement.setDirective(DEPENDENCY_OPTIONAL, dn.getDependency().getOptional().toString());
+		}
+	}
+
+	private void solveChildren(DependencyNode dn, Requirement requirement) {
+		Requirement child = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
+		createDependencyRequirement(dn,child);
 		
 		requirement.addChild(child);
 		child.setParent(requirement);
@@ -172,10 +180,14 @@ public class MavenArtifactMetadataIndexer {
 		}		
 	}	
 	
-	private Version convertVersion(DefaultArtifactVersion v) {
-		// to prevent faling validation because of short version or qualifier
 	
-
+	/**
+	 * Prevent failing validation because of 
+	 * short version format or strange qualifier
+	 * @param v handled version from Artifact
+	 * @return new format of Version.class
+	 */
+	private Version convertVersion(MavenArtifactVersion v) {
 		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier());
 	}
 

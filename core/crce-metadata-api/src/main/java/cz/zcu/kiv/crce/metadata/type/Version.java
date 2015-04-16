@@ -49,6 +49,7 @@ public class Version implements Comparable<Version> {
 	private final String		qualifier;
 	private static final String	SEPARATOR		= ".";
 	private transient String	versionString;
+	private boolean mavenArtifact = false;
 
 	/**
 	 * The empty version "0.0.0".
@@ -93,6 +94,23 @@ public class Version implements Comparable<Version> {
 		this.micro = micro;
 		this.qualifier = qualifier;
 		versionString = null;
+		validate();
+	}
+	
+	/*
+	 * Constructor for Maven Artifact version
+	 */
+	public Version(int major, int minor, int micro, String qualifier, boolean mavenArtifact) {
+		if (qualifier == null) {
+			qualifier = "";
+		}
+
+		this.major = major;
+		this.minor = minor;
+		this.micro = micro;
+		this.qualifier = qualifier;
+		versionString = null;
+		this.mavenArtifact = mavenArtifact;
 		validate();
 	}
 
@@ -188,9 +206,13 @@ public class Version implements Comparable<Version> {
 			if ('0' <= ch && ch <= '9') {
 				continue;
 			}
-			if (ch == '_' || ch == '-') {
+			if (ch == '_' || ch == '-') {				
 				continue;
 			}
+			if (mavenArtifact && (ch == '_' || ch == '-' || ch == '.')) {
+				continue;
+			}
+			
 			throw new IllegalArgumentException("invalid qualifier: "
 					+ qualifier);
 		}
@@ -375,4 +397,15 @@ public class Version implements Comparable<Version> {
 
 		return qualifier.compareTo(other != null ? other.qualifier : "");
 	}
+
+	public boolean isMavenArtifact() {
+		return mavenArtifact;
+	}
+
+	public void setMavenArtifact(boolean mavenArtifact) {
+		this.mavenArtifact = mavenArtifact;
+	}
+    
+
+
 }
