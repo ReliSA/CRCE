@@ -23,4 +23,5 @@ Embed-Dependency:\
   maven-aether-provider,\
   maven-model,\
   maven-model-builder,\
-  maven-repository-metadata
+  maven-repository-metadata,\
+  maven-artifact

@@ -1,6 +1,8 @@
-package cz.zcu.kiv.crce.repository.maven.internal;
+package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
 import org.eclipse.aether.artifact.Artifact;
+
+import cz.zcu.kiv.crce.repository.maven.internal.LocalMavenRepositoryIndexer;
 
 /**
  * 

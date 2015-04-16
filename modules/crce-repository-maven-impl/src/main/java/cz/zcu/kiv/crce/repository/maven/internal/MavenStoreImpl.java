@@ -22,6 +22,7 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallbackImpl;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 

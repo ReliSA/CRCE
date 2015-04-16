@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.maven.internal;
+package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,8 @@ import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
-import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactMetadataIndexer;
+import cz.zcu.kiv.crce.repository.maven.internal.IdentityIndexer;
+import cz.zcu.kiv.crce.repository.maven.internal.LocalMavenRepositoryIndexer;
 
 /**
 * Implementation class of MetadataaIndexerCallback interface
@@ -47,10 +48,13 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
 	}	
 
-	private void postProcessing(File file, Resource resource) {
+	private void postProcessing(File file, Resource resource, Artifact artifact, LocalMavenRepositoryIndexer caller) {
 		metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
 		identityIndexer.preIndex(file, file.getName(), resource);
+		
+		updateResourceMetadataFromAether(resource, caller, artifact);
+		
 		identityIndexer.postIndex(file, resource);
 	}
 
@@ -84,11 +88,9 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 			if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
 				Resource resource;
 
-				resource = resourceIndexerService.indexResource(file);
+				resource = resourceIndexerService.indexResource(file);				
 
-				updateResourceMetadataFromAether(resource, caller, artifact);
-
-				postProcessing(file, resource);
+				postProcessing(file, resource, artifact, caller);
 
 				validate(resource);
 

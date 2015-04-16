@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
  *
