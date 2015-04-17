@@ -40,8 +40,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     public static final String PID = "cz.zcu.kiv.crce.repository.maven";
 
-    public static final String STORE_URI = "maven.store.uri";
-
     private final Map<String, Component> components = new HashMap<>();
 
     private volatile DependencyManager dependencyManager; /* injected by dependency manager */
@@ -88,33 +86,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             logger.warn("Repository ({}) configuration is empty!", pid);
             return;
         }
-
-        String path = (String) properties.get(STORE_URI);
         
-        if(path==null){
-        	logger.debug("Check configuration file!!, paramater ({}) is empty or no such parameter is defined", STORE_URI);
-        	return;
-        }
-
-        URI uri = null;
-        File file = null;
-        try {
-            uri = new URI(path);
-            if (uri.getScheme() == null) {
-                file = new File(path);
-                uri = file.toURI();
-            } else if ("file".equals(uri.getScheme())) {
-                file = new File(uri);
-            } else {
-                throw new ConfigurationException(STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
-            }
-        } catch (URISyntaxException ex) {
-            // TODO verify this usecase and correctness
-            file = new File(path);
-            uri = file.toURI();
-        }
-
-        logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
+        MavenStoreConfig.initConfig(properties);
+        
+        URI uri = getRepositoryURI();
 
         Component mavenStore;
 		try {
@@ -133,7 +108,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 			            .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
 			            .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class));
 		} catch (IOException e) {
-			 throw new ConfigurationException(STORE_URI, "Can not create maven store on given base directory: " + uri, e);
+			 throw new ConfigurationException(PID, "Can not create maven store on given base directory: " + uri, e);
 		}
 
         logger.debug("Registering Repository Maven Store: {}", mavenStore);
@@ -142,7 +117,50 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dependencyManager.add(mavenStore);
     }
 
-    @Override
+	private URI getRepositoryURI() throws ConfigurationException {
+		URI uri;
+		File file;
+		
+		if (MavenStoreConfig.isUseLocalRepo()) {
+			String path = MavenStoreConfig.getLocalRepoURI();
+			try {
+				uri = new URI(path);
+				if (uri.getScheme() == null) {
+					file = new File(path);
+					uri = file.toURI();
+				} else if ("file".equals(uri.getScheme())) {
+					file = new File(uri);
+				} else {
+					throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
+				}
+			} catch (URISyntaxException ex) {
+				// TODO verify this usecase and correctness
+				file = new File(path);
+				uri = file.toURI();
+			}
+			
+			logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
+
+		}
+		
+		else{
+			try {
+				uri = new URI (MavenStoreConfig.REMOTE_MAVEN_STORE_URI);
+				
+				//TODO: Handle remote repository
+				
+				
+			} catch (URISyntaxException e) {
+				logger.debug("Wrong Remote Repository URI >>> Switch to Local repository", e);
+				file = new File(MavenStoreConfig.getLocalRepoURI());
+				uri = file.toURI();
+			}
+	
+		}
+		return uri;
+	}
+
+	@Override
     public void deleted(String pid) {
         dependencyManager.remove(components.remove(pid));
     }

@@ -123,7 +123,7 @@ public class MavenArtifactMetadataIndexer {
         collectRequest.setManagedDependencies( descriptorResult.getManagedDependencies() );
         collectRequest.setRepositories( descriptorRequest.getRepositories() );
 
-        CollectResult collectResult = system.collectDependencies( session, collectRequest );   
+        CollectResult collectResult = system.collectDependencies( session, collectRequest );
         
         //solving children dependencies
         createReqHierarchy(collectResult.getRoot().getChildren(), resource);
@@ -188,7 +188,7 @@ public class MavenArtifactMetadataIndexer {
 	 * @return new format of Version.class
 	 */
 	private Version convertVersion(MavenArtifactVersion v) {
-		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier());
+		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier(),true);
 	}
 
 }
