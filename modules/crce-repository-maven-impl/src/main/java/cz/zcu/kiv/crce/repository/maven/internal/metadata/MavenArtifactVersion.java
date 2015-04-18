@@ -25,12 +25,20 @@ public class MavenArtifactVersion {
 	public final void parseVersion(String version) {
 
 		int index = version.indexOf("-");
+		int index2 = version.indexOf("_");
 
 		String part1;
 		String part2 = null;
 
 		if (index < 0) {
-			part1 = version;
+			if(index2<0){
+				part1 = version;				
+			}
+			else{
+				index = index2;
+				part1 = version.substring(0, index);
+				part2 = version.substring(index + 1);
+			}
 		} else {
 			part1 = version.substring(0, index);
 			part2 = version.substring(index + 1);

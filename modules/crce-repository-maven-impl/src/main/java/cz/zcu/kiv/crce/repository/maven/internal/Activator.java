@@ -89,7 +89,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         MavenStoreConfig.initConfig(properties);
         
-        URI uri = getRepositoryURI();
+        URI uri = getDefaultStoreURI();
 
         Component mavenStore;
 		try {
@@ -117,11 +117,11 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dependencyManager.add(mavenStore);
     }
 
-	private URI getRepositoryURI() throws ConfigurationException {
+	private URI getDefaultStoreURI() throws ConfigurationException {
 		URI uri;
 		File file;
 		
-		if (MavenStoreConfig.isUseLocalRepo()) {
+		if (!MavenStoreConfig.isRemoteRepoDefault()) {
 			String path = MavenStoreConfig.getLocalRepoURI();
 			try {
 				uri = new URI(path);

@@ -16,14 +16,14 @@ public class MavenStoreConfig {
 	
 	public static final String LOCAL_MAVEN_STORE_URI = "local.maven.store.uri";
 	public static final String REMOTE_MAVEN_STORE_URI = "remote.maven.store.uri";
-	public static final String USE_LOCAL_REPO = "use.local.maven.store";
+	public static final String REMOTE_STORE_DEFAULT = "use.remote.maven.store.default";
 	public static final String DEPENDENCY_HIERARCHY = "aether.find.dependency.hierarchy";
 	public static final String RESOLVE_DEPENDENCIES = "aether.resolve.dependencies";
 	
 		
 	private static String localRepoURI = "mvn_store";
 	private static String remoteRepoURI = "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public";
-	private static boolean useLocalRepo = true;
+	private static boolean remoteRepoDefault = false;
 	private static boolean dependencyHierarchy = false;
 	private static boolean resolveDependencies = false;	
 
@@ -34,7 +34,7 @@ public class MavenStoreConfig {
 		
 		
 		try {
-			setUseLocalRepo(toBoolean(properties.get(USE_LOCAL_REPO).toString()));
+			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
 			setResolveDependencies(toBoolean(properties.get(RESOLVE_DEPENDENCIES).toString()));
 			
@@ -77,15 +77,15 @@ public class MavenStoreConfig {
 	public static void setRemoteRepoURI(String remoteRepoURI) {
 		MavenStoreConfig.remoteRepoURI = remoteRepoURI;
 	}
+	
 
-
-	public static boolean isUseLocalRepo() {
-		return useLocalRepo;
+	public static boolean isRemoteRepoDefault() {
+		return remoteRepoDefault;
 	}
 
 
-	public static void setUseLocalRepo(boolean useLocalRepo) {
-		MavenStoreConfig.useLocalRepo = useLocalRepo;
+	public static void setRemoteRepoDefault(boolean remoteRepoDefault) {
+		MavenStoreConfig.remoteRepoDefault = remoteRepoDefault;
 	}
 
 

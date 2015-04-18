@@ -16,6 +16,8 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
+import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
+
 
 /**
 * Factory for creating repositories
@@ -48,7 +50,7 @@ public class RepositoryFactory {
 	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
-		LocalRepository localRepo = new LocalRepository("mvn_store");
+		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoURI());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
 		// uncomment to generate dirty trees
