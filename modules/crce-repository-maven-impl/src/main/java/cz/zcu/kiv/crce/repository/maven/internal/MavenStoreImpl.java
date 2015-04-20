@@ -48,20 +48,27 @@ public class MavenStoreImpl implements Store {
     private Repository repository;
     private final URI baseUri;
 
-    MavenStoreImpl(URI baseUri) throws IOException {
+    MavenStoreImpl(URI baseUri, boolean remoteRepository) throws IOException {
         this.baseUri = baseUri;
-        File mvnStorePath = new File(baseUri);
-       
-        if (!mvnStorePath.exists()) {
-            if (!mvnStorePath.mkdirs()) {
-                logger.error("Could not create maven store directory {}", mvnStorePath);
-            }
-        } else if (!mvnStorePath.isDirectory()) {
-            throw new IOException("Base directory is not a directory: " + mvnStorePath);
-        }
-        if (!mvnStorePath.exists()) {
-            throw new IllegalStateException("Base direcotory could be not created: " + mvnStorePath, new IOException("Can not create directory"));
-        }
+        
+		if (remoteRepository) {
+			logger.debug("URI {} for Remote Maven repository set", baseUri);
+		}
+		else{
+			File mvnStorePath = new File(baseUri);
+			
+			if (!mvnStorePath.exists()) {
+				if (!mvnStorePath.mkdirs()) {
+					logger.error("Could not create maven store directory {}", mvnStorePath);
+				}
+			} else if (!mvnStorePath.isDirectory()) {
+				throw new IOException("Base directory is not a directory: " + mvnStorePath);
+			}
+			if (!mvnStorePath.exists()) {
+				throw new IllegalStateException("Base direcotory could be not created: " + mvnStorePath, new IOException(
+						"Can not create directory"));
+			}			
+		}
     }
 
     @Override

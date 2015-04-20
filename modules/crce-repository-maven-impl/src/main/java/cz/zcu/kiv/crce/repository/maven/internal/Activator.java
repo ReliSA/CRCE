@@ -89,13 +89,13 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         MavenStoreConfig.initConfig(properties);
         
-        URI uri = getDefaultStoreURI();
+        URI uri = getDefaultStoreURI(properties);
 
         Component mavenStore;
 		try {
 			mavenStore = createComponent()
 			        .setInterface(Store.class.getName(), null)
-			        .setImplementation(new MavenStoreImpl(uri))
+			        .setImplementation(new MavenStoreImpl(uri, MavenStoreConfig.isRemoteRepoDefault()))
 			        .add(dependencyManager.createConfigurationDependency().setPid(pid))
 			            .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
 			            .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
@@ -117,46 +117,45 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dependencyManager.add(mavenStore);
     }
 
-	private URI getDefaultStoreURI() throws ConfigurationException {
+	private URI getDefaultStoreURI(Dictionary<String, ?> properties) throws ConfigurationException {
 		URI uri;
 		File file;
-		
+		String path;
+
 		if (!MavenStoreConfig.isRemoteRepoDefault()) {
-			String path = MavenStoreConfig.getLocalRepoURI();
+			path = MavenStoreConfig.getLocalRepoURI();
+			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.LOCAL_STORE_NAME).toString());
+		} else {
+			path = MavenStoreConfig.getRemoteRepoURI();
+			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.REMOTE_STORE_NAME).toString());
 			try {
 				uri = new URI(path);
-				if (uri.getScheme() == null) {
-					file = new File(path);
-					uri = file.toURI();
-				} else if ("file".equals(uri.getScheme())) {
-					file = new File(uri);
-				} else {
-					throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "No Store implementation for given URI scheme: " + uri.getScheme());
-				}
-			} catch (URISyntaxException ex) {
-				// TODO verify this usecase and correctness
+				return uri;
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				logger.error("Wrong URI {} , check configuration file!", path, e);
+			}
+		}
+
+		try {
+			uri = new URI(path);
+			if (uri.getScheme() == null) {
 				file = new File(path);
 				uri = file.toURI();
+			} else if ("file".equals(uri.getScheme())) {
+				file = new File(uri);
+			} else {
+				throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "No Store implementation for given URI scheme: "
+						+ uri.getScheme());
 			}
-			
-			logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
+		} catch (URISyntaxException ex) {
+			// TODO verify this usecase and correctness
+			file = new File(path);
+			uri = file.toURI();
+		}
 
-		}
-		
-		else{
-			try {
-				uri = new URI (MavenStoreConfig.REMOTE_MAVEN_STORE_URI);
-				
-				//TODO: Handle remote repository
-				
-				
-			} catch (URISyntaxException e) {
-				logger.debug("Wrong Remote Repository URI >>> Switch to Local repository", e);
-				file = new File(MavenStoreConfig.getLocalRepoURI());
-				uri = file.toURI();
-			}
-	
-		}
+		logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
+
 		return uri;
 	}
 

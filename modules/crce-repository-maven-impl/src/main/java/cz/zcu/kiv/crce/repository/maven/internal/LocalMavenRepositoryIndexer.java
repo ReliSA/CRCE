@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.lucene.search.BooleanClause;
@@ -23,34 +24,36 @@ import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.expr.SourcedSearchExpression;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.index.updater.IndexUpdateRequest;
+import org.apache.maven.index.updater.IndexUpdateResult;
+import org.apache.maven.index.updater.IndexUpdater;
+import org.apache.maven.index.updater.ResourceFetcher;
+import org.apache.maven.index.updater.WagonHelper;
+import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.events.TransferEvent;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
+import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
@@ -63,7 +66,8 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
-    private CloseableIndexingContext indexingContext;
+    private CloseableIndexingContext closeableIndexingContext;
+    private static final String INDEXING_CONTEXT = "mvn_store_index";
     
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
@@ -78,23 +82,30 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         logger.debug("Updating Maven repository index started.");
         FlatSearchResponse response;
         try {
-        	indexingContext = initIndexingContext("localMavenStore", new File(uri), new File("mvn_store_index"), true);
-            Indexer indexer = indexingContext.getIndexer();
+        	if(!MavenStoreConfig.isRemoteRepoDefault()){
+        		closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(INDEXING_CONTEXT), true);        		
+        	}
+        	
+        	else{
+        		closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(INDEXING_CONTEXT), true);
+        	}
+        	
+            Indexer indexer = closeableIndexingContext.getIndexer();
 
             BooleanQuery query = new BooleanQuery();
             query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
 
-            response = indexer.searchFlat(new FlatSearchRequest(query, indexingContext));
+            response = indexer.searchFlat(new FlatSearchRequest(query, closeableIndexingContext));
         } catch (Exception e) {
             logger.error("Error updating Maven repository index.", e);
             return null;
         }
         logger.debug("Updating Maven repository index finished.");
-
-        RepositorySystem repositorySystem = newRepositorySystem(); //Aether
-        RepositorySystemSession session = newSession(repositorySystem, uri);
-
         logger.debug("Indexing artifacts (amount: {}).", response.getTotalHitsCount());
+
+        RepositorySystem repositorySystem = RepositoryFactory.newRepositorySystem(); //Aether
+        //localRepo must be defined even indexing remote repository
+        RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(repositorySystem);
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
         for (ArtifactInfo ai : response.getResults()) {
@@ -116,28 +127,9 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         
         return null;
     }
+ 
 
-
-    private static RepositorySystem newRepositorySystem() {
-        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        locator.addService(TransporterFactory.class, FileTransporterFactory.class);
-        locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
-
-        return locator.getService(RepositorySystem.class);
-    }
-
-    private static RepositorySystemSession newSession(RepositorySystem system, URI uri) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-        LocalRepository localRepo = new LocalRepository(new File(uri));
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
-        return session;
-    }
-
-
-    private CloseableIndexingContext initIndexingContext(String name, File repository, File indexParentDir, boolean update)
+	private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {
         logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
         if (repository == null || indexParentDir == null) {
@@ -158,13 +150,13 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         PlexusContainer plexusContainer;
         Indexer indexer;
         try {
-            ContainerConfiguration configuration = new DefaultContainerConfiguration();
+            ContainerConfiguration config = new DefaultContainerConfiguration();
             
             ClassWorld world = new ClassWorld();
             ClassRealm classRealm = new ClassRealm(world, "crce-maven-repo-indexer", getClass().getClassLoader());
-            configuration.setRealm(classRealm);
+            config.setRealm(classRealm);
 
-            plexusContainer = new DefaultPlexusContainer(configuration);
+            plexusContainer = new DefaultPlexusContainer(config);
             indexer = plexusContainer.lookup(Indexer.class);
 //            final IndexUpdater indexUpdater = plexusContainer.lookup(IndexUpdater.class);
         } catch (Exception e) {
@@ -268,5 +260,141 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
         return new CloseableIndexingContext(indexingContext, indexer);
     }
+	
+	
+	private CloseableIndexingContext createRemoteRepositoryIndexingContext(String storeName, URI uri, File indexParentDir, boolean update)
+			throws IOException, PlexusContainerException, ComponentLookupException {
+		if (!indexParentDir.exists() && !indexParentDir.mkdirs()) {
+			throw new IOException("Cannot create parent directory for indices: " + indexParentDir);
+		}
 
+		logger.debug("Initializing Plexus container.");
+
+		PlexusContainer plexusContainer;
+		Indexer indexer;
+		IndexUpdater indexUpdater;
+		IndexingContext indexingContext;
+		Wagon httpWagon;
+
+		try {
+			DefaultContainerConfiguration config = new DefaultContainerConfiguration();
+			config.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+			plexusContainer = new DefaultPlexusContainer(config);
+
+			ClassWorld world = new ClassWorld();
+			ClassRealm classRealm = new ClassRealm(world, "crce-maven-repo-indexer", getClass().getClassLoader());
+			config.setRealm(classRealm);
+
+			plexusContainer = new DefaultPlexusContainer(config);
+			indexer = plexusContainer.lookup(Indexer.class);
+			indexUpdater = plexusContainer.lookup(IndexUpdater.class);
+			httpWagon = plexusContainer.lookup(Wagon.class, "http");
+
+		} catch (Exception e) {
+			logger.error("Error initializing Plexus container.", e);
+			throw new IllegalStateException(e);
+		}
+		
+
+		// Creators we want to use (search for fields it defines)
+		List<IndexCreator> indexers = new ArrayList<IndexCreator>();
+		indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
+		// indexers.add( plexusContainer.lookup( IndexCreator.class,"maven-archetype" ) );
+		// indexers.add( plexusContainer.lookup( IndexCreator.class,"osgi-metadatas" ) );
+
+		// Create context for remote repository index
+		indexingContext = indexer.createIndexingContext(storeName + "-context", storeName, new File(storeName + "cache"), new File(indexParentDir, storeName),
+				uri.toString(), null, true, true, indexers);
+
+		//TODO: replace 'update' for some trigger ...eg once in week after midnight
+		if (update) {
+
+			logger.info("Updating Index...");
+			logger.info("This might take a while on first run, so please be patient! ... It could take 5 minutes and more");
+
+			TransferListener listener = new AbstractTransferListener() {
+				public void transferStarted(TransferEvent transferEvent) {
+					logger.info("  Downloading " + transferEvent.getResource().getName());
+				}
+
+				public void transferProgress(TransferEvent transferEvent, byte[] buffer, int length) {
+				}
+
+				public void transferCompleted(TransferEvent transferEvent) {
+					logger.info(" - DONE");
+				}
+			};
+
+			// always use temporary context when reindexing
+			final File tmpFile = File.createTempFile(indexingContext.getId(), "-tmp", indexParentDir);
+			final File tmpDir = new File(indexParentDir, tmpFile.getName() + ".dir");
+			if (!tmpDir.mkdirs()) {
+				throw new IOException("Cannot create temporary directory: " + tmpDir);
+			}
+
+			logger.debug("Temporary dir '{}' created.", tmpDir);
+
+			try {
+
+				final FSDirectory directory = FSDirectory.open(tmpDir);
+				IndexUtils.copyDirectory(indexingContext.getIndexDirectory(), directory);
+
+				logger.debug("Creating temporary indexing context.");
+
+				try (@SuppressWarnings("deprecation")
+				CloseableIndexingContext tmpContext = new CloseableIndexingContext(new DefaultIndexingContext(indexingContext.getId()
+						+ "-tmp", indexingContext.getRepositoryId(), indexingContext.getRepository(), directory,
+						indexingContext.getRepositoryUrl(), indexingContext.getIndexUpdateUrl(), indexingContext.getIndexCreators(), true),
+						null)) {
+
+					logger.debug("Remote maven store update started.");
+					long start_time = System.nanoTime();
+
+					ResourceFetcher resourceFetcher = new WagonHelper.WagonFetcher(httpWagon, listener, null, null);
+					Date indexingContextCurrentTimestamp = tmpContext.getTimestamp();
+					IndexUpdateRequest updateRequest = new IndexUpdateRequest(tmpContext, resourceFetcher);
+					IndexUpdateResult updateResult = indexUpdater.fetchAndUpdateIndex(updateRequest);
+					
+					if (updateResult.isFullUpdate()) {
+						logger.debug("Full update happened!");
+					} else if (updateResult.getTimestamp().equals(indexingContextCurrentTimestamp)) {
+						logger.debug("No update needed, index is up to date!");
+					} else {
+						logger.debug("Incremental update happened, change covered " + indexingContextCurrentTimestamp + " - "
+								+ updateResult.getTimestamp() + " period.");
+					}
+
+					logger.info("Indexing remote repository finished succesfully!!!");
+					long end_time = System.nanoTime();
+					double difference = (end_time - start_time) / 1e6;
+					logger.debug("Indexing remote repository took {} nanoseconds ", difference);
+
+					tmpContext.updateTimestamp(true);
+					
+					//TODO: decide if use tempContext
+					logger.debug("Replacing contexts from temporary to origin.");
+					indexingContext.replace(tmpContext.getIndexDirectory());
+					
+				} catch (Throwable t) {
+					logger.error("Error indexing remote Maven repository 1.", t);
+				}
+			} catch (IOException ex) {
+				logger.error("Error indexing remote Maven repository 2.", ex);
+				throw new IOException("Error scanning context " + indexingContext.getId() + ": " + ex, ex);
+			} catch (Throwable t) {
+				logger.error("Error indexing remote Maven repository 3.", t);
+			} finally {
+				try {
+					if (tmpFile.exists()) {
+						tmpFile.delete();
+					}
+				} finally {
+					FileUtils.deleteDirectory(tmpDir); // TODO replace plexus utils														
+				}
+			}
+		}
+		
+		logger.debug("Indexing remote maven store '{}' finished.", uri);
+		return new CloseableIndexingContext(indexingContext, indexer);
+	}
 }

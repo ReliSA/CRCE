@@ -24,4 +24,6 @@ Embed-Dependency:\
   maven-model,\
   maven-model-builder,\
   maven-repository-metadata,\
-  maven-artifact
+  maven-artifact,\
+  wagon-provider-api,\
+  wagon-http-lightweight

@@ -19,6 +19,8 @@ public class MavenStoreConfig {
 	public static final String REMOTE_STORE_DEFAULT = "use.remote.maven.store.default";
 	public static final String DEPENDENCY_HIERARCHY = "aether.find.dependency.hierarchy";
 	public static final String RESOLVE_DEPENDENCIES = "aether.resolve.dependencies";
+	public static final String LOCAL_STORE_NAME = "local.store.name";
+	public static final String REMOTE_STORE_NAME = "remote.store.name";
 	
 		
 	private static String localRepoURI = "mvn_store";
@@ -26,6 +28,7 @@ public class MavenStoreConfig {
 	private static boolean remoteRepoDefault = false;
 	private static boolean dependencyHierarchy = false;
 	private static boolean resolveDependencies = false;	
+	private static String storeName = "maven_store";
 
 	
 	public static void initConfig(Dictionary<String, ?> properties) {
@@ -106,6 +109,17 @@ public class MavenStoreConfig {
 
 	public static void setResolveDependencies(boolean resolveDependencies) {
 		MavenStoreConfig.resolveDependencies = resolveDependencies;
+	}
+
+
+	public static String getStoreName() {
+		return storeName;
+	}
+
+
+	public static void setStoreName(String storeName) {
+		MavenStoreConfig.storeName = storeName;
 	}	
+	
 }
 
