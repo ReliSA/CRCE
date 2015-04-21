@@ -46,6 +46,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -83,11 +84,11 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         FlatSearchResponse response;
         try {
         	if(!MavenStoreConfig.isRemoteRepoDefault()){
-        		closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(INDEXING_CONTEXT), true);        		
+        		closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());        		
         	}
         	
         	else{
-        		closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(INDEXING_CONTEXT), true);
+        		closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
         	}
         	
             Indexer indexer = closeableIndexingContext.getIndexer();
@@ -102,29 +103,39 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         }
         logger.debug("Updating Maven repository index finished.");
         logger.debug("Indexing artifacts (amount: {}).", response.getTotalHitsCount());
+        
+//		if (MavenStoreConfig.isRemoteRepoDefault()) {
+//			for (ArtifactInfo ai : response.getResults()) {
+//				DefaultArtifact a = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);			
+//				metadataIndexerCallback.index(a, this);
+//			}
+//		}
+		
+		
+		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
+		// localRepo must be defined even indexing remote repository
+		RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
 
-        RepositorySystem repositorySystem = RepositoryFactory.newRepositorySystem(); //Aether
-        //localRepo must be defined even indexing remote repository
-        RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(repositorySystem);
+		ArtifactRequest artifactRequest = new ArtifactRequest();
+		for (ArtifactInfo ai : response.getResults()) {
+			artifactRequest.setArtifact(new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version));
+			if(MavenStoreConfig.isRemoteRepoDefault()){
+				artifactRequest.addRepository(new RemoteRepository.Builder(MavenStoreConfig.getStoreName(), "default", MavenStoreConfig.getRemoteRepoURI()).build());
+			}				
+			ArtifactResult result;
+			try {
+				result = system.resolveArtifact(session, artifactRequest);
+				metadataIndexerCallback.index(result.getArtifact(), this);
+			} catch (ArtifactResolutionException e) {
+				logger.debug("Artifact could not be found in local repository: " + artifactRequest.toString());
+				// TODO optionally download the artifact from a remote repository or local .m2
+				continue;
+			}
+		}			
+		
 
-        ArtifactRequest artifactRequest = new ArtifactRequest();
-        for (ArtifactInfo ai : response.getResults()) {
-            artifactRequest.setArtifact(new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version));
-            ArtifactResult result;
-            try {
-                result = repositorySystem.resolveArtifact(session, artifactRequest);
-                metadataIndexerCallback.index(result.getArtifact(), this);
-            } catch (ArtifactResolutionException e) {
-                logger.info("Artifact is not present in local repository: " + artifactRequest.toString());
-                // TODO optionally download the artifact from a remote repository
-                continue;
-            }           
-            
-        }
 
         logger.info("Indexing local Maven repository finished: {}", uri);
-        
-        
         return null;
     }
  
@@ -219,7 +230,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
                     null)
             ) {
 
-                logger.debug("Mvn local store scanning started.");
+                logger.debug("Maven local store scanning started.");
 
                 ScanningRequest scanningRequest = new ScanningRequest(
                         tmpContext,
@@ -256,7 +267,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
             }
         }
 
-        logger.debug("Indexing local mvn store '{}' finished.", repository);
+        logger.debug("Indexing local maven store '{}' finished.", repository);
 
         return new CloseableIndexingContext(indexingContext, indexer);
     }
@@ -347,7 +358,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 						indexingContext.getRepositoryUrl(), indexingContext.getIndexUpdateUrl(), indexingContext.getIndexCreators(), true),
 						null)) {
 
-					logger.debug("Remote maven store update started.");
+					logger.debug("Remote maven store indexing started.");
 					long start_time = System.nanoTime();
 
 					ResourceFetcher resourceFetcher = new WagonHelper.WagonFetcher(httpWagon, listener, null, null);
@@ -355,11 +366,20 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 					IndexUpdateRequest updateRequest = new IndexUpdateRequest(tmpContext, resourceFetcher);
 					IndexUpdateResult updateResult = indexUpdater.fetchAndUpdateIndex(updateRequest);
 					
-					if (updateResult.isFullUpdate()) {
+					if(updateResult.getTimestamp() == null){
+						logger.debug("Index is up to date"); //as it is in DefaultIndexUpdater.class
+						updateResult.setTimestamp(indexingContextCurrentTimestamp);
+					}
+					
+					else if (updateResult.isFullUpdate()) {
 						logger.debug("Full update happened!");
-					} else if (updateResult.getTimestamp().equals(indexingContextCurrentTimestamp)) {
+					}
+					
+					else if (updateResult.getTimestamp().equals(indexingContextCurrentTimestamp)) {
 						logger.debug("No update needed, index is up to date!");
-					} else {
+					}
+					
+					else {
 						logger.debug("Incremental update happened, change covered " + indexingContextCurrentTimestamp + " - "
 								+ updateResult.getTimestamp() + " period.");
 					}

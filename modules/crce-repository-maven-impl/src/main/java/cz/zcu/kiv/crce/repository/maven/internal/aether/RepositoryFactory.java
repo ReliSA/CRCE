@@ -24,6 +24,7 @@ import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
 * @author Miroslav Brožek
 */
 public class RepositoryFactory {
+	private static ArrayList<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
 
 	public static RepositorySystem newRepositorySystem() {
 		/*
@@ -60,7 +61,7 @@ public class RepositoryFactory {
 	}
 
 	public static List<RemoteRepository> newRepositories(RepositorySystem system, RepositorySystemSession session) {
-		ArrayList<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+		
 		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();
 		RemoteRepository relisa =  new RemoteRepository.Builder("relisa", "default", "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public").build();
 		RemoteRepository kalwi =  new RemoteRepository.Builder("kalwi", "default", "http://maven.kalwi.eu/repo/releases").build();
@@ -71,5 +72,19 @@ public class RepositoryFactory {
 		
 		return repositories;
 	}
+	
+	public void addRemoteRepository(RemoteRepository remoteRepo){
+		repositories.add(remoteRepo);		
+	}
+
+	public static ArrayList<RemoteRepository> getRepositories() {
+		return repositories;
+	}
+
+	public static void setRepositories(ArrayList<RemoteRepository> repositories) {
+		RepositoryFactory.repositories = repositories;
+	}
+	
+	
 	
 }

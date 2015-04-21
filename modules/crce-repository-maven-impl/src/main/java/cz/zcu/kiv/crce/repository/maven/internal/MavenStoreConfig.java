@@ -21,6 +21,7 @@ public class MavenStoreConfig {
 	public static final String RESOLVE_DEPENDENCIES = "aether.resolve.dependencies";
 	public static final String LOCAL_STORE_NAME = "local.store.name";
 	public static final String REMOTE_STORE_NAME = "remote.store.name";
+	public static final String UPDATE_REPOSITORY = "update.repository";
 	
 		
 	private static String localRepoURI = "mvn_store";
@@ -29,6 +30,7 @@ public class MavenStoreConfig {
 	private static boolean dependencyHierarchy = false;
 	private static boolean resolveDependencies = false;	
 	private static String storeName = "maven_store";
+	private static boolean updateRepository = false;
 
 	
 	public static void initConfig(Dictionary<String, ?> properties) {
@@ -40,6 +42,7 @@ public class MavenStoreConfig {
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
 			setResolveDependencies(toBoolean(properties.get(RESOLVE_DEPENDENCIES).toString()));
+			setUpdateRepository(toBoolean(properties.get(UPDATE_REPOSITORY).toString()));
 			
 		} catch (ConfigurationException e) {
 			logger.debug("Wrong configuration in config file ", e);
@@ -119,6 +122,16 @@ public class MavenStoreConfig {
 
 	public static void setStoreName(String storeName) {
 		MavenStoreConfig.storeName = storeName;
+	}
+
+
+	public static boolean isUpdateRepository() {
+		return updateRepository;
+	}
+
+
+	public static void setUpdateRepository(boolean updateRepository) {
+		MavenStoreConfig.updateRepository = updateRepository;
 	}	
 	
 }

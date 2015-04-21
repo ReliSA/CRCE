@@ -103,7 +103,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 	}
 
 	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, Artifact artifact) {		
-		mami.setMavenArtifactMetadata(caller, artifact, resource);
+		mami.createMavenArtifactMetadata(caller, artifact, resource);
 
 	} 		
 	

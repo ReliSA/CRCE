@@ -68,7 +68,7 @@ public class MavenArtifactMetadataIndexer {
 		this.metadataFactory = metadaFactory;
 	}
 
-	public void setMavenArtifactMetadata(LocalMavenRepositoryIndexer caller, Artifact artifact, Resource resource) {
+	public void createMavenArtifactMetadata(LocalMavenRepositoryIndexer caller, Artifact artifact, Resource resource) {
 
 		metadataService.addCategory(resource, "maven");
 
