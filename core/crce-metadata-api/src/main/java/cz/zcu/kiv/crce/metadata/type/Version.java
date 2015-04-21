@@ -49,7 +49,6 @@ public class Version implements Comparable<Version> {
 	private final String		qualifier;
 	private static final String	SEPARATOR		= ".";
 	private transient String	versionString;
-	private boolean mavenArtifact = false;
 
 	/**
 	 * The empty version "0.0.0".
@@ -95,25 +94,8 @@ public class Version implements Comparable<Version> {
 		this.qualifier = qualifier;
 		versionString = null;
 		validate();
-	}
+	}	
 	
-	/*
-	 * Constructor for Maven Artifact version
-	 */
-	public Version(int major, int minor, int micro, String qualifier, boolean mavenArtifact) {
-		if (qualifier == null) {
-			qualifier = "";
-		}
-
-		this.major = major;
-		this.minor = minor;
-		this.micro = micro;
-		this.qualifier = qualifier;
-		versionString = null;
-		this.mavenArtifact = mavenArtifact;
-		validate();
-	}
-
 	/**
 	 * Created a version identifier from the specified string.
 	 *
@@ -185,13 +167,13 @@ public class Version implements Comparable<Version> {
 	 *         or the qualifier string is invalid.
 	 */
 	private void validate() {
-		if (major < 0) {
+		if (major < -1) {
 			throw new IllegalArgumentException("negative major");
 		}
-		if (minor < 0) {
+		if (minor < -1) {
 			throw new IllegalArgumentException("negative minor");
 		}
-		if (micro < 0) {
+		if (micro < -1) {
 			throw new IllegalArgumentException("negative micro");
 		}
 		char[] chars = qualifier.toCharArray();
@@ -206,12 +188,9 @@ public class Version implements Comparable<Version> {
 			if ('0' <= ch && ch <= '9') {
 				continue;
 			}
-			if (ch == '_' || ch == '-') {				
+			if (ch == '_' || ch == '-' || ch == '.') {				
 				continue;
-			}
-			if (mavenArtifact && (ch == '_' || ch == '-' || ch == '.')) {
-				continue;
-			}
+			}			
 			
 			throw new IllegalArgumentException("invalid qualifier: "
 					+ qualifier);
@@ -299,18 +278,32 @@ public class Version implements Comparable<Version> {
 		}
 		int q = qualifier.length();
         @SuppressWarnings("StringBufferMayBeStringBuilder")
-		StringBuffer result = new StringBuffer(20 + q);
-		result.append(major);
+		StringBuffer result = new StringBuffer(20 + q);        
+        result.append(convertNumber(major));
 		result.append(SEPARATOR);
-		result.append(minor);
+		result.append(convertNumber(minor));
 		result.append(SEPARATOR);
-		result.append(micro);
+		result.append(convertNumber(micro));
 		if (q > 0) {
 			result.append(SEPARATOR);
 			result.append(qualifier);
 		}
 		return versionString = result.toString();
 	}
+    
+    /**
+     * Conversion from -1 to ""
+     * @param n input nr.
+     * @return new string value
+     */
+    private String convertNumber(int n){
+    	if(n == -1){
+    		return "";
+    	}
+    	else{
+    		return ""+n;
+    	}    	
+    }
 
 	/**
 	 * Returns a hash code value for the object.
@@ -397,15 +390,4 @@ public class Version implements Comparable<Version> {
 
 		return qualifier.compareTo(other != null ? other.qualifier : "");
 	}
-
-	public boolean isMavenArtifact() {
-		return mavenArtifact;
-	}
-
-	public void setMavenArtifact(boolean mavenArtifact) {
-		this.mavenArtifact = mavenArtifact;
-	}
-    
-
-
 }

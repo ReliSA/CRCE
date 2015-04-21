@@ -205,7 +205,7 @@ public class MavenArtifactMetadataIndexer {
 		Artifact a = d.getArtifact();
 		requirement.addAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
 		requirement.addAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());	
-		requirement.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(a.getBaseVersion())));
+		checkRangeVersion(requirement,new MavenArtifactVersion(a.getBaseVersion()));
 					
 		String scope = d.getScope();
 		if(scope != null && !scope.isEmpty() && !scope.equals("compile")){
@@ -215,6 +215,22 @@ public class MavenArtifactMetadataIndexer {
 		if( d.getOptional() ){
 			requirement.setDirective(DEPENDENCY_OPTIONAL, d.getOptional().toString());
 		}
+	}
+
+	/**
+	 * Check if dependency Version is range of versions
+	 * @param r is dependency
+	 * @param v is version of dependency
+	 */
+	private void checkRangeVersion(Requirement r, MavenArtifactVersion v) {
+		if(v.isRangeVersion()){
+			if(!v.getvMin().equals("")){
+				r.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(v.getvMin())), v.getvMinOperator());	
+			}
+			if(!v.getvMax().equals("")){
+				r.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(v.getvMax())), v.getvMaxOperator());	
+			}
+		}		
 	}
 
 	private void solveChildren(DependencyNode dn, Requirement requirement) {
@@ -238,11 +254,7 @@ public class MavenArtifactMetadataIndexer {
 	 * @return new format of Version.class
 	 */
 	private Version convertVersion(MavenArtifactVersion v) {
-//		debug
-//		if(v.getQualifier()!= null && v.getQualifier().equals("3.2.1_3")){
-//			System.out.println("STOP HERE);
-//		}
-		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier(),true);
+		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier());
 	}
 
 }

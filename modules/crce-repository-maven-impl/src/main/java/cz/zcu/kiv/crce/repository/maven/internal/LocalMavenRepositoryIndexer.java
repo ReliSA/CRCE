@@ -97,6 +97,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
             query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
 
             response = indexer.searchFlat(new FlatSearchRequest(query, closeableIndexingContext));
+            
+            //close cleanly
+            indexer.closeIndexingContext( closeableIndexingContext, false );
+            
         } catch (Exception e) {
             logger.error("Error updating Maven repository index.", e);
             return null;
@@ -104,16 +108,8 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         logger.debug("Updating Maven repository index finished.");
         logger.debug("Indexing artifacts (amount: {}).", response.getTotalHitsCount());
         
-//		if (MavenStoreConfig.isRemoteRepoDefault()) {
-//			for (ArtifactInfo ai : response.getResults()) {
-//				DefaultArtifact a = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);			
-//				metadataIndexerCallback.index(a, this);
-//			}
-//		}
-		
 		
 		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
-		// localRepo must be defined even indexing remote repository
 		RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
 
 		ArtifactRequest artifactRequest = new ArtifactRequest();
@@ -131,9 +127,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 				// TODO optionally download the artifact from a remote repository or local .m2
 				continue;
 			}
-		}			
-		
-
+		}
 
         logger.info("Indexing local Maven repository finished: {}", uri);
         return null;

@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
 import java.util.StringTokenizer;
 
+import cz.zcu.kiv.crce.metadata.Operator;
+
 /**
 * Container of Artifact Version
 * Parsing incoming string a set versions
@@ -17,6 +19,16 @@ public class MavenArtifactVersion {
 	private Integer buildNumber;
 
 	private String qualifier;
+	
+	private String vMin;
+	
+	private Operator vMinOperator;
+	
+	private String vMax;
+	
+	private Operator vMaxOperator;
+	
+	private boolean rangeVersion = false;
 
 	public MavenArtifactVersion(String v) {
 		parseVersion(v);
@@ -76,9 +88,13 @@ public class MavenArtifactVersion {
 					incrementalVersion = getNextIntegerToken(tok);
 				}
 				if (tok.hasMoreTokens()) {
+					fallback = true;
+				}
+				if (tok.hasMoreTokens()) {
 					qualifier = tok.nextToken("");
 					qualifier = qualifier.substring(1);// cutting delimiter
 				}
+				
 			} catch (NumberFormatException e) {
 				fallback = true;
 			}
@@ -89,7 +105,8 @@ public class MavenArtifactVersion {
 				majorVersion = null;
 				minorVersion = null;
 				incrementalVersion = null;
-				buildNumber = null;
+				buildNumber = null;					
+				rangeVersion = checkRangeVersion();				
 			}
 		}
 	}
@@ -103,23 +120,157 @@ public class MavenArtifactVersion {
 	}
 
 	public int getMajorVersion() {
-		return majorVersion != null ? majorVersion.intValue() : 0;
+		return majorVersion != null ? majorVersion.intValue() : -1;
 	}
 
 	public int getMinorVersion() {
-		return minorVersion != null ? minorVersion.intValue() : 0;
+		return minorVersion != null ? minorVersion.intValue() : -1;
 	}
 
 	public int getIncrementalVersion() {
-		return incrementalVersion != null ? incrementalVersion.intValue() : 0;
+		return incrementalVersion != null ? incrementalVersion.intValue() : -1;
 	}
 
 	public int getBuildNumber() {
-		return buildNumber != null ? buildNumber.intValue() : 0;
+		return buildNumber != null ? buildNumber.intValue() : -1;
 	}
 
 	public String getQualifier() {
 		return qualifier;
 	}
+	
+	private boolean checkRangeVersion() {
+		boolean range = false;
 
+		int index = qualifier.indexOf(",");
+
+		if (index < 0) {
+			return range;
+		}
+
+		else {
+
+			// must have 2 brackets , one coma and at least 1 digit >> qualifier  must be bigger than 3
+			if (qualifier.length() > 3) {
+
+				vMin = qualifier.substring(0, index);
+				vMax = qualifier.substring(index + 1);
+
+				// at least one version part must have bracket + number
+				if ((vMin.length() > 0 && vMax.length() > 1) || (vMin.length() > 1 && vMax.length() > 0)) {
+
+					// parse brackets
+					if (setMinOperator(vMin) && setMaxOperator(vMax)) {
+						range = true;
+					}
+					
+					//at least one part must have number
+					if (!hasNumber(vMin) && !hasNumber(vMax)){
+						range = false;
+					}
+				}
+			}
+		}
+		return range;
+	}
+
+	private boolean setMinOperator(String v) {
+		boolean b = false;
+		
+		if (v.charAt(0) == '(') {
+			vMinOperator = Operator.GREATER;
+			b = true;
+			
+		} else if (v.charAt(0) == '[') {
+			vMinOperator = Operator.GREATER_EQUAL;
+			b =  true;
+		}
+		
+		if (vMin.length() > 1) {
+			vMin = vMin.substring(1);
+		}
+		else{
+			vMin = "";
+		}
+		
+		return b;
+	}
+
+	private boolean setMaxOperator(String v) {
+		boolean b = false;
+		
+		if (v.charAt(v.length()-1) == ')') {
+			vMaxOperator = Operator.LESS;
+			b = true;
+		} else if (v.charAt(v.length()-1)  == ']') {
+			vMaxOperator = Operator.LESS_EQUAL;
+			b = true;
+		}
+		
+		if (vMax.length() >= 2) {
+			vMax = vMax.substring(0, vMax.length() - 1);
+		}
+		
+		else{
+			vMax = "";
+		}
+		
+		return b;
+	}
+	
+	
+	private boolean hasNumber(String v){	
+
+		char[] chars = v.toCharArray();
+		for (int i = 0, length = chars.length; i < length; i++) {
+			char ch = chars[i];
+
+			if ('0' <= ch && ch <= '9') {
+				return true;
+			} 
+		}
+		return false;
+	}
+	
+
+	public String getvMin() {
+		return vMin;
+	}
+
+	public void setvMin(String vMin) {
+		this.vMin = vMin;
+	}
+
+	public Operator getvMinOperator() {
+		return vMinOperator;
+	}
+
+	public void setvMinOperator(Operator vMinOperator) {
+		this.vMinOperator = vMinOperator;
+	}
+
+	public String getvMax() {
+		return vMax;
+	}
+
+	public void setvMax(String vMax) {
+		this.vMax = vMax;
+	}
+
+	public Operator getvMaxOperator() {
+		return vMaxOperator;
+	}
+
+	public void setvMaxOperator(Operator vMaxOperator) {
+		this.vMaxOperator = vMaxOperator;
+	}
+
+	public boolean isRangeVersion() {
+		return rangeVersion;
+	}
+
+	public void setRangeVersion(boolean rangeVersion) {
+		this.rangeVersion = rangeVersion;
+	}
+	
 }
