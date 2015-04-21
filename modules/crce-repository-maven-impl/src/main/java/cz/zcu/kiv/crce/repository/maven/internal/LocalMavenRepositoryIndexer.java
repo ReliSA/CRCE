@@ -68,7 +68,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext closeableIndexingContext;
-    private static final String INDEXING_CONTEXT = "mvn_store_index";
+    private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextURI();
     
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");

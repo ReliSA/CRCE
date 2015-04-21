@@ -22,6 +22,7 @@ public class MavenStoreConfig {
 	public static final String LOCAL_STORE_NAME = "local.store.name";
 	public static final String REMOTE_STORE_NAME = "remote.store.name";
 	public static final String UPDATE_REPOSITORY = "update.repository";
+	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
 	
 		
 	private static String localRepoURI = "mvn_store";
@@ -31,12 +32,13 @@ public class MavenStoreConfig {
 	private static boolean resolveDependencies = false;	
 	private static String storeName = "maven_store";
 	private static boolean updateRepository = false;
+	private static String indexingContextURI = "mvn_store_index"; 
 
 	
 	public static void initConfig(Dictionary<String, ?> properties) {
 		setLocalRepoURI((String) properties.get(LOCAL_MAVEN_STORE_URI));
 		setRemoteRepoURI((String) properties.get(REMOTE_MAVEN_STORE_URI));
-		
+		setIndexingContextURI(properties.get(INDEXING_CONTEXT_URI).toString());		
 		
 		try {
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
@@ -132,7 +134,15 @@ public class MavenStoreConfig {
 
 	public static void setUpdateRepository(boolean updateRepository) {
 		MavenStoreConfig.updateRepository = updateRepository;
-	}	
-	
+	}
+
+
+	public static String getIndexingContextURI() {
+		return indexingContextURI;
+	}
+
+	public static void setIndexingContextURI(String indexingContextURI) {
+		MavenStoreConfig.indexingContextURI = indexingContextURI;
+	}		
 }
 
