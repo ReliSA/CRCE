@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 import java.util.StringTokenizer;
 
 import cz.zcu.kiv.crce.metadata.Operator;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
 * Container of Artifact Version
@@ -271,6 +272,16 @@ public class MavenArtifactVersion {
 
 	public void setRangeVersion(boolean rangeVersion) {
 		this.rangeVersion = rangeVersion;
+	}
+	
+	/**
+	 * Prevent failing validation because of 
+	 * short version format or strange qualifier
+	 * @param v handled version from Artifact
+	 * @return new format of Version.class
+	 */
+	public Version convertVersion() {
+		return new Version(getMajorVersion(), getMinorVersion(), getIncrementalVersion(), getQualifier());
 	}
 	
 }

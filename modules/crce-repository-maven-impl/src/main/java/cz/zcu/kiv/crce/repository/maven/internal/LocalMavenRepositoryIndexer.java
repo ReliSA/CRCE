@@ -45,16 +45,21 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactVersion;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
@@ -69,6 +74,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext closeableIndexingContext;
     private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextURI();
+    private ArrayList<Version> allowedV = new ArrayList<Version>();
     
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
@@ -92,10 +98,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         	}
         	
             Indexer indexer = closeableIndexingContext.getIndexer();
-
+            
+           
             BooleanQuery query = new BooleanQuery();
             query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
-
             response = indexer.searchFlat(new FlatSearchRequest(query, closeableIndexingContext));
             
             //close cleanly
@@ -109,18 +115,69 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         logger.debug("Indexing artifacts (amount: {}).", response.getTotalHitsCount());
         
 		
+		VersionResolve vr = MavenStoreConfig.getVersionResolve();
+		switch (vr) {
+		case ALL:
+			logger.debug("All Artifact's versions will be processed");
+			break;
+		case NEWEST:
+			logger.debug("Only the latest Artifact's versions will be processed");			
+			break;
+		case HIGHEST_MAJOR:
+			logger.debug("Only the highest major Artifact's versions will be processed");	
+			break;
+		case HIGHEST_MINOR:
+			logger.debug("Only the highest minor Artifact's versions will be processed");	
+			break;
+		case HIGHEST_MICRO:
+			logger.debug("Only the highest micro Artifact's versions will be processed");	
+			break;
+		default:
+			// index all??
+			// index none?
+			break;
+		}
+
 		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
 		RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
-
-		ArtifactRequest artifactRequest = new ArtifactRequest();
+		ArtifactRequest artifactRequest = new ArtifactRequest();		
+		boolean skipArtifact = false;
+		
 		for (ArtifactInfo ai : response.getResults()) {
 			artifactRequest.setArtifact(new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version));
-			if(MavenStoreConfig.isRemoteRepoDefault()){
-				artifactRequest.addRepository(new RemoteRepository.Builder(MavenStoreConfig.getStoreName(), "default", MavenStoreConfig.getRemoteRepoURI()).build());
-			}				
+			logger.debug("Processing artifact {} from indexingContext.",ai.toString());
+			
+						
+			switch (vr) {
+			case ALL:
+				//no pecial action needed, should be removed?
+				break;
+			case NEWEST:
+				skipArtifact = getLatestVersion(ai,system, session);
+				break;
+			case HIGHEST_MAJOR:
+				System.out.println("MAJOR");
+				break;
+			case HIGHEST_MINOR:
+				System.out.println("MINOR");
+				break;
+			case HIGHEST_MICRO:
+				System.out.println("MICRO");
+				break;
+			default:
+				// index all??
+				// index none?
+				break;
+			}
+
+			if (skipArtifact) {
+				logger.debug("Skipping artifact {} due the version enum condition",ai.toString());
+				continue;
+			}
+			
 			ArtifactResult result;
 			try {
-				result = system.resolveArtifact(session, artifactRequest);
+				result = system.resolveArtifact(session, artifactRequest);				
 				metadataIndexerCallback.index(result.getArtifact(), this);
 			} catch (ArtifactResolutionException e) {
 				logger.debug("Artifact could not be found in local repository: " + artifactRequest.toString());
@@ -133,6 +190,28 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
         return null;
     }
  
+
+	private boolean getLatestVersion(ArtifactInfo ai, RepositorySystem system, RepositorySystemSession session) throws VersionRangeResolutionException {
+		 Artifact artifact = new DefaultArtifact( ai.groupId+":"+ai.artifactId+":[0,)" );
+
+	        VersionRangeRequest rangeRequest = new VersionRangeRequest();
+	        rangeRequest.setArtifact( artifact );
+	        rangeRequest.setRepositories(RepositoryFactory.newRepositories( system, session ) );
+	        VersionRangeResult rangeResult = system.resolveVersionRange( session, rangeRequest );
+	        org.eclipse.aether.version.Version newestVersion = rangeResult.getHighestVersion();
+	        
+	        List<org.eclipse.aether.version.Version> versions = rangeResult.getVersions();
+
+	        logger.debug("Available versions " + versions );
+	        
+	        Version latest = new MavenArtifactVersion(newestVersion.toString()).convertVersion();
+	        Version cand = new MavenArtifactVersion(ai.version).convertVersion();
+	        
+	        if (cand.compareTo(latest) < 0){
+	        	return true;
+	        }
+	        return false;
+	}
 
 	private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {

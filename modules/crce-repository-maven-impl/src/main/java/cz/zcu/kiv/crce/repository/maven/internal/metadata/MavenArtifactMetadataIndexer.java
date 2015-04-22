@@ -86,7 +86,7 @@ public class MavenArtifactMetadataIndexer {
 		Capability cap = metadataFactory.createCapability(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 		cap.setAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
 		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());		
-		cap.setAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(a.getBaseVersion())));	
+		cap.setAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(a.getBaseVersion()).convertVersion());	
 				
 		//empty string make no sense to store				
 		if(!(a.getClassifier().equals(""))){
@@ -225,10 +225,10 @@ public class MavenArtifactMetadataIndexer {
 	private void checkRangeVersion(Requirement r, MavenArtifactVersion v) {
 		if(v.isRangeVersion()){
 			if(!v.getvMin().equals("")){
-				r.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(v.getvMin())), v.getvMinOperator());	
+				r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMin()).convertVersion(), v.getvMinOperator());	
 			}
 			if(!v.getvMax().equals("")){
-				r.addAttribute(ATTRIBUTE__VERSION, convertVersion(new MavenArtifactVersion(v.getvMax())), v.getvMaxOperator());	
+				r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMax()).convertVersion(), v.getvMaxOperator());	
 			}
 		}		
 	}
@@ -244,17 +244,5 @@ public class MavenArtifactMetadataIndexer {
 		while(it.hasNext()){
 			solveChildren(it.next(), child);
 		}		
-	}	
-	
-	
-	/**
-	 * Prevent failing validation because of 
-	 * short version format or strange qualifier
-	 * @param v handled version from Artifact
-	 * @return new format of Version.class
-	 */
-	private Version convertVersion(MavenArtifactVersion v) {
-		return new Version(v.getMajorVersion(), v.getMinorVersion(), v.getIncrementalVersion(), v.getQualifier());
 	}
-
 }

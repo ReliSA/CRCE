@@ -24,7 +24,7 @@ import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
 * @author Miroslav Brožek
 */
 public class RepositoryFactory {
-	private static ArrayList<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+	private static ArrayList<RemoteRepository> repositories;
 
 	public static RepositorySystem newRepositorySystem() {
 		/*
@@ -61,22 +61,35 @@ public class RepositoryFactory {
 	}
 
 	public static List<RemoteRepository> newRepositories(RepositorySystem system, RepositorySystemSession session) {
+		repositories = new ArrayList<RemoteRepository>();
 		
-		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();
-		RemoteRepository relisa =  new RemoteRepository.Builder("relisa", "default", "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public").build();
-		RemoteRepository kalwi =  new RemoteRepository.Builder("kalwi", "default", "http://maven.kalwi.eu/repo/releases").build();
+		//using remote repository? then search primary this one
+		if (MavenStoreConfig.isRemoteRepoDefault()) {
+			repositories.add(new RemoteRepository.Builder(MavenStoreConfig.getStoreName(), "default", MavenStoreConfig.getRemoteRepoURI())
+					.build());
+		}
+
+		// else if (MavenStoreConfig.isUseMavenCentralRepository()){
+		// addCentralRepo();
+		// }
 		
-		repositories.add(central);
-		repositories.add(relisa);
-		repositories.add(kalwi);
-		
+		//if using only local repository, add also Central
+		else {
+			addCentralRepo();
+		}
+
 		return repositories;
+	}
+	
+	private static void addCentralRepo(){
+		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();			
+		repositories.add(central);		
 	}
 	
 	public void addRemoteRepository(RemoteRepository remoteRepo){
 		repositories.add(remoteRepo);		
 	}
-
+	
 	public static ArrayList<RemoteRepository> getRepositories() {
 		return repositories;
 	}
