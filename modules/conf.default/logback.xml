@@ -14,21 +14,23 @@
 	class="ch.qos.logback.core.rolling.RollingFileAppender">
 	<file>logs/crce-debug.log</file>
 
-	<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-		<fileNamePattern>logs/crce-debug_%i.log</fileNamePattern>
-		<minIndex>1</minIndex>
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<!-- daily rollover -->
+		<fileNamePattern>logs\logFile.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<!-- or whenever the file size reaches 10MB -->
+			<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>365</maxHistory>
 	</rollingPolicy>
-
-	<triggeringPolicy
-		class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-		<maxFileSize>10MB</maxFileSize>
-	</triggeringPolicy>
 
 	<encoder>
 		<pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level {%thread} [%logger{36}]
 			%msg%n</pattern>
 	</encoder>
-  </appender>
+</appender>
 
   <appender name="FILE-INFO" class="ch.qos.logback.core.FileAppender">
     <file>logs/crce.log</file>

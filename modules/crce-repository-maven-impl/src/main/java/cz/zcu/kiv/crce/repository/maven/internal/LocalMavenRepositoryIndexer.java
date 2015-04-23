@@ -5,17 +5,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoGroup;
 import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.FlatSearchRequest;
 import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.GroupedSearchRequest;
+import org.apache.maven.index.GroupedSearchResponse;
 import org.apache.maven.index.Indexer;
 import org.apache.maven.index.IndexerEngine;
 import org.apache.maven.index.MAVEN;
@@ -26,6 +30,7 @@ import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.expr.SourcedSearchExpression;
+import org.apache.maven.index.search.grouping.GAGrouping;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
@@ -55,16 +60,11 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.VersionRangeRequest;
-import org.eclipse.aether.resolution.VersionRangeResolutionException;
-import org.eclipse.aether.resolution.VersionRangeResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
-import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
-import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactVersion;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
@@ -115,7 +115,8 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			case NEWEST:
 				logger.debug("Only the latest Artifact's versions will be processed");
-				results = filterNewest(results);
+				//results = filterNewest(results);
+				results = latestVersionMI(indexer);
 				break;
 
 			case HIGHEST_MAJOR:
@@ -158,7 +159,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			try {
 
-				if (MavenStoreConfig.isResolveDependencies() == false) {
+				if (MavenStoreConfig.isResolveArtifacts() == false) {
 					indexByPom(system, session, artifactRequest, ai);
 				}
 
@@ -186,7 +187,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 		ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
 		descriptorRequest.setArtifact(artifact);
-		descriptorRequest.setRepositories(RepositoryFactory.newRepositories());
+		descriptorRequest.setRepositories(artifactRequest.getRepositories());
 		ArtifactDescriptorResult descriptorResult;
 		descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
 		Artifact a = descriptorResult.getArtifact();
@@ -250,53 +251,63 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	}
 
 	
-	private Set<ArtifactInfo> filterNewest(Set<ArtifactInfo> all) throws VersionRangeResolutionException {
-		  RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
-			RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
-			ArtifactRequest artifactRequest = new ArtifactRequest();
-			artifactRequest.setRepositories(RepositoryFactory.newRepositories());
-		
-		for (Iterator<ArtifactInfo> i = all.iterator(); i.hasNext();) {
-		    ArtifactInfo ai = i.next();			
-			Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":[0,)");
-
-			VersionRangeRequest rangeRequest = new VersionRangeRequest();
-			rangeRequest.setArtifact(artifact);
-			rangeRequest.setRepositories(RepositoryFactory.newRepositories());
-			VersionRangeResult rangeResult = system.resolveVersionRange(session, rangeRequest);
-			org.eclipse.aether.version.Version newestVersion = rangeResult.getHighestVersion();
-			List<org.eclipse.aether.version.Version> versions = rangeResult.getVersions();
-//			logger.debug("Available versions " + versions);
-			if(newestVersion==null){
-				logger.debug("Removing artifact, which is not available anymore...");
-				i.remove();
-				continue;
-			}
-			Version latest = new MavenArtifactVersion(newestVersion.toString()).convertVersion();
-			Version cand = new MavenArtifactVersion(ai.version).convertVersion();
-
-			if (cand.compareTo(latest) < 0) {
-				i.remove();
-			}
-		}
-		
-		return all;
-	}
-
-//	/**
-//	 * Latest version recieved by MavenIndexer not recomended to use, doesnet
-//	 * see further version
-//	 * 
-//	 * @param indexer
-//	 * @return
-//	 * @throws IOException
-//	 */
-//	private GroupedSearchResponse artifafactLatestVersionMI(Indexer indexer) throws IOException {
-//		BooleanQuery query = new BooleanQuery();
-//		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
-//		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), closeableIndexingContext));
-//		return response;
+//	//Aether artifacts latest version filter NEEDS rework
+//	private Set<ArtifactInfo> filterLatestByAether(Set<ArtifactInfo> all) throws VersionRangeResolutionException {
+//		  RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
+//			RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
+//			ArtifactRequest artifactRequest = new ArtifactRequest();
+//			artifactRequest.setRepositories(RepositoryFactory.newRepositories());
+//		
+//		for (Iterator<ArtifactInfo> i = all.iterator(); i.hasNext();) {
+//		    ArtifactInfo ai = i.next();			
+//			Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":[0,)");
+//
+//			VersionRangeRequest rangeRequest = new VersionRangeRequest();
+//			rangeRequest.setArtifact(artifact);
+//			rangeRequest.setRepositories(RepositoryFactory.newRepositories());
+//			VersionRangeResult rangeResult = system.resolveVersionRange(session, rangeRequest);
+//			org.eclipse.aether.version.Version newestVersion = rangeResult.getHighestVersion();
+//			List<org.eclipse.aether.version.Version> versions = rangeResult.getVersions();
+////			logger.debug("Available versions " + versions);
+//			if(newestVersion==null){
+//				logger.debug("Removing artifact, which is not available anymore...");
+//				i.remove();
+//				continue;
+//			}
+//			Version latest = new MavenArtifactVersion(newestVersion.toString()).convertVersion();
+//			Version cand = new MavenArtifactVersion(ai.version).convertVersion();
+//
+//			if (cand.compareTo(latest) < 0) {
+//				i.remove();
+//			}
+//		}
+//		
+//		return all;
 //	}
+
+	/**
+	 * Latest version of bundle recieved by MavenIndexer 
+	 * 
+	 * @param indexer
+	 * @return
+	 * @throws IOException
+	 */
+	private Set<ArtifactInfo> latestVersionMI(Indexer indexer) throws IOException {
+		BooleanQuery query = new BooleanQuery();
+		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
+		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), closeableIndexingContext));
+		Set<ArtifactInfo> res = new LinkedHashSet<ArtifactInfo>();
+		
+		//debug
+		for (Map.Entry<String, ArtifactInfoGroup> entry : response.getResults().entrySet()) {
+			ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
+			res.add(ai);
+			logger.debug("* Entry " + ai);
+			logger.debug("{} artifact atest version:  {}",ai, ai.version);
+		}
+		 
+		return res;
+	}
 
 //	/**
 //	 * MavenIndexer search example - not recommended

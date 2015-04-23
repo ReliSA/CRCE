@@ -18,7 +18,7 @@ public class MavenStoreConfig {
 	public static final String REMOTE_MAVEN_STORE_URI = "remote.maven.store.uri";
 	public static final String REMOTE_STORE_DEFAULT = "use.remote.maven.store.default";
 	public static final String DEPENDENCY_HIERARCHY = "aether.find.dependency.hierarchy";
-	public static final String RESOLVE_DEPENDENCIES = "aether.resolve.dependencies";
+	public static final String RESOLVE_ARTIFACTS = "aether.resolve.artifacts";
 	public static final String LOCAL_STORE_NAME = "local.store.name";
 	public static final String REMOTE_STORE_NAME = "remote.store.name";
 	public static final String UPDATE_REPOSITORY = "update.repository";
@@ -30,7 +30,7 @@ public class MavenStoreConfig {
 	private static String remoteRepoURI = "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public";
 	private static boolean remoteRepoDefault = false;
 	private static boolean dependencyHierarchy = false;
-	private static boolean resolveDependencies = false;	
+	private static boolean resolveArtifacts = false;	
 	private static String storeName = "maven_store";
 	private static boolean updateRepository = false;
 	private static String indexingContextURI = "mvn_store_index"; 
@@ -45,7 +45,7 @@ public class MavenStoreConfig {
 		try {
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
-			setResolveDependencies(toBoolean(properties.get(RESOLVE_DEPENDENCIES).toString()));
+			setResolveArtifacts(toBoolean(properties.get(RESOLVE_ARTIFACTS).toString()));
 			setUpdateRepository(toBoolean(properties.get(UPDATE_REPOSITORY).toString()));
 			setArtifactResolve(ArtifactResolve.fromValue(properties.get(ARTIFACT_RESOLVE).toString()));
 			
@@ -107,16 +107,16 @@ public class MavenStoreConfig {
 
 	public static void setDependencyHierarchy(boolean dependencyHierarchy) {
 		MavenStoreConfig.dependencyHierarchy = dependencyHierarchy;
+	}	
+
+
+	public static boolean isResolveArtifacts() {
+		return resolveArtifacts;
 	}
 
 
-	public static boolean isResolveDependencies() {
-		return resolveDependencies;
-	}
-
-
-	public static void setResolveDependencies(boolean resolveDependencies) {
-		MavenStoreConfig.resolveDependencies = resolveDependencies;
+	public static void setResolveArtifacts(boolean resolveArtifacts) {
+		MavenStoreConfig.resolveArtifacts = resolveArtifacts;
 	}
 
 

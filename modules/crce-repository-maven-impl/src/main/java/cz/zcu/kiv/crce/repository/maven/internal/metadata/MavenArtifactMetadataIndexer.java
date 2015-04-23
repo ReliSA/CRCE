@@ -155,7 +155,7 @@ public class MavenArtifactMetadataIndexer {
 				resource.addRequirement(requirement);
 
 				// resolve JAR dependency?
-				if (MavenStoreConfig.isResolveDependencies()) {
+				if (MavenStoreConfig.isResolveArtifacts()) {
 					resolveDependency(system, session, d);
 				}
 			}
@@ -197,7 +197,7 @@ public class MavenArtifactMetadataIndexer {
 			createReqHierarchy(collectResult.getRoot().getChildren(), resource);
 
 			// resolve JAR hieararchy dependencies?
-			if (MavenStoreConfig.isResolveDependencies()) {
+			if (MavenStoreConfig.isResolveArtifacts()) {
 				DependencyFilter depFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
 
 				collectRequest = new CollectRequest();
