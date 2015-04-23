@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,9 +12,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
 import org.apache.maven.index.ArtifactInfoGroup;
 import org.apache.maven.index.DefaultScannerListener;
 import org.apache.maven.index.FlatSearchRequest;
@@ -22,6 +26,8 @@ import org.apache.maven.index.GroupedSearchRequest;
 import org.apache.maven.index.GroupedSearchResponse;
 import org.apache.maven.index.Indexer;
 import org.apache.maven.index.IndexerEngine;
+import org.apache.maven.index.IteratorSearchRequest;
+import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.Scanner;
 import org.apache.maven.index.ScanningRequest;
@@ -60,6 +66,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +130,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			case HIGHEST_MAJOR:
 				logger.debug("Only the highest major Artifact's versions will be processed");
+				results = highestMajorMI(indexer, results);
 				break;
 			case HIGHEST_MINOR:
 				logger.debug("Only the highest minor Artifact's versions will be processed");
@@ -138,7 +148,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			indexResults(results);
 
 		} catch (Exception e) {
-			logger.error("Error updating Maven repository index.", e);
+			logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
 			return null;
 		}
 
@@ -169,7 +179,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			}
 
 			catch (ArtifactResolutionException e) {
-				logger.error("Artifact couldnt be resolved, could be old indexing context: ", ai);
+				logger.error("Artifact {} couldnt be resolved, could be old indexing context: ", ai);
 				// optionally try download the artifact from a another remote
 				// repository or local .m2
 				continue;
@@ -192,41 +202,79 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
 		Artifact a = descriptorResult.getArtifact();
 
-		a = setPOMfileToArtifact(system, session, artifactRequest, a);
+		a = setPOMfileToArtifact(a, system, session, artifactRequest);
 		metadataIndexerCallback.index(a, this);
 	}
 
-	private Artifact setPOMfileToArtifact(RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest,
-			Artifact a) throws ArtifactResolutionException {
-		String pom = a.getArtifactId() + "-" + a.getVersion() + ".pom";
-		String g = a.getGroupId().replaceAll("\\.", "\\\\");
-		File dir = new File(MavenStoreConfig.getLocalRepoURI().toString() + "\\" + g + "\\" + a.getArtifactId() + "\\" + a.getVersion()
-				+ "\\");
-		File f = findPOM(a.getGroupId(), pom, dir);
-
-		// POM not found in repositories
-		if (f != null) {
-			a = a.setFile(f);
-
-		} else {
-			logger.debug("Can't find POM file...trying resolve whole JAR file... " + a);
-			a = system.resolveArtifact(session, artifactRequest).getArtifact();
+	private Artifact setPOMfileToArtifact(Artifact a, RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest) throws ArtifactResolutionException {
+		File pom = new File(getPathForArtifact(a, true, true));
+		
+		if (pom.getAbsoluteFile().exists()) {
+			a = a.setFile(pom);			
 		}
+		
+		else{
+			String g = a.getGroupId().split("\\.")[0];
+			String pomS = a.getArtifactId() + "-" + a.getVersion()+".pom";	
+			File root = new File(MavenStoreConfig.getLocalRepoURI().toString() + "\\" + g) ;
+			String  newPath = findPOM(pomS, root);
+			
+			if(newPath== null){
+				logger.debug("Can't find POM file...trying resolve whole JAR file... " + a);
+				a = system.resolveArtifact(session, artifactRequest).getArtifact();				
+			}
+			else{
+				logger.debug("POM file found in repository on different place"); 
+				a=a.setFile(new File(newPath));
+			}
+		}		
+
 		return a;
 	}
 
-	private File findPOM(String gid, String name, File dir) {
+	//fallback
+	private String findPOM(String name, File dir) {
+		String found = null;		
+
 		File[] list = dir.listFiles();
 		if (list != null)
 			for (File fil : list) {
 				if (fil.isDirectory()) {
-					findPOM(gid, name, fil);
+					found = findPOM(name, fil);
+					if(found!=null){
+						break;
+					}
 				} else if (name.equalsIgnoreCase(fil.getName())) {
-					return fil.getAbsoluteFile();
+					return fil.getAbsolutePath();
 				}
 			}
-		return null;
+		return found;
 	}
+	
+	private String getPathForArtifact(Artifact artifact, boolean local, boolean searchPOM) {
+	    StringBuilder path = new StringBuilder(128);
+	    path.append(MavenStoreConfig.getLocalRepoURI().toString()+"\\");
+	    path.append(artifact.getGroupId().replace('.', '\\')).append('\\');
+	    path.append(artifact.getArtifactId()).append('\\');
+	    path.append(artifact.getBaseVersion()).append('\\');
+	    path.append(artifact.getArtifactId()).append('-');
+	    if (local) {
+	      path.append(artifact.getBaseVersion());
+	    } else {
+	      path.append(artifact.getVersion());
+	    }
+	    if (artifact.getClassifier().length() > 0) {
+	      path.append('-').append(artifact.getClassifier());
+	    }
+	    
+	    if(searchPOM){
+	    	path.append('.').append("pom");
+	    }
+	    else if (artifact.getExtension().length() > 0) {
+	      path.append('.').append(artifact.getExtension());
+	    }
+	    return path.toString();
+	  }
 
 	private void indexByJar(RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest)
 			throws ArtifactResolutionException {
@@ -249,6 +297,84 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		response = indexer.searchFlat(new FlatSearchRequest(query, closeableIndexingContext));
 		return response.getResults();
 	}
+
+	/**
+	 * Filter to search latest version of bundle recieved by MavenIndexer 
+	 * 
+	 * @param indexer maven indexer
+	 * @return Set of artifacts
+	 * @throws IOException
+	 */
+	private Set<ArtifactInfo> latestVersionMI(Indexer indexer) throws IOException {		
+		BooleanQuery query = new BooleanQuery();
+		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
+		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), closeableIndexingContext));
+		Set<ArtifactInfo> res = new LinkedHashSet<ArtifactInfo>();
+		
+		//debug
+		for (Map.Entry<String, ArtifactInfoGroup> entry : response.getResults().entrySet()) {
+			ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
+			res.add(ai);
+			logger.debug("* Entry " + ai);
+			logger.debug("{} artifact atest version:  {}",ai, ai.version);
+		}		 
+		return res;
+	}
+
+	/**
+	 * Filter to search only artifact with highest major in version
+	 * @param indexer i maven indexer
+	 * @param ai is artifact info
+	 * @throws IOException
+	 * @throws InvalidVersionSpecificationException 
+	 */
+	private Set<ArtifactInfo> highestMajorMI(Indexer indexer, Set<ArtifactInfo> results) throws IOException,
+			InvalidVersionSpecificationException {
+		for (ArtifactInfo ai : results) {
+
+			getVersions(indexer, ai);
+
+		}
+		return results;
+	}
+
+	private void getVersions(Indexer indexer, ArtifactInfo ai) throws InvalidVersionSpecificationException, IOException {
+		Query gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(ai.groupId));
+		Query aidQ = indexer.constructQuery(MAVEN.ARTIFACT_ID, new SourcedSearchExpression(ai.artifactId));		
+		Query pckQ = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle"));
+
+		BooleanQuery bq = new BooleanQuery();
+		bq.add(gidQ, Occur.MUST);
+		bq.add(aidQ, Occur.MUST);	
+		bq.add(pckQ, Occur.MUST);
+
+		final GenericVersionScheme versionScheme = new GenericVersionScheme();
+		final String versionString = "0.0.0";
+		final Version version = versionScheme.parseVersion(versionString);
+
+		// construct the filter to express "V greater than"
+		final ArtifactInfoFilter versionFilter = new ArtifactInfoFilter() {
+			public boolean accepts(final IndexingContext ctx, final ArtifactInfo ai) {
+				try {
+					final Version aiV = versionScheme.parseVersion(ai.version);
+					// Use ">=" if you are INCLUSIVE
+					return aiV.compareTo(version) > 0;
+				} catch (InvalidVersionSpecificationException e) {
+					// do something here? be safe and include?
+					return true;
+				}
+			}
+		};
+
+		System.out.println("Searching for all GAVs with G=org.sonatype.nexus and nexus-api and having V greater than 1.5.0");
+		final IteratorSearchRequest request = new IteratorSearchRequest(bq,
+				Collections.singletonList((IndexingContext) closeableIndexingContext), versionFilter);
+		final IteratorSearchResponse response = indexer.searchIterator(request);
+		for (ArtifactInfo a : response) {
+			System.out.println(a.toString());
+		}
+	}
+	
 
 	
 //	//Aether artifacts latest version filter NEEDS rework
@@ -283,50 +409,6 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 //		}
 //		
 //		return all;
-//	}
-
-	/**
-	 * Latest version of bundle recieved by MavenIndexer 
-	 * 
-	 * @param indexer
-	 * @return
-	 * @throws IOException
-	 */
-	private Set<ArtifactInfo> latestVersionMI(Indexer indexer) throws IOException {
-		BooleanQuery query = new BooleanQuery();
-		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
-		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), closeableIndexingContext));
-		Set<ArtifactInfo> res = new LinkedHashSet<ArtifactInfo>();
-		
-		//debug
-		for (Map.Entry<String, ArtifactInfoGroup> entry : response.getResults().entrySet()) {
-			ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
-			res.add(ai);
-			logger.debug("* Entry " + ai);
-			logger.debug("{} artifact atest version:  {}",ai, ai.version);
-		}
-		 
-		return res;
-	}
-
-//	/**
-//	 * MavenIndexer search example - not recommended
-//	 */
-//	private void find(Indexer indexer, ArtifactInfo ai) throws IOException {
-//		Query gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(ai.groupId));
-//		Query aidQ = indexer.constructQuery(MAVEN.ARTIFACT_ID, new SourcedSearchExpression(ai.artifactId));
-//		Query vidQ = indexer.constructQuery(MAVEN.VERSION, new SourcedSearchExpression(ai.version));
-//		Query pomQ = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("pom"));
-//
-//		BooleanQuery bq = new BooleanQuery();
-//		bq.add(gidQ, Occur.MUST);
-//		bq.add(aidQ, Occur.MUST);
-//		bq.add(vidQ, Occur.MUST);
-//		// bq.add( pomQ, Occur.MUST );
-//
-//		FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(bq, closeableIndexingContext));
-//		System.out.println(response.getReturnedHitsCount());
-//
 //	}
 
 	private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)

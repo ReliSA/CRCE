@@ -23,7 +23,7 @@ public class MavenStoreConfig {
 	public static final String REMOTE_STORE_NAME = "remote.store.name";
 	public static final String UPDATE_REPOSITORY = "update.repository";
 	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
-	public static final String ARTIFACT_RESOLVE = "version.resolve";
+	public static final String ARTIFACT_RESOLVE = "artifact.resolve";
 	
 		
 	private static String localRepoURI = "mvn_store";

@@ -26,4 +26,5 @@ Embed-Dependency:\
   maven-repository-metadata,\
   maven-artifact,\
   wagon-provider-api,\
-  wagon-http-lightweight
+  wagon-http-lightweight,\
+  lucene-highlighter
