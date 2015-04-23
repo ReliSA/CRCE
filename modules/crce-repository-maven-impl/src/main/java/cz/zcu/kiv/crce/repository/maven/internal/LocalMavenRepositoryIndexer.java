@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
 import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactVersion;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
@@ -98,6 +100,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 	@Override
 	protected Object run() throws Exception {
+		logger.error("START");
 		logger.info("Indexing Maven repository metadata started: {}", uri);
 		logger.debug("Updating  index started.");
 
@@ -130,21 +133,27 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			case HIGHEST_MAJOR:
 				logger.debug("Only the highest major Artifact's versions will be processed");
-				results = highestMajorMI(indexer, results);
+				results = getHighest(indexer, results);
 				break;
+				
 			case HIGHEST_MINOR:
 				logger.debug("Only the highest minor Artifact's versions will be processed");
+				results = getHighest(indexer, results);
 				break;
+				
 			case HIGHEST_MICRO:
 				logger.debug("Only the highest micro Artifact's versions will be processed");
+				results = getHighest(indexer, results);
 				break;
+				
 			default:
 				// index all??
 				// index none?
 				break;
 			}
 
-			logger.debug("Indexing artifacts (amount: {}).", results.size());
+//			logger.debug("Indexing artifacts (amount: {}).", results.size());
+			System.out.println("size>"+results.size());
 			indexResults(results);
 
 		} catch (Exception e) {
@@ -152,6 +161,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			return null;
 		}
 
+		logger.error("END");
 		logger.info("Indexing Maven repository metadata finished: {}", uri);
 		closeableIndexingContext.close();
 		return null;
@@ -315,7 +325,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		for (Map.Entry<String, ArtifactInfoGroup> entry : response.getResults().entrySet()) {
 			ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
 			res.add(ai);
-			logger.debug("* Entry " + ai);
+
 			logger.debug("{} artifact atest version:  {}",ai, ai.version);
 		}		 
 		return res;
@@ -328,17 +338,33 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	 * @throws IOException
 	 * @throws InvalidVersionSpecificationException 
 	 */
-	private Set<ArtifactInfo> highestMajorMI(Indexer indexer, Set<ArtifactInfo> results) throws IOException,
+	private Set<ArtifactInfo> getHighest(Indexer indexer, Set<ArtifactInfo> results) throws IOException,
 			InvalidVersionSpecificationException {
+		
+		HashSet<String>done = new HashSet<String>();//list of proccesed artifacts...much faster
+		LinkedHashSet<String> filtredArtifactsInString = new LinkedHashSet<String>();		
+		
 		for (ArtifactInfo ai : results) {
-
-			getVersions(indexer, ai);
-
+			String ar = new String(ai.groupId+":"+ai.artifactId);
+			if(done.contains(ar)){
+				continue;
+			}			
+			getMatch(indexer, ai, filtredArtifactsInString);
+			done.add(ar);
 		}
-		return results;
+
+		LinkedHashSet<ArtifactInfo> filtred = new LinkedHashSet<ArtifactInfo>();
+		for (String s : filtredArtifactsInString) {
+			String[] coords = s.split(":");
+			filtred.add(new ArtifactInfo("", coords[0], coords[1], coords[2], ""));
+		}
+
+		return filtred;
 	}
 
-	private void getVersions(Indexer indexer, ArtifactInfo ai) throws InvalidVersionSpecificationException, IOException {
+	private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred) throws InvalidVersionSpecificationException, IOException {
+		int highest = 0;
+		
 		Query gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(ai.groupId));
 		Query aidQ = indexer.constructQuery(MAVEN.ARTIFACT_ID, new SourcedSearchExpression(ai.artifactId));		
 		Query pckQ = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle"));
@@ -366,12 +392,68 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			}
 		};
 
-		System.out.println("Searching for all GAVs with G=org.sonatype.nexus and nexus-api and having V greater than 1.5.0");
+		logger.debug("Searching all versions for artifact {}-{}",ai.groupId,ai.artifactId);
 		final IteratorSearchRequest request = new IteratorSearchRequest(bq,
 				Collections.singletonList((IndexingContext) closeableIndexingContext), versionFilter);
-		final IteratorSearchResponse response = indexer.searchIterator(request);
-		for (ArtifactInfo a : response) {
-			System.out.println(a.toString());
+		
+		IteratorSearchResponse response = indexer.searchIterator(request);
+		
+		
+		ArtifactResolve ar = MavenStoreConfig.getArtifactResolve();
+		switch (ar) {		
+		case HIGHEST_MAJOR:			
+			for (ArtifactInfo a : response) {			
+				int major = new MavenArtifactVersion(a.version).getMajorVersion();
+				highest = major > highest ? major : highest;
+			}
+			response.close();
+			
+			response = indexer.searchIterator(request);	
+			
+			for (ArtifactInfo a : response) {			
+				int major = new MavenArtifactVersion(a.version).getMajorVersion();
+				if(major >= highest){
+					filtred.add(a.toString());			
+				}
+			}			
+			break;
+			
+		case HIGHEST_MINOR:			
+			for (ArtifactInfo a : response) {			
+				int minor = new MavenArtifactVersion(a.version).getMinorVersion();
+				highest = minor > highest ? minor : highest;
+			}		
+			response.close();
+			
+			response = indexer.searchIterator(request);	
+			
+			for (ArtifactInfo a : response) {			
+				int minor = new MavenArtifactVersion(a.version).getMinorVersion();
+				if(minor >= highest){
+					filtred.add(a.toString());			
+				}
+			}
+			break;
+			
+		case HIGHEST_MICRO:
+			for (ArtifactInfo a : response) {			
+				int micro = new MavenArtifactVersion(a.version).getIncrementalVersion();
+				highest = micro > highest ? micro : highest;
+			}		
+			response.close();
+			
+			response = indexer.searchIterator(request);	
+			
+			for (ArtifactInfo a : response) {			
+				int micro = new MavenArtifactVersion(a.version).getIncrementalVersion();
+				if(micro >= highest){
+					filtred.add(a.toString());			
+				}
+			}
+			break;
+			
+		default:			
+			break;
 		}
 	}
 	

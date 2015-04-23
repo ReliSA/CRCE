@@ -1,15 +1,8 @@
 package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
@@ -99,22 +92,23 @@ public class MavenArtifactMetadataIndexer {
 			cap.setAttribute(ATTRIBUTE__CLASSIFIER, a.getClassifier());
 		}		
 		cap.setAttribute(ATTRIBUTE__EXTENSION, a.getExtension());
+		cap.setAttribute(ATTRIBUTE__PACKAGING, "bundle");
 		
-		//need more info from POM file?
-		File jar = new File (metadataService.getUri(resource));			
-		String pomPath = FilenameUtils.removeExtension(jar.toString()) +".pom";
-		File pom = new File(pomPath);
-		if (pom.exists()){
-			MavenXpp3Reader reader = new MavenXpp3Reader();
-			Model model;
-			try {
-				model = reader.read(new FileReader(pom));
-				cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
-			} catch (IOException | XmlPullParserException e) {
-				logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
-			}	
-			//model.getParent() //do we need parentPOM?			
-		}
+//		//need more info from POM file?
+//		File jar = new File (metadataService.getUri(resource));			
+//		String pomPath = FilenameUtils.removeExtension(jar.toString()) +".pom";
+//		File pom = new File(pomPath);
+//		if (pom.exists()){
+//			MavenXpp3Reader reader = new MavenXpp3Reader();
+//			Model model;
+//			try {
+//				model = reader.read(new FileReader(pom));
+//				cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
+//			} catch (IOException | XmlPullParserException e) {
+//				logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
+//			}	
+//			//model.getParent() //do we need parentPOM?			
+//		}
 		
 		metadataService.addRootCapability(resource, cap);
 	}
