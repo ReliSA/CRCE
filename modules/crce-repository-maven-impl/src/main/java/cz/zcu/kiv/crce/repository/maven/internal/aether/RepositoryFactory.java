@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
@@ -49,18 +48,14 @@ public class RepositoryFactory {
 	}
 
 	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
+		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoURI());		
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoURI());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
-		// uncomment to generate dirty trees
-		// session.setDependencyGraphTransformer( null );
-
+		
 		return session;
 	}
 
-	public static List<RemoteRepository> newRepositories(RepositorySystem system, RepositorySystemSession session) {
+	public static List<RemoteRepository> newRepositories() {
 		repositories = new ArrayList<RemoteRepository>();
 		
 		//using remote repository? then search primary this one
@@ -68,20 +63,13 @@ public class RepositoryFactory {
 			repositories.add(new RemoteRepository.Builder(MavenStoreConfig.getStoreName(), "default", MavenStoreConfig.getRemoteRepoURI())
 					.build());
 		}
-
-		// else if (MavenStoreConfig.isUseMavenCentralRepository()){
-		// addCentralRepo();
-		// }
 		
-		//if using only local repository, add also Central
-		else {
-			addCentralRepo();
-		}
+		addCentralRepo();		
 
 		return repositories;
 	}
 	
-	private static void addCentralRepo(){
+	public static void addCentralRepo(){
 		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();			
 		repositories.add(central);		
 	}

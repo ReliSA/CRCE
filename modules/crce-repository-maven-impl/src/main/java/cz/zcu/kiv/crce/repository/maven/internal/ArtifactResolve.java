@@ -5,17 +5,24 @@ package cz.zcu.kiv.crce.repository.maven.internal;
  * @author Miroslav Brozek
  *
  */
-public enum VersionResolve {
+public enum ArtifactResolve {
 	ALL("all"),
 	NEWEST("newest"),
 	HIGHEST_MAJOR("highest-major"),
 	HIGHEST_MINOR("highest-minor"),
 	HIGHEST_MICRO("highest-micro"),
-	HIGHEST_CLASSIFIER("highest-classifier");
+	HIGHEST_QUALIFIER("highest-qualifier"),
+	GAV("gav"),
+	GROUP_ID("group-id"),
+	GROUPID_ARTIFACTID("groupid-artifactid"),
+	GROUPID_ARTIFACTID_FROM_VERSION("groupid-artifactid-minversion");
+	
+	
+	
 	
 	private String value;
 
-	private VersionResolve(String value) {
+	private ArtifactResolve(String value) {
 		this.value = value;
 	}
 
@@ -23,8 +30,8 @@ public enum VersionResolve {
 		return value;
 	}
 	
-	public static VersionResolve fromValue(String value) {
-        for (VersionResolve v : values()) {
+	public static ArtifactResolve fromValue(String value) {
+        for (ArtifactResolve v : values()) {
             if (v.value.equals(value)) {
                 return v;
             }

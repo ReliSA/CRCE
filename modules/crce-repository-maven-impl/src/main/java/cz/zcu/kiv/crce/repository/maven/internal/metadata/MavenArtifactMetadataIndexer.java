@@ -2,25 +2,31 @@ package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
@@ -52,7 +58,7 @@ public class MavenArtifactMetadataIndexer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MavenArtifactMetadataIndexer.class);
 	
-	public static final String NAMESPACE__CRCE_MAVEN_ARTIFACT = "crce.maven.artifact";
+	public static final String NAMESPACE__CRCE_MAVEN_ARTIFACT = "maven.artifact";
 	public static final AttributeType<String> ATTRIBUTE__GROUP_ID = new SimpleAttributeType<>("groupId", String.class);
 	public static final AttributeType<String> ATTRIBUTE__ARTIFACT_ID = new SimpleAttributeType<>("artifactId", String.class);
 	public static final AttributeType<Version> ATTRIBUTE__VERSION = new SimpleAttributeType<>("version", Version.class);
@@ -82,7 +88,7 @@ public class MavenArtifactMetadataIndexer {
 		}
 	}	
 	
-	private void addArtifactCapability(Artifact a, Resource resource) throws Exception {
+	private void addArtifactCapability(Artifact a, Resource resource){
 		Capability cap = metadataFactory.createCapability(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 		cap.setAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
 		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());		
@@ -100,83 +106,120 @@ public class MavenArtifactMetadataIndexer {
 		File pom = new File(pomPath);
 		if (pom.exists()){
 			MavenXpp3Reader reader = new MavenXpp3Reader();
-			Model model = reader.read(new FileReader(pom));	
-			cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
+			Model model;
+			try {
+				model = reader.read(new FileReader(pom));
+				cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
+			} catch (IOException | XmlPullParserException e) {
+				logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
+			}	
 			//model.getParent() //do we need parentPOM?			
 		}
 		
 		metadataService.addRootCapability(resource, cap);
 	}
 	
-	private void addArtifactRequirements(Artifact artifact, Resource resource) throws Exception {
+	private void addArtifactRequirements(Artifact artifact, Resource resource) {
 		RepositorySystem system = RepositoryFactory.newRepositorySystem();
-		DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession( system );
-		
+		DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession( system );		
 		session.setConfigProperty( ConflictResolver.CONFIG_PROP_VERBOSE, true );
         session.setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, true );
         
-        //debug
-       // artifact = new DefaultArtifact( "org.apache.maven:maven-aether-provider:3.1.0" );
         ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
         descriptorRequest.setArtifact( artifact );
-        descriptorRequest.setRepositories( RepositoryFactory.newRepositories( system, session ) );
-        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor( session, descriptorRequest );
+        descriptorRequest.setRepositories( RepositoryFactory.newRepositories() );
+        
 
         //Create Dependency Hierarchy
         if(MavenStoreConfig.isDependencyHierarchy()){
-        	CollectRequest collectRequest = new CollectRequest();
-        	collectRequest.setRootArtifact( descriptorResult.getArtifact() );        
-        	collectRequest.setDependencies( descriptorResult.getDependencies() );
-        	collectRequest.setManagedDependencies( descriptorResult.getManagedDependencies() );
-        	collectRequest.setRepositories( descriptorRequest.getRepositories() );
-        	
-        	CollectResult collectResult = system.collectDependencies( session, collectRequest );
-        	
-        	//creating children dependencies requierements
-        	createReqHierarchy(collectResult.getRoot().getChildren(), resource);
-        	
-        	//resolve dependencies?
-        	if(MavenStoreConfig.isResolveDependencies()){
-        		DependencyFilter depFilter = DependencyFilterUtils.classpathFilter( JavaScopes.COMPILE );
-
-                collectRequest = new CollectRequest();
-                collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
-                collectRequest.setRepositories( RepositoryFactory.newRepositories( system, session ) );
-                
-                DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, depFilter );
-                List<ArtifactResult> artifactResults =
-                    system.resolveDependencies( session, dependencyRequest ).getArtifactResults();         
-
-                for ( ArtifactResult artifactResult : artifactResults )
-                {
-                    logger.info( artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile() );
-                }
-        	}
+        	createDependencyHierarchy(artifact, resource, system, session, descriptorRequest);
         }
         
         //Create Only Direct Dependency
         else{
+			createDirectDependency(resource, system, session, descriptorRequest);
+		}
+	}
+
+	private void createDirectDependency(Resource resource, RepositorySystem system, DefaultRepositorySystemSession session,
+			ArtifactDescriptorRequest descriptorRequest) {
+		ArtifactDescriptorResult descriptorResult;
+		
+		
+		try {
+			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
 			descriptorResult.getDependencies();
 			for (Dependency d : descriptorResult.getDependencies()) {
 				Requirement requirement = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 				createDependencyRequirement(d, requirement);
 				resource.addRequirement(requirement);
-				
-				//resolve dependency
+
+				// resolve JAR dependency?
 				if (MavenStoreConfig.isResolveDependencies()) {
-					Artifact artifactD = d.getArtifact();
-					ArtifactRequest artifactRequest = new ArtifactRequest();
-					artifactRequest.setArtifact(artifactD);
-					artifactRequest.setRepositories(RepositoryFactory.newRepositories(system, session));
-					try {
-						ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
-						artifactD = artifactResult.getArtifact();					
-						logger.info(artifactD + " resolved to  " + artifactD.getFile());
-					} catch (Exception e) {						
-						logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!",artifactD, e);						
-					}
+					resolveDependency(system, session, d);
 				}
 			}
+			
+		} catch (ArtifactDescriptorException e) {
+			logger.error("Failed to read ArtifactDescriptor...", e);
+			
+		} catch (ArtifactResolutionException e) {
+			logger.error("Couldn't resolve dependendency...",e);	
+		}
+	}
+
+
+	private void resolveDependency(RepositorySystem system, DefaultRepositorySystemSession session, Dependency d)
+			throws ArtifactResolutionException {
+		Artifact artifactD = d.getArtifact();
+		ArtifactRequest artifactRequest = new ArtifactRequest();
+		artifactRequest.setArtifact(artifactD);
+		artifactRequest.setRepositories(RepositoryFactory.newRepositories());
+
+		ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
+		artifactD = artifactResult.getArtifact();
+		logger.info(artifactD + " resolved to  " + artifactD.getFile());
+	}
+	
+
+	private void createDependencyHierarchy(Artifact artifact, Resource resource, RepositorySystem system,
+			DefaultRepositorySystemSession session, ArtifactDescriptorRequest descriptorRequest) {
+		ArtifactDescriptorResult descriptorResult;
+		try {
+			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+			CollectRequest collectRequest = new CollectRequest();
+			collectRequest.setRootArtifact(descriptorResult.getArtifact());
+			collectRequest.setDependencies(descriptorResult.getDependencies());
+			collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
+			collectRequest.setRepositories(descriptorRequest.getRepositories());
+
+			CollectResult collectResult = system.collectDependencies(session, collectRequest);
+			createReqHierarchy(collectResult.getRoot().getChildren(), resource);
+
+			// resolve JAR hieararchy dependencies?
+			if (MavenStoreConfig.isResolveDependencies()) {
+				DependencyFilter depFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
+
+				collectRequest = new CollectRequest();
+				collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
+
+				DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, depFilter);
+				List<ArtifactResult> artifactResults = system.resolveDependencies(session, dependencyRequest).getArtifactResults();
+
+				for (ArtifactResult artifactResult : artifactResults) {
+					logger.debug(artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile());
+				}
+			}
+
+		} catch (ArtifactDescriptorException e) {			
+			logger.error("Failed to read ArtifactDescriptor...", e);
+			
+		} catch (DependencyResolutionException e) {
+			logger.error("Couldn't resolve dependendencies...", e);
+			
+			
+		} catch (DependencyCollectionException e) {
+			logger.error("Couldn't collect dependendencies...", e);
 		}
 	}
 
@@ -227,7 +270,7 @@ public class MavenArtifactMetadataIndexer {
 			if(!v.getvMin().equals("")){
 				r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMin()).convertVersion(), v.getvMinOperator());	
 			}
-			if(!v.getvMax().equals("")){
+			if(!v.getvMax().equals("")){			
 				r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMax()).convertVersion(), v.getvMaxOperator());	
 			}
 		}		

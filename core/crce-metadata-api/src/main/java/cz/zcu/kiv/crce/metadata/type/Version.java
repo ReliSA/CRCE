@@ -167,13 +167,13 @@ public class Version implements Comparable<Version> {
 	 *         or the qualifier string is invalid.
 	 */
 	private void validate() {
-		if (major < -1) {
+		if (major < -2) {
 			throw new IllegalArgumentException("negative major");
 		}
-		if (minor < -1) {
+		if (minor < -2) {
 			throw new IllegalArgumentException("negative minor");
 		}
-		if (micro < -1) {
+		if (micro < -2) {
 			throw new IllegalArgumentException("negative micro");
 		}
 		char[] chars = qualifier.toCharArray();

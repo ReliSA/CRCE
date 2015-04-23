@@ -151,26 +151,24 @@ public class MavenArtifactVersion {
 
 		else {
 
-			// must have 2 brackets , one coma and at least 1 digit >> qualifier  must be bigger than 3
+			// must have 2 brackets , one coma and at least 1 digit >> qualifier
+			// must be bigger than 3
 			if (qualifier.length() > 3) {
 
 				vMin = qualifier.substring(0, index);
 				vMax = qualifier.substring(index + 1);
 
-				// at least one version part must have bracket + number
-				if ((vMin.length() > 0 && vMax.length() > 1) || (vMin.length() > 1 && vMax.length() > 0)) {
+				// parse brackets
+				if (setMinOperator(vMin) && setMaxOperator(vMax)) {
+					range = true;
+				}
 
-					// parse brackets
-					if (setMinOperator(vMin) && setMaxOperator(vMax)) {
-						range = true;
-					}
-					
-					//at least one part must have number
-					if (!hasNumber(vMin) && !hasNumber(vMax)){
-						range = false;
-					}
+				// at least one part must have number
+				if (!hasNumber(vMin) && !hasNumber(vMax)) {
+					range = false;
 				}
 			}
+
 		}
 		return range;
 	}
@@ -188,7 +186,7 @@ public class MavenArtifactVersion {
 		}
 		
 		if (vMin.length() > 1) {
-			vMin = vMin.substring(1);
+			vMin = vMin.substring(1).trim();
 		}
 		else{
 			vMin = "";
@@ -209,7 +207,7 @@ public class MavenArtifactVersion {
 		}
 		
 		if (vMax.length() >= 2) {
-			vMax = vMax.substring(0, vMax.length() - 1);
+			vMax = vMax.substring(0, vMax.length() - 1).trim();
 		}
 		
 		else{

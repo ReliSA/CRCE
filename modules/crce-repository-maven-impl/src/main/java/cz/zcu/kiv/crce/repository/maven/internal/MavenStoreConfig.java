@@ -23,7 +23,7 @@ public class MavenStoreConfig {
 	public static final String REMOTE_STORE_NAME = "remote.store.name";
 	public static final String UPDATE_REPOSITORY = "update.repository";
 	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
-	public static final String VERSION_RESOLVE = "version.resolve";
+	public static final String ARTIFACT_RESOLVE = "version.resolve";
 	
 		
 	private static String localRepoURI = "mvn_store";
@@ -34,7 +34,7 @@ public class MavenStoreConfig {
 	private static String storeName = "maven_store";
 	private static boolean updateRepository = false;
 	private static String indexingContextURI = "mvn_store_index"; 
-	private static VersionResolve versionResolve = VersionResolve.NEWEST;
+	private static ArtifactResolve artifactResolve = ArtifactResolve.NEWEST;
 
 	
 	public static void initConfig(Dictionary<String, ?> properties) {
@@ -47,7 +47,7 @@ public class MavenStoreConfig {
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
 			setResolveDependencies(toBoolean(properties.get(RESOLVE_DEPENDENCIES).toString()));
 			setUpdateRepository(toBoolean(properties.get(UPDATE_REPOSITORY).toString()));
-			setVersionResolve(VersionResolve.fromValue(properties.get(VERSION_RESOLVE).toString()));
+			setArtifactResolve(ArtifactResolve.fromValue(properties.get(ARTIFACT_RESOLVE).toString()));
 			
 		} catch (ConfigurationException e) {
 			logger.debug("Wrong configuration in config file ", e);
@@ -149,15 +149,13 @@ public class MavenStoreConfig {
 	}
 
 
-	public static VersionResolve getVersionResolve() {
-		return versionResolve;
+	public static ArtifactResolve getArtifactResolve() {
+		return artifactResolve;
 	}
 
 
-	public static void setVersionResolve(VersionResolve versionResolve) {
-		MavenStoreConfig.versionResolve = versionResolve;
+	public static void setArtifactResolve(ArtifactResolve artifactResolve) {
+		MavenStoreConfig.artifactResolve = artifactResolve;
 	}
-	
-	
 }
 
