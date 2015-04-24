@@ -88,9 +88,7 @@ public class MavenArtifactVersion {
 				if (tok.hasMoreTokens()) {
 					incrementalVersion = getNextIntegerToken(tok);
 				}
-				if (tok.hasMoreTokens()) {
-					fallback = true;
-				}
+				
 				if (tok.hasMoreTokens()) {
 					qualifier = tok.nextToken("");
 					qualifier = qualifier.substring(1);// cutting delimiter

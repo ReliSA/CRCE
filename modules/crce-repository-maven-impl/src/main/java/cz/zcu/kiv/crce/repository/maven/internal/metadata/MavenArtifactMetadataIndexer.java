@@ -1,8 +1,15 @@
 package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.artifact.Artifact;
@@ -59,8 +66,13 @@ public class MavenArtifactMetadataIndexer {
 	public static final AttributeType<String> ATTRIBUTE__CLASSIFIER = new SimpleAttributeType<>("classifier", String.class);
 	public static final AttributeType<String> ATTRIBUTE__EXTENSION = new SimpleAttributeType<>("extension", String.class);
 	
+	public static final AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
+	public static final String NAMESPACE__OSGI_BUNDLE = "osgi.wiring.bundle";
+	public static final AttributeType<String> ATTRIBUTE__SYMBOLIC_NAME = new SimpleAttributeType<>("symbolic-name", String.class);
+	
 	public static final String DEPENDENCY_SCOPE = "scope";
 	public static final String DEPENDENCY_OPTIONAL = "optional";
+
 
 	public MavenArtifactMetadataIndexer(MetadataService metadataService, MetadataFactory metadaFactory) {
 		this.metadataService = metadataService;
@@ -81,35 +93,51 @@ public class MavenArtifactMetadataIndexer {
 		}
 	}	
 	
-	private void addArtifactCapability(Artifact a, Resource resource){
+	private void addArtifactCapability(Artifact a, Resource resource) {
 		Capability cap = metadataFactory.createCapability(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 		cap.setAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
-		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());		
-		cap.setAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(a.getBaseVersion()).convertVersion());	
-				
-		//empty string make no sense to store				
-		if(!(a.getClassifier().equals(""))){
+		cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());
+		Version v = new MavenArtifactVersion(a.getBaseVersion()).convertVersion();
+		cap.setAttribute(ATTRIBUTE__VERSION, v);
+
+		// empty string make no sense to store
+		if (!(a.getClassifier().equals(""))) {
 			cap.setAttribute(ATTRIBUTE__CLASSIFIER, a.getClassifier());
-		}		
+		}
 		cap.setAttribute(ATTRIBUTE__EXTENSION, a.getExtension());
 		cap.setAttribute(ATTRIBUTE__PACKAGING, "bundle");
-		
-//		//need more info from POM file?
-//		File jar = new File (metadataService.getUri(resource));			
-//		String pomPath = FilenameUtils.removeExtension(jar.toString()) +".pom";
-//		File pom = new File(pomPath);
-//		if (pom.exists()){
-//			MavenXpp3Reader reader = new MavenXpp3Reader();
-//			Model model;
-//			try {
-//				model = reader.read(new FileReader(pom));
-//				cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
-//			} catch (IOException | XmlPullParserException e) {
-//				logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
-//			}	
-//			//model.getParent() //do we need parentPOM?			
-//		}
-		
+
+		// OSGI indexer cant read POM file...this will fix GUI name
+		if (metadataService.getPresentationName(resource).startsWith("unknown-name")) {
+
+			// need more info from POM file?
+			File jar = new File(metadataService.getUri(resource));
+			String pomPath = FilenameUtils.removeExtension(jar.toString()) + ".pom";
+			File pom = new File(pomPath);
+			if (pom.exists()) {
+				MavenXpp3Reader reader = new MavenXpp3Reader();
+				Model model;
+				try {
+					model = reader.read(new FileReader(pom));
+					cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
+
+					metadataService.setPresentationName(resource, "POM - " + model.getName());
+					Capability capOsgi = metadataFactory.createCapability(NAMESPACE__OSGI_BUNDLE);
+
+					String sm = model.getProperties().get("bundle.symbolicName").toString();
+					int index = sm.indexOf(".");
+					String symbName = a.getGroupId() + sm.substring(index);
+					capOsgi.setAttribute(ATTRIBUTE__SYMBOLIC_NAME, symbName);
+					capOsgi.setAttribute(ATTRIBUTE__VERSION, v);
+					metadataService.addRootCapability(resource, capOsgi);
+
+				} catch (IOException | XmlPullParserException e) {
+					logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
+				}
+			}
+
+		}
+
 		metadataService.addRootCapability(resource, cap);
 	}
 	
@@ -204,6 +232,7 @@ public class MavenArtifactMetadataIndexer {
 					logger.debug(artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile());
 				}
 			}
+			
 
 		} catch (ArtifactDescriptorException e) {			
 			logger.error("Failed to read ArtifactDescriptor...", e);
@@ -219,6 +248,7 @@ public class MavenArtifactMetadataIndexer {
 
 	/**
 	 * Adding Dependency info to Resource requirements
+	 * Very very time consuming
 	 * @param list of Node Dependencies
 	 * @param resource is Artifact Node
 	 */
@@ -274,7 +304,7 @@ public class MavenArtifactMetadataIndexer {
 		Requirement child = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 		createDependencyRequirement(dn.getDependency(),child);
 		
-		requirement.addChild(child);
+ 		requirement.addChild(child);
 		child.setParent(requirement);
 		
 		Iterator<DependencyNode> it = dn.getChildren().iterator(); 					
