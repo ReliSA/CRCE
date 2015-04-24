@@ -13,7 +13,7 @@ public enum ArtifactResolve {
 	HIGHEST_MICRO("highest-micro"),
 	HIGHEST_QUALIFIER("highest-qualifier"),
 	GAV("gav"),
-	GROUP_ID("group-id"),
+	GROUP_ID("groupid"),
 	GROUPID_ARTIFACTID("groupid-artifactid"),
 	GROUPID_ARTIFACTID_FROM_VERSION("groupid-artifactid-minversion");
 	

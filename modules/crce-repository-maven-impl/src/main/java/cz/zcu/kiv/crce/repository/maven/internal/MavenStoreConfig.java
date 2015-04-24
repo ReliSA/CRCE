@@ -24,6 +24,8 @@ public class MavenStoreConfig {
 	public static final String UPDATE_REPOSITORY = "update.repository";
 	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
 	public static final String ARTIFACT_RESOLVE = "artifact.resolve";
+	public static final String ARTIFACT_RESOLVE_PARAM = "artifact.resolve.param";
+	public static final String AR_STRINGS = "gav:groupid:groupid-artifactid:groupid-artifactid-minversion";
 	
 		
 	private static String localRepoURI = "mvn_store";
@@ -35,22 +37,28 @@ public class MavenStoreConfig {
 	private static boolean updateRepository = false;
 	private static String indexingContextURI = "mvn_store_index"; 
 	private static ArtifactResolve artifactResolve = ArtifactResolve.NEWEST;
+	private static String artifactResolveParam = "";
 
 	
-	public static void initConfig(Dictionary<String, ?> properties) {
-		setLocalRepoURI((String) properties.get(LOCAL_MAVEN_STORE_URI));
-		setRemoteRepoURI((String) properties.get(REMOTE_MAVEN_STORE_URI));
-		setIndexingContextURI(properties.get(INDEXING_CONTEXT_URI).toString());		
-		
+	public static void initConfig(Dictionary<String, ?> properties) {	
 		try {
+			setLocalRepoURI(properties.get(LOCAL_MAVEN_STORE_URI).toString());
+			setRemoteRepoURI((String) properties.get(REMOTE_MAVEN_STORE_URI));
+			setIndexingContextURI(properties.get(INDEXING_CONTEXT_URI).toString());		
+			
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
 			setResolveArtifacts(toBoolean(properties.get(RESOLVE_ARTIFACTS).toString()));
 			setUpdateRepository(toBoolean(properties.get(UPDATE_REPOSITORY).toString()));
 			setArtifactResolve(ArtifactResolve.fromValue(properties.get(ARTIFACT_RESOLVE).toString()));
 			
-		} catch (ConfigurationException e) {
-			logger.debug("Wrong configuration in config file ", e);
+			if ( AR_STRINGS.contains ( artifactResolve.getValue().toLowerCase() ) ){
+				setArtifactResolveParam(properties.get(ARTIFACT_RESOLVE_PARAM).toString());				
+			}
+			
+			
+		} catch (Exception e) {
+			logger.error("Wrong configuration file ", e);
 			e.printStackTrace();
 		}
 	}
@@ -156,6 +164,16 @@ public class MavenStoreConfig {
 
 	public static void setArtifactResolve(ArtifactResolve artifactResolve) {
 		MavenStoreConfig.artifactResolve = artifactResolve;
+	}
+
+
+	public static String getArtifactResolveParam() {
+		return artifactResolveParam;
+	}
+
+
+	public static void setArtifactResolveParam(String artifactResolveParam) {
+		MavenStoreConfig.artifactResolveParam = artifactResolveParam;
 	}
 }
 

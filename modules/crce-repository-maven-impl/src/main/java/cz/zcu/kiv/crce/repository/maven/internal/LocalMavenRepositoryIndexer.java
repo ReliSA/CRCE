@@ -67,6 +67,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -117,12 +120,14 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			}
 
 			Indexer indexer = closeableIndexingContext.getIndexer();
-			Set<ArtifactInfo> results = indexAll(indexer);
+			Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
+			String arParam = "";
 
 			ArtifactResolve ar = MavenStoreConfig.getArtifactResolve();
 			switch (ar) {
 			case ALL:
 				logger.debug("All Artifact's versions will be processed");				
+				results = indexAll(indexer);
 				break;
 
 			case NEWEST:
@@ -133,17 +138,49 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			case HIGHEST_MAJOR:
 				logger.debug("Only the highest major Artifact's versions will be processed");
-				results = getHighest(indexer, results);
+				results = getHighest(indexer, indexAll(indexer), ar);
 				break;
 				
 			case HIGHEST_MINOR:
 				logger.debug("Only the highest minor Artifact's versions will be processed");
-				results = getHighest(indexer, results);
+				results = getHighest(indexer, indexAll(indexer), ar);
 				break;
 				
 			case HIGHEST_MICRO:
 				logger.debug("Only the highest micro Artifact's versions will be processed");
-				results = getHighest(indexer, results);
+				results = getHighest(indexer, indexAll(indexer), ar);
+				break;
+				
+			case GAV:
+				arParam = MavenStoreConfig.getArtifactResolveParam();
+				logger.debug("Trying process Artifact with GAV: {} ",arParam);
+				
+				String[] gav = arParam.split(":");
+
+				if (gav.length >= 3) {
+					ArtifactInfo ai = new ArtifactInfo("", gav[0].trim(), gav[1].trim(), gav[2].trim(), "");
+					results.add(ai);
+				} else {
+					logger.error("Wrong parameter! String must be in format > groupID:artifactID:versionID! , eg.: 'org.sonatype.nexus:nexus-api:1.5.0'");
+				}
+				break;
+				
+			case GROUP_ID:
+				arParam = MavenStoreConfig.getArtifactResolveParam();
+				logger.debug("Trying process Artifacts with groupID> {} ",arParam);
+				results = getArtifactsGAV(indexer, ar);
+				break;
+			
+			case GROUPID_ARTIFACTID:
+				arParam = MavenStoreConfig.getArtifactResolveParam();
+				logger.debug("Trying process Artifacts > {} ",arParam);
+				results = getArtifactsGAV(indexer, ar);
+				break;
+				
+			case GROUPID_ARTIFACTID_FROM_VERSION:
+				arParam = MavenStoreConfig.getArtifactResolveParam();
+				logger.debug("Trying process Artifacts from specified Version > {} ",arParam);
+				results = getArtifactsGAV(indexer, ar);
 				break;
 				
 			default:
@@ -153,8 +190,16 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			}
 
 //			logger.debug("Indexing artifacts (amount: {}).", results.size());
+			//for debug
 			System.out.println("size>"+results.size());
-			indexResults(results);
+			
+			if(results.size()>0){
+				indexResults(results);				
+			}
+			else{
+				logger.warn("NO RESULTS! Check configuration file!");
+			}
+			
 
 		} catch (Exception e) {
 			logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
@@ -332,25 +377,25 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	}
 
 	/**
-	 * Filter to search only artifact with highest major in version
+	 * Filter to search only highest versions Artifacts
 	 * @param indexer i maven indexer
 	 * @param ai is artifact info
 	 * @throws IOException
 	 * @throws InvalidVersionSpecificationException 
 	 */
-	private Set<ArtifactInfo> getHighest(Indexer indexer, Set<ArtifactInfo> results) throws IOException,
+	private Set<ArtifactInfo> getHighest(Indexer indexer, Set<ArtifactInfo> results, ArtifactResolve ars) throws IOException,
 			InvalidVersionSpecificationException {
 		
 		HashSet<String>done = new HashSet<String>();//list of proccesed artifacts...much faster
 		LinkedHashSet<String> filtredArtifactsInString = new LinkedHashSet<String>();		
 		
 		for (ArtifactInfo ai : results) {
-			String ar = new String(ai.groupId+":"+ai.artifactId);
-			if(done.contains(ar)){
+			String ga = new String(ai.groupId+":"+ai.artifactId);
+			if(done.contains(ga)){
 				continue;
 			}			
-			getMatch(indexer, ai, filtredArtifactsInString);
-			done.add(ar);
+			getMatch(indexer, ai, filtredArtifactsInString, ars);
+			done.add(ga);
 		}
 
 		LinkedHashSet<ArtifactInfo> filtred = new LinkedHashSet<ArtifactInfo>();
@@ -361,8 +406,16 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 		return filtred;
 	}
-
-	private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred) throws InvalidVersionSpecificationException, IOException {
+	
+	/**
+	 * Filter to create results by Enum
+	 * @param indexer
+	 * @param ai
+	 * @param filtred
+	 * @throws InvalidVersionSpecificationException
+	 * @throws IOException
+	 */
+	private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ArtifactResolve ar) throws InvalidVersionSpecificationException, IOException {
 		int highest = 0;
 		
 		Query gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(ai.groupId));
@@ -399,7 +452,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		IteratorSearchResponse response = indexer.searchIterator(request);
 		
 		
-		ArtifactResolve ar = MavenStoreConfig.getArtifactResolve();
+		
 		switch (ar) {		
 		case HIGHEST_MAJOR:			
 			for (ArtifactInfo a : response) {			
@@ -419,7 +472,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			break;
 			
 		case HIGHEST_MINOR:			
-			for (ArtifactInfo a : response) {			
+			for (ArtifactInfo a : response) {				
 				int minor = new MavenArtifactVersion(a.version).getMinorVersion();
 				highest = minor > highest ? minor : highest;
 			}		
@@ -455,6 +508,127 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		default:			
 			break;
 		}
+	}
+	
+
+	private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ArtifactResolve ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
+		
+		Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();	
+		String arParam = MavenStoreConfig.getArtifactResolveParam();
+		String[] gav = arParam.split(":");
+		
+	
+		BooleanQuery bq = new BooleanQuery();
+				
+		switch (ar) {		
+		case GROUP_ID:			
+			Query gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(gav[0]));
+			Query pckQ = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle"));
+						
+			bq.add(gidQ, Occur.MUST);
+			bq.add(pckQ, Occur.MUST);
+			
+			FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(bq, closeableIndexingContext));
+			results = response.getResults();
+			break;
+			
+		case GROUPID_ARTIFACTID:
+			if(gav.length >= 2){
+				results = getArtifactFromVersion(indexer, gav, ar);				
+			}
+			
+			break;
+			
+		case GROUPID_ARTIFACTID_FROM_VERSION:
+			if(gav.length >= 3){
+				results = getArtifactFromVersion(indexer, gav, ar);				
+			}
+			
+			break;
+	
+		default:
+			break;
+		}
+		
+		return results;
+	}
+
+	private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ArtifactResolve ar) throws InvalidVersionSpecificationException,
+			IOException, VersionRangeResolutionException {
+		
+		Query gidQ;
+		Query aidQ;
+		Query pckQ;
+		gidQ = indexer.constructQuery(MAVEN.GROUP_ID, new SourcedSearchExpression(gav[0]));
+		aidQ = indexer.constructQuery(MAVEN.ARTIFACT_ID, new SourcedSearchExpression(gav[1]));				
+		pckQ = indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle"));
+		
+		BooleanQuery bq = new BooleanQuery();
+		bq.add(gidQ, Occur.MUST);
+		bq.add(aidQ, Occur.MUST);			
+		bq.add(pckQ, Occur.MUST);
+		
+		
+		final String versionString;
+		
+		//find artifacts version at 'gav[2] inclusive and higher
+		if (ar.equals(ArtifactResolve.GROUPID_ARTIFACTID_FROM_VERSION)) {
+			versionString = gav[2];
+		
+		} else {
+			versionString = "0.0.0";			
+		}
+		
+		
+		final GenericVersionScheme versionScheme = new GenericVersionScheme();
+		final Version version = versionScheme.parseVersion(versionString);
+
+		// construct the filter to express "V greater than"
+		final ArtifactInfoFilter versionFilter = new ArtifactInfoFilter() {
+			public boolean accepts(final IndexingContext ctx, final ArtifactInfo ai) {
+				try {
+					final Version aiV = versionScheme.parseVersion(ai.version);
+					// Use ">=" if you are INCLUSIVE
+					return aiV.compareTo(version) >= 0;
+				} catch (InvalidVersionSpecificationException e) {
+					// do something here? be safe and include?
+					return true;
+				}
+			}
+		};
+
+		logger.debug("Searching all versions for artifact {}-{}",gav[0],gav[1]);
+		final IteratorSearchRequest request = new IteratorSearchRequest(bq,
+				Collections.singletonList((IndexingContext) closeableIndexingContext), versionFilter);
+		
+		IteratorSearchResponse isr = indexer.searchIterator(request);
+		
+		LinkedHashSet<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
+		for (ArtifactInfo ai : isr) {			
+			results.add(ai);
+		}			
+		
+		isr.close();
+		
+		//fallback, if query doesnt match with any Artifacts in indexing context > using Aether -time consuming
+		if (results.size()<1){
+			RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
+			RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
+			Artifact a = new DefaultArtifact( gav[0]+":"+gav[1]+":["+versionString+",)" );
+			
+			VersionRangeRequest rangeRequest = new VersionRangeRequest();
+		    rangeRequest.setArtifact( a );
+		    rangeRequest.setRepositories( RepositoryFactory.newRepositories());
+		    VersionRangeResult rangeResult = system.resolveVersionRange( session, rangeRequest );
+		    List<Version> versions = rangeResult.getVersions();
+		    
+		    logger.debug("Aether found Artifacts range > {}",versions);
+		    for (Version v : versions) {
+				results.add(new ArtifactInfo("", a.getGroupId(), a.getArtifactId(), v.toString(), ""));
+			}		    
+		}
+		
+		return results;
 	}
 	
 
