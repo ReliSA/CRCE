@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -108,7 +107,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 			            .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
 			            .add(createServiceDependency().setRequired(true).setService(MetadataValidator.class));
 		} catch (IOException e) {
-			 throw new ConfigurationException(PID, "Can not create maven store on given base directory: " + uri, e);
+			 throw new ConfigurationException(PID, "Wrong URI syntax, check Configuration file: " + uri, e);
 		}
 
         logger.debug("Registering Repository Maven Store: {}", mavenStore);
@@ -117,45 +116,27 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dependencyManager.add(mavenStore);
     }
 
-	private URI getDefaultStoreURI(Dictionary<String, ?> properties) throws ConfigurationException {
-		URI uri;
-		File file;
-		String path;
-
-		if (!MavenStoreConfig.isRemoteRepoDefault()) {
-			path = MavenStoreConfig.getLocalRepoURI();
-			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.LOCAL_STORE_NAME).toString());
-		} else {
-			path = MavenStoreConfig.getRemoteRepoURI();
+	private URI getDefaultStoreURI(Dictionary<String, ?> properties) {
+		URI uri = null;
+				
+		if (MavenStoreConfig.isRemoteRepoDefault()) {
 			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.REMOTE_STORE_NAME).toString());
 			try {
-				uri = new URI(path);
-				return uri;
+				uri = new URI(MavenStoreConfig.getRemoteRepoURI());
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
-				logger.error("Wrong URI {} , check configuration file!", path, e);
+				logger.error("Wrong URI syntax, check Configuration file: ", e);
 			}
 		}
-
-		try {
-			uri = new URI(path);
-			if (uri.getScheme() == null) {
-				file = new File(path);
-				uri = file.toURI();
-			} else if ("file".equals(uri.getScheme())) {
-				file = new File(uri);
-			} else {
-				throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "No Store implementation for given URI scheme: "
-						+ uri.getScheme());
+		else{
+			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.LOCAL_STORE_NAME).toString());
+			try {
+				uri = new URI(MavenStoreConfig.getLocalRepoPath());
+			} catch (URISyntaxException e) {
+				logger.error("Wrong URI syntax, check Configuration file: ", e);
 			}
-		} catch (URISyntaxException ex) {
-			// TODO verify this usecase and correctness
-			file = new File(path);
-			uri = file.toURI();
 		}
-
-		logger.debug("Repository Store URI: {}, file: {}", uri, file.getAbsoluteFile());
-
+		
 		return uri;
 	}
 

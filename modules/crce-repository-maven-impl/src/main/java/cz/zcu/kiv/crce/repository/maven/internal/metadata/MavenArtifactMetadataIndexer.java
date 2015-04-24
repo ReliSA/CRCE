@@ -107,7 +107,7 @@ public class MavenArtifactMetadataIndexer {
 		cap.setAttribute(ATTRIBUTE__EXTENSION, a.getExtension());
 		cap.setAttribute(ATTRIBUTE__PACKAGING, "bundle");
 
-		// OSGI indexer cant read POM file...this will fix GUI name
+		//if indexing by POM file...this will fix GUI name
 		if (metadataService.getPresentationName(resource).startsWith("unknown-name")) {
 
 			// need more info from POM file?
@@ -119,8 +119,7 @@ public class MavenArtifactMetadataIndexer {
 				Model model;
 				try {
 					model = reader.read(new FileReader(pom));
-					cap.setAttribute(ATTRIBUTE__PACKAGING, model.getPackaging());
-
+					
 					metadataService.setPresentationName(resource, "POM - " + model.getName());
 					Capability capOsgi = metadataFactory.createCapability(NAMESPACE__OSGI_BUNDLE);
 

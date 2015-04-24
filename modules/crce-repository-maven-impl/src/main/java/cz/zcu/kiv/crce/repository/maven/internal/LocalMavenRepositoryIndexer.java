@@ -92,7 +92,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext closeableIndexingContext;
-    private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextURI();
+    private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextPath();
     
     
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
@@ -110,13 +110,11 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		try {
 
 			if (!MavenStoreConfig.isRemoteRepoDefault()) {
-				closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(
-						INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
+				closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
 			}
 
 			else {
-				closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(
-						INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
+				closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
 			}
 
 			Indexer indexer = closeableIndexingContext.getIndexer();
@@ -271,7 +269,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		else{
 			String g = a.getGroupId().split("\\.")[0];
 			String pomS = a.getArtifactId() + "-" + a.getVersion()+".pom";	
-			File root = new File(MavenStoreConfig.getLocalRepoURI().toString() + "\\" + g) ;
+			File root = new File(MavenStoreConfig.getLocalRepoPath() + "\\" + g) ;
 			String  newPath = findPOM(pomS, root);
 			
 			if(newPath== null){
@@ -308,7 +306,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	
 	private String getPathForArtifact(Artifact artifact, boolean local, boolean searchPOM) {
 	    StringBuilder path = new StringBuilder(128);
-	    path.append(MavenStoreConfig.getLocalRepoURI().toString()+"\\");
+	    path.append(MavenStoreConfig.getLocalRepoPath()+"\\");
 	    path.append(artifact.getGroupId().replace('.', '\\')).append('\\');
 	    path.append(artifact.getArtifactId()).append('\\');
 	    path.append(artifact.getBaseVersion()).append('\\');

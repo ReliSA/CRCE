@@ -48,7 +48,7 @@ public class RepositoryFactory {
 	}
 
 	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
-		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoURI());		
+		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoPath());		
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 		

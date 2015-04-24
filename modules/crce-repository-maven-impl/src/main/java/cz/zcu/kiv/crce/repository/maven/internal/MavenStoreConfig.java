@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Dictionary;
 
 import org.osgi.service.cm.ConfigurationException;
@@ -28,23 +31,28 @@ public class MavenStoreConfig {
 	public static final String AR_STRINGS = "gav:groupid:groupid-artifactid:groupid-artifactid-minversion";
 	
 		
-	private static String localRepoURI = "mvn_store";
+	private static String localRepoPath = "mvn_store";
 	private static String remoteRepoURI = "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public";
 	private static boolean remoteRepoDefault = false;
 	private static boolean dependencyHierarchy = false;
 	private static boolean resolveArtifacts = false;	
 	private static String storeName = "maven_store";
 	private static boolean updateRepository = false;
-	private static String indexingContextURI = "mvn_store_index"; 
+	private static String indexingContextPath = "mvn_store_index"; 
 	private static ArtifactResolve artifactResolve = ArtifactResolve.NEWEST;
 	private static String artifactResolveParam = "";
 
 	
 	public static void initConfig(Dictionary<String, ?> properties) {	
+		
 		try {
-			setLocalRepoURI(properties.get(LOCAL_MAVEN_STORE_URI).toString());
-			setRemoteRepoURI((String) properties.get(REMOTE_MAVEN_STORE_URI));
-			setIndexingContextURI(properties.get(INDEXING_CONTEXT_URI).toString());		
+			String localRepo = properties.get(LOCAL_MAVEN_STORE_URI).toString();
+			String remoteRepo = properties.get(REMOTE_MAVEN_STORE_URI).toString();
+			String indexContext = properties.get(INDEXING_CONTEXT_URI).toString();
+			
+			setLocalRepoPath(getURItoFile(localRepo));
+			setIndexingContextPath(getURItoFile(indexContext));
+			setRemoteRepoURI(getRemoteRepoURI(remoteRepo));
 			
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
@@ -62,6 +70,51 @@ public class MavenStoreConfig {
 			e.printStackTrace();
 		}
 	}
+	
+	private static String getURItoFile (String localRepoURI) throws ConfigurationException{		
+		URI uri = null;
+		File file;
+
+		try {
+			uri = new URI(localRepoURI);
+			if (uri.getScheme() == null) {
+				file = new File(localRepoURI);
+				uri = file.toURI();
+			} else if ("file".equals(uri.getScheme())) {
+				file = new File(uri);
+				return file.getAbsolutePath();
+				
+			} else {
+				throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());						
+			}
+			
+		} catch (URISyntaxException ex) {
+			// TODO verify this usecase and correctness
+			file = new File(localRepoURI);
+			uri = file.toURI();
+		}
+		
+		return new File(uri).getAbsolutePath();
+	}
+	
+	
+	private static String getRemoteRepoURI(String remoteRepoURI) throws ConfigurationException{
+		URI uri = null;
+		
+		try {
+			uri = new URI(remoteRepoURI);
+			if ("http".equals(uri.getScheme())) {
+				return uri.toString();
+			} else {
+				throw new ConfigurationException(MavenStoreConfig.REMOTE_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
+			}
+
+		} catch (URISyntaxException ex) {
+			logger.error("Wrong URI syntax, check Configuration file: ", ex);
+			return null;
+		}
+		
+	}
 
 
 	private static boolean toBoolean(String s) throws ConfigurationException {
@@ -78,15 +131,13 @@ public class MavenStoreConfig {
 	}
 
 
-	public static String getLocalRepoURI() {
-		return localRepoURI;
+	public static String getLocalRepoPath() {
+		return localRepoPath;
 	}
 
-
-	public static void setLocalRepoURI(String localRepoURI) {
-		MavenStoreConfig.localRepoURI = localRepoURI;
+	public static void setLocalRepoPath(String localRepoPath) {
+		MavenStoreConfig.localRepoPath = localRepoPath;
 	}
-
 
 	public static String getRemoteRepoURI() {
 		return remoteRepoURI;
@@ -96,7 +147,15 @@ public class MavenStoreConfig {
 	public static void setRemoteRepoURI(String remoteRepoURI) {
 		MavenStoreConfig.remoteRepoURI = remoteRepoURI;
 	}
-	
+		
+
+	public static String getIndexingContextPath() {
+		return indexingContextPath;
+	}
+
+	public static void setIndexingContextPath(String indexingContexPath) {
+		MavenStoreConfig.indexingContextPath = indexingContexPath;
+	}
 
 	public static boolean isRemoteRepoDefault() {
 		return remoteRepoDefault;
@@ -145,15 +204,6 @@ public class MavenStoreConfig {
 
 	public static void setUpdateRepository(boolean updateRepository) {
 		MavenStoreConfig.updateRepository = updateRepository;
-	}
-
-
-	public static String getIndexingContextURI() {
-		return indexingContextURI;
-	}
-
-	public static void setIndexingContextURI(String indexingContextURI) {
-		MavenStoreConfig.indexingContextURI = indexingContextURI;
 	}
 
 
