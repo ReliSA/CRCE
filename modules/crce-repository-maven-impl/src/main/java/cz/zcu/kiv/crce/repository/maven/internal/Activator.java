@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.repository.maven.internal;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +87,14 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         MavenStoreConfig.initConfig(properties);
         
-        URI uri = getDefaultStoreURI(properties);
+        URI uri;
+    	if (MavenStoreConfig.isRemoteRepoDefault()) {
+    		uri = MavenStoreConfig.getRemoteRepository().getUri();
+    	}
+    	else{
+    		uri = MavenStoreConfig.getLocalRepository().getUri();
+    	}
+    	
 
         Component mavenStore;
 		try {
@@ -116,29 +122,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dependencyManager.add(mavenStore);
     }
 
-	private URI getDefaultStoreURI(Dictionary<String, ?> properties) {
-		URI uri = null;
-				
-		if (MavenStoreConfig.isRemoteRepoDefault()) {
-			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.REMOTE_STORE_NAME).toString());
-			try {
-				uri = new URI(MavenStoreConfig.getRemoteRepoURI());
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				logger.error("Wrong URI syntax, check Configuration file: ", e);
-			}
-		}
-		else{
-			MavenStoreConfig.setStoreName(properties.get(MavenStoreConfig.LOCAL_STORE_NAME).toString());
-			try {
-				uri = new URI(MavenStoreConfig.getLocalRepoPath());
-			} catch (URISyntaxException e) {
-				logger.error("Wrong URI syntax, check Configuration file: ", e);
-			}
-		}
-		
-		return uri;
-	}
 
 	@Override
     public void deleted(String pid) {

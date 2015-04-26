@@ -91,10 +91,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
-    private CloseableIndexingContext closeableIndexingContext;
+    private CloseableIndexingContext indexingContext;
+    
     private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextPath();
-    
-    
+      
     public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
         this.uri = uri;
@@ -108,16 +108,18 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		logger.debug("Updating  index started.");
 
 		try {
-
+			
 			if (!MavenStoreConfig.isRemoteRepoDefault()) {
-				closeableIndexingContext = createLocalRepoIndexingContext(MavenStoreConfig.getStoreName(), new File(uri), new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
+				RepositoryWrapper lr = MavenStoreConfig.getLocalRepository();
+				indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(INDEXING_CONTEXT), lr.isUpdate());
 			}
 
 			else {
-				closeableIndexingContext = createRemoteRepositoryIndexingContext(MavenStoreConfig.getStoreName(), uri, new File(INDEXING_CONTEXT), MavenStoreConfig.isUpdateRepository());
+				RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
+				indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(INDEXING_CONTEXT), rr.isUpdate());
 			}
 
-			Indexer indexer = closeableIndexingContext.getIndexer();
+			Indexer indexer = indexingContext.getIndexer();
 			Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
 			String arParam = "";
 
@@ -189,10 +191,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 //			logger.debug("Indexing artifacts (amount: {}).", results.size());
 			//for debug
-			System.out.println("size>"+results.size());
-			
+			System.out.println("size>"+results.size());		
+		
 			if(results.size()>0){
-				indexResults(results);				
+				indexResults(results);
 			}
 			else{
 				logger.warn("NO RESULTS! Check configuration file!");
@@ -206,7 +208,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 		logger.error("END");
 		logger.info("Indexing Maven repository metadata finished: {}", uri);
-		closeableIndexingContext.close();
+		indexingContext.close();
 		return null;
 	}
 
@@ -269,7 +271,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		else{
 			String g = a.getGroupId().split("\\.")[0];
 			String pomS = a.getArtifactId() + "-" + a.getVersion()+".pom";	
-			File root = new File(MavenStoreConfig.getLocalRepoPath() + "\\" + g) ;
+			File root = new File(MavenStoreConfig.getLocalRepository().getURItoPath() + "\\" + g) ;
 			String  newPath = findPOM(pomS, root);
 			
 			if(newPath== null){
@@ -306,7 +308,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	
 	private String getPathForArtifact(Artifact artifact, boolean local, boolean searchPOM) {
 	    StringBuilder path = new StringBuilder(128);
-	    path.append(MavenStoreConfig.getLocalRepoPath()+"\\");
+	    path.append(MavenStoreConfig.getLocalRepository().getURItoPath()+"\\");
 	    path.append(artifact.getGroupId().replace('.', '\\')).append('\\');
 	    path.append(artifact.getArtifactId()).append('\\');
 	    path.append(artifact.getBaseVersion()).append('\\');
@@ -347,7 +349,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		FlatSearchResponse response;
 		BooleanQuery query = new BooleanQuery();
 		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
-		response = indexer.searchFlat(new FlatSearchRequest(query, closeableIndexingContext));
+		response = indexer.searchFlat(new FlatSearchRequest(query, indexingContext));
 		return response.getResults();
 	}
 
@@ -361,7 +363,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	private Set<ArtifactInfo> latestVersionMI(Indexer indexer) throws IOException {		
 		BooleanQuery query = new BooleanQuery();
 		query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
-		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), closeableIndexingContext));
+		GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), indexingContext));
 		Set<ArtifactInfo> res = new LinkedHashSet<ArtifactInfo>();
 		
 		//debug
@@ -445,7 +447,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 		logger.debug("Searching all versions for artifact {}-{}",ai.groupId,ai.artifactId);
 		final IteratorSearchRequest request = new IteratorSearchRequest(bq,
-				Collections.singletonList((IndexingContext) closeableIndexingContext), versionFilter);
+				Collections.singletonList((IndexingContext) indexingContext), versionFilter);
 		
 		IteratorSearchResponse response = indexer.searchIterator(request);
 		
@@ -526,7 +528,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			bq.add(gidQ, Occur.MUST);
 			bq.add(pckQ, Occur.MUST);
 			
-			FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(bq, closeableIndexingContext));
+			FlatSearchResponse response = indexer.searchFlat(new FlatSearchRequest(bq, indexingContext));
 			results = response.getResults();
 			break;
 			
@@ -597,7 +599,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 		logger.debug("Searching all versions for artifact {}-{}",gav[0],gav[1]);
 		final IteratorSearchRequest request = new IteratorSearchRequest(bq,
-				Collections.singletonList((IndexingContext) closeableIndexingContext), versionFilter);
+				Collections.singletonList((IndexingContext) indexingContext), versionFilter);
 		
 		IteratorSearchResponse isr = indexer.searchIterator(request);
 		
@@ -702,8 +704,8 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
         List<IndexCreator> indexers = new ArrayList<>();
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
-        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype" ) );
-        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) );       
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype" ) );
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) );       
 
         logger.info("Creating indexing context of local maven store.");
 
@@ -774,6 +776,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
                 logger.debug("Replacing contexts from temporary to origin.");
 
                 indexingContext.replace(tmpContext.getIndexDirectory());
+               
             } catch (Throwable t) {
                 logger.error("Error indexing local Maven repository 1.", t);
             }

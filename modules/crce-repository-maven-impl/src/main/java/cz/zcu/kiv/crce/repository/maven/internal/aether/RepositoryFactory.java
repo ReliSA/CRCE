@@ -16,6 +16,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 
 import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
+import cz.zcu.kiv.crce.repository.maven.internal.RepositoryWrapper;
 
 
 /**
@@ -36,6 +37,8 @@ public class RepositoryFactory {
 		locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
 		locator.addService(TransporterFactory.class, FileTransporterFactory.class);
 		locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+		
+		
 
 		locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
 			@Override
@@ -48,9 +51,11 @@ public class RepositoryFactory {
 	}
 
 	public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
-		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepoPath());		
+		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepository().getURItoPath());		
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
+//		session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, "2000");//2s
+//		session.setConfigProperty(ConfigurationProperties.CONNECT_TIMEOUT, "1000");//1000ms
 		
 		return session;
 	}
@@ -60,32 +65,20 @@ public class RepositoryFactory {
 		
 		//using remote repository? then search primary this one
 		if (MavenStoreConfig.isRemoteRepoDefault()) {
-			repositories.add(new RemoteRepository.Builder(MavenStoreConfig.getStoreName(), "default", MavenStoreConfig.getRemoteRepoURI())
-					.build());
+			RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
+			repositories.add(new RemoteRepository.Builder(rr.getName(), "default",rr.getUri().toString()).build());			
 		}
 		
-		addCentralRepo();		
+		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();	
+		
+		repositories.add(central);			
 
 		return repositories;
 	}
 	
-	public static void addCentralRepo(){
-		RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();			
-		repositories.add(central);		
-	}
-	
-	public void addRemoteRepository(RemoteRepository remoteRepo){
-		repositories.add(remoteRepo);		
-	}
-	
+
 	public static ArrayList<RemoteRepository> getRepositories() {
 		return repositories;
 	}
-
-	public static void setRepositories(ArrayList<RemoteRepository> repositories) {
-		RepositoryFactory.repositories = repositories;
-	}
-	
-	
 	
 }

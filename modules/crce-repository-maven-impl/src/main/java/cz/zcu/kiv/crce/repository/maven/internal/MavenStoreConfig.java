@@ -18,46 +18,59 @@ public class MavenStoreConfig {
 	private static final Logger logger = LoggerFactory.getLogger(MavenStoreConfig.class);
 	
 	public static final String LOCAL_MAVEN_STORE_URI = "local.maven.store.uri";
+	public static final String LOCAL_STORE_NAME = "local.store.name";
+	public static final String LOCAL_REPOSITORY_UPDATE = "local.repository.update";
+	
 	public static final String REMOTE_MAVEN_STORE_URI = "remote.maven.store.uri";
+	public static final String REMOTE_STORE_NAME = "remote.store.name";
+	public static final String REMOTE_REPOSITORY_UPDATE = "remote.repository.update";
+	
+	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
 	public static final String REMOTE_STORE_DEFAULT = "use.remote.maven.store.default";
 	public static final String DEPENDENCY_HIERARCHY = "aether.find.dependency.hierarchy";
 	public static final String RESOLVE_ARTIFACTS = "aether.resolve.artifacts";
-	public static final String LOCAL_STORE_NAME = "local.store.name";
-	public static final String REMOTE_STORE_NAME = "remote.store.name";
-	public static final String UPDATE_REPOSITORY = "update.repository";
-	public static final String INDEXING_CONTEXT_URI ="indexing.context.uri";
 	public static final String ARTIFACT_RESOLVE = "artifact.resolve";
 	public static final String ARTIFACT_RESOLVE_PARAM = "artifact.resolve.param";
 	public static final String AR_STRINGS = "gav:groupid:groupid-artifactid:groupid-artifactid-minversion";
 	
-		
-	private static String localRepoPath = "mvn_store";
-	private static String remoteRepoURI = "http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public";
+	
+	private static RepositoryWrapper localRepository;
+	private static RepositoryWrapper remoteRepository;
+	
+	private static String indexingContextPath = "mvn_store_index"; 
 	private static boolean remoteRepoDefault = false;
 	private static boolean dependencyHierarchy = false;
 	private static boolean resolveArtifacts = false;	
-	private static String storeName = "maven_store";
-	private static boolean updateRepository = false;
-	private static String indexingContextPath = "mvn_store_index"; 
+	
 	private static ArtifactResolve artifactResolve = ArtifactResolve.NEWEST;
 	private static String artifactResolveParam = "";
 
 	
-	public static void initConfig(Dictionary<String, ?> properties) {	
-		
+	public static void initConfig(Dictionary<String, ?> properties) {			
 		try {
-			String localRepo = properties.get(LOCAL_MAVEN_STORE_URI).toString();
-			String remoteRepo = properties.get(REMOTE_MAVEN_STORE_URI).toString();
+			
+			//Local Repo
+			String uriLoc = properties.get(LOCAL_MAVEN_STORE_URI).toString();
+			URI uriL = checkLocalURI(uriLoc);
+			String name = properties.get(MavenStoreConfig.LOCAL_STORE_NAME).toString();
+			Boolean update = toBoolean(properties.get(LOCAL_REPOSITORY_UPDATE).toString());
+			localRepository = new RepositoryWrapper(uriL, name, update, true);
+			
+			
+			//Remote Repo
+			String uriRem = properties.get(REMOTE_MAVEN_STORE_URI).toString();
+			URI uriR = checkRemoteURI(uriRem);
+			String nameR = properties.get(MavenStoreConfig.REMOTE_STORE_NAME).toString();
+			Boolean updateR = toBoolean(properties.get(REMOTE_REPOSITORY_UPDATE).toString());
+			remoteRepository = new RepositoryWrapper(uriR, nameR, updateR, false);			
+		
 			String indexContext = properties.get(INDEXING_CONTEXT_URI).toString();
-			
-			setLocalRepoPath(getURItoFile(localRepo));
-			setIndexingContextPath(getURItoFile(indexContext));
-			setRemoteRepoURI(getRemoteRepoURI(remoteRepo));
-			
+			setIndexingContextPath(convertURItoString(indexContext));
+								
 			setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
 			setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
 			setResolveArtifacts(toBoolean(properties.get(RESOLVE_ARTIFACTS).toString()));
-			setUpdateRepository(toBoolean(properties.get(UPDATE_REPOSITORY).toString()));
+			
 			setArtifactResolve(ArtifactResolve.fromValue(properties.get(ARTIFACT_RESOLVE).toString()));
 			
 			if ( AR_STRINGS.contains ( artifactResolve.getValue().toLowerCase() ) ){
@@ -70,8 +83,52 @@ public class MavenStoreConfig {
 			e.printStackTrace();
 		}
 	}
+
+	private static URI checkLocalURI(String localRepoURI) throws ConfigurationException {
+		URI uri = null;
+		File file = new File(localRepoURI);
+
+		try {
+			uri = new URI(localRepoURI);
+
+			if (uri.getScheme() == null) {
+				uri = file.toURI();
+				return uri;
+			} else if ("file".equals(uri.getScheme())) {
+				return uri;
+
+			} else {
+				throw new ConfigurationException(MavenStoreConfig.LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
+			}
+
+		} catch (URISyntaxException ex) {
+
+			file = new File(localRepoURI);
+			uri = file.toURI();
+		}
+
+		return uri;
+	}
 	
-	private static String getURItoFile (String localRepoURI) throws ConfigurationException{		
+	private static URI checkRemoteURI(String remoteRepoURI) throws ConfigurationException {
+		URI uri;
+		
+		try {
+			uri = new URI(remoteRepoURI);
+			if ("http".equals(uri.getScheme())) {
+				return uri;
+			} else {
+				throw new ConfigurationException(REMOTE_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
+			}
+
+		} catch (URISyntaxException ex) {
+			logger.error("Wrong URI syntax, check Configuration file: ", ex);
+			return null;
+		}		
+	}
+	
+	
+	private static String convertURItoString (String localRepoURI) throws ConfigurationException{		
 		URI uri = null;
 		File file;
 
@@ -96,25 +153,8 @@ public class MavenStoreConfig {
 		
 		return new File(uri).getAbsolutePath();
 	}
-	
-	
-	private static String getRemoteRepoURI(String remoteRepoURI) throws ConfigurationException{
-		URI uri = null;
-		
-		try {
-			uri = new URI(remoteRepoURI);
-			if ("http".equals(uri.getScheme())) {
-				return uri.toString();
-			} else {
-				throw new ConfigurationException(MavenStoreConfig.REMOTE_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
-			}
 
-		} catch (URISyntaxException ex) {
-			logger.error("Wrong URI syntax, check Configuration file: ", ex);
-			return null;
-		}
-		
-	}
+
 
 
 	private static boolean toBoolean(String s) throws ConfigurationException {
@@ -131,23 +171,23 @@ public class MavenStoreConfig {
 	}
 
 
-	public static String getLocalRepoPath() {
-		return localRepoPath;
+			
+
+	public static RepositoryWrapper getLocalRepository() {
+		return localRepository;
 	}
 
-	public static void setLocalRepoPath(String localRepoPath) {
-		MavenStoreConfig.localRepoPath = localRepoPath;
+	public static void setLocalRepository(RepositoryWrapper localRepository) {
+		MavenStoreConfig.localRepository = localRepository;
 	}
 
-	public static String getRemoteRepoURI() {
-		return remoteRepoURI;
+	public static RepositoryWrapper getRemoteRepository() {
+		return remoteRepository;
 	}
 
-
-	public static void setRemoteRepoURI(String remoteRepoURI) {
-		MavenStoreConfig.remoteRepoURI = remoteRepoURI;
+	public static void setRemoteRepository(RepositoryWrapper remoteRepository) {
+		MavenStoreConfig.remoteRepository = remoteRepository;
 	}
-		
 
 	public static String getIndexingContextPath() {
 		return indexingContextPath;
@@ -187,24 +227,6 @@ public class MavenStoreConfig {
 	}
 
 
-	public static String getStoreName() {
-		return storeName;
-	}
-
-
-	public static void setStoreName(String storeName) {
-		MavenStoreConfig.storeName = storeName;
-	}
-
-
-	public static boolean isUpdateRepository() {
-		return updateRepository;
-	}
-
-
-	public static void setUpdateRepository(boolean updateRepository) {
-		MavenStoreConfig.updateRepository = updateRepository;
-	}
 
 
 	public static ArtifactResolve getArtifactResolve() {

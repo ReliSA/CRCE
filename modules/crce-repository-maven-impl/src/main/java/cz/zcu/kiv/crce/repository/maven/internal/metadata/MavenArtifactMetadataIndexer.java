@@ -83,13 +83,12 @@ public class MavenArtifactMetadataIndexer {
 
 		metadataService.addCategory(resource, "maven");
 
-		try {
+		try{
 			addArtifactCapability(artifact, resource);
 			addArtifactRequirements(artifact, resource);
 
 		} catch (Exception e) {
-			logger.error("Not possible create maven artifact Capability or Requirements due error:", e);
-			e.printStackTrace();
+			logger.error("Not possible create maven artifact Capability or Requirements due error:", e);			
 		}
 	}	
 	
@@ -123,9 +122,16 @@ public class MavenArtifactMetadataIndexer {
 					metadataService.setPresentationName(resource, "POM - " + model.getName());
 					Capability capOsgi = metadataFactory.createCapability(NAMESPACE__OSGI_BUNDLE);
 
-					String sm = model.getProperties().get("bundle.symbolicName").toString();
-					int index = sm.indexOf(".");
-					String symbName = a.getGroupId() + sm.substring(index);
+					String symbName;
+					Object symbolicNameProp = model.getProperties().get("bundle.symbolicName");
+					if(symbolicNameProp!=null){
+						String sm = symbolicNameProp.toString();
+						int index = sm.indexOf(".");
+						symbName = a.getGroupId() + sm.substring(index);						
+					}
+					else{
+						symbName = a.getGroupId();
+					}
 					capOsgi.setAttribute(ATTRIBUTE__SYMBOLIC_NAME, symbName);
 					capOsgi.setAttribute(ATTRIBUTE__VERSION, v);
 					metadataService.addRootCapability(resource, capOsgi);
@@ -168,8 +174,7 @@ public class MavenArtifactMetadataIndexer {
 		
 		
 		try {
-			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-			descriptorResult.getDependencies();
+			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);		
 			for (Dependency d : descriptorResult.getDependencies()) {
 				Requirement requirement = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
 				createDependencyRequirement(d, requirement);
@@ -207,7 +212,7 @@ public class MavenArtifactMetadataIndexer {
 			DefaultRepositorySystemSession session, ArtifactDescriptorRequest descriptorRequest) {
 		ArtifactDescriptorResult descriptorResult;
 		try {
-			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+			descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);			
 			CollectRequest collectRequest = new CollectRequest();
 			collectRequest.setRootArtifact(descriptorResult.getArtifact());
 			collectRequest.setDependencies(descriptorResult.getDependencies());
@@ -257,13 +262,16 @@ public class MavenArtifactMetadataIndexer {
 			createDependencyRequirement(dn.getDependency(), requirement);
 			
 			//any existing children dependcies?
-			Iterator<DependencyNode> it = dn.getChildren().iterator(); 					
+			Iterator<DependencyNode> it = dn.getChildren().iterator(); 
+	
 			while(it.hasNext()){
 				solveChildren(it.next(), requirement);
+				
 			}
 			
 			resource.addRequirement(requirement);
-		}		
+		}	
+		
 	}
 	
 	
@@ -309,6 +317,6 @@ public class MavenArtifactMetadataIndexer {
 		Iterator<DependencyNode> it = dn.getChildren().iterator(); 					
 		while(it.hasNext()){
 			solveChildren(it.next(), child);
-		}		
+		}	
 	}
 }
