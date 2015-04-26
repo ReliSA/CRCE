@@ -57,19 +57,33 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -79,6 +93,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.concurrency.model.Task;
 import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactVersion;
+import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactWrapper;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallback;
 
 /**
@@ -213,55 +228,97 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	}
 
 	private void indexResults(Set<ArtifactInfo> results) {
-		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
-		RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
-		ArtifactRequest artifactRequest = new ArtifactRequest();
-		artifactRequest.setRepositories(RepositoryFactory.newRepositories());
-
 		for (ArtifactInfo ai : results) {
-			artifactRequest.setArtifact(new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version));
-			logger.debug("Processing artifact {} from indexingContext.", ai.toString());		
+			logger.debug("Processing artifact {} from indexingContext.", ai.toString());
+			
+			RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
+			DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
+
+			Artifact a = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
+			ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
+			descriptorRequest.setRepositories(RepositoryFactory.newRepositories());
+			descriptorRequest.setArtifact(a);
 
 			try {
 
-				if (MavenStoreConfig.isResolveArtifacts() == false) {
-					indexByPom(system, session, artifactRequest, ai);
+				// Direct Dependency
+				if (!MavenStoreConfig.isDependencyHierarchy()) {
+
+					ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+					List<Dependency> directD = descriptorResult.getDependencies();
+
+					// Indexing and resolve JAR
+					if (MavenStoreConfig.isResolveArtifacts()) {
+						ArtifactRequest artifactRequest = new ArtifactRequest();
+						artifactRequest.setArtifact(a);
+						artifactRequest.setRepositories(descriptorRequest.getRepositories());
+
+						ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
+						a = artifactResult.getArtifact();
+					}
+
+					// Indexing by POM
+					else {
+						a = descriptorResult.getArtifact();
+						a = setPOMfileToArtifact(a, system, session);
+					}
+
+					MavenArtifactWrapper maw = new MavenArtifactWrapper(a, directD, null);
+					metadataIndexerCallback.index(maw);
 				}
 
+				// Create Hierarchy Dependcies
 				else {
-					indexByJar(system, session, artifactRequest);
-				}
-			}
 
-			catch (ArtifactResolutionException e) {
-				logger.error("Artifact {} couldnt be resolved, could be old indexing context: ", ai);
-				// optionally try download the artifact from a another remote
-				// repository or local .m2
-				continue;
+					session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
+					session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
+
+					ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+
+					CollectRequest collectRequest = new CollectRequest();
+					collectRequest.setRootArtifact(descriptorResult.getArtifact());
+					collectRequest.setDependencies(descriptorResult.getDependencies());
+					collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
+					collectRequest.setRepositories(descriptorRequest.getRepositories());
+
+					CollectResult collectResult = system.collectDependencies(session, collectRequest);
+					List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
+
+					// Indexing by POM
+					if (!MavenStoreConfig.isResolveArtifacts()) {
+						a = collectResult.getRoot().getArtifact();
+						a = setPOMfileToArtifact(a, system, session);
+					}
+
+					// Indexing and resolve JARs
+					else {
+						DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
+						collectRequest.setRoot(new Dependency(a, JavaScopes.COMPILE));
+						DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
+						DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
+						a = dr.getRoot().getArtifact();
+					}
+
+					MavenArtifactWrapper maw = new MavenArtifactWrapper(a, null, hierarchyD);
+					metadataIndexerCallback.index(maw);
+				}
+
+			} catch (DependencyCollectionException e) {
+				logger.error("Couldn't collect dependendencies...", e);
+
+			} catch (ArtifactResolutionException e) {
+				logger.error("Couldn't resolve artifact...", e);
 
 			} catch (ArtifactDescriptorException e) {
 				logger.error("Failed to read ArtifactDescriptor...", e);
-				continue;
-			}
+
+			} catch (DependencyResolutionException e) {
+				logger.error("Couldn't resolve dependendencies...", e);
+			}	
 		}
 	}
 
-	private void indexByPom(RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest, ArtifactInfo ai)
-			throws ArtifactDescriptorException, ArtifactResolutionException {
-		Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
-
-		ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
-		descriptorRequest.setArtifact(artifact);
-		descriptorRequest.setRepositories(artifactRequest.getRepositories());
-		ArtifactDescriptorResult descriptorResult;
-		descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-		Artifact a = descriptorResult.getArtifact();
-
-		a = setPOMfileToArtifact(a, system, session, artifactRequest);
-		metadataIndexerCallback.index(a, this);
-	}
-
-	private Artifact setPOMfileToArtifact(Artifact a, RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest) throws ArtifactResolutionException {
+	private Artifact setPOMfileToArtifact(Artifact a, RepositorySystem system, RepositorySystemSession session) throws ArtifactResolutionException {
 		File pom = new File(getPathForArtifact(a, true, true));
 		
 		if (pom.getAbsoluteFile().exists()) {
@@ -276,6 +333,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 			
 			if(newPath== null){
 				logger.debug("Can't find POM file...trying resolve whole JAR file... " + a);
+				
+				ArtifactRequest artifactRequest = new ArtifactRequest();
+				artifactRequest.setRepositories(RepositoryFactory.newRepositories());
+				artifactRequest.setArtifact(a);
 				a = system.resolveArtifact(session, artifactRequest).getArtifact();				
 			}
 			else{
@@ -330,13 +391,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	    }
 	    return path.toString();
 	  }
-
-	private void indexByJar(RepositorySystem system, RepositorySystemSession session, ArtifactRequest artifactRequest)
-			throws ArtifactResolutionException {
-		ArtifactResult result;
-		result = system.resolveArtifact(session, artifactRequest);
-		metadataIndexerCallback.index(result.getArtifact(), this);
-	}
+	
 
 	/**
 	 * Main method to get all 'bundles' from indexingContext

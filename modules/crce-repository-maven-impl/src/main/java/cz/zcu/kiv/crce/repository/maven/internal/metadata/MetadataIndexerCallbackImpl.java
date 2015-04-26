@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,12 +47,12 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
 	}	
 
-	private void postProcessing(File file, Resource resource, Artifact artifact, LocalMavenRepositoryIndexer caller) {
+	private void postProcessing(File file, Resource resource, MavenArtifactWrapper maw) {
 		metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
 		identityIndexer.preIndex(file, file.getName(), resource);
 		
-		updateResourceMetadataFromAether(resource, caller, artifact);
+		updateResourceMetadataFromAether(resource, maw);
 		
 		identityIndexer.postIndex(file, resource);
 	}
@@ -79,8 +78,8 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 	}	
 
 	@Override
-	public void index(Artifact artifact, LocalMavenRepositoryIndexer caller) {
-		File file = artifact.getFile().getAbsoluteFile();
+	public void index(MavenArtifactWrapper maw) {
+		File file = maw.getArtifact().getFile().getAbsoluteFile();
 		try {
 
 			logger.debug("Indexing artifact {}", file);
@@ -90,7 +89,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 
 				resource = resourceIndexerService.indexResource(file);				
 
-				postProcessing(file, resource, artifact, caller);
+				postProcessing(file, resource, maw);
 
 				validate(resource);
 
@@ -102,8 +101,8 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 		}
 	}
 
-	private void updateResourceMetadataFromAether(Resource resource, LocalMavenRepositoryIndexer caller, Artifact artifact) {		
-		mami.createMavenArtifactMetadata(caller, artifact, resource);
+	private void updateResourceMetadataFromAether(Resource resource, MavenArtifactWrapper maw) {		
+		mami.createMavenArtifactMetadata(resource, maw);
 
 	} 		
 	

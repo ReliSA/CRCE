@@ -1,8 +1,5 @@
 package cz.zcu.kiv.crce.repository.maven.internal.metadata;
 
-import org.eclipse.aether.artifact.Artifact;
-
-import cz.zcu.kiv.crce.repository.maven.internal.LocalMavenRepositoryIndexer;
 
 /**
  * 
@@ -10,6 +7,6 @@ import cz.zcu.kiv.crce.repository.maven.internal.LocalMavenRepositoryIndexer;
  */
 public interface MetadataIndexerCallback {    
     
-    void index(Artifact artifact, LocalMavenRepositoryIndexer caller);   
+    void index(MavenArtifactWrapper maw);   
     
 }
