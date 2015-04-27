@@ -76,10 +76,38 @@ public class MavenStoreImpl implements Store {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public boolean remove(Resource resource) throws IOException 
-    {
-    	throw new UnsupportedOperationException("Not supported yet.");
+	@Override
+	public boolean remove(Resource resource) throws IOException {
+		// resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource,this);
+
+		if (!isInStore(resource)) {
+			if (resourceDAO.existsResource(metadataService.getUri(resource))) {
+				logger.warn("Removing resource is not in store but it is in internal repository: {}", resource.getId());
+				resourceDAO.deleteResource(metadataService.getUri(resource));
+			}
+			// pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+			return false;
+		}
+
+		// if URI scheme is not 'file', it is detected in previous isInStore() check
+		File file = new File(metadataService.getUri(resource));
+		if (!file.delete()) {
+			throw new IOException("Can not delete artifact file from store: " + metadataService.getUri(resource));
+		}
+
+		resourceDAO.deleteResource(metadataService.getUri(resource));
+
+		// pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+		//TODO: check if pluginManager is needed, or if whole Artifact DIR should be removed?
+		return true;
+	}
+	
+	private boolean isInStore(Resource resource) {
+        URI uri = metadataService.getUri(resource).normalize();
+        if (!"file".equals(uri.getScheme())) {
+            return false;
+        }
+        return new File(uri).getPath().startsWith(MavenStoreConfig.getLocalRepository().getURItoPath());
     }
 
     @Override
