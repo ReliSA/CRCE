@@ -1,4 +1,4 @@
-ALTER TABLE capability_attribute ALTER COLUMN name VARCHAR(32) NOT NULL;
+ALTER TABLE capability_attribute ALTER COLUMN name VARCHAR(64) NOT NULL;
 
 ALTER TABLE requirement_attribute ALTER COLUMN name VARCHAR(32) NOT NULL;
 
