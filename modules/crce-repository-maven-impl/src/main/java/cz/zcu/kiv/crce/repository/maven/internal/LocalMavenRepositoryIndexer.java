@@ -228,11 +228,13 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	}
 
 	private void indexResults(Set<ArtifactInfo> results) {
+		int counter = 1;
+		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
+		DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
+		
 		for (ArtifactInfo ai : results) {
-			logger.debug("Processing artifact {} from indexingContext.", ai.toString());
+			logger.debug("Processing {}. Artifact: {}",counter, ai.toString());
 			
-			RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
-			DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
 
 			Artifact a = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
 			ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
@@ -314,7 +316,9 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 
 			} catch (DependencyResolutionException e) {
 				logger.error("Couldn't resolve dependendencies...", e);
-			}	
+			}
+			
+			counter++;
 		}
 	}
 
@@ -328,7 +332,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 		else{
 			String g = a.getGroupId().split("\\.")[0];
 			String pomS = a.getArtifactId() + "-" + a.getVersion()+".pom";	
-			File root = new File(MavenStoreConfig.getLocalRepository().getURItoPath() + "\\" + g) ;
+			File root = new File(MavenStoreConfig.getLocalRepository().getURItoPath() + "/" + g) ;
 			String  newPath = findPOM(pomS, root);
 			
 			if(newPath== null){
@@ -369,10 +373,10 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
 	
 	private String getPathForArtifact(Artifact artifact, boolean local, boolean searchPOM) {
 	    StringBuilder path = new StringBuilder(128);
-	    path.append(MavenStoreConfig.getLocalRepository().getURItoPath()+"\\");
-	    path.append(artifact.getGroupId().replace('.', '\\')).append('\\');
-	    path.append(artifact.getArtifactId()).append('\\');
-	    path.append(artifact.getBaseVersion()).append('\\');
+	    path.append(MavenStoreConfig.getLocalRepository().getURItoPath()+"/");
+	    path.append(artifact.getGroupId().replace('.', '/')).append('/');
+	    path.append(artifact.getArtifactId()).append('/');
+	    path.append(artifact.getBaseVersion()).append('/');
 	    path.append(artifact.getArtifactId()).append('-');
 	    if (local) {
 	      path.append(artifact.getBaseVersion());

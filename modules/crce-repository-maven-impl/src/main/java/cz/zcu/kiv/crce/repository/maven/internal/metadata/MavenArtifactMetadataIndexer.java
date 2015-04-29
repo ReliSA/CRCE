@@ -97,25 +97,29 @@ public class MavenArtifactMetadataIndexer {
 				Model model;
 				try {
 					model = reader.read(new FileReader(pom));
-					
+
+					String presName = model.getName();
+
+					if (presName == null || presName.contains("${project.artifactId}") || presName.contains("$")) {
+						model.setName(a.getArtifactId());
+					}
+
 					metadataService.setPresentationName(resource, "POM - " + model.getName());
 					Capability capOsgi = metadataFactory.createCapability(NAMESPACE__OSGI_BUNDLE);
 
 					String symbName;
 					Object symbolicNameProp = model.getProperties().get("bundle.symbolicName");
-					
-					if(symbolicNameProp!=null){
+
+					if (symbolicNameProp != null) {
 						String sm = symbolicNameProp.toString();
-						int index = sm.indexOf(".");
-						
-						if(index>0){
+						int index = sm.lastIndexOf(".");
+
+						if (index > 0) {
 							symbName = a.getGroupId() + sm.substring(index);
+						} else {
+							symbName = a.getGroupId() + sm;
 						}
-						else{
-							symbName = a.getGroupId()+sm;
-						}
-					}
-					else{
+					} else {
 						symbName = a.getGroupId();
 					}
 					capOsgi.setAttribute(ATTRIBUTE__SYMBOLIC_NAME, symbName);

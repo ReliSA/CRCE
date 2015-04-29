@@ -61,7 +61,9 @@ public class RepositoryWrapper {
 	
 	public String getURItoPath() {
 		File file = new File(this.uri);
-		return file.getAbsolutePath();
+		String path = file.getAbsolutePath();
+		path = path.replace('\\', '/');
+		return path;
 
 	}
 

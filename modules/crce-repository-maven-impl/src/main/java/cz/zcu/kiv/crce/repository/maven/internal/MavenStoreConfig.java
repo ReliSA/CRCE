@@ -102,9 +102,8 @@ public class MavenStoreConfig {
 			}
 
 		} catch (URISyntaxException ex) {
-
-			file = new File(localRepoURI);
-			uri = file.toURI();
+			logger.error("Wrong URI, check configuration file!",ex);
+			uri = null;
 		}
 
 		return uri;
@@ -137,6 +136,7 @@ public class MavenStoreConfig {
 			if (uri.getScheme() == null) {
 				file = new File(localRepoURI);
 				uri = file.toURI();
+				return new File(uri).getAbsolutePath();
 			} else if ("file".equals(uri.getScheme())) {
 				file = new File(uri);
 				return file.getAbsolutePath();
@@ -146,12 +146,10 @@ public class MavenStoreConfig {
 			}
 			
 		} catch (URISyntaxException ex) {
-			// TODO verify this usecase and correctness
-			file = new File(localRepoURI);
-			uri = file.toURI();
+			logger.error("Wrong URI, check configuration file!", ex);
+			return null;
 		}
 		
-		return new File(uri).getAbsolutePath();
 	}
 
 
@@ -246,6 +244,11 @@ public class MavenStoreConfig {
 
 	public static void setArtifactResolveParam(String artifactResolveParam) {
 		MavenStoreConfig.artifactResolveParam = artifactResolveParam;
+	}
+	
+	public void printConfig(){
+		logger.debug("");
+		
 	}
 }
 
