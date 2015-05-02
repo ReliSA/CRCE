@@ -15,7 +15,6 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.repository.maven.internal.IdentityIndexer;
-import cz.zcu.kiv.crce.repository.maven.internal.LocalMavenRepositoryIndexer;
 
 /**
 * Implementation class of MetadataaIndexerCallback interface
@@ -36,7 +35,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     
 	public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
 			MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
-			LocalMavenRepositoryIndexer repositoryIndexer, Repository repository) {
+			Repository repository) {
 		this.resourceDAO = resourceDAO;
 		this.resourceIndexerService = resourceIndexerService;
 		this.metadataService = metadataService;
@@ -92,7 +91,6 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 				postProcessing(file, resource, maw);
 
 				validate(resource);
-
 				saveToDB(file, resource);
 			}
 

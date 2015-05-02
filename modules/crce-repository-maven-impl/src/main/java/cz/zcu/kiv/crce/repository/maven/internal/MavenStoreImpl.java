@@ -43,7 +43,6 @@ public class MavenStoreImpl implements Store {
     private volatile MetadataValidator metadataValidator;
     private volatile IdentityIndexer identityIndexer;
     private volatile ResourceLoader resourceLoader;
-    private volatile LocalMavenRepositoryIndexer repositoryIndexer;
 
     private Repository repository;
     private final URI baseUri;
@@ -166,8 +165,8 @@ public class MavenStoreImpl implements Store {
      * Main method for start indexing local maven repository
      */    
 	private void index() {
-		taskRunnerService.scheduleTask(new LocalMavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
-				resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repositoryIndexer, repository)));
+		taskRunnerService.scheduleTask(new MavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
+				resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repository)));
 	}
 
 }

@@ -100,9 +100,9 @@ import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallbac
  *
  * @author Miroslav Brožek
  */
-public class LocalMavenRepositoryIndexer extends Task<Object> {
+public class MavenRepositoryIndexer extends Task<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalMavenRepositoryIndexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(MavenRepositoryIndexer.class);
 
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
@@ -110,7 +110,7 @@ public class LocalMavenRepositoryIndexer extends Task<Object> {
     
     private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextPath();
       
-    public LocalMavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
+    public MavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
         this.uri = uri;
         this.metadataIndexerCallback = metadataIndexerCallback;

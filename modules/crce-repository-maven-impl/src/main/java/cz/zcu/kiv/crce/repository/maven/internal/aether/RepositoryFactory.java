@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
@@ -54,8 +55,8 @@ public class RepositoryFactory {
 		LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepository().getURItoPath());		
 		DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-//		session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, "2000");//2s
-//		session.setConfigProperty(ConfigurationProperties.CONNECT_TIMEOUT, "1000");//1000ms
+		session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, "2000");//2s
+		session.setConfigProperty(ConfigurationProperties.CONNECT_TIMEOUT, "1000");//1000ms
 		
 		return session;
 	}
