@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Version>: \
+  ${pom.version}
+
+Bundle-SymbolicName: \
+  ${bundle.symbolicName}
+
+Bundle-Name: CRCE - Rest V2
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Import-Package: \
+  !javax.annotation, \
+  javax.servlet, \
+  javax.servlet.http, \
+  org.osgi.framework, \
+  org.osgi.service.log, \
+  org.osgi.service.useradmin, \
+  org.glassfish.jersey.servlet, \
+  cz.zcu.kiv.crce.repository, \
+  *
+
+Export-Package:
+
+Dynamic-ImportPackage: *
+
+Bundle-ClassPath: .,WEB-INF/classes
+
+Web-ContextPath: rest/v2
+
+Webapp-Context: rest/v2
