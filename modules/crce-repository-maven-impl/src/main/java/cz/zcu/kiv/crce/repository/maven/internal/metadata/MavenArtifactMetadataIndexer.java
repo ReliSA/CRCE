@@ -210,7 +210,10 @@ public class MavenArtifactMetadataIndexer {
 			if(!v.getvMax().equals("")){			
 				r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMax()).convertVersion(), v.getvMaxOperator());	
 			}
-		}		
+		}
+		else{
+			r.addAttribute(ATTRIBUTE__VERSION, v.convertVersion());
+		}
 	}
 	
 
