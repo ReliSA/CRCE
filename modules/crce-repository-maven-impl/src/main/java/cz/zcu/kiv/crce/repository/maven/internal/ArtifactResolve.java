@@ -12,6 +12,8 @@ public enum ArtifactResolve {
 	HIGHEST_MINOR("highest-minor"),
 	HIGHEST_MICRO("highest-micro"),
 	HIGHEST_QUALIFIER("highest-qualifier"),
+	LOWEST_MINOR("lowest-minor"),
+	LOWEST_MICRO("lowest-micro"),
 	GAV("gav"),
 	GROUP_ID("groupid"),
 	GROUPID_ARTIFACTID("groupid-artifactid"),

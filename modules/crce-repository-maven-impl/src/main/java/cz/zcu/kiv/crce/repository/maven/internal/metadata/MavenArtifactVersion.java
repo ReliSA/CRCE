@@ -15,7 +15,7 @@ public class MavenArtifactVersion {
 
 	private Integer minorVersion;
 
-	private Integer incrementalVersion;
+	private Integer microVersion;
 
 	private Integer buildNumber;
 
@@ -86,7 +86,7 @@ public class MavenArtifactVersion {
 					minorVersion = getNextIntegerToken(tok);
 				}
 				if (tok.hasMoreTokens()) {
-					incrementalVersion = getNextIntegerToken(tok);
+					microVersion = getNextIntegerToken(tok);
 				}
 				
 				if (tok.hasMoreTokens()) {
@@ -103,7 +103,7 @@ public class MavenArtifactVersion {
 				qualifier = version;
 				majorVersion = null;
 				minorVersion = null;
-				incrementalVersion = null;
+				microVersion = null;
 				buildNumber = null;					
 				rangeVersion = checkRangeVersion();				
 			}
@@ -126,8 +126,8 @@ public class MavenArtifactVersion {
 		return minorVersion != null ? minorVersion.intValue() : -1;
 	}
 
-	public int getIncrementalVersion() {
-		return incrementalVersion != null ? incrementalVersion.intValue() : -1;
+	public int getMicroVersion() {
+		return microVersion != null ? microVersion.intValue() : -1;
 	}
 
 	public int getBuildNumber() {
@@ -277,7 +277,7 @@ public class MavenArtifactVersion {
 	 * @return new format of Version.class
 	 */
 	public Version convertVersion() {
-		return new Version(getMajorVersion(), getMinorVersion(), getIncrementalVersion(), getQualifier());
+		return new Version(getMajorVersion(), getMinorVersion(), getMicroVersion(), getQualifier());
 	}
 	
 }
