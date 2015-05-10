@@ -37,11 +37,13 @@ public class MavenArtifactVersion {
 
 	public final void parseVersion(String version) {
 		
-		rangeVersion = checkRangeVersion(version);	
-		if(rangeVersion){
-			return;
+		//check if version is written as range
+		if( (version.startsWith("[") || version.startsWith("(")) && 
+				(version.endsWith("]") || version.endsWith(")")) ){
+			rangeVersion = checkRangeVersion(version);			
 		}
-
+		
+		
 		int index = version.indexOf("-");
 		int index2 = version.indexOf("_");
 
@@ -109,8 +111,11 @@ public class MavenArtifactVersion {
 				majorVersion = null;
 				minorVersion = null;
 				microVersion = null;
-				buildNumber = null;					
-				rangeVersion = checkRangeVersion(qualifier);				
+				buildNumber = null;	
+				
+				if(!rangeVersion){
+					rangeVersion = checkRangeVersion(qualifier);
+				}
 			}
 		}
 	}
@@ -153,19 +158,15 @@ public class MavenArtifactVersion {
 	}
 
 	private boolean checkHardVersion(String ver) {
-		ver = ver.trim();
-		
-		if(ver.startsWith("[") && ver.endsWith("]")){
-			vMin = ver.substring(0, ver.length()-1);
-			vMax = ver.substring(1, ver.length());
 
-			// parse brackets
-			if (setMinOperator(vMin) && setMaxOperator(vMax)) {
-				return true;
-			}			
+		vMin = ver.substring(0, ver.length() - 1);
+		vMax = ver.substring(1, ver.length());
+
+		// parse brackets
+		if (setMinOperator(vMin) && setMaxOperator(vMax)) {
+			return true;
 		}
-		
-		
+
 		return false;
 	}
 
