@@ -119,9 +119,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 	@Override
 	protected Object run() throws Exception {
 		logger.error("START");
-		logger.info("Indexing Maven repository metadata started: {}", uri);
-		logger.debug("Updating  index started.");
-
+		logger.error("Indexing Maven repository started: {}", uri);
+		
 		try {
 			
 			if (!MavenStoreConfig.isRemoteRepoDefault()) {
@@ -133,6 +132,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 				RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
 				indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(INDEXING_CONTEXT), rr.isUpdate());
 			}
+			logger.error("Indexing Maven repository ended: {}", uri);
 
 			Indexer indexer = indexingContext.getIndexer();
 			Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();

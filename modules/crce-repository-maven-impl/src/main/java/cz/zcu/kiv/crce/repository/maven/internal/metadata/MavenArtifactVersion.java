@@ -36,6 +36,11 @@ public class MavenArtifactVersion {
 	}
 
 	public final void parseVersion(String version) {
+		
+		rangeVersion = checkRangeVersion(version);	
+		if(rangeVersion){
+			return;
+		}
 
 		int index = version.indexOf("-");
 		int index2 = version.indexOf("_");
@@ -105,7 +110,7 @@ public class MavenArtifactVersion {
 				minorVersion = null;
 				microVersion = null;
 				buildNumber = null;					
-				rangeVersion = checkRangeVersion();				
+				rangeVersion = checkRangeVersion(qualifier);				
 			}
 		}
 	}
@@ -138,10 +143,10 @@ public class MavenArtifactVersion {
 		return qualifier;
 	}
 	
-	private boolean checkRangeVersion() {
+	private boolean checkRangeVersion(String ver) {
 		boolean range = false;
 
-		int index = qualifier.indexOf(",");
+		int index = ver.indexOf(",");
 
 		if (index < 0) {
 			return range;
@@ -151,10 +156,10 @@ public class MavenArtifactVersion {
 
 			// must have 2 brackets , one coma and at least 1 digit >> qualifier
 			// must be bigger than 3
-			if (qualifier.length() > 3) {
+			if (ver.length() > 3) {
 
-				vMin = qualifier.substring(0, index);
-				vMax = qualifier.substring(index + 1);
+				vMin = ver.substring(0, index);
+				vMax = ver.substring(index + 1);
 
 				// parse brackets
 				if (setMinOperator(vMin) && setMaxOperator(vMax)) {

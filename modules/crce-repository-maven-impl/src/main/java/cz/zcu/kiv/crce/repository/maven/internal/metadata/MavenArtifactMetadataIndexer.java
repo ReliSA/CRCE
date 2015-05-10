@@ -51,8 +51,8 @@ public class MavenArtifactMetadataIndexer {
 	
 	public static final String DEPENDENCY_SCOPE = "scope";
 	public static final String DEPENDENCY_OPTIONAL = "optional";
-
-
+	
+	
 	public MavenArtifactMetadataIndexer(MetadataService metadataService, MetadataFactory metadaFactory) {
 		this.metadataService = metadataService;
 		this.metadataFactory = metadaFactory;
@@ -67,7 +67,7 @@ public class MavenArtifactMetadataIndexer {
 			addArtifactRequirements(resource, maw);
 
 		} catch (Exception e) {
-			logger.error("Not possible create maven artifact Capability or Requirements due error:", e);			
+			logger.error("Not possible create Capability or Requirements for {} due error:", maw.getArtifact(), e);			
 		}
 	}	
 	
