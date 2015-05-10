@@ -144,6 +144,27 @@ public class MavenArtifactVersion {
 	}
 	
 	private boolean checkRangeVersion(String ver) {
+		
+		if(checkNormalRange(ver) || checkHardVersion(ver)){
+			return true;
+		}		
+		
+		return false;
+	}
+
+	private boolean checkHardVersion(String ver) {
+		ver = ver.trim();
+		vMin = ver.substring(0, ver.length()-1);
+		vMax = ver.substring(1, ver.length());
+
+		// parse brackets
+		if (setMinOperator(vMin) && setMaxOperator(vMax)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkNormalRange(String ver) {
 		boolean range = false;
 
 		int index = ver.indexOf(",");
