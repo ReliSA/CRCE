@@ -253,9 +253,27 @@ public class MavenRepositoryIndexer extends Task<Object> {
 						artifactRequest.setArtifact(a);
 						artifactRequest.setRepositories(descriptorRequest.getRepositories());
 
+						//resolve root artifact
 						ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
 						a = artifactResult.getArtifact();
+
+						//resolve directDependencies						
+						for (Dependency d : directD) {
+							Artifact artifactD = d.getArtifact();
+							artifactRequest = new ArtifactRequest();
+							artifactRequest.setArtifact(artifactD);
+							artifactRequest.setRepositories(descriptorRequest.getRepositories());
+							
+							try {
+								artifactResult = system.resolveArtifact(session, artifactRequest);
+								artifactD = artifactResult.getArtifact();
+								logger.debug(artifactD + " resolved to  " + artifactD.getFile());
+							} catch (Exception e) {
+								logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", artifactD, e);
+							}
+						}
 					}
+							
 
 					// Indexing by POM
 					else {
