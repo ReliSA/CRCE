@@ -118,8 +118,6 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
 	@Override
 	protected Object run() throws Exception {
-		logger.error("START");
-		logger.error("Indexing Maven repository started: {}", uri);
 		
 		try {
 			
@@ -131,8 +129,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 			else {
 				RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
 				indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(INDEXING_CONTEXT), rr.isUpdate());
-			}
-			logger.error("Indexing Maven repository ended: {}", uri);
+			}	
+			
 
 			Indexer indexer = indexingContext.getIndexer();
 			Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
@@ -207,6 +205,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 			System.out.println("size>"+results.size());		
 		
 			if(results.size()>0){
+				
 				indexResults(results);
 			}
 			else{
@@ -218,14 +217,14 @@ public class MavenRepositoryIndexer extends Task<Object> {
 			logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
 			return null;
 		}
-
-		logger.error("END");
-		logger.info("Indexing Maven repository metadata finished: {}", uri);
+		
 		indexingContext.close();
 		return null;
 	}
 
 	private void indexResults(Set<ArtifactInfo> results) {
+		logger.info("Indexing Artifacts in Maven repository started: {}", uri);
+		
 		int counter = 1;
 		RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
 		DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
@@ -260,9 +259,18 @@ public class MavenRepositoryIndexer extends Task<Object> {
 						//resolve directDependencies						
 						for (Dependency d : directD) {
 							Artifact artifactD = d.getArtifact();
+							MavenArtifactVersion v = new MavenArtifactVersion(artifactD.getBaseVersion());
+							
+							if(v.isRangeVersion()){								
+								//get newest dependendency from range, should be configurable
+								String version = v.getvMax();
+								artifactD = artifactD.setVersion(version);								
+							}
+							
+							
 							artifactRequest = new ArtifactRequest();
 							artifactRequest.setArtifact(artifactD);
-							artifactRequest.setRepositories(descriptorRequest.getRepositories());
+							artifactRequest.setRepositories(descriptorRequest.getRepositories());							
 							
 							try {
 								artifactResult = system.resolveArtifact(session, artifactRequest);
@@ -285,7 +293,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 					metadataIndexerCallback.index(maw);
 				}
 
-				// Create Hierarchy Dependcies
+				// Create Hierarchy Dependencies
 				else {
 
 					session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
@@ -336,6 +344,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 			
 			counter++;
 		}
+		
+		logger.info("Indexing Artifacts in Maven repository finished: {}", uri);
 	}
 
 	private Artifact setPOMfileToArtifact(Artifact a, RepositorySystem system, RepositorySystemSession session) throws ArtifactResolutionException {
