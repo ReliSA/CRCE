@@ -202,10 +202,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
 //			logger.debug("Indexing artifacts (amount: {}).", results.size());
 			//for debug
-			System.out.println("size>"+results.size());		
 		
 			if(results.size()>0){
 				
+				logger.info("Amount of artifacts to index: {}", results.size());		
 				indexResults(results);
 			}
 			else{

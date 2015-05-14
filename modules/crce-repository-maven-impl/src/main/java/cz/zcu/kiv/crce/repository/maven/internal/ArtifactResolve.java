@@ -34,7 +34,7 @@ public enum ArtifactResolve {
 	
 	public static ArtifactResolve fromValue(String value) {
         for (ArtifactResolve v : values()) {
-            if (v.value.equals(value)) {
+            if (v.value.equals(value.trim())) {
                 return v;
             }
         }
