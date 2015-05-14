@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -91,6 +91,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
+import cz.zcu.kiv.crce.repository.maven.internal.ArtifactResolve;
+import cz.zcu.kiv.crce.repository.maven.internal.CloseableIndexingContext;
+import cz.zcu.kiv.crce.repository.maven.internal.MavenRepositoryIndexer;
+import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
+import cz.zcu.kiv.crce.repository.maven.internal.RepositoryWrapper;
 import cz.zcu.kiv.crce.repository.maven.internal.aether.RepositoryFactory;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactVersion;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MavenArtifactWrapper;
@@ -98,7 +103,7 @@ import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallbac
 
 /**
  *
- * @author Miroslav Brožek
+ * @author Miroslav BroĹľek
  */
 public class MavenRepositoryIndexer extends Task<Object> {
 
@@ -456,7 +461,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 			ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
 			res.add(ai);
 
-			logger.debug("{} artifact atest version:  {}",ai, ai.version);
+			logger.debug("{} artifact latest version:  {}",ai, ai.version);
 		}		 
 		return res;
 	}
