@@ -144,7 +144,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> resources;
             if ("store".equals(link)) {
-                resources = Activator.instance().getStore().getResources();
+                resources = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 resources = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -187,7 +187,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -241,7 +241,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -287,7 +287,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -370,7 +370,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -434,7 +434,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -530,7 +530,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -670,7 +670,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -702,7 +702,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -737,7 +737,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -771,7 +771,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -805,7 +805,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -842,7 +842,7 @@ public class EditServlet extends HttpServlet {
         List<Resource> array;
 
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -890,7 +890,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -924,7 +924,7 @@ public class EditServlet extends HttpServlet {
         String link = (String) req.getSession().getAttribute("source");
         List<Resource> array;
         if ("store".equals(link)) {
-            array = Activator.instance().getStore().getResources();
+            array = Activator.instance().getStore(null).getResources();
         } else if ("buffer".equals(link)) {
             array = Activator.instance().getBuffer(req).getResources();
         } else {
@@ -970,7 +970,7 @@ public class EditServlet extends HttpServlet {
             String link = (String) req.getSession().getAttribute("source");
             List<Resource> array;
             if ("store".equals(link)) {
-                array = Activator.instance().getStore().getResources();
+                array = Activator.instance().getStore(null).getResources();
             } else if ("buffer".equals(link)) {
                 array = Activator.instance().getBuffer(req).getResources();
             } else {
@@ -1017,9 +1017,9 @@ public class EditServlet extends HttpServlet {
         try {
             URI fileUri = new URI(uri);
             if ("store".equals(link)) {
-                List<Resource> array = Activator.instance().getStore().getResources();
+                List<Resource> array = Activator.instance().getStore(null).getResources();
                 Resource found = findResource(fileUri, array);
-                Activator.instance().getStore().remove(found);
+                Activator.instance().getStore(null).remove(found);
             } else if ("buffer".equals(link)) {
                 List<Resource> array = Activator.instance().getBuffer(req).getResources();
                 Resource found = findResource(fileUri, array);

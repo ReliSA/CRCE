@@ -144,6 +144,21 @@
             <type>bundle</type>
             <scope>test</scope>
         </dependency>
+        
+        <!-- The following dependencies are there in order to fulfill OSGi dependencies when REST API module is not deployed, TODO identify why they are even needed in that case and fix it -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+        </dependency>        
+        
     </dependencies>
 
 </project>

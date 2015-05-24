@@ -69,7 +69,7 @@ public class RuntimeServlet extends HttpServlet {
     private List<Resource> fetchRightResources(String source, HttpServletRequest req) {
         Activator a = Activator.instance();
         if (source.equals("store")) {
-            return a.getStore().getResources();
+            return a.getStore(null).getResources();
         } else {
             return a.getBuffer(req).getResources();
         }
