@@ -71,8 +71,12 @@ public final class Activator extends DependencyActivatorBase {
         return metadataFactory;
     }
 
+    /**
+     * 
+     * @return Map of repository ID to repository name.
+     */
     @Nonnull
-    public Map<String, String> getStores() {
+    public Map<String, String> getRepositories() {
         Map<String, String> stores = new HashMap<>();
         
         Collection<ServiceReference<Store>> serviceReferences;
@@ -99,8 +103,8 @@ public final class Activator extends DependencyActivatorBase {
         return stores;
     }
     
-    public Store getStore(String storeId) {
-        String filter = "(id=" + storeId + ")";
+    public Store getStore(String repositoryId) {
+        String filter = "(id=" + repositoryId + ")";
         
         Collection<ServiceReference<Store>> serviceReferences;
         try {
@@ -111,12 +115,12 @@ public final class Activator extends DependencyActivatorBase {
         }
         
         if (serviceReferences == null || serviceReferences.isEmpty()) {
-            logger.warn("Store not found for ID: {}", storeId);
+            logger.warn("Store not found for repository ID: {}", repositoryId);
             return null;
         }
         
         if (serviceReferences.size() > 1) {
-            logger.warn("More than one stores found for ID: {}, using the first one.", storeId);
+            logger.warn("More than one stores found for repository ID: {}, using the first one.", repositoryId);
         }
         
         return bundleContext.getService(serviceReferences.iterator().next());
@@ -154,7 +158,7 @@ public final class Activator extends DependencyActivatorBase {
         );
 
 
-        logger.debug("Webui activator initialized.");
+        logger.debug("WebUI activator initialized.");
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
@@ -58,14 +59,22 @@ public class ResourceServlet extends HttpServlet {
 
         if ("upload".equals(source) || "commit".equals(source)) {
             doGet(req, resp);
-        } else if (req.getParameter("filter") != null) {
-            String filter = req.getParameter("filter");
-            logger.warn("LDAP filter is not supported yet with new Metadata API, returning all resources for filter: {}", filter);
-            fillSession(source, req, null); // TODO there was filter instead of null in implementation with old metadata
-            req.getRequestDispatcher("jsp/" + source + ".jsp").forward(req, resp);
         } else {
-            doGet(req, resp);
-        }
+            String filter = req.getParameter("filter");
+            if (filter != null && !filter.isEmpty()) {
+
+                logger.warn("LDAP filter is not supported yet with new Metadata API, returning all resources for filter: {}", filter);
+
+                fillSession(source, req, null); // TODO there was filter instead of null in implementation with old metadata
+                req.getRequestDispatcher("jsp/" + source + ".jsp").forward(req, resp);
+            } else {
+                doGet(req, resp);
+            }
+        } 
+//        else if (req.getParameter("repositorySelection") != null) {
+//            req.getSession().setAttribute("repositoryId", req.getParameter("repositorySelection"));
+//        }
+        
     }
 
     @Override
@@ -112,27 +121,33 @@ public class ResourceServlet extends HttpServlet {
         if (link == null) {
             return false;
         }
+        
+        Set<Map.Entry<String, String>> repositories = Activator.instance().getRepositories().entrySet();
+        session.setAttribute("showRepositorySelection", repositories.size() > 1); // TODO this logic should be in header.jsp
+        session.setAttribute("repositories", repositories);
+        
         switch (link) {
-            case "buffer":
-                List<Resource> bufferResources;
+            case "buffer": {
+                List<Resource> resources;
                 if (filter == null) {
-                    bufferResources = Activator.instance().getBuffer(req).getResources();
+                    resources = Activator.instance().getBuffer(req).getResources();
                 } else {
                     try {
-                        bufferResources = Activator.instance().getBuffer(req).getResources(filter);
+                        resources = Activator.instance().getBuffer(req).getResources(filter);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        bufferResources = Activator.instance().getBuffer(req).getResources();
+                        resources = Activator.instance().getBuffer(req).getResources();
                     }
                 }
-                List<ResourceExt> bufferResourcesExt = new ArrayList<>(bufferResources.size());
-                for (Resource resource : bufferResources) {
+                List<ResourceExt> bufferResourcesExt = new ArrayList<>(resources.size());
+                for (Resource resource : resources) {
                     bufferResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                 }
                 session.setAttribute("buffer", bufferResourcesExt);
                 return true;
+            }
 
-            case "plugins":
+            case "plugins": {
                 List<Plugin> plugins;
                 if (filter == null) {
                     plugins = Activator.instance().getPluginManager().getPlugins();
@@ -147,32 +162,33 @@ public class ResourceServlet extends HttpServlet {
                 }
                 session.setAttribute("plugins", pluginWrappers);
                 return true;
+            }
 
             case "store": {
                 String id = getStoreId(req);
                 if (id == null) {
                     return true;
                 }
-                List<Resource> storeResources;
+                List<Resource> resources;
                 if (filter == null) {
-                    storeResources = Activator.instance().getStore(id).getResources();
+                    resources = Activator.instance().getStore(id).getResources();
                 } else {
                     try {
-                        storeResources = Activator.instance().getStore(id).getResources(filter);
+                        resources = Activator.instance().getStore(id).getResources(filter);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
-                        storeResources = Activator.instance().getStore(id).getResources();
+                        resources = Activator.instance().getStore(id).getResources();
                     }
                 }
-                List<ResourceExt> storeResourcesExt = new ArrayList<>(storeResources.size());
-                for (Resource resource : storeResources) {
+                List<ResourceExt> storeResourcesExt = new ArrayList<>(resources.size());
+                for (Resource resource : resources) {
                     storeResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
                 }
                 session.setAttribute("store", storeResourcesExt);
                 return true;
             }
 
-            case "tags":
+            case "tags": {
                 List<Resource> resources = prepareResources(req, filter);
                 ArrayList<Category> categoryList = prepareCategoryList(resources);
                 ArrayList<ResourceExt> filteredResourceList;
@@ -191,8 +207,9 @@ public class ResourceServlet extends HttpServlet {
                 session.setAttribute("categoryList", categoryList);
 
                 return true;
+            }
 
-            case "compatibility":
+            case "compatibility": {
                 String name = req.getParameter("name");
                 String version = req.getParameter("version");
                 String id = getStoreId(req);
@@ -227,6 +244,7 @@ public class ResourceServlet extends HttpServlet {
                 session.setAttribute("upper", upper);
 
                 return true;
+            }
 
             default:
                 return false;
@@ -350,9 +368,9 @@ public class ResourceServlet extends HttpServlet {
     
     @CheckForNull
     private String getStoreId(HttpServletRequest req) {
-        String id = req.getParameter("id");
+        String id = req.getParameter("repositoryId");
         if (id == null) {
-            Map<String, String> stores = Activator.instance().getStores();
+            Map<String, String> stores = Activator.instance().getRepositories();
             if (stores.isEmpty()) {
                 return null;
             }
