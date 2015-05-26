@@ -195,6 +195,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-osgi-bundle</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
