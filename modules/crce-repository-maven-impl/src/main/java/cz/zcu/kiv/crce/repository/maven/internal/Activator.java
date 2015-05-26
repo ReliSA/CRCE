@@ -27,9 +27,6 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
-import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
-import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
@@ -65,17 +62,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         dm.add(createComponent()
                 .setInterface(ManagedServiceFactory.class.getName(), props)
                 .setImplementation(this)
-                );
-
-        dm.add(createComponent()
-                .setInterface(SessionRegister.class.getName(), null)
-                .setImplementation(SessionRegisterImpl.class)
-                );
-
-        dm.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
-                .setImplementation(PriorityActionHandler.class)
-                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
     }
 
@@ -151,7 +137,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         Properties props = new Properties();
         props.put("id", pid);
         props.put("name", "Maven: " + uri);
-        
+
         Component storeComponent = createComponent()
                 .setInterface(Store.class.getName(), props)
                 .setImplementation(new MavenStoreImpl(uri))
