@@ -21,8 +21,8 @@ import cz.zcu.kiv.crce.repository.maven.internal.IdentityIndexer;
 * @author Miroslav Brožek
 */
 public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
-		
-	private volatile ResourceDAO resourceDAO;	
+        
+    private volatile ResourceDAO resourceDAO;    
     private volatile ResourceIndexerService resourceIndexerService;    
     private volatile MetadataService metadataService;
     private volatile MetadataValidator metadataValidator;
@@ -33,75 +33,75 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     private Repository repository;
     
     
-	public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
-			MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
-			Repository repository) {
-		this.resourceDAO = resourceDAO;
-		this.resourceIndexerService = resourceIndexerService;
-		this.metadataService = metadataService;
-		this.metadataValidator = metadataValidator;
-		this.identityIndexer = identityIndexer;		
-		this.logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
-		this.repository = repository;
-		this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
-	}	
+    public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
+            MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
+            Repository repository) {
+        this.resourceDAO = resourceDAO;
+        this.resourceIndexerService = resourceIndexerService;
+        this.metadataService = metadataService;
+        this.metadataValidator = metadataValidator;
+        this.identityIndexer = identityIndexer;        
+        this.logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
+        this.repository = repository;
+        this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
+    }    
 
-	private void postProcessing(File file, Resource resource, MavenArtifactWrapper maw) {
-		metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
+    private void postProcessing(File file, Resource resource, MavenArtifactWrapper maw) {
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 
-		identityIndexer.preIndex(file, file.getName(), resource);
-		
-		updateResourceMetadataFromAether(resource, maw);
-		
-		identityIndexer.postIndex(file, resource);
-	}
+        identityIndexer.preIndex(file, file.getName(), resource);
+        
+        updateResourceMetadataFromAether(resource, maw);
+        
+        identityIndexer.postIndex(file, resource);
+    }
 
-	private void validate(Resource resource) {
-		ResourceValidationResult validationResult = metadataValidator.validate(resource);
-		if (!validationResult.isContextValid()) {
-		    logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
-		    
-		}
-		else
-		{			
-			logger.info("Indexed resource {} is valid.", resource.getId());
-		}
-	}
+    private void validate(Resource resource) {
+        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+        if (!validationResult.isContextValid()) {
+            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+            
+        }
+        else
+        {            
+            logger.info("Indexed resource {} is valid.", resource.getId());
+        }
+    }
 
-	private void saveToDB(File file, Resource resource) {
-		try {
-		    resourceDAO.saveResource(resource);
-		} catch (IOException e) {
-		    logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
-		}
-	}	
+    private void saveToDB(File file, Resource resource) {
+        try {
+            resourceDAO.saveResource(resource);
+        } catch (IOException e) {
+            logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
+        }
+    }    
 
-	@Override
-	public void index(MavenArtifactWrapper maw) {
-		File file = maw.getArtifact().getFile().getAbsoluteFile();
-		try {
+    @Override
+    public void index(MavenArtifactWrapper maw) {
+        File file = maw.getArtifact().getFile().getAbsoluteFile();
+        try {
 
-			logger.debug("Indexing artifact {}", file);
+            logger.debug("Indexing artifact {}", file);
 
-			if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
-				Resource resource;
+            if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
+                Resource resource;
 
-				resource = resourceIndexerService.indexResource(file);				
+                resource = resourceIndexerService.indexResource(file);                
 
-				postProcessing(file, resource, maw);
+                postProcessing(file, resource, maw);
 
-				validate(resource);
-				saveToDB(file, resource);
-			}
+                validate(resource);
+                saveToDB(file, resource);
+            }
 
-		} catch (IOException e) {
-			logger.error("Could not index file {}", file, e);
-		}
-	}
+        } catch (IOException e) {
+            logger.error("Could not index file {}", file, e);
+        }
+    }
 
-	private void updateResourceMetadataFromAether(Resource resource, MavenArtifactWrapper maw) {		
-		mami.createMavenArtifactMetadata(resource, maw);
+    private void updateResourceMetadataFromAether(Resource resource, MavenArtifactWrapper maw) {        
+        mami.createMavenArtifactMetadata(resource, maw);
 
-	} 		
-	
+    }         
+    
 }

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.repository.internal;
+package cz.zcu.kiv.crce.repository.filebased.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

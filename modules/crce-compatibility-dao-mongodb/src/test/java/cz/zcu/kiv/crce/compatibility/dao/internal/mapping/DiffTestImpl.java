@@ -3,9 +3,8 @@ package cz.zcu.kiv.crce.compatibility.dao.internal.mapping;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.zcu.kiv.typescmp.Difference;
-
 import cz.zcu.kiv.crce.compatibility.Diff;
+import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.DifferenceRole;
 

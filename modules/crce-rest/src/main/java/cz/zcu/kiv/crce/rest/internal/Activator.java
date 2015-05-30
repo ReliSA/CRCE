@@ -1,10 +1,13 @@
 package cz.zcu.kiv.crce.rest.internal;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
@@ -17,6 +20,8 @@ import cz.zcu.kiv.crce.rest.internal.mapping.JaxbMapping;
 
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
 public final class Activator extends DependencyActivatorBase {
+
+    private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
     private static volatile Activator instance;
 
@@ -55,7 +60,11 @@ public final class Activator extends DependencyActivatorBase {
         return filterParser;
     }
 
+    @Nullable
     public CompatibilitySearchService getCompatibilityService() {
+        if(compatibilityService == null) {
+            logger.info("Compatibility service is not available!");
+        }
         return compatibilityService;
     }
 
@@ -87,7 +96,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)) // FIXME 'not required' is only a temporary solution to make the component startable
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setAutoConfig(false).setRequired(false))
         );
     }
 }

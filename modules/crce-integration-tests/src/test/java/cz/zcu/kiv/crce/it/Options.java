@@ -25,11 +25,15 @@ import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.ops4j.pax.exam.options.extra.VMOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class contains a set of Pax Exam options, intended for typo-free provisioning of bundles.
  */
 public class Options {
+
+    private static final Logger logger = LoggerFactory.getLogger(Options.class);
 
     public static class Osgi {
 
@@ -246,6 +250,11 @@ public class Options {
     }
 
     private static MavenArtifactProvisionOption mavenBundle(String groupId, String artifactId) {
-        return CoreOptions.mavenBundle().groupId(groupId).artifactId(artifactId).versionAsInProject();
+        try {
+            return CoreOptions.mavenBundle().groupId(groupId).artifactId(artifactId).versionAsInProject();
+        } catch (Exception e) {
+            logger.error("Error loading Maven bundle: " + groupId + ":" + artifactId, e);
+            throw e;
+        }
     }
 }

@@ -2,8 +2,6 @@ package cz.zcu.kiv.crce.compatibility;
 
 import java.util.List;
 
-import cz.zcu.kiv.typescmp.Difference;
-
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**

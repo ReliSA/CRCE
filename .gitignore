@@ -44,3 +44,7 @@ modules/crce-rest/src/main/java/cz/zcu/kiv/crce/rest/internal/jaxb/
 
 # sbteclipse plugin 
 .target
+
+### IDEA ###
+.idea/
+*.iml

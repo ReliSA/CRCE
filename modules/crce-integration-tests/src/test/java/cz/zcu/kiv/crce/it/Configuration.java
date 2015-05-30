@@ -20,10 +20,15 @@ public class Configuration {
 
     public static void repository(IntegrationTestBase integrationTestBase) throws IOException {
     	//Disabled -> store was switched in POMs to maven store -> THIS STORE IS NOT READY FOR TEST yet...
-    	
+
         //integrationTestBase.configure(
                 //cz.zcu.kiv.crce.repository.maven.internal.Activator.PID,
                 //cz.zcu.kiv.crce.repository.internal.Activator.STORE_URI, "target/store"
         //);
+        
+        integrationTestBase.configureFactory(
+                cz.zcu.kiv.crce.repository.filebased.internal.Activator.PID,
+                cz.zcu.kiv.crce.repository.filebased.internal.Activator.CFG_PROPERTY__STORE_URI, "target/store"
+        );
     }
 }

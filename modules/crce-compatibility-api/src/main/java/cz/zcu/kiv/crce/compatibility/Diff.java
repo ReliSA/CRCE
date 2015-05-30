@@ -6,8 +6,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cz.zcu.kiv.typescmp.Difference;
-
 /**
  * Detailed description of differences between two bundles.
  *

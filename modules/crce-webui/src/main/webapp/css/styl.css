@@ -118,7 +118,7 @@ h3 {
 
 #menu .vyhledavani_h {
     float: right;
-    width: 250px;
+    width: 450px;
     height: 24px;
     /*line-height: 20px;*/
     text-align: right;
@@ -145,6 +145,10 @@ h3 {
     font-weight: normal;
     line-height: 16px;
     font-size: 8pt;
+}
+
+#menu .vyhledavani_h .repository_selection {
+    width: 250px;
 }
 
 #menu {

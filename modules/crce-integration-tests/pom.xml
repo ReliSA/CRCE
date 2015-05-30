@@ -171,11 +171,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>cz.zcu.kiv.jacc</groupId>
-            <artifactId>types-cmp</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <scope>test</scope>
@@ -195,6 +190,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

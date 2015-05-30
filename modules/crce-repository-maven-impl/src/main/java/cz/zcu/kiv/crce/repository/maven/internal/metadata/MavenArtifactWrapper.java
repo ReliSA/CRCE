@@ -15,44 +15,44 @@ import org.eclipse.aether.graph.DependencyNode;
  *
  */
 public class MavenArtifactWrapper {
-	
-	private Artifact artifact;
-	
-	private List<Dependency> directDependency;
-	
-	private List<DependencyNode> hiearchyDependency;
-	
-	
-	public MavenArtifactWrapper(Artifact artifact, List<Dependency> directDependency, List<DependencyNode> hiearchyDependency) {
-		super();
-		this.artifact = artifact;
-		this.directDependency = directDependency;
-		this.hiearchyDependency = hiearchyDependency;
-	}
+    
+    private Artifact artifact;
+    
+    private List<Dependency> directDependency;
+    
+    private List<DependencyNode> hiearchyDependency;
+    
+    
+    public MavenArtifactWrapper(Artifact artifact, List<Dependency> directDependency, List<DependencyNode> hiearchyDependency) {
+        super();
+        this.artifact = artifact;
+        this.directDependency = directDependency;
+        this.hiearchyDependency = hiearchyDependency;
+    }
 
-	public Artifact getArtifact() {
-		return artifact;
-	}
+    public Artifact getArtifact() {
+        return artifact;
+    }
 
-	public void setArtifact(Artifact artifact) {
-		this.artifact = artifact;
-	}
+    public void setArtifact(Artifact artifact) {
+        this.artifact = artifact;
+    }
 
-	public List<Dependency> getDirectDependency() {
-		return directDependency;
-	}
+    public List<Dependency> getDirectDependency() {
+        return directDependency;
+    }
 
-	public void setDirectDependency(List<Dependency> directDependency) {
-		this.directDependency = directDependency;
-	}
+    public void setDirectDependency(List<Dependency> directDependency) {
+        this.directDependency = directDependency;
+    }
 
-	public List<DependencyNode> getHiearchyDependency() {
-		return hiearchyDependency;
-	}
+    public List<DependencyNode> getHiearchyDependency() {
+        return hiearchyDependency;
+    }
 
-	public void setHiearchyDependency(List<DependencyNode> hiearchyDependency) {
-		this.hiearchyDependency = hiearchyDependency;
-	}	
-	
+    public void setHiearchyDependency(List<DependencyNode> hiearchyDependency) {
+        this.hiearchyDependency = hiearchyDependency;
+    }    
+    
 
 }

@@ -15,6 +15,7 @@ import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.namespace.NsCrceCompatibility;
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.internal.Activator;
 import cz.zcu.kiv.crce.rest.internal.jaxb.compatibility.ObjectFactory;
@@ -28,7 +29,6 @@ import cz.zcu.kiv.crce.rest.internal.jaxb.metadata.Property;
  * @author Jakub Danek
  */
 public class CompatibilityMapper {
-
     private ObjectFactory compatibilityObjectFactory = new ObjectFactory();
     private cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory metadataObjectFactory = new cz.zcu.kiv.crce.rest.internal.jaxb.metadata.ObjectFactory();
 
@@ -41,10 +41,13 @@ public class CompatibilityMapper {
      */
     @Nullable
     public Property mapCompatibility(Resource resource) {
-        List<Compatibility> compatibilities = Activator.instance().getCompatibilityService().listLowerCompatibilities(resource);
+        CompatibilitySearchService service = Activator.instance().getCompatibilityService();
+        if(service == null) {
+            return null;
+        }
 
         Property compProp = null;
-
+        List<Compatibility> compatibilities = service.listLowerCompatibilities(resource);
         if (!compatibilities.isEmpty()) {
             compProp = metadataObjectFactory.createProperty();
             compProp.setNamespace(NsCrceCompatibility.NAMESPACE__CRCE_COMPATIBILITY);

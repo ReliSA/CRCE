@@ -5,8 +5,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cz.zcu.kiv.typescmp.Difference;
-
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**

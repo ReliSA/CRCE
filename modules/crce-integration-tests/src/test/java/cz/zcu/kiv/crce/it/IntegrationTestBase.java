@@ -20,7 +20,6 @@ package cz.zcu.kiv.crce.it;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 //import static org.apache.ace.test.utils.Util.properties;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+
 import junit.framework.TestCase;
 
 import org.apache.felix.dm.Component;
@@ -39,7 +39,9 @@ import org.apache.felix.dm.ComponentDependencyDeclaration;
 import org.apache.felix.dm.ComponentStateListener;
 import org.apache.felix.dm.DependencyManager;
 import org.apache.felix.dm.ServiceDependency;
+
 import org.junit.Before;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
@@ -49,6 +51,8 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for integration tests. There is no technical reason to use this, but it might make
@@ -58,6 +62,9 @@ import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
  *
  */
 public class IntegrationTestBase extends TestCase {
+
+    private static final Logger logger = LoggerFactory.getLogger(IntegrationTestBase.class);
+
     /**
      * If we have to wait for a service, wait this amount of seconds.
      */
@@ -278,6 +285,11 @@ public class IntegrationTestBase extends TestCase {
     };
 
     public MavenArtifactProvisionOption mavenBundle(String groupId, String artifactId) {
-        return CoreOptions.mavenBundle(groupId, artifactId).versionAsInProject();
+        try {
+            return CoreOptions.mavenBundle(groupId, artifactId).versionAsInProject();
+        } catch (Exception e) {
+            logger.error("Error loading Maven bundle: " + groupId + ":" + artifactId, e);
+            throw e;
+        }
     }
 }

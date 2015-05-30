@@ -32,11 +32,11 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
  */
 public class MavenStoreImpl implements Store {
 
-	private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
 
-	private volatile RepositoryDAO repositoryDAO;
-	private volatile ResourceDAO resourceDAO;
-	private volatile TaskRunnerService taskRunnerService;
+    private volatile RepositoryDAO repositoryDAO;
+    private volatile ResourceDAO resourceDAO;
+    private volatile TaskRunnerService taskRunnerService;
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService;
@@ -47,27 +47,8 @@ public class MavenStoreImpl implements Store {
     private Repository repository;
     private final URI baseUri;
 
-    MavenStoreImpl(URI baseUri, boolean remoteRepository) throws IOException {
+    MavenStoreImpl(URI baseUri) {
         this.baseUri = baseUri;
-        
-		if (remoteRepository) {
-			logger.debug("URI {} for Remote Maven repository set", baseUri);
-		}
-		else{
-			File mvnStorePath = new File(baseUri);
-			
-			if (!mvnStorePath.exists()) {
-				if (!mvnStorePath.mkdirs()) {
-					logger.error("Could not create maven store directory {}", mvnStorePath);
-				}
-			} else if (!mvnStorePath.isDirectory()) {
-				throw new IOException("Base directory is not a directory: " + mvnStorePath);
-			}
-			if (!mvnStorePath.exists()) {
-				throw new IllegalStateException("Base direcotory could be not created: " + mvnStorePath, new IOException(
-						"Can not create directory"));
-			}			
-		}
     }
 
     @Override
@@ -75,33 +56,33 @@ public class MavenStoreImpl implements Store {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-	@Override
-	public boolean remove(Resource resource) throws IOException {
-		// resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource,this);
+    @Override
+    public boolean remove(Resource resource) throws IOException {
+        // resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource,this);
 
-		if (!isInStore(resource)) {
-			if (resourceDAO.existsResource(metadataService.getUri(resource))) {
-				logger.warn("Removing resource is not in store but it is in internal repository: {}", resource.getId());
-				resourceDAO.deleteResource(metadataService.getUri(resource));
-			}
-			// pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
-			return false;
-		}
+        if (!isInStore(resource)) {
+            if (resourceDAO.existsResource(metadataService.getUri(resource))) {
+                logger.warn("Removing resource is not in store but it is in internal repository: {}", resource.getId());
+                resourceDAO.deleteResource(metadataService.getUri(resource));
+            }
+            // pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+            return false;
+        }
 
-		// if URI scheme is not 'file', it is detected in previous isInStore() check
-		File file = new File(metadataService.getUri(resource));
-		if (!file.delete()) {
-			throw new IOException("Can not delete artifact file from store: " + metadataService.getUri(resource));
-		}
+        // if URI scheme is not 'file', it is detected in previous isInStore() check
+        File file = new File(metadataService.getUri(resource));
+        if (!file.delete()) {
+            throw new IOException("Can not delete artifact file from store: " + metadataService.getUri(resource));
+        }
 
-		resourceDAO.deleteResource(metadataService.getUri(resource));
+        resourceDAO.deleteResource(metadataService.getUri(resource));
 
-		// pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
-		//TODO: check if pluginManager is needed, or if whole Artifact DIR should be removed?
-		return true;
-	}
-	
-	private boolean isInStore(Resource resource) {
+        // pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
+        //TODO: check if pluginManager is needed, or if whole Artifact DIR should be removed?
+        return true;
+    }
+
+    private boolean isInStore(Resource resource) {
         URI uri = metadataService.getUri(resource).normalize();
         if (!"file".equals(uri.getScheme())) {
             return false;
@@ -156,17 +137,67 @@ public class MavenStoreImpl implements Store {
             } catch (IOException ex) {
                 logger.error("Could not save repository for {}", baseUri, ex);
             }
-        }               
-        
-        index();             
-    }    
+        }
+
+        index();
+    }
 
     /**
      * Main method for start indexing local maven repository
-     */    
-	private void index() {
-		taskRunnerService.scheduleTask(new MavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
-				resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repository)));
-	}
+     */
+    private void index() {
+        taskRunnerService.scheduleTask(new MavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
+                resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repository)));
+    }
 
+//<<<<<<< HEAD:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
+//=======
+//    void stop() {
+//        logger.info("Stopping DM component {}", this);
+//    }
+//
+//    private void index() {
+//        taskRunnerService.scheduleTask(new LocalRepositoryIndexer(baseUri, new MetadataIndexerCallback() {
+//
+//            @Override
+//            public void index(File file) {
+//                try {
+//                    if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
+//                        Resource resource;
+//                        try {
+//                            resource = resourceIndexerService.indexResource(file);
+//                        } catch (IOException e) {
+//                            logger.error("Could not index file {}", file, e);
+//                            return;
+//                        }
+//                        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
+//
+//                        identityIndexer.preIndex(file, file.getName(), resource);
+//                        identityIndexer.postIndex(file, resource);
+//
+//                        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+//                        if (!validationResult.isContextValid()) {
+//                            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+//                            return;
+//                        }
+//                        logger.info("Indexed resource {} is valid.", resource.getId());
+//
+//                        try {
+//                            resourceDAO.saveResource(resource);
+//                        } catch (IOException e) {
+//                            logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    logger.error("Could not check that resource exists: {}", file, e);
+//                }
+//            }
+//        }));
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "MavenStoreImpl{" + "baseUri=" + baseUri + '}';
+//    }
+//>>>>>>> master:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
 }

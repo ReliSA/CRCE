@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.rest.internal.xml;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
@@ -69,27 +71,33 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
      * @return resource, that could replace client bundle.
      * @throws WebApplicationException unsupported operation
      */
+    @Nullable
     private Resource findResourceToReturn(String op, Resource clientResource) throws WebApplicationException {
-        Resource resourceToReturn = null;
+        Resource resourceToReturn;
+        CompatibilitySearchService service = Activator.instance().getCompatibilityService();
+        if(service == null) {
+            return null;
+        }
+
         if (op != null) {
             switch (op) {
                 case LOWEST_OP:
-                    resourceToReturn = Activator.instance().getCompatibilityService().findLowestDowngrade(clientResource);
+                    resourceToReturn = service.findLowestDowngrade(clientResource);
                     break;
                 case HIGHEST_OP:
-                    resourceToReturn = Activator.instance().getCompatibilityService().findHighestUpgrade(clientResource);
+                    resourceToReturn = service.findHighestUpgrade(clientResource);
                     break;
                 case DOWNGRADE_OP:
-                    resourceToReturn = Activator.instance().getCompatibilityService().findNearestDowngrade(clientResource);
+                    resourceToReturn = service.findNearestDowngrade(clientResource);
                     break;
                 case UPGRADE_OP:
-                    resourceToReturn = Activator.instance().getCompatibilityService().findNearestUpgrade(clientResource);
+                    resourceToReturn = service.findNearestUpgrade(clientResource);
                     break;
                 case ANY_OP:
                     //use highest (if there is no higher, use nearest lower)
-                    resourceToReturn = Activator.instance().getCompatibilityService().findHighestUpgrade(clientResource);
+                    resourceToReturn = service.findHighestUpgrade(clientResource);
                     if (resourceToReturn == null) {
-                        resourceToReturn = Activator.instance().getCompatibilityService().findNearestDowngrade(clientResource);
+                        resourceToReturn = service.findNearestDowngrade(clientResource);
                     }
                     break;
                 default:
@@ -99,7 +107,7 @@ public class ReplaceBundleResource extends ResourceParent implements GetReplaceB
 
 
         } else {
-            resourceToReturn = Activator.instance().getCompatibilityService().findNearestUpgrade(clientResource);
+            resourceToReturn = service.findNearestUpgrade(clientResource);
         }
 
         return resourceToReturn;

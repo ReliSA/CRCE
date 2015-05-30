@@ -1,10 +1,8 @@
-package cz.zcu.kiv.crce.repository.maven.internal;
-
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig.REMOTE_MAVEN_STORE_URI;
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig.LOCAL_MAVEN_STORE_URI;
+package cz.zcu.kiv.crce.repository.filebased.internal;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,26 +20,29 @@ import org.osgi.service.cm.ManagedServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.concurrency.service.TaskRunnerService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
+import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
+import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
  * Activator of this bundle.
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
- * @author Miroslav Brozek
  */
 public class Activator extends DependencyActivatorBase implements ManagedServiceFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
-    public static final String PID = "cz.zcu.kiv.crce.repository.maven";
+    public static final String PID = "cz.zcu.kiv.crce.repository.filebased";
+
+    public static final String CFG_PROPERTY__STORE_URI = "store.uri";
 
     /**
      * PID to component.
@@ -56,13 +57,24 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
-        logger.debug("Maven repository activator - initializing");
+        logger.debug("Initializing filebased repository.");
 
         Properties props = new Properties();
         props.put(Constants.SERVICE_PID, PID);
         dm.add(createComponent()
                 .setInterface(ManagedServiceFactory.class.getName(), props)
                 .setImplementation(this)
+                );
+
+        dm.add(createComponent()
+                .setInterface(SessionRegister.class.getName(), null)
+                .setImplementation(SessionRegisterImpl.class)
+                );
+
+        dm.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(PriorityActionHandler.class)
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class))
                 );
     }
 
@@ -71,59 +83,61 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Component component : components.values()) {
             dependencyManager.remove(component);
         }
-        logger.debug("Maven repository destroyed.");
+        logger.debug("Filebased repository destroyed.");
     }
 
     @Override
     public String getName() {
-        return "Maven repository store factory.";
+        return "Filebased repository store factory.";
     }
 
     @Override
     public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
         logger.trace("ManagedServiceFactory updated with pid: {}", pid);
 
-        // allow reconfiguration of existing instances
-//        if (components.containsKey(pid)) {
-//            logger.info("Repository ({}) is already configured.", pid);
-//            return;
-//        }
-
         if (properties == null) {
             logger.warn("Repository ({}) configuration is empty!", pid);
             return;
         }
 
-        logger.debug("Updating maven repository ({}) configuration: {}", properties);
+        logger.debug("Updating filebased repository ({}) configuration: {}", properties);
 
-        MavenStoreConfig.initConfig(properties);
-
-        String absolutePath;
+        String path = (String) properties.get(CFG_PROPERTY__STORE_URI);
 
         URI uri;
-        if (MavenStoreConfig.isRemoteRepoDefault()) {
-            uri = MavenStoreConfig.getRemoteRepository().getUri();
-            absolutePath = uri.getPath();
-            logger.debug("URI {} for Remote Maven repository set", uri);
-        } else {
-            uri = MavenStoreConfig.getLocalRepository().getUri();
-            File mvnStorePath = new File(uri);
-
-            absolutePath = mvnStorePath.getAbsolutePath();
-
-            if (!mvnStorePath.exists() && !mvnStorePath.mkdirs()) {
-                throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Can not create directory on the given path: " + absolutePath);
-            } else if (!mvnStorePath.isDirectory()) {
-                throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Store URI is not a directory: " + absolutePath);
+        File file = null;
+        try {
+            uri = new URI(path);
+            if (uri.getScheme() == null) {
+                file = new File(path);
+                uri = file.toURI();
+            } else if ("file".equals(uri.getScheme())) {
+                file = new File(uri);
+            } else {
+                throw new ConfigurationException(CFG_PROPERTY__STORE_URI, "Unsupported URI scheme for filebased repository: " + uri.getScheme());
             }
+        } catch (URISyntaxException ex) {
+            logger.warn("Invalid URI syntax: " + path, ex);
+            file = new File(path);
+            uri = file.toURI();
+        }
+
+        final String absolutePath = file.getAbsolutePath();
+
+        logger.debug("Repository URI: {}, file: {}", uri, absolutePath);
+
+        if (!file.exists() && !file.mkdirs()) {
+            throw new ConfigurationException(CFG_PROPERTY__STORE_URI, "Can not create directory on the given path: " + path);
+        }
+
+        if (!file.isDirectory()) {
+            throw new ConfigurationException(CFG_PROPERTY__STORE_URI, "Store URI is not a directory: " + path);
         }
 
         for (Map.Entry<String, String> entry : uris.entrySet()) {
             if (entry.getValue().equals(absolutePath) && !entry.getKey().equals(pid)) {
-                throw new ConfigurationException(
-                        MavenStoreConfig.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
-                        "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath
-                );
+                throw new ConfigurationException(CFG_PROPERTY__STORE_URI,
+                        "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath);
             }
         }
 
@@ -139,11 +153,11 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         Properties props = new Properties();
         props.put("id", pid);
-        props.put("name", "Maven: " + uri);
-
+        props.put("name", "Filebased: " + file.getName());
+        
         Component storeComponent = createComponent()
                 .setInterface(Store.class.getName(), props)
-                .setImplementation(new MavenStoreImpl(uri))
+                .setImplementation(new FilebasedStoreImpl(file))
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
@@ -153,10 +167,9 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 .add(createServiceDependency().setRequired(true).setService(ResourceLoader.class))
                 .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceIndexerService.class))
-                .add(createServiceDependency().setRequired(true).setService(TaskRunnerService.class))
-                .add(createServiceDependency().setRequired(true).setService(IdentityIndexer.class));
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class));
 
-        logger.debug("Registering maven repository store: {}", storeComponent);
+        logger.debug("Registering repository store: {}", storeComponent);
 
         uris.put(pid, absolutePath);
         components.put(pid, storeComponent);
