@@ -2,37 +2,37 @@
 <!-- <!DOCTYPE web-app
     PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
     "http://java.sun.com/dtd/web-app_2_3.dtd"> -->
-
+    
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     
     <context-param>
         <param-name>test</param-name>
         <param-value>1234</param-value>
     </context-param>
-
-  <!-- Default page to serve -->
+    
+    <!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
-  <!-- Session listener -->
+    
+    <!-- Session listener -->
     <listener>
         <listener-class>cz.zcu.kiv.crce.webui.internal.SessionListener</listener-class>
     </listener>
-
+    
     <!-- Filters -->
     <filter>
         <filter-name>CompatInfoCheckFilter</filter-name>
         <filter-class>cz.zcu.kiv.crce.webui.internal.filter.CompatibilityAvailabilityFilter</filter-class>
     </filter>
-
+    
     <filter-mapping>
         <filter-name>CompatInfoCheckFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-  
-  <!-- Servlets -->
- 
+    
+    <!-- Servlets -->
+    
     <servlet>
         <servlet-name>testServlet</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.TestServlet</servlet-class>
@@ -41,35 +41,35 @@
         <servlet-name>testServlet</servlet-name>
         <url-pattern>/test</url-pattern>
     </servlet-mapping>
-
-	<servlet>
-		<servlet-name>download</servlet-name>
-		<servlet-class>cz.zcu.kiv.crce.webui.internal.DownloadServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>download</servlet-name>
-		<url-pattern>/download</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>check</servlet-name>
-		<servlet-class>cz.zcu.kiv.crce.webui.internal.CheckServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>check</servlet-name>
-		<url-pattern>/check</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>test</servlet-name>
-		<servlet-class>cz.zcu.kiv.crce.webui.internal.RuntimeServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>test</servlet-name>
-		<url-pattern>/test</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
+    
+    <servlet>
+        <servlet-name>download</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.DownloadServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>download</servlet-name>
+        <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>check</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.CheckServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>check</servlet-name>
+        <url-pattern>/check</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>test</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.RuntimeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
         <servlet-name>resource</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.ResourceServlet</servlet-class>
     </servlet>
@@ -77,8 +77,8 @@
         <servlet-name>resource</servlet-name>
         <url-pattern>/resource</url-pattern>
     </servlet-mapping>
-	
-	<servlet>
+    
+    <servlet>
         <servlet-name>edit</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.EditServlet</servlet-class>
     </servlet>
@@ -86,7 +86,7 @@
         <servlet-name>edit</servlet-name>
         <url-pattern>/edit</url-pattern>
     </servlet-mapping>
-	
+    
     <servlet>
         <servlet-name>UploadServlet</servlet-name>
         <servlet-class>cz.zcu.kiv.crce.webui.internal.UploadServlet</servlet-class>
@@ -94,6 +94,16 @@
     <servlet-mapping>
         <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <description>This servlet is responsible for providing UI for parsing of remote Web service IDLs and turning them into CRCE Resource representations.</description>
+        <servlet-name>WebservicesServlet</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.WebservicesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WebservicesServlet</servlet-name>
+        <url-pattern>/parse_idl</url-pattern>
     </servlet-mapping>
     
     <listener>

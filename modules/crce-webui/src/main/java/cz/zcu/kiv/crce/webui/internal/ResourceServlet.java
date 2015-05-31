@@ -216,6 +216,11 @@ public class ResourceServlet extends HttpServlet {
                 return true;
             }
 
+            case "webservices": {
+                session.setAttribute("webservices", true);
+                return true;
+            }
+
             case "compatibility": {
                 String name = req.getParameter("name");
                 String version = req.getParameter("version");

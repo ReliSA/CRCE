@@ -35,6 +35,9 @@
         <c:when test="${param.tags}">
             <c:set scope="session" var="source" value="tags"/>
         </c:when>
+        <c:when test="${param.webservices}">
+            <c:set scope="session" var="source" value="webservices"/>
+        </c:when>
         <c:when test="${param.compatibility}">
             <c:set scope="session" var="source" value="compatibility"/>
         </c:when>
@@ -65,6 +68,7 @@
             <li><a <c:if test="${param.buffer}"> class="aktivni"</c:if> href="resource?link=buffer">Upload</a></li>
             <li><a <c:if test="${param.plugins}"> class="aktivni"</c:if> href="resource?link=plugins">Plugins</a></li>
             <li><a <c:if test="${param.tags}"> class="aktivni"</c:if> href="resource?link=tags">Tags</a></li>
+            <li><a <c:if test="${param.webservices}"> class="aktivni"</c:if> href="resource?link=webservices">Web services</a></li>
             <c:if test="${param.hasCompatInfo}">
                 <li><a <c:if test="${param.compatibility}"> class="aktivni"</c:if> href="resource?link=compatibility">Compatibility</a></li>
             </c:if>
