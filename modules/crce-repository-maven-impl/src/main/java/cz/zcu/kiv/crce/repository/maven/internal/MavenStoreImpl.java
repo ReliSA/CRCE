@@ -58,7 +58,7 @@ public class MavenStoreImpl implements Store {
 
     @Override
     public boolean remove(Resource resource) throws IOException {
-        // resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource,this);
+        // resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
 
         if (!isInStore(resource)) {
             if (resourceDAO.existsResource(metadataService.getUri(resource))) {
@@ -87,7 +87,7 @@ public class MavenStoreImpl implements Store {
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return new File(uri).getPath().startsWith(MavenStoreConfig.getLocalRepository().getURItoPath());
+        return new File(uri).getPath().startsWith(MavenStoreConfiguration.getLocalRepository().getURItoPath());
     }
 
     @Override

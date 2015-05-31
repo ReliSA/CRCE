@@ -17,17 +17,14 @@ import org.eclipse.aether.graph.DependencyNode;
 public class MavenArtifactWrapper {
     
     private Artifact artifact;
-    
-    private List<Dependency> directDependency;
-    
-    private List<DependencyNode> hiearchyDependency;
-    
+    private List<Dependency> directDependencies;
+    private List<DependencyNode> hiearchyDependencies;
     
     public MavenArtifactWrapper(Artifact artifact, List<Dependency> directDependency, List<DependencyNode> hiearchyDependency) {
         super();
         this.artifact = artifact;
-        this.directDependency = directDependency;
-        this.hiearchyDependency = hiearchyDependency;
+        this.directDependencies = directDependency;
+        this.hiearchyDependencies = hiearchyDependency;
     }
 
     public Artifact getArtifact() {
@@ -38,21 +35,19 @@ public class MavenArtifactWrapper {
         this.artifact = artifact;
     }
 
-    public List<Dependency> getDirectDependency() {
-        return directDependency;
+    public List<Dependency> getDirectDependencies() {
+        return directDependencies;
     }
 
-    public void setDirectDependency(List<Dependency> directDependency) {
-        this.directDependency = directDependency;
+    public void setDirectDependencies(List<Dependency> directDependencies) {
+        this.directDependencies = directDependencies;
     }
 
-    public List<DependencyNode> getHiearchyDependency() {
-        return hiearchyDependency;
+    public List<DependencyNode> getHiearchyDependencies() {
+        return hiearchyDependencies;
     }
 
-    public void setHiearchyDependency(List<DependencyNode> hiearchyDependency) {
-        this.hiearchyDependency = hiearchyDependency;
+    public void setHiearchyDependencies(List<DependencyNode> hiearchyDependencies) {
+        this.hiearchyDependencies = hiearchyDependencies;
     }    
-    
-
 }

@@ -15,8 +15,10 @@ import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
+import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration;
 import cz.zcu.kiv.crce.repository.maven.internal.RepositoryWrapper;
 
 
@@ -25,6 +27,9 @@ import cz.zcu.kiv.crce.repository.maven.internal.RepositoryWrapper;
 * @author Miroslav Brožek
 */
 public class RepositoryFactory {
+    
+    private static final Logger errorHandlerLogger = LoggerFactory.getLogger(DefaultServiceLocator.ErrorHandler.class);
+    
     private static ArrayList<RemoteRepository> repositories;
 
     public static RepositorySystem newRepositorySystem() {
@@ -42,9 +47,10 @@ public class RepositoryFactory {
         
 
         locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
+            
             @Override
             public void serviceCreationFailed(Class<?> type, Class<?> impl, Throwable exception) {
-                exception.printStackTrace();
+                errorHandlerLogger.error("Service creation failed for type: " + type + ", impl: " + impl, exception);
             }
         });
 
@@ -52,7 +58,7 @@ public class RepositoryFactory {
     }
 
     public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
-        LocalRepository localRepo = new LocalRepository(MavenStoreConfig.getLocalRepository().getURItoPath());        
+        LocalRepository localRepo = new LocalRepository(MavenStoreConfiguration.getLocalRepository().getURItoPath());        
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
         session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, "2000");//2s
@@ -62,15 +68,16 @@ public class RepositoryFactory {
     }
 
     public static List<RemoteRepository> newRepositories() {
-        repositories = new ArrayList<RemoteRepository>();
+        repositories = new ArrayList<>(2);
         
         //using remote repository? then search primary this one
-        if (MavenStoreConfig.isRemoteRepoDefault()) {
-            RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
-            repositories.add(new RemoteRepository.Builder(rr.getName(), "default",rr.getUri().toString()).build());            
+        if (MavenStoreConfiguration.isRemoteRepoDefault()) {
+            RepositoryWrapper rr = MavenStoreConfiguration.getRemoteRepository();
+            repositories.add(new RemoteRepository.Builder(rr.getName(), "default", rr.getUri().toString()).build());            
         }
         
-        RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();    
+        // TODO configurable
+        RemoteRepository central =  new RemoteRepository.Builder("central", "default", "http://central.maven.org/maven2/").build();
         
         repositories.add(central);            
 
@@ -81,5 +88,7 @@ public class RepositoryFactory {
     public static ArrayList<RemoteRepository> getRepositories() {
         return repositories;
     }
-    
+
+    private RepositoryFactory() {
+    }
 }

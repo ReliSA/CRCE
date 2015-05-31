@@ -63,6 +63,7 @@ public class IdentityIndexer {
      * @param file
      * @return hexadecimal SHA-256 of file with resource or null
      */
+    @SuppressWarnings("NestedAssignment")
     private String getSHA(File file) {
         try (FileInputStream fis = new FileInputStream(file)) {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

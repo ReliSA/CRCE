@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -47,7 +47,6 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
-
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -109,7 +108,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext indexingContext;
 
-    private static final String INDEXING_CONTEXT = MavenStoreConfig.getIndexingContextPath();
+    private static final String INDEXING_CONTEXT = MavenStoreConfiguration.getIndexingContextPath();
 
     public MavenRepositoryIndexer(URI uri, MetadataIndexerCallback metadataIndexerCallback) {
         super(uri.toString(), "Indexes local maven repository.", "crce-repository-maven-impl");
@@ -122,22 +121,20 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         try {
 
-            if (!MavenStoreConfig.isRemoteRepoDefault()) {
-                RepositoryWrapper lr = MavenStoreConfig.getLocalRepository();
-                indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(INDEXING_CONTEXT), lr.isUpdate());
-            }
-
-            else {
-                RepositoryWrapper rr = MavenStoreConfig.getRemoteRepository();
+            if (MavenStoreConfiguration.isRemoteRepoDefault()) {
+                RepositoryWrapper rr = MavenStoreConfiguration.getRemoteRepository();
                 indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(INDEXING_CONTEXT), rr.isUpdate());
+            } else {
+                RepositoryWrapper lr = MavenStoreConfiguration.getLocalRepository();
+                indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(INDEXING_CONTEXT), lr.isUpdate());
             }
 
 
             Indexer indexer = indexingContext.getIndexer();
-            Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
+            Set<ArtifactInfo> results = new LinkedHashSet<>();
             String arParam = "";
 
-            ArtifactResolve ar = MavenStoreConfig.getArtifactResolve();
+            ArtifactResolutionStrategy ar = MavenStoreConfiguration.getArtifactResolve();
             switch (ar) {
             case ALL:
                 logger.debug("All Artifact's versions will be processed");
@@ -159,13 +156,13 @@ public class MavenRepositoryIndexer extends Task<Object> {
             case LOWEST_MINOR:
 
             case LOWEST_MICRO:
-                logger.debug("Only the {} Artifact's versions will be processed",ar);
+                logger.debug("Only the {} Artifact's versions will be processed", ar);
                 results = getHiLowFiltredResults(indexer, indexAll(indexer), ar);
                 break;
 
             case GAV:
-                arParam = MavenStoreConfig.getArtifactResolveParam();
-                logger.debug("Trying process Artifact with GAV: {} ",arParam);
+                arParam = MavenStoreConfiguration.getArtifactResolveParam();
+                logger.debug("Trying process Artifact with GAV: {} ", arParam);
 
                 String[] gav = arParam.split(":");
 
@@ -178,20 +175,20 @@ public class MavenRepositoryIndexer extends Task<Object> {
                 break;
 
             case GROUP_ID:
-                arParam = MavenStoreConfig.getArtifactResolveParam();
-                logger.debug("Trying process Artifacts with groupID> {} ",arParam);
+                arParam = MavenStoreConfiguration.getArtifactResolveParam();
+                logger.debug("Trying process Artifacts with groupID> {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
 
             case GROUPID_ARTIFACTID:
-                arParam = MavenStoreConfig.getArtifactResolveParam();
-                logger.debug("Trying process Artifacts > {} ",arParam);
+                arParam = MavenStoreConfiguration.getArtifactResolveParam();
+                logger.debug("Trying process Artifacts > {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
 
             case GROUPID_ARTIFACTID_FROM_VERSION:
-                arParam = MavenStoreConfig.getArtifactResolveParam();
-                logger.debug("Trying process Artifacts from specified Version > {} ",arParam);
+                arParam = MavenStoreConfiguration.getArtifactResolveParam();
+                logger.debug("Trying process Artifacts from specified Version > {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
 
@@ -204,12 +201,11 @@ public class MavenRepositoryIndexer extends Task<Object> {
 //            logger.debug("Indexing artifacts (amount: {}).", results.size());
             //for debug
 
-            if(results.size()>0){
-
+            if (!results.isEmpty()) {
                 logger.info("Amount of artifacts to index: {}", results.size());
+                
                 indexResults(results);
-            }
-            else{
+            } else {
                 logger.warn("NO RESULTS! Check configuration file!");
             }
 
@@ -218,7 +214,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
             return null;
         }
-
+        
         indexingContext.close();
         return null;
     }
@@ -231,54 +227,50 @@ public class MavenRepositoryIndexer extends Task<Object> {
         DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
 
         for (ArtifactInfo ai : results) {
-            logger.debug("Processing {}. Artifact: {}",counter, ai.toString());
+            logger.debug("Processing {}. Artifact: {}", counter, ai.toString());
 
-
-            Artifact a = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
+            Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
             ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
             descriptorRequest.setRepositories(RepositoryFactory.newRepositories());
-            descriptorRequest.setArtifact(a);
+            descriptorRequest.setArtifact(artifact);
 
             try {
-
                 // Direct Dependency
-                if (!MavenStoreConfig.isDependencyHierarchy()) {
-
+                if (!MavenStoreConfiguration.isDependencyHierarchy()) {
                     ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-                    List<Dependency> directD = descriptorResult.getDependencies();
+                    List<Dependency> directDependencies = descriptorResult.getDependencies();
 
                     // Indexing and resolve JAR
-                    if (MavenStoreConfig.isResolveArtifacts()) {
+                    if (MavenStoreConfiguration.isResolveArtifacts()) {
                         ArtifactRequest artifactRequest = new ArtifactRequest();
-                        artifactRequest.setArtifact(a);
+                        artifactRequest.setArtifact(artifact);
                         artifactRequest.setRepositories(descriptorRequest.getRepositories());
 
                         //resolve root artifact
                         ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
-                        a = artifactResult.getArtifact();
+                        artifact = artifactResult.getArtifact();
 
                         //resolve directDependencies
-                        for (Dependency d : directD) {
-                            Artifact artifactD = d.getArtifact();
-                            MavenArtifactVersion v = new MavenArtifactVersion(artifactD.getBaseVersion());
+                        for (Dependency dependency : directDependencies) {
+                            Artifact dependencyArtifact = dependency.getArtifact();
+                            MavenArtifactVersion version = new MavenArtifactVersion(dependencyArtifact.getBaseVersion());
 
-                            if(v.isRangeVersion()){
+                            if (version.isRangeVersion()) {
                                 //get newest dependendency from range, should be configurable
-                                String version = v.getvMax();
-                                artifactD = artifactD.setVersion(version);
+                                dependencyArtifact = dependencyArtifact.setVersion(version.getvMax());
                             }
 
 
                             artifactRequest = new ArtifactRequest();
-                            artifactRequest.setArtifact(artifactD);
+                            artifactRequest.setArtifact(dependencyArtifact);
                             artifactRequest.setRepositories(descriptorRequest.getRepositories());
 
                             try {
                                 artifactResult = system.resolveArtifact(session, artifactRequest);
-                                artifactD = artifactResult.getArtifact();
-                                logger.debug(artifactD + " resolved to  " + artifactD.getFile());
+                                dependencyArtifact = artifactResult.getArtifact();
+                                logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
                             } catch (Exception e) {
-                                logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", artifactD, e);
+                                logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
                             }
                         }
                     }
@@ -286,11 +278,11 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
                     // Indexing by POM
                     else {
-                        a = descriptorResult.getArtifact();
-                        a = setPOMfileToArtifact(a, system, session);
+                        artifact = descriptorResult.getArtifact();
+                        artifact = setPOMfileToArtifact(artifact, system, session);
                     }
 
-                    MavenArtifactWrapper maw = new MavenArtifactWrapper(a, directD, null);
+                    MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, directDependencies, null);
                     metadataIndexerCallback.index(maw);
                 }
 
@@ -312,21 +304,21 @@ public class MavenRepositoryIndexer extends Task<Object> {
                     List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
 
                     // Indexing by POM
-                    if (!MavenStoreConfig.isResolveArtifacts()) {
-                        a = collectResult.getRoot().getArtifact();
-                        a = setPOMfileToArtifact(a, system, session);
+                    if (!MavenStoreConfiguration.isResolveArtifacts()) {
+                        artifact = collectResult.getRoot().getArtifact();
+                        artifact = setPOMfileToArtifact(artifact, system, session);
                     }
 
                     // Indexing and resolve JARs
                     else {
                         DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
-                        collectRequest.setRoot(new Dependency(a, JavaScopes.COMPILE));
+                        collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
                         DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
                         DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
-                        a = dr.getRoot().getArtifact();
+                        artifact = dr.getRoot().getArtifact();
                     }
 
-                    MavenArtifactWrapper maw = new MavenArtifactWrapper(a, null, hierarchyD);
+                    MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, null, hierarchyD);
                     metadataIndexerCallback.index(maw);
                 }
 
@@ -358,11 +350,11 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         else{
             String g = a.getGroupId().split("\\.")[0];
-            String pomS = a.getArtifactId() + "-" + a.getVersion()+".pom";
-            File root = new File(MavenStoreConfig.getLocalRepository().getURItoPath() + "/" + g) ;
-            String  newPath = findPOM(pomS, root);
+            String pomS = a.getArtifactId() + "-" + a.getVersion() + ".pom";
+            File root = new File(MavenStoreConfiguration.getLocalRepository().getURItoPath() + "/" + g) ;
+            String  newPath = findPom(pomS, root);
 
-            if(newPath== null){
+            if (newPath== null) {
                 logger.debug("Can't find POM file...trying resolve whole JAR file... " + a);
 
                 ArtifactRequest artifactRequest = new ArtifactRequest();
@@ -380,27 +372,28 @@ public class MavenRepositoryIndexer extends Task<Object> {
     }
 
     //fallback
-    private String findPOM(String name, File dir) {
+    private String findPom(String name, File dir) {
         String found = null;
 
         File[] list = dir.listFiles();
-        if (list != null)
-            for (File fil : list) {
-                if (fil.isDirectory()) {
-                    found = findPOM(name, fil);
-                    if(found!=null){
+        if (list != null) {
+            for (File file : list) {
+                if (file.isDirectory()) {
+                    found = findPom(name, file);
+                    if (found!=null) {
                         break;
                     }
-                } else if (name.equalsIgnoreCase(fil.getName())) {
-                    return fil.getAbsolutePath();
+                } else if (name.equalsIgnoreCase(file.getName())) {
+                    return file.getAbsolutePath();
                 }
             }
+        }
         return found;
     }
 
     private String getPathForArtifact(Artifact artifact, boolean local, boolean searchPOM) {
         StringBuilder path = new StringBuilder(128);
-        path.append(MavenStoreConfig.getLocalRepository().getURItoPath()+"/");
+        path.append(MavenStoreConfiguration.getLocalRepository().getURItoPath()).append("/");
         path.append(artifact.getGroupId().replace('.', '/')).append('/');
         path.append(artifact.getArtifactId()).append('/');
         path.append(artifact.getBaseVersion()).append('/');
@@ -414,7 +407,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
           path.append('-').append(artifact.getClassifier());
         }
 
-        if(searchPOM){
+        if (searchPOM) {
             path.append('.').append("pom");
         }
         else if (artifact.getExtension().length() > 0) {
@@ -450,14 +443,14 @@ public class MavenRepositoryIndexer extends Task<Object> {
         BooleanQuery query = new BooleanQuery();
         query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
         GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), indexingContext));
-        Set<ArtifactInfo> res = new LinkedHashSet<ArtifactInfo>();
+        Set<ArtifactInfo> res = new LinkedHashSet<>(response.getResults().size());
 
         //debug
         for (Map.Entry<String, ArtifactInfoGroup> entry : response.getResults().entrySet()) {
-            ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next();
+            ArtifactInfo ai = entry.getValue().getArtifactInfos().iterator().next(); // TODO check why only the first artifact info?
             res.add(ai);
 
-            logger.debug("{} artifact latest version:  {}",ai, ai.version);
+            logger.debug("{} artifact latest version: {}", ai, ai.version);
         }
         return res;
     }
@@ -469,22 +462,22 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws IOException
      * @throws InvalidVersionSpecificationException
      */
-    private Set<ArtifactInfo> getHiLowFiltredResults(Indexer indexer, Set<ArtifactInfo> results, ArtifactResolve ars) throws IOException,
-            InvalidVersionSpecificationException {
+    private Set<ArtifactInfo> getHiLowFiltredResults(Indexer indexer, Set<ArtifactInfo> results, ArtifactResolutionStrategy ars)
+            throws IOException, InvalidVersionSpecificationException {
 
-        HashSet<String>done = new HashSet<String>();//list of proccesed artifacts...much faster
-        LinkedHashSet<String> filtredArtifactsInString = new LinkedHashSet<String>();
+        HashSet<String> done = new HashSet<>();//list of proccesed artifacts...much faster
+        LinkedHashSet<String> filtredArtifactsInString = new LinkedHashSet<>(results.size());
 
         for (ArtifactInfo ai : results) {
-            String ga = new String(ai.groupId+":"+ai.artifactId);
-            if(done.contains(ga)){
+            String ga = ai.groupId + ":" + ai.artifactId;
+            if (done.contains(ga)) {
                 continue;
             }
             getMatch(indexer, ai, filtredArtifactsInString, ars);
             done.add(ga);
         }
 
-        LinkedHashSet<ArtifactInfo> filtred = new LinkedHashSet<ArtifactInfo>();
+        LinkedHashSet<ArtifactInfo> filtred = new LinkedHashSet<>(filtredArtifactsInString.size());
         for (String s : filtredArtifactsInString) {
             String[] coords = s.split(":");
             filtred.add(new ArtifactInfo("", coords[0], coords[1], coords[2], ""));
@@ -501,7 +494,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws InvalidVersionSpecificationException
      * @throws IOException
      */
-    private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ArtifactResolve ar) throws InvalidVersionSpecificationException, IOException {
+    private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ArtifactResolutionStrategy ar) throws InvalidVersionSpecificationException, IOException {
         int highest = 0;
         int lowest = Integer.MAX_VALUE;
 
@@ -520,6 +513,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         // construct the filter to express "V greater than"
         final ArtifactInfoFilter versionFilter = new ArtifactInfoFilter() {
+            
+            @Override
             public boolean accepts(final IndexingContext ctx, final ArtifactInfo ai) {
                 try {
                     final Version aiV = versionScheme.parseVersion(ai.version);
@@ -638,12 +633,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
     }
 
 
-    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ArtifactResolve ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
-
-        Set<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
-        String arParam = MavenStoreConfig.getArtifactResolveParam();
+    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ArtifactResolutionStrategy ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
+        Set<ArtifactInfo> results = Collections.emptySet();
+        String arParam = MavenStoreConfiguration.getArtifactResolveParam();
         String[] gav = arParam.split(":");
-
 
         BooleanQuery bq = new BooleanQuery();
 
@@ -660,14 +653,14 @@ public class MavenRepositoryIndexer extends Task<Object> {
             break;
 
         case GROUPID_ARTIFACTID:
-            if(gav.length >= 2){
+            if (gav.length >= 2) {
                 results = getArtifactFromVersion(indexer, gav, ar);
             }
 
             break;
 
         case GROUPID_ARTIFACTID_FROM_VERSION:
-            if(gav.length >= 3){
+            if (gav.length >= 3) {
                 results = getArtifactFromVersion(indexer, gav, ar);
             }
 
@@ -680,7 +673,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         return results;
     }
 
-    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ArtifactResolve ar) throws InvalidVersionSpecificationException,
+    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ArtifactResolutionStrategy ar) throws InvalidVersionSpecificationException,
             IOException, VersionRangeResolutionException {
 
         Query gidQ;
@@ -699,7 +692,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         final String versionString;
 
         //find artifacts version at 'gav[2] inclusive and higher
-        if (ar.equals(ArtifactResolve.GROUPID_ARTIFACTID_FROM_VERSION)) {
+        if (ar.equals(ArtifactResolutionStrategy.GROUPID_ARTIFACTID_FROM_VERSION)) {
             versionString = gav[2];
 
         } else {
@@ -712,6 +705,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         // construct the filter to express "V greater than"
         final ArtifactInfoFilter versionFilter = new ArtifactInfoFilter() {
+
+            @Override
             public boolean accepts(final IndexingContext ctx, final ArtifactInfo ai) {
                 try {
                     final Version aiV = versionScheme.parseVersion(ai.version);
@@ -724,24 +719,24 @@ public class MavenRepositoryIndexer extends Task<Object> {
             }
         };
 
-        logger.debug("Searching all versions for artifact {}-{}",gav[0],gav[1]);
+        logger.debug("Searching all versions for artifact {}-{}", gav[0], gav[1]);
+        
         final IteratorSearchRequest request = new IteratorSearchRequest(bq,
                 Collections.singletonList((IndexingContext) indexingContext), versionFilter);
 
-        IteratorSearchResponse isr = indexer.searchIterator(request);
-
-        LinkedHashSet<ArtifactInfo> results = new LinkedHashSet<ArtifactInfo>();
-        for (ArtifactInfo ai : isr) {
-            results.add(ai);
+        LinkedHashSet<ArtifactInfo> results;
+        try (IteratorSearchResponse isr = indexer.searchIterator(request)) {
+            results = new LinkedHashSet<>();
+            for (ArtifactInfo ai : isr) {
+                results.add(ai);
+            }
         }
 
-        isr.close();
-
         //fallback, if query doesnt match with any Artifacts in indexing context > using Aether -time consuming
-        if (results.size()<1){
+        if (results.isEmpty()) {
             RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
             RepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(system);
-            Artifact a = new DefaultArtifact( gav[0]+":"+gav[1]+":["+versionString+",)" );
+            Artifact a = new DefaultArtifact(gav[0] + ":" + gav[1] + ":[" + versionString + ",)");
 
             VersionRangeRequest rangeRequest = new VersionRangeRequest();
             rangeRequest.setArtifact( a );
@@ -749,7 +744,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             VersionRangeResult rangeResult = system.resolveVersionRange( session, rangeRequest );
             List<Version> versions = rangeResult.getVersions();
 
-            logger.debug("Aether found Artifacts range > {}",versions);
+            logger.debug("Aether found Artifacts range > {}", versions);
             for (Version v : versions) {
                 results.add(new ArtifactInfo("", a.getGroupId(), a.getArtifactId(), v.toString(), ""));
             }
@@ -778,7 +773,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 //            org.eclipse.aether.version.Version newestVersion = rangeResult.getHighestVersion();
 //            List<org.eclipse.aether.version.Version> versions = rangeResult.getVersions();
 ////            logger.debug("Available versions " + versions);
-//            if(newestVersion==null){
+//            if (newestVersion==null) {
 //                logger.debug("Removing artifact, which is not available anymore...");
 //                i.remove();
 //                continue;
@@ -796,7 +791,9 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
     private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {
+        
         logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
+        
         if (repository == null || indexParentDir == null) {
             logger.debug("Mvn repository '{}' or index parent dir '{}' is null. Indexing could not be started!", repository, indexParentDir);
             return null;
@@ -824,15 +821,15 @@ public class MavenRepositoryIndexer extends Task<Object> {
             plexusContainer = new DefaultPlexusContainer(config);
             indexer = plexusContainer.lookup(Indexer.class);
 //            final IndexUpdater indexUpdater = plexusContainer.lookup(IndexUpdater.class);
-        } catch (Exception e) {
+        } catch (PlexusContainerException | ComponentLookupException e) {
             logger.error("Error initializing Plexus container.", e);
             throw new IllegalStateException(e);
         }
 
         List<IndexCreator> indexers = new ArrayList<>();
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
-//        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype" ) );
-//        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas" ) );
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype"));
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas"));
 
         logger.info("Creating indexing context of local maven store.");
 
@@ -939,7 +936,6 @@ public class MavenRepositoryIndexer extends Task<Object> {
         PlexusContainer plexusContainer;
         Indexer indexer;
         IndexUpdater indexUpdater;
-        IndexingContext indexingContext;
         Wagon httpWagon;
 
         try {
@@ -956,38 +952,51 @@ public class MavenRepositoryIndexer extends Task<Object> {
             indexUpdater = plexusContainer.lookup(IndexUpdater.class);
             httpWagon = plexusContainer.lookup(Wagon.class, "http");
 
-        } catch (Exception e) {
+        } catch (PlexusContainerException | ComponentLookupException e) {
             logger.error("Error initializing Plexus container.", e);
             throw new IllegalStateException(e);
         }
 
 
         // Creators we want to use (search for fields it defines)
-        List<IndexCreator> indexers = new ArrayList<IndexCreator>();
+        List<IndexCreator> indexers = new ArrayList<>();
         indexers.add(plexusContainer.lookup(IndexCreator.class, "min"));
-        // indexers.add( plexusContainer.lookup( IndexCreator.class,"maven-archetype" ) );
-        // indexers.add( plexusContainer.lookup( IndexCreator.class,"osgi-metadatas" ) );
+        // indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-archetype"));
+        // indexers.add( plexusContainer.lookup( IndexCreator.class, "osgi-metadatas"));
 
         // Create context for remote repository index
-        indexingContext = indexer.createIndexingContext(storeName + "-context", storeName, new File(storeName + "cache"), new File(indexParentDir, storeName),
-                uri.toString(), null, true, true, indexers);
+        IndexingContext indexingContext = indexer.createIndexingContext(
+                storeName + "-context",
+                storeName,
+                new File(storeName + "cache"),
+                new File(indexParentDir, storeName),
+                uri.toString(),
+                null,
+                true,
+                true,
+                indexers
+        );
 
         //TODO: replace 'update' for some trigger ...eg once in week after midnight
         if (update) {
 
             logger.info("Updating Index...");
-            logger.info("This might take a while on first run, so please be patient! ... It could take 5 minutes and more");
+            logger.info("This might take a while on the first run, please be patient...");
 
             TransferListener listener = new AbstractTransferListener() {
+
+                @Override
                 public void transferStarted(TransferEvent transferEvent) {
-                    logger.info("  Downloading " + transferEvent.getResource().getName());
+                    logger.info("Downloading " + transferEvent.getResource().getName());
                 }
 
+                @Override
                 public void transferProgress(TransferEvent transferEvent, byte[] buffer, int length) {
                 }
 
+                @Override
                 public void transferCompleted(TransferEvent transferEvent) {
-                    logger.info(" - DONE");
+                    logger.info("Downloading done.");
                 }
             };
 
@@ -1000,20 +1009,29 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
             logger.debug("Temporary dir '{}' created.", tmpDir);
 
-            try {
-
-                final FSDirectory directory = FSDirectory.open(tmpDir);
+            try (final FSDirectory directory = FSDirectory.open(tmpDir)) {
+                
                 IndexUtils.copyDirectory(indexingContext.getIndexDirectory(), directory);
 
                 logger.debug("Creating temporary indexing context.");
 
                 try (@SuppressWarnings("deprecation")
-                CloseableIndexingContext tmpContext = new CloseableIndexingContext(new DefaultIndexingContext(indexingContext.getId()
-                        + "-tmp", indexingContext.getRepositoryId(), indexingContext.getRepository(), directory,
-                        indexingContext.getRepositoryUrl(), indexingContext.getIndexUpdateUrl(), indexingContext.getIndexCreators(), true),
-                        null)) {
-
+                    CloseableIndexingContext tmpContext = new CloseableIndexingContext(
+                            new DefaultIndexingContext(
+                                    indexingContext.getId() + "-tmp",
+                                    indexingContext.getRepositoryId(),
+                                    indexingContext.getRepository(),
+                                    directory,
+                                    indexingContext.getRepositoryUrl(),
+                                    indexingContext.getIndexUpdateUrl(),
+                                    indexingContext.getIndexCreators(),
+                                    true
+                            ),
+                            null
+                    )
+                ) {
                     logger.debug("Remote maven store indexing started.");
+                    
                     long start_time = System.nanoTime();
 
                     ResourceFetcher resourceFetcher = new WagonHelper.WagonFetcher(httpWagon, listener, null, null);
@@ -1021,27 +1039,23 @@ public class MavenRepositoryIndexer extends Task<Object> {
                     IndexUpdateRequest updateRequest = new IndexUpdateRequest(tmpContext, resourceFetcher);
                     IndexUpdateResult updateResult = indexUpdater.fetchAndUpdateIndex(updateRequest);
 
-                    if(updateResult.getTimestamp() == null){
+                    if (updateResult.getTimestamp() == null) {
                         logger.debug("Index is up to date"); //as it is in DefaultIndexUpdater.class
                         updateResult.setTimestamp(indexingContextCurrentTimestamp);
-                    }
-
-                    else if (updateResult.isFullUpdate()) {
+                    } else if (updateResult.isFullUpdate()) {
                         logger.debug("Full update happened!");
-                    }
-
-                    else if (updateResult.getTimestamp().equals(indexingContextCurrentTimestamp)) {
+                    } else if (updateResult.getTimestamp().equals(indexingContextCurrentTimestamp)) {
                         logger.debug("No update needed, index is up to date!");
-                    }
-
-                    else {
-                        logger.debug("Incremental update happened, change covered " + indexingContextCurrentTimestamp + " - "
-                                + updateResult.getTimestamp() + " period.");
+                    } else {
+                        logger.debug("Incremental update happened, change covered " + indexingContextCurrentTimestamp
+                                + " - " + updateResult.getTimestamp() + " period.");
                     }
 
                     logger.info("Indexing remote repository finished succesfully!!!");
+                    
                     long end_time = System.nanoTime();
                     double difference = (end_time - start_time) / 1e6;
+                    
                     logger.debug("Indexing remote repository took {} nanoseconds ", difference);
 
                     tmpContext.updateTimestamp(true);
@@ -1050,12 +1064,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
                     logger.debug("Replacing contexts from temporary to origin.");
                     indexingContext.replace(tmpContext.getIndexDirectory());
 
-                } catch (Throwable t) {
-                    logger.error("Error indexing remote Maven repository 1.", t);
                 }
-            } catch (IOException ex) {
-                logger.error("Error indexing remote Maven repository 2.", ex);
-                throw new IOException("Error scanning context " + indexingContext.getId() + ": " + ex, ex);
+            } catch (IOException e) {
+                logger.error("Error indexing remote Maven repository 2.", e);
+                throw new IOException("Error scanning context " + indexingContext.getId() + ": " + e, e);
             } catch (Throwable t) {
                 logger.error("Error indexing remote Maven repository 3.", t);
             } finally {

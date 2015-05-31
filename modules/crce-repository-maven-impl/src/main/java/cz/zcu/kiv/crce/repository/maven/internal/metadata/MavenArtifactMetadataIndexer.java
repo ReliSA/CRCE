@@ -23,7 +23,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.type.Version;
-import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig;
+import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration;
 
 /**
 * Getting Maven artifact informations
@@ -71,18 +71,18 @@ public class MavenArtifactMetadataIndexer {
         }
     }    
     
-    private void addArtifactCapability(Resource resource, Artifact a) {
+    private void addArtifactCapability(Resource resource, Artifact artifact) {
         Capability cap = metadataFactory.createCapability(NAMESPACE__CRCE_MAVEN_ARTIFACT);
-        cap.setAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
-        cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());
-        Version v = new MavenArtifactVersion(a.getBaseVersion()).convertVersion();
+        cap.setAttribute(ATTRIBUTE__GROUP_ID, artifact.getGroupId());
+        cap.setAttribute(ATTRIBUTE__ARTIFACT_ID, artifact.getArtifactId());
+        Version v = new MavenArtifactVersion(artifact.getBaseVersion()).convertVersion();
         cap.setAttribute(ATTRIBUTE__VERSION, v);
 
         // empty string make no sense to store
-        if (!(a.getClassifier().equals(""))) {
-            cap.setAttribute(ATTRIBUTE__CLASSIFIER, a.getClassifier());
+        if (!artifact.getClassifier().isEmpty()) {
+            cap.setAttribute(ATTRIBUTE__CLASSIFIER, artifact.getClassifier());
         }
-        cap.setAttribute(ATTRIBUTE__EXTENSION, a.getExtension());
+        cap.setAttribute(ATTRIBUTE__EXTENSION, artifact.getExtension());
         cap.setAttribute(ATTRIBUTE__PACKAGING, "bundle");
 
         //if indexing by POM file...this will fix GUI name
@@ -101,7 +101,7 @@ public class MavenArtifactMetadataIndexer {
                     String presName = model.getName();
 
                     if (presName == null || presName.contains("${project.artifactId}") || presName.contains("$")) {
-                        model.setName(a.getArtifactId());
+                        model.setName(artifact.getArtifactId());
                     }
 
                     metadataService.setPresentationName(resource, "POM - " + model.getName());
@@ -112,22 +112,22 @@ public class MavenArtifactMetadataIndexer {
 
                     if (symbolicNameProp != null) {
                         String sm = symbolicNameProp.toString();
-                        int index = sm.lastIndexOf(".");
+                        int index = sm.lastIndexOf('.');
 
                         if (index > 0) {
-                            symbName = a.getGroupId() + sm.substring(index);
+                            symbName = artifact.getGroupId() + sm.substring(index);
                         } else {
-                            symbName = a.getGroupId() + sm;
+                            symbName = artifact.getGroupId() + sm;
                         }
                     } else {
-                        symbName = a.getGroupId();
+                        symbName = artifact.getGroupId();
                     }
                     capOsgi.setAttribute(ATTRIBUTE__SYMBOLIC_NAME, symbName);
                     capOsgi.setAttribute(ATTRIBUTE__VERSION, v);
                     metadataService.addRootCapability(resource, capOsgi);
 
                 } catch (IOException | XmlPullParserException e) {
-                    logger.error("{} POM file has corrupted XML structure, can't be read properly", a);
+                    logger.error("{} POM file has corrupted XML structure, can't be read properly", artifact);
                 }
             }
 
@@ -139,7 +139,7 @@ public class MavenArtifactMetadataIndexer {
     private void addArtifactRequirements(Resource resource, MavenArtifactWrapper maw) {
            
          //Create Only Direct Dependency
-        if(!MavenStoreConfig.isDependencyHierarchy()){
+        if (!MavenStoreConfiguration.isDependencyHierarchy()) {
             createDirectDependency(resource, maw);            
         }
         
@@ -151,7 +151,7 @@ public class MavenArtifactMetadataIndexer {
 
     private void createDirectDependency(Resource resource, MavenArtifactWrapper maw) {
         
-        for (Dependency d : maw.getDirectDependency()) {
+        for (Dependency d : maw.getDirectDependencies()) {
             Requirement requirement = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
             createDependencyRequirement(d, requirement);
             resource.addRequirement(requirement);
@@ -167,14 +167,14 @@ public class MavenArtifactMetadataIndexer {
      */
     private void createDependencyHierarchy(Resource resource, MavenArtifactWrapper maw) {        
         
-        for (DependencyNode dn : maw.getHiearchyDependency()) {
+        for (DependencyNode dn : maw.getHiearchyDependencies()) {
             Requirement requirement = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
             createDependencyRequirement(dn.getDependency(), requirement);
             
             //any existing children dependcies?
             Iterator<DependencyNode> it = dn.getChildren().iterator(); 
     
-            while(it.hasNext()){
+            while(it.hasNext()) {
                 solveChildren(it.next(), requirement);                
             }            
             resource.addRequirement(requirement);
@@ -185,14 +185,14 @@ public class MavenArtifactMetadataIndexer {
         Artifact a = d.getArtifact();
         requirement.addAttribute(ATTRIBUTE__GROUP_ID, a.getGroupId());
         requirement.addAttribute(ATTRIBUTE__ARTIFACT_ID, a.getArtifactId());    
-        checkRangeVersion(requirement,new MavenArtifactVersion(a.getBaseVersion()));
+        checkRangeVersion(requirement, new MavenArtifactVersion(a.getBaseVersion()));
                     
         String scope = d.getScope();
-        if(scope != null && !scope.isEmpty() && !scope.equals("compile")){
+        if (scope != null && !scope.isEmpty() && !scope.equals("compile")) {
             requirement.setDirective(DEPENDENCY_SCOPE, scope);                
         }
         
-        if( d.getOptional() ){
+        if ( d.getOptional()) {
             requirement.setDirective(DEPENDENCY_OPTIONAL, d.getOptional().toString());
         }
     }
@@ -203,11 +203,11 @@ public class MavenArtifactMetadataIndexer {
      * @param v is version of dependency
      */
     private void checkRangeVersion(Requirement r, MavenArtifactVersion v) {
-        if(v.isRangeVersion()){
-            if(!v.getvMin().equals("")){
+        if (v.isRangeVersion()) {
+            if (!v.getvMin().isEmpty()) {
                 r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMin()).convertVersion(), v.getvMinOperator());    
             }
-            if(!v.getvMax().equals("")){            
+            if (!v.getvMax().isEmpty()) {            
                 r.addAttribute(ATTRIBUTE__VERSION, new MavenArtifactVersion(v.getvMax()).convertVersion(), v.getvMaxOperator());    
             }
         }
@@ -219,13 +219,13 @@ public class MavenArtifactMetadataIndexer {
 
     private void solveChildren(DependencyNode dn, Requirement requirement) {
         Requirement child = metadataFactory.createRequirement(NAMESPACE__CRCE_MAVEN_ARTIFACT);
-        createDependencyRequirement(dn.getDependency(),child);
+        createDependencyRequirement(dn.getDependency(), child);
         
-         requirement.addChild(child);
+        requirement.addChild(child);
         child.setParent(requirement);
         
         Iterator<DependencyNode> it = dn.getChildren().iterator();                     
-        while(it.hasNext()){
+        while(it.hasNext()) {
             solveChildren(it.next(), child);
         }    
     }

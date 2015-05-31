@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig.REMOTE_MAVEN_STORE_URI;
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfig.LOCAL_MAVEN_STORE_URI;
+import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.LOCAL_MAVEN_STORE_URI;
+import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.REMOTE_MAVEN_STORE_URI;
 
 import java.io.File;
 import java.net.URI;
@@ -13,12 +13,10 @@ import java.util.Properties;
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,17 +94,17 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Updating maven repository ({}) configuration: {}", properties);
 
-        MavenStoreConfig.initConfig(properties);
+        MavenStoreConfiguration.initConfig(properties);
 
         String absolutePath;
 
         URI uri;
-        if (MavenStoreConfig.isRemoteRepoDefault()) {
-            uri = MavenStoreConfig.getRemoteRepository().getUri();
+        if (MavenStoreConfiguration.isRemoteRepoDefault()) {
+            uri = MavenStoreConfiguration.getRemoteRepository().getUri();
             absolutePath = uri.getPath();
             logger.debug("URI {} for Remote Maven repository set", uri);
         } else {
-            uri = MavenStoreConfig.getLocalRepository().getUri();
+            uri = MavenStoreConfiguration.getLocalRepository().getUri();
             File mvnStorePath = new File(uri);
 
             absolutePath = mvnStorePath.getAbsolutePath();
@@ -121,7 +119,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Map.Entry<String, String> entry : uris.entrySet()) {
             if (entry.getValue().equals(absolutePath) && !entry.getKey().equals(pid)) {
                 throw new ConfigurationException(
-                        MavenStoreConfig.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
+                        MavenStoreConfiguration.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
                         "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath
                 );
             }

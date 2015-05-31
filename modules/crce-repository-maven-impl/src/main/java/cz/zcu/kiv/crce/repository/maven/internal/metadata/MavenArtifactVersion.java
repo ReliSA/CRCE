@@ -35,23 +35,22 @@ public class MavenArtifactVersion {
         parseVersion(v);
     }
 
-    public final void parseVersion(String version) {
+    private void parseVersion(String version) {
         
         //check if version is written as range
-        if( (version.startsWith("[") || version.startsWith("(")) && 
-                (version.endsWith("]") || version.endsWith(")")) ){
+        if ((version.startsWith("[") || version.startsWith("("))
+                && (version.endsWith("]") || version.endsWith(")"))) {
             rangeVersion = checkRangeVersion(version);            
         }
         
-        
-        int index = version.indexOf("-");
-        int index2 = version.indexOf("_");
+        int index = version.indexOf('-');
+        int index2 = version.indexOf('_');
 
         String part1;
         String part2 = null;
 
         if (index < 0) {
-            if(index2<0){
+            if (index2<0) {
                 part1 = version;                
             }
             else{
@@ -76,7 +75,7 @@ public class MavenArtifactVersion {
             }
         }
 
-        if (part1.indexOf(".") < 0 && !part1.startsWith("0")) {
+        if (part1.indexOf('.') < 0 && !part1.startsWith("0")) {
             try {
                 majorVersion = Integer.valueOf(part1);
             } catch (NumberFormatException e) {
@@ -113,7 +112,7 @@ public class MavenArtifactVersion {
                 microVersion = null;
                 buildNumber = null;    
                 
-                if(!rangeVersion){
+                if (!rangeVersion) {
                     rangeVersion = checkRangeVersion(qualifier);
                 }
             }
@@ -129,19 +128,19 @@ public class MavenArtifactVersion {
     }
 
     public int getMajorVersion() {
-        return majorVersion != null ? majorVersion.intValue() : -1;
+        return majorVersion != null ? majorVersion : -1;
     }
 
     public int getMinorVersion() {
-        return minorVersion != null ? minorVersion.intValue() : -1;
+        return minorVersion != null ? minorVersion : -1;
     }
 
     public int getMicroVersion() {
-        return microVersion != null ? microVersion.intValue() : -1;
+        return microVersion != null ? microVersion : -1;
     }
 
     public int getBuildNumber() {
-        return buildNumber != null ? buildNumber.intValue() : -1;
+        return buildNumber != null ? buildNumber : -1;
     }
 
     public String getQualifier() {
@@ -149,37 +148,25 @@ public class MavenArtifactVersion {
     }
     
     private boolean checkRangeVersion(String ver) {
-        
-        if(checkNormalRange(ver) || checkHardVersion(ver)){
-            return true;
-        }        
-        
-        return false;
+        return checkNormalRange(ver) || checkHardVersion(ver);
     }
 
     private boolean checkHardVersion(String ver) {
-
         vMin = ver.substring(0, ver.length() - 1);
         vMax = ver.substring(1, ver.length());
-
+        
         // parse brackets
-        if (setMinOperator(vMin) && setMaxOperator(vMax)) {
-            return true;
-        }
-
-        return false;
+        return setMinOperator(vMin) && setMaxOperator(vMax);
     }
 
     private boolean checkNormalRange(String ver) {
         boolean range = false;
 
-        int index = ver.indexOf(",");
+        int index = ver.indexOf(',');
 
         if (index < 0) {
             return range;
-        }
-
-        else {
+        } else {
 
             // must have 2 brackets , one coma and at least 1 digit >> qualifier
             // must be bigger than 3
@@ -203,54 +190,51 @@ public class MavenArtifactVersion {
         return range;
     }
 
-    private boolean setMinOperator(String v) {
-        boolean b = false;
+    private boolean setMinOperator(String version) {
+        boolean result = false;
         
-        if (v.charAt(0) == '(') {
+        if (version.charAt(0) == '(') {
             vMinOperator = Operator.GREATER;
-            b = true;
+            result = true;
             
-        } else if (v.charAt(0) == '[') {
+        } else if (version.charAt(0) == '[') {
             vMinOperator = Operator.GREATER_EQUAL;
-            b =  true;
+            result =  true;
         }
         
         if (vMin.length() > 1) {
             vMin = vMin.substring(1).trim();
-        }
-        else{
+        } else {
             vMin = "";
         }
         
-        return b;
+        return result;
     }
 
-    private boolean setMaxOperator(String v) {
-        boolean b = false;
+    private boolean setMaxOperator(String version) {
+        boolean result = false;
         
-        if (v.charAt(v.length()-1) == ')') {
+        if (version.charAt(version.length() - 1) == ')') {
             vMaxOperator = Operator.LESS;
-            b = true;
-        } else if (v.charAt(v.length()-1)  == ']') {
+            result = true;
+        } else if (version.charAt(version.length() - 1) == ']') {
             vMaxOperator = Operator.LESS_EQUAL;
-            b = true;
+            result = true;
         }
         
         if (vMax.length() >= 2) {
             vMax = vMax.substring(0, vMax.length() - 1).trim();
-        }
-        
-        else{
+        } else {
             vMax = "";
         }
         
-        return b;
+        return result;
     }
     
     
-    private boolean hasNumber(String v){    
+    private boolean hasNumber(String version) {    
 
-        char[] chars = v.toCharArray();
+        char[] chars = version.toCharArray();
         for (int i = 0, length = chars.length; i < length; i++) {
             char ch = chars[i];
 
@@ -305,7 +289,6 @@ public class MavenArtifactVersion {
     /**
      * Prevent failing validation because of 
      * short version format or strange qualifier
-     * @param v handled version from Artifact
      * @return new format of Version.class
      */
     public Version convertVersion() {

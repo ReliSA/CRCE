@@ -21,29 +21,28 @@ import cz.zcu.kiv.crce.repository.maven.internal.IdentityIndexer;
 * @author Miroslav Brožek
 */
 public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
-        
-    private volatile ResourceDAO resourceDAO;    
-    private volatile ResourceIndexerService resourceIndexerService;    
-    private volatile MetadataService metadataService;
-    private volatile MetadataValidator metadataValidator;
-    private volatile IdentityIndexer identityIndexer;    
-    private MavenArtifactMetadataIndexer mami;
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
     
-    Logger logger;    
-    private Repository repository;
+    private final IdentityIndexer identityIndexer;
+    private final MavenArtifactMetadataIndexer mavenArtifactMetadataIndexer;
+    private final MetadataService metadataService;
+    private final MetadataValidator metadataValidator;
+    private final Repository repository;
+    private final ResourceDAO resourceDAO;
+    private final ResourceIndexerService resourceIndexerService;
     
     
     public MetadataIndexerCallbackImpl(ResourceDAO resourceDAO, ResourceIndexerService resourceIndexerService,
-            MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator, IdentityIndexer identityIndexer,
-            Repository repository) {
+            MetadataService metadataService, MetadataFactory metadataFactory, MetadataValidator metadataValidator,
+            IdentityIndexer identityIndexer, Repository repository) {
         this.resourceDAO = resourceDAO;
         this.resourceIndexerService = resourceIndexerService;
         this.metadataService = metadataService;
         this.metadataValidator = metadataValidator;
         this.identityIndexer = identityIndexer;        
-        this.logger = LoggerFactory.getLogger(MetadataIndexerCallbackImpl.class);
         this.repository = repository;
-        this.mami = new MavenArtifactMetadataIndexer(metadataService,metadataFactory);
+        this.mavenArtifactMetadataIndexer = new MavenArtifactMetadataIndexer(metadataService, metadataFactory);
     }    
 
     private void postProcessing(File file, Resource resource, MavenArtifactWrapper maw) {
@@ -60,10 +59,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
         ResourceValidationResult validationResult = metadataValidator.validate(resource);
         if (!validationResult.isContextValid()) {
             logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
-            
-        }
-        else
-        {            
+        } else {
             logger.info("Indexed resource {} is valid.", resource.getId());
         }
     }
@@ -80,7 +76,6 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     public void index(MavenArtifactWrapper maw) {
         File file = maw.getArtifact().getFile().getAbsoluteFile();
         try {
-
             logger.debug("Indexing artifact {}", file);
 
             if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
@@ -100,8 +95,6 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
     }
 
     private void updateResourceMetadataFromAether(Resource resource, MavenArtifactWrapper maw) {        
-        mami.createMavenArtifactMetadata(resource, maw);
-
+        mavenArtifactMetadataIndexer.createMavenArtifactMetadata(resource, maw);
     }         
-    
 }

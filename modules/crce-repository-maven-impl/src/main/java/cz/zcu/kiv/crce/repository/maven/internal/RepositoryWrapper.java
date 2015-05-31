@@ -13,12 +13,9 @@ import java.net.URI;
 public class RepositoryWrapper {
     
     private URI uri;
-    
     private String name;
-    
-    boolean update;
-    
-    boolean local;
+    private boolean update;
+    private boolean local;
 
     public RepositoryWrapper(URI uri, String name, boolean update, boolean local) {        
         this.uri = uri;
@@ -60,7 +57,7 @@ public class RepositoryWrapper {
     }
     
     public String getURItoPath() {
-        File file = new File(this.uri);
+        File file = new File(uri);
         String path = file.getAbsolutePath();
         path = path.replace('\\', '/');
         return path;
