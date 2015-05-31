@@ -30,8 +30,6 @@ public class RepositoryFactory {
     
     private static final Logger errorHandlerLogger = LoggerFactory.getLogger(DefaultServiceLocator.ErrorHandler.class);
     
-    private static ArrayList<RemoteRepository> repositories;
-
     public static RepositorySystem newRepositorySystem() {
         /*
          * Aether's components implement org.eclipse.aether.spi.locator.Service
@@ -57,8 +55,8 @@ public class RepositoryFactory {
         return locator.getService(RepositorySystem.class);
     }
 
-    public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
-        LocalRepository localRepo = new LocalRepository(MavenStoreConfiguration.getLocalRepository().getURItoPath());        
+    public static DefaultRepositorySystemSession newRepositorySystemSession(MavenStoreConfiguration configuration, RepositorySystem system) {
+        LocalRepository localRepo = new LocalRepository(configuration.getLocalRepository().getURItoPath());        
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
         session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, "2000");//2s
@@ -67,12 +65,12 @@ public class RepositoryFactory {
         return session;
     }
 
-    public static List<RemoteRepository> newRepositories() {
-        repositories = new ArrayList<>(2);
+    public static List<RemoteRepository> newRepositories(MavenStoreConfiguration configuration) {
+        List<RemoteRepository> repositories = new ArrayList<>(2);
         
         //using remote repository? then search primary this one
-        if (MavenStoreConfiguration.isRemoteRepoDefault()) {
-            RepositoryWrapper rr = MavenStoreConfiguration.getRemoteRepository();
+        if (configuration.isRemoteRepoDefault()) {
+            RepositoryWrapper rr = configuration.getRemoteRepository();
             repositories.add(new RemoteRepository.Builder(rr.getName(), "default", rr.getUri().toString()).build());            
         }
         
@@ -84,10 +82,6 @@ public class RepositoryFactory {
         return repositories;
     }
     
-
-    public static ArrayList<RemoteRepository> getRepositories() {
-        return repositories;
-    }
 
     private RepositoryFactory() {
     }

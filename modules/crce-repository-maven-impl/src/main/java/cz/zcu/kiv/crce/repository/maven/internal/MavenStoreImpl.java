@@ -46,9 +46,11 @@ public class MavenStoreImpl implements Store {
 
     private Repository repository;
     private final URI baseUri;
+    private MavenStoreConfiguration configuration;
 
-    MavenStoreImpl(URI baseUri) {
+    MavenStoreImpl(URI baseUri, MavenStoreConfiguration configuration) {
         this.baseUri = baseUri;
+        this.configuration = configuration;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class MavenStoreImpl implements Store {
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return new File(uri).getPath().startsWith(MavenStoreConfiguration.getLocalRepository().getURItoPath());
+        return new File(uri).getPath().startsWith(configuration.getLocalRepository().getURItoPath());
     }
 
     @Override
@@ -146,10 +148,22 @@ public class MavenStoreImpl implements Store {
      * Main method for start indexing local maven repository
      */
     private void index() {
-        taskRunnerService.scheduleTask(new MavenRepositoryIndexer(baseUri, new MetadataIndexerCallbackImpl(resourceDAO,
-                resourceIndexerService, metadataService, metadataFactory, metadataValidator, identityIndexer, repository)));
+        taskRunnerService.scheduleTask(new MavenRepositoryIndexer(
+                baseUri,
+                configuration,
+                new MetadataIndexerCallbackImpl(
+                        configuration,
+                        resourceDAO,
+                        resourceIndexerService,
+                        metadataService,
+                        metadataFactory,
+                        metadataValidator,
+                        identityIndexer,
+                        repository
+                )
+        ));
     }
-
+    
 //<<<<<<< HEAD:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
 //=======
 //    void stop() {
@@ -200,4 +214,8 @@ public class MavenStoreImpl implements Store {
 //        return "MavenStoreImpl{" + "baseUri=" + baseUri + '}';
 //    }
 //>>>>>>> master:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
+
+    public void setConfiguration(MavenStoreConfiguration configuration) {
+        this.configuration = configuration;
+    }
 }

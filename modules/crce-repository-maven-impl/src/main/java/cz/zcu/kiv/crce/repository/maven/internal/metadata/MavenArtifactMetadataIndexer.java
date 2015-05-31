@@ -32,11 +32,6 @@ import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration;
 */
 public class MavenArtifactMetadataIndexer {
     
-    private volatile MetadataService metadataService;
-    private volatile MetadataFactory metadataFactory;
-    
-    private static final Logger logger = LoggerFactory.getLogger(MavenArtifactMetadataIndexer.class);
-    
     public static final String NAMESPACE__CRCE_MAVEN_ARTIFACT = "maven.artifact";
     public static final AttributeType<String> ATTRIBUTE__GROUP_ID = new SimpleAttributeType<>("groupId", String.class);
     public static final AttributeType<String> ATTRIBUTE__ARTIFACT_ID = new SimpleAttributeType<>("artifactId", String.class);
@@ -52,10 +47,17 @@ public class MavenArtifactMetadataIndexer {
     public static final String DEPENDENCY_SCOPE = "scope";
     public static final String DEPENDENCY_OPTIONAL = "optional";
     
+    private static final Logger logger = LoggerFactory.getLogger(MavenArtifactMetadataIndexer.class);
     
-    public MavenArtifactMetadataIndexer(MetadataService metadataService, MetadataFactory metadaFactory) {
+    private final MetadataService metadataService;
+    private final MetadataFactory metadataFactory;
+    private final MavenStoreConfiguration configuration;
+    
+    public MavenArtifactMetadataIndexer(MavenStoreConfiguration configuration,
+            MetadataService metadataService, MetadataFactory metadaFactory) {
         this.metadataService = metadataService;
         this.metadataFactory = metadaFactory;
+        this.configuration = configuration;
     }
 
     public void createMavenArtifactMetadata(Resource resource, MavenArtifactWrapper maw) {
@@ -139,7 +141,7 @@ public class MavenArtifactMetadataIndexer {
     private void addArtifactRequirements(Resource resource, MavenArtifactWrapper maw) {
            
          //Create Only Direct Dependency
-        if (!MavenStoreConfiguration.isDependencyHierarchy()) {
+        if (!configuration.isDependencyHierarchy()) {
             createDirectDependency(resource, maw);            
         }
         

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author M.Brozek
  */
 public class MavenStoreConfiguration {
+    
     private static final Logger logger = LoggerFactory.getLogger(MavenStoreConfiguration.class);
 
     public static final String LOCAL_MAVEN_STORE_URI = "local.maven.store.uri";
@@ -34,42 +35,44 @@ public class MavenStoreConfiguration {
     public static final String AR_STRINGS = "gav:groupid:groupid-artifactid:groupid-artifactid-minversion";
 
 
-    private static RepositoryWrapper localRepository;
-    private static RepositoryWrapper remoteRepository;
+    private final RepositoryWrapper localRepository;
+    private final RepositoryWrapper remoteRepository;
 
-    private static String indexingContextPath = "mvn_store_index";
-    private static boolean remoteRepoDefault = false;
-    private static boolean dependencyHierarchy = false;
-    private static boolean resolveArtifacts = false;
+    private final String indexingContextPath;
+    private final boolean remoteRepoDefault;
+    private final boolean dependencyHierarchy;
+    private final boolean resolveArtifacts;
 
-    private static ArtifactResolutionStrategy artifactResolve = ArtifactResolutionStrategy.NEWEST;
-    private static String artifactResolveParam = "";
+    private final ArtifactResolutionStrategy artifactResolve;
+    private final String artifactResolveParam;
 
 
-    public static void initConfig(Dictionary<String, ?> properties) throws ConfigurationException {
+    public MavenStoreConfiguration(Dictionary<String, ?> properties) throws ConfigurationException {
         //Local Repo
         URI localUri = checkLocalURI(properties.get(LOCAL_MAVEN_STORE_URI).toString());
-        String localName = properties.get(MavenStoreConfiguration.LOCAL_STORE_NAME).toString();
+        String localName = properties.get(LOCAL_STORE_NAME).toString();
         Boolean localUpdate = toBoolean(properties.get(LOCAL_REPOSITORY_UPDATE).toString());
         localRepository = new RepositoryWrapper(localUri, localName, localUpdate, true);
 
         //Remote Repo
         URI remoteUri = checkRemoteURI(properties.get(REMOTE_MAVEN_STORE_URI).toString());
-        String remoteName = properties.get(MavenStoreConfiguration.REMOTE_STORE_NAME).toString();
+        String remoteName = properties.get(REMOTE_STORE_NAME).toString();
         Boolean remoteUpdate = toBoolean(properties.get(REMOTE_REPOSITORY_UPDATE).toString());
         remoteRepository = new RepositoryWrapper(remoteUri, remoteName, remoteUpdate, false);
 
         String indexContext = properties.get(INDEXING_CONTEXT_URI).toString();
-        setIndexingContextPath(convertURItoString(indexContext));
+        indexingContextPath = convertURItoString(indexContext);
 
-        setRemoteRepoDefault(toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString()));
-        setDependencyHierarchy(toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString()));
-        setResolveArtifacts(toBoolean(properties.get(RESOLVE_ARTIFACTS).toString()));
+        remoteRepoDefault = toBoolean(properties.get(REMOTE_STORE_DEFAULT).toString());
+        dependencyHierarchy = toBoolean(properties.get(DEPENDENCY_HIERARCHY).toString());
+        resolveArtifacts = toBoolean(properties.get(RESOLVE_ARTIFACTS).toString());
 
-        setArtifactResolve(ArtifactResolutionStrategy.fromValue(properties.get(ARTIFACT_RESOLVE).toString()));
+        artifactResolve = ArtifactResolutionStrategy.fromValue(properties.get(ARTIFACT_RESOLVE).toString());
 
         if (AR_STRINGS.contains(artifactResolve.getValue().toLowerCase())) {
-            setArtifactResolveParam(properties.get(ARTIFACT_RESOLVE_PARAM).toString());
+            artifactResolveParam = properties.get(ARTIFACT_RESOLVE_PARAM).toString();
+        } else {
+            artifactResolveParam = "";
         }
     }
 
@@ -87,7 +90,7 @@ public class MavenStoreConfiguration {
         } else if ("file".equals(uri.getScheme())) {
             return uri;
         } else {
-            throw new ConfigurationException(MavenStoreConfiguration.LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
+            throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
         }
     }
 
@@ -121,7 +124,7 @@ public class MavenStoreConfiguration {
                 return file.getAbsolutePath();
 
             } else {
-                throw new ConfigurationException(MavenStoreConfiguration.LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
+                throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Wrong URI format: " + uri.getScheme());
             }
 
         } catch (URISyntaxException ex) {
@@ -142,69 +145,36 @@ public class MavenStoreConfiguration {
         }
     }
 
-    public static RepositoryWrapper getLocalRepository() {
+    public RepositoryWrapper getLocalRepository() {
         return localRepository;
     }
 
-    public static void setLocalRepository(RepositoryWrapper localRepository) {
-        MavenStoreConfiguration.localRepository = localRepository;
-    }
-
-    public static RepositoryWrapper getRemoteRepository() {
+    public RepositoryWrapper getRemoteRepository() {
         return remoteRepository;
     }
 
-    public static void setRemoteRepository(RepositoryWrapper remoteRepository) {
-        MavenStoreConfiguration.remoteRepository = remoteRepository;
-    }
-
-    public static String getIndexingContextPath() {
+    public String getIndexingContextPath() {
         return indexingContextPath;
     }
 
-    public static void setIndexingContextPath(String indexingContexPath) {
-        MavenStoreConfiguration.indexingContextPath = indexingContexPath;
-    }
-
-    public static boolean isRemoteRepoDefault() {
+    public boolean isRemoteRepoDefault() {
         return remoteRepoDefault;
     }
 
-    public static void setRemoteRepoDefault(boolean remoteRepoDefault) {
-        MavenStoreConfiguration.remoteRepoDefault = remoteRepoDefault;
-    }
-
-
-    public static boolean isDependencyHierarchy() {
+    public boolean isDependencyHierarchy() {
         return dependencyHierarchy;
     }
 
-    public static void setDependencyHierarchy(boolean dependencyHierarchy) {
-        MavenStoreConfiguration.dependencyHierarchy = dependencyHierarchy;
-    }
-
-    public static boolean isResolveArtifacts() {
+    public boolean isResolveArtifacts() {
         return resolveArtifacts;
     }
 
-    public static void setResolveArtifacts(boolean resolveArtifacts) {
-        MavenStoreConfiguration.resolveArtifacts = resolveArtifacts;
-    }
-
-    public static ArtifactResolutionStrategy getArtifactResolve() {
+    public ArtifactResolutionStrategy getArtifactResolve() {
         return artifactResolve;
     }
 
-    public static void setArtifactResolve(ArtifactResolutionStrategy artifactResolve) {
-        MavenStoreConfiguration.artifactResolve = artifactResolve;
-    }
-
-    public static String getArtifactResolveParam() {
+    public String getArtifactResolveParam() {
         return artifactResolveParam;
-    }
-
-    public static void setArtifactResolveParam(String artifactResolveParam) {
-        MavenStoreConfiguration.artifactResolveParam = artifactResolveParam;
     }
 }
 

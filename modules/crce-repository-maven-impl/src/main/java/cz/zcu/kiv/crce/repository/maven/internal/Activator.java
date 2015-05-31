@@ -49,6 +49,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
      * PID to URI.
      */
     private final Map<String, String> uris = new HashMap<>();
+    private final Map<String, MavenStoreConfiguration> configurations = new HashMap<>();
 
     private volatile DependencyManager dependencyManager; /* injected by dependency manager */
 
@@ -69,6 +70,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Component component : components.values()) {
             dependencyManager.remove(component);
         }
+        
+        uris.clear();
+        configurations.clear();
+        
         logger.debug("Maven repository destroyed.");
     }
 
@@ -81,12 +86,6 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
         logger.trace("ManagedServiceFactory updated with pid: {}", pid);
 
-        // allow reconfiguration of existing instances
-//        if (components.containsKey(pid)) {
-//            logger.info("Repository ({}) is already configured.", pid);
-//            return;
-//        }
-
         if (properties == null) {
             logger.warn("Repository ({}) configuration is empty!", pid);
             return;
@@ -94,17 +93,16 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Updating maven repository ({}) configuration: {}", properties);
 
-        MavenStoreConfiguration.initConfig(properties);
+        MavenStoreConfiguration configuration = new MavenStoreConfiguration(properties);
 
         String absolutePath;
-
         URI uri;
-        if (MavenStoreConfiguration.isRemoteRepoDefault()) {
-            uri = MavenStoreConfiguration.getRemoteRepository().getUri();
+        if (configuration.isRemoteRepoDefault()) {
+            uri = configuration.getRemoteRepository().getUri();
             absolutePath = uri.getPath();
             logger.debug("URI {} for Remote Maven repository set", uri);
         } else {
-            uri = MavenStoreConfiguration.getLocalRepository().getUri();
+            uri = configuration.getLocalRepository().getUri();
             File mvnStorePath = new File(uri);
 
             absolutePath = mvnStorePath.getAbsolutePath();
@@ -119,7 +117,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Map.Entry<String, String> entry : uris.entrySet()) {
             if (entry.getValue().equals(absolutePath) && !entry.getKey().equals(pid)) {
                 throw new ConfigurationException(
-                        MavenStoreConfiguration.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
+                        configuration.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
                         "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath
                 );
             }
@@ -141,7 +139,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         Component storeComponent = createComponent()
                 .setInterface(Store.class.getName(), props)
-                .setImplementation(new MavenStoreImpl(uri))
+                .setImplementation(new MavenStoreImpl(uri, configuration))
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
@@ -157,6 +155,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         logger.debug("Registering maven repository store: {}", storeComponent);
 
         uris.put(pid, absolutePath);
+        configurations.put(pid, configuration);
         components.put(pid, storeComponent);
         dependencyManager.add(storeComponent);
     }
@@ -169,6 +168,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
             dependencyManager.remove(storeComponent);
             uris.remove(pid);
+            configurations.remove(pid);
         }
     }
 }
