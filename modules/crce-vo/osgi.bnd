@@ -1,0 +1,15 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Version>: \
+  ${pom.version}
+
+Bundle-SymbolicName: \
+  ${bundle.symbolicName}
+
+Bundle-Name: CRCE - VOs
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+
