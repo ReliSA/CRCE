@@ -5,7 +5,8 @@ package cz.zcu.kiv.crce.repository.maven.internal;
  * @author Miroslav Brozek
  *
  */
-public enum ArtifactResolutionStrategy {
+public enum ResolutionStrategy {
+    
     ALL("all"),
     NEWEST("newest"),
     HIGHEST_MAJOR("highest-major"),
@@ -18,10 +19,10 @@ public enum ArtifactResolutionStrategy {
     GROUP_ID("groupid"),
     GROUPID_ARTIFACTID("groupid-artifactid"),
     GROUPID_ARTIFACTID_FROM_VERSION("groupid-artifactid-minversion");
-    
+
     private final String value;
 
-    private ArtifactResolutionStrategy(String value) {
+    private ResolutionStrategy(String value) {
         this.value = value;
     }
 
@@ -29,9 +30,9 @@ public enum ArtifactResolutionStrategy {
         return value;
     }
 
-    public static ArtifactResolutionStrategy fromValue(String value) {
-        for (ArtifactResolutionStrategy v : values()) {
-            if (v.value.equals(value.trim())) {
+    public static ResolutionStrategy fromValue(String value) {
+        for (ResolutionStrategy v : values()) {
+            if (v.value.equalsIgnoreCase(value.trim())) {
                 return v;
             }
         }

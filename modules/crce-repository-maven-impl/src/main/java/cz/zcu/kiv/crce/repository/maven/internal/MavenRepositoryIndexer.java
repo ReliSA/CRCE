@@ -124,20 +124,23 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         try {
 
-            if (configuration.isRemoteRepoDefault()) {
-                RepositoryWrapper rr = configuration.getRemoteRepository();
-                indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(indexingContextPath), rr.isUpdate());
-            } else {
-                RepositoryWrapper lr = configuration.getLocalRepository();
-                indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(indexingContextPath), lr.isUpdate());
-            }
+            switch (configuration.getPrimaryRepository()) {
+                case REMOTE:
+                    RepositoryWrapper rr = configuration.getRemoteRepository();
+                    indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(indexingContextPath), rr.isUpdate());
+                    break;
 
+                case LOCAL:
+                    RepositoryWrapper lr = configuration.getLocalRepository();
+                    indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(indexingContextPath), lr.isUpdate());
+                    break;
+            }
 
             Indexer indexer = indexingContext.getIndexer();
             Set<ArtifactInfo> results = new LinkedHashSet<>();
             String arParam = "";
 
-            ArtifactResolutionStrategy ar = configuration.getArtifactResolve();
+            ResolutionStrategy ar = configuration.getArtifactResolve();
             switch (ar) {
             case ALL:
                 logger.debug("All Artifact's versions will be processed");
@@ -206,7 +209,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
             if (!results.isEmpty()) {
                 logger.info("Amount of artifacts to index: {}", results.size());
-                
+
                 indexResults(results);
             } else {
                 logger.warn("NO RESULTS! Check configuration file!");
@@ -217,7 +220,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
             return null;
         }
-        
+
         indexingContext.close();
         return null;
     }
@@ -239,90 +242,97 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
             try {
                 // Direct Dependency
-                if (!configuration.isDependencyHierarchy()) {
-                    ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-                    List<Dependency> directDependencies = descriptorResult.getDependencies();
+                switch (configuration.getResolutionDepth()) {
+                    case NONE:
+                        throw new UnsupportedOperationException("Not implemented yet.");
 
-                    // Indexing and resolve JAR
-                    if (configuration.isResolveArtifacts()) {
-                        ArtifactRequest artifactRequest = new ArtifactRequest();
-                        artifactRequest.setArtifact(artifact);
-                        artifactRequest.setRepositories(descriptorRequest.getRepositories());
+                    case DIRECT: {
+                        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+                        List<Dependency> directDependencies = descriptorResult.getDependencies();
 
-                        //resolve root artifact
-                        ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
-                        artifact = artifactResult.getArtifact();
+                        // Indexing and resolve JAR
+                        switch (configuration.getResolutionMethod()) {
+                            case JAR: {
+                                ArtifactRequest artifactRequest = new ArtifactRequest();
+                                artifactRequest.setArtifact(artifact);
+                                artifactRequest.setRepositories(descriptorRequest.getRepositories());
 
-                        //resolve directDependencies
-                        for (Dependency dependency : directDependencies) {
-                            Artifact dependencyArtifact = dependency.getArtifact();
-                            MavenArtifactVersion version = new MavenArtifactVersion(dependencyArtifact.getBaseVersion());
+                                //resolve root artifact
+                                ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
+                                artifact = artifactResult.getArtifact();
 
-                            if (version.isRangeVersion()) {
-                                //get newest dependendency from range, should be configurable
-                                dependencyArtifact = dependencyArtifact.setVersion(version.getvMax());
+                                //resolve directDependencies
+                                for (Dependency dependency : directDependencies) {
+                                    Artifact dependencyArtifact = dependency.getArtifact();
+                                    MavenArtifactVersion version = new MavenArtifactVersion(dependencyArtifact.getBaseVersion());
+
+                                    if (version.isRangeVersion()) {
+                                        //get newest dependendency from range, should be configurable
+                                        dependencyArtifact = dependencyArtifact.setVersion(version.getvMax());
+                                    }
+
+                                    artifactRequest = new ArtifactRequest();
+                                    artifactRequest.setArtifact(dependencyArtifact);
+                                    artifactRequest.setRepositories(descriptorRequest.getRepositories());
+
+                                    try {
+                                        artifactResult = system.resolveArtifact(session, artifactRequest);
+                                        dependencyArtifact = artifactResult.getArtifact();
+                                        logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
+                                    } catch (Exception e) {
+                                        logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
+                                    }
+                                }
+                                break;
                             }
 
-
-                            artifactRequest = new ArtifactRequest();
-                            artifactRequest.setArtifact(dependencyArtifact);
-                            artifactRequest.setRepositories(descriptorRequest.getRepositories());
-
-                            try {
-                                artifactResult = system.resolveArtifact(session, artifactRequest);
-                                dependencyArtifact = artifactResult.getArtifact();
-                                logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
-                            } catch (Exception e) {
-                                logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
+                            case POM: {
+                                artifact = descriptorResult.getArtifact();
+                                artifact = setPOMfileToArtifact(artifact, system, session);
+                                break;
                             }
                         }
+
+                        MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, directDependencies, null);
+                        metadataIndexerCallback.index(maw);
+                        break;
                     }
 
+                    case TRANSITIVE: {
+                        session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
+                        session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
 
-                    // Indexing by POM
-                    else {
-                        artifact = descriptorResult.getArtifact();
-                        artifact = setPOMfileToArtifact(artifact, system, session);
+                        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+
+                        CollectRequest collectRequest = new CollectRequest();
+                        collectRequest.setRootArtifact(descriptorResult.getArtifact());
+                        collectRequest.setDependencies(descriptorResult.getDependencies());
+                        collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
+                        collectRequest.setRepositories(descriptorRequest.getRepositories());
+
+                        CollectResult collectResult = system.collectDependencies(session, collectRequest);
+                        List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
+
+                        // Indexing by POM
+                        switch (configuration.getResolutionMethod()) {
+                            case POM:
+                                artifact = collectResult.getRoot().getArtifact();
+                                artifact = setPOMfileToArtifact(artifact, system, session);
+                                break;
+
+                            case JAR:
+                                DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
+                                collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
+                                DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
+                                DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
+                                artifact = dr.getRoot().getArtifact();
+                                break;
+                        }
+
+                        MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, null, hierarchyD);
+                        metadataIndexerCallback.index(maw);
+                        break;
                     }
-
-                    MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, directDependencies, null);
-                    metadataIndexerCallback.index(maw);
-                }
-
-                // Create Hierarchy Dependencies
-                else {
-
-                    session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
-                    session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
-
-                    ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-
-                    CollectRequest collectRequest = new CollectRequest();
-                    collectRequest.setRootArtifact(descriptorResult.getArtifact());
-                    collectRequest.setDependencies(descriptorResult.getDependencies());
-                    collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
-                    collectRequest.setRepositories(descriptorRequest.getRepositories());
-
-                    CollectResult collectResult = system.collectDependencies(session, collectRequest);
-                    List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
-
-                    // Indexing by POM
-                    if (!configuration.isResolveArtifacts()) {
-                        artifact = collectResult.getRoot().getArtifact();
-                        artifact = setPOMfileToArtifact(artifact, system, session);
-                    }
-
-                    // Indexing and resolve JARs
-                    else {
-                        DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
-                        collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
-                        DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
-                        DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
-                        artifact = dr.getRoot().getArtifact();
-                    }
-
-                    MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, null, hierarchyD);
-                    metadataIndexerCallback.index(maw);
                 }
 
             } catch (DependencyCollectionException e) {
@@ -465,7 +475,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws IOException
      * @throws InvalidVersionSpecificationException
      */
-    private Set<ArtifactInfo> getHiLowFiltredResults(Indexer indexer, Set<ArtifactInfo> results, ArtifactResolutionStrategy ars)
+    private Set<ArtifactInfo> getHiLowFiltredResults(Indexer indexer, Set<ArtifactInfo> results, ResolutionStrategy ars)
             throws IOException, InvalidVersionSpecificationException {
 
         HashSet<String> done = new HashSet<>();//list of proccesed artifacts...much faster
@@ -497,7 +507,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws InvalidVersionSpecificationException
      * @throws IOException
      */
-    private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ArtifactResolutionStrategy ar) throws InvalidVersionSpecificationException, IOException {
+    private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ResolutionStrategy ar) throws InvalidVersionSpecificationException, IOException {
         int highest = 0;
         int lowest = Integer.MAX_VALUE;
 
@@ -516,7 +526,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         // construct the filter to express "V greater than"
         final ArtifactInfoFilter versionFilter = new ArtifactInfoFilter() {
-            
+
             @Override
             public boolean accepts(final IndexingContext ctx, final ArtifactInfo ai) {
                 try {
@@ -636,7 +646,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
     }
 
 
-    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ArtifactResolutionStrategy ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
+    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ResolutionStrategy ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
         Set<ArtifactInfo> results = Collections.emptySet();
         String arParam = configuration.getArtifactResolveParam();
         String[] gav = arParam.split(":");
@@ -676,7 +686,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         return results;
     }
 
-    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ArtifactResolutionStrategy ar) throws InvalidVersionSpecificationException,
+    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ResolutionStrategy ar) throws InvalidVersionSpecificationException,
             IOException, VersionRangeResolutionException {
 
         Query gidQ;
@@ -695,7 +705,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         final String versionString;
 
         //find artifacts version at 'gav[2] inclusive and higher
-        if (ar.equals(ArtifactResolutionStrategy.GROUPID_ARTIFACTID_FROM_VERSION)) {
+        if (ar.equals(ResolutionStrategy.GROUPID_ARTIFACTID_FROM_VERSION)) {
             versionString = gav[2];
 
         } else {
@@ -723,7 +733,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         };
 
         logger.debug("Searching all versions for artifact {}-{}", gav[0], gav[1]);
-        
+
         final IteratorSearchRequest request = new IteratorSearchRequest(bq,
                 Collections.singletonList((IndexingContext) indexingContext), versionFilter);
 
@@ -794,9 +804,9 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
     private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)
             throws PlexusContainerException, ComponentLookupException, IOException {
-        
+
         logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
-        
+
         if (repository == null || indexParentDir == null) {
             logger.debug("Mvn repository '{}' or index parent dir '{}' is null. Indexing could not be started!", repository, indexParentDir);
             return null;
@@ -1013,7 +1023,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             logger.debug("Temporary dir '{}' created.", tmpDir);
 
             try (final FSDirectory directory = FSDirectory.open(tmpDir)) {
-                
+
                 IndexUtils.copyDirectory(indexingContext.getIndexDirectory(), directory);
 
                 logger.debug("Creating temporary indexing context.");
@@ -1034,7 +1044,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
                     )
                 ) {
                     logger.debug("Remote maven store indexing started.");
-                    
+
                     long start_time = System.nanoTime();
 
                     ResourceFetcher resourceFetcher = new WagonHelper.WagonFetcher(httpWagon, listener, null, null);
@@ -1055,10 +1065,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
                     }
 
                     logger.info("Indexing remote repository finished succesfully!!!");
-                    
+
                     long end_time = System.nanoTime();
                     double difference = (end_time - start_time) / 1e6;
-                    
+
                     logger.debug("Indexing remote repository took {} nanoseconds ", difference);
 
                     tmpContext.updateTimestamp(true);

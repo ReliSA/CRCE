@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.repository.maven.internal;
 
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.LOCAL_MAVEN_STORE_URI;
-import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.REMOTE_MAVEN_STORE_URI;
+import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.CFG__REPOSITORY_LOCAL_URI;
+import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.CFG__REPOSITORY_REMOTE_URI;
 
 import java.io.File;
 import java.net.URI;
@@ -13,10 +13,12 @@ import java.util.Properties;
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,10 +72,10 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         for (Component component : components.values()) {
             dependencyManager.remove(component);
         }
-        
+
         uris.clear();
         configurations.clear();
-        
+
         logger.debug("Maven repository destroyed.");
     }
 
@@ -95,29 +97,33 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         MavenStoreConfiguration configuration = new MavenStoreConfiguration(properties);
 
-        String absolutePath;
-        URI uri;
-        if (configuration.isRemoteRepoDefault()) {
-            uri = configuration.getRemoteRepository().getUri();
-            absolutePath = uri.getPath();
-            logger.debug("URI {} for Remote Maven repository set", uri);
-        } else {
-            uri = configuration.getLocalRepository().getUri();
-            File mvnStorePath = new File(uri);
+        String absolutePath = null;
+        URI uri = null;
+        switch (configuration.getPrimaryRepository()) {
+            case REMOTE:
+                uri = configuration.getRemoteRepository().getUri();
+                absolutePath = uri.getPath();
+                logger.debug("URI {} for Remote Maven repository set", uri);
+                break;
 
-            absolutePath = mvnStorePath.getAbsolutePath();
+            case LOCAL:
+                uri = configuration.getLocalRepository().getUri();
+                File mvnStorePath = new File(uri);
 
-            if (!mvnStorePath.exists() && !mvnStorePath.mkdirs()) {
-                throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Can not create directory on the given path: " + absolutePath);
-            } else if (!mvnStorePath.isDirectory()) {
-                throw new ConfigurationException(LOCAL_MAVEN_STORE_URI, "Store URI is not a directory: " + absolutePath);
-            }
+                absolutePath = mvnStorePath.getAbsolutePath();
+
+                if (!mvnStorePath.exists() && !mvnStorePath.mkdirs()) {
+                    throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Can not create directory on the given path: " + absolutePath);
+                } else if (!mvnStorePath.isDirectory()) {
+                    throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Store URI is not a directory: " + absolutePath);
+                }
+                break;
         }
 
         for (Map.Entry<String, String> entry : uris.entrySet()) {
             if (entry.getValue().equals(absolutePath) && !entry.getKey().equals(pid)) {
                 throw new ConfigurationException(
-                        configuration.isRemoteRepoDefault() ? REMOTE_MAVEN_STORE_URI : LOCAL_MAVEN_STORE_URI,
+                        RepositoryType.REMOTE.equals(configuration.getPrimaryRepository()) ? CFG__REPOSITORY_REMOTE_URI : CFG__REPOSITORY_LOCAL_URI,
                         "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath
                 );
             }
