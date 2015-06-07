@@ -38,10 +38,10 @@ public class MavenStoreConfiguration {
     public static final String AR_STRINGS = "gav:groupid:groupid-artifactid:groupid-artifactid-minversion";
 
 
-    private final RepositoryWrapper localRepository;
-    private final RepositoryWrapper remoteRepository;
+    private final RepositoryConfiguration localRepository;
+    private final RepositoryConfiguration remoteRepository;
 
-    private final String indexingContextPath;
+    private final File indexingContextPath;
     private final RepositoryType primaryRepository;
     private final ResolutionDepth resolutionDepth;
     private final ResolutionMethod resolutionMethod;
@@ -50,21 +50,20 @@ public class MavenStoreConfiguration {
     private final String artifactResolveParam;
 
 
-    public MavenStoreConfiguration(Dictionary<String, ?> properties) throws ConfigurationException {
+    public MavenStoreConfiguration(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
         //Local Repo
-        URI localUri = checkLocalURI(properties.get(CFG__REPOSITORY_LOCAL_URI).toString());
-        String localName = properties.get(CFG__REPOSITORY_LOCAL_NAME).toString();
-        Boolean localUpdate = toBoolean(properties.get(CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP));
-        localRepository = new RepositoryWrapper(localUri, localName, localUpdate, true);
+        URI uri = getLocalUri(properties);
+        String name = getProperty(properties, CFG__REPOSITORY_LOCAL_NAME, pid + "-local");
+        Boolean updateOnStartup = toBoolean(properties.get(CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP));
+        localRepository = new RepositoryConfiguration(uri, name, updateOnStartup, true);
 
         //Remote Repo
-        URI remoteUri = checkRemoteURI(properties.get(CFG__REPOSITORY_REMOTE_URI).toString());
-        String remoteName = properties.get(CFG__REPOSITORY_REMOTE_NAME).toString();
-        Boolean remoteUpdate = toBoolean(properties.get(CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP));
-        remoteRepository = new RepositoryWrapper(remoteUri, remoteName, remoteUpdate, false);
+        uri = getRemoteUri(properties);
+        name = getProperty(properties, CFG__REPOSITORY_REMOTE_NAME, pid + "-remote");
+        updateOnStartup = toBoolean(properties.get(CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP));
+        remoteRepository = new RepositoryConfiguration(uri, name, updateOnStartup, false);
 
-        String indexContext = properties.get(CFG__INDEXING_CONTEXT_URI).toString();
-        indexingContextPath = convertURItoString(indexContext);
+        indexingContextPath = getIndexingContextPath(properties);
 
         primaryRepository = RepositoryType.valueOfIgnoreCase(getProperty(properties, CFG__REPOSITORY_PRIMARY), null);
         if (primaryRepository == null) {
@@ -73,26 +72,30 @@ public class MavenStoreConfiguration {
         resolutionDepth = ResolutionDepth.valueOfIgnoreCase(getProperty(properties, CFG__RESOLUTION_DEPTH), ResolutionDepth.DIRECT);
         resolutionMethod = ResolutionMethod.valueOfIgnoreCase(getProperty(properties, CFG__RESOLUTION_METHOD), ResolutionMethod.POM);
 
-        artifactResolve = ResolutionStrategy.fromValue(properties.get(CFG__RESOLUTION_STRATEGY).toString());
+        artifactResolve = ResolutionStrategy.fromValue(getProperty(properties, CFG__RESOLUTION_STRATEGY, ResolutionStrategy.NEWEST.getValue()));
 
         if (AR_STRINGS.contains(artifactResolve.getValue().toLowerCase())) {
-            artifactResolveParam = properties.get(CFG__RESOLUTION_STRATEGY_PARAMETERS).toString();
+            artifactResolveParam = getProperty(properties, CFG__RESOLUTION_STRATEGY_PARAMETERS, "");
         } else {
             artifactResolveParam = "";
         }
     }
 
-    private static URI checkLocalURI(String localRepoURI) throws ConfigurationException {
-        URI uri;
+    private static URI getLocalUri(Dictionary<String, ?> properties) throws ConfigurationException {
+        String uriString = getProperty(properties, CFG__REPOSITORY_LOCAL_URI);
+        if (uriString == null) {
+            throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Remote repository URI cannot be null.");
+        }
 
+        URI uri;
         try {
-            uri = new URI(localRepoURI);
+            uri = new URI(uriString);
         } catch (URISyntaxException ex) {
-            throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Invalid URI syntax: " + localRepoURI, ex);
+            throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Invalid URI syntax: " + uriString, ex);
         }
 
         if (uri.getScheme() == null) {
-            return new File(localRepoURI).toURI();
+            return new File(uriString).toURI();
         } else if ("file".equals(uri.getScheme())) {
             return uri;
         } else {
@@ -100,13 +103,17 @@ public class MavenStoreConfiguration {
         }
     }
 
-    private static URI checkRemoteURI(String remoteRepoURI) throws ConfigurationException {
-        URI uri;
+    private static URI getRemoteUri(Dictionary<String, ?> properties) throws ConfigurationException {
+        String uriString = getProperty(properties, CFG__REPOSITORY_REMOTE_URI);
+        if (uriString == null) {
+            throw new ConfigurationException(CFG__REPOSITORY_REMOTE_URI, "Local repository URI cannot be null.");
+        }
 
+        URI uri;
         try {
-            uri = new URI(remoteRepoURI);
+            uri = new URI(uriString);
         } catch (URISyntaxException ex) {
-            throw new ConfigurationException(CFG__REPOSITORY_REMOTE_URI, "Invalid URI syntax: " + remoteRepoURI, ex);
+            throw new ConfigurationException(CFG__REPOSITORY_REMOTE_URI, "Invalid URI syntax: " + uriString, ex);
         }
 
         if ("http".equals(uri.getScheme())) {
@@ -114,45 +121,39 @@ public class MavenStoreConfiguration {
         } else {
             throw new ConfigurationException(CFG__REPOSITORY_REMOTE_URI, "Wrong URI format: " + uri.getScheme());
         }
-
     }
 
-    private static String convertURItoString(String localRepoURI) throws ConfigurationException {
+    private static File getIndexingContextPath(Dictionary<String, ?> properties) throws ConfigurationException {
+        String uriString = getProperty(properties, CFG__INDEXING_CONTEXT_URI, "maven-index");
+
         try {
-            File file;
-            URI uri = new URI(localRepoURI);
+            URI uri = new URI(uriString);
             if (uri.getScheme() == null) {
-                file = new File(localRepoURI);
-                uri = file.toURI();
-                return new File(uri).getAbsolutePath();
+                return new File(uriString).getAbsoluteFile();
             } else if ("file".equals(uri.getScheme())) {
-                file = new File(uri);
-                return file.getAbsolutePath();
-
+                return new File(uri).getAbsoluteFile();
             } else {
-                throw new ConfigurationException(CFG__REPOSITORY_LOCAL_URI, "Wrong URI format: " + uri.getScheme());
+                throw new ConfigurationException(CFG__INDEXING_CONTEXT_URI, "Wrong URI format: " + uri.getScheme());
             }
-
         } catch (URISyntaxException ex) {
             logger.error("Wrong URI, check configuration file!", ex);
             return null;
         }
-
     }
 
     private static boolean toBoolean(Object value) throws ConfigurationException {
         return value != null && value instanceof String && Boolean.valueOf(((String) value).trim());
     }
 
-    public RepositoryWrapper getLocalRepository() {
+    public RepositoryConfiguration getLocalRepository() {
         return localRepository;
     }
 
-    public RepositoryWrapper getRemoteRepository() {
+    public RepositoryConfiguration getRemoteRepository() {
         return remoteRepository;
     }
 
-    public String getIndexingContextPath() {
+    public File getIndexingContextPath() {
         return indexingContextPath;
     }
 
@@ -176,7 +177,7 @@ public class MavenStoreConfiguration {
         return artifactResolveParam;
     }
 
-    private String getProperty(Dictionary<String, ?> properties, String key) {
+    private static String getProperty(Dictionary<String, ?> properties, String key) {
         if (properties != null) {
             Object value = properties.get(key);
             if (value != null && value instanceof String) {
@@ -184,6 +185,11 @@ public class MavenStoreConfiguration {
             }
         }
         return null;
+    }
+
+    private static String getProperty(Dictionary<String, ?> properties, String key, String defaultValue) {
+        String value = getProperty(properties, key);
+        return (value == null) ? defaultValue : value;
     }
 }
 

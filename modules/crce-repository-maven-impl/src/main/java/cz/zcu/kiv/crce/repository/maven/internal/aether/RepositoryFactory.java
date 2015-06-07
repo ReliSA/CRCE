@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration;
 import cz.zcu.kiv.crce.repository.maven.internal.RepositoryType;
-import cz.zcu.kiv.crce.repository.maven.internal.RepositoryWrapper;
+import cz.zcu.kiv.crce.repository.maven.internal.RepositoryConfiguration;
 
 
 /**
@@ -72,7 +72,7 @@ public class RepositoryFactory {
 
         //using remote repository? then search primary this one
         if (RepositoryType.REMOTE.equals(configuration.getPrimaryRepository())) {
-            RepositoryWrapper rr = configuration.getRemoteRepository();
+            RepositoryConfiguration rr = configuration.getRemoteRepository();
             repositories.add(new RemoteRepository.Builder(rr.getName(), "default", rr.getUri().toString()).build());
         }
 

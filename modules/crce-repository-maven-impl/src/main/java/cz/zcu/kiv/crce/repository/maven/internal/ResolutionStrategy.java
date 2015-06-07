@@ -6,7 +6,7 @@ package cz.zcu.kiv.crce.repository.maven.internal;
  *
  */
 public enum ResolutionStrategy {
-    
+
     ALL("all"),
     NEWEST("newest"),
     HIGHEST_MAJOR("highest-major"),
@@ -15,6 +15,7 @@ public enum ResolutionStrategy {
     HIGHEST_QUALIFIER("highest-qualifier"),
     LOWEST_MINOR("lowest-minor"),
     LOWEST_MICRO("lowest-micro"),
+    
     GAV("gav"),
     GROUP_ID("groupid"),
     GROUPID_ARTIFACTID("groupid-artifactid"),

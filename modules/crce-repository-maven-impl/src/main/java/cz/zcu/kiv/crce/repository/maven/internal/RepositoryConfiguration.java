@@ -10,14 +10,14 @@ import java.net.URI;
  * @author Miroslav Brozek
  *
  */
-public class RepositoryWrapper {
+public class RepositoryConfiguration {
     
     private URI uri;
     private String name;
     private boolean update;
     private boolean local;
 
-    public RepositoryWrapper(URI uri, String name, boolean update, boolean local) {        
+    public RepositoryConfiguration(URI uri, String name, boolean update, boolean local) {        
         this.uri = uri;
         this.name = name;
         this.update = update;

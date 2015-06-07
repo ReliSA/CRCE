@@ -108,7 +108,6 @@ public class MavenRepositoryIndexer extends Task<Object> {
     private final MetadataIndexerCallback metadataIndexerCallback;
     private CloseableIndexingContext indexingContext;
 
-    private final String indexingContextPath;
     private final MavenStoreConfiguration configuration;
 
     public MavenRepositoryIndexer(URI uri, MavenStoreConfiguration configuration, MetadataIndexerCallback metadataIndexerCallback) {
@@ -116,7 +115,6 @@ public class MavenRepositoryIndexer extends Task<Object> {
         this.uri = uri;
         this.metadataIndexerCallback = metadataIndexerCallback;
         this.configuration = configuration;
-        this.indexingContextPath = configuration.getIndexingContextPath();
     }
 
     @Override
@@ -124,15 +122,14 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         try {
 
+            RepositoryConfiguration repositoryConfiguration = configuration.getRemoteRepository();
             switch (configuration.getPrimaryRepository()) {
                 case REMOTE:
-                    RepositoryWrapper rr = configuration.getRemoteRepository();
-                    indexingContext = createRemoteRepositoryIndexingContext(rr.getName(), uri, new File(indexingContextPath), rr.isUpdate());
+                    indexingContext = createRemoteRepositoryIndexingContext(repositoryConfiguration, uri, configuration.getIndexingContextPath());
                     break;
 
                 case LOCAL:
-                    RepositoryWrapper lr = configuration.getLocalRepository();
-                    indexingContext = createLocalRepoIndexingContext(lr.getName(), new File(uri), new File(indexingContextPath), lr.isUpdate());
+                    indexingContext = createLocalRepoIndexingContext(repositoryConfiguration, new File(uri), configuration.getIndexingContextPath());
                     break;
             }
 
@@ -686,8 +683,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
         return results;
     }
 
-    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ResolutionStrategy ar) throws InvalidVersionSpecificationException,
-            IOException, VersionRangeResolutionException {
+    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ResolutionStrategy ar)
+            throws InvalidVersionSpecificationException, IOException, VersionRangeResolutionException {
 
         Query gidQ;
         Query aidQ;
@@ -802,10 +799,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
 //        return all;
 //    }
 
-    private CloseableIndexingContext createLocalRepoIndexingContext(String name, File repository, File indexParentDir, boolean update)
+    private CloseableIndexingContext createLocalRepoIndexingContext(RepositoryConfiguration rc, File repository, File indexParentDir)
             throws PlexusContainerException, ComponentLookupException, IOException {
 
-        logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", name, indexParentDir, repository, update);
+        logger.debug("Updating index '{}' at '{}' for local repo '{}', update: {}", rc.getName(), indexParentDir, repository, rc.isUpdate());
 
         if (repository == null || indexParentDir == null) {
             logger.debug("Mvn repository '{}' or index parent dir '{}' is null. Indexing could not be started!", repository, indexParentDir);
@@ -847,10 +844,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
         logger.info("Creating indexing context of local maven store.");
 
         IndexingContext indexingContext = indexer.createIndexingContext(
-                        name + "-context",
-                        name,
+                        rc.getName() + "-context",
+                        rc.getName(),
                         repository,
-                        new File(indexParentDir, name),
+                        new File(indexParentDir, rc.getName()),
                         null,
                         null,
                         true,
@@ -873,7 +870,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             IndexerEngine indexerEngine = plexusContainer.lookup(IndexerEngine.class);
 
             final FSDirectory directory = FSDirectory.open(tmpDir);
-            if (update) {
+            if (rc.isUpdate()) {
                 IndexUtils.copyDirectory(indexingContext.getIndexDirectory(), directory);
             }
 
@@ -898,7 +895,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
                 ScanningRequest scanningRequest = new ScanningRequest(
                         tmpContext,
-                        new DefaultScannerListener(tmpContext, indexerEngine, update, null),
+                        new DefaultScannerListener(tmpContext, indexerEngine, rc.isUpdate(), null),
                         null
                 );
 
@@ -938,7 +935,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
     }
 
 
-    private CloseableIndexingContext createRemoteRepositoryIndexingContext(String storeName, URI uri, File indexParentDir, boolean update)
+    private CloseableIndexingContext createRemoteRepositoryIndexingContext(RepositoryConfiguration rc, URI uri, File indexParentDir)
             throws IOException, PlexusContainerException, ComponentLookupException {
         if (!indexParentDir.exists() && !indexParentDir.mkdirs()) {
             throw new IOException("Cannot create parent directory for indices: " + indexParentDir);
@@ -979,10 +976,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         // Create context for remote repository index
         IndexingContext indexingContext = indexer.createIndexingContext(
-                storeName + "-context",
-                storeName,
-                new File(storeName + "cache"),
-                new File(indexParentDir, storeName),
+                rc.getName() + "-context",
+                rc.getName(),
+                new File(rc.getName() + "cache"),
+                new File(indexParentDir, rc.getName()),
                 uri.toString(),
                 null,
                 true,
@@ -991,7 +988,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         );
 
         //TODO: replace 'update' for some trigger ...eg once in week after midnight
-        if (update) {
+        if (rc.isUpdate()) {
 
             logger.info("Updating Index...");
             logger.info("This might take a while on the first run, please be patient...");
