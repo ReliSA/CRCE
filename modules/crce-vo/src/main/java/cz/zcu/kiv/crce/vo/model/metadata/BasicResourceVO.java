@@ -6,6 +6,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import cz.zcu.kiv.crce.vo.model.ValueObject;
 
 /**
+ *
+ * Value object for {@link cz.zcu.kiv.crce.metadata.Resource}
+ * Contains only resource's identity view.
+ *
+ * For use in simple listings.
+ *
  * Date: 5.5.15
  *
  * @author Jakub Danek

@@ -11,6 +11,9 @@ import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.IdentityCapabilityVO;
 
 /**
+ * Convertor of Resource instances into a value object (BasicResourceVO) with only elementary
+ * information about the resource.
+ *
  * Date: 10.5.15
  *
  * @author Jakub Danek

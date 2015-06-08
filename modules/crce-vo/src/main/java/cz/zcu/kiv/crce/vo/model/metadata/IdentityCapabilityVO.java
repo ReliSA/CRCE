@@ -14,15 +14,19 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.StringUtils;
 
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceMetadata;
+import cz.zcu.kiv.crce.vo.model.ValueObject;
 
 /**
+ *
+ * Easy-to-use view of CRCE Identity Capability instances.
+ *
  * Date: 5.5.15
  *
  * @author Jakub Danek
  */
 @ParametersAreNonnullByDefault
 @XmlRootElement(name = "capability")
-public class IdentityCapabilityVO extends GenericCapabilityVO {
+public class IdentityCapabilityVO extends ValueObject {
 
     /**
      * CRCE Readable name. E.g. osgi symbolic name.
@@ -194,14 +198,25 @@ public class IdentityCapabilityVO extends GenericCapabilityVO {
     }
 
     @Nonnull
-    public List getCategories() {
+    public List<String> getCategories() {
         if(categories == null) {
             return new ArrayList<>();
         }
         return Arrays.asList(categories.getValue().split(","));
     }
 
-    protected void setCategories(@Nonnull List categories) {
+    public void addCategory(String cat) {
+        if(categories == null) {
+            this.categories = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES.getName(), cat);
+        } else {
+            String oldVal = this.categories.getValue();
+            oldVal = oldVal.concat("," + cat);
+            this.categories.setValue(oldVal);
+        }
+    }
+
+
+    protected void setCategories(@Nonnull List<String> categories) {
         String value = StringUtils.join(categories, ",");
         if(this.categories == null) {
             this.categories = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES.getName(), value);

@@ -6,6 +6,9 @@ import org.dozer.util.DozerClassLoader;
 import org.osgi.framework.BundleContext;
 
 /**
+ * Classloader for Dozer bean mapper which allows loading multiple
+ * mapping files from various OSGi bundles.
+ *
  * Date: 18.5.15
  *
  * @author http://modio.io/dozer-pojo-mapper-in-osgi/

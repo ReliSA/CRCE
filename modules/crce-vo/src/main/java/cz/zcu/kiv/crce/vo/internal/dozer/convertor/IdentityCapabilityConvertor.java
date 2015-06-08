@@ -10,6 +10,9 @@ import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.vo.model.metadata.IdentityCapabilityVO;
 
 /**
+ * Convertor of a CRCE identity Capability into special VO which is easier
+ * to use within clients (UI, web services) than the generic Capability API.
+ *
  * Date: 25.5.15
  *
  * @author Jakub Danek
@@ -41,7 +44,7 @@ public class IdentityCapabilityConvertor extends DozerConverter<Capability, Iden
         List<String> cats = identity.getAttributeValue(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES);
         if(cats != null) {
             for (String c : cats) {
-                idVO.getCategories().add(c);
+                idVO.addCategory(c);
             }
         }
 

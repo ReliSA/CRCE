@@ -1,12 +1,14 @@
-package cz.zcu.kiv.crce.vo.internal.convertor.dozer;
+package cz.zcu.kiv.crce.vo.internal.dozer.convertor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.dozer.DozerBeanMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,6 +24,8 @@ import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 
 /**
+ * Test for {@link BasicResourceConvertor} class.
+ *
  * Date: 15.5.15
  *
  * @author Jakub Danek
@@ -53,8 +57,14 @@ public class BasicResourceConvertorTest {
     private void initDozer() {
         convertor = new BasicResourceConvertor();
         convertor.setMetadataService(metadataService);
+        convertor.setMapper(new DozerBeanMapper(Arrays.asList("mappings.xml")));
     }
 
+    /**
+     * Tests conversion from Resource to BasicResourceVO.
+     *
+     * @throws Exception
+     */
     @Test
     public void testConvertTo() throws Exception {
         Capability c = Mockito.mock(Capability.class);

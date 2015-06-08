@@ -6,6 +6,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import cz.zcu.kiv.crce.vo.model.ValueObject;
 
 /**
+ *
+ * Value object for {@link cz.zcu.kiv.crce.metadata.Attribute}
+ *
  * Date: 5.5.15
  *
  * @author Jakub Danek

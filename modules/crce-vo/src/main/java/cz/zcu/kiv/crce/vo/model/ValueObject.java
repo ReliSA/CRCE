@@ -5,6 +5,11 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
+ *
+ * Parent object for all CRCE value objects.
+ *
+ * Marked as Serializable and contains id and namespace properties.
+ *
  * Date: 18.5.15
  *
  * @author Jakub Danek
