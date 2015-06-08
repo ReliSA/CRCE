@@ -3,17 +3,40 @@ package cz.zcu.kiv.crce.vo.model.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import cz.zcu.kiv.crce.vo.model.ValueObject;
 
 /**
+ *
+ * Generic capability for {@link cz.zcu.kiv.crce.metadata.Capability}
+ *
  * Date: 5.5.15
  *
  * @author Jakub Danek
  */
 @XmlRootElement(name = "capability")
 public class GenericCapabilityVO extends ValueObject {
+
+    /**
+     * List of capability attributes.
+     */
+    private List<AttributeVO> attributes = new ArrayList<>();
+    /**
+     * List of subcapabilities.
+     */
+    private List<GenericCapabilityVO> capabilities = new ArrayList<>();
+    /**
+     * List of capability's properties.
+     */
+    private List<PropertyVO> properties = new ArrayList<>();
+    /**
+     * List of capability's requirements.
+     */
+    private List<GenericRequirementVO> requirements = new ArrayList<>();
+
 
     public GenericCapabilityVO() {
     }
@@ -26,19 +49,9 @@ public class GenericCapabilityVO extends ValueObject {
         super(id, namespace);
     }
 
-    /**
-     * List of capability attributes.
-     */
-    private List<AttributeVO> attributes = new ArrayList<>();
-    /**
-     * List of subcapabilities.
-     */
-    private List<GenericCapabilityVO> capabilities = new ArrayList<>();
-    /**
-     * List of capability's requirements.
-     */
-    private List<GenericRequirementVO> requirements = new ArrayList<>();
 
+    @Nonnull
+    @XmlElementRef
     public List<AttributeVO> getAttributes() {
         return attributes;
     }
@@ -47,6 +60,8 @@ public class GenericCapabilityVO extends ValueObject {
         this.attributes = attributes;
     }
 
+    @Nonnull
+    @XmlElementRef
     public List<GenericCapabilityVO> getCapabilities() {
         return capabilities;
     }
@@ -55,6 +70,18 @@ public class GenericCapabilityVO extends ValueObject {
         this.capabilities = capabilities;
     }
 
+    @Nonnull
+    @XmlElementRef
+    public List<PropertyVO> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<PropertyVO> properties) {
+        this.properties = properties;
+    }
+
+    @Nonnull
+    @XmlElementRef
     public List<GenericRequirementVO> getRequirements() {
         return requirements;
     }

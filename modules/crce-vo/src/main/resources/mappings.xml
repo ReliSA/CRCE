@@ -21,5 +21,14 @@
         </custom-converters>
 
     </configuration>
+    
+    <mapping>
+        <class-a>cz.zcu.kiv.crce.metadata.Capability</class-a>
+        <class-b>cz.zcu.kiv.crce.vo.model.metadata.GenericCapabilityVO</class-b>
+        <field>
+            <a>children</a>
+            <b>capabilities</b>
+        </field>
+    </mapping>
 
 </mappings>
