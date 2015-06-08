@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.dozer.CustomConverter;
 import org.dozer.DozerBeanMapper;
 import org.dozer.config.BeanContainer;
@@ -14,9 +17,12 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
 
 /**
+ * Dozer implementation of MappingService interface.
+ *
  * Date: 15.5.15
  *
  * @author Jakub Danek
@@ -50,6 +56,31 @@ public class MappingServiceDozer implements MappingService {
         return vos;
     }
 
+    @Nullable
+    @Override
+    public DetailedResourceVO mapFull(Resource resource) {
+        return mapper.map(resource, DetailedResourceVO.class);
+    }
+
+    @Nonnull
+    @Override
+    public List<DetailedResourceVO> mapFull(List<Resource> resources) {
+        List<DetailedResourceVO>  list = new ArrayList<>();
+
+        DetailedResourceVO v;
+        for (Resource resource : resources) {
+            v = mapFull(resource);
+            if(v != null) {
+                list.add(v);
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Called by OSGi
+     */
     public void init() {
         //workaround for Dozer OSGi unsuitability
         OSGiDozerClassLoader cl = new OSGiDozerClassLoader();
