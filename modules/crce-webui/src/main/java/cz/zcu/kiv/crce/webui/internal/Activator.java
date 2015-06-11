@@ -24,6 +24,7 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
 
 /**
  * Activator of this bundle
@@ -44,6 +45,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile PluginManager pluginManager;
     private volatile SessionRegister sessionRegister;
     private volatile MetadataService metadataService;
+    private volatile WebservicesDescription webservicesDescription;
     private volatile CompatibilitySearchService compatibilityService;
 
     public static Activator instance() {
@@ -70,6 +72,10 @@ public final class Activator extends DependencyActivatorBase {
 
     public MetadataFactory getMetadataFactory() {
         return metadataFactory;
+    }
+
+    public WebservicesDescription getWebservicesDescription() {
+        return webservicesDescription;
     }
 
     /**
@@ -159,6 +165,7 @@ public final class Activator extends DependencyActivatorBase {
 
         manager.add(createComponent()
                 .setImplementation(this)
+                .add(createServiceDependency().setService(WebservicesDescription.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))

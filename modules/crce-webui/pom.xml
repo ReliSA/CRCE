@@ -119,7 +119,7 @@
             <artifactId>crce-core</artifactId>
             <type>pom</type>
         </dependency>
-
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-osgi-bundle</artifactId>
@@ -128,6 +128,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-webservices-indexer</artifactId>
             <version>${project.version}</version>
         </dependency>
 

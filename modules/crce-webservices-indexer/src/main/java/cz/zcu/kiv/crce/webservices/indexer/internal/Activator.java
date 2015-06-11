@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
 
 /**
  * Activator of this bundle.
@@ -22,10 +24,18 @@ public class Activator extends DependencyActivatorBase {
     @Override
     public void init(BundleContext context, final DependencyManager manager) throws Exception {
         logger.debug("Initializing Webservices Indexer module.");
+        
+        //
         manager.add(createComponent()
-                .setInterface(WebserviceDescription.class.getName(), null)
+                .setInterface(WebservicesDescription.class.getName(), null)
                 .setImplementation(WebservicesDescriptionImpl.class)
-                .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class)));
+                .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
+                .add(createServiceDependency().setRequired(true).setService(PluginManager.class)));
+        
+        //
+        manager.add(createComponent()
+                .setInterface(Plugin.class.getName(), null)
+                .setImplementation(WebservicesDescriptionImpl.class));
     }
 
     @Override

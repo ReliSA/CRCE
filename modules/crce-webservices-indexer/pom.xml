@@ -10,7 +10,6 @@
     </parent>
     
     <artifactId>crce-webservices-indexer</artifactId>
-    <version>0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>CRCE - Webservices Indexer</name>

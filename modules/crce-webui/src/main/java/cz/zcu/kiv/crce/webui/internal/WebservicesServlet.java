@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -31,7 +32,9 @@ public class WebservicesServlet extends HttpServlet {
             uri = req.getParameter("uri");
             logger.debug("Got \"uri\" parameter with value \"" + uri + "\".");
             
-            // TODO invoke processing of remote IDL document
+            // invoke processing of remote IDL document
+            WebservicesDescription wd = Activator.instance().getWebservicesDescription();
+            wd.parseWebserviceDescription(uri);
             
         } else {
             logger.debug("Empty \"uri\" parameter during HTTP POST.");

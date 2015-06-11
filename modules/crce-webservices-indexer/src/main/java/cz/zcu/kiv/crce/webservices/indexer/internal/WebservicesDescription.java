@@ -6,7 +6,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
-public interface WebserviceDescription {
+public interface WebservicesDescription {
 
     Resource parseWebserviceDescription(String url);
 
