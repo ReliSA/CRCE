@@ -12,7 +12,7 @@ public enum ResolutionMethod {
         if (value != null) {
             try {
                 return ResolutionMethod.valueOf(value.toUpperCase());
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) { // NOPMD
                 // do nothing
             }
         }

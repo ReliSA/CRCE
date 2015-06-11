@@ -14,7 +14,7 @@ public enum ResolutionDepth {
         if (value != null) {
             try {
                 return ResolutionDepth.valueOf(value.toUpperCase());
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) { // NOPMD
                 // do nothing
             }
         }

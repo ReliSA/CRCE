@@ -13,7 +13,7 @@ public enum RepositoryType {
         if (value != null) {
             try {
                 return RepositoryType.valueOf(value.toUpperCase());
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) { // NOPMD
                 // do nothing
             }
         }

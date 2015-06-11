@@ -121,21 +121,19 @@ public class MavenRepositoryIndexer extends Task<Object> {
     protected Object run() throws Exception {
 
         try {
-
-            RepositoryConfiguration repositoryConfiguration = configuration.getRemoteRepository();
             switch (configuration.getPrimaryRepository()) {
                 case REMOTE:
-                    indexingContext = createRemoteRepositoryIndexingContext(repositoryConfiguration, uri, configuration.getIndexingContextPath());
+                    indexingContext = createRemoteRepositoryIndexingContext(configuration.getRemoteRepository(), uri, configuration.getIndexingContextPath());
                     break;
 
                 case LOCAL:
-                    indexingContext = createLocalRepoIndexingContext(repositoryConfiguration, new File(uri), configuration.getIndexingContextPath());
+                    indexingContext = createLocalRepoIndexingContext(configuration.getLocalRepository(), new File(uri), configuration.getIndexingContextPath());
                     break;
             }
 
             Indexer indexer = indexingContext.getIndexer();
             Set<ArtifactInfo> results = new LinkedHashSet<>();
-            String arParam = "";
+            String arParam;
 
             ResolutionStrategy ar = configuration.getArtifactResolve();
             switch (ar) {
