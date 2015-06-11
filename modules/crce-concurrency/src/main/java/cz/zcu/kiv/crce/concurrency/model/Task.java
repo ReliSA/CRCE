@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.concurrency.model;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author Jakub Danek
  */
 public abstract class Task<T> implements Callable<T> {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Task.class);
 
     private final String id;
@@ -74,17 +75,20 @@ public abstract class Task<T> implements Callable<T> {
     public final T call() throws Exception {
         setState(TaskState.RUNNING);
         logger.info("Task {} called by {} has been started.", id, caller);
-        logger.debug("Task description: {}", description);
+        logger.debug("Task description: {}.", description);
         T obj;
+        long duration;
         try {
+            long start = System.nanoTime();
             obj = run();
+            duration = System.nanoTime() - start;
         } catch (Throwable t) {
-            logger.error("Error while executing task {}", id, t);
+            logger.error("Error while executing task {}.", id, t);
             throw t;
         }
         setState(TaskState.FINISHED);   //should be set AFTER returning the object
         // probably will require listener thread for the TaskRunner
-        logger.info("Task {} called by {} has finished.", id, caller);
+        logger.info("Task {} called by {} has finished in {} ms.", id, caller, TimeUnit.NANOSECONDS.toMillis(duration));
         return obj;
     }
 
