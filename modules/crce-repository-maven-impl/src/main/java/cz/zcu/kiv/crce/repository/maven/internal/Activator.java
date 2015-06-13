@@ -44,14 +44,9 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     public static final String PID = "cz.zcu.kiv.crce.repository.maven";
 
     /**
-     * PID to component.
+     * PID to ComponentContext.
      */
-    private final Map<String, Component> components = new HashMap<>();
-    /**
-     * PID to URI.
-     */
-    private final Map<String, String> uris = new HashMap<>();
-    private final Map<String, MavenStoreConfiguration> configurations = new HashMap<>();
+    private final Map<String, ComponentContext> componentContexts = new HashMap<>();
 
     private volatile DependencyManager dependencyManager; /* injected by dependency manager */
 
@@ -69,12 +64,9 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
     @Override
     public void destroy(BundleContext bc, DependencyManager dm) throws Exception {
-        for (Component component : components.values()) {
-            dependencyManager.remove(component);
+        for (ComponentContext componentContext : componentContexts.values()) {
+            dependencyManager.remove(componentContext.getComponent());
         }
-
-        uris.clear();
-        configurations.clear();
 
         logger.debug("Maven repository destroyed.");
     }
@@ -127,8 +119,8 @@ public class Activator extends DependencyActivatorBase implements ManagedService
                 break;
         }
 
-        for (Map.Entry<String, String> entry : uris.entrySet()) {
-            if (entry.getValue().equals(absolutePath) && !entry.getKey().equals(pid)) {
+        for (Map.Entry<String, ComponentContext> entry : componentContexts.entrySet()) {
+            if (entry.getValue().getAbsoluteUri().equals(absolutePath) && !entry.getKey().equals(pid)) {
                 throw new ConfigurationException(
                         RepositoryType.REMOTE.equals(configuration.getPrimaryRepository()) ? CFG__REPOSITORY_REMOTE_URI : CFG__REPOSITORY_LOCAL_URI,
                         "Another repository (PID: " + entry.getKey() + ") is already configured for this path: " + absolutePath
@@ -136,16 +128,16 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             }
         }
 
-        String oldPath = uris.get(pid);
-        if (oldPath != null) {
-            if (oldPath.equals(absolutePath)) {
+        ComponentContext oldComponentContext = componentContexts.get(pid);
+        if (oldComponentContext != null) {
+            if (oldComponentContext.getAbsoluteUri().equals(absolutePath)) {
                 logger.debug("Repository (PID: {}) is already configured for this path: {}", pid, absolutePath);
                 return;
             } else {
                 deleted(pid);
             }
         }
-
+        
         Properties props = new Properties();
         props.put("id", pid);
         props.put("name", "Maven: " + uri);
@@ -167,21 +159,19 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Registering maven repository store: {}", storeComponent);
 
-        uris.put(pid, absolutePath);
-        configurations.put(pid, configuration);
-        components.put(pid, storeComponent);
         dependencyManager.add(storeComponent);
+        
+        ComponentContext componentContext = new ComponentContext(pid, storeComponent, absolutePath, configuration);
+        componentContexts.put(pid, componentContext);
     }
 
     @Override
     public void deleted(String pid) {
-        Component storeComponent = components.remove(pid);
-        if (storeComponent != null) {
-            logger.debug("Unregistering repository store: {}", storeComponent);
-
-            dependencyManager.remove(storeComponent);
-            uris.remove(pid);
-            configurations.remove(pid);
+        ComponentContext componentContext = componentContexts.remove(pid);
+        if (componentContext != null) {
+            logger.debug("Unregistering repository store: {}", componentContext.getComponent());
+            
+            dependencyManager.remove(componentContext.getComponent());
         }
     }
 }
