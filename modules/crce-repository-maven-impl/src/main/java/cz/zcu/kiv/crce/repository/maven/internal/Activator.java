@@ -96,6 +96,13 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         logger.debug("Updating maven repository ({}) configuration: {}", properties);
 
         MavenStoreConfiguration configuration = new MavenStoreConfiguration(pid, properties);
+        if (!configuration.isEnabled()) {
+            logger.debug("Maven repository disabled, PID: {}", pid);
+            
+            deleted(pid);
+            
+            return;
+        }
 
         String absolutePath = null;
         URI uri = null;

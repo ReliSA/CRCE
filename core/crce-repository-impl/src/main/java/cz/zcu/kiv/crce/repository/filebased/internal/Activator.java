@@ -43,6 +43,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     public static final String PID = "cz.zcu.kiv.crce.repository.filebased";
 
     public static final String CFG_PROPERTY__STORE_URI = "store.uri";
+    public static final String CFG_PROPERTY__REPOSITORY_ENABLED = "repository.enabled";
 
     /**
      * PID to component.
@@ -102,6 +103,15 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         logger.debug("Updating filebased repository ({}) configuration: {}", properties);
 
+        String enabled = (String) properties.get(CFG_PROPERTY__REPOSITORY_ENABLED);
+        if (!Boolean.TRUE.equals(Boolean.valueOf(enabled))) {
+            logger.debug("Filebased repository disabled, PID: {}", pid);
+            
+            deleted(pid);
+            
+            return;
+        }
+        
         String path = (String) properties.get(CFG_PROPERTY__STORE_URI);
 
         URI uri;

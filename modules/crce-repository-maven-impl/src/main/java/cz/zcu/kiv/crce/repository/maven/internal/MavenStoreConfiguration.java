@@ -18,6 +18,8 @@ public class MavenStoreConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenStoreConfiguration.class);
 
+    public static final String CFG__REPOSITORY_ENABLED = "repository.enabled";
+    
     public static final String CFG__REPOSITORY_LOCAL_URI = "repository.local.uri";
     public static final String CFG__REPOSITORY_LOCAL_NAME = "repository.local.name";
     public static final String CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP = "repository.local.update-on-startup";
@@ -48,19 +50,22 @@ public class MavenStoreConfiguration {
 
     private final ResolutionStrategy artifactResolve;
     private final String artifactResolveParam;
+    private final boolean enabled;
 
 
     public MavenStoreConfiguration(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
+        enabled = Boolean.parseBoolean(getProperty(properties, CFG__REPOSITORY_ENABLED));
+        
         //Local Repo
         URI uri = getLocalUri(properties);
         String name = getProperty(properties, CFG__REPOSITORY_LOCAL_NAME, pid + "-local");
-        Boolean updateOnStartup = toBoolean(properties.get(CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP));
+        Boolean updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP));
         localRepository = new RepositoryConfiguration(uri, name, updateOnStartup, true);
 
         //Remote Repo
         uri = getRemoteUri(properties);
         name = getProperty(properties, CFG__REPOSITORY_REMOTE_NAME, pid + "-remote");
-        updateOnStartup = toBoolean(properties.get(CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP));
+        updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP));
         remoteRepository = new RepositoryConfiguration(uri, name, updateOnStartup, false);
 
         indexingContextPath = getIndexingContextPath(properties);
@@ -141,10 +146,6 @@ public class MavenStoreConfiguration {
         }
     }
 
-    private static boolean toBoolean(Object value) throws ConfigurationException {
-        return value != null && value instanceof String && Boolean.valueOf(((String) value).trim());
-    }
-
     public RepositoryConfiguration getLocalRepository() {
         return localRepository;
     }
@@ -175,6 +176,10 @@ public class MavenStoreConfiguration {
 
     public String getArtifactResolveParam() {
         return artifactResolveParam;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     private static String getProperty(Dictionary<String, ?> properties, String key) {
