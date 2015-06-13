@@ -1,7 +1,10 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import java.util.logging.Level;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -11,25 +14,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
-public class WebserviceTypeJsonWsp implements WebserviceType {
+public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements WebserviceType {
     
     private static final Logger logger = LoggerFactory.getLogger(WebservicesDescriptionImpl.class);
     
-    private MetadataFactory metadataFactory;
+    private final static String JSON_WSP_TYPE = "type";
+    private final static String JSON_WSP_TYPE_VALUE = "jsonwsp/description";
     
-    final static String JSON_WSP_TYPE = "type";
-    final static String JSON_WSP_TYPE_VALUE = "jsonwsp/description";
+    private final static String JSON_WSP_VERSION = "version";
+    private final static String JSON_WSP_SERVICENAME = "servicename";
+    private final static String JSON_WSP_URL = "url";
+    private final static String JSON_WSP_TYPES = "types";
+    private final static String JSON_WSP_METHODS = "methods";
     
-    final static String JSON_WSP_VERSION = "version";
-    final static String JSON_WSP_SERVICENAME = "servicename";
-    final static String JSON_WSP_URL = "url";
-    final static String JSON_WSP_TYPES = "types";
-    final static String JSON_WSP_METHODS = "methods";
-    
-    public WebserviceTypeJsonWsp(MetadataFactory mf) {
-        metadataFactory = mf;
+    public WebserviceTypeJsonWsp(MetadataFactory mf, MetadataService ms) {
+        super(mf, ms);
     }
-
+    
+    @Override
+    public String getSpecificWebserviceCategory() {
+        return "json-wsp";
+    }
+    
     @Override
     public boolean recognizeIDL(String idl) {
         
@@ -93,9 +99,73 @@ public class WebserviceTypeJsonWsp implements WebserviceType {
     @Override
     public Resource parseIDL(String idl) {
         
-        Resource resource = metadataFactory.createResource();
+        ////////////////////////////////////////////
+        // process idl and get all necessary info //
+        ////////////////////////////////////////////
         
-        return null;
+        // process idl into jsonObject
+        JSONObject jsonObj = null;
+        try {
+            jsonObj = new JSONObject(idl);
+        } catch (JSONException ex) {
+            logger.error("IDL is not a valid JSON object", ex);
+        }
+        if (jsonObj == null) {
+            return null;
+        }
+        
+        // get webservice name
+        String webserviceName = null;
+        try {
+            webserviceName = jsonObj.getString(JSON_WSP_SERVICENAME);
+        } catch (JSONException ex) {
+            logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_SERVICENAME, ex);
+        }
+        
+        // get webservice url
+        String webserviceUrl = null;
+        try {
+            webserviceUrl = jsonObj.getString(JSON_WSP_URL);
+        } catch (JSONException ex) {
+            logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_URL, ex);
+        }
+        
+        // get webservice url
+        String webserviceMime = null;
+        try {
+            webserviceMime = jsonObj.getString(JSON_WSP_TYPE);
+        } catch (JSONException ex) {
+            logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_TYPE, ex);
+        }
+        
+        // process idl endpoints (i.e. methods)
+        
+        
+        
+        ////////////////////////////////////////////////////////////////////////////
+        // create CRCE metadata structures and fill it by retrieved info from idl //
+        ////////////////////////////////////////////////////////////////////////////
+
+        // create new resource and varible for holding reference to current capability
+        Resource resource = metadataFactory.createResource();
+        Capability capability;
+        
+        // Capability - CRCE Identity
+        capability = metadataService.getIdentity(resource);
+        metadataService.addCategory(resource, getSpecificWebserviceCategory()); // add specific category for this type of web service
+        metadataService.setPresentationName(resource, webserviceName);
+        metadataService.setSize(resource, idl.length());
+        metadataService.setUri(resource, webserviceUrl);
+        capability.setAttribute(ATTRIBUTE__MIME, webserviceMime);
+        capability.setAttribute(ATTRIBUTE__HASH, getIdlHash(idl));
+        
+        
+        //Capability capability = metadataFactory.createCapability(NAMESPACE__CRCE_IDENTITY);
+        //resource.addCapability(capability);
+        //resource.addRootCapability(capability);
+        
+        
+        return resource;
     }
     
 }

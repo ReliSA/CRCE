@@ -32,12 +32,12 @@ public interface Buffer extends Store {
     /**
      * Commits uploaded resources to the configured store.
      * <p>If <code>move</code> is <code>true</code> then resources will be removed
-     * from the buffer. Returned list constains resources successfully commited
+     * from the buffer. Returned list contains resources successfully committed
      * to the store.
      *
-     * @param move if <code>true</code>, commited resources are removed from the
+     * @param move if <code>true</code>, committed resources are removed from the
      * buffer.
-     * @return list of commited resources.
+     * @return list of committed resources.
      * @throws IOException
      */
     @Nonnull
@@ -46,7 +46,7 @@ public interface Buffer extends Store {
     /**
      * Commits only the given resources to the configured store.
      * <p>If <code>move</code> is <code>true</code> then resources will be removed
-     * from the buffer. Returned list constains resources successfully commited
+     * from the buffer. Returned list contains resources successfully committed
      * to the store.
      *
      * @param resources

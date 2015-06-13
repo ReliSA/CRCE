@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -34,7 +35,10 @@ public class WebservicesServlet extends HttpServlet {
             
             // invoke processing of remote IDL document
             WebservicesDescription wd = Activator.instance().getWebservicesDescription();
-            wd.parseWebserviceDescription(uri);
+            Resource resource = wd.parseWebserviceDescription(uri);
+            
+            // save CRCE resource into repository
+            //Activator.instance().get
             
         } else {
             logger.debug("Empty \"uri\" parameter during HTTP POST.");

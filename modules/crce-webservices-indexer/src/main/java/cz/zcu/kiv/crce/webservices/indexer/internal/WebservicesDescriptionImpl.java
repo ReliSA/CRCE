@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,8 +20,12 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
     
     private static final Logger logger = LoggerFactory.getLogger(WebservicesDescriptionImpl.class);
     
-    private volatile MetadataFactory metadataFactory; // injected by dependency manager
+    // injected by dependency manager
+    private volatile MetadataFactory metadataFactory; 
+    private volatile MetadataService metadataService;
 
+    private final static String MAIN_CATEGORY = "webservice";
+    
     public enum IdlType {
         JSON_WSP, WSDL
     }
@@ -66,7 +71,7 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         IdlType idlType = null;
         
         // create specialized IDL handling classes for all web service types
-        WebserviceTypeJsonWsp wstJsonWsp = new WebserviceTypeJsonWsp(metadataFactory);
+        WebserviceTypeJsonWsp wstJsonWsp = new WebserviceTypeJsonWsp(metadataFactory, metadataService);
         
         if (wstJsonWsp.recognizeIDL(idl)) {
             logger.debug("IDL type at \"{}\" recognized as JSON-WSP.", url_string);
@@ -92,6 +97,7 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
             logger.error("Could not parse IDL at \"{}\" (recognized as {} type).", url_string, idlType.toString());
             return null;
         }
+        metadataService.addCategory(resource, MAIN_CATEGORY); // label resource with main category
         
         ////////////////////////////////////////////////////////////
         // all done; return parsed IDL in form of a CRCE Resource //

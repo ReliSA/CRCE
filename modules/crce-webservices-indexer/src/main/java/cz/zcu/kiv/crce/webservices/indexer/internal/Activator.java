@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 
@@ -30,6 +31,7 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(WebservicesDescription.class.getName(), null)
                 .setImplementation(WebservicesDescriptionImpl.class)
                 .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
+                .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(PluginManager.class)));
         
         //
