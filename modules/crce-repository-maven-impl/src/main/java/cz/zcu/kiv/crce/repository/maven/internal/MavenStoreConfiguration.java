@@ -24,15 +24,15 @@ public class MavenStoreConfiguration {
     
     public static final String CFG__REPOSITORY_LOCAL_URI = "repository.local.uri";
     public static final String CFG__REPOSITORY_LOCAL_NAME = "repository.local.name";
-    public static final String CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP = "repository.local.update-on-startup";
+    public static final String CFG__REPOSITORY_LOCAL_UPDATE_EXISTING_INDEX = "repository.local.update-existing-index";
 
     public static final String CFG__REPOSITORY_REMOTE_URI = "repository.remote.uri";
     public static final String CFG__REPOSITORY_REMOTE_NAME = "repository.remote.name";
-    public static final String CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP = "repository.remote.update-on-startup";
+    public static final String CFG__REPOSITORY_REMOTE_UPDATE_EXISTING_INDEX = "repository.remote.update-existing-index";
 
     public static final String CFG__REPOSITORY_PRIMARY = "repository.primary";
 
-    public static final String CFG__INDEXING_CONTEXT_URI ="indexing.context.uri";
+    public static final String CFG__MAVEN_INDEX_URI = "maven-index.uri";
 
     public static final String CFG__RESOLUTION_DEPTH = "resolution.depth";
     public static final String CFG__RESOLUTION_METHOD = "resolution.method";
@@ -45,33 +45,33 @@ public class MavenStoreConfiguration {
     private final RepositoryConfiguration localRepository;
     private final RepositoryConfiguration remoteRepository;
 
-    private final File indexingContextPath;
+    private final File mavenIndexRootPath;
     private final RepositoryType primaryRepository;
     private final ResolutionDepth resolutionDepth;
     private final ResolutionMethod resolutionMethod;
 
-    private final ResolutionStrategy artifactResolve;
-    private final String artifactResolveParam;
-    private final boolean enabled;
+    private final ResolutionStrategy resolutionStrategy;
+    private final String resolutionStrategyParameters;
+    private final boolean repositoryEnabled;
     private final boolean jmxEnabled;
 
 
     public MavenStoreConfiguration(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
-        enabled = Boolean.parseBoolean(getProperty(properties, CFG__REPOSITORY_ENABLED));
+        repositoryEnabled = Boolean.parseBoolean(getProperty(properties, CFG__REPOSITORY_ENABLED));
         
         //Local Repo
         URI uri = getLocalUri(properties);
         String name = getProperty(properties, CFG__REPOSITORY_LOCAL_NAME, pid + "-local");
-        Boolean updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_LOCAL_UPDATE_ON_STARTUP));
+        Boolean updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_LOCAL_UPDATE_EXISTING_INDEX));
         localRepository = new RepositoryConfiguration(uri, name, updateOnStartup, true);
 
         //Remote Repo
         uri = getRemoteUri(properties);
         name = getProperty(properties, CFG__REPOSITORY_REMOTE_NAME, pid + "-remote");
-        updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_REMOTE_UPDATE_ON_STARTUP));
+        updateOnStartup = Boolean.valueOf(getProperty(properties, CFG__REPOSITORY_REMOTE_UPDATE_EXISTING_INDEX));
         remoteRepository = new RepositoryConfiguration(uri, name, updateOnStartup, false);
 
-        indexingContextPath = getIndexingContextPath(properties);
+        mavenIndexRootPath = getMavenIndexRootPath(properties);
 
         primaryRepository = RepositoryType.valueOfIgnoreCase(getProperty(properties, CFG__REPOSITORY_PRIMARY), null);
         if (primaryRepository == null) {
@@ -80,12 +80,12 @@ public class MavenStoreConfiguration {
         resolutionDepth = ResolutionDepth.valueOfIgnoreCase(getProperty(properties, CFG__RESOLUTION_DEPTH), ResolutionDepth.DIRECT);
         resolutionMethod = ResolutionMethod.valueOfIgnoreCase(getProperty(properties, CFG__RESOLUTION_METHOD), ResolutionMethod.POM);
 
-        artifactResolve = ResolutionStrategy.fromValue(getProperty(properties, CFG__RESOLUTION_STRATEGY, ResolutionStrategy.NEWEST.getValue()));
+        resolutionStrategy = ResolutionStrategy.fromValue(getProperty(properties, CFG__RESOLUTION_STRATEGY, ResolutionStrategy.NEWEST.getValue()));
 
-        if (AR_STRINGS.contains(artifactResolve.getValue().toLowerCase())) {
-            artifactResolveParam = getProperty(properties, CFG__RESOLUTION_STRATEGY_PARAMETERS, "");
+        if (AR_STRINGS.contains(resolutionStrategy.getValue().toLowerCase())) {
+            resolutionStrategyParameters = getProperty(properties, CFG__RESOLUTION_STRATEGY_PARAMETERS, "");
         } else {
-            artifactResolveParam = "";
+            resolutionStrategyParameters = "";
         }
         
         jmxEnabled = Boolean.parseBoolean(getProperty(properties, CFG__REPOSITORY_ENABLED));
@@ -133,8 +133,8 @@ public class MavenStoreConfiguration {
         }
     }
 
-    private static File getIndexingContextPath(Dictionary<String, ?> properties) throws ConfigurationException {
-        String uriString = getProperty(properties, CFG__INDEXING_CONTEXT_URI, "maven-index");
+    private static File getMavenIndexRootPath(Dictionary<String, ?> properties) throws ConfigurationException {
+        String uriString = getProperty(properties, CFG__MAVEN_INDEX_URI, "maven-index");
 
         try {
             URI uri = new URI(uriString);
@@ -143,7 +143,7 @@ public class MavenStoreConfiguration {
             } else if ("file".equals(uri.getScheme())) {
                 return new File(uri).getAbsoluteFile();
             } else {
-                throw new ConfigurationException(CFG__INDEXING_CONTEXT_URI, "Wrong URI format: " + uri.getScheme());
+                throw new ConfigurationException(CFG__MAVEN_INDEX_URI, "Wrong URI format: " + uri.getScheme());
             }
         } catch (URISyntaxException ex) {
             logger.error("Wrong URI, check configuration file!", ex);
@@ -159,8 +159,8 @@ public class MavenStoreConfiguration {
         return remoteRepository;
     }
 
-    public File getIndexingContextPath() {
-        return indexingContextPath;
+    public File getMavenIndexRootPath() {
+        return mavenIndexRootPath;
     }
 
     public RepositoryType getPrimaryRepository() {
@@ -175,16 +175,16 @@ public class MavenStoreConfiguration {
         return resolutionMethod;
     }
 
-    public ResolutionStrategy getArtifactResolve() {
-        return artifactResolve;
+    public ResolutionStrategy getResolutionStrategy() {
+        return resolutionStrategy;
     }
 
-    public String getArtifactResolveParam() {
-        return artifactResolveParam;
+    public String getResolutionStrategyParameters() {
+        return resolutionStrategyParameters;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isRepositoryEnabled() {
+        return repositoryEnabled;
     }
 
     public boolean isJmxEnabled() {

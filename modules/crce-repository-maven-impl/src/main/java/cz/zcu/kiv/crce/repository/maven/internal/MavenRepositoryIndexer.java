@@ -123,11 +123,11 @@ public class MavenRepositoryIndexer extends Task<Object> {
         try {
             switch (configuration.getPrimaryRepository()) {
                 case REMOTE:
-                    indexingContext = createRemoteRepositoryIndexingContext(configuration.getRemoteRepository(), uri, configuration.getIndexingContextPath());
+                    indexingContext = createRemoteRepositoryIndexingContext(configuration.getRemoteRepository(), uri, configuration.getMavenIndexRootPath());
                     break;
 
                 case LOCAL:
-                    indexingContext = createLocalRepoIndexingContext(configuration.getLocalRepository(), new File(uri), configuration.getIndexingContextPath());
+                    indexingContext = createLocalRepoIndexingContext(configuration.getLocalRepository(), new File(uri), configuration.getMavenIndexRootPath());
                     break;
             }
 
@@ -135,7 +135,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             Set<ArtifactInfo> results = new LinkedHashSet<>();
             String arParam;
 
-            ResolutionStrategy ar = configuration.getArtifactResolve();
+            ResolutionStrategy ar = configuration.getResolutionStrategy();
             switch (ar) {
             case ALL:
                 logger.debug("All Artifact's versions will be processed");
@@ -162,7 +162,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
                 break;
 
             case GAV:
-                arParam = configuration.getArtifactResolveParam();
+                arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifact with GAV: {} ", arParam);
 
                 String[] gav = arParam.split(":");
@@ -176,19 +176,19 @@ public class MavenRepositoryIndexer extends Task<Object> {
                 break;
 
             case GROUP_ID:
-                arParam = configuration.getArtifactResolveParam();
+                arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts with groupID> {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
 
             case GROUPID_ARTIFACTID:
-                arParam = configuration.getArtifactResolveParam();
+                arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts > {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
 
             case GROUPID_ARTIFACTID_FROM_VERSION:
-                arParam = configuration.getArtifactResolveParam();
+                arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts from specified Version > {} ", arParam);
                 results = getArtifactsGAV(indexer, ar);
                 break;
@@ -643,7 +643,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
     private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ResolutionStrategy ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
         Set<ArtifactInfo> results = Collections.emptySet();
-        String arParam = configuration.getArtifactResolveParam();
+        String arParam = configuration.getResolutionStrategyParameters();
         String[] gav = arParam.split(":");
 
         BooleanQuery bq = new BooleanQuery();
