@@ -106,7 +106,6 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
-    private CloseableIndexingContext indexingContext;
 
     private final MavenStoreConfiguration configuration;
 
@@ -120,17 +119,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
     @Override
     protected Object run() throws Exception {
 
-        try {
-            switch (configuration.getPrimaryRepository()) {
-                case REMOTE:
-                    indexingContext = createRemoteRepositoryIndexingContext(configuration.getRemoteRepository(), uri, configuration.getMavenIndexRootPath());
-                    break;
-
-                case LOCAL:
-                    indexingContext = createLocalRepoIndexingContext(configuration.getLocalRepository(), new File(uri), configuration.getMavenIndexRootPath());
-                    break;
-            }
-
+        try (CloseableIndexingContext indexingContext = createIndexingContext()) {
             Indexer indexer = indexingContext.getIndexer();
             Set<ArtifactInfo> results = new LinkedHashSet<>();
             String arParam;
@@ -139,13 +128,13 @@ public class MavenRepositoryIndexer extends Task<Object> {
             switch (ar) {
             case ALL:
                 logger.debug("All Artifact's versions will be processed");
-                results = indexAll(indexer);
+                results = indexAll(indexer, indexingContext);
                 break;
 
             case NEWEST:
                 logger.debug("Only the latest Artifact's versions will be processed");
                 //results = filterNewest(results);
-                results = latestVersionMI(indexer);
+                results = latestVersionMI(indexer, indexingContext);
                 break;
 
             case HIGHEST_MAJOR:
@@ -158,7 +147,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
             case LOWEST_MICRO:
                 logger.debug("Only the {} Artifact's versions will be processed", ar);
-                results = getHiLowFiltredResults(indexer, indexAll(indexer), ar);
+                results = getHiLowFiltredResults(indexer, indexAll(indexer, indexingContext), ar, indexingContext);
                 break;
 
             case GAV:
@@ -178,19 +167,19 @@ public class MavenRepositoryIndexer extends Task<Object> {
             case GROUP_ID:
                 arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts with groupID> {} ", arParam);
-                results = getArtifactsGAV(indexer, ar);
+                results = getArtifactsGAV(indexer, ar, indexingContext);
                 break;
 
             case GROUPID_ARTIFACTID:
                 arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts > {} ", arParam);
-                results = getArtifactsGAV(indexer, ar);
+                results = getArtifactsGAV(indexer, ar, indexingContext);
                 break;
 
             case GROUPID_ARTIFACTID_FROM_VERSION:
                 arParam = configuration.getResolutionStrategyParameters();
                 logger.debug("Trying process Artifacts from specified Version > {} ", arParam);
-                results = getArtifactsGAV(indexer, ar);
+                results = getArtifactsGAV(indexer, ar, indexingContext);
                 break;
 
             default:
@@ -215,9 +204,20 @@ public class MavenRepositoryIndexer extends Task<Object> {
             logger.error("Error updating Maven repository index. STOPPING INDEXING artifact's metadata !!", e);
             return null;
         }
-
-        indexingContext.close();
         return null;
+    }
+
+    private CloseableIndexingContext createIndexingContext() throws PlexusContainerException, ComponentLookupException, IOException {
+        switch (configuration.getPrimaryRepository()) {
+            case REMOTE:
+                return createRemoteRepositoryIndexingContext(configuration.getRemoteRepository(), uri, configuration.getMavenIndexRootPath());
+
+            case LOCAL:
+                return createLocalRepoIndexingContext(configuration.getLocalRepository(), new File(uri), configuration.getMavenIndexRootPath());
+                
+            default:
+                throw new UnsupportedOperationException("Repository type not supported: " + configuration.getPrimaryRepository());
+        }
     }
 
     private void indexResults(Set<ArtifactInfo> results) {
@@ -274,7 +274,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
                                         artifactResult = system.resolveArtifact(session, artifactRequest);
                                         dependencyArtifact = artifactResult.getArtifact();
                                         logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
-                                    } catch (Exception e) {
+                                    } catch (ArtifactResolutionException e) {
                                         logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
                                     }
                                 }
@@ -432,7 +432,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @return FlatSearchResponse result due query setting
      * @throws IOException
      */
-    private Set<ArtifactInfo> indexAll(Indexer indexer) throws IOException {
+    private Set<ArtifactInfo> indexAll(Indexer indexer, IndexingContext indexingContext) throws IOException {
         FlatSearchResponse response;
         BooleanQuery query = new BooleanQuery();
         query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
@@ -447,7 +447,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @return Set of artifacts
      * @throws IOException
      */
-    private Set<ArtifactInfo> latestVersionMI(Indexer indexer) throws IOException {
+    private Set<ArtifactInfo> latestVersionMI(Indexer indexer, IndexingContext indexingContext) throws IOException {
         BooleanQuery query = new BooleanQuery();
         query.add(indexer.constructQuery(MAVEN.PACKAGING, new SourcedSearchExpression("bundle")), BooleanClause.Occur.MUST);
         GroupedSearchResponse response = indexer.searchGrouped(new GroupedSearchRequest(query, new GAGrouping(), indexingContext));
@@ -470,8 +470,9 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws IOException
      * @throws InvalidVersionSpecificationException
      */
-    private Set<ArtifactInfo> getHiLowFiltredResults(Indexer indexer, Set<ArtifactInfo> results, ResolutionStrategy ars)
-            throws IOException, InvalidVersionSpecificationException {
+    private Set<ArtifactInfo> getHiLowFiltredResults(
+            Indexer indexer, Set<ArtifactInfo> results, ResolutionStrategy ars, IndexingContext indexingContext
+    ) throws IOException, InvalidVersionSpecificationException {
 
         HashSet<String> done = new HashSet<>();//list of proccesed artifacts...much faster
         LinkedHashSet<String> filtredArtifactsInString = new LinkedHashSet<>(results.size());
@@ -481,7 +482,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
             if (done.contains(ga)) {
                 continue;
             }
-            getMatch(indexer, ai, filtredArtifactsInString, ars);
+            getMatch(indexer, ai, filtredArtifactsInString, ars, indexingContext);
             done.add(ga);
         }
 
@@ -502,7 +503,10 @@ public class MavenRepositoryIndexer extends Task<Object> {
      * @throws InvalidVersionSpecificationException
      * @throws IOException
      */
-    private void getMatch(Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ResolutionStrategy ar) throws InvalidVersionSpecificationException, IOException {
+    private void getMatch(
+            Indexer indexer, ArtifactInfo ai, LinkedHashSet<String> filtred, ResolutionStrategy ar, IndexingContext indexingContext)
+            throws InvalidVersionSpecificationException, IOException {
+        
         int highest = 0;
         int lowest = Integer.MAX_VALUE;
 
@@ -536,8 +540,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         };
 
         logger.debug("Searching all versions for artifact {}-{}", ai.groupId, ai.artifactId);
-        final IteratorSearchRequest request = new IteratorSearchRequest(bq, Collections.singletonList((IndexingContext) indexingContext),
-                versionFilter);
+        final IteratorSearchRequest request = new IteratorSearchRequest(bq, Collections.singletonList(indexingContext), versionFilter);
 
         IteratorSearchResponse response = indexer.searchIterator(request);
 
@@ -641,7 +644,9 @@ public class MavenRepositoryIndexer extends Task<Object> {
     }
 
 
-    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ResolutionStrategy ar) throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
+    private Set<ArtifactInfo> getArtifactsGAV(Indexer indexer, ResolutionStrategy ar, IndexingContext indexingContext)
+            throws IOException, ArtifactResolutionException, InvalidVersionSpecificationException, VersionRangeResolutionException {
+        
         Set<ArtifactInfo> results = Collections.emptySet();
         String arParam = configuration.getResolutionStrategyParameters();
         String[] gav = arParam.split(":");
@@ -662,14 +667,14 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         case GROUPID_ARTIFACTID:
             if (gav.length >= 2) {
-                results = getArtifactFromVersion(indexer, gav, ar);
+                results = getArtifactFromVersion(indexer, gav, ar, indexingContext);
             }
 
             break;
 
         case GROUPID_ARTIFACTID_FROM_VERSION:
             if (gav.length >= 3) {
-                results = getArtifactFromVersion(indexer, gav, ar);
+                results = getArtifactFromVersion(indexer, gav, ar, indexingContext);
             }
 
             break;
@@ -681,7 +686,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
         return results;
     }
 
-    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ResolutionStrategy ar)
+    private Set<ArtifactInfo> getArtifactFromVersion(Indexer indexer, String[] gav, ResolutionStrategy ar, IndexingContext indexingContext)
             throws InvalidVersionSpecificationException, IOException, VersionRangeResolutionException {
 
         Query gidQ;
@@ -729,8 +734,7 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
         logger.debug("Searching all versions for artifact {}-{}", gav[0], gav[1]);
 
-        final IteratorSearchRequest request = new IteratorSearchRequest(bq,
-                Collections.singletonList((IndexingContext) indexingContext), versionFilter);
+        final IteratorSearchRequest request = new IteratorSearchRequest(bq, Collections.singletonList(indexingContext), versionFilter);
 
         LinkedHashSet<ArtifactInfo> results;
         try (IteratorSearchResponse isr = indexer.searchIterator(request)) {
