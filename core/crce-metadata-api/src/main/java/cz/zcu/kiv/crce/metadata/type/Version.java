@@ -168,13 +168,13 @@ public class Version implements Comparable<Version> {
 	 */
 	private void validate() {
 		if (major < -1) {
-			throw new IllegalArgumentException("negative major");
+			throw new IllegalArgumentException("Negative major: " + major);
 		}
 		if (minor < -1) {
-			throw new IllegalArgumentException("negative minor");
+			throw new IllegalArgumentException("Negative minor: " + minor);
 		}
 		if (micro < -1) {
-			throw new IllegalArgumentException("negative micro");
+			throw new IllegalArgumentException("Negative micro: " + micro);
 		}
 		char[] chars = qualifier.toCharArray();
 		for (int i = 0, length = chars.length; i < length; i++) {
@@ -192,8 +192,7 @@ public class Version implements Comparable<Version> {
 				continue;
 			}			
 			
-			throw new IllegalArgumentException("invalid qualifier: "
-					+ qualifier);
+			throw new IllegalArgumentException("invalid qualifier: " + qualifier);
 		}
 	}
 
