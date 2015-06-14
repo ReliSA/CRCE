@@ -52,7 +52,8 @@
   
   <!-- Loggers -->
   
-  <logger name="cz.zcu.kiv.crce" level="TRACE"/>
+  <logger name="cz.zcu.kiv.crce" level="DEBUG"/>
+  <logger name="cz.zcu.kiv.crce.metadata.dao" level="INFO"/>
   <!-- <logger name="cz.zcu.kiv.crce.something" level="DEBUG"/> -->
 
   <root level="INFO">
