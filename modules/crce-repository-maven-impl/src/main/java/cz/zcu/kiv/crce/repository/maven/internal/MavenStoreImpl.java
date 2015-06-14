@@ -152,7 +152,6 @@ public class MavenStoreImpl implements Store {
                 baseUri,
                 configuration,
                 new MetadataIndexerCallbackImpl(
-                        configuration,
                         resourceDAO,
                         resourceIndexerService,
                         metadataService,

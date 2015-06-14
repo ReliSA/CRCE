@@ -15,7 +15,6 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.repository.maven.internal.IdentityIndexer;
-import cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration;
 
 /**
 * Implementation class of MetadataaIndexerCallback interface
@@ -35,7 +34,6 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 
 
     public MetadataIndexerCallbackImpl(
-            MavenStoreConfiguration configuration,
             ResourceDAO resourceDAO,
             ResourceIndexerService resourceIndexerService,
             MetadataService metadataService,
@@ -50,7 +48,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
         this.metadataValidator = metadataValidator;
         this.identityIndexer = identityIndexer;
         this.repository = repository;
-        this.mavenArtifactMetadataIndexer = new MavenArtifactMetadataIndexer(configuration, metadataService, metadataFactory);
+        this.mavenArtifactMetadataIndexer = new MavenArtifactMetadataIndexer(metadataService, metadataFactory);
     }
 
     private void postProcessing(File file, Resource resource, MavenArtifactWrapper maw) {
@@ -58,7 +56,7 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
 
         identityIndexer.preIndex(file, file.getName(), resource);
 
-        updateResourceMetadataFromAether(resource, maw);
+        mavenArtifactMetadataIndexer.indexMavenArtifactMetadata(resource, maw);
 
         identityIndexer.postIndex(file, resource);
     }
@@ -100,9 +98,5 @@ public class MetadataIndexerCallbackImpl implements MetadataIndexerCallback {
         } catch (IOException e) {
             logger.error("Could not index file {}", file, e);
         }
-    }
-
-    private void updateResourceMetadataFromAether(Resource resource, MavenArtifactWrapper maw) {
-        mavenArtifactMetadataIndexer.createMavenArtifactMetadata(resource, maw);
     }
 }
