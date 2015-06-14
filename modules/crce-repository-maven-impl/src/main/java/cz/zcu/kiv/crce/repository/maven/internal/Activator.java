@@ -4,21 +4,26 @@ import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.
 import static cz.zcu.kiv.crce.repository.maven.internal.MavenStoreConfiguration.CFG__REPOSITORY_REMOTE_URI;
 
 import java.io.File;
-import java.net.URI;
+import java.lang.management.ManagementFactory;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
 import org.apache.felix.dm.Component;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +35,7 @@ import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.repository.maven.internal.jmx.RepositoryManagement;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -49,7 +55,7 @@ public class Activator extends DependencyActivatorBase implements ManagedService
     private final Map<String, ComponentContext> componentContexts = new HashMap<>();
 
     private volatile DependencyManager dependencyManager; /* injected by dependency manager */
-
+    
     @Override
     public void init(BundleContext bc, DependencyManager dm) throws Exception {
         logger.debug("Maven repository activator - initializing");
@@ -96,18 +102,18 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             return;
         }
 
+        RepositoryConfiguration repositoryConfiguration = null;
         String absolutePath = null;
-        URI uri = null;
         switch (configuration.getPrimaryRepository()) {
             case REMOTE:
-                uri = configuration.getRemoteRepository().getUri();
-                absolutePath = uri.getPath();
-                logger.debug("URI {} for Remote Maven repository set", uri);
+                repositoryConfiguration = configuration.getRemoteRepository();
+                absolutePath = repositoryConfiguration.getUri().getPath();
+                logger.debug("URI {} for Remote Maven repository set", repositoryConfiguration.getUri());
                 break;
 
             case LOCAL:
-                uri = configuration.getLocalRepository().getUri();
-                File mvnStorePath = new File(uri);
+                repositoryConfiguration = configuration.getLocalRepository();
+                File mvnStorePath = new File(repositoryConfiguration.getUri());
 
                 absolutePath = mvnStorePath.getAbsolutePath();
 
@@ -140,11 +146,12 @@ public class Activator extends DependencyActivatorBase implements ManagedService
         
         Properties props = new Properties();
         props.put("id", pid);
-        props.put("name", "Maven: " + uri);
+        props.put("name", "Maven: " + repositoryConfiguration.getUri());
 
+        MavenStoreImpl mavenStoreImpl = new MavenStoreImpl(repositoryConfiguration.getUri(), configuration);
         Component storeComponent = createComponent()
                 .setInterface(Store.class.getName(), props)
-                .setImplementation(new MavenStoreImpl(uri, configuration))
+                .setImplementation(mavenStoreImpl)
 //                .add(dependencyManager.createConfigurationDependency().setPid(pid).setPropagate(true))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
@@ -161,7 +168,30 @@ public class Activator extends DependencyActivatorBase implements ManagedService
 
         dependencyManager.add(storeComponent);
         
-        ComponentContext componentContext = new ComponentContext(pid, storeComponent, absolutePath, configuration);
+        ObjectName objectName = null;
+        if (configuration.isJmxEnabled()) {
+            RepositoryManagement jmxRepository = new RepositoryManagement();
+            jmxRepository.setMavenStoreImpl(mavenStoreImpl);
+            jmxRepository.setMavenStoreConfiguration(configuration);
+            jmxRepository.setRepositoryConfiguration(repositoryConfiguration);
+            
+            String mbeanName = PID + ":type=" + repositoryConfiguration.getName();
+            try {
+                objectName = new ObjectName(mbeanName);
+                ManagementFactory.getPlatformMBeanServer().registerMBean(jmxRepository, objectName);
+                logger.info("Repository MBean registered: {}", mbeanName);
+            } catch (MalformedObjectNameException e) {
+                logger.error("Could not register MBean with the given repository name: " + mbeanName);
+            } catch (InstanceAlreadyExistsException e) {
+                logger.error("MBean with repository name already exists: " + mbeanName, e);
+            } catch (MBeanRegistrationException e) {
+                logger.error("Could not register MBean", e);
+            } catch (NotCompliantMBeanException e) {
+                logger.error("Not compliant MBean", e);
+            }
+        }
+        
+        ComponentContext componentContext = new ComponentContext(pid, storeComponent, absolutePath, configuration, objectName);
         componentContexts.put(pid, componentContext);
     }
 
@@ -172,6 +202,16 @@ public class Activator extends DependencyActivatorBase implements ManagedService
             logger.debug("Unregistering repository store: {}", componentContext.getComponent());
             
             dependencyManager.remove(componentContext.getComponent());
+            
+            if (componentContext.getObjectName() != null) {
+                try {
+                    ManagementFactory.getPlatformMBeanServer().unregisterMBean(componentContext.getObjectName());
+                } catch (InstanceNotFoundException e) {
+                    logger.warn("Unregistered MBean doesn't exist.", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("Could not unregister MBean.", e);
+                }
+            }
         }
     }
 }

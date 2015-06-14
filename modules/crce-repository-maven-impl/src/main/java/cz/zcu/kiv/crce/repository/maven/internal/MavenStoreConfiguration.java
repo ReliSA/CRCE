@@ -18,6 +18,8 @@ public class MavenStoreConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenStoreConfiguration.class);
 
+    public static final String CFG__JMX_ENABLED = "jmx.enabled";
+    
     public static final String CFG__REPOSITORY_ENABLED = "repository.enabled";
     
     public static final String CFG__REPOSITORY_LOCAL_URI = "repository.local.uri";
@@ -51,6 +53,7 @@ public class MavenStoreConfiguration {
     private final ResolutionStrategy artifactResolve;
     private final String artifactResolveParam;
     private final boolean enabled;
+    private final boolean jmxEnabled;
 
 
     public MavenStoreConfiguration(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
@@ -84,6 +87,8 @@ public class MavenStoreConfiguration {
         } else {
             artifactResolveParam = "";
         }
+        
+        jmxEnabled = Boolean.parseBoolean(getProperty(properties, CFG__REPOSITORY_ENABLED));
     }
 
     private static URI getLocalUri(Dictionary<String, ?> properties) throws ConfigurationException {
@@ -180,6 +185,10 @@ public class MavenStoreConfiguration {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isJmxEnabled() {
+        return jmxEnabled;
     }
 
     private static String getProperty(Dictionary<String, ?> properties, String key) {

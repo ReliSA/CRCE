@@ -147,7 +147,7 @@ public class MavenStoreImpl implements Store {
     /**
      * Main method for start indexing local maven repository
      */
-    private void index() {
+    public void index() {
         taskRunnerService.scheduleTask(new MavenRepositoryIndexer(
                 baseUri,
                 configuration,
