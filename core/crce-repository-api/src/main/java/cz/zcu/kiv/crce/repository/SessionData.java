@@ -10,4 +10,7 @@ public interface SessionData {
 
     @Nonnull
     Buffer getBuffer();
+    
+    @Nonnull
+    Buffer getWsBuffer(); // aditional buffer for webservices
 }

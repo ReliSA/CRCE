@@ -1,8 +1,11 @@
 package cz.zcu.kiv.crce.webui.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
 import java.io.IOException;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +24,27 @@ public class WebservicesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("resource?link=webservices");
+        boolean failed = false;
+
+        if (req.getParameter("uri") != null) {
+            Buffer buffer = Activator.instance().getWsBuffer(req);
+            try {
+                buffer.commit(true);
+            } catch (IOException e) {
+                logger.error("Could not commit", e);
+                failed = true;
+            }
+        } else {
+            failed = true;
+        }
+        
+        if (failed) {
+            logger.error("Commit failed");
+            ResourceServlet.setError(req.getSession(), !failed, "Commit failed");
+        } else {
+            req.getRequestDispatcher("resource?link=webservices");
+        }
+        
     }
 
     @Override
@@ -29,22 +52,34 @@ public class WebservicesServlet extends HttpServlet {
 
         // process HTTP POST parameter with uri of Webservice IDL
         String uri;
+        boolean upload_success = true;
         if (req.getParameter("uri") != null) {
             uri = req.getParameter("uri");
-            logger.debug("Got \"uri\" parameter with value \"" + uri + "\".");
+            logger.debug("Got \"uri\" parameter with value \"{}\".", uri);
             
             // invoke processing of remote IDL document
             WebservicesDescription wd = Activator.instance().getWebservicesDescription();
             Resource resource = wd.parseWebserviceDescription(uri);
-            
-            // save CRCE resource into repository
-            //Activator.instance().get
+            if (resource == null) {
+                logger.warn("Could not parse web service IDL at \"{}\" into CRCE artifact.", uri);
+            } else {
+                logger.info("Web service IDL at \"{}\" was successfully parsed into CRCE artifact.", uri);
+                
+                // save CRCE resource into repository
+                try {
+                    Activator.instance().getWsBuffer(req).put(resource);
+                } catch (RefusedArtifactException ex) {
+                    logger.warn("Artifact revoked: ", ex.getMessage());
+                    upload_success = false;
+                }
+            }
             
         } else {
             logger.debug("Empty \"uri\" parameter during HTTP POST.");
         }
         
         // redirect to Webservices section
+        ResourceServlet.setError(req.getSession(), upload_success, upload_success ? "Upload was succesful." : "Upload failed.");
         req.getSession().setAttribute("source", "webservices");
         req.getRequestDispatcher("resource?link=webservices").forward(req, resp);
     }

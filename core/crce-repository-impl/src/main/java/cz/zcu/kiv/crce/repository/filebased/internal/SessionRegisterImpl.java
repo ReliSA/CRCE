@@ -33,8 +33,10 @@ public class SessionRegisterImpl implements SessionRegister {
             if (!sessions.containsKey(sessionId)) {
                 SessionDataImpl sd = new SessionDataImpl();
                 BufferImpl buffer = new BufferImpl(sessionId);
+                BufferImpl wsBuffer = new BufferImpl(sessionId);
 
                 sd.buffer = buffer;
+                sd.wsBuffer = wsBuffer;
 
                 sd.bufferComponent = dependencyManager.createComponent()
                         .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
@@ -49,7 +51,21 @@ public class SessionRegisterImpl implements SessionRegister {
                         .add(dependencyManager.createServiceDependency().setService(IdentityIndexer.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(ResourceIndexerService.class).setRequired(true));
 
+                sd.wsBufferComponent = dependencyManager.createComponent()
+                        .setInterface(Buffer.class.getName(), buffer.getSessionProperties())
+                        .setImplementation(wsBuffer)
+                        .add(dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(MetadataFactory.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(ResourceDAO.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(MetadataService.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(MetadataValidator.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(IdentityIndexer.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(ResourceIndexerService.class).setRequired(true));
+
                 dependencyManager.add(sd.bufferComponent);
+                dependencyManager.add(sd.wsBufferComponent);
                 sessions.put(sessionId, sd);
             }
         }
@@ -61,6 +77,7 @@ public class SessionRegisterImpl implements SessionRegister {
             SessionDataImpl sd = sessions.remove(sessionId);
             if (sd != null) {
                 dependencyManager.remove(sd.bufferComponent);
+                dependencyManager.remove(sd.wsBufferComponent);
             }
         }
     }

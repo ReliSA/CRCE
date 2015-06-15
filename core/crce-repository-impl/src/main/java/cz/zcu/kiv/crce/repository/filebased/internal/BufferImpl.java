@@ -161,7 +161,10 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public Resource put(Resource resource) throws IOException, RefusedArtifactException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
+        metadataService.getIdentity(resource).setAttribute("status", String.class, "buffered");
+        resourceDAO.saveResource(resource);
+        return resource;
     }
 
     @Override
@@ -236,6 +239,7 @@ public class BufferImpl implements Buffer, EventHandler {
 //            	logger.warn( "Resource to be removed is not in buffer but it is in internal repository: {}, cleaning up", resource.getId());
 //                m_ResourceDAO.deleteResource(LegacyMetadataHelper.getUri(resource));
 //            }
+            resourceDAO.deleteResource(metadataService.getUri(resource));
             return false;
         }
 
@@ -307,38 +311,40 @@ public class BufferImpl implements Buffer, EventHandler {
         // remove resources from buffer
         if (move) {
             for (URI resource : resourcesToRemove) {
-                File resourceFile = new File(resource);
-                if (resourceFile.exists() && !resourceFile.delete()) {
-                    logger.error( "Can not delete artifact from buffer: {}", resource);
-                    continue;
-                }
-                try {
-                    resourceDAO.deleteResource(resource);
-                } catch (IOException e) {
-                    // once the artifact file was removed, the resource has to be removed
-                    // from the repository even in case of exception on removing metadata
-                    // to keep consistency of repository with stored artifact files
+                if (resource.getScheme().equalsIgnoreCase("file")) {
+                    File resourceFile = new File(resource);
+                    if (resourceFile.exists() && !resourceFile.delete()) {
+                        logger.error( "Can not delete artifact from buffer: {}", resource);
+                        continue;
+                    }
+                    try {
+                        resourceDAO.deleteResource(resource);
+                    } catch (IOException e) {
+                        // once the artifact file was removed, the resource has to be removed
+                        // from the repository even in case of exception on removing metadata
+                        // to keep consistency of repository with stored artifact files
+//                        if (!m_repository.removeResource(resource)) {
+//                            // cleanup (after renamed resource)
+//                            Resource fake = m_metadataFactory.createResource();
+//                            fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
+//                            fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
+//                            if (!m_repository.removeResource(fake)) {
+//                                logger.warn( "Buffer's internal repository does not contain removing resource: {}", resource.getId());
+//                            }
+//                        }
+//                        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
+                        throw e;
+                    }
 //                    if (!m_repository.removeResource(resource)) {
 //                        // cleanup (after renamed resource)
 //                        Resource fake = m_metadataFactory.createResource();
 //                        fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
 //                        fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
 //                        if (!m_repository.removeResource(fake)) {
-//                        	logger.warn( "Buffer's internal repository does not contain removing resource: {}", resource.getId());
+//                        	logger.warn("Buffer's internal repository does not contain removing resource: {}", resource.getId());
 //                        }
 //                    }
-//                    m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
-                    throw e;
                 }
-//                if (!m_repository.removeResource(resource)) {
-//                    // cleanup (after renamed resource)
-//                    Resource fake = m_metadataFactory.createResource();
-//                    fake.setSymbolicName(toRemoveNonrenamed.get(resource.getId())[0]);
-//                    fake.setVersion(toRemoveNonrenamed.get(resource.getId())[1]);
-//                    if (!m_repository.removeResource(fake)) {
-//                    	logger.warn("Buffer's internal repository does not contain removing resource: {}", resource.getId());
-//                    }
-//                }
             }
 //            m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
         }

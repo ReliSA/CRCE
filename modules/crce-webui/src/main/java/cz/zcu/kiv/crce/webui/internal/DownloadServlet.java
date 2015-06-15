@@ -35,14 +35,22 @@ public class DownloadServlet extends HttpServlet {
         boolean success;
         String message;
         @SuppressWarnings("unchecked")
-        List<ResourceExt> buffer = (List<ResourceExt>) req.getSession().getAttribute("buffer");
-        List<Resource> list = Activator.instance().getBuffer(req).commit(true);
+        List<ResourceExt> buffer = null;
+        List<Resource> list = null;
+        if ("buffer".equals(req.getSession().getAttribute("source"))) {
+            buffer = (List<ResourceExt>) req.getSession().getAttribute("buffer");
+            list = Activator.instance().getBuffer(req).commit(true);
+        }
+        if ("webservices".equals(req.getSession().getAttribute("source"))) {
+            buffer = (List<ResourceExt>) req.getSession().getAttribute("wsBuffer");
+            list = Activator.instance().getWsBuffer(req).commit(true);
+        }
         if (list.size() == buffer.size()) {
             success = true;
-            message = "All resources commited succesfully";
+            message = "All resources commited successfully";
         } else {
             success = false;
-            message = "Not all resources commited succesfully";
+            message = "Not all resources commited successfully";
         }
         req.getSession().setAttribute("source", "commit");
         ResourceServlet.setError(req.getSession(), success, message);

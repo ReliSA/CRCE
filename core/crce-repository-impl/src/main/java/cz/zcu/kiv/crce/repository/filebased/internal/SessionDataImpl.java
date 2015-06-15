@@ -10,11 +10,21 @@ import org.apache.felix.dm.Component;
  */
 public class SessionDataImpl implements SessionData {
 
+    // buffer for uploaded file artefacts
     Component bufferComponent;
     Buffer buffer;
+
+    // buffer for parsed webservice IDLs
+    Component wsBufferComponent;
+    Buffer wsBuffer;
 
     @Override
     public Buffer getBuffer() {
         return buffer;
+    }
+    
+    @Override
+    public Buffer getWsBuffer() {
+        return wsBuffer;
     }
 }

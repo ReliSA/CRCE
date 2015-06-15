@@ -217,7 +217,22 @@ public class ResourceServlet extends HttpServlet {
             }
 
             case "webservices": {
-                session.setAttribute("webservices", true);
+                List<Resource> resources;
+                if (filter == null) {
+                    resources = Activator.instance().getWsBuffer(req).getResources();
+                } else {
+                    try {
+                        resources = Activator.instance().getWsBuffer(req).getResources(filter);
+                    } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
+                        setError(session, false, errorMessage);
+                        resources = Activator.instance().getWsBuffer(req).getResources();
+                    }
+                }
+                List<ResourceExt> bufferResourcesExt = new ArrayList<>(resources.size());
+                for (Resource resource : resources) {
+                    bufferResourcesExt.add(new ResourceExt(resource, Activator.instance().getMetadataService()));
+                }
+                session.setAttribute("wsBuffer", bufferResourcesExt);
                 return true;
             }
 
@@ -264,9 +279,11 @@ public class ResourceServlet extends HttpServlet {
     }
 
     /**
-     * Prepare resource array. Resource array is created from store and buffer. Store resources are added, if request parameter
-     * <code>store</code> is "yes". Buffer resources are added, if request parameter
-     * <code>buffer</code> is "yes".
+     * Prepares resource array. Resource array is created from store, buffer and webservice buffer.
+     * 
+     * Store resources are added, if request parameter <code>showStoreTag</code> is set to "yes".
+     * Buffer resources are added, if request parameter <code>showBufferTag</code> is set to "yes".
+     * Webservice buffer resources are added, if request parameter <code>showWsBufferTag</code> is set to "yes".
      *
      * @param req    request with parameters
      * @param filter possible filter of resources
@@ -277,6 +294,7 @@ public class ResourceServlet extends HttpServlet {
 
         List<Resource> storeResources = Collections.emptyList();
         List<Resource> bufferResources = Collections.emptyList();
+        List<Resource> wsBufferResources = Collections.emptyList();
 
         String id = getRepositoryId(req);
         if (id != null && "yes".equalsIgnoreCase((String) session.getAttribute("showStoreTag"))) {
@@ -307,10 +325,25 @@ public class ResourceServlet extends HttpServlet {
             }
         }
 
-        //merge two resources arrays
-        List<Resource> resources = new ArrayList<>(storeResources.size() + bufferResources.size());
+        if ("yes".equals((String) session.getAttribute("showWsBufferTag"))) {
+            if (filter == null) {
+                wsBufferResources = Activator.instance().getWsBuffer(req).getResources();
+            } else {
+                try {
+                    wsBufferResources = Activator.instance().getWsBuffer(req).getResources(filter);
+                } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
+                    logger.warn("Invalid syntax", e);
+                    setError(session, false, filter + " is not a valid filter");
+                    wsBufferResources = Activator.instance().getWsBuffer(req).getResources();
+                }
+            }
+        }
+
+        //merge all resource arrays together
+        List<Resource> resources = new ArrayList<>(storeResources.size() + bufferResources.size() + wsBufferResources.size());
         resources.addAll(storeResources);
         resources.addAll(bufferResources);
+        resources.addAll(wsBufferResources);
 
         return resources;
     }

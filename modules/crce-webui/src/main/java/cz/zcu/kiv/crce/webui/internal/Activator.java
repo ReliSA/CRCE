@@ -154,6 +154,15 @@ public final class Activator extends DependencyActivatorBase {
         return sessionRegister.getSessionData(sid).getBuffer();
     }
 
+    public Buffer getWsBuffer(HttpServletRequest req) {
+        if (req == null) {
+            return null;
+        }
+
+        String sid = req.getSession(true).getId();
+        return sessionRegister.getSessionData(sid).getWsBuffer();
+    }
+
     public MetadataService getMetadataService() {
         return metadataService;
     }

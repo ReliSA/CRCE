@@ -155,10 +155,10 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             resource = tmp;
         }
 
-        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
-            throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
-        }
         if ("file".equals(metadataService.getUri(resource).getScheme())) {
+            if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
+                throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
+            }
             resource = putFileResource(resource, move);
         } else {
             resource = putNonFileResource(resource, move);
@@ -207,9 +207,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         return resource;
     }
 
-    private Resource putNonFileResource(Resource resource, boolean move) {
-        throw new UnsupportedOperationException("Put resource from another URI than file not supported yet: "
-                + resource.getId() + ": " + metadataService.getUri(resource) + ", move: " + move);
+    private Resource putNonFileResource(Resource resource, boolean move) throws IOException {
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
+        metadataService.getIdentity(resource).setAttribute("status", String.class, "stored");
+        resourceDAO.saveResource(resource);
+        return resource;
     }
 
     @Override
