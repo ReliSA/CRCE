@@ -4,4 +4,4 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
-Export-Package: ${bundle.namespace}.internal
+Export-Package: ${bundle.namespace}.internal, ${bundle.namespace}.structures

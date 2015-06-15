@@ -18,15 +18,45 @@ public abstract class WebserviceTypeBase {
     protected MetadataFactory metadataFactory;
     protected MetadataService metadataService;
     
+    ////////////////
+    // NAMESPACES //
+    ////////////////
+    
     // list of all namespaces used by this module for Capabilities
     public static final String NAMESPACE__CRCE_IDENTITY = MetadataServiceImpl.NAMESPACE__CRCE_IDENTITY;
     public static final String NAMESPACE__WEBSERVICE_IDENTITY = "webservice.identity";
     public static final String NAMESPACE__WEBSERVICE_ENDPOINT = "webservice.endpoint";
     public static final String NAMESPACE__WEBSERVICE_TYPE = "webservice.type";
     
+    // list of all namespaces used by this module for Properties
+    public static final String NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER = "webservice.endpoint.parameter";
+    public static final String NAMESPACE__WEBSERVICE_ENDPOINT_RESPONSE = "webservice.endpoint.response";
+    
+    ////////////////
+    // ATTRIBUTES //
+    ////////////////
+    
     // list of attributes used by this module for NAMESPACE__CRCE_IDENTITY Capability
-    public static final AttributeType<String> ATTRIBUTE__MIME = new SimpleAttributeType<>("mime", String.class);
-    public static final AttributeType<String> ATTRIBUTE__HASH = new SimpleAttributeType<>("hash", String.class);
+    public static final AttributeType<String> ATTRIBUTE__CRCE_IDENTITY__MIME = new SimpleAttributeType<>("mime", String.class);
+    public static final AttributeType<String> ATTRIBUTE__CRCE_IDENTITY__HASH = new SimpleAttributeType<>("hash", String.class);
+    
+    // list of attributes used by this module for NAMESPACE__WEBSERVICE_IDENTITY Capability
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_IDENTITY__IDL_VERSION = new SimpleAttributeType<>("idl-version", String.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_IDENTITY__TYPE = new SimpleAttributeType<>("type", String.class);
+    
+    // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT Capability
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME = new SimpleAttributeType<>("name", String.class);
+    
+    // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER Property
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME = new SimpleAttributeType<>("name", String.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE = new SimpleAttributeType<>("type", String.class);
+    public static final AttributeType<Long> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER = new SimpleAttributeType<>("order", Long.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL = new SimpleAttributeType<>("optional", String.class);
+    
+    // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER Property
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE = new SimpleAttributeType<>("type", String.class);
+
+    
     
     public WebserviceTypeBase(MetadataFactory mf, MetadataService ms) {
         metadataFactory = mf;
@@ -34,6 +64,8 @@ public abstract class WebserviceTypeBase {
     }
     
     public abstract String getSpecificWebserviceCategory();
+
+    public abstract String getSpecificWebserviceType();
 
     public String getIdlHash(String idl) {
         try {

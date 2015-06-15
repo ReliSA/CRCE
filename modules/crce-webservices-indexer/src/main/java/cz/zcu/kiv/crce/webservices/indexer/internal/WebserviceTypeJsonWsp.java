@@ -2,9 +2,15 @@ package cz.zcu.kiv.crce.webservices.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import java.util.logging.Level;
+import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint;
+import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointParameter;
+import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointResponse;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -26,6 +32,12 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
     private final static String JSON_WSP_URL = "url";
     private final static String JSON_WSP_TYPES = "types";
     private final static String JSON_WSP_METHODS = "methods";
+    private final static String JSON_WSP_METHOD_PARAMETERS = "params";
+    private final static String JSON_WSP_METHOD_PARAMETER_TYPE = "type";
+    private final static String JSON_WSP_METHOD_PARAMETER_ORDER = "def_order";
+    private final static String JSON_WSP_METHOD_PARAMETER_OPTIONAL = "optional";
+    private final static String JSON_WSP_METHOD_RESPONSE = "ret_info";
+    private final static String JSON_WSP_METHOD_RESPONSE_TYPE = "type";
     
     public WebserviceTypeJsonWsp(MetadataFactory mf, MetadataService ms) {
         super(mf, ms);
@@ -34,6 +46,11 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
     @Override
     public String getSpecificWebserviceCategory() {
         return "json-wsp";
+    }
+    
+    @Override
+    public String getSpecificWebserviceType() {
+        return "rpc";
     }
     
     @Override
@@ -130,7 +147,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
             logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_URL, ex);
         }
         
-        // get webservice url
+        // get webservice mime format
         String webserviceMime = null;
         try {
             webserviceMime = jsonObj.getString(JSON_WSP_TYPE);
@@ -138,7 +155,64 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
             logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_TYPE, ex);
         }
         
+        // get webservice idl version
+        String webserviceIdlVersion = null;
+        try {
+            webserviceIdlVersion = jsonObj.getString(JSON_WSP_VERSION);
+        } catch (JSONException ex) {
+            logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_VERSION, ex);
+        }
+        
         // process idl endpoints (i.e. methods)
+        List<WebserviceEndpoint> processedEndpoints = new ArrayList<>();
+        if (jsonObj.has(JSON_WSP_METHODS)) {
+            try {
+                JSONObject jsonEndpoints = jsonObj.getJSONObject(JSON_WSP_METHODS);
+                Iterator enpoints = jsonEndpoints.keys();
+                
+                // iterate through all endpoints (i.e. methods)
+                while (enpoints.hasNext()) {
+                    String endpointName = (String)enpoints.next(); // get endpoint name
+                    JSONObject jsonEndpoint = jsonEndpoints.getJSONObject(endpointName);
+                    
+                    // get endpoint parameters
+                    JSONObject jsonParams = jsonEndpoint.getJSONObject(JSON_WSP_METHOD_PARAMETERS);
+                    Iterator params = jsonParams.keys();
+                    
+                    // iterate through all parameters of current endpoint
+                    List<WebserviceEndpointParameter> processedParams = new ArrayList<>();
+                    while(params.hasNext()) {
+                        try {
+                            // get info about parameter
+                            String paramName = (String)params.next();
+                            JSONObject jsonParam = jsonParams.getJSONObject(paramName);
+                            String paramType = jsonParam.getString(JSON_WSP_METHOD_PARAMETER_TYPE);
+                            int paramOrder = jsonParam.getInt(JSON_WSP_METHOD_PARAMETER_ORDER);
+                            boolean paramOptional = jsonParam.getBoolean(JSON_WSP_METHOD_PARAMETER_OPTIONAL);
+
+                            // save parameter info into list
+                            processedParams.add(new WebserviceEndpointParameter(paramName, paramType, paramOrder, paramOptional));
+                        } catch (JSONException ex) {
+                            logger.warn("Error while processing parameters of endpoint \"{}\".", endpointName, ex);
+                        }
+                    }
+                    
+                    // get endpoint response
+                    JSONObject jsonEndpointResponse = jsonEndpoint.getJSONObject(JSON_WSP_METHOD_RESPONSE);
+                    String responseType = jsonEndpointResponse.getString(JSON_WSP_METHOD_RESPONSE_TYPE);
+                    WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(responseType);
+                    
+                    // add endpoint info into list
+                    processedEndpoints.add(new WebserviceEndpoint(endpointName, processedParams, processedResponse));
+                    
+                }
+            } catch (JSONException ex) {
+                logger.warn("Error while processing endpoints.", ex);
+            }
+        }
+        else {
+            logger.warn("IDL does not have \"{}\" key defined in root JSON structure.", JSON_WSP_METHODS);
+        }
         
         
         
@@ -156,14 +230,40 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
         metadataService.setPresentationName(resource, webserviceName);
         metadataService.setSize(resource, idl.length());
         metadataService.setUri(resource, webserviceUrl);
-        capability.setAttribute(ATTRIBUTE__MIME, webserviceMime);
-        capability.setAttribute(ATTRIBUTE__HASH, getIdlHash(idl));
+        capability.setAttribute(ATTRIBUTE__CRCE_IDENTITY__MIME, webserviceMime);
+        capability.setAttribute(ATTRIBUTE__CRCE_IDENTITY__HASH, getIdlHash(idl));
         
+        // Capability - Webservice Identity
+        capability = metadataFactory.createCapability(NAMESPACE__WEBSERVICE_IDENTITY);
+        capability.setAttribute(ATTRIBUTE__WEBSERVICE_IDENTITY__IDL_VERSION, webserviceIdlVersion);
+        capability.setAttribute(ATTRIBUTE__WEBSERVICE_IDENTITY__TYPE, getSpecificWebserviceType());
+        resource.addCapability(capability);
+        resource.addRootCapability(capability);
         
-        //Capability capability = metadataFactory.createCapability(NAMESPACE__CRCE_IDENTITY);
-        //resource.addCapability(capability);
-        //resource.addRootCapability(capability);
-        
+        // Capabilities - Webservice Endpoint
+        for (int i = 0; i < processedEndpoints.size(); i++) {
+            capability = metadataFactory.createCapability(NAMESPACE__WEBSERVICE_ENDPOINT);
+            capability.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME, processedEndpoints.get(i).getName());
+            
+            // Properties - Webservice Enpoint Parameter
+            List<WebserviceEndpointParameter> processedParams = processedEndpoints.get(i).getParameters();
+            for (int j = 0; j < processedParams.size(); j++) {
+                Property property = metadataFactory.createProperty(NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER);
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME, processedParams.get(j).getName());
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE, processedParams.get(j).getType());
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER, processedParams.get(j).getOrder());
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL, processedParams.get(j).isOptional() ? "true" : "false");
+                capability.addProperty(property);
+            }
+            
+            // Property - Webservice Endpoint Response
+            Property property = metadataFactory.createProperty(NAMESPACE__WEBSERVICE_ENDPOINT_RESPONSE);
+            property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE, processedEndpoints.get(i).getResponse().getType());
+            capability.addProperty(property);
+
+            resource.addCapability(capability);
+            resource.addRootCapability(capability);
+        }
         
         return resource;
     }
