@@ -11,6 +11,7 @@ import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointResponse
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -186,12 +187,21 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                             // get info about parameter
                             String paramName = (String)params.next();
                             JSONObject jsonParam = jsonParams.getJSONObject(paramName);
-                            String paramType = jsonParam.getString(JSON_WSP_METHOD_PARAMETER_TYPE);
+                            String paramType;
+                            boolean paramArray;
+                            if (jsonParam.optJSONArray(JSON_WSP_METHOD_PARAMETER_TYPE) == null){
+                                paramType = jsonParam.getString(JSON_WSP_METHOD_PARAMETER_TYPE);
+                                paramArray = false;
+                            } else {
+                                JSONArray jsonArray = jsonParam.getJSONArray(JSON_WSP_METHOD_PARAMETER_TYPE);
+                                paramType = jsonArray.getString(0);
+                                paramArray = true;
+                            }
                             int paramOrder = jsonParam.getInt(JSON_WSP_METHOD_PARAMETER_ORDER);
                             boolean paramOptional = jsonParam.getBoolean(JSON_WSP_METHOD_PARAMETER_OPTIONAL);
 
                             // save parameter info into list
-                            processedParams.add(new WebserviceEndpointParameter(paramName, paramType, paramOrder, paramOptional));
+                            processedParams.add(new WebserviceEndpointParameter(paramName, paramType, paramOrder, paramOptional, paramArray));
                         } catch (JSONException ex) {
                             logger.warn("Error while processing parameters of endpoint \"{}\".", endpointName, ex);
                         }
@@ -199,8 +209,17 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                     
                     // get endpoint response
                     JSONObject jsonEndpointResponse = jsonEndpoint.getJSONObject(JSON_WSP_METHOD_RESPONSE);
-                    String responseType = jsonEndpointResponse.getString(JSON_WSP_METHOD_RESPONSE_TYPE);
-                    WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(responseType);
+                    String responseType;
+                    boolean responseArray;
+                    if (jsonEndpointResponse.optJSONArray(JSON_WSP_METHOD_RESPONSE_TYPE) == null){
+                        responseType = jsonEndpointResponse.getString(JSON_WSP_METHOD_PARAMETER_TYPE);
+                        responseArray = false;
+                    } else {
+                        JSONArray jsonArray = jsonEndpointResponse.getJSONArray(JSON_WSP_METHOD_PARAMETER_TYPE);
+                        responseType = jsonArray.getString(0);
+                        responseArray = true;
+                    }
+                    WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(responseType, responseArray);
                     
                     // add endpoint info into list
                     processedEndpoints.add(new WebserviceEndpoint(endpointName, processedParams, processedResponse));
@@ -253,12 +272,14 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE, processedParams.get(j).getType());
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER, processedParams.get(j).getOrder());
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL, processedParams.get(j).isOptional() ? "true" : "false");
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY, processedParams.get(j).isArray() ? "true" : "false");
                 capability.addProperty(property);
             }
             
             // Property - Webservice Endpoint Response
             Property property = metadataFactory.createProperty(NAMESPACE__WEBSERVICE_ENDPOINT_RESPONSE);
             property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE, processedEndpoints.get(i).getResponse().getType());
+            property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY, processedEndpoints.get(i).getResponse().isArray() ? "true" : "false");
             capability.addProperty(property);
 
             resource.addCapability(capability);

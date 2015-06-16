@@ -52,9 +52,11 @@ public abstract class WebserviceTypeBase {
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE = new SimpleAttributeType<>("type", String.class);
     public static final AttributeType<Long> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER = new SimpleAttributeType<>("order", Long.class);
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL = new SimpleAttributeType<>("optional", String.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY = new SimpleAttributeType<>("array", String.class);
     
     // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER Property
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE = new SimpleAttributeType<>("type", String.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY = new SimpleAttributeType<>("array", String.class);
 
     
     

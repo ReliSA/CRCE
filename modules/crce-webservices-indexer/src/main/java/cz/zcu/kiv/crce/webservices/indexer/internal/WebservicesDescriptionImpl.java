@@ -72,10 +72,14 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         
         // create specialized IDL handling classes for all web service types
         WebserviceTypeJsonWsp wstJsonWsp = new WebserviceTypeJsonWsp(metadataFactory, metadataService);
+        WebserviceTypeWsdl wstWsdl = new WebserviceTypeWsdl(metadataFactory, metadataService);
         
         if (wstJsonWsp.recognizeIDL(idl)) {
             logger.debug("IDL type at \"{}\" recognized as JSON-WSP.", url_string);
             idlType = IdlType.JSON_WSP;
+        } else if (wstWsdl.recognizeIDL(idl)) {
+            logger.debug("IDL type at \"{}\" recognized as WSDL.", url_string);
+            idlType = IdlType.WSDL;
         }
         
         if (idlType == null) {

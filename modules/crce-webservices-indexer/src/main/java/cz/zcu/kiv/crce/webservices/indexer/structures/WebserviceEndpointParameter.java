@@ -10,12 +10,14 @@ public class WebserviceEndpointParameter {
     private String type;
     private long order;
     private boolean optional;
+    private boolean array;
     
-    public WebserviceEndpointParameter(String name, String type, long order, boolean optional) {
+    public WebserviceEndpointParameter(String name, String type, long order, boolean optional, boolean array) {
         this.name = name;
         this.type = type;
         this.order = order;
         this.optional = optional;
+        this.array = array;
     }
 
     /**
@@ -72,6 +74,20 @@ public class WebserviceEndpointParameter {
      */
     public void setOptional(boolean optional) {
         this.optional = optional;
+    }
+
+    /**
+     * @return the array
+     */
+    public boolean isArray() {
+        return array;
+    }
+
+    /**
+     * @param array the array to set
+     */
+    public void setArray(boolean array) {
+        this.array = array;
     }
     
 }
