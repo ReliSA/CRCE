@@ -115,7 +115,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
     }
 
     @Override
-    public Resource parseIDL(String idl) {
+    public List<Resource> parseIDL(String idl) {
         
         ////////////////////////////////////////////
         // process idl and get all necessary info //
@@ -197,7 +197,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                                 paramType = jsonArray.getString(0);
                                 paramArray = true;
                             }
-                            int paramOrder = jsonParam.getInt(JSON_WSP_METHOD_PARAMETER_ORDER);
+                            long paramOrder = jsonParam.getLong(JSON_WSP_METHOD_PARAMETER_ORDER);
                             boolean paramOptional = jsonParam.getBoolean(JSON_WSP_METHOD_PARAMETER_OPTIONAL);
 
                             // save parameter info into list
@@ -222,7 +222,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                     WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(responseType, responseArray);
                     
                     // add endpoint info into list
-                    processedEndpoints.add(new WebserviceEndpoint(endpointName, processedParams, processedResponse));
+                    processedEndpoints.add(new WebserviceEndpoint(endpointName, null, processedParams, processedResponse));
                     
                 }
             } catch (JSONException ex) {
@@ -286,7 +286,10 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
             resource.addRootCapability(capability);
         }
         
-        return resource;
+        // return this single resource in a list (JSON-WSP description document can describe only one webservice at once)
+        List<Resource> resources = new ArrayList<>();
+        resources.add(resource);
+        return resources;
     }
     
 }

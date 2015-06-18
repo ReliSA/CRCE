@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import java.util.List;
 
 /**
  * This interface serves as a basic API for processing of IDLs of different types of web services. Any class implementing this interface should represent one
@@ -25,6 +26,6 @@ public interface WebserviceType {
      * @param idl Textual representation of web service IDL.
      * @return Returns CRCE {@link cz.zcu.kiv.crce.metadata.Resource} representation of parsed web service. In case of any error null is returned instead.
      */
-    Resource parseIDL(String idl);
+    List<Resource> parseIDL(String idl);
     
 }

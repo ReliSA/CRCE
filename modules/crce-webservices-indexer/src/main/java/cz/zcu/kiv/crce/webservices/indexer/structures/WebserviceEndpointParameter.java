@@ -8,11 +8,11 @@ public class WebserviceEndpointParameter {
     
     private String name;
     private String type;
-    private long order;
-    private boolean optional;
-    private boolean array;
+    private Long order;
+    private Boolean optional;
+    private Boolean array;
     
-    public WebserviceEndpointParameter(String name, String type, long order, boolean optional, boolean array) {
+    public WebserviceEndpointParameter(String name, String type, Long order, Boolean optional, Boolean array) {
         this.name = name;
         this.type = type;
         this.order = order;
@@ -51,42 +51,42 @@ public class WebserviceEndpointParameter {
     /**
      * @return the order
      */
-    public long getOrder() {
+    public Long getOrder() {
         return order;
     }
 
     /**
      * @param order the order to set
      */
-    public void setOrder(long order) {
+    public void setOrder(Long order) {
         this.order = order;
     }
 
     /**
      * @return the optional
      */
-    public boolean isOptional() {
+    public Boolean isOptional() {
         return optional;
     }
 
     /**
      * @param optional the optional to set
      */
-    public void setOptional(boolean optional) {
+    public void setOptional(Boolean optional) {
         this.optional = optional;
     }
 
     /**
      * @return the array
      */
-    public boolean isArray() {
+    public Boolean isArray() {
         return array;
     }
 
     /**
      * @param array the array to set
      */
-    public void setArray(boolean array) {
+    public void setArray(Boolean array) {
         this.array = array;
     }
     

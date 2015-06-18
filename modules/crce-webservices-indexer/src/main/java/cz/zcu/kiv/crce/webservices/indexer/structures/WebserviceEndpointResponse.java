@@ -7,9 +7,9 @@ package cz.zcu.kiv.crce.webservices.indexer.structures;
 public class WebserviceEndpointResponse {
     
     private String type;
-    private boolean array;
+    private Boolean array;
     
-    public WebserviceEndpointResponse(String type, boolean array) {
+    public WebserviceEndpointResponse(String type, Boolean array) {
         this.type = type;
         this.array = array;
     }
@@ -31,14 +31,14 @@ public class WebserviceEndpointResponse {
     /**
      * @return the array
      */
-    public boolean isArray() {
+    public Boolean isArray() {
         return array;
     }
 
     /**
      * @param array the array to set
      */
-    public void setArray(boolean array) {
+    public void setArray(Boolean array) {
         this.array = array;
     }
     

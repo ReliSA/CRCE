@@ -1,7 +1,9 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.internal.MetadataServiceImpl;
@@ -54,7 +56,7 @@ public abstract class WebserviceTypeBase {
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL = new SimpleAttributeType<>("optional", String.class);
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY = new SimpleAttributeType<>("array", String.class);
     
-    // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER Property
+    // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_RESPONSE Property
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE = new SimpleAttributeType<>("type", String.class);
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY = new SimpleAttributeType<>("array", String.class);
 
@@ -87,6 +89,22 @@ public abstract class WebserviceTypeBase {
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
+    }
+    
+    protected <T> boolean setIfSet(Capability capability, AttributeType<T> attribute, T value) {
+        if (capability != null && value != null) {
+            capability.setAttribute(attribute, value);
+            return true;
+        }
+        return false;
+    }
+    
+    protected <T> boolean setIfSet(Property property, AttributeType<T> attribute, T value) {
+        if (property != null && value != null) {
+            property.setAttribute(attribute, value);
+            return true;
+        }
+        return false;
     }
 
 }

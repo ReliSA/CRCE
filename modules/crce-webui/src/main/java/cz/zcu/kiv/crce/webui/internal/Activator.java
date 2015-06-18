@@ -182,7 +182,6 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)) // FIXME 'not required' is only a temporary solution to make the component startable
         );
 
-
         logger.debug("WebUI activator initialized.");
     }
 

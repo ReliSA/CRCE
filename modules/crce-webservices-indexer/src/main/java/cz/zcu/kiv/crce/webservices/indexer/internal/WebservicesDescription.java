@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.Resource;
+import java.util.List;
 
 /**
  *
@@ -8,8 +9,6 @@ import cz.zcu.kiv.crce.metadata.Resource;
  */
 public interface WebservicesDescription {
 
-    Resource parseWebserviceDescription(String url);
+    List<Resource> createWebserviceRepresentations(String url);
 
-    boolean saveResourceIntoRepository();
-	
 }

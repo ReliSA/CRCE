@@ -10,6 +10,7 @@ import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -34,7 +35,7 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
     }
     
     @Override
-    public Resource parseWebserviceDescription(String url_string) {
+    public List<Resource> createWebserviceRepresentations(String url_string) {
         
         //////////////////////////////////////
         // try to access IDL content at URL //
@@ -91,28 +92,29 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         // parse IDL according to it's type //
         //////////////////////////////////////
         logger.debug("Attempting to parse IDL at \"{}\" (recognized as {} type).", url_string, idlType.toString());
-        Resource resource = null;
+        List<Resource> resources = null;
         switch(idlType) {
             case JSON_WSP:
-                resource = wstJsonWsp.parseIDL(idl);
+                resources = wstJsonWsp.parseIDL(idl);
                 break;
+            case WSDL:
+                resources = wstWsdl.parseIDL(idl);
         }
-        if (resource == null) {
+        if (resources == null) {
             logger.error("Could not parse IDL at \"{}\" (recognized as {} type).", url_string, idlType.toString());
             return null;
         }
-        metadataService.addCategory(resource, MAIN_CATEGORY); // label resource with main category
+        
+        // label all resources with main category
+        for (Resource resource : resources) {
+            metadataService.addCategory(resource, MAIN_CATEGORY);
+        }
         
         ////////////////////////////////////////////////////////////
         // all done; return parsed IDL in form of a CRCE Resource //
         ////////////////////////////////////////////////////////////
         logger.debug("IDL at \"{}\" successfully parsed (recognized as {} type).", url_string, idlType.toString());
-        return resource;
-    }
-    
-    @Override
-    public boolean saveResourceIntoRepository() {
-        return true;
+        return resources;
     }
     
 }
