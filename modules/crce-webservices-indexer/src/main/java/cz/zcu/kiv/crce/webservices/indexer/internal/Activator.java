@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
+import cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 

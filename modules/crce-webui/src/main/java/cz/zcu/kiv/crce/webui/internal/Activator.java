@@ -24,7 +24,7 @@ import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
-import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
+import cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription;
 
 /**
  * Activator of this bundle

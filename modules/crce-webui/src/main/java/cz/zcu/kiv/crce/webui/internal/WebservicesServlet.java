@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.webui.internal;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
-import cz.zcu.kiv.crce.webservices.indexer.internal.WebservicesDescription;
+import cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;

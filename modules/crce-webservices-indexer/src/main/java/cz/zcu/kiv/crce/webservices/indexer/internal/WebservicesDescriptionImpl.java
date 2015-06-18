@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
+import cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import org.slf4j.Logger;

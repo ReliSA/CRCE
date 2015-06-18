@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.webservices.indexer.internal;
+package cz.zcu.kiv.crce.webservices.indexer;
 
 import cz.zcu.kiv.crce.metadata.Resource;
 import java.util.List;

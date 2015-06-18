@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.webservices.indexer.structures;
+package cz.zcu.kiv.crce.webservices.indexer.structures.wsdl;
 
 import java.util.List;
 
