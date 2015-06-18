@@ -28,4 +28,11 @@ public interface WebserviceType {
      */
     List<Resource> parseIDL(String idl);
     
+    /**
+     * Returns name of specific IDL of which class that implements this interface deals with. E.g. "json-wsp", "soap", "wadl", etc...
+     *
+     * @return Name of specific IDL of which class that implements this interface deals with.
+     */
+    String getSpecificIdlCategory();
+    
 }

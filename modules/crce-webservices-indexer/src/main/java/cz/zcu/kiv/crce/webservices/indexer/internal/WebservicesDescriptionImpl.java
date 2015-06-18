@@ -12,6 +12,7 @@ import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -72,21 +73,22 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         // recognize IDL type //
         ////////////////////////
         logger.debug("Attempting to recognize IDL type at \"{}\".", url_string);
-        IdlType idlType = null;
         
         // create specialized IDL handling classes for all web service types
-        WebserviceTypeJsonWsp wstJsonWsp = new WebserviceTypeJsonWsp(metadataFactory, metadataService);
-        WebserviceTypeWsdl wstWsdl = new WebserviceTypeWsdl(metadataFactory, metadataService);
-        
-        if (wstJsonWsp.recognizeIDL(idl)) {
-            logger.debug("IDL type at \"{}\" recognized as JSON-WSP.", url_string);
-            idlType = IdlType.JSON_WSP;
-        } else if (wstWsdl.recognizeIDL(idl)) {
-            logger.debug("IDL type at \"{}\" recognized as WSDL.", url_string);
-            idlType = IdlType.WSDL;
+        List<WebserviceType> webserviceTypes = new ArrayList<>();
+        webserviceTypes.add(new WebserviceTypeJsonWsp(metadataFactory, metadataService));
+        webserviceTypes.add(new WebserviceTypeWsdl(metadataFactory, metadataService));
+
+        // recognize IDL type
+        WebserviceType recognizedWebserviceType = null;
+        for (WebserviceType webserviceType : webserviceTypes) {
+            if (webserviceType.recognizeIDL(idl)) {
+                logger.debug("IDL type at \"{}\" recognized as {}.", url_string, webserviceType.getSpecificIdlCategory());
+                recognizedWebserviceType = webserviceType;
+                break; // end the search, we have found out what type of IDL are we dealing with
+            }
         }
-        
-        if (idlType == null) {
+        if (recognizedWebserviceType == null) {
             logger.error("IDL type at \"{}\" unrecognizable.", url_string);
             return null;
         }
@@ -94,17 +96,11 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         //////////////////////////////////////
         // parse IDL according to it's type //
         //////////////////////////////////////
-        logger.debug("Attempting to parse IDL at \"{}\" (recognized as {} type).", url_string, idlType.toString());
-        List<Resource> resources = null;
-        switch(idlType) {
-            case JSON_WSP:
-                resources = wstJsonWsp.parseIDL(idl);
-                break;
-            case WSDL:
-                resources = wstWsdl.parseIDL(idl);
-        }
+        logger.debug("Attempting to parse IDL at \"{}\" (recognized as {} type).", url_string, recognizedWebserviceType.getSpecificIdlCategory());
+        List<Resource> resources;
+        resources = recognizedWebserviceType.parseIDL(idl); // parse IDL according to it's type
         if (resources == null) {
-            logger.error("Could not parse IDL at \"{}\" (recognized as {} type).", url_string, idlType.toString());
+            logger.error("Could not parse IDL at \"{}\" (recognized as {} type).", url_string, recognizedWebserviceType.getSpecificIdlCategory());
             return null;
         }
         
@@ -119,7 +115,7 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         ////////////////////////////////////////////////////////////
         // all done; return parsed IDL in form of a CRCE Resource //
         ////////////////////////////////////////////////////////////
-        logger.debug("IDL at \"{}\" successfully parsed (recognized as {} type).", url_string, idlType.toString());
+        logger.debug("IDL at \"{}\" successfully parsed (recognized as {} type).", url_string, recognizedWebserviceType.getSpecificIdlCategory());
         return resources;
     }
     

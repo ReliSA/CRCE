@@ -45,7 +45,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
     }
     
     @Override
-    public String getSpecificWebserviceCategory() {
+    public String getSpecificIdlCategory() {
         return "json-wsp";
     }
     
@@ -245,7 +245,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
         
         // Capability - CRCE Identity
         capability = metadataService.getIdentity(resource);
-        metadataService.addCategory(resource, getSpecificWebserviceCategory()); // add specific category for this type of web service
+        metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
         metadataService.setPresentationName(resource, webserviceName);
         metadataService.setSize(resource, idl.length());
         metadataService.setUri(resource, webserviceUrl);

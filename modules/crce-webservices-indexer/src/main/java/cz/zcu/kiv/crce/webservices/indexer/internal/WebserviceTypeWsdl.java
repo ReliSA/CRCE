@@ -61,7 +61,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     }
     
     @Override
-    public String getSpecificWebserviceCategory() {
+    public String getSpecificIdlCategory() {
         return "wsdl";
     }
 
@@ -255,7 +255,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             
             // Capability - CRCE Identity
             capability = metadataService.getIdentity(resource);
-            metadataService.addCategory(resource, getSpecificWebserviceCategory()); // add specific category for this type of web service
+            metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
             metadataService.setPresentationName(resource, processedWebservice.getName());
             metadataService.setSize(resource, idl.length());
             metadataService.setUri(resource, processedWebservice.getUrl() == null ? "http://unknown.url" : processedWebservice.getUrl());

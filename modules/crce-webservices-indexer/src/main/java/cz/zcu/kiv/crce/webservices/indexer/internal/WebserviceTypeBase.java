@@ -70,11 +70,9 @@ public abstract class WebserviceTypeBase {
         metadataService = ms;
     }
     
-    public abstract String getSpecificWebserviceCategory();
-
     public abstract String getSpecificWebserviceType();
 
-    public String getIdlHash(String idl) {
+    public static String getIdlHash(String idl) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(idl.getBytes("UTF-8"));
@@ -94,7 +92,7 @@ public abstract class WebserviceTypeBase {
         }
     }
     
-    protected <T> boolean setIfSet(Capability capability, AttributeType<T> attribute, T value) {
+    protected static <T> boolean setIfSet(Capability capability, AttributeType<T> attribute, T value) {
         if (capability != null && value != null) {
             capability.setAttribute(attribute, value);
             return true;
@@ -102,7 +100,7 @@ public abstract class WebserviceTypeBase {
         return false;
     }
     
-    protected <T> boolean setIfSet(Property property, AttributeType<T> attribute, T value) {
+    protected static <T> boolean setIfSet(Property property, AttributeType<T> attribute, T value) {
         if (property != null && value != null) {
             property.setAttribute(attribute, value);
             return true;
