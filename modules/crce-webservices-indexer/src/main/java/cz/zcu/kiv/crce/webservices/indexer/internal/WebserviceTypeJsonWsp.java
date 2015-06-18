@@ -256,6 +256,7 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
         capability = metadataFactory.createCapability(NAMESPACE__WEBSERVICE_IDENTITY);
         capability.setAttribute(ATTRIBUTE__WEBSERVICE_IDENTITY__IDL_VERSION, webserviceIdlVersion);
         capability.setAttribute(ATTRIBUTE__WEBSERVICE_IDENTITY__TYPE, getSpecificWebserviceType());
+        capability.setAttribute(ATTRIBUTE__WEBSERVICE_IDENTITY__URI, webserviceUrl);
         resource.addCapability(capability);
         resource.addRootCapability(capability);
         
@@ -271,15 +272,15 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME, processedParams.get(j).getName());
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE, processedParams.get(j).getType());
                 property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER, processedParams.get(j).getOrder());
-                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL, processedParams.get(j).isOptional() ? "true" : "false");
-                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY, processedParams.get(j).isArray() ? "true" : "false");
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL, (long)(processedParams.get(j).isOptional() ? 1 : 0));
+                property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY, (long)(processedParams.get(j).isArray() ? 1 : 0));
                 capability.addProperty(property);
             }
             
             // Property - Webservice Endpoint Response
             Property property = metadataFactory.createProperty(NAMESPACE__WEBSERVICE_ENDPOINT_RESPONSE);
             property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__TYPE, processedEndpoints.get(i).getResponse().getType());
-            property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY, processedEndpoints.get(i).getResponse().isArray() ? "true" : "false");
+            property.setAttribute(ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY, (long)(processedEndpoints.get(i).getResponse().isArray() ? 1 : 0));
             capability.addProperty(property);
 
             resource.addCapability(capability);

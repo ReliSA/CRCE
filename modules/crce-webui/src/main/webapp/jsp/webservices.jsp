@@ -10,7 +10,7 @@
 		<div class="upload">
 			<table class="upload">
 				<tr>
-					<td><input class="text" type="text" name="uri"/></td>
+					<td>Enter URL of IDL: <input class="text" type="text" name="uri"/></td>
 					<td><div class="tlac"><input class="tlacitko" type="submit" value="Parse IDL"/></div></td>
 				</tr>
 			</table>

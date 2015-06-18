@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -105,9 +107,12 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
             return null;
         }
         
-        // label all resources with main category
+        // label all resources with main category and other common attributes
         for (Resource resource : resources) {
-            metadataService.addCategory(resource, MAIN_CATEGORY);
+            metadataService.addCategory(resource, MAIN_CATEGORY); // assign main category tag
+            Capability capability = resource.getCapabilities(WebserviceTypeBase.NAMESPACE__WEBSERVICE_IDENTITY).get(0); // get webservice.idetntity capability
+            capability.setAttribute(WebserviceTypeBase.ATTRIBUTE__WEBSERVICE_IDENTITY__TIMESTAMP, new Date().getTime()); // save timestamp of when the websevice was parsed
+            capability.setAttribute(WebserviceTypeBase.ATTRIBUTE__WEBSERVICE_IDENTITY__IDL_URI, url_string);
         }
         
         ////////////////////////////////////////////////////////////

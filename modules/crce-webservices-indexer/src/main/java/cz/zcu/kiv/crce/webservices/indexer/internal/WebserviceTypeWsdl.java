@@ -191,15 +191,8 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
                 NamedNodeMap endpointAttributes = endpoint.getAttributes();
                 String endpointBinding = returnNodeValue(endpointAttributes, "binding");
                 
-                logger.debug("********** endpoint NODE ***** {}", endpoint.toString());
-                logger.debug("********** endpoint NODE attr ***** {}", endpointAttributes.toString());
-                logger.debug("********** endpoint NODE eb ***** {}", endpointBinding);
-                logger.debug("********** endpoint NODE ebson ***** {}", stripOfNamespace(endpointBinding));
-
-                
                 // get all operations implemented by this endpoint via its's binding object and list of operations defined in corresponding interface
                 WebserviceTypeWsdlBinding binding = getBindingByName(processedBindings, endpointBinding);
-                logger.debug("********** binding ***** {}, {}, {}, {}", binding.getName(), binding.getSoapStyle(), binding.getInterface_(), binding.getBindedOperations().size());
                 List<WebserviceTypeWsdlBindedOperation> bindedOperations = binding.getBindedOperations();
                 List<WebserviceTypeWsdlOperation> interfaceOperations = getInterfaceByName(processedInterfaces, binding.getInterface_()).getOperations();
                 
@@ -209,9 +202,6 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
                     // each with their parameters, datatypes, return value etc. That is why CRCE Webservice Endpoint corresponds to WSDL Operation.
                     
                     WebserviceTypeWsdlOperation operation = getOperationByName(interfaceOperations, bindedOperation.getName());
-                    
-                    logger.debug("********** BO ***** name {}", bindedOperation.toString());
-                    logger.debug("**********  O ***** name {}", operation.toString());
                     
                     // proces all input parts defined in this operation as endpoint parameters
                     List<WebserviceEndpointParameter> processedParameters = new ArrayList<>();
@@ -276,6 +266,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             capability = metadataFactory.createCapability(NAMESPACE__WEBSERVICE_IDENTITY);
             setIfSet(capability, ATTRIBUTE__WEBSERVICE_IDENTITY__IDL_VERSION, processedWebservice.getIdlVersion());
             setIfSet(capability, ATTRIBUTE__WEBSERVICE_IDENTITY__TYPE, processedWebservice.getType());
+            setIfSet(capability, ATTRIBUTE__WEBSERVICE_IDENTITY__URI, processedWebservice.getUrl());
             resource.addCapability(capability);
             resource.addRootCapability(capability);
 
