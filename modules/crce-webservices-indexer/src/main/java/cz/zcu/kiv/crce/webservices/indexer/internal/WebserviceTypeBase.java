@@ -12,11 +12,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * This class can be extended by any class implementing {@link cz.zcu.kiv.crce.webservices.indexer.internal.WebserviceType} interface. Since
+ * {@link cz.zcu.kiv.crce.webservices.indexer.internal.WebserviceType} interface defines strictly only necessary functionality towards external usage this class
+ * defines convenient common functionality that is often internally needed when implementing class for parsing of specific webservice IDL type.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
 public abstract class WebserviceTypeBase {
     
+    // in order to work with metadata these services are needed
     protected MetadataFactory metadataFactory;
     protected MetadataService metadataService;
     
@@ -66,13 +70,30 @@ public abstract class WebserviceTypeBase {
 
     
     
+    /**
+     * This constructor sets up references to all necessary services for metadata manipulation.
+     *
+     * @param mf
+     * @param ms
+     */
     public WebserviceTypeBase(MetadataFactory mf, MetadataService ms) {
         metadataFactory = mf;
         metadataService = ms;
     }
     
+    /**
+     * Returns specific communication pattern used by implemented webservice type. E.g. "rpc", "messaging" or "rest".
+     *
+     * @return Specific communication pattern used by implemented webservice type.
+     */
     public abstract String getSpecificWebserviceType();
 
+    /**
+     * This function simply takes input string and encode in into SHA-256 hash.
+     *
+     * @param idl Content of IDL document.
+     * @return SHA-256 encrypted hash.
+     */
     public static String getIdlHash(String idl) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -93,6 +114,16 @@ public abstract class WebserviceTypeBase {
         }
     }
     
+    /**
+     * This function sets <code>attribute</code> of {@link cz.zcu.kiv.crce.metadata.Capability} to a <code>value</code> provided that passed <code>value</code>
+     * is not <code>null</code>.
+     *
+     * @param <T> Datatype of attribute-value pair.
+     * @param capability {@link cz.zcu.kiv.crce.metadata.Capability} for which <code>attribute</code> will be set.
+     * @param attribute <code>attribute</code> to set.
+     * @param value <code>value</code> to set.
+     * @return Returns <code>true</code> if <code>value</code> was set. Returns <code>false</code> otherwise.
+     */
     protected static <T> boolean setIfSet(Capability capability, AttributeType<T> attribute, T value) {
         if (capability != null && value != null) {
             capability.setAttribute(attribute, value);
@@ -101,6 +132,16 @@ public abstract class WebserviceTypeBase {
         return false;
     }
     
+    /**
+     * This function sets <code>attribute</code> of {@link cz.zcu.kiv.crce.metadata.Property} to a <code>value</code> provided that passed <code>value</code>
+     * is not <code>null</code>.
+     *
+     * @param <T> Datatype of attribute-value pair.
+     * @param property {@link cz.zcu.kiv.crce.metadata.Property} for which <code>attribute</code> will be set.
+     * @param attribute <code>attribute</code> to set.
+     * @param value <code>value</code> to set.
+     * @return Returns <code>true</code> if <code>value</code> was set. Returns <code>false</code> otherwise.
+     */
     protected static <T> boolean setIfSet(Property property, AttributeType<T> attribute, T value) {
         if (property != null && value != null) {
             property.setAttribute(attribute, value);

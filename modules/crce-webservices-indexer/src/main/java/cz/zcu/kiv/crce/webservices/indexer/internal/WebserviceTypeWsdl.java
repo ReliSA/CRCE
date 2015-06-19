@@ -33,6 +33,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
+ * <p>This class can recognize and parse remote IDL documents representing WSDL (Web Services Description Language)
+ * (see <a href="http://www.w3.org/TR/wsdl20/">http://www.w3.org/TR/wsdl20/</a>).
+ * 
+ * <p>Parsed WSDL description object describing webservices is then represented by {@link cz.zcu.kiv.crce.metadata.Capability} returned in a
+ * {@link java.util.List} with as many items as many webservices were described in the IDL.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -54,6 +59,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     private static final String WSDL_SERVICE_ENDPOINT_V_1_1 = "port";
     private static final String WSDL_SERVICE_ENDPOINT_V_2_0 = "endpoint";
     
+    /**
+     * Constructor
+     *
+     * @param mf
+     * @param ms
+     */
     public WebserviceTypeWsdl(MetadataFactory mf, MetadataService ms) {
         super(mf, ms);
     }
@@ -299,6 +310,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         return resources;
     }
     
+    /**
+     * Processes all portTypes (WSDL 1.1) / interfaces (WSDL 2.0) defined in WSDL IDL document.
+     * 
+     * @param interfaces Passed portTypes (WSDL 1.1) / interfaces (WSDL 2.0) defined in WSDL IDL document.
+     * @param processedInterfaces Resulting processed portTypes (WSDL 1.1) / interfaces (WSDL 2.0).
+     */
     private void processInterfaces(NodeList interfaces, List<WebserviceTypeWsdlInterface> processedInterfaces) {
         
         // iterate through all passed "portType" / "interface" elements
@@ -358,6 +375,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         }
     }
     
+   /**
+     * Processes all messages (WSDL 1.1) defined in WSDL IDL document.
+     * 
+     * @param messages Passed messages (WSDL 1.1) defined in WSDL IDL document.
+     * @param processedMessages Resulting processed messages (WSDL 1.1).
+     */
     private void processMessages(NodeList messages, List<WebserviceTypeWsdlMessage> processedMessages) {
         
         // iterate through all passed "message" elements
@@ -387,6 +410,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         }
     }
     
+    /**
+     * Processes all bindings defined in WSDL IDL document.
+     * 
+     * @param bindings Passed bindings defined in WSDL IDL document.
+     * @param processedBindings Resulting processed bindings.
+     */
     private void processBindings(NodeList bindings, List<WebserviceTypeWsdlBinding> processedBindings) {
         
         // iterate through all passed "binding" elements
@@ -432,6 +461,13 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         }
     }
     
+    /**
+     * Returns binding from a list based on it's name.
+     * 
+     * @param bindings List of bindings.
+     * @param name Name of desired binding.
+     * @return Returns binding from a list based on it's name.
+     */
     private WebserviceTypeWsdlBinding getBindingByName(List<WebserviceTypeWsdlBinding> bindings, String name) {
         if (bindings == null || name == null) {
             return null;
@@ -444,6 +480,13 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         return null;
     }
     
+    /**
+     * Returns interface from a list based on it's name.
+     * 
+     * @param interfaces List of interfaces.
+     * @param name Name of desired interface.
+     * @return Returns interface from a list based on it's name.
+     */
     private WebserviceTypeWsdlInterface getInterfaceByName(List<WebserviceTypeWsdlInterface> interfaces, String name) {
         if (interfaces == null || name == null) {
             return null;
@@ -456,6 +499,13 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         return null;
     }
     
+    /**
+     * Returns operation from a list based on it's name.
+     * 
+     * @param operations List of operations.
+     * @param name Name of desired operation.
+     * @return Returns operation from a list based on it's name.
+     */
     private WebserviceTypeWsdlOperation getOperationByName(List<WebserviceTypeWsdlOperation> operations, String name) {
         if (operations == null || name == null) {
             return null;
@@ -468,6 +518,13 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         return null;
     }
     
+    /**
+     * Returns message from a list based on it's name.
+     * 
+     * @param messages List of messages.
+     * @param name Name of desired message.
+     * @return Returns message from a list based on it's name.
+     */
     private WebserviceTypeWsdlMessage getMessageByName(List<WebserviceTypeWsdlMessage> messages, String name) {
         if (messages == null || name == null) {
             return null;
@@ -480,22 +537,24 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         return null;
     }
     
-    private Node getNodeByNameAndNamespace(NodeList nodes, String name, String namespace) {
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (name != null && !node.getNodeName().equalsIgnoreCase(name) || namespace != null && !node.getPrefix().equalsIgnoreCase(namespace)) {
-                continue;
-            }
-            return node;
-        }
-        return null;
-    }
-    
+    /**
+     * Returns value of attribute only if it exists in passed attributes.
+     * 
+     * @param namedNodeMap List of attributes. 
+     * @param nodeName Name of attribute with desired value.
+     * @return Value of attribute only if it exists in passed attributes. <code>null</code> otherwise.
+     */
     private String returnNodeValue(NamedNodeMap namedNodeMap, String nodeName) {
         Node node = namedNodeMap.getNamedItem(nodeName);
         return node == null ? null : node.getNodeValue();
     }
     
+    /**
+     * Removes namespace part of XML element node name. E.g. turns "tns:address" into "address".
+     * 
+     * @param value XML element node name.
+     * @return XML element node name without namespace.
+     */
     private String stripOfNamespace(String value) {
         return value.substring(value.indexOf(':') + 1);
     }

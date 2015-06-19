@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.webservices.indexer.structures.wsdl;
 
 /**
+ * This is a data class for inner representation of WSDL part element.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -10,6 +11,13 @@ public class WebserviceTypeWsdlPart {
     private String type;
     private String element;
     
+    /**
+     * Constructor.
+     *
+     * @param name Name of this part.
+     * @param type Datatype of a parameter (in case of RPC communication pattern).
+     * @param element Reference to a grammar definition (in case of messaging communication pattern).
+     */
     public WebserviceTypeWsdlPart(String name, String type, String element) {
         this.name = name;
         this.type = type;
@@ -17,42 +25,42 @@ public class WebserviceTypeWsdlPart {
     }
 
     /**
-     * @return the name
+     * @return Name of this part.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param name the name to set
+     * @param name Name of this part.
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return the type
+     * @return Datatype of a parameter (in case of RPC communication pattern).
      */
     public String getType() {
         return type;
     }
 
     /**
-     * @param type the type to set
+     * @param type Datatype of a parameter (in case of RPC communication pattern).
      */
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     * @return the element
+     * @return Reference to a grammar definition (in case of messaging communication pattern).
      */
     public String getElement() {
         return element;
     }
 
     /**
-     * @param element the element to set
+     * @param element Reference to a grammar definition (in case of messaging communication pattern).
      */
     public void setElement(String element) {
         this.element = element;

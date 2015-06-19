@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
+ * This is an implementation of {@link cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription} - all necessary information can be found there.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -31,10 +32,10 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
 
     private final static String MAIN_CATEGORY = "webservice";
     
-    public enum IdlType {
-        JSON_WSP, WSDL
-    }
-
+    /**
+     * Constructor
+     *
+     */
     public WebservicesDescriptionImpl() {
     }
     

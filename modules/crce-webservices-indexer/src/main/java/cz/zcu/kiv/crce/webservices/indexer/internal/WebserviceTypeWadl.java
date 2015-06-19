@@ -25,6 +25,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
+ * <p>This class can recognize and parse remote IDL documents representing WADL (Web Application Description Language)
+ * (see <a href="http://www.w3.org/Submission/wadl/#x3-70002.2">http://www.w3.org/Submission/wadl/#x3-70002.2</a>).
+ * 
+ * <p>Parsed WADL description object describing webservice is then represented by {@link cz.zcu.kiv.crce.metadata.Capability} returned in a
+ * {@link java.util.List} with a single item.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -43,6 +48,12 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
     private static final String WADL_RESOURCE_METHOD_REQUEST = "request";
     private static final String WADL_RESOURCE_METHOD_RESPONSE = "response";
     
+    /**
+     * Constructor
+     *
+     * @param mf
+     * @param ms
+     */
     public WebserviceTypeWadl(MetadataFactory mf, MetadataService ms) {
         super(mf, ms);
     }
@@ -183,6 +194,16 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
         return resources;
     }
     
+    /**
+     * Each WADL "resource" element can contain arbitrary number of "resource", "method" and "param" elements. This function process this structure recursively
+     * (by processing "resource" elements nested to each other) and creates {@link cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint} from every
+     * "method" element along the way with parameters as all known "params" elements known at a current scope. 
+     * 
+     * @param resources Represent set of "resource", "method" and "param" elements on each level of recursion.
+     * @param baseUrl With each recursive call this parameter gets longer. It is a path used for all "method" elements and it's pieces are defined
+     * hierarchically in parent "resource" elements.
+     * @param processedEndpoints Passed {@link java.util.List} of {@link cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint} discovered so far.
+     */
     private void processWadlResourcesRecursive(NodeList resources, String baseUrl, List<WebserviceEndpoint> processedEndpoints) {
         
         // process all parameters, methods and sub-resources defined in this resource
@@ -259,6 +280,12 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
         
     }
     
+    /**
+     * Processes attributes of WADL "param" element into {@link cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointParameter}.
+     * 
+     * @param nodeAttributes Attributes of WADL "param" element.
+     * @return 
+     */
     private WebserviceEndpointParameter processParameter(NamedNodeMap nodeAttributes) {
         String paramName = null;
         if (nodeAttributes.getNamedItem("name") != null) {
@@ -279,6 +306,12 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
         return new WebserviceEndpointParameter(paramName, paramType, null, paramRequired == null ? null : !paramRequired, null);
     }
 
+    /**
+     * Removes namespace part of XML element node name. E.g. turns "tns:address" into "address".
+     * 
+     * @param value XML element node name.
+     * @return XML element node name without namespace.
+     */
     private String stripOfNamespace(String value) {
         return value.substring(value.indexOf(':') + 1);
     }

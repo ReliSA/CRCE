@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This servlet closely corresponds to "Web services" section in Web UI and it's "webservices.jsp" template. It uses buffer into which parsed artifacts of
+ * webservices represented by IDLs can be put and from which they can consequently be commited into store.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -94,25 +96,31 @@ public class WebservicesServlet extends HttpServlet {
         req.getRequestDispatcher("resource?link=webservices").forward(req, resp);
     }
     
-    private InputStream createInputStreamFromIdlUri(String uri) {
+    /**
+     * Opens remote URL of IDL document and returns {@link java.io.InputStream} of that location in order to read content from it.
+     * 
+     * @param url Remote URL
+     * @return {@link java.io.InputStream} of passed <code>url</code> location.
+     */
+    private InputStream createInputStreamFromIdlUri(String url) {
         
         // try to access IDL content at uri
-        logger.debug("Attempting to access IDL at \"{}\".", uri);
-        URL url = null;
+        logger.debug("Attempting to access IDL at \"{}\".", url);
+        URL urlObj = null;
         try {
-            url = new URL(uri);
+            urlObj = new URL(url);
         } catch (MalformedURLException ex) {
-            logger.error("MalformedURLException: {}", uri, ex);
+            logger.error("MalformedURLException: {}", url, ex);
         }
-        if (url == null) {
+        if (urlObj == null) {
             return null;
         }
         
         // try to return InputStream
         try {
-            return url.openStream();
+            return urlObj.openStream();
         } catch (IOException ex) {
-            logger.error("IOException: {}", uri, ex);
+            logger.error("IOException: {}", url, ex);
             return null;
         }
     }

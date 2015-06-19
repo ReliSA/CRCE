@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.webservices.indexer.structures.wsdl;
 
 /**
+ * This is a data class for inner representation of abstract WSDL operation element.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -16,6 +17,17 @@ public class WebserviceTypeWsdlOperation {
     private String outputMessage;
     private String outputElement;
 
+    /**
+     * Constructor.
+     *
+     * @param name Name of this operation.
+     * @param inputName Name of element representing the input structure of this operation.
+     * @param inputMessage Reference to a message (WSDL 1.1) representing the input structure of this operation.
+     * @param inputElement Reference to an element (WSDL 2.0) representing the input structure of this operation.
+     * @param outputName Name of element representing the output structure of this operation.
+     * @param outputMessage Reference to a message (WSDL 1.1) representing the output structure of this operation.
+     * @param outputElement Reference to an element (WSDL 2.0) representing the output structure of this operation.
+     */
     public WebserviceTypeWsdlOperation(String name, String inputName, String inputMessage, String inputElement, String outputName, String outputMessage, String outputElement) {
         this.name = name;
         this.inputName = inputName;
@@ -33,98 +45,98 @@ public class WebserviceTypeWsdlOperation {
     }
     
     /**
-     * @return the name
+     * @return Name of this operation.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param name the name to set
+     * @param name Name of this operation.
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return the inputName
+     * @return Name of element representing the input structure of this operation.
      */
     public String getInputName() {
         return inputName;
     }
 
     /**
-     * @param inputName the inputName to set
+     * @param inputName Name of element representing the input structure of this operation.
      */
     public void setInputName(String inputName) {
         this.inputName = inputName;
     }
 
     /**
-     * @return the inputMessage
+     * @return Reference to a message (WSDL 1.1) representing the input structure of this operation.
      */
     public String getInputMessage() {
         return inputMessage;
     }
 
     /**
-     * @param inputMessage the inputMessage to set
+     * @param inputMessage Reference to a message (WSDL 1.1) representing the input structure of this operation.
      */
     public void setInputMessage(String inputMessage) {
         this.inputMessage = inputMessage;
     }
 
     /**
-     * @return the inputElement
+     * @return Reference to an element (WSDL 2.0) representing the input structure of this operation.
      */
     public String getInputElement() {
         return inputElement;
     }
 
     /**
-     * @param inputElement the inputElement to set
+     * @param inputElement Reference to an element (WSDL 2.0) representing the input structure of this operation.
      */
     public void setInputElement(String inputElement) {
         this.inputElement = inputElement;
     }
 
     /**
-     * @return the outputName
+     * @return Name of element representing the output structure of this operation.
      */
     public String getOutputName() {
         return outputName;
     }
 
     /**
-     * @param outputName the outputName to set
+     * @param outputName Name of element representing the output structure of this operation.
      */
     public void setOutputName(String outputName) {
         this.outputName = outputName;
     }
 
     /**
-     * @return the outputMessage
+     * @return Reference to a message (WSDL 1.1) representing the output structure of this operation.
      */
     public String getOutputMessage() {
         return outputMessage;
     }
 
     /**
-     * @param outputMessage the outputMessage to set
+     * @param outputMessage Reference to a message (WSDL 1.1) representing the output structure of this operation.
      */
     public void setOutputMessage(String outputMessage) {
         this.outputMessage = outputMessage;
     }
 
     /**
-     * @return the outputElement
+     * @return Reference to an element (WSDL 2.0) representing the output structure of this operation.
      */
     public String getOutputElement() {
         return outputElement;
     }
 
     /**
-     * @param outputElement the outputElement to set
+     * @param outputElement Reference to an element (WSDL 2.0) representing the output structure of this operation.
      */
     public void setOutputElement(String outputElement) {
         this.outputElement = outputElement;

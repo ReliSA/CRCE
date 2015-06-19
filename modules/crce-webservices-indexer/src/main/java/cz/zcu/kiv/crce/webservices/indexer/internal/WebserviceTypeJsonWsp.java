@@ -18,6 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * <p>This class can recognize and parse remote IDL documents representing JSON-WSP description objects
+ * (see <a href="https://en.wikipedia.org/wiki/JSON-WSP#Description_object">https://en.wikipedia.org/wiki/JSON-WSP#Description_object</a>).
+ * 
+ * <p>Parsed JSON-WSP description object describing webservice is then represented by {@link cz.zcu.kiv.crce.metadata.Capability} returned in a
+ * {@link java.util.List} with a single item.
  *
  * @author David Pejrimovsky (maxidejf@gmail.com)
  */
@@ -40,6 +45,12 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
     private final static String JSON_WSP_METHOD_RESPONSE = "ret_info";
     private final static String JSON_WSP_METHOD_RESPONSE_TYPE = "type";
     
+    /**
+     * Constructor
+     *
+     * @param mf
+     * @param ms
+     */
     public WebserviceTypeJsonWsp(MetadataFactory mf, MetadataService ms) {
         super(mf, ms);
     }
