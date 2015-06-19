@@ -51,6 +51,7 @@ public abstract class WebserviceTypeBase {
     
     // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT Capability
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME = new SimpleAttributeType<>("name", String.class);
+    public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT__URL = new SimpleAttributeType<>("url", String.class);
     
     // list of attributes used by this module for NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER Property
     public static final AttributeType<String> ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME = new SimpleAttributeType<>("name", String.class);

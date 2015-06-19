@@ -504,7 +504,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
      * Recursively removes the namespace of a node.
      * @param node the starting node.
      */
-    public void stripOfNamespaceRecursive(Node node) {
+    private void stripOfNamespaceRecursive(Node node) {
         Document document = node.getOwnerDocument();
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             document.renameNode(node, null, stripOfNamespace(node.getNodeName()));

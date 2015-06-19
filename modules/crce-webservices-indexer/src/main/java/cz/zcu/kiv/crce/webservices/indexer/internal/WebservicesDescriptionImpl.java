@@ -78,6 +78,7 @@ public class WebservicesDescriptionImpl extends AbstractPlugin implements Webser
         List<WebserviceType> webserviceTypes = new ArrayList<>();
         webserviceTypes.add(new WebserviceTypeJsonWsp(metadataFactory, metadataService));
         webserviceTypes.add(new WebserviceTypeWsdl(metadataFactory, metadataService));
+        webserviceTypes.add(new WebserviceTypeWadl(metadataFactory, metadataService));
 
         // recognize IDL type
         WebserviceType recognizedWebserviceType = null;
