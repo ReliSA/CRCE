@@ -230,6 +230,61 @@ public class BufferImpl implements Buffer, EventHandler {
     }
 
     @Override
+    public synchronized Resource put(String name, InputStream artifact, Resource resource) throws IOException, RefusedArtifactException {
+        String name2 = pluginManager.getPlugin(ActionHandler.class).beforeUploadToBuffer(name, this);
+        if (name2 == null || artifact == null || "".equals(name2)) {
+            throw new RefusedArtifactException("No file name was given on uploading to buffer");
+        }
+
+        File file = File.createTempFile("res", ".tmp", baseDir);
+        try (FileOutputStream output = new FileOutputStream(file)) {
+            byte[] buffer = new byte[BUFFER_SIZE];
+            for (int count = artifact.read(buffer); count != -1; count = artifact.read(buffer)) {
+                output.write(buffer, 0, count);
+            }
+        }
+
+        metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
+
+        identityIndexer.preIndex(file, name2, resource);
+
+        String presentationName = metadataService.getPresentationName(resource);
+        if (presentationName.trim().isEmpty() || presentationName.startsWith("unknown-name:")) {
+            metadataService.setPresentationName(resource, name2);
+        }
+
+        Resource tmp;
+        try {
+            tmp = pluginManager.getPlugin(ActionHandler.class).onUploadToBuffer(resource, this, name2);
+        } catch (RefusedArtifactException e) {
+            if (!file.delete()) {
+            	logger.error( "Can not delete file of revoked artifact: {}", file.getPath());
+            }
+            throw e;
+        }
+
+        if (tmp == null) {
+        	logger.error( "ActionHandler onUploadToBuffer returned null resource, using original");
+        } else {
+            resource = tmp;
+        }
+
+        ResourceValidationResult validationResult = metadataValidator.validate(resource);
+        if (!validationResult.isContextValid()) {
+            logger.error("Uploaded Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
+            throw new RefusedArtifactException("Resource is not valid.");
+        }
+
+        logger.info("Uploaded resource {} is valid.", resource.getId());
+
+        metadataService.getIdentity(resource).setAttribute("status", String.class, "buffered");
+
+        resourceDAO.saveResource(resource);
+
+        return pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
+    }
+
+    @Override
     public synchronized boolean remove(Resource resource) throws IOException {
         resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromBuffer(resource, this);
 

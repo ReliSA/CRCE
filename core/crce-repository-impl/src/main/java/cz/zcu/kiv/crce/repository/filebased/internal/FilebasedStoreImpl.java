@@ -34,6 +34,10 @@ import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Filebased implementation of <code>Store</code>.
@@ -168,8 +172,18 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     private synchronized Resource putFileResource(Resource resource, boolean move) throws IOException, RefusedArtifactException {
         File sourceFile = new File(metadataService.getUri(resource));
+        
         if (!sourceFile.exists()) {
-            throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
+            
+            // the file does not exists on local HDD, but we also have to inspect the possibility of it existing on some url
+            InputStream inputStream = metadataService.getUri(resource).toURL().openStream();
+            try (OutputStream outputStream = new FileOutputStream(sourceFile)) {
+                IOUtils.copy(inputStream, outputStream); // copy data from remote location to the sourceFile
+            }
+            
+            if (!sourceFile.exists()) {
+                throw new RefusedArtifactException("File to be put tu store does not exist: " + sourceFile.getPath());
+            }
         }
         metadataService.getIdentity(resource).setAttribute("repository-id", String.class, repository.getId());
 

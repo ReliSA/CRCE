@@ -30,6 +30,19 @@ public interface Buffer extends Store {
     Resource put(String name, InputStream resource) throws IOException, RefusedArtifactException;
 
     /**
+     * Puts an existing resource into resource buffer.
+     *
+     * @param fileName A name of uploaded file.
+     * @param fileData A data of uploaded file.
+     * @param resource Already preexisting meta-data binded to the uploaded file.
+     * @return
+     * @throws IOException
+     * @throws RefusedArtifactException
+     */
+    @Nonnull
+    Resource put(String fileName, InputStream fileData, Resource resource) throws IOException, RefusedArtifactException;
+
+    /**
      * Commits uploaded resources to the configured store.
      * <p>If <code>move</code> is <code>true</code> then resources will be removed
      * from the buffer. Returned list contains resources successfully committed

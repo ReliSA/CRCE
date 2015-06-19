@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
-import cz.zcu.kiv.crce.metadata.Attribute;
-import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -258,7 +256,6 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
             metadataService.setPresentationName(resource, processedWebservice.getName());
             metadataService.setSize(resource, idl.length());
-            metadataService.setUri(resource, processedWebservice.getUrl() == null ? "http://unknown.url" : processedWebservice.getUrl());
             setIfSet(capability, ATTRIBUTE__CRCE_IDENTITY__MIME, WSDL_MIME);
             setIfSet(capability, ATTRIBUTE__CRCE_IDENTITY__HASH, getIdlHash(idl));
 

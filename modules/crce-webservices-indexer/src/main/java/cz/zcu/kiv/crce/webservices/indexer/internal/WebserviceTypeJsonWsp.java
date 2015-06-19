@@ -248,7 +248,6 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
         metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
         metadataService.setPresentationName(resource, webserviceName);
         metadataService.setSize(resource, idl.length());
-        metadataService.setUri(resource, webserviceUrl);
         capability.setAttribute(ATTRIBUTE__CRCE_IDENTITY__MIME, webserviceMime);
         capability.setAttribute(ATTRIBUTE__CRCE_IDENTITY__HASH, getIdlHash(idl));
         

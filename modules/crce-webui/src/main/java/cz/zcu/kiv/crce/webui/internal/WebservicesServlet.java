@@ -5,8 +5,10 @@ import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.webservices.indexer.WebservicesDescription;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +76,7 @@ public class WebservicesServlet extends HttpServlet {
 
                         // save CRCE resource into repository
                         try {
-                            Activator.instance().getWsBuffer(req).put(resource);
+                            Activator.instance().getWsBuffer(req).put(uri, createInputStreamFromIdlUri(uri),resource);
                         } catch (RefusedArtifactException ex) {
                             logger.warn("Artifact revoked: ", ex.getMessage());
                             upload_success = false;
@@ -90,5 +92,28 @@ public class WebservicesServlet extends HttpServlet {
         ResourceServlet.setError(req.getSession(), upload_success, upload_success ? "Upload was succesful." : "Upload failed.");
         req.getSession().setAttribute("source", "webservices");
         req.getRequestDispatcher("resource?link=webservices").forward(req, resp);
+    }
+    
+    private InputStream createInputStreamFromIdlUri(String uri) {
+        
+        // try to access IDL content at uri
+        logger.debug("Attempting to access IDL at \"{}\".", uri);
+        URL url = null;
+        try {
+            url = new URL(uri);
+        } catch (MalformedURLException ex) {
+            logger.error("MalformedURLException: {}", uri, ex);
+        }
+        if (url == null) {
+            return null;
+        }
+        
+        // try to return InputStream
+        try {
+            return url.openStream();
+        } catch (IOException ex) {
+            logger.error("IOException: {}", uri, ex);
+            return null;
+        }
     }
 }
