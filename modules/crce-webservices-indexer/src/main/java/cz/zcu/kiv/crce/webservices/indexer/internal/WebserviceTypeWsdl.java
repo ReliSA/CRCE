@@ -87,6 +87,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         
         // check whether IDL has a valid WSDL structure
         Element root = document.getDocumentElement();
+        stripOfNamespaceRecursive(root);
         if (!root.getNodeName().equalsIgnoreCase(WSDL_DEFINITIONS)) {
             logger.debug("IDL is not a valid WSDL. Does not have a root element \"{}\"", WSDL_DEFINITIONS);
             return false;
@@ -124,6 +125,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         
         // get root WSDL element
         Element root = document.getDocumentElement();
+        stripOfNamespaceRecursive(root);
         if (!root.getNodeName().equalsIgnoreCase(WSDL_DEFINITIONS)) {
             logger.debug("IDL is not a valid WSDL. Does not have a root element \"{}\"", WSDL_DEFINITIONS);
             return null;
@@ -156,9 +158,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         // process all bindings into list
         NodeList bindings = root.getElementsByTagName(WSDL_BINDING);
         List<WebserviceTypeWsdlBinding> processedBindings = new ArrayList<>();
-        for (int i = 0; i < bindings.getLength(); i++) {
-            processBindings(bindings, processedBindings);
-        }
+        processBindings(bindings, processedBindings);
         
         // process all services defined in this WSDL
         List<Webservice> processedWebservices = new ArrayList<>();
@@ -398,6 +398,9 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             if (bindingInterface == null) {
                 bindingInterface = returnNodeValue(bindingAttributes, "interface"); // WSDL 2.0
             }
+            if(bindingInterface == null) {
+                continue;
+            }
             
             // get SOAP-specific binding info
             //Node bindingSoap = getNodeByNameAndNamespace(binding.getChildNodes(), "binding", "soap");
@@ -496,4 +499,19 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     private String stripOfNamespace(String value) {
         return value.substring(value.indexOf(':') + 1);
     }
+    
+    /**
+     * Recursively removes the namespace of a node.
+     * @param node the starting node.
+     */
+    public void stripOfNamespaceRecursive(Node node) {
+        Document document = node.getOwnerDocument();
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            document.renameNode(node, null, stripOfNamespace(node.getNodeName()));
+        }
+        NodeList list = node.getChildNodes();
+        for (int i = 0; i < list.getLength(); ++i) {
+            stripOfNamespaceRecursive(list.item(i));
+        }
+    }    
 }
