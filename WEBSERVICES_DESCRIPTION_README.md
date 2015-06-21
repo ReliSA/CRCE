@@ -20,7 +20,7 @@
    - http://ladonize.org/python-demos/AlbumService/soap11/description (simple IDL with more namespaces)
    - http://www.webservicex.net/geoipservice.asmx?WSDL (more complex IDL)
    - http://www.webservicex.com/globalweather.asmx?wsdl
-   - https://raw.githubusercontent.com/jkinred/psphere/master/psphere/wsdl/vim.wsdl (did not parse?)
+   - https://raw.githubusercontent.com/jkinred/psphere/master/psphere/wsdl/vim.wsdl (IDL will not be parsed, because this WSDL does not define any service elements in its concrete section thus no webservice descriptions to process)
    - http://enterprise-demo.user.magentotrial.com/api?wsdl
   - WADL
    - ftp://ftp.bgbilling.ru/pub/bgbilling/activemq/win/apache-activemq-5.4.2/webapps/camel/WEB-INF/classes/application.wadl
