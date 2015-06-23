@@ -13,6 +13,7 @@
   - JSON-WSP
    - http://ladonize.org/python-demos/AlbumService/jsonwsp/description
    - http://ladonize.org/python-demos/Calculator/jsonwsp/description
+   - http://grom.ijs.si:8001/MUSE_services_V3/jsonwsp/description
   - WSDL
    - http://ladonize.org/python-demos/Calculator/soap/description (simple IDL)
    - http://ladonize.org/python-demos/AlbumService/soap/description (simple IDL)
