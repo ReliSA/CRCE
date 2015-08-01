@@ -3,7 +3,7 @@
 <% VersionInfo versionInfo = VersionInfo.getVersionInfo(getServletContext()); %>
 
 <div id="paticka">CRCE version <%= versionInfo.getProductVersion() %> build rev. <%= versionInfo.getBuildRevision() %>
--- &copy; 2011-2012 University of West Bohemia, Department of Computer Science --
+    <br/> &copy; 2011-2012 University of West Bohemia, Department of Computer Science --
 <a href="http://relisa.kiv.zcu.cz/">ReliSA research group</a></div>
 
 

@@ -26,6 +26,25 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.lukegb.mojo</groupId>
+                <artifactId>gitdescribe-maven-plugin</artifactId>
+                <version>3.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>gitdescribe</goal>
+                        </goals>
+                        <id>git-describe</id>
+                        <phase>initialize</phase>
+                        <configuration>
+                            <extraArguments>
+                                <param>--tags</param>
+                            </extraArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
@@ -35,7 +54,7 @@
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                         <manifestEntries>
                             <Product-Version>${project.parent.version}</Product-Version>
-                            <Implementation-Build>${crce-product.revision}</Implementation-Build>
+                            <Implementation-Build>${describe}</Implementation-Build>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -144,7 +163,7 @@
             <type>bundle</type>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- The following dependencies are there in order to fulfill OSGi dependencies when REST API module is not deployed, TODO identify why they are even needed in that case and fix it -->
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -157,8 +176,8 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-        </dependency>        
-        
+        </dependency>
+
     </dependencies>
 
 </project>
