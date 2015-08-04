@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang3.StringUtils;
 
-import cz.zcu.kiv.crce.metadata.namespace.NsCrceMetadata;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.vo.model.ValueObject;
 
 /**
@@ -59,13 +59,13 @@ public class IdentityCapabilityVO extends ValueObject {
     }
 
     public IdentityCapabilityVO(String id) {
-        super(id, NsCrceMetadata.Identity.NAMESPACE__CRCE_IDENTITY);
+        super(id, NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
     }
 
     public IdentityCapabilityVO(String id, String name, String version) {
         this(id);
-        this.name = new AttributeVO(NsCrceMetadata.ATTRIBUTE__NAME.getName(), name);
-        this.version = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__VERSION.getName(), version);
+        this.name = new AttributeVO(NsCrceIdentity.ATTRIBUTE__NAME.getName(), name);
+        this.version = new AttributeVO(NsCrceIdentity.ATTRIBUTE__VERSION.getName(), version);
     }
 
     /*
@@ -157,7 +157,7 @@ public class IdentityCapabilityVO extends ValueObject {
 
     public void setOriginalVersion(String originalVersion) {
         if(this.originalVersion == null) {
-            this.originalVersion = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__VERSION.getName(), originalVersion);
+            this.originalVersion = new AttributeVO(NsCrceIdentity.ATTRIBUTE__VERSION.getName(), originalVersion);
         } else {
             this.originalVersion.setValue(originalVersion);
         }
@@ -174,7 +174,7 @@ public class IdentityCapabilityVO extends ValueObject {
 
     public void setSize(Long size) {
         if(this.size == null) {
-            this.size = new AttributeVO(NsCrceMetadata.ATTRIBUTE__SIZE.getName(), size.toString());
+            this.size = new AttributeVO(NsCrceIdentity.ATTRIBUTE__SIZE.getName(), size.toString());
         } else {
             this.size.setValue(size.toString());
         }
@@ -191,7 +191,7 @@ public class IdentityCapabilityVO extends ValueObject {
     protected void setTypes(@Nonnull List types) {
         String value = StringUtils.join(types, ",");
         if(this.types == null) {
-            this.types = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__TYPES.getName(), value);
+            this.types = new AttributeVO(NsCrceIdentity.ATTRIBUTE__TYPES.getName(), value);
         } else {
             this.types.setValue(value);
         }
@@ -207,7 +207,7 @@ public class IdentityCapabilityVO extends ValueObject {
 
     public void addCategory(String cat) {
         if(categories == null) {
-            this.categories = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES.getName(), cat);
+            this.categories = new AttributeVO(NsCrceIdentity.ATTRIBUTE__CATEGORIES.getName(), cat);
         } else {
             String oldVal = this.categories.getValue();
             oldVal = oldVal.concat("," + cat);
@@ -219,7 +219,7 @@ public class IdentityCapabilityVO extends ValueObject {
     protected void setCategories(@Nonnull List<String> categories) {
         String value = StringUtils.join(categories, ",");
         if(this.categories == null) {
-            this.categories = new AttributeVO(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES.getName(), value);
+            this.categories = new AttributeVO(NsCrceIdentity.ATTRIBUTE__CATEGORIES.getName(), value);
         } else {
             this.categories.setValue(value);
         }

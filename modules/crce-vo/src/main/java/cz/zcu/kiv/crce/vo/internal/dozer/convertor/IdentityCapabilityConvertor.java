@@ -5,7 +5,7 @@ import java.util.List;
 import org.dozer.DozerConverter;
 
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.namespace.NsCrceMetadata;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.vo.model.metadata.IdentityCapabilityVO;
 
@@ -27,21 +27,21 @@ public class IdentityCapabilityConvertor extends DozerConverter<Capability, Iden
     public IdentityCapabilityVO convertTo(Capability identity, IdentityCapabilityVO destination) {
         String id = identity.getId();
 
-        String name = identity.getAttributeValue(NsCrceMetadata.ATTRIBUTE__NAME);
+        String name = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__NAME);
         if(name == null) {
             name = "-";
         }
 
-        Version v = identity.getAttributeValue(NsCrceMetadata.Identity.ATTRIBUTE__VERSION);
+        Version v = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__VERSION);
         String version = v != null ? v.toString() : "-";
 
         IdentityCapabilityVO idVO = new IdentityCapabilityVO(id, name, version);
-        Long size = identity.getAttributeValue(NsCrceMetadata.ATTRIBUTE__SIZE);
+        Long size = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__SIZE);
         if(size != null) {
             idVO.setSize(size);
         }
 
-        List<String> cats = identity.getAttributeValue(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES);
+        List<String> cats = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__CATEGORIES);
         if(cats != null) {
             for (String c : cats) {
                 idVO.addCategory(c);

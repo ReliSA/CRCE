@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.namespace.NsCrceMetadata;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericCapabilityVO;
@@ -63,7 +63,7 @@ public class DetailedResourceConverter extends DozerConverter<Resource, Detailed
     private void mapCapabilities(Resource src, DetailedResourceVO dest) {
         boolean filtered = false;
         for (Capability capability : src.getRootCapabilities()) {
-            if(filtered || capability.getNamespace().equals(NsCrceMetadata.Identity.NAMESPACE__CRCE_IDENTITY)) {
+            if(filtered || capability.getNamespace().equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY)) {
                 //identity capability already converted
                 filtered = true;
                 continue;
