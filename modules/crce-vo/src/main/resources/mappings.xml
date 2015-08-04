@@ -9,7 +9,13 @@
         <wildcard>true</wildcard>
 
         <custom-converters>
-            <converter  type="cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor">
+
+            <converter type="cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter">
+                <class-a>cz.zcu.kiv.crce.metadata.Resource</class-a>
+                <class-b>cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO</class-b>
+            </converter>
+
+            <converter type="cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor">
                 <class-a>cz.zcu.kiv.crce.metadata.Resource</class-a>
                 <class-b>cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO</class-b>
             </converter>
@@ -21,13 +27,15 @@
         </custom-converters>
 
     </configuration>
-    
-    <mapping>
+
+    <mapping type="one-way">
         <class-a>cz.zcu.kiv.crce.metadata.Capability</class-a>
         <class-b>cz.zcu.kiv.crce.vo.model.metadata.GenericCapabilityVO</class-b>
         <field>
             <a>children</a>
             <b>capabilities</b>
+            <a-hint>cz.zcu.kiv.crce.metadata.Capability</a-hint>
+            <b-hint>cz.zcu.kiv.crce.vo.model.metadata.GenericCapabilityVO</b-hint>
         </field>
     </mapping>
 

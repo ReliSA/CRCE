@@ -27,7 +27,7 @@ public class AttributeVO extends ValueObject {
     /**
      * Attribute type.
      */
-    private Class<?> type;
+    private String type;
 
     public AttributeVO() {
     }
@@ -35,13 +35,13 @@ public class AttributeVO extends ValueObject {
     public AttributeVO(String name, String value) {
         this.name = name;
         this.value = value;
-        this.type = value.getClass();
+        this.type = value.getClass().getName();
     }
 
     public AttributeVO(String name, String value, Class<?> type) {
         this.name = name;
         this.value = value;
-        this.type = type;
+        this.type = type.getName();
     }
 
     @XmlAttribute(name = "name")
@@ -63,11 +63,11 @@ public class AttributeVO extends ValueObject {
     }
 
     @XmlAttribute(name = "type")
-    public Class<?> getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Class<?> type) {
+    public void setType(String type) {
         this.type = type;
     }
 

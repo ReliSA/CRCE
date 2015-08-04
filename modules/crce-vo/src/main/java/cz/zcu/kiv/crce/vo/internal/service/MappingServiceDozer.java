@@ -16,6 +16,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
+import cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter;
+import cz.zcu.kiv.crce.vo.internal.dozer.convertor.IdentityCapabilityConvertor;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
@@ -93,6 +95,8 @@ public class MappingServiceDozer implements MappingService {
 
         List<CustomConverter> converters = new LinkedList<>();
         converters.add(new BasicResourceConvertor(metadataService));
+        converters.add(new DetailedResourceConverter(metadataService));
+        converters.add(new IdentityCapabilityConvertor());
         mapper.setCustomConverters(converters);
 
         // Force loading of the dozer.xml now instead of loading it
