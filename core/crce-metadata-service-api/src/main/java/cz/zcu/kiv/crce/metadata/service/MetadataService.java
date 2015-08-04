@@ -106,4 +106,20 @@ public interface MetadataService {
      */
     @Nonnull
     Capability getSingletonCapability(Resource resource, String namespace);
+
+    /**
+     * Creates requirement for particular resource name (crce.identity name)
+     * @param name desired value
+     * @return requirement enforcing the constraint
+     */
+    Requirement createIdentityRequirement(String name);
+
+    /**
+     * Creates requirement for particular resource name (crce.identity name) and
+     * version (crce.identity.version)
+     * @param name desired name value
+     * @param version desired version value
+     * @return requirement enforcing the constraints
+     */
+    Requirement createIdentityRequirement(String name, String version);
 }

@@ -26,6 +26,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *
@@ -348,5 +349,23 @@ public class MetadataServiceImpl implements MetadataService {
         assert capability != null;
 
         return capability;
+    }
+
+    @Override
+    public Requirement createIdentityRequirement(String name) {
+        Requirement req = metadataFactory.createRequirement(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
+        /*
+            TODO this is flawed, crce.identity.name is Presentation Naem -> not unique, contains spaces etc.
+            TODO must be resolved after unique name is retriavable somehow in CRCE.
+         */
+        req.addAttribute(NsCrceIdentity.ATTRIBUTE__NAME, name);
+        return req;
+    }
+
+    @Override
+    public Requirement createIdentityRequirement(String name, String version) {
+        Requirement req = createIdentityRequirement(name);
+        req.addAttribute(NsCrceIdentity.ATTRIBUTE__VERSION, new Version(version));
+        return req;
     }
 }
