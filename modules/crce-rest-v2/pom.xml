@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>crce-modules-reactor</artifactId>
+        <artifactId>crce-modules-parent</artifactId>
         <groupId>cz.zcu.kiv.crce</groupId>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
@@ -16,8 +16,8 @@
     <name>CRCE - REST Version 2</name>
 
     <properties>
-        <bundle.symbolicName>${namespace}.rest</bundle.symbolicName>
-        <bundle.namespace>${namespace}.rest</bundle.namespace>
+        <bundle.symbolicName>${namespace}.rest.v2</bundle.symbolicName>
+        <bundle.namespace>${namespace}.rest.v2</bundle.namespace>
         <javax.xml.accessExternalSchema>all</javax.xml.accessExternalSchema>
     </properties>
 
@@ -101,6 +101,11 @@
             <artifactId>crce-compatibility-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-vo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 3rd party dependencies -->
 
@@ -119,6 +124,22 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-xml-provider</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

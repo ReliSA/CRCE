@@ -146,6 +146,10 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         if (pn != null) {
             metadataService.setPresentationName(resource, pn.getValue());
         }
+        cz.zcu.kiv.crce.metadata.Attribute<String> sn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
+        if(sn != null) {
+            metadataService.setExternalId(resource, sn.getValue());
+        }
 
         metadataService.addCategory(resource, "osgi");
 

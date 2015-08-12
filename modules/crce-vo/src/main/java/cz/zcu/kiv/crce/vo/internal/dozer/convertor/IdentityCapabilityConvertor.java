@@ -27,6 +27,11 @@ public class IdentityCapabilityConvertor extends DozerConverter<Capability, Iden
     public IdentityCapabilityVO convertTo(Capability identity, IdentityCapabilityVO destination) {
         String id = identity.getId();
 
+        String externalId = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID);
+        if(externalId == null) {
+            externalId = "-";
+        }
+
         String name = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__NAME);
         if(name == null) {
             name = "-";
@@ -35,7 +40,7 @@ public class IdentityCapabilityConvertor extends DozerConverter<Capability, Iden
         Version v = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__VERSION);
         String version = v != null ? v.toString() : "-";
 
-        IdentityCapabilityVO idVO = new IdentityCapabilityVO(id, name, version);
+        IdentityCapabilityVO idVO = new IdentityCapabilityVO(id, externalId, name, version);
         Long size = identity.getAttributeValue(NsCrceIdentity.ATTRIBUTE__SIZE);
         if(size != null) {
             idVO.setSize(size);

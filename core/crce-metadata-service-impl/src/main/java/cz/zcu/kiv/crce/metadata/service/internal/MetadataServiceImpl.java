@@ -26,6 +26,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  *
@@ -67,6 +68,22 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public void setPresentationName(Resource resource, String name) {
         getSingletonCapability(resource, NsCrceIdentity.NAMESPACE__CRCE_IDENTITY).setAttribute(NsCrceIdentity.ATTRIBUTE__NAME, name);
+    }
+
+    @Override
+    public String getExternalId(@Nonnull Resource resource) {
+        String id = getIdentity(resource).getAttributeValue(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID);
+
+        if(id == null) {
+            id = "unknown-external-id: " + resource.getId();
+        }
+
+        return id;
+    }
+
+    @Override
+    public void setExternalId(@Nonnull Resource resource, String externalId) {
+        getIdentity(resource).setAttribute(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID, externalId);
     }
 
     @Override
@@ -348,5 +365,19 @@ public class MetadataServiceImpl implements MetadataService {
         assert capability != null;
 
         return capability;
+    }
+
+    @Override
+    public Requirement createIdentityRequirement(String name) {
+        Requirement req = metadataFactory.createRequirement(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
+        req.addAttribute(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID, name);
+        return req;
+    }
+
+    @Override
+    public Requirement createIdentityRequirement(String name, String version) {
+        Requirement req = createIdentityRequirement(name);
+        req.addAttribute(NsCrceIdentity.ATTRIBUTE__VERSION, new Version(version));
+        return req;
     }
 }

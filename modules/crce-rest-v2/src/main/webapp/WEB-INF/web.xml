@@ -16,14 +16,26 @@ PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
         <servlet-name>JerseyV2</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;org.codehaus.jackson.jaxrs</param-value>
+        </init-param>
+        <init-param>
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>cz.zcu.kiv.crce.rest.v2.internal.RestApplication</param-value>
+        </init-param>
+        <init-param>
+            <param-name>jersey.config.jaxb.collections.processXmlRootElement</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.feature.Trace</param-name>
+            <param-value>true</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>JerseyV2</servlet-name>
-        <url-pattern>/rest/v2/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

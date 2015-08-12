@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Jakub Danek
  */
-public interface MetadataResource {
+public interface MetadataRes {
 
     /**
      * Enumeration of possible operations.
@@ -40,12 +40,19 @@ public interface MetadataResource {
     Response metadata(String name);
 
     /**
-     * Displays detailed metadata about the given resource.
+     * Displays list of available resources with given name and version
      * @param name name of the resource
      * @param version version of the resource
      * @return
      */
     Response metadata(String name, String version);
+
+    /**
+     * Displays detailed information about a concrete resource.
+     * @param uuid id of the resource
+     * @return
+     */
+    Response metadataDetails(String uuid);
 
     /**
      * Displays differences between the resource identified by name and version

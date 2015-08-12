@@ -16,6 +16,7 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.vo.service.MappingService;
 
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
 public final class Activator extends DependencyActivatorBase {
@@ -33,6 +34,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile FilterParser filterParser;
     private volatile CompatibilitySearchService compatibilityService;
     private volatile SessionRegister sessionRegister;
+    private volatile MappingService mappingService;
 
     public static Activator instance() {
         return instance;
@@ -52,6 +54,10 @@ public final class Activator extends DependencyActivatorBase {
 
     public FilterParser getFilterParser() {
         return filterParser;
+    }
+
+    public MappingService getMappingService() {
+        return mappingService;
     }
 
     @Nullable
@@ -82,6 +88,8 @@ public final class Activator extends DependencyActivatorBase {
     public void init(BundleContext context, DependencyManager manager) throws Exception {
         instance = this;
 
+        logger.debug("Initializing Rest-V2 Activator!");
+
         manager.add(createComponent()
                 .setImplementation(this)
                 .add(createServiceDependency().setService(Store.class).setRequired(true))
@@ -89,7 +97,10 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
+                .add(createServiceDependency().setService(MappingService.class).setRequired(true))
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setAutoConfig(false).setRequired(false))
         );
+
+        logger.debug("Finished initializing Rest-V2 Activator!");
     }
 }

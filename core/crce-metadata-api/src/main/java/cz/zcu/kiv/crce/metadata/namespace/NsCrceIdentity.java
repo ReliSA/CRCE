@@ -21,6 +21,7 @@ public final class NsCrceIdentity {
 
     public static final String NAMESPACE__CRCE_IDENTITY = "crce.identity";
 
+    public static final AttributeType<String> ATTRIBUTE__EXTERNAL_ID = new SimpleAttributeType<>("external-id", String.class);
     public static final AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
     public static final AttributeType<URI> ATTRIBUTE__URI = new SimpleAttributeType<>("uri", URI.class);
     public static final AttributeType<String> ATTRIBUTE__FILE_NAME = new SimpleAttributeType<>("file-name", String.class);
