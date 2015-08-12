@@ -156,11 +156,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.ace</groupId>
             <artifactId>org.apache.ace.obr.metadata</artifactId>
             <scope>test</scope>
@@ -185,31 +180,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- CRCE dependencies -->
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-api</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-dao-api</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-dao-mongodb</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
