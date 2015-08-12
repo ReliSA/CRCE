@@ -22,7 +22,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.namespace.NsCrceMetadata;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.vo.model.metadata.AttributeVO;
@@ -180,21 +180,21 @@ public class DetailedResourceConverterTest {
 
     private void initIdentity(Resource resource) {
         Capability c = Mockito.mock(Capability.class);
-        when(c.getNamespace()).thenReturn(NsCrceMetadata.Identity.NAMESPACE__CRCE_IDENTITY);
+        when(c.getNamespace()).thenReturn(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
 
-        when(c.getAttributeValue(NsCrceMetadata.ATTRIBUTE__NAME)).thenReturn(CMP_NAME);
+        when(c.getAttributeValue(NsCrceIdentity.ATTRIBUTE__NAME)).thenReturn(CMP_NAME);
 
         version = new Version(2,1,1);
-        when(c.getAttributeValue(NsCrceMetadata.Identity.ATTRIBUTE__VERSION)).thenReturn(version);
+        when(c.getAttributeValue(NsCrceIdentity.ATTRIBUTE__VERSION)).thenReturn(version);
 
         size = 1024l;
-        when(c.getAttributeValue(NsCrceMetadata.ATTRIBUTE__SIZE)) .thenReturn(size);
+        when(c.getAttributeValue(NsCrceIdentity.ATTRIBUTE__SIZE)) .thenReturn(size);
 
         categories = new ArrayList<>();
         categories.add("osgi");
         categories.add("jar");
         categories.add("test");
-        when(c.getAttributeValue(NsCrceMetadata.Identity.ATTRIBUTE__CATEGORIES)).thenReturn(categories);
+        when(c.getAttributeValue(NsCrceIdentity.ATTRIBUTE__CATEGORIES)).thenReturn(categories);
 
         when(metadataService.getIdentity(resource)).thenReturn(c);
     }

@@ -29,7 +29,13 @@ import cz.zcu.kiv.crce.vo.model.ValueObject;
 public class IdentityCapabilityVO extends ValueObject {
 
     /**
-     * CRCE Readable name. E.g. osgi symbolic name.
+     * CRCE external id - identificator from the external system.
+     *
+     * E.g. osgi symbolic name.
+     */
+    private AttributeVO externalId;
+    /**
+     * CRCE Readable name. E.g. osgi presentation name.
      */
     private AttributeVO name;
     /**
@@ -62,8 +68,9 @@ public class IdentityCapabilityVO extends ValueObject {
         super(id, NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
     }
 
-    public IdentityCapabilityVO(String id, String name, String version) {
+    public IdentityCapabilityVO(String id, String externalId, String name, String version) {
         this(id);
+        this.externalId = new AttributeVO(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID.getName(), externalId);
         this.name = new AttributeVO(NsCrceIdentity.ATTRIBUTE__NAME.getName(), name);
         this.version = new AttributeVO(NsCrceIdentity.ATTRIBUTE__VERSION.getName(), version);
     }
@@ -71,6 +78,15 @@ public class IdentityCapabilityVO extends ValueObject {
     /*
     ################MAPPING INTERFACE #########################
      */
+
+    @XmlElementRef
+    AttributeVO getExternalIdAt() {
+        return externalId;
+    }
+
+    void setExternalIdAt(AttributeVO externalId) {
+        this.externalId = externalId;
+    }
 
     @XmlElementRef
     AttributeVO getNameAt() {
@@ -129,13 +145,23 @@ public class IdentityCapabilityVO extends ValueObject {
     /*
      ################### PUBLIC INTERFACE #########################
      */
+
+    @Nonnull
+    public String getExternalId() {
+        return externalId.getValue();
+    }
+
+    protected void setExternalId(String externalId) {
+        this.externalId.setValue(externalId);
+    }
+
     @Nonnull
     public String getName() {
         return name.getValue();
     }
 
     protected void setName(String name) {
-        this.name.setName(name);
+        this.name.setValue(name);
     }
 
     @Nonnull
