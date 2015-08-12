@@ -7,87 +7,19 @@ Project URL: https://www.assembla.com/spaces/crce
 
 Source Code: http://github.com/ReliSA/crce/
 
-# Group Bundles
-Bundle resources of the CRCE API represent the actual component binaries.
+# Group Resources
+Resources of the CRCE API represent the actual component binaries. These endpoints allow browsing of
+basic resource identification meta-data and the actual binary search and download.
 
-## Bundles Collection [/bundles]
-
-+ Model (application/xml)
-   
-   + Body
-   
-            <resources>
-                <resource>
-                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.gate" />
-                        <attribute name="crce.type" value="osgi,jar" type="list" />
-                        <attribute name="provider" value="cz.zcu.kiv" />
-                        <attribute name="version.original" type="Version" value="1.0.0" />
-                        <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
-                        <attribute name="crce.status" value="stored" />
-                    </capability>
-                    
-                    <link rel="self" href="/bundles/org.obcc.parking.gate/1.0.0"/>
-                    <link rel="meta-data" href="/meta-data/org.obcc.parking.gate/1.0.0"/>                
-                </resource>
-                <resource>
-                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.gate" />
-                        <attribute name="crce.type" value="osgi,jar" type="list" />
-                        <attribute name="provider" value="cz.zcu.kiv" />
-                        <attribute name="version.original" type="Version" value="1.1.0" />
-                        <attribute name="crce.categories" value="versioned,osgi" type="list" />
-                        <attribute name="crce.status" value="stored" />
-                    </capability>
-                    
-                    <link rel="self" href="/bundles/org.obcc.parking.gate/1.1.0"/>
-                    <link rel="meta-data" href="/meta-data/org.obcc.parking.gate/1.1.0"/>                
-                </resource>
-                <resource>
-                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.statistics" />
-                        <attribute name="crce.type" value="osgi,jar" type="list" />
-                        <attribute name="provider" value="cz.zcu.kiv" />
-                        <attribute name="version.original" type="Version" value="1.0.0" />
-                        <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
-                        <attribute name="crce.status" value="stored" />
-                    </capability>
-                    
-                    <link rel="self" href="/bundles/org.obcc.parking.statistics/1.0.0"/>
-                    <link rel="meta-data" href="/meta-data/org.obcc.parking.statistics/1.0.0"/>                
-                </resource>
-                
-                <link rel="self" href="/bundles"/>            
-            </resources>                
-
-### Upload a Bundle [POST]
-+ Request (multipart/form-data)
-
-        *Component binary file*
-
-+ Response 202
-
-## Bundles Collection [/bundles/{name}]
+## Resource [/resources/{id}]
+Concrete resource record identified by internal CRCE ID.
 
 + Parameters
-    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
-    
-### List all Bundles [GET]
-Returns list of all components in the repository with links to their binaries. Same view as /meta-data collection, just from different
-perspective.
+    + id (required, string, `550e8400-e29b-41d4-a716-446655440000`) ... Internal CRCE identificator of the particular component.;
 
-+ Response 200
-
-    [Bundles Collection][]
-
-## Bundle [/bundles/{name}/{version}]
-A particular component revision.
-
-+ Parameters
-    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
-    + version (required, Version, `1.0.4`) ... Version identifier;
-    
 ### Download binary [GET]
+Serves the client the binary associated with the id. Use /metadata/{id} to get resource's meta-data.
+
 + Response 200 (application/octet-stream)
 
     + Headers
@@ -96,11 +28,79 @@ A particular component revision.
     + Body
             
             ***component binary***
-            
+
+## Resources Collection [/resources]
+
++ Model (application/xml)
+   
+   + Body
+   
+            <resources>
+                <resource>
+                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
+                        <attribute name="external-id" value="org.obcc.parking.gate" />
+                        <attribute name="crce.type" value="osgi,jar" type="list" />
+                        <attribute name="provider" value="cz.zcu.kiv" />
+                        <attribute name="version.original" type="Version" value="1.0.0" />
+                        <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
+                        <attribute name="crce.status" value="stored" />
+                    </capability>
+                </resource>
+                <resource>
+                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
+                        <attribute name="external-id" value="org.obcc.parking.gate" />
+                        <attribute name="crce.type" value="osgi,jar" type="list" />
+                        <attribute name="provider" value="cz.zcu.kiv" />
+                        <attribute name="version.original" type="Version" value="1.1.0" />
+                        <attribute name="crce.categories" value="versioned,osgi" type="list" />
+                        <attribute name="crce.status" value="stored" />
+                    </capability>
+                </resource>
+                <resource>
+                    <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
+                        <attribute name="external-id" value="org.obcc.parking.statistics" />
+                        <attribute name="crce.type" value="osgi,jar" type="list" />
+                        <attribute name="provider" value="cz.zcu.kiv" />
+                        <attribute name="version.original" type="Version" value="1.0.0" />
+                        <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
+                        <attribute name="crce.status" value="stored" />
+                    </capability>
+                </resource>
+            </resources>    
+
+### List all Bundles [GET]
+Returns list of all components in the repository with links to their binaries. Same view as /metadata collection, just from different
+perspective.
+
++ Response 200
+
+    [Resources Collection][]  
+
+### Upload a Resource [POST]
++ Request (multipart/form-data)
+
+        *Component binary file*
+
++ Response 202
+
+## Filtered Resources Collection [/resources/catalogue/{externalId}/{version}]
+
++ Parameters
+    + externalId (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + version (optional, Version, `1.0.0-SNAPSHOT`) ... Version identificator having the major.minor.micro-qualifier schema;
+    
+### List all Bundles [GET]
+Returns list of all components fitting the given externalId and version, which can be found in the repository with links to their binaries.
+Same view as /metadata collection, just from different perspective.
+
++ Response 200
+
+    [Resources Collection][]    
+
 # Group Meta-Data
 Meta-Data describing bundles stored within the repository. Their capabilities, requirements and other vital pieces of information.
 
-## Bundle Meta-Data [/meta-data/{name}/{version}]
+## Meta-Data [/metadata/{id}]
 A particular component revision.
 
 + Model (application/xml)
@@ -113,25 +113,17 @@ A particular component revision.
 
                 <!-- Resource meta-data as defined at https://www.assembla.com/spaces/crce/wiki/Metadata_example_-_core -->
                 
-                <link rel="self" href="/meta-data/org.obcc.parking.gate/1.0.4"/>
-                <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.0.4"/>
-                <link rel="diffs" href="/meta-data/org.obcc.parking.gate/1.0.4/diffs"/>
-                <link rel="compatible" href="/meta-data/org.obcc.parking.gate/1.0.4/compatible"/>            
             </resource>            
 
 + Parameters
-    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
-    + version (required, Version, `1.0.4`) ... Version identifier;
-                
+    + id (required, string, `550e8400-e29b-41d4-a716-446655440000`) ... Internal CRCE identificator of the particular component.;
+
 ### Get Meta-Data for Bundle [GET]
 + Response 200 
 
-    [Bundle Meta-Data][]       
+    [Meta-Data][]       
 
-## Meta-Data Collection [/meta-data/{name}]
-
-+ Parameters
-    + name (optional, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+## Meta-Data Collection [/metadata]
 
 + Model (application/xml)
     
@@ -142,62 +134,68 @@ A particular component revision.
             <resources>
                 <resource>
                     <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.gate" />
+                        <attribute name="external-id" value="org.obcc.parking.gate" />
                         <attribute name="crce.type" value="osgi,jar" type="list" />
                         <attribute name="provider" value="cz.zcu.kiv" />
                         <attribute name="version.original" type="Version" value="1.0.0" />
                         <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
                         <attribute name="crce.status" value="stored" />
                     </capability>
-                    
-                    <link rel="self" href="/meta-data/org.obcc.parking.gate/1.0.0"/>
-                    <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.0.0"/>                    
                 </resource>
                 <resource>
                     <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.gate" />
+                        <attribute name="external-id" value="org.obcc.parking.gate" />
                         <attribute name="crce.type" value="osgi,jar" type="list" />
                         <attribute name="provider" value="cz.zcu.kiv" />
                         <attribute name="version.original" type="Version" value="1.1.0" />
                         <attribute name="crce.categories" value="versioned,osgi" type="list" />
                         <attribute name="crce.status" value="stored" />
                     </capability>
-                    
-                    <link rel="self" href="/meta-data/org.obcc.parking.gate/1.1.0"/>
-                    <link rel="bundle" href="/bundles/org.obcc.parking.gate/1.1.0"/>                                    
                 </resource>
                 <resource>
                     <capability namespace='crce.identity' uuid='550e8400-e29b-41d4-a716-446655440000'>
-                        <attribute name="name" value="org.obcc.parking.statistics" />
+                        <attribute name="external-id" value="org.obcc.parking.statistics" />
                         <attribute name="crce.type" value="osgi,jar" type="list" />
                         <attribute name="provider" value="cz.zcu.kiv" />
                         <attribute name="version.original" type="Version" value="1.0.0" />
                         <attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
                         <attribute name="crce.status" value="stored" />
                     </capability>
-                    
-                    <link rel="self" href="/meta-data/org.obcc.parking.statistics/1.0.0"/>
-                    <link rel="bundle" href="/bundles/org.obcc.parking.statistics/1.0.0"/>                     
                 </resource>
-                
-                <link rel="self" href="/meta-data"/>
             </resources>
 
 ### List All Meta-Data [GET]
-Returns list of all components in the repository with links to their meta-data. Same view as /bundles collection, just from different
+Returns list of all components in the repository with links to their meta-data. Same view as /resources collection, just from different
 perspective.
 
 + Response 200
 
     [Meta-Data Collection][]
+    
+## Filtered Meta-Data Collection [/metadata/catalogue/{externalId}/{version}]    
+    
++ Parameters
+    + externalId (required, string, `org.obcc.parking.gate`) ... External ID of the particular component. E.g. OSGi "symbolic-name";
+    + version (optional, Version, `1.0.0-SNAPSHOT`) ... Version identificator having the major.minor.micro-qualifier schema;    
+    
+### List Meta-Data [GET]
+Returns list of all components fitting the externalId and version, which can be found in the repository with links to their meta-data. 
+Same view as /resources collection, just from different perspective.
+
++ Response 200
+
+    [Meta-Data Collection][]
+    
                   
-## Meta-Data describing differences between Bundles [/meta-data/{name}/{version}/diffs{?otherName}{?otherVersion}]
+## Meta-Data describing differences between Bundles - not implemented [/meta-data/catalogue/{externalId}/{version}/diffs{?otherExternalId}{?otherVersion}]
 Meta-Data with information about API differences between bundles.
 
+TODO: (externalId, version) might result in multiple resources. Need to extend the identification so that it is not ambiguous.
+
 + Parameters
-    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + externalId (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
     + version (required, Version, `1.0.4`) ... Version identifier;
-    + otherName (optional, string, `com.kknd.park.gate`) ... Name of the other compared component;
+    + otherExternalId (optional, string, `com.kknd.park.gate`) ... Name of the other compared component;
     + otherVersion (optional, Version, `1.0.0`) ... Version identifier of the second component;
      
 
@@ -208,7 +206,7 @@ Meta-Data with information about API differences between bundles.
             <!-- Diff meta-data as defined at https://www.assembla.com/spaces/crce/wiki/Metadata_example_-_compatibility -->
         </diffs>
         
-## Meta-Data for a compatible Bundle [/meta-data/{name}/{version}/compatible{?operation}]
+## Meta-Data for a compatible Bundle - not implemented [/meta-data/catalogue/{externalId}/{version}/compatible{?operation}]
 Returns meta-data for a bundle compatible with the one specified using `name` and `version` parameters. While
 there might be many compatible bundles in the repository, at most one is returned. Rule, by which the bundle
 is chosen is determined by the `operation` parameter, which can have the following values:
@@ -219,12 +217,14 @@ is chosen is determined by the `operation` parameter, which can have the followi
 - upgrade (default) nearest compatible version higher than the original is returned   
 - highest           highest compatible version is returned
 
+TODO: (externalId, version) might result in multiple resources. Need to extend the identification so that it is not ambiguous.
+
 + Parameters
-    + name (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
+    + externalId (required, string, `org.obcc.parking.gate`) ... Fully qualified name of the partiuclar component. E.g. OSGi "symbolic-name";
     + version (required, Version, `1.0.4`) ... Version identifier;
     + operation (optional, string) ... Specification of the operation you want the compatible bundle for;
 
 ### Get Compatible Bundle Meta-Data [GET]
 + Response 200
     
-    [Bundle Meta-Data][]
+    [Meta-Data][]
