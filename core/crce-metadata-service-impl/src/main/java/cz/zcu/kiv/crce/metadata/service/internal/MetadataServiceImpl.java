@@ -71,6 +71,22 @@ public class MetadataServiceImpl implements MetadataService {
     }
 
     @Override
+    public String getExternalId(@Nonnull Resource resource) {
+        String id = getIdentity(resource).getAttributeValue(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID);
+
+        if(id == null) {
+            id = "unknown-external-id: " + resource.getId();
+        }
+
+        return id;
+    }
+
+    @Override
+    public void setExternalId(@Nonnull Resource resource, String externalId) {
+        getIdentity(resource).setAttribute(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID, externalId);
+    }
+
+    @Override
     public String getPresentationName(Capability capability) {
         if (capability == null) {
             throw new IllegalArgumentException("Capability is null.");
@@ -354,11 +370,7 @@ public class MetadataServiceImpl implements MetadataService {
     @Override
     public Requirement createIdentityRequirement(String name) {
         Requirement req = metadataFactory.createRequirement(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
-        /*
-            TODO this is flawed, crce.identity.name is Presentation Naem -> not unique, contains spaces etc.
-            TODO must be resolved after unique name is retriavable somehow in CRCE.
-         */
-        req.addAttribute(NsCrceIdentity.ATTRIBUTE__NAME, name);
+        req.addAttribute(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID, name);
         return req;
     }
 

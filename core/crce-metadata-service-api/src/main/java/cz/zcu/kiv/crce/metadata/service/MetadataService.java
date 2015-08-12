@@ -40,6 +40,11 @@ public interface MetadataService {
     String getPresentationName(Attribute<?> attribute);
 
     @Nonnull
+    String getExternalId( @Nonnull Resource resource);
+
+    void setExternalId(@Nonnull Resource resource, String externalId);
+
+    @Nonnull
     URI getUri(Resource resource);
 
     void setUri(Resource resource, URI uri);
