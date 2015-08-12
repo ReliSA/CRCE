@@ -14,6 +14,7 @@ Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Import-Package: \
   !javax.annotation, \
+  !org.apache.felix.dm.impl, \
   javax.servlet, \
   javax.servlet.http, \
   org.osgi.framework, \
