@@ -66,7 +66,6 @@
             <outputDirectory>crce-bundles</outputDirectory>
             <excludes>
                 <exclude>cz.zcu.kiv.crce:crce-core</exclude>
-                <exclude>cz.zcu.kiv.crce:crce-compatibility-impl</exclude>
                 <exclude>org.apache.felix:org.apache.felix.utils</exclude>
             </excludes>
         </dependencySet>
