@@ -17,7 +17,21 @@ public interface MetadataRes {
      *
      */
     enum Operation {
+        UPGRADE("UP"),
+        DOWNGRADE("DOWN"),
+        LOWEST("LOW"),
+        HIGHEST("HIGH"),
+        ANY("ANY");
 
+        private String value;
+
+        Operation(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -7,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,10 +16,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.v2.internal.Activator;
 import cz.zcu.kiv.crce.rest.v2.internal.ws.MetadataRes;
+import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 
@@ -53,7 +58,8 @@ public class MetadataResJersey implements MetadataRes {
         List<Resource> resources = Activator.instance().getStore().getResources(r);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
-        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
+        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {
+        }).build();
     }
 
     @GET
@@ -65,7 +71,8 @@ public class MetadataResJersey implements MetadataRes {
         List<Resource> resources = Activator.instance().getStore().getResources(r);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
-        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
+        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {
+        }).build();
     }
 
     /**
@@ -97,13 +104,82 @@ public class MetadataResJersey implements MetadataRes {
         return Response.ok(vo).build();
     }
 
+    @GET
+    @Path("/catalogue/{externalId}/{version}/diffs")
     @Override
-    public Response diffs(String name, String version, String otherName, String otherVersion) {
-        return null;
+    public Response diffs(@PathParam("externalId") String externalId,
+                          @PathParam("version") String version,
+                          @QueryParam("otherExternalId") String otherExternalId,
+                          @QueryParam("otherVersion") String otherVersion) {
+        Activator act = Activator.instance();
+
+        CompatibilitySearchService service = act.getCompatibilityService();
+        if(service == null) {
+            return createNotAvailableResponse();
+        }
+
+
+        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version));
+        List<Compatibility> diffs = new LinkedList<>();
+
+        for (Resource re : res) {
+            diffs.addAll(service.listLowerCompatibilities(re));
+            diffs.addAll(service.listUpperCompatibilities(re));
+        }
+
+        List<CompatibilityVO> vos = act.getMappingService().mapCompatibility(diffs);
+
+        return Response.ok().entity(new GenericEntity<List<CompatibilityVO>>(vos) {}).build();
     }
 
+    @GET
+    @Path("/catalogue/{externalId}/{version}/compatible")
     @Override
-    public Response compatible(String name, String version, Operation operation) {
-        return null;
+    public Response compatible(@PathParam("externalId") String externalId, @PathParam("version") String version, @QueryParam("op") Operation operation) {
+        Activator act = Activator.instance();
+
+        CompatibilitySearchService service = act.getCompatibilityService();
+        if(service == null) {
+            return createNotAvailableResponse();
+        }
+
+        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version));
+        List<Resource> compatible = new LinkedList<>();
+        Resource tmp;
+        for (Resource re : res) {
+            switch (operation) {
+                case DOWNGRADE:
+                    tmp = service.findNearestDowngrade(re);
+                    break;
+                case UPGRADE:
+                    tmp = service.findNearestUpgrade(re);
+                    break;
+                case HIGHEST:
+                    tmp = service.findHighestUpgrade(re);
+                    break;
+                case LOWEST:
+                    tmp = service.findLowestDowngrade(re);
+                    break;
+                case ANY:
+                default:
+                    tmp = service.findHighestUpgrade(re);
+                    if(tmp == null) {
+                        tmp = service.findNearestDowngrade(re);
+                    }
+                    break;
+            }
+
+            if(tmp != null) {
+                compatible.add(tmp);
+            }
+        }
+
+        List<DetailedResourceVO> resources = act.getMappingService().mapFull(compatible);
+
+        return Response.ok().entity(new GenericEntity<List<DetailedResourceVO>>(resources) {}).build();
+    }
+
+    private Response createNotAvailableResponse() {
+        return Response.status(Response.Status.NOT_FOUND).entity("The request functionality is not supported by this instance.").build();
     }
 }

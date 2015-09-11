@@ -98,7 +98,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(MappingService.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilitySearchService.class).setAutoConfig(false).setRequired(false))
+                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false))
         );
 
         logger.debug("Finished initializing Rest-V2 Activator!");
