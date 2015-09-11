@@ -39,4 +39,30 @@
         </field>
     </mapping>
 
+    <mapping type="one-way">
+        <class-a>cz.zcu.kiv.crce.compatibility.Compatibility</class-a>
+        <class-b>cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO</class-b>
+
+        <field>
+            <a>resourceName</a>
+            <b>otherExternalId</b>
+        </field>
+        <field>
+            <a>resourceVersion</a>
+            <b>otherVersion</b>
+        </field>
+        <field>
+            <a>baseResourceName</a>
+            <b>baseExternalId</b>
+        </field>
+        <field>
+            <a>baseResourceVersion</a>
+            <b>baseVersion</b>
+        </field>
+        <field>
+            <a>diffDetails</a>
+            <b>diffs</b>
+        </field>
+    </mapping>
+
 </mappings>

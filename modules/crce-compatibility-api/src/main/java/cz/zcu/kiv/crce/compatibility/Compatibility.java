@@ -43,7 +43,7 @@ public interface Compatibility {
     Version getResourceVersion();
 
     /**
-     * Name of the resource (crce.identity namespace) which was the Resource has been compared to
+     * Name of the resource (crce.identity namespace) which was the reference Resource
      *
      * @return unique name
      */

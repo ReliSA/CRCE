@@ -1,5 +1,9 @@
 package cz.zcu.kiv.crce.compatibility;
 
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * List of possible difference classes between two resource elements.
  *
@@ -7,13 +11,22 @@ package cz.zcu.kiv.crce.compatibility;
  *
  * @author Jakub Danek
  */
+@XmlType
+@XmlEnum
 public enum Difference {
+    @XmlEnumValue("NON")
     NON("None"),
+    @XmlEnumValue("INS")
     INS("Insertion"),
+    @XmlEnumValue("DEL")
     DEL("Deletetion"),
+    @XmlEnumValue("GEN")
     GEN("Generalization"),
+    @XmlEnumValue("SPE")
     SPE("Specialization"),
+    @XmlEnumValue("MUT")
     MUT("Mutation"),
+    @XmlEnumValue("UNK")
     UNK("Unknown");
 
     private String name;

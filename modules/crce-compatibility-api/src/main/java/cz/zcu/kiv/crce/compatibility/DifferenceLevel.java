@@ -1,6 +1,10 @@
 package cz.zcu.kiv.crce.compatibility;
 
 
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Enumeration for specification of level which a difference value is related to.
  * <p/>
@@ -10,12 +14,19 @@ package cz.zcu.kiv.crce.compatibility;
  *
  * @author Jakub Danek
  */
+@XmlType
+@XmlEnum
 public enum DifferenceLevel {
 
+    @XmlEnumValue("package")
     PACKAGE("package"),
+    @XmlEnumValue("type")
     TYPE("type"),
+    @XmlEnumValue("operation")
     OPERATION("operation"),    //both methods and constructors
+    @XmlEnumValue("field")
     FIELD("field"),
+    @XmlEnumValue("unknown")
     UNKNOWN("unknown");
 
     private final String value;

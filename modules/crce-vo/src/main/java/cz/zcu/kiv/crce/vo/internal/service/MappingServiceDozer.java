@@ -6,18 +6,21 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import org.dozer.CustomConverter;
 import org.dozer.DozerBeanMapper;
 import org.dozer.config.BeanContainer;
 import org.osgi.framework.FrameworkUtil;
 
+import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.IdentityCapabilityConvertor;
+import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
@@ -29,6 +32,7 @@ import cz.zcu.kiv.crce.vo.service.MappingService;
  *
  * @author Jakub Danek
  */
+@ParametersAreNonnullByDefault
 public class MappingServiceDozer implements MappingService {
 
     private DozerBeanMapper mapper;
@@ -36,13 +40,14 @@ public class MappingServiceDozer implements MappingService {
 
 
     @Override
-    public BasicResourceVO mapBasic(Resource resource) {
+    public BasicResourceVO mapBasic(@Nullable Resource resource) {
         if(resource == null) {
             return null;
         }
         return mapper.map(resource, BasicResourceVO.class);
     }
 
+    @Nonnull
     @Override
     public List<BasicResourceVO> mapBasic(List<Resource> resources) {
         List<BasicResourceVO> vos = new ArrayList<>(resources.size());
@@ -60,7 +65,10 @@ public class MappingServiceDozer implements MappingService {
 
     @Nullable
     @Override
-    public DetailedResourceVO mapFull(Resource resource) {
+    public DetailedResourceVO mapFull(@Nullable Resource resource) {
+        if(resource == null) {
+            return null;
+        }
         return mapper.map(resource, DetailedResourceVO.class);
     }
 
@@ -78,6 +86,31 @@ public class MappingServiceDozer implements MappingService {
         }
 
         return list;
+    }
+
+    @Nonnull
+    @Override
+    public List<CompatibilityVO> mapCompatibility(List<Compatibility> diffs) {
+        List<CompatibilityVO> list = new LinkedList<>();
+
+        CompatibilityVO vo;
+        for (Compatibility diff : diffs) {
+            vo = mapCompatibility(diff);
+            if(vo != null) {
+                list.add(vo);
+            }
+        }
+
+        return list;
+    }
+
+    @Nullable
+    @Override
+    public CompatibilityVO mapCompatibility(@Nullable Compatibility diff) {
+        if(diff == null) {
+            return null;
+        }
+        return mapper.map(diff, CompatibilityVO.class);
     }
 
     /**
