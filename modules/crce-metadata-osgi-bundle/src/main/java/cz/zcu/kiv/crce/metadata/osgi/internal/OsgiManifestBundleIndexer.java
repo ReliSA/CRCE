@@ -35,6 +35,7 @@
  */
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiFragment;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
@@ -149,6 +150,12 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         cz.zcu.kiv.crce.metadata.Attribute<String> sn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
         if(sn != null) {
             metadataService.setExternalId(resource, sn.getValue());
+        }
+
+        cz.zcu.kiv.crce.metadata.Attribute<Version> ver = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION);
+        if(ver != null) {
+            Capability identity = metadataService.getIdentity(resource);
+            identity.setAttribute(NsCrceIdentity.ATTRIBUTE__VERSION, ver.getValue());
         }
 
         metadataService.addCategory(resource, "osgi");
