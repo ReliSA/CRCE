@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <jsp:include page="include/header.jsp" flush="true">
     <jsp:param name="title" value="Store list" />
@@ -6,6 +7,28 @@
 </jsp:include>
 
 <div id="telo">
+
+	<c:forEach items="${repositories}" var="repository">
+		<c:if test="${repository.key == repositoryId}">
+			<c:set var="repoVal" value="${repository.value}" />
+			<c:if test="${fn:startsWith(repoVal, 'Maven')}">
+				<%-- <c:set var="repoU" value="${fn:replace(repoVal, 'Maven:', '')}" />
+						<c:out value="Repository URI: ${repoU}"></c:out> --%>
+						
+				<form method="get" action="mavenArtifactsResolve"	accept-charset="utf-8">
+					<div class="upload">
+
+						<div class="mvn">
+							<c:out value="Maven repository >>"></c:out>
+
+							<input class="tlacitko" type="submit" name="resolve" value="Resolve" /> 
+							<input class="tlacitko" type="submit" name="showcfg" value="Show Config" />
+						</div>
+					</div>
+				</form>
+			</c:if>
+		</c:if>
+	</c:forEach>
 
     <form class="execute_commit" method="post" action="test">
 
