@@ -213,8 +213,5 @@ public class MavenStoreImpl implements Store {
 //        return "MavenStoreImpl{" + "baseUri=" + baseUri + '}';
 //    }
 //>>>>>>> master:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
-
-    public void setConfiguration(MavenStoreConfiguration configuration) {
-        this.configuration = configuration;
-    }
+   
 }

@@ -1,7 +1,10 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -11,6 +14,8 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.ServiceUnavailableException;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
@@ -174,4 +179,30 @@ public final class Activator extends DependencyActivatorBase {
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
         // nothing to do
     }
+    
+    public Dictionary<String, Object> getConfig(String repositoryId) {
+		Dictionary<String, Object> props = null;
+
+		ServiceReference<?> caRef = bundleContext.getServiceReference(ConfigurationAdmin.class.getName());
+
+		if (caRef != null) {
+			ConfigurationAdmin configAdmin = (ConfigurationAdmin) bundleContext.getService(caRef);
+			Configuration config;
+			try {
+				config = configAdmin.getConfiguration(repositoryId);
+				props = config.getProperties();
+				if (props == null) {
+					props = new Hashtable<String, Object>();
+				}
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return props;
+	}
+    
+    
 }

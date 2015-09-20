@@ -96,6 +96,15 @@
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
     
+     <servlet>
+        <servlet-name>mvnRepo</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.MvnRepoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>mvnRepo</servlet-name>
+        <url-pattern>/mvnRepo</url-pattern>
+    </servlet-mapping>
+    
     <listener>
         <listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
     </listener>
