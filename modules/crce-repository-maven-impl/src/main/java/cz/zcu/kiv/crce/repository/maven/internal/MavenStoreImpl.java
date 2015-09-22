@@ -20,8 +20,8 @@ import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
+import cz.zcu.kiv.crce.repository.PausableStore;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
-import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallbackImpl;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
@@ -30,7 +30,7 @@ import cz.zcu.kiv.crce.resolver.ResourceLoader;
  *
  * @author Miroslav Brozek
  */
-public class MavenStoreImpl implements Store {
+public class MavenStoreImpl implements PausableStore {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenStoreImpl.class);
 
@@ -43,7 +43,8 @@ public class MavenStoreImpl implements Store {
     private volatile MetadataValidator metadataValidator;
     private volatile IdentityIndexer identityIndexer;
     private volatile ResourceLoader resourceLoader;
-
+    
+    private MavenRepositoryIndexer mri;
     private Repository repository;
     private final URI baseUri;
     private MavenStoreConfiguration configuration;
@@ -141,27 +142,50 @@ public class MavenStoreImpl implements Store {
             }
         }
 
-        index();
+       // index();
     }
 
     /**
      * Main method for start indexing local maven repository
      */
     public void index() {
-        taskRunnerService.scheduleTask(new MavenRepositoryIndexer(
-                baseUri,
-                configuration,
-                new MetadataIndexerCallbackImpl(
-                        resourceDAO,
-                        resourceIndexerService,
-                        metadataService,
-                        metadataFactory,
-                        metadataValidator,
-                        identityIndexer,
-                        repository
-                )
-        ));
+    	 mri = new MavenRepositoryIndexer(
+                 baseUri,
+                 configuration,
+                 new MetadataIndexerCallbackImpl(
+                         resourceDAO,
+                         resourceIndexerService,
+                         metadataService,
+                         metadataFactory,
+                         metadataValidator,
+                         identityIndexer,
+                         repository
+                 ));
+        taskRunnerService.scheduleTask(mri);
+        
     }
+
+	@Override
+	public void startResolve() {
+		index();		
+	}
+
+	@Override
+	public void pauseResolve() {
+		if(mri!=null){
+			mri.pause();	
+		}
+	}
+
+	@Override
+	public void resumeResolve() {
+		if(mri!=null){
+			mri.resume();			
+		}
+		
+	}
+    
+    
     
 //<<<<<<< HEAD:modules/crce-repository-maven-impl/src/main/java/cz/zcu/kiv/crce/repository/maven/internal/MavenStoreImpl.java
 //=======

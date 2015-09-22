@@ -15,16 +15,19 @@
 				<%-- <c:set var="repoU" value="${fn:replace(repoVal, 'Maven:', '')}" />
 						<c:out value="Repository URI: ${repoU}"></c:out> --%>
 
-				<form method="get" action="mvnRepo?link=startResolve" accept-charset="utf-8">
+				<form method="post" action="mvnRepo?link=resolveArtifact" accept-charset="utf-8">
 					<div class="upload">
 
 						<div class="mvn">
 							<c:out value="Maven repository >>"></c:out>
 
-							<input class="tlacitko" type="submit" name="resolve" value="Resolve" />				
+							<input class="tlacitko" type="submit" name="start" value="Start" />
+							<input class="tlacitko" type="submit" name="pause" value="Pause" />
+							<input class="tlacitko" type="submit" name="resume" value="Resume" />
+							<input type=hidden name="repoId" value="${repositoryId}" >				
 
 							<input class="tlacitko" type="button" name="showcfg" value="Show Config"
-								onclick="PopupCenter('mvnRepo?link=config&id=${repositoryId}', 'Maven Repository Config', 900, 400);" />
+								onclick="PopupCenter('mvnRepo?link=config&repoId=${repositoryId}', 'Maven Repository Config', 900, 400);" />
 						</div>
 					</div>
 				</form>

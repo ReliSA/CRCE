@@ -98,7 +98,7 @@ import cz.zcu.kiv.crce.repository.maven.internal.metadata.MetadataIndexerCallbac
 
 /**
  *
- * @author Miroslav BroĹľek
+ * @author Miroslav Brozek
  */
 public class MavenRepositoryIndexer extends Task<Object> {
 
@@ -106,6 +106,8 @@ public class MavenRepositoryIndexer extends Task<Object> {
 
     private final URI uri;
     private final MetadataIndexerCallback metadataIndexerCallback;
+    
+    private Boolean working = Boolean.TRUE;    
 
     private final MavenStoreConfiguration configuration;
 
@@ -115,6 +117,17 @@ public class MavenRepositoryIndexer extends Task<Object> {
         this.metadataIndexerCallback = metadataIndexerCallback;
         this.configuration = configuration;
     }
+    
+	public void resume() {
+		synchronized (this) {
+			this.working = Boolean.TRUE;
+			this.notifyAll();
+		}
+	}
+    
+	public void pause() {
+		working = Boolean.FALSE;
+	}
 
     @Override
     protected Object run() throws Exception {
@@ -227,127 +240,144 @@ public class MavenRepositoryIndexer extends Task<Object> {
         RepositorySystem system = RepositoryFactory.newRepositorySystem(); // Aether
         DefaultRepositorySystemSession session = RepositoryFactory.newRepositorySystemSession(configuration, system);
 
-        for (ArtifactInfo ai : results) {
-            logger.debug("Processing {}. Artifact: {}", counter, ai.toString());
-
-            Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
-            ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
-            descriptorRequest.setRepositories(RepositoryFactory.newRepositories(configuration));
-            descriptorRequest.setArtifact(artifact);
-
-            try {
-                // Direct Dependency
-                switch (configuration.getResolutionDepth()) {
-                    case NONE:
-                        throw new UnsupportedOperationException("Not implemented yet.");
-
-                    case DIRECT: {
-                        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-                        List<Dependency> directDependencies = descriptorResult.getDependencies();
-
-                        // Indexing and resolve JAR
-                        switch (configuration.getResolutionMethod()) {
-                            case JAR: {
-                                ArtifactRequest artifactRequest = new ArtifactRequest();
-                                artifactRequest.setArtifact(artifact);
-                                artifactRequest.setRepositories(descriptorRequest.getRepositories());
-
-                                //resolve root artifact
-                                ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
-                                artifact = artifactResult.getArtifact();
-
-                                //resolve directDependencies
-                                for (Dependency dependency : directDependencies) {
-                                    Artifact dependencyArtifact = dependency.getArtifact();
-                                    MavenArtifactVersion version = new MavenArtifactVersion(dependencyArtifact.getBaseVersion());
-
-                                    if (version.isRangeVersion()) {
-                                        //get newest dependendency from range, should be configurable
-                                        dependencyArtifact = dependencyArtifact.setVersion(version.getvMax());
-                                    }
-
-                                    artifactRequest = new ArtifactRequest();
-                                    artifactRequest.setArtifact(dependencyArtifact);
-                                    artifactRequest.setRepositories(descriptorRequest.getRepositories());
-
-                                    try {
-                                        artifactResult = system.resolveArtifact(session, artifactRequest);
-                                        dependencyArtifact = artifactResult.getArtifact();
-                                        logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
-                                    } catch (ArtifactResolutionException e) {
-                                        logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
-                                    }
-                                }
-                                break;
-                            }
-
-                            case POM: {
-                                artifact = descriptorResult.getArtifact();
-                                artifact = setPOMfileToArtifact(artifact, system, session);
-                                break;
-                            }
-                        }
-
-                        MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, directDependencies, null);
-                        metadataIndexerCallback.index(maw);
-                        break;
-                    }
-
-                    case TRANSITIVE: {
-                        session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
-                        session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
-
-                        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
-
-                        CollectRequest collectRequest = new CollectRequest();
-                        collectRequest.setRootArtifact(descriptorResult.getArtifact());
-                        collectRequest.setDependencies(descriptorResult.getDependencies());
-                        collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
-                        collectRequest.setRepositories(descriptorRequest.getRepositories());
-
-                        CollectResult collectResult = system.collectDependencies(session, collectRequest);
-                        List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
-
-                        // Indexing by POM
-                        switch (configuration.getResolutionMethod()) {
-                            case POM:
-                                artifact = collectResult.getRoot().getArtifact();
-                                artifact = setPOMfileToArtifact(artifact, system, session);
-                                break;
-
-                            case JAR:
-                                DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
-                                collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
-                                DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
-                                DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
-                                artifact = dr.getRoot().getArtifact();
-                                break;
-                        }
-
-                        MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, null, hierarchyD);
-                        metadataIndexerCallback.index(maw);
-                        break;
-                    }
-                }
-
-            } catch (DependencyCollectionException e) {
-                logger.error("Couldn't collect dependendencies...", e);
-
-            } catch (ArtifactResolutionException e) {
-                logger.error("Couldn't resolve artifact...", e);
-
-            } catch (ArtifactDescriptorException e) {
-                logger.error("Failed to read ArtifactDescriptor...", e);
-
-            } catch (DependencyResolutionException e) {
-                logger.error("Couldn't resolve dependendencies...", e);
-            }
-
-            counter++;
+        for (ArtifactInfo ai : results) 
+        {
+        	synchronized(this)
+        	{
+        		while(working == Boolean.FALSE)
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        		counter = getOneArtefact(counter, system, session, ai);
+        	}
         }
 
         logger.info("Indexing Artifacts in Maven repository finished: {}", uri);
     }
+
+	private int getOneArtefact(int counter, RepositorySystem system, DefaultRepositorySystemSession session,
+			ArtifactInfo ai) {
+		logger.debug("Processing {}. Artifact: {}", counter, ai.toString());
+
+		Artifact artifact = new DefaultArtifact(ai.groupId + ":" + ai.artifactId + ":" + ai.version);
+		ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
+		descriptorRequest.setRepositories(RepositoryFactory.newRepositories(configuration));
+		descriptorRequest.setArtifact(artifact);
+
+		try {
+		    // Direct Dependency
+		    switch (configuration.getResolutionDepth()) {
+		        case NONE:
+		            throw new UnsupportedOperationException("Not implemented yet.");
+
+		        case DIRECT: {
+		            ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+		            List<Dependency> directDependencies = descriptorResult.getDependencies();
+
+		            // Indexing and resolve JAR
+		            switch (configuration.getResolutionMethod()) {
+		                case JAR: {
+		                    ArtifactRequest artifactRequest = new ArtifactRequest();
+		                    artifactRequest.setArtifact(artifact);
+		                    artifactRequest.setRepositories(descriptorRequest.getRepositories());
+
+		                    //resolve root artifact
+		                    ArtifactResult artifactResult = system.resolveArtifact(session, artifactRequest);
+		                    artifact = artifactResult.getArtifact();
+
+		                    //resolve directDependencies
+		                    for (Dependency dependency : directDependencies) {
+		                        Artifact dependencyArtifact = dependency.getArtifact();
+		                        MavenArtifactVersion version = new MavenArtifactVersion(dependencyArtifact.getBaseVersion());
+
+		                        if (version.isRangeVersion()) {
+		                            //get newest dependendency from range, should be configurable
+		                            dependencyArtifact = dependencyArtifact.setVersion(version.getvMax());
+		                        }
+
+		                        artifactRequest = new ArtifactRequest();
+		                        artifactRequest.setArtifact(dependencyArtifact);
+		                        artifactRequest.setRepositories(descriptorRequest.getRepositories());
+
+		                        try {
+		                            artifactResult = system.resolveArtifact(session, artifactRequest);
+		                            dependencyArtifact = artifactResult.getArtifact();
+		                            logger.debug(dependencyArtifact + " resolved to  " + dependencyArtifact.getFile());
+		                        } catch (ArtifactResolutionException e) {
+		                            logger.error("Couldn't resolve artifact {} !. Artifact not found in any defined repository!", dependencyArtifact, e);
+		                        }
+		                    }
+		                    break;
+		                }
+
+		                case POM: {
+		                    artifact = descriptorResult.getArtifact();
+		                    artifact = setPOMfileToArtifact(artifact, system, session);
+		                    break;
+		                }
+		            }
+
+		            MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, directDependencies, null);
+		            metadataIndexerCallback.index(maw);
+		            break;
+		        }
+
+		        case TRANSITIVE: {
+		            session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true);
+		            session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
+
+		            ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor(session, descriptorRequest);
+
+		            CollectRequest collectRequest = new CollectRequest();
+		            collectRequest.setRootArtifact(descriptorResult.getArtifact());
+		            collectRequest.setDependencies(descriptorResult.getDependencies());
+		            collectRequest.setManagedDependencies(descriptorResult.getManagedDependencies());
+		            collectRequest.setRepositories(descriptorRequest.getRepositories());
+
+		            CollectResult collectResult = system.collectDependencies(session, collectRequest);
+		            List<DependencyNode> hierarchyD = collectResult.getRoot().getChildren();
+
+		            // Indexing by POM
+		            switch (configuration.getResolutionMethod()) {
+		                case POM:
+		                    artifact = collectResult.getRoot().getArtifact();
+		                    artifact = setPOMfileToArtifact(artifact, system, session);
+		                    break;
+
+		                case JAR:
+		                    DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
+		                    collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
+		                    DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
+		                    DependencyResult dr = system.resolveDependencies(session, dependencyRequest);
+		                    artifact = dr.getRoot().getArtifact();
+		                    break;
+		            }
+
+		            MavenArtifactWrapper maw = new MavenArtifactWrapper(artifact, null, hierarchyD);
+		            metadataIndexerCallback.index(maw);
+		            break;
+		        }
+		    }
+
+		} catch (DependencyCollectionException e) {
+		    logger.error("Couldn't collect dependendencies...", e);
+
+		} catch (ArtifactResolutionException e) {
+		    logger.error("Couldn't resolve artifact...", e);
+
+		} catch (ArtifactDescriptorException e) {
+		    logger.error("Failed to read ArtifactDescriptor...", e);
+
+		} catch (DependencyResolutionException e) {
+		    logger.error("Couldn't resolve dependendencies...", e);
+		}
+
+		counter++;
+		return counter;
+	}
 
     private Artifact setPOMfileToArtifact(Artifact a, RepositorySystem system, RepositorySystemSession session) throws ArtifactResolutionException {
         File pom = new File(getPathForArtifact(a, true, true));
