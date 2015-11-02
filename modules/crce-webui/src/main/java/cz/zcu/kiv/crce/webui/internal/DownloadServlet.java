@@ -39,10 +39,10 @@ public class DownloadServlet extends HttpServlet {
         List<Resource> list = Activator.instance().getBuffer(req).commit(true);
         if (list.size() == buffer.size()) {
             success = true;
-            message = "All resources commited succesfully";
+            message = "All resources commited successfully";
         } else {
             success = false;
-            message = "Not all resources commited succesfully";
+            message = "Not all resources commited successfully";
         }
         req.getSession().setAttribute("source", "commit");
         ResourceServlet.setError(req.getSession(), success, message);
@@ -95,7 +95,7 @@ public class DownloadServlet extends HttpServlet {
         if (failed) {
             message = "Download failed";
         } else {
-            message = "Download succesfull";
+            message = "Download successful";
         }
         ResourceServlet.setError(req.getSession(), !failed, message);
 

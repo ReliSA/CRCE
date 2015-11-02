@@ -142,12 +142,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> resources;
-            if ("store".equals(link)) {
-                resources = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                resources = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> resources = getResources(req, link);
+            if (resources == null) {
                 return false;
             }
             Resource resource = findResource(resURI, resources);
@@ -185,12 +181,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
                 return false;
             }
             Resource resource = findResource(resURI, array);
@@ -239,15 +231,9 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
-                {
-                    return false;
-                }
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
+                return false;
             }
             Resource resource = findResource(resURI, array);
             int lengthBefore = resource.getCapabilities().size();
@@ -285,12 +271,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
                 return false;
             }
             Resource resource = findResource(resURI, array);
@@ -368,15 +350,9 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
-                {
-                    return false;
-                }
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
+                return false;
             }
             Resource resource = findResource(resURI, array);
 
@@ -432,12 +408,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
                 return false;
             }
             Resource resource = findResource(resURI, array);
@@ -528,12 +500,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
                 return false;
             }
             Resource resource = findResource(resURI, array);
@@ -668,12 +636,8 @@ public class EditServlet extends HttpServlet {
 
     private boolean editProperties(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
         String uri = req.getParameter("uri");
@@ -700,12 +664,8 @@ public class EditServlet extends HttpServlet {
 
     private boolean addCapabilityProperty(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
         String uri = req.getParameter("uri");
@@ -735,12 +695,8 @@ public class EditServlet extends HttpServlet {
     private boolean addRequirement(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
         String uri = req.getParameter("uri");
@@ -769,12 +725,8 @@ public class EditServlet extends HttpServlet {
     private boolean editRequirements(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
 
@@ -803,12 +755,8 @@ public class EditServlet extends HttpServlet {
 
     private boolean addCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
 
@@ -839,13 +787,8 @@ public class EditServlet extends HttpServlet {
 
     private boolean editCapabilities(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters, boolean b) {
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
 
@@ -888,12 +831,8 @@ public class EditServlet extends HttpServlet {
     private boolean addCategories(HttpServletRequest req, HttpServletResponse resp, Map<?, ?> parameters) { // NOPMD parameters would be used in the future
 
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
 
@@ -922,12 +861,8 @@ public class EditServlet extends HttpServlet {
 
     private boolean editCategories(HttpServletRequest req, HttpServletResponse resp) {
         String link = (String) req.getSession().getAttribute("source");
-        List<Resource> array;
-        if ("store".equals(link)) {
-            array = Activator.instance().getStore(null).getResources();
-        } else if ("buffer".equals(link)) {
-            array = Activator.instance().getBuffer(req).getResources();
-        } else {
+        List<Resource> array = getResources(req, link);
+        if (array == null) {
             return false;
         }
 
@@ -968,12 +903,8 @@ public class EditServlet extends HttpServlet {
         try {
             URI resURI = new URI(uri);
             String link = (String) req.getSession().getAttribute("source");
-            List<Resource> array;
-            if ("store".equals(link)) {
-                array = Activator.instance().getStore(null).getResources();
-            } else if ("buffer".equals(link)) {
-                array = Activator.instance().getBuffer(req).getResources();
-            } else {
+            List<Resource> array = getResources(req, link);
+            if (array == null) {
                 return false;
             }
 
@@ -1017,9 +948,9 @@ public class EditServlet extends HttpServlet {
         try {
             URI fileUri = new URI(uri);
             if ("store".equals(link)) {
-                List<Resource> array = Activator.instance().getStore(null).getResources();
+                List<Resource> array = Activator.instance().getStore(getRepositoryId(req)).getResources();
                 Resource found = findResource(fileUri, array);
-                Activator.instance().getStore(null).remove(found);
+                Activator.instance().getStore(getRepositoryId(req)).remove(found);
             } else if ("buffer".equals(link)) {
                 List<Resource> array = Activator.instance().getBuffer(req).getResources();
                 Resource found = findResource(fileUri, array);
@@ -1064,5 +995,29 @@ public class EditServlet extends HttpServlet {
 
     private static void cleanSession(HttpSession session) {
         session.removeAttribute("resource");
+    }
+    
+    private List<Resource> getResources(HttpServletRequest req, String link) {
+        switch (link) {
+            case "store":
+                return Activator.instance().getStore(getRepositoryId(req)).getResources();
+            case "buffer":
+                return Activator.instance().getBuffer(req).getResources();
+            default:
+                return null;
+        }
+    }
+    
+    private String getRepositoryId(HttpServletRequest req) {
+        String id = req.getParameter("repositoryId");
+        if (id == null) {
+            Map<String, String> stores = Activator.instance().getRepositories();
+            if (stores.isEmpty()) {
+                return null;
+            }
+            id = stores.keySet().iterator().next();
+            logger.trace("Store ID not specified, using the first store found: " + id);
+        }
+        return id;
     }
 }
