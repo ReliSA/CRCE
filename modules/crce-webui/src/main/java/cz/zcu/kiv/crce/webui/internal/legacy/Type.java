@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.webui.internal.legacy;
 
 import java.util.Arrays;
 import java.util.List;
+
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
@@ -18,7 +19,8 @@ public enum Type {
 //    URL("url", String.class),
     URI("uri", String.class), // TODO URI is not supported type yet (PENDING)
 //    SET("set", List.class);
-    LIST("list", List.class);
+    LIST("list", List.class),
+    BOOLEAN("boolean", Boolean.class);
 
     private final String string;
     private final Class<?> clazz;
