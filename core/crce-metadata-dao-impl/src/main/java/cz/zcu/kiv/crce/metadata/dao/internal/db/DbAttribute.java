@@ -15,6 +15,7 @@ public class DbAttribute {
     private String stringValue;
     private Long longValue;
     private Double doubleValue;
+    private Boolean booleanValue;
     private Integer versionMajorValue;
     private Integer versionMinorValue;
     private Integer versionMicroValue;
@@ -89,6 +90,14 @@ public class DbAttribute {
 
     public void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
+    }
+
+    public Boolean getBooleanValue() {
+        return booleanValue;
+    }
+
+    public void setBooleanValue(Boolean booleanValue) {
+        this.booleanValue = booleanValue;
     }
 
     public Integer getVersionMajorValue() {

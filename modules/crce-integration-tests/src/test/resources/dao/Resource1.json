@@ -29,6 +29,10 @@
                     "name": "repository-id",
                     "type": "String",
                     "value": "d9e321fc-7e2d-a123-bc9f-f2ead3d5ac88"
+                }, {
+                    "name": "confirmed",
+                    "type": "Boolean",
+                    "value": "true"
                 }
             ]
         }, {

@@ -53,6 +53,8 @@ public class AttributeSerializer extends JsonSerializer<Attribute<?>> {
             jgen.writeNumberField(Constants.ATTRIBUTE__VALUE, (Long) attribute.getValue());
         } else if (Double.class.equals(type)) {
             jgen.writeNumberField(Constants.ATTRIBUTE__VALUE, (Double) attribute.getValue());
+        } else if (Boolean.class.equals(type)) {
+            jgen.writeBooleanField(Constants.ATTRIBUTE__VALUE, (Boolean) attribute.getValue());
         } else if (Version.class.equals(type)) {
             jgen.writeObjectFieldStart(Constants.ATTRIBUTE__VALUE);
 

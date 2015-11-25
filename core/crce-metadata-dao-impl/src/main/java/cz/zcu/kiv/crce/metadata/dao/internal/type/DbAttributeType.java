@@ -17,7 +17,8 @@ public enum DbAttributeType {
     DOUBLE(Double.class, (short) 2),
     LIST(List.class, (short) 3),
     VERSION(Version.class, (short) 4),
-    URI(URI.class, (short) 5);
+    URI(URI.class, (short) 5),
+    BOOLEAN(Boolean.class, (short) 6);
 
     private final Class<?> clazz;
     private final short dbValue;

@@ -24,13 +24,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.DirectiveProvider;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.PropertyProvider;
-
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.type.Version;
@@ -421,6 +420,10 @@ public class MetadataDeserializer {
                         case "List":
                         case "java.util.List":
                             callback.addAttribute(new ListAttributeType(name), deserializeList(valueNode), operator);
+                            continue;
+
+                        case "Boolean":
+                            callback.addAttribute(new SimpleAttributeType<>(name, Boolean.class), valueNode.asBoolean(), operator);
                             continue;
 
                         case "URI":

@@ -17,8 +17,8 @@ import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
@@ -158,6 +158,10 @@ public class MetadataMapping {
                         dbAttribute.setStringValue(attribute.getValue().toString());
                         break;
 
+                    case BOOLEAN:
+                        dbAttribute.setBooleanValue((Boolean) attribute.getValue());
+                        break;
+
                     default:
                         throw new IllegalArgumentException("Unexpected attribute type: " + dbAttributeType);
                 }
@@ -281,6 +285,11 @@ public class MetadataMapping {
                         } catch (URISyntaxException e) {
                             throw new IllegalStateException("Invalid URI for attribute " + dbAttribute.getName(), e);
                         }
+                        break;
+
+                    case BOOLEAN:
+                        entity.setAttribute(new SimpleAttributeType<>(dbAttribute.getName(), Boolean.class),
+                                dbAttribute.getBooleanValue(), DbOperator.getOperatorValue(dbAttribute.getOperator()));
                         break;
 
                     case VERSION:

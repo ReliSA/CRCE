@@ -35,8 +35,6 @@
  */
 package cz.zcu.kiv.crce.it.dao;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 import java.io.File;
@@ -46,7 +44,6 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.felix.dm.Component;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
@@ -61,11 +58,12 @@ import cz.zcu.kiv.crce.it.Options.Crce;
 import cz.zcu.kiv.crce.it.Options.Felix;
 import cz.zcu.kiv.crce.it.Options.Osgi;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -176,6 +174,9 @@ public class ResourceDAOIT extends IntegrationTestBase {
         Resource expected = metadataJsonMapper.deserialize(FileUtils.readFileToString(new File("src/test/resources/dao/Resource1.json")));
         assertNotNull(expected);
 
+        //test boolean loading
+        assertTrue(metadataService.getIdentity(expected).getAttribute(new SimpleAttributeType<Boolean>("confirmed", Boolean.class)).getValue());
+
         metadataService.getIdentity(expected).setAttribute("repository-id", String.class, repository.getId());
 
         URI uri = metadataService.getUri(expected);
@@ -192,5 +193,8 @@ public class ResourceDAOIT extends IntegrationTestBase {
         assertTrue(expected.equalsTo(actual, EqualityLevel.SHALLOW_WITH_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_NO_KEY));
         assertTrue(expected.equalsTo(actual, EqualityLevel.DEEP_WITH_KEY));
+
+        //test boolean storage
+        assertTrue(metadataService.getIdentity(actual).getAttribute(new SimpleAttributeType<Boolean>("confirmed", Boolean.class)).getValue());
     }
 }

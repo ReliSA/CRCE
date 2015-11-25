@@ -126,6 +126,11 @@ public class ResolvingSqlProvider {
                 sb.append(false, ")");
                 break;
 
+            case BOOLEAN:
+                sb.append(false, alias, ".boolean_value");
+                evaluateOperator(sb, attribute.getOperator(), index);
+                break;
+
             case LIST:
                 throw new UnsupportedOperationException();
         }
