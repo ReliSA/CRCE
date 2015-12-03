@@ -31,7 +31,7 @@ public abstract class WebserviceTypeBase {
     // list of all namespaces used by this module for Capabilities
     public static final String NAMESPACE__CRCE_IDENTITY = NsCrceIdentity.NAMESPACE__CRCE_IDENTITY;
     public static final String NAMESPACE__WEBSERVICESCHEMA_IDENTITY = WebserviceDescriptionResourceIndexer.MAIN_CATEGORY + ".identity";
-    public static final String NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE = WebserviceDescriptionResourceIndexer.MAIN_CATEGORY + ".webservice";
+    public static final String NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE = WebserviceDescriptionResourceIndexer.MAIN_CATEGORY + ".ws";
     public static final String NAMESPACE__WEBSERVICE_ENDPOINT = NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE + ".endpoint";
     public static final String NAMESPACE__WEBSERVICE_TYPE = NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE + ".type";
     

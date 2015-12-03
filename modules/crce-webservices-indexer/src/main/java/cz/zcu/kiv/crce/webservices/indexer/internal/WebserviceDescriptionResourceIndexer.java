@@ -28,7 +28,7 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
     private volatile MetadataFactory metadataFactory; 
     private volatile MetadataService metadataService;
 
-    public final static String MAIN_CATEGORY = "webserviceschema";
+    public final static String MAIN_CATEGORY = "ws-schema";
     
     /**
      * Constructor
