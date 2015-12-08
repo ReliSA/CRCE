@@ -6,6 +6,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -27,6 +28,8 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
     // injected by dependency manager
     private volatile MetadataFactory metadataFactory; 
     private volatile MetadataService metadataService;
+    
+    List<Class> definedWebserviceTypes;
 
     public final static String MAIN_CATEGORY = "ws-schema";
     
@@ -35,6 +38,11 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
      *
      */
     public WebserviceDescriptionResourceIndexer() {
+        // any new type of specialized IDL handling class that extends WebserviceType should be added here just once and nowhere else
+        definedWebserviceTypes = new ArrayList<>();
+        definedWebserviceTypes.add(WebserviceTypeJsonWsp.class);
+        definedWebserviceTypes.add(WebserviceTypeWsdl.class);
+        definedWebserviceTypes.add(WebserviceTypeWadl.class);
     }
     
     @Override
@@ -52,11 +60,8 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
         logger.debug("Attempting to recognize IDL type.");
         
         // create specialized IDL handling classes for all web service types
-        List<WebserviceType> webserviceTypes = new ArrayList<>();
-        webserviceTypes.add(new WebserviceTypeJsonWsp(metadataFactory, metadataService));
-        webserviceTypes.add(new WebserviceTypeWsdl(metadataFactory, metadataService));
-        webserviceTypes.add(new WebserviceTypeWadl(metadataFactory, metadataService));
-
+        List<WebserviceType> webserviceTypes = getWebserviceTypes();
+        
         // recognize IDL type
         WebserviceType recognizedWebserviceType = null;
         for (WebserviceType webserviceType : webserviceTypes) {
@@ -84,8 +89,9 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
         //logger.debug(recognizedWebserviceType.generateIDL(resource));
         //logger.debug(" * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
         
-        // label the resource with main category and other common attributes
+        // label the resource with categories and other common attributes
         metadataService.addCategory(resource, MAIN_CATEGORY); // assign main category tag
+        metadataService.addCategory(resource, recognizedWebserviceType.getSpecificIdlCategory()); // add specific category for this type of web service
         Capability capability = resource.getCapabilities(WebserviceTypeBase.NAMESPACE__WEBSERVICESCHEMA_IDENTITY).get(0); // get webserviceschema.identity capability
         capability.setAttribute(WebserviceTypeBase.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__TIMESTAMP, new Date().getTime()); // save timestamp of when the websevice was parsed
         
@@ -96,5 +102,35 @@ public class WebserviceDescriptionResourceIndexer extends AbstractResourceIndexe
         
         return Collections.singletonList(MAIN_CATEGORY);
     }
+
+    @Override
+    public List<String> getProvidedCategories() {
+        List<String> categories = new ArrayList<>();
+        categories.add(MAIN_CATEGORY);
+        List<WebserviceType> webserviceTypes = getWebserviceTypes();
+        for (WebserviceType webserviceType : webserviceTypes) {
+            categories.add(webserviceType.getSpecificIdlCategory());
+        }
+        return categories;
+    }
     
+    /**
+     * This function reads the list of class references, creates instances of them and return those instances in another list.
+     *
+     */
+    private List<WebserviceType> getWebserviceTypes() {
+        List<WebserviceType> webserviceTypes = new ArrayList<>();
+        for (Class definedWebserviceType : definedWebserviceTypes) {
+            WebserviceTypeBase wtb = null;
+            try {
+                wtb = (WebserviceTypeBase)definedWebserviceType.getDeclaredConstructor(MetadataFactory.class, MetadataService.class).newInstance(metadataFactory, metadataService);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+                logger.debug("Error while initializing WebserviceType instance.", ex);
+            }
+            if (wtb instanceof WebserviceType) {
+                webserviceTypes.add((WebserviceType)wtb);
+            }
+        }
+        return webserviceTypes;
+    }
 }

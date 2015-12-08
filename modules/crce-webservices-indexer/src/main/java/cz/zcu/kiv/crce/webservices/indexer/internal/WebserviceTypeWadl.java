@@ -170,7 +170,6 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
         
         // Capability - CRCE Identity
         capability = metadataService.getIdentity(resource);
-        metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
         metadataService.setPresentationName(resource, WADL_WEBSERVICE_NAME);
         metadataService.setSize(resource, idl.length());
         capability.setAttribute(ATTRIBUTE__CRCE_IDENTITY__MIME, WADL_MIME);

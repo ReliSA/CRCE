@@ -300,7 +300,6 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
                 break;
         }
         capability = metadataService.getIdentity(resource);
-        metadataService.addCategory(resource, getSpecificIdlCategory()); // add specific category for this type of web service
         metadataService.setPresentationName(resource, main_name);
         metadataService.setSize(resource, idl.length());
         setIfSet(capability, ATTRIBUTE__CRCE_IDENTITY__MIME, WSDL_MIME);
