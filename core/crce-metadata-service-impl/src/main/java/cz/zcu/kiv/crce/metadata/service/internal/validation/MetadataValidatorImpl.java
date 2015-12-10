@@ -22,11 +22,11 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.validation.CapabilityValidationResult;
+import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.PropertyValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.ReasonType;
 import cz.zcu.kiv.crce.metadata.service.validation.RequirementValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
-import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 
 /**
  *
@@ -89,7 +89,7 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
             // --- Requirements validation ---
             List<Requirement> requirements = resource.getRequirements();
             for (Requirement requirement : requirements) {
-                RequirementValidationResult requirementResult = validate(requirement, resource, includeChildren);
+                RequirementValidationResult requirementResult = validateRecursive(requirement, resource, includeChildren);
                 if (!requirementResult.isContextValid()) {
                     result.setContextValid(false);
                 }
@@ -113,14 +113,13 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
 
     @Nonnull
     private CapabilityValidationResult validate(Capability capability, Resource resource, Set<Capability> remaining, boolean includeChildren) {
-        CapabilityValidationResult result = validateRecursive(capability, null, resource, remaining, includeChildren);
+        CapabilityValidationResult result = validateRecursive(capability, resource, remaining, includeChildren);
         return result;
     }
 
     /**
      *
      * @param capability Validated capability.
-     * @param parent Parent capability.
      * @param resource Parent resource.
      * @param remaining Unprocessed capabilities.
      * @param includeChildren
@@ -128,32 +127,22 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
      */
     @Nonnull
     private CapabilityValidationResult validateRecursive(
-            @Nonnull Capability capability, @CheckForNull Capability parent, @CheckForNull Resource resource,
+            @Nonnull Capability capability, @CheckForNull Resource resource,
             @CheckForNull Set<Capability> remaining, boolean includeChildren) {
 
         CapabilityValidationResult result = new CapabilityValidationResultImpl();
         result.setCapability(capability);
 
-        if (structureValidationEnabled) {
-            if (remaining != null && !remaining.remove(capability)) {
-                    result.addReason(new ReasonImpl(ReasonType.CAPABILITY_TREE, capability.getId(),
-                            "Capability from hierarchy tree is not on list of all capabilities."));
-                    result.setContextValid(false);
-                    result.setEntityValid(false);
-            }
-            if (parent != null && !parent.equals(capability.getParent())) {
-                result.addReason(
-                        new ReasonImpl(ReasonType.PARENT_REFERENCE, capability.getId(),
-                        "Wrong reference to parent: " + capability.getParent()));
-
-                result.setEntityValid(false);
-                result.setContextValid(false);
-            }
+        if (structureValidationEnabled && remaining != null && !remaining.remove(capability)) {
+            result.addReason(new ReasonImpl(ReasonType.CAPABILITY_TREE, capability.getId(),
+                    "Capability from hierarchy tree is not on list of all capabilities."));
+            result.setContextValid(false);
+            result.setEntityValid(false);
         }
 
         if (includeChildren) {
             for (Capability child : capability.getChildren()) {
-                CapabilityValidationResult childResult = validateRecursive(child, capability, resource, remaining, includeChildren);
+                CapabilityValidationResult childResult = validateRecursive(child, resource, remaining, includeChildren);
                 if (!childResult.isContextValid()) {
                     result.setContextValid(false);
                 }
@@ -165,39 +154,24 @@ public class MetadataValidatorImpl implements MetadataValidator, ManagedService 
 
     @Override
     public RequirementValidationResult validate(Requirement requirement) {
-        RequirementValidationResult result = validate(requirement, null, true);
+        RequirementValidationResult result = validateRecursive(requirement, null, true);
         return result;
     }
 
     @Override
     public RequirementValidationResult validate(Requirement requirement, boolean includeChildren) {
-        return validate(requirement, null, includeChildren);
+        return validateRecursive(requirement, null, includeChildren);
     }
 
     @Nonnull
-    private RequirementValidationResult validate(@Nonnull Requirement requirement, @CheckForNull Resource resource, boolean includeChildren) {
-        return validateRecursive(requirement, null, resource, includeChildren);
-    }
-
-    @Nonnull
-    private RequirementValidationResult validateRecursive(@Nonnull Requirement requirement, @CheckForNull Requirement parent,
-            @CheckForNull Resource resource, boolean includeChildren) {
+    private RequirementValidationResult validateRecursive(@Nonnull Requirement requirement, @CheckForNull Resource resource, boolean includeChildren) {
 
         RequirementValidationResult result = new RequirementValidationResultImpl();
         result.setRequirement(requirement);
 
-        if (structureValidationEnabled && parent != null && !parent.equals(requirement.getParent())) {
-            result.addReason(
-                    new ReasonImpl(ReasonType.PARENT_REFERENCE, requirement.getId(),
-                            "Wrong reference to parent: " + requirement.getParent()));
-
-            result.setEntityValid(false);
-            result.setContextValid(false);
-        }
-
         if (includeChildren) {
             for (Requirement child : requirement.getChildren()) {
-                RequirementValidationResult childResult = validateRecursive(child, requirement, resource, includeChildren);
+                RequirementValidationResult childResult = validateRecursive(child, resource, includeChildren);
                 if (!childResult.isContextValid()) {
                     result.setContextValid(false);
                 }

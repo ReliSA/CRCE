@@ -252,12 +252,6 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void addRootCapability(Resource resource, Capability capability) {
-        Capability parent = capability.getParent();
-        if (parent != null && !capability.equals(parent)) {
-            throw new IllegalStateException("The capability " + capability.getId()
-                    + " can't be added as a root capability. It is a child of " + parent.getId());
-        }
-
         List<Capability> rootCapabilities = resource.getRootCapabilities(capability.getNamespace());
         if (!rootCapabilities.contains(capability)) {
             resource.addRootCapability(capability);
@@ -273,7 +267,6 @@ public class MetadataServiceImpl implements MetadataService {
         }
 
         for (Capability child : capability.getChildren()) {
-            assert capability.equals(child.getParent());
             addCapabilityTree(resource, child);
         }
     }
@@ -312,12 +305,6 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public void addRequirement(Resource resource, Requirement requirement) {
-        Requirement parent = requirement.getParent();
-        if (parent != null && !requirement.equals(parent)) {
-            throw new IllegalStateException("The requirement " + requirement.getId()
-                    + " can't be added to the resource. It is a child of " + parent.getId());
-        }
-
         List<Requirement> requirements = resource.getRequirements(requirement.getNamespace());
         if (!requirements.contains(requirement)) {
             resource.addRequirement(requirement);

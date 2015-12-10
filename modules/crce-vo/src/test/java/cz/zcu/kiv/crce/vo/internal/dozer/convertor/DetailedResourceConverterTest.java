@@ -211,11 +211,9 @@ public class DetailedResourceConverterTest {
         list = Arrays.asList(initCustomRequirement(resource));
         when(c.getRequirements()).thenReturn(list);
 
-        if(root == null) {
+        if (root == null) {
             list = Arrays.asList(initCustomCapabilityTree(resource, c));
             when(c.getChildren()).thenReturn(list);
-        } else {
-            when(c.getParent()).thenReturn(root);
         }
 
         return c;

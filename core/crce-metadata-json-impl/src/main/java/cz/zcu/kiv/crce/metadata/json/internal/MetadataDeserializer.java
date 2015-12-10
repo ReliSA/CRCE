@@ -157,7 +157,6 @@ public class MetadataDeserializer {
             }
         } else {
             parent.addChild(capability);
-            capability.setParent(parent);
         }
 
         Iterator<Entry<String, JsonNode>> fields = capabilityNode.fields();
@@ -254,7 +253,6 @@ public class MetadataDeserializer {
             }
         } else {
             parent.addChild(requirement);
-            requirement.setParent(parent);
         }
         Iterator<Entry<String, JsonNode>> fields = requirementNode.fields();
         while (fields.hasNext()) {

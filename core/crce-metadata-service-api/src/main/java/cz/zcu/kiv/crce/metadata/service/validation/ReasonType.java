@@ -11,10 +11,6 @@ package cz.zcu.kiv.crce.metadata.service.validation;
  */
 public enum ReasonType {
 
-    PARENT_REFERENCE,
-    RESOURCE_REFERENCE,
     CHILD_REFERENCE,
     CAPABILITY_TREE,
-
-
 }

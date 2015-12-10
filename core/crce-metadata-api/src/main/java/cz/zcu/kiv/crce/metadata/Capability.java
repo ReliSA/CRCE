@@ -2,9 +2,7 @@ package cz.zcu.kiv.crce.metadata;
 
 import java.util.List;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -21,11 +19,6 @@ public interface Capability
 
     @Nonnull
     String getNamespace();
-
-    @CheckForNull
-    Capability getParent();
-
-    boolean setParent(@Nullable Capability parent);
 
     boolean addChild(Capability capability);
 

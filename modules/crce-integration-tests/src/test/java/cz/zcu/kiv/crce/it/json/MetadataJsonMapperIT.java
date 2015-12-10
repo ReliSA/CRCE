@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.it.json;
 
-import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
+import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +15,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
-
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
@@ -25,11 +24,11 @@ import cz.zcu.kiv.crce.it.IntegrationTestBase;
 import cz.zcu.kiv.crce.it.Options;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.EqualityLevel;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.json.MetadataJsonMapper;
@@ -204,7 +203,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
 
         Requirement child = metadataFactory.createRequirement("ns6", "req2");
         requirement.addChild(child);
-        child.setParent(requirement);
 
         child.addAttribute(new SimpleAttributeType<>("atr1", String.class), "a1", Operator.GREATER);
         child.addAttribute(new SimpleAttributeType<>("atr2", String.class), "a2", Operator.LESS);
@@ -243,7 +241,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         }
 
         capability.addChild(child);
-        child.setParent(capability);
 
         child.setAttribute(new SimpleAttributeType<>("c1atr1", String.class), "c1val1", Operator.EQUAL);
 
@@ -254,7 +251,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         }
 
         capability.addChild(child);
-        child.setParent(capability);
 
         child.setAttribute(new SimpleAttributeType<>("c2atr1", String.class), "c2val1", Operator.EQUAL);
 
@@ -270,7 +266,6 @@ public class MetadataJsonMapperIT extends IntegrationTestBase {
         requirement2.addAttribute("c2req2atr2", Long.class, 123L);
 
         requirement1.addChild(requirement2);
-        requirement2.setParent(requirement1);
 
         return capability;
     }

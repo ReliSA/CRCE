@@ -137,7 +137,6 @@ public class ResourceDAOImpl implements ResourceDAO {
                 Requirement parent = requirements.get(dbRequirement.getParentRequirementId());
                 if (parent != null) {
                     parent.addChild(requirement);
-                    requirement.setParent(parent);
                 } else {
                     logger.warn("There is unprocessed requirement (missing parent) for resource {}, ID: {}, parent ID: {}.",
                             resourceId, dbRequirement.getRequirementId(), dbRequirement.getParentRequirementId());
@@ -156,7 +155,6 @@ public class ResourceDAOImpl implements ResourceDAO {
                 if (parent != null) {
                     Requirement requirement = requirements.get(entry.getKey());
                     parent.addChild(requirement);
-                    requirement.setParent(parent);
                     iterator.remove();
                 }
             }
@@ -195,7 +193,6 @@ public class ResourceDAOImpl implements ResourceDAO {
                 Capability parent = capabilities.get(dbCapability.getParentCapabilityId());
                 if (parent != null) {
                     parent.addChild(capability);
-                    capability.setParent(parent);
                 } else {
                     logger.warn("There is unprocessed capability (missing parent) for resource {}, ID: {}, parent ID: {}.",
                             resourceId, dbCapability.getCapabilityId(), dbCapability.getParentCapabilityId());
@@ -216,7 +213,6 @@ public class ResourceDAOImpl implements ResourceDAO {
                 if (parent != null) {
                     Capability capability = capabilities.get(entry.getKey());
                     parent.addChild(capability);
-                    capability.setParent(parent);
                     iterator.remove();
                 }
             }

@@ -33,7 +33,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     private final DirectiveProvider directiveProvider = new DirectiveProviderImpl();
 
     private String namespace = null;
-    private Capability parent = null;
 
     public CapabilityImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace.intern();
@@ -48,17 +47,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
     @Override
     public String getNamespace() {
         return namespace;
-    }
-
-    @Override
-    public Capability getParent() {
-        return parent;
-    }
-
-    @Override
-    public boolean setParent(Capability parent) {
-        this.parent = parent;
-        return true;
     }
 
     @Override
@@ -222,9 +210,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
-                    return false;
-                }
                 if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_NO_KEY)) {
                     return false;
                 }
@@ -235,9 +220,6 @@ public class CapabilityImpl extends AttributeProviderImpl implements Capability,
 
             case DEEP_WITH_KEY:
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
-                    return false;
-                }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
                     return false;
                 }
                 if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_WITH_KEY)) {

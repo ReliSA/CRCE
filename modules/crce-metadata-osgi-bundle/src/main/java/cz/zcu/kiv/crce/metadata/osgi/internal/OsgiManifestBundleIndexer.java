@@ -350,7 +350,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
                 Capability cap = createServiceCapability(export);
                 resource.addCapability(cap);
                 if (root != null) {
-                    cap.setParent(root);
                     root.addChild(cap);
                 } else {
                     resource.addRootCapability(cap);
@@ -402,7 +401,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             capability.setAttribute(NsOsgiFragment.ATTRIBUTE__VERSION, new Version(getVersion(clauses[0])));
             resource.addCapability(capability);
             if (root != null) {
-                capability.setParent(root);
                 root.addChild(capability);
             } else {
                 resource.addRootCapability(capability);
@@ -449,7 +447,6 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
                 Capability capability = createCapability(clause); // Capability.PACKAGE,
                 resource.addCapability(capability);
                 if (root != null) {
-                    capability.setParent(root);
                     root.addChild(capability);
                 } else {
                     resource.addRootCapability(capability);

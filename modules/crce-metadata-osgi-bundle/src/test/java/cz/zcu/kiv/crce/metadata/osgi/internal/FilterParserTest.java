@@ -275,7 +275,6 @@ public class FilterParserTest {
         requirement = parent.getChildren().get(0);
 
         assertEquals(namespace, requirement.getNamespace());
-        assertEquals(requirement.getParent(), parent);
 
         assertTrue(requirement.getAttributes().isEmpty());
         assertEquals("or", requirement.getDirectives().get("operator"));
@@ -299,7 +298,6 @@ public class FilterParserTest {
         requirement = parent.getChildren().get(0);
 
         assertEquals(namespace, requirement.getNamespace());
-        assertEquals(requirement.getParent(), parent);
         assertTrue(requirement.getChildren().isEmpty());
 
         assertFalse(requirement.getAttributes().isEmpty());
@@ -335,7 +333,6 @@ public class FilterParserTest {
         requirement = parent.getChildren().get(1);
 
         assertEquals(namespace, requirement.getNamespace());
-        assertEquals(requirement.getParent(), parent);
         assertTrue(requirement.getChildren().isEmpty());
 
         assertFalse(requirement.getAttributes().isEmpty());

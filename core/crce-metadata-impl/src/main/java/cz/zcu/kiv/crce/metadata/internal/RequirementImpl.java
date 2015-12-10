@@ -29,7 +29,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     protected final Map<String, List<Attribute<?>>> attributesMap = new HashMap<>();
 
     private String namespace = null;
-    private Requirement parent = null;
 
     public RequirementImpl(@Nonnull String namespace, @Nonnull String id) {
         this.namespace = namespace.intern();
@@ -44,17 +43,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
     @Override
     public String getNamespace() {
         return namespace;
-    }
-
-    @Override
-    public Requirement getParent() {
-        return parent;
-    }
-
-    @Override
-    public boolean setParent(Requirement parent) {
-        this.parent = parent;
-        return true;
     }
 
     @Override
@@ -182,9 +170,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_NO_KEY)) {
                     return false;
                 }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_NO_KEY)) {
-                    return false;
-                }
                 if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_NO_KEY)) {
                     return false;
                 }
@@ -192,9 +177,6 @@ public class RequirementImpl extends DirectiveProviderImpl implements Requiremen
 
             case DEEP_WITH_KEY:
                 if (!Util.equalsTo(this, other, EqualityLevel.SHALLOW_WITH_KEY)) {
-                    return false;
-                }
-                if (!Util.equalsTo(parent, other.getParent(), EqualityLevel.SHALLOW_WITH_KEY)) {
                     return false;
                 }
                 if (!Util.equalsTo(children, other.getChildren(), EqualityLevel.DEEP_WITH_KEY)) {

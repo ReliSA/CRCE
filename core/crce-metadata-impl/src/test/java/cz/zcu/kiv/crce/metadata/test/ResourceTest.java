@@ -120,12 +120,7 @@ public class ResourceTest {
 
         // checking of presence of added child is commented because of possible performance decrease
         root.addChild(child1);
-        // with the check enabled, this would not be necessary
-        child1.setParent(root);
-
         root.addChild(child2);
-        // with the check enabled, this would not be necessary
-        child2.setParent(root);
 
         resource.addCapability(child1);
 
@@ -189,9 +184,6 @@ public class ResourceTest {
         nest.addChild(nested);
 
         // checking of presence of added child is commented because of possible performance decrease
-
-        // with the check enabled, this would not be necessary
-        nested.setParent(nest);
 
         resource.addRequirement(nested);
 

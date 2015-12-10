@@ -3,9 +3,7 @@ package cz.zcu.kiv.crce.metadata;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -21,11 +19,6 @@ public interface Requirement extends DirectiveProvider, EqualityComparable<Requi
 
     @Nonnull
     String getNamespace();
-
-    @CheckForNull
-    Requirement getParent();
-
-    boolean setParent(@Nullable Requirement parent);
 
     boolean addChild(Requirement requirement);
 

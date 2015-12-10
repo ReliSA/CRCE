@@ -85,7 +85,6 @@ public class FilterParserImpl implements FilterParser {
         if (level > 0) {
             Requirement child = metadataFactory.createRequirement(parent.getNamespace());
             parent.addChild(child);
-            child.setParent(parent);
             return child;
         }
         return parent;

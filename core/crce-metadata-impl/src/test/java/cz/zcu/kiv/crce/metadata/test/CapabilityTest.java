@@ -152,11 +152,6 @@ public class CapabilityTest {
 
         // checking of presence of added child is commented because of possible performance decrease
 
-        // with the check enabled, this would not be necessary
-        child1.setParent(root);
-        child2.setParent(root);
-        child3.setParent(root);
-
         List<Capability> children = root.getChildren();
         // with the check enabled, expected value would be 3
         assertEquals(6, children.size());
@@ -164,9 +159,5 @@ public class CapabilityTest {
         assertTrue(children.contains(child1));
         assertTrue(children.contains(child2));
         assertTrue(children.contains(child3));
-
-        for (Capability child : children) {
-            assertEquals(root, child.getParent());
-        }
     }
 }
