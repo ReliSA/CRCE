@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>crce-metadata-api</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>bundle</packaging>
 
     <name>CRCE - Core - Metadata API</name>
@@ -20,7 +20,7 @@
         <url>https://github.com/ReliSA/crce/tree/master/core/crce-metadata-api</url>
         <connection>https://github.com/ReliSA/crce.git</connection>
         <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>crce-metadata-api-3.0.0</tag>
     </scm>
 
     <properties>
