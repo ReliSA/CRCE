@@ -7,11 +7,11 @@
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>compiled-bundle-settings</artifactId>
         <version>2.1.1</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <artifactId>crce-repository-impl</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.1.0</version>
     <packaging>bundle</packaging>
 
     <name>CRCE - Core - Repository Implementation</name>
@@ -20,7 +20,7 @@
         <url>https://github.com/ReliSA/crce/tree/master/core/crce-repository-impl</url>
         <connection>https://github.com/ReliSA/crce.git</connection>
         <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>crce-repository-impl-2.1.0</tag>
     </scm>
 
     <properties>
