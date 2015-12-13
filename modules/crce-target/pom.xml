@@ -7,7 +7,7 @@
         <relativePath>../pom</relativePath>
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>crce-modules-parent</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.1.0</version>
     </parent>
 
     <artifactId>crce-target</artifactId>
