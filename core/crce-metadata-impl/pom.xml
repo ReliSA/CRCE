@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>crce-metadata-impl</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>CRCE - Core - Metadata Implementation</name>
@@ -20,7 +20,7 @@
         <url>https://github.com/ReliSA/crce/tree/master/core/crce-metadata-impl</url>
         <connection>https://github.com/ReliSA/crce.git</connection>
         <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
-        <tag>crce-metadata-impl-3.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
