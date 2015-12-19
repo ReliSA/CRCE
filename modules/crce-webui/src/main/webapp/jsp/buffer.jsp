@@ -6,11 +6,24 @@
 </jsp:include>
   	<div id="telo">
   	  
-		<form method="post" enctype="multipart/form-data" action="upload" accept-charset="utf-8">
+		<form method="post" enctype="multipart/form-data" action="upload?from=local" accept-charset="utf-8">
 		<div class="upload">
+            <h3>Local upload from HDD:</h3>
 			<table class="upload">
 				<tr>
 					<td><input class="text" type="file" name="bundle"/></td>
+					<td><div class="tlac"><input class="tlacitko" type="submit" value="Upload"/></div></td>
+				</tr>
+			</table>
+		</div>
+		</form>
+  	   	
+		<form method="post" action="upload?from=remote" accept-charset="utf-8">
+		<div class="upload">
+            <h3>Remote upload from URL:</h3>
+			<table class="upload">
+				<tr>
+					<td><input class="text" type="text" name="url"/></td>
 					<td><div class="tlac"><input class="tlacitko" type="submit" value="Upload"/></div></td>
 				</tr>
 			</table>

@@ -5,11 +5,6 @@
 
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     
-    <context-param>
-        <param-name>test</param-name>
-        <param-value>1234</param-value>
-    </context-param>
-
   <!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
@@ -33,15 +28,6 @@
   
   <!-- Servlets -->
  
-    <servlet>
-        <servlet-name>testServlet</servlet-name>
-        <servlet-class>cz.zcu.kiv.crce.webui.internal.TestServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>testServlet</servlet-name>
-        <url-pattern>/test</url-pattern>
-    </servlet-mapping>
-
 	<servlet>
 		<servlet-name>download</servlet-name>
 		<servlet-class>cz.zcu.kiv.crce.webui.internal.DownloadServlet</servlet-class>
