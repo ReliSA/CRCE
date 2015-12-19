@@ -343,12 +343,10 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
 
                 resource.addCapability(endpoint_capability);
                 webservice_capability.addChild(endpoint_capability);
-                endpoint_capability.setParent(webservice_capability);
             }
             
             resource.addCapability(webservice_capability);
             capability.addChild(webservice_capability);
-            webservice_capability.setParent(capability);
         }
 
         return processedWebservices.size();

@@ -318,7 +318,6 @@ public class WebserviceTypeJsonWsp extends WebserviceTypeBase implements Webserv
 
             resource.addCapability(endpoint_capability);
             capability.addChild(endpoint_capability);
-            endpoint_capability.setParent(capability);
         }
         
         // return "1" as a number of parsed WSs, since JSON-WSP description document can describe exactly one webservice at once

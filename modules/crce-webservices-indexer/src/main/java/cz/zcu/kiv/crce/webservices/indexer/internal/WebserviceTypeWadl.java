@@ -207,7 +207,6 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
             
             resource.addCapability(endpoint_capability);
             capability.addChild(endpoint_capability);
-            endpoint_capability.setParent(capability);
         }
         
         // return "1" as a number of parsed WSs, since WADL description document can describe exactly one webservice at once
