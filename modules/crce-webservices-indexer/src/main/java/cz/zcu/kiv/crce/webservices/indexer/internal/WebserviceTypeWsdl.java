@@ -1,5 +1,24 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -15,22 +34,6 @@ import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlInt
 import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlMessage;
 import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlOperation;
 import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlPart;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * <p>This class can recognize and parse remote IDL documents representing WSDL (Web Services Description Language)
@@ -181,13 +184,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         // process all portTypes / interfaces into list
         NodeList portTypes = root.getElementsByTagName(WSDL_SERVICE_INTERFACE_V_1_1);
         NodeList interfaces = root.getElementsByTagName(WSDL_SERVICE_INTERFACE_V_2_0);
-        String wsdlVersion = null;
         List<WebserviceTypeWsdlInterface> processedInterfaces = new ArrayList<>();
         if (portTypes.getLength() > 0 && interfaces.getLength() == 0) {
-            wsdlVersion = WSDL_V_1_1;
+            //wsdlVersion = WSDL_V_1_1;
             processInterfaces(portTypes, processedInterfaces);
         } else if (portTypes.getLength() == 0 && interfaces.getLength() > 0) {
-            wsdlVersion = WSDL_V_2_0;
+            //wsdlVersion = WSDL_V_2_0;
             processInterfaces(interfaces, processedInterfaces);
         } else {
             logger.warn("Processed WSDL seems to use both {} and {} specification. Parsing both \"{}\" and \"{}\" elements.", WSDL_V_1_1, WSDL_V_2_0, WSDL_SERVICE_INTERFACE_V_1_1, WSDL_SERVICE_INTERFACE_V_2_0);

@@ -1,19 +1,14 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.Property;
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint;
-import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointParameter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -23,6 +18,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint;
+import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointParameter;
 
 /**
  * <p>This class can recognize and parse remote IDL documents representing WADL (Web Application Description Language)
@@ -63,6 +66,7 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
     private static final String WADL_RESOURCE_PARAM = "param";
     private static final String WADL_RESOURCE_METHOD = "method";
     private static final String WADL_RESOURCE_METHOD_REQUEST = "request";
+    @SuppressWarnings("unused")
     private static final String WADL_RESOURCE_METHOD_RESPONSE = "response";
     
     /**
@@ -276,10 +280,10 @@ public class WebserviceTypeWadl extends WebserviceTypeBase implements Webservice
                             }
                         }
 
-                    } else if (subsubnode.getNodeName().equalsIgnoreCase(WADL_RESOURCE_METHOD_REQUEST)) {
+                    } /*else if (subsubnode.getNodeName().equalsIgnoreCase(WADL_RESOURCE_METHOD_REQUEST)) {
                         // process response
                         // TODO WADL method can define multiple responses, each with multiple representations, refactoring will be needed in order to represent them.
-                    }
+                    }*/
                 }
 
                 // create new endpoint
