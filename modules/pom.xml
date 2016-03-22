@@ -52,6 +52,7 @@
         -->
 
         <version.org.slf4j>1.7.7</version.org.slf4j>
+        <version.logback>1.1.2</version.logback>
     </properties>
 
     <modules>
@@ -119,8 +120,8 @@
                         <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
                         <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
-                        <param>mvn:ch.qos.logback/logback-core@1</param>
-                        <param>mvn:ch.qos.logback/logback-classic@1</param>
+                        <param>mvn:ch.qos.logback/logback-core/${version.logback}@1</param>
+                        <param>mvn:ch.qos.logback/logback-classic/${version.logback}@1</param>
                     </provision>
                 </configuration>
             </plugin>
