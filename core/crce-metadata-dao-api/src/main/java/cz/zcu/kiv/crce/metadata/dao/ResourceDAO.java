@@ -10,6 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
 
 /**
  * Plugin implementing this class manages retrieving and storing metadata of an

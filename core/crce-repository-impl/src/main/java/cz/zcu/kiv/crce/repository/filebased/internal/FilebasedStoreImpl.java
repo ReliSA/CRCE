@@ -7,21 +7,22 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
+import javax.annotation.Nonnull;
+
+import org.apache.commons.io.FileUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-
-import org.apache.commons.io.FileUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
@@ -282,15 +283,22 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     @Override
     public synchronized List<Resource> getResources(Requirement requirement) {
+        return getResources(Collections.singleton(requirement));
+    }
+
+    @Nonnull
+    @Override
+    public synchronized List<Resource> getResources(Set<Requirement> requirement) {
         List<Resource> resources = Collections.emptyList();
         try {
             resources = resourceLoader.getResources(repository, requirement);
         } catch (IOException e) {
-            logger.error("Could not load resources for requirement ({})", requirement.getNamespace(), e);
+            logger.error("Could not load resources for requirement ({})", requirement.toString());
+            logger.error(e.getMessage(), e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("getResources(requirement={}) returns {}", requirement.getNamespace(), resources.size());
+            logger.debug("getResources(requirement={}) returns {}", requirement.toString(), resources.size());
         }
         return resources;
     }

@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.resolver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,4 +20,7 @@ public interface ResourceLoader {
 
     @Nonnull
     List<Resource> getResources(Repository repository, Requirement requirement) throws IOException;
+
+    @Nonnull
+    List<Resource> getResources(Repository repository, Set<Requirement> requirement) throws IOException;
 }

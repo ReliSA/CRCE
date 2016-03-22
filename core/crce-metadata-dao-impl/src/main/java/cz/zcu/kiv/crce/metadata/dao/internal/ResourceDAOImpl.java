@@ -19,26 +19,25 @@ import org.apache.felix.dm.annotation.api.Start;
 import org.apache.felix.dm.annotation.api.Stop;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
-import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
+import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 
@@ -315,27 +314,15 @@ public class ResourceDAOImpl implements ResourceDAO {
     @Override
     public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceDAOFilter filter) throws IOException {
         logger.debug("loadResources(repository={}, filter={})", repository,
-                logger.isTraceEnabled() ? filter : filter.getNamespace() + "(" + filter.getAttributes().size() + ")");
+                logger.isTraceEnabled() ? filter.toString() :  "(" + filter.getCapabilityFilters().size() + ")");
 
         List<Resource> result = Collections.emptyList();
         try (SqlSession session = sessionManager.getSession()) {
             Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
 
             if (repositoryId != null) {
-                List<DbResource> dbResources = null;
-                switch (filter.getOperator()) {
-                    case AND:
-                        dbResources = session
-                                .getMapper(ResolvingMapper.class)
-                                .getResourcesAnd(repositoryId, filter.getNamespace(), filter.getAttributes());
-                        break;
+                List<DbResource> dbResources = session.getMapper(ResolvingMapper.class).getResources(repositoryId, filter);
 
-                    case OR:
-                        dbResources = session
-                                .getMapper(ResolvingMapper.class)
-                                .getResourcesOr(repositoryId, filter.getNamespace(), filter.getAttributes());
-
-                }
                 if (dbResources != null && !dbResources.isEmpty()) {
                     result = new ArrayList<>(dbResources.size());
                     for (DbResource dbResource : dbResources) {
@@ -353,10 +340,10 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         if (logger.isTraceEnabled()) {
             logger.trace("loadResources(repository={}, filter={}) returns {}",
-                    repository, filter.getNamespace() + "(" + filter.getAttributes().size() + ")", result);
+                    repository, filter.toString() + "(" + filter.getCapabilityFilters().size() + ")", result);
         } else {
             logger.debug("loadResources(repository={}, filter={}) returns {}",
-                    repository, filter.getNamespace() + "(" + filter.getAttributes().size() + ")", result.size());
+                    repository, "(" + filter.getCapabilityFilters().size() + ")", result.size());
         }
 
         return result;

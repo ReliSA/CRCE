@@ -11,28 +11,30 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
-import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
@@ -389,6 +391,12 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public List<Resource> getResources(Requirement requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Nonnull
+    @Override
+    public List<Resource> getResources(Set<Requirement> requirement) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

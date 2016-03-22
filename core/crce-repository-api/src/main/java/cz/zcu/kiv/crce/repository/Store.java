@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.repository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -51,6 +52,9 @@ public interface Store {
 
     @Nonnull
     List<Resource> getResources(Requirement requirement);
+
+    @Nonnull
+    List<Resource> getResources(Set<Requirement> requirement);
 
     /**
      * TODO analyze requirements for this method:

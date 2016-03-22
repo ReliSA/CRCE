@@ -2,12 +2,10 @@ package cz.zcu.kiv.crce.metadata.dao.internal.mapper;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 
-import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 
 /**
@@ -16,11 +14,6 @@ import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
  */
 public interface ResolvingMapper {
 
-    @SelectProvider(type = ResolvingSqlProvider.class, method = "getResourcesAnd")
-    List<DbResource> getResourcesAnd(
-            @Param("repositoryId") long repositoryId, @Param("namespace") @Nonnull String namespace, @Param("attributes") List<Attribute<?>> attributes);
-
-    @SelectProvider(type = ResolvingSqlProvider.class, method = "getResourcesOr")
-    List<DbResource> getResourcesOr(
-            @Param("repositoryId") long repositoryId, @Param("namespace") @Nonnull String namespace, @Param("attributes") List<Attribute<?>> attributes);
+    @SelectProvider(type = SqlFilterProvider.class, method = "generateSQL")
+    List<DbResource> getResources(@Param(SqlFilterProvider.PARAM_REPOSITORY_ID) long repositoryId, @Param(SqlFilterProvider.PARAM_FILTER) ResourceDAOFilter filter);
 }
