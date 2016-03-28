@@ -7,8 +7,10 @@ import java.util.List;
  * Date: 10.3.16
  *
  * @author Jakub Danek
+ * @since 3.0.0
+ * @version 3.0.0
  */
-public class ResourceDAOFilter {
+public class ResourceFilter {
 
     /**
      * Operator to be used to joing the filters
@@ -16,7 +18,7 @@ public class ResourceDAOFilter {
     private Operator operator;
     private final List<CapabilityFilter> capabilityFilters;
 
-    public ResourceDAOFilter() {
+    public ResourceFilter() {
         this.capabilityFilters = new ArrayList<>();
     }
 

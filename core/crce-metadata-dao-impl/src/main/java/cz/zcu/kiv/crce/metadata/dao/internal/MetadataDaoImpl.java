@@ -28,18 +28,20 @@ import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
-import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbAttribute;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbDirective;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbProperty;
+import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRepository;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbRequirement;
 import cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import javax.annotation.CheckForNull;
 
 /**
  *
@@ -47,17 +49,18 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
  * @author Jan Dyrczyk (dyrczyk@students.zcu.cz)
  * @author Pavel Cihlář
  */
-@Component(provides={ResourceDAO.class})
-public class ResourceDAOImpl implements ResourceDAO {
+@Component(provides={MetadataDao.class})
+public class MetadataDaoImpl implements MetadataDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceDAOImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetadataDaoImpl.class);
 
     private static final String RESOURCE_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResourceMapper.";
+    private static final String REPOSITORY_MAPPER = "cz.zcu.kiv.crce.metadata.dao.internal.mapper.RepositoryMapper.";
+
 
     @ServiceDependency private volatile MetadataFactory metadataFactory;
     @ServiceDependency private volatile MetadataService metadataService;
     @ServiceDependency private volatile SessionManager sessionManager;
-    @ServiceDependency private volatile RepositoryDAOImpl repositoryDAOImpl;
 
     @Start
     void start() {
@@ -284,7 +287,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         List<Resource> result = Collections.emptyList();
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
+            Long repositoryId = getRepositoryId(repository.getId(), session);
 
             if (repositoryId != null) {
                 List<DbResource> dbResources = session.selectList(RESOURCE_MAPPER + "selectResourcesByRepositoryId", repositoryId);
@@ -312,13 +315,13 @@ public class ResourceDAOImpl implements ResourceDAO {
     }
 
     @Override
-    public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceDAOFilter filter) throws IOException {
+    public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceFilter filter) throws IOException {
         logger.debug("loadResources(repository={}, filter={})", repository,
                 logger.isTraceEnabled() ? filter.toString() :  "(" + filter.getCapabilityFilters().size() + ")");
 
         List<Resource> result = Collections.emptyList();
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
+            Long repositoryId = getRepositoryId(repository.getId(), session);
 
             if (repositoryId != null) {
                 List<DbResource> dbResources = session.getMapper(ResolvingMapper.class).getResources(repositoryId, filter);
@@ -378,7 +381,7 @@ public class ResourceDAOImpl implements ResourceDAO {
                 throw new IllegalArgumentException("Repository is not set on resource: " + resource.getId());
             }
 
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repositoryUuid, session);
+            Long repositoryId = getRepositoryId(repositoryUuid, session);
             if (repositoryId == null) {
                 throw new IllegalArgumentException("Repository doesn't exist: " + repositoryUuid);
             }
@@ -542,7 +545,7 @@ public class ResourceDAOImpl implements ResourceDAO {
 
         boolean result = false;
         try (SqlSession session = sessionManager.getSession()) {
-            Long repositoryId = repositoryDAOImpl.getRepositoryId(repository.getId(), session);
+            Long repositoryId = getRepositoryId(repository.getId(), session);
 
             DbResource dbResource = session.selectOne(RESOURCE_MAPPER + "selectResourceByUri", uri.toString());
             if (dbResource != null && dbResource.getRepositoryId() == repositoryId) {
@@ -569,5 +572,107 @@ public class ResourceDAOImpl implements ResourceDAO {
         }
 
         return result;
+    }
+
+
+    @Override
+    public Repository loadRepository(URI uri) throws IOException {
+        logger.debug("loadRepository(uri={})", uri);
+
+        Repository repository;
+        try (SqlSession session = sessionManager.getSession()) {
+            repository = loadRepository(uri, session);
+        } catch (PersistenceException e) {
+            throw new IOException(e);
+        }
+
+        logger.debug("loadRepository(uri={}) returns {}", uri, repository);
+
+        return repository;
+    }
+
+    @CheckForNull
+    private Repository loadRepository(@Nonnull URI uri, @Nonnull SqlSession session) {
+        Repository repository = null;
+        DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByUri", uri.toString());
+        if (dbRepository != null) {
+            try {
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()), dbRepository.getId());
+            } catch (URISyntaxException ex) {
+                throw new IllegalArgumentException("Invalid URI: " + dbRepository.getUri(), ex);
+            }
+        }
+        return repository;
+    }
+
+    @Override
+    public void deleteRepository(Repository repository) throws IOException {
+        logger.debug("deleteRepository(repository={})", repository);
+
+        try (SqlSession session = sessionManager.getSession()) {
+            session.delete(REPOSITORY_MAPPER + "deleteRepository", repository.getUri().toString());
+        }
+
+        logger.debug("deleteRepository(repository={}) returns", repository);
+    }
+
+    @Override
+    public void saveRepository(Repository repository) throws IOException {
+        logger.debug("saveRepository(repository={})", repository);
+
+        try (SqlSession session = sessionManager.getSession()) {
+            if (loadRepository(repository.getUri()) == null) {
+                SequenceMapper seqMapper = session.getMapper(SequenceMapper.class);
+
+                DbRepository dbRepository = new DbRepository();
+
+                long repositoryId = seqMapper.nextVal("resource_seq");
+
+                dbRepository.setRepositoryId(repositoryId);
+                dbRepository.setUri(repository.getUri().toString());
+                dbRepository.setId(repository.getId());
+
+                session.insert(REPOSITORY_MAPPER + "insertRepository", dbRepository);
+
+                session.commit();
+            } else {
+                logger.info("Saved repository already exists, saving skipped (update not implemented).");
+            }
+        }
+
+        logger.debug("saveRepository(repository={}) returns", repository);
+    }
+
+    /* Internal public methods */
+
+    @CheckForNull
+    public Long getRepositoryId(@Nonnull String uuid, @Nonnull SqlSession session) {
+        logger.debug("getRepositoryId(uuid={})", uuid);
+
+        Long repositoryId = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryId", uuid);
+
+        logger.debug("getRepositoryId(uuid={}) returns {}", uuid, repositoryId);
+
+        return repositoryId;
+    }
+
+    @CheckForNull
+    public Repository loadRepository(long repositoryId, @Nonnull SqlSession session) throws IOException {
+        logger.debug("getRepository(repositoryId={})", repositoryId);
+
+        Repository repository = null;
+
+        DbRepository dbRepository = session.selectOne(REPOSITORY_MAPPER + "selectRepositoryByRepositoryId", repositoryId);
+        if (dbRepository != null) {
+            try {
+                repository = metadataFactory.createRepository(new URI(dbRepository.getUri()), dbRepository.getId());
+            } catch (URISyntaxException e) {
+                throw new IOException("Invalid URI syntax of repository with ID: " + repositoryId + ", URI: " + dbRepository.getUri(), e);
+            }
+        }
+
+        logger.debug("getRepository(repositoryId={}) returns {}", repositoryId, repository);
+
+        return repository;
     }
 }

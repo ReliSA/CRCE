@@ -10,20 +10,21 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 
 /**
  * Plugin implementing this class manages retrieving and storing metadata of an
  * artifact.
  *
- * <p> Typical usage of <code>ResourceDAO</code> plugin is in repository core to
+ * <p> Typical usage of <code>MetadataDao</code> plugin is in repository core to
  * manipulate and manage metadata resource while uploading artifacts, retrieving
  * them, copying etc.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
+ * @version 3.0.0
  */
 @ParametersAreNonnullByDefault
-public interface ResourceDAO {
+public interface MetadataDao {
 
     /**
      * Returns <code>Resource</code> object for the given resource. Returns
@@ -47,7 +48,7 @@ public interface ResourceDAO {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> loadResources(Repository repository, ResourceDAOFilter filter) throws IOException;
+    List<Resource> loadResources(Repository repository, ResourceFilter filter) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.
@@ -67,4 +68,28 @@ public interface ResourceDAO {
     boolean existsResource(URI uri) throws IOException;
 
     boolean existsResource(URI uri, Repository repository) throws IOException;
+    
+    /**
+     * Reads metadata of resources stored in repository on the given URI.
+     * @param uri Path to repository or a repository identificator.
+     * @return Loaded repository or null if such repository doesn't exist.
+     * @throws IOException
+     */
+    @CheckForNull
+    Repository loadRepository(URI uri) throws IOException;
+
+    /**
+     * Deletes existing repository (if it exists) including all contained resources.
+     * @param repository
+     * @throws IOException
+     */
+    void deleteRepository(Repository repository) throws IOException;
+
+    /**
+     * Stores metadata of resources stored in the given repository. Typical
+     * target is a repository.xml in the root folder of the repository.
+     * @param repository
+     * @throws IOException
+     */
+    void saveRepository(Repository repository) throws IOException;
 }

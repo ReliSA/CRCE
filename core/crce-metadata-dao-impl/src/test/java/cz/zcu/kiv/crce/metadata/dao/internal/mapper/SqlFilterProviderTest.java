@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
 import cz.zcu.kiv.crce.metadata.dao.filter.Operator;
-import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 
 /**
  * Date: 14.3.16
@@ -62,8 +62,8 @@ public class SqlFilterProviderTest {
         logger.info(sql);
     }
 
-    private ResourceDAOFilter buildFilter(Operator operator) {
-        ResourceDAOFilter filter = new ResourceDAOFilter();
+    private ResourceFilter buildFilter(Operator operator) {
+        ResourceFilter filter = new ResourceFilter();
         filter.setOperator(operator);
 
         List<Attribute<?>> attributes = new ArrayList<>();

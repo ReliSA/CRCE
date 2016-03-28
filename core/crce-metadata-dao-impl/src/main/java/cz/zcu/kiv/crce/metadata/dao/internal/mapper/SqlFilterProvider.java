@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
-import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 import cz.zcu.kiv.crce.metadata.dao.internal.helper.SimpleStringBuilder;
 import cz.zcu.kiv.crce.metadata.dao.internal.type.DbAttributeType;
 
@@ -76,7 +76,7 @@ public class SqlFilterProvider {
         logger.debug("generateSQL({})", params);
 
         @SuppressWarnings("unchecked")
-        ResourceDAOFilter filter = (ResourceDAOFilter) params.get(PARAM_FILTER);
+        ResourceFilter filter = (ResourceFilter) params.get(PARAM_FILTER);
 
         switch (filter.getOperator()) {
             case OR:

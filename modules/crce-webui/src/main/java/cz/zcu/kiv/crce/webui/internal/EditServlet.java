@@ -154,7 +154,7 @@ public class EditServlet extends HttpServlet {
 //            LegacyMetadataHelper.setVersion(Activator.instance().getMetadataFactory(), resource, new Version(version));
 //            LegacyMetadataHelper.setSymbolicName(Activator.instance().getMetadataFactory(), resource, symbolicName);
 
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save resource property: {}", e.getMessage());
             return false;
@@ -196,7 +196,7 @@ public class EditServlet extends HttpServlet {
             } catch (IllegalArgumentException e) {
                 return false;
             }
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't save property: {}", e.getMessage());
@@ -243,7 +243,7 @@ public class EditServlet extends HttpServlet {
                 return false;
             }
 
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
 
             req.setAttribute("capabilityId", String.valueOf(resource.getCapabilities().size()));
         } catch (URISyntaxException e) {
@@ -320,7 +320,7 @@ public class EditServlet extends HttpServlet {
                 requir.setDirective("extend", String.valueOf(extend));
                 requir.setDirective("comment", comment);
             }
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't add requirement: {}", e.getMessage());
             return false;
@@ -383,7 +383,7 @@ public class EditServlet extends HttpServlet {
                     logger.warn("Cannot change property, resource: {}, capability: {}", resource, capability);
                 }
             }
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save capabilities: {}", e.getMessage());
             return false;
@@ -471,7 +471,7 @@ public class EditServlet extends HttpServlet {
 //					resource.addRequirement(requir);
                 }
             }
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
         } catch (URISyntaxException e) {
             logger.warn("Can't save requirements: {}", e.getMessage());
             return false;
@@ -516,7 +516,7 @@ public class EditServlet extends HttpServlet {
                 req.getSession().setAttribute("message", "Cannot add category.");
             }
 
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't add category: {}", e.getMessage());
@@ -918,7 +918,7 @@ public class EditServlet extends HttpServlet {
                 return false;
             }
 
-            Activator.instance().getResourceDAO().saveResource(resource);
+            Activator.instance().getMetadataDao().saveResource(resource);
 
         } catch (URISyntaxException e) {
             logger.warn("Can't delete category: {}", e.getMessage());

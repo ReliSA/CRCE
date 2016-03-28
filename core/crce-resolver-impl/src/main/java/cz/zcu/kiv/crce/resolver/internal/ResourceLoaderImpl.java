@@ -17,10 +17,10 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
 import cz.zcu.kiv.crce.metadata.dao.filter.Operator;
-import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
+import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -33,7 +33,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceLoaderImpl.class);
 
-    @ServiceDependency private volatile ResourceDAO resourceDAO;
+    @ServiceDependency private volatile MetadataDao metadataDao;
     @ServiceDependency private volatile MetadataFactory metadataFactory; // NOPMD will be used
 
     @Override
@@ -47,8 +47,8 @@ public class ResourceLoaderImpl implements ResourceLoader {
     public List<Resource> getResources(Repository repository, Set<Requirement> requirements) throws IOException {
         List<Resource> resources = Collections.emptyList();
         try {
-            ResourceDAOFilter filter = buildFilter(requirements);
-            resources = resourceDAO.loadResources(repository, filter);
+            ResourceFilter filter = buildFilter(requirements);
+            resources = metadataDao.loadResources(repository, filter);
         } catch (IOException e) {
             logger.error("Could not load resources for requirements ({})", requirements.toString());
             logger.error("Stacktrace: ", e);
@@ -60,8 +60,8 @@ public class ResourceLoaderImpl implements ResourceLoader {
         return resources;
     }
 
-    private ResourceDAOFilter buildFilter(Set<Requirement> requirements) {
-        ResourceDAOFilter filter = new ResourceDAOFilter();
+    private ResourceFilter buildFilter(Set<Requirement> requirements) {
+        ResourceFilter filter = new ResourceFilter();
 
         for (Requirement req : requirements) {
             CapabilityFilter cap = new CapabilityFilter(req.getNamespace());

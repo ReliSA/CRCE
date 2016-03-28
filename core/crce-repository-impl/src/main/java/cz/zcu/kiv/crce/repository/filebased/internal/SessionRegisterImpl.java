@@ -6,8 +6,7 @@ import java.util.Map;
 import org.apache.felix.dm.DependencyManager;
 
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
@@ -42,8 +41,7 @@ public class SessionRegisterImpl implements SessionRegister {
                         .add(dependencyManager.createServiceDependency().setService(PluginManager.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(Store.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataFactory.class).setRequired(true))
-                        .add(dependencyManager.createServiceDependency().setService(ResourceDAO.class).setRequired(true))
-                        .add(dependencyManager.createServiceDependency().setService(RepositoryDAO.class).setRequired(true))
+                        .add(dependencyManager.createServiceDependency().setService(MetadataDao.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataService.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(MetadataValidator.class).setRequired(true))
                         .add(dependencyManager.createServiceDependency().setService(IdentityIndexer.class).setRequired(true))

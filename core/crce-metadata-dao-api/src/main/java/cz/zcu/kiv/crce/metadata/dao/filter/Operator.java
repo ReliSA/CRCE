@@ -4,6 +4,8 @@ package cz.zcu.kiv.crce.metadata.dao.filter;
  * Date: 10.3.16
  *
  * @author Jakub Danek
+ * @since 3.0.0
+ * @version 3.0.0
  */
 public enum Operator {
     AND("AND"),
