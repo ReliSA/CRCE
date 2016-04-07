@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.concurrency.model.Task;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
 import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
@@ -26,16 +26,16 @@ import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 public class MetricsIndexerTask extends Task {
 
 	private static final Logger logger = LoggerFactory.getLogger(MetricsIndexerTask.class);
-	
+
 	private MetadataService metadataService;
 	private MetadataValidator metadataValidator;
-	private MetricsIndexer metricsIndexer;	
+	private MetricsIndexer metricsIndexer;
 	private Resource resource;
-	private ResourceDAO resourceDAO;
-	
+	private MetadataDao metadataDao;
+
 	/**
 	 * New instance.
-	 * 
+	 *
 	 * @param id Job ID.
 	 * @param metadataService MetadataService.
 	 * @param metadataValidator MetadataValidator.
@@ -44,52 +44,52 @@ public class MetricsIndexerTask extends Task {
 	 * @param resourceDAO ResourceDAO.
 	 */
 	protected MetricsIndexerTask(@Nonnull String id, @Nonnull MetadataService metadataService, @Nonnull MetadataValidator metadataValidator,
-			@Nonnull MetricsIndexer metricsIndexer, @Nonnull Resource resource, @Nonnull ResourceDAO resourceDAO) {
-		
+			@Nonnull MetricsIndexer metricsIndexer, @Nonnull Resource resource, @Nonnull MetadataDao resourceDAO) {
+
 		super(id, "Calculates metrics for a provided resource.", "crce-handler-metrics");
 
 		this.metadataService = metadataService;
 		this.metadataValidator = metadataValidator;
 		this.metricsIndexer = metricsIndexer;
-		this.resource = resource;		
-		this.resourceDAO = resourceDAO;
+		this.resource = resource;
+		this.metadataDao = resourceDAO;
 	}
 
 	@Override
 	protected Object run() throws Exception {
-		
+
 		logger.debug("Started computing metrics for resource {} ", resource.getId());
-		
+
 		if (metadataService.getCategories(resource).contains("osgi")) {
-			
-			URI uri = metadataService.getUri(resource);			
+
+			URI uri = metadataService.getUri(resource);
 			File file = new File(uri);
 			logger.debug("file name: {}", file.getName());
 	        try (FileInputStream fis = new FileInputStream(file)) {
 	        	metricsIndexer.index(fis, resource);
 	        }
-	        
+
 	        metricsIndexer.computeAndSaveMetrics(resource);
-	        
-	        ResourceValidationResult validationResult = metadataValidator.validate(resource);        
+
+	        ResourceValidationResult validationResult = metadataValidator.validate(resource);
 	        if (!validationResult.isContextValid()) {
-	        	
+
 	            logger.error("Indexed Resource {} is not valid:\r\n{}", resource.getId(), validationResult);
 	        }
 	        else {
-	        	
+
 		        logger.info("Indexed resource {} is valid.", resource.getId());
-		        
+
 		        try {
-		        	resourceDAO.saveResource(resource);
-		        } 
+		        	metadataDao.saveResource(resource);
+		        }
 		        catch (IOException e) {
 		            logger.error("Could not save indexed resource for file {}: {}", file, resource.getId(), e);
 		        }
 	        }
 		}
 		else {
-			
+
 			logger.debug("Resource {} not OSGI", resource.getId());
 		}
 
