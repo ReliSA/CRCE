@@ -64,20 +64,38 @@
             <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <outputDirectory>crce-bundles</outputDirectory>
+            <scope>runtime</scope>
             <excludes>
+                <exclude>*:war:*</exclude>
                 <exclude>cz.zcu.kiv.crce:crce-core</exclude>
                 <exclude>org.apache.felix:org.apache.felix.utils</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <outputDirectory>crce-wars</outputDirectory>
+            <scope>runtime</scope>
+            <includes>
+                <include>*:war:*</include>
+            </includes>
+            <outputFileNameMapping>
+                ${artifact.artifactId}.${artifact.extension}
+            </outputFileNameMapping>
+        </dependencySet>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <scope>provided</scope>
             <outputDirectory>required-bundles</outputDirectory>
+            <includes>
+                <include>*:jar:*</include>
+            </includes>
             <excludes>
                 <exclude>org.ops4j.pax.runner:pax-runner</exclude>
                 <exclude>org.apache.felix:org.apache.felix.dependencymanager.annotation</exclude>
                 <exclude>com.google.code.findbugs:jsr305</exclude>
+                <exclude>org.apache.tomcat.embed:*</exclude>
             </excludes>
         </dependencySet>
         <dependencySet>
