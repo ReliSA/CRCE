@@ -177,7 +177,7 @@ perspective.
 + Parameters
     + externalId (required, string, `org.obcc.parking.gate`) ... External ID of the particular component. E.g. OSGi "symbolic-name";
     + version (optional, Version, `1.0.0-SNAPSHOT`) ... Version identificator having the major.minor.micro-qualifier schema;    
-    
+
 ### List Meta-Data [GET]
 Returns list of all components fitting the externalId and version, which can be found in the repository with links to their meta-data. 
 Same view as /resources collection, just from different perspective.
@@ -186,7 +186,34 @@ Same view as /resources collection, just from different perspective.
 
     [Meta-Data Collection][]
     
-                  
+    
+### Search Catalogue [POST]
+Returns list of all components fitting the externalId and version and posted requirements parameters.
+
+The requirements set represents a query into the repository with the following rules:
+* each requirement is mapped on a capability - NOT IMPLEMENTED
+* multiple requirements are joined using AND by default (use directive operator on requirements tag to override) - NOT IMPLEMENTED
+* multiple attributes in single requirements are joined using AND by default (use directive operator to override) - NOT IMPLEMENTED
+
++ Request (application/xml)
+
+        <requirements>
+            <requirement namespace='crce.identity'>
+                <attribute name="external-id" value="org.obcc.parking.gate" />      
+                <attribute name="external-id" value="org.obcc.parking.statistics" />
+                <directive name="operator" value="or"/>
+            </requirement>
+            <requirement>
+                <attribute name="provider" value="cz.kiv.zcu"/>
+            </requirement>
+            <directive name="operator" value="and"/>
+        </requirements>
+    
++ Response 200
+    
+    [Meta-Data Collection][]
+    
+    
 ## Meta-Data describing differences between Bundles - not implemented [/meta-data/catalogue/{externalId}/{version}/diffs{?otherExternalId}{?otherVersion}]
 Meta-Data with information about API differences between bundles.
 
