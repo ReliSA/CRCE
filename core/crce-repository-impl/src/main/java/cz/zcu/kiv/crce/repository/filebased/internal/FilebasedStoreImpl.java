@@ -33,6 +33,7 @@ import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
+import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -287,9 +288,19 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     @Nonnull
     @Override
     public synchronized List<Resource> getResources(Set<Requirement> requirement) {
+        return internalGetResources(requirement, Operator.AND);
+    }
+
+    @Nonnull
+    @Override
+    public synchronized List<Resource> getPossibleResources(Set<Requirement> requirement) {
+       return internalGetResources(requirement, Operator.OR);
+    }
+
+    private List<Resource> internalGetResources(Set<Requirement> requirement, Operator op) {
         List<Resource> resources = Collections.emptyList();
         try {
-            resources = resourceLoader.getResources(repository, requirement);
+            resources = resourceLoader.getResources(repository, requirement, op);
         } catch (IOException e) {
             logger.error("Could not load resources for requirement ({})", requirement.toString());
             logger.error(e.getMessage(), e);

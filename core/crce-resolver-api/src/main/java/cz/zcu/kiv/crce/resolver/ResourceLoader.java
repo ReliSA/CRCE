@@ -21,6 +21,24 @@ public interface ResourceLoader {
     @Nonnull
     List<Resource> getResources(Repository repository, Requirement requirement) throws IOException;
 
+    /**
+     *
+     * @param repository repository to search
+     * @param requirement set of requirements
+     * @return resources that fullfil all the given requirements
+     * @throws IOException
+     */
     @Nonnull
     List<Resource> getResources(Repository repository, Set<Requirement> requirement) throws IOException;
+
+    /**
+     *
+     * @param repository repository to search
+     * @param requirement set of requirements
+     * @param op AND or OR the requirement constraints
+     * @return resources that fulfill some or all of the given requirements, depending on the operator value
+     * @throws IOException
+     */
+    @Nonnull
+    List<Resource> getResources(Repository repository, Set<Requirement> requirement, Operator op) throws IOException;
 }

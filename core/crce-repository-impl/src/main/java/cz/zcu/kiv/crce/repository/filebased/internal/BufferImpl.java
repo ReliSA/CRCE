@@ -398,6 +398,12 @@ public class BufferImpl implements Buffer, EventHandler {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Nonnull
+    @Override
+    public List<Resource> getPossibleResources(Set<Requirement> requirement) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     private boolean isInBuffer(Resource resource) {
         URI uri = metadataService.getUri(resource).normalize();
         if (!"file".equals(uri.getScheme())) {

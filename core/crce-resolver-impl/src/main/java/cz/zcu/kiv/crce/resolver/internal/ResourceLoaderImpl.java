@@ -19,8 +19,8 @@ import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
-import cz.zcu.kiv.crce.metadata.dao.filter.Operator;
 import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
+import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -45,9 +45,15 @@ public class ResourceLoaderImpl implements ResourceLoader {
     @Nonnull
     @Override
     public List<Resource> getResources(Repository repository, Set<Requirement> requirements) throws IOException {
+        return getResources(repository, requirements, Operator.AND);
+    }
+
+    @Nonnull
+    @Override
+    public List<Resource> getResources(Repository repository, Set<Requirement> requirements, Operator op) throws IOException {
         List<Resource> resources = Collections.emptyList();
         try {
-            ResourceFilter filter = buildFilter(requirements);
+            ResourceFilter filter = buildFilter(requirements, op);
             resources = metadataDao.loadResources(repository, filter);
         } catch (IOException e) {
             logger.error("Could not load resources for requirements ({})", requirements.toString());
@@ -60,17 +66,28 @@ public class ResourceLoaderImpl implements ResourceLoader {
         return resources;
     }
 
-    private ResourceFilter buildFilter(Set<Requirement> requirements) {
+    private ResourceFilter buildFilter(Set<Requirement> requirements, Operator op) {
         ResourceFilter filter = new ResourceFilter();
+
+        switch (op) {
+            case AND:
+                filter.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.AND);
+                break;
+            case OR:
+                filter.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.OR);
+                break;
+            default:
+                throw new RuntimeException("Invalid state!");
+        }
 
         for (Requirement req : requirements) {
             CapabilityFilter cap = new CapabilityFilter(req.getNamespace());
 
             String operator = req.getDirective("operator");
             if (operator == null || operator.equals("and")) {
-                cap.setOperator(Operator.AND);
+                cap.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.AND);
             } else if (operator.equals("or")) {
-                cap.setOperator(Operator.OR);
+                cap.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.OR);
             }
 
             cap.addAttributes(req.getAttributes());

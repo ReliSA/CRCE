@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ import cz.zcu.kiv.crce.metadata.service.validation.ResourceValidationResult;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
+import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -71,31 +74,33 @@ public class MavenStoreImpl implements Store {
     }
 
     @Override
-    public List<Resource> getResources(Requirement requirement) {
-        List<Resource> resources = Collections.emptyList();
-        try {
-            resources = resourceLoader.getResources(repository, requirement);
-        } catch (IOException e) {
-            logger.error("Could not load resources for requirement ({})", requirement.getNamespace(), e);
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("getResources(requirement={}) returns {}", requirement.getNamespace(), resources.size());
-        }
-        return resources;
+    public synchronized List<Resource> getResources(Requirement requirement) {
+        return getResources(Collections.singleton(requirement));
     }
 
+    @Nonnull
     @Override
-    public List<Resource> getResources(Set<Requirement> requirements) {
+    public synchronized List<Resource> getResources(Set<Requirement> requirement) {
+        return internalGetResources(requirement, Operator.AND);
+    }
+
+    @Nonnull
+    @Override
+    public synchronized List<Resource> getPossibleResources(Set<Requirement> requirement) {
+        return internalGetResources(requirement, Operator.OR);
+    }
+
+    private List<Resource> internalGetResources(Set<Requirement> requirement, Operator op) {
         List<Resource> resources = Collections.emptyList();
         try {
-            resources = resourceLoader.getResources(repository, requirements);
+            resources = resourceLoader.getResources(repository, requirement, op);
         } catch (IOException e) {
-            logger.error("Could not load resources for requirements ({})", requirements, e);
+            logger.error("Could not load resources for requirement ({})", requirement.toString());
+            logger.error(e.getMessage(), e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("getResources(requirement={}) returns {}", requirements, resources.size());
+            logger.debug("getResources(requirement={}) returns {}", requirement.toString(), resources.size());
         }
         return resources;
     }

@@ -19,6 +19,7 @@ public class ResourceFilter {
     private final List<CapabilityFilter> capabilityFilters;
 
     public ResourceFilter() {
+        this.operator = Operator.AND;
         this.capabilityFilters = new ArrayList<>();
     }
 

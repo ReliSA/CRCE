@@ -53,8 +53,22 @@ public interface Store {
     @Nonnull
     List<Resource> getResources(Requirement requirement);
 
+    /**
+     *
+     * @param requirement set of requirements
+     * @return resources that provide the whole set of requirements
+     */
     @Nonnull
     List<Resource> getResources(Set<Requirement> requirement);
+
+    /**
+     *
+     * @param requirement set of requirements
+     * @return resources that provide at least a portion of the requirements
+     */
+    @Nonnull
+    List<Resource> getPossibleResources(Set<Requirement> requirement);
+
 
     /**
      * TODO analyze requirements for this method:
