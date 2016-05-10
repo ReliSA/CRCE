@@ -1,10 +1,12 @@
 package cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -25,6 +27,7 @@ import cz.zcu.kiv.crce.rest.v2.internal.ws.MetadataRes;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.RequirementListVO;
 
 /**
  * Date: 2.8.15
@@ -71,8 +74,24 @@ public class MetadataResJersey implements MetadataRes {
         List<Resource> resources = Activator.instance().getStore().getResources(r);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
-        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {
-        }).build();
+        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
+    }
+
+    @POST
+    @Path("/catalogue/")
+    @Override
+    public Response metadata(RequirementListVO constraint) {
+        List<Requirement> requirements = Activator.instance().getMappingService().map(constraint.getRequirements());
+
+        List<Resource> resources;
+        if(constraint.andRequirements()) {
+            resources = Activator.instance().getStore().getResources(new HashSet<>(requirements));
+        } else {
+            resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements));
+        }
+        List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
+
+        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
     }
 
     /**

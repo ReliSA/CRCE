@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.dozer.CustomConverter;
 import org.dozer.DozerBeanMapper;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -80,7 +81,9 @@ public class DetailedResourceConverterTest {
 
     private void initDozer() {
         convertor = new DetailedResourceConverter(metadataService);
-        convertor.setMapper(new DozerBeanMapper(Arrays.asList("mappings.xml")));
+        DozerBeanMapper m = new DozerBeanMapper(Arrays.asList("mappings.xml"));
+        m.setCustomConverters(Collections.<CustomConverter>singletonList(new RequirementConvertor(null)));
+        convertor.setMapper(m);
     }
 
     /**

@@ -10,6 +10,11 @@
 
         <custom-converters>
 
+            <converter type="cz.zcu.kiv.crce.vo.internal.dozer.convertor.RequirementConvertor">
+                <class-a>cz.zcu.kiv.crce.metadata.Requirement</class-a>
+                <class-b>cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO</class-b>
+            </converter>
+
             <converter type="cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter">
                 <class-a>cz.zcu.kiv.crce.metadata.Resource</class-a>
                 <class-b>cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO</class-b>
@@ -62,6 +67,16 @@
         <field>
             <a>diffDetails</a>
             <b>diffs</b>
+        </field>
+    </mapping>
+
+    <mapping type="one-way">
+        <class-a>cz.zcu.kiv.crce.metadata.Attribute</class-a>
+        <class-b>cz.zcu.kiv.crce.vo.model.metadata.AttributeVO</class-b>
+
+        <field>
+            <a>attributeType.type.name</a>
+            <b>type</b>
         </field>
     </mapping>
 

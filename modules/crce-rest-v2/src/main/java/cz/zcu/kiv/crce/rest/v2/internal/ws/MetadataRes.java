@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.rest.v2.internal.ws;
 
 import javax.ws.rs.core.Response;
 
+import cz.zcu.kiv.crce.vo.model.metadata.RequirementListVO;
+
 /**
  * Date: 5.5.15
  *
@@ -60,6 +62,14 @@ public interface MetadataRes {
      * @return
      */
     Response metadata(String name, String version);
+
+    /**
+     * Displays list of available resources fulfilling the given constraints.
+     *
+     * @param constraint capability constraints
+     * @return
+     */
+    Response metadata(RequirementListVO constraint);
 
     /**
      * Displays detailed information about a concrete resource.

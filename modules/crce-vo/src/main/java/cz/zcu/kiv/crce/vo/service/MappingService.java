@@ -7,10 +7,12 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
 
 /**
  *
@@ -75,4 +77,13 @@ public interface MappingService {
      */
     @Nullable
     CompatibilityVO mapCompatibility(@Nullable Compatibility diff);
+
+    /**
+     * Maps list of requirement vos into list of requirement entities.
+     *
+     * @param requirements to be mapped, not null
+     * @return
+     */
+    @Nonnull
+    List<Requirement> map(List<GenericRequirementVO> requirements);
 }

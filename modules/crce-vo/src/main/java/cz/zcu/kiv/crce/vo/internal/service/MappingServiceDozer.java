@@ -14,15 +14,19 @@ import org.dozer.config.BeanContainer;
 import org.osgi.framework.FrameworkUtil;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.IdentityCapabilityConvertor;
+import cz.zcu.kiv.crce.vo.internal.dozer.convertor.RequirementConvertor;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
 
 /**
@@ -37,6 +41,7 @@ public class MappingServiceDozer implements MappingService {
 
     private DozerBeanMapper mapper;
     private MetadataService metadataService;
+    private MetadataFactory metadataFactory;
 
 
     @Override
@@ -113,6 +118,22 @@ public class MappingServiceDozer implements MappingService {
         return mapper.map(diff, CompatibilityVO.class);
     }
 
+    @Nonnull
+    @Override
+    public List<Requirement> map(List<GenericRequirementVO> requirements) {
+        List<Requirement> req = new LinkedList<>();
+
+        Requirement r;
+        for (GenericRequirementVO requirement : requirements) {
+            r = mapper.map(requirement, Requirement.class);
+            if(r != null) {
+                req.add(r);
+            }
+        }
+
+        return req;
+    }
+
     /**
      * Called by OSGi
      */
@@ -130,6 +151,7 @@ public class MappingServiceDozer implements MappingService {
         converters.add(new BasicResourceConvertor(metadataService));
         converters.add(new DetailedResourceConverter(metadataService));
         converters.add(new IdentityCapabilityConvertor());
+        converters.add(new RequirementConvertor(metadataFactory));
         mapper.setCustomConverters(converters);
 
         // Force loading of the dozer.xml now instead of loading it
@@ -139,5 +161,9 @@ public class MappingServiceDozer implements MappingService {
 
     public void setMetadataService(MetadataService metadataService) {
         this.metadataService = metadataService;
+    }
+
+    public void setMetadataFactory(MetadataFactory metadataFactory) {
+        this.metadataFactory = metadataFactory;
     }
 }
