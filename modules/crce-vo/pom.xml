@@ -13,7 +13,7 @@
     <artifactId>crce-vo</artifactId>
     <packaging>bundle</packaging>
     
-    <name>CRCE - View Objects</name>
+    <name>CRCE - Value Objects</name>
     
     <properties>
         <bundle.symbolicName>${namespace}.vo</bundle.symbolicName>

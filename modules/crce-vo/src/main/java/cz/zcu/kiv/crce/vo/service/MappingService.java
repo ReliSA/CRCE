@@ -9,10 +9,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
 
 /**
  *
@@ -86,4 +88,11 @@ public interface MappingService {
      */
     @Nonnull
     List<Requirement> map(List<GenericRequirementVO> requirements);
+
+    @Nonnull
+    List<CostFunctionDescriptorVO> mapCostFunction(List<CostFunctionFactory> descriptors);
+
+    @Nullable
+    CostFunctionDescriptorVO mapCostFunction(@Nullable CostFunctionFactory descriptor);
+
 }
