@@ -16,6 +16,7 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionRepository;
 import cz.zcu.kiv.crce.vo.service.MappingService;
 
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
@@ -35,6 +36,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile CompatibilitySearchService compatibilityService;
     private volatile SessionRegister sessionRegister;
     private volatile MappingService mappingService;
+    private volatile CostFunctionRepository costFunctionRepository;
 
     public static Activator instance() {
         return instance;
@@ -58,6 +60,10 @@ public final class Activator extends DependencyActivatorBase {
 
     public MappingService getMappingService() {
         return mappingService;
+    }
+
+    public CostFunctionRepository getCostFunctionRepository() {
+        return costFunctionRepository;
     }
 
     @Nullable
@@ -98,6 +104,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(FilterParser.class).setRequired(true))
                 .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
                 .add(createServiceDependency().setService(MappingService.class).setRequired(true))
+                .add(createServiceDependency().setService(CostFunctionRepository.class).setRequired(true))
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false))
         );
 
