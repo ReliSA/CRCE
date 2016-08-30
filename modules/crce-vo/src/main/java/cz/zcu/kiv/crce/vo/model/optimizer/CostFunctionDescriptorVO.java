@@ -2,16 +2,22 @@ package cz.zcu.kiv.crce.vo.model.optimizer;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
+
 /**
  * Date: 17.6.16
  *
  * @author Jakub Danek
  */
+@XmlRootElement(name = "optimizer")
 public class CostFunctionDescriptorVO implements Serializable {
 
     private String id;
     private String description;
 
+    @XmlAttribute(name = "id")
     public String getId() {
         return id;
     }
@@ -20,6 +26,7 @@ public class CostFunctionDescriptorVO implements Serializable {
         this.id = id;
     }
 
+    @XmlValue
     public String getDescription() {
         return description;
     }
