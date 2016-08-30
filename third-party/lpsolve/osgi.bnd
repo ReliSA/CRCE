@@ -1,0 +1,13 @@
+#--------------------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the wrapped library
+#--------------------------------------------------------------------------
+
+#
+# this unpacks the contents of the wrapped jar artifact inside the bundle
+# to also inline dependencies of this artifact add Embed-Transitive: true
+#
+Embed-Dependency: *;scope=compile|runtime;type=!pom;inline=true
+
+Bundle-NativeCode: libs/linux/x64/liblpsolve55j.so; \
+                      osname=Linux ; \
+                      processor=x86-64
