@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,6 +24,7 @@ import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.v2.internal.Activator;
+import cz.zcu.kiv.crce.rest.v2.internal.Headers;
 import cz.zcu.kiv.crce.rest.v2.internal.ws.MetadataRes;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
@@ -84,14 +86,22 @@ public class MetadataResJersey implements MetadataRes {
         List<Requirement> requirements = Activator.instance().getMappingService().map(constraint.getRequirements());
 
         List<Resource> resources;
+        //ugly hack to measure experiment time
+        long duration = System.nanoTime();
         if(constraint.andRequirements()) {
             resources = Activator.instance().getStore().getResources(new HashSet<>(requirements));
         } else {
             resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements));
         }
+        duration = System.nanoTime() - duration;
+        duration = TimeUnit.NANOSECONDS.toMillis(duration);
+
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
-        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
+        Response.ResponseBuilder b =  Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {});
+        b.header(Headers.REQUEST_DURATION, duration);
+
+        return b.build();
     }
 
     /**
