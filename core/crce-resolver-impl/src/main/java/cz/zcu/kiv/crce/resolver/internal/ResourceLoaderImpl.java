@@ -27,6 +27,7 @@ import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
 import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunction;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionRepository;
 import cz.zcu.kiv.crce.resolver.optimizer.NsResultOptimizer;
 import cz.zcu.kiv.crce.resolver.optimizer.OptimizationMode;
@@ -102,7 +103,11 @@ public class ResourceLoaderImpl implements ResourceLoader {
         //TODO Requirement should implement AttributeProvider interface to avoid this
         List<Attribute<String>> id = optimizationRequest.getAttributes(NsResultOptimizer.ATTRIBUTE__FUNCTION_ID);
 
-        return !id.isEmpty() ? costFunctionRepository.findOne(id.get(0).getValue()).createInstance(optimizationRequest) : null;
+        if(id.isEmpty()) {
+            return null;
+        }
+        CostFunctionFactory factory = costFunctionRepository.findOne(id.get(0).getValue());
+        return factory != null ? factory.createInstance(optimizationRequest) : null;
     }
 
     /**
