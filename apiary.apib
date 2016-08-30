@@ -7,6 +7,25 @@ Project URL: https://www.assembla.com/spaces/crce
 
 Source Code: http://github.com/ReliSA/crce/
 
+# Group Cost Functions
+
+Cost functions are optimization functions supported by the repository. They assign a particular value to each component. The functions
+may be used for search result optimization when querying the /meta-data/catalogue endpoint.
+
+## Cost Function Collection [/optimizers]
+
+### List All Available Cost Functions [GET]
+
+Returns list of cost functions supported by the repository.
+
++ Response 200 (application/xml)
+
+    + Body
+    
+                <optimizers>
+                    <optimizer id="equal-cost">Optimizes result set by the total amount of components (usually you want to return as few components as possible in this scenario.</optimizer>
+                </optimizers>
+
 # Group Resources
 Resources of the CRCE API represent the actual component binaries. These endpoints allow browsing of
 basic resource identification meta-data and the actual binary search and download.
@@ -186,27 +205,35 @@ Same view as /resources collection, just from different perspective.
 
     [Meta-Data Collection][]
     
+
+## Search Meta-Data Collection [/metadata/catalogue/] 
     
 ### Search Catalogue [POST]
 Returns list of all components fitting the externalId and version and posted requirements parameters.
 
 The requirements set represents a query into the repository with the following rules:
 * each requirement is mapped on a capability - NOT IMPLEMENTED
-* multiple requirements are joined using AND by default (use directive operator on requirements tag to override) - NOT IMPLEMENTED
-* multiple attributes in single requirements are joined using AND by default (use directive operator to override) - NOT IMPLEMENTED
+* multiple requirements are joined using AND by default (use directive operator on requirements tag to override) - DIRECTIVE NOT IMPLEMENTED
+* multiple attributes in single requirements are joined using AND by default (use directive operator to override) - DIRECTIVE NOT IMPLEMENTED
+* all xml attributes are mandatory (uuid, namespace, name, type, value)
+
+The search request may come with additional optimization criteria. The optimization requirement is denoted by namespace 'result.optimize-by'.
+Its attribute 'function-ID' of type 'java.lang.String' specifies the optimization function. Query the *Cost Function Repository* endpoint to
+receive list of supported optimization functions.
 
 + Request (application/xml)
 
         <requirements>
-            <requirement namespace='crce.identity'>
-                <attribute name="external-id" value="org.obcc.parking.gate" />      
-                <attribute name="external-id" value="org.obcc.parking.statistics" />
-                <directive name="operator" value="or"/>
+            <requirement uuid='1' namespace='crce.identity'>
+                <attribute name="external-id" type="java.lang.String" value="org.obcc.parking.gate" />      
+                <attribute name="external-id" type="java.lang.String" value="org.obcc.parking.statistics" />
             </requirement>
-            <requirement>
+            <requirement uuid='2' namespace='osgi.identity'>
                 <attribute name="provider" value="cz.kiv.zcu"/>
             </requirement>
-            <directive name="operator" value="and"/>
+           <requirement uuid="3" namespace="result.optimize-by">
+                <attribute name="function-ID" type="java.lang.String" value="equal-cost"/>
+            </requirement>
         </requirements>
     
 + Response 200
