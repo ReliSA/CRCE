@@ -47,6 +47,11 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
 
     @Override
     public List<Resource> optimizeResult(Set<Requirement> requirements, List<Resource> fullSet, CostFunction cost, OptimizationMode mode) {
+        if(fullSet.isEmpty()) {
+            logger.info("No candidates, nothing to optimize.");
+            return fullSet;
+        }
+
         logger.info("Attempting result optimization.");
         LpSolve lp = null;
         try {

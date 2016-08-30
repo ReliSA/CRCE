@@ -3,6 +3,9 @@ package cz.zcu.kiv.crce.resolver.optimizer;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -14,6 +17,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  *
  * @author Jakub Danek
  */
+@ParametersAreNonnullByDefault
 public interface ResultOptimizer {
 
     /**
@@ -25,6 +29,7 @@ public interface ResultOptimizer {
      * @param mode optimization mode - min or max
      * @return in general subset with lowest/highest price/score still fulfilling the requirements
      */
+    @Nonnull
     List<Resource> optimizeResult(Set<Requirement> requirements, List<Resource> fullSet, CostFunction cost, OptimizationMode mode);
 
 }
