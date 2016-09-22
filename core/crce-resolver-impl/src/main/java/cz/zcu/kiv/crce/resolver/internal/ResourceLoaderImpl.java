@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.resolver.internal;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -157,6 +158,12 @@ public class ResourceLoaderImpl implements ResourceLoader {
                 throw new RuntimeException("Invalid state!");
         }
 
+        filter = processRequirements(filter, requirements);
+
+        return filter;
+    }
+
+    private ResourceFilter processRequirements(ResourceFilter filter, Set<Requirement> requirements) {
         for (Requirement req : requirements) {
             CapabilityFilter cap = new CapabilityFilter(req.getNamespace());
 
@@ -168,9 +175,28 @@ public class ResourceLoaderImpl implements ResourceLoader {
             }
 
             cap.addAttributes(req.getAttributes());
+            processRequirements(cap, req.getChildren());
             filter.addCapabilityFilter(cap);
         }
 
         return filter;
+    }
+
+    private void processRequirements(CapabilityFilter filter, Collection<Requirement> requirements) {
+        for (Requirement req : requirements) {
+            CapabilityFilter cap = new CapabilityFilter(req.getNamespace());
+
+            String operator = req.getDirective("operator");
+            if (operator == null || operator.equals("and")) {
+                cap.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.AND);
+            } else if (operator.equals("or")) {
+                cap.setOperator(cz.zcu.kiv.crce.metadata.dao.filter.Operator.OR);
+            }
+
+            cap.addAttributes(req.getAttributes());
+            processRequirements(cap, req.getChildren());
+            filter.addSubFilter(cap);
+        }
+
     }
 }
