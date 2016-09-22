@@ -38,6 +38,9 @@ public interface MetadataDao {
     Resource loadResource(URI uri) throws IOException;
 
     @Nonnull
+    List<Resource> loadResourcesWithoutCategory(String category) throws IOException;
+
+    @Nonnull
     List<Resource> loadResources(Repository repository) throws IOException;
 
     /**
