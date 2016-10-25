@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.compatibility.dao.internal;
+package cz.zcu.kiv.crce.metadata.dao.mongodb;
 
 import java.net.UnknownHostException;
 
