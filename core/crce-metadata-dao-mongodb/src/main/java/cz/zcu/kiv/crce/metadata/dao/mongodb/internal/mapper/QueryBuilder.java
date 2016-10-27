@@ -127,7 +127,7 @@ public class QueryBuilder {
     private static DBQuery.Query processAttributeFilter(String prefix, Attribute<?> attribute) {
         DBQuery.Query name = DBQuery.is(joinPath(prefix, DbAttribute.NAME), attribute.getName());
         DBQuery.Query type = DBQuery.is(joinPath(prefix, DbAttribute.TYPE), attribute.getType());
-        DBQuery.Query value = processAttributeValue(joinPath(prefix, DbAttribute.VALUE), attribute.getOperator(), attribute.getValue());
+        DBQuery.Query value = processAttributeValue(prefix, attribute.getOperator(), attribute.getValue());
 
         return DBQuery.and(name, type, value);
     }
