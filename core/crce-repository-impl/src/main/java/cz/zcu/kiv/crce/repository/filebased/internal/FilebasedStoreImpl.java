@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.BundleContext;
@@ -270,10 +271,21 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }).start();
     }
 
+    @Nullable
+    @Override
+    public Resource getResource(String uid, boolean withDetails) {
+        try {
+            return metadataDao.loadResource(uid, withDetails);
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return null;
+    }
+
     @Override
     public synchronized List<Resource> getResources() {
         try {
-            return metadataDao.loadResources(repository);
+            return metadataDao.loadResources(repository, false);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
@@ -281,26 +293,26 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     @Override
-    public synchronized List<Resource> getResources(Requirement requirement) {
-        return getResources(Collections.singleton(requirement));
+    public synchronized List<Resource> getResources(Requirement requirement, boolean withDetails) {
+        return getResources(Collections.singleton(requirement), withDetails);
     }
 
     @Nonnull
     @Override
-    public synchronized List<Resource> getResources(Set<Requirement> requirement) {
-        return internalGetResources(requirement, Operator.AND);
+    public synchronized List<Resource> getResources(Set<Requirement> requirement, boolean withDetails) {
+        return internalGetResources(requirement, Operator.AND, withDetails);
     }
 
     @Nonnull
     @Override
-    public synchronized List<Resource> getPossibleResources(Set<Requirement> requirement) {
-       return internalGetResources(requirement, Operator.OR);
+    public synchronized List<Resource> getPossibleResources(Set<Requirement> requirement, boolean withDetails) {
+       return internalGetResources(requirement, Operator.OR, withDetails);
     }
 
-    private List<Resource> internalGetResources(Set<Requirement> requirement, Operator op) {
+    private List<Resource> internalGetResources(Set<Requirement> requirement, Operator op, boolean withDetails) {
         List<Resource> resources = Collections.emptyList();
         try {
-            resources = resourceLoader.getResources(repository, requirement, op);
+            resources = resourceLoader.getResources(repository, requirement, op, withDetails);
         } catch (IOException e) {
             logger.error("Could not load resources for requirement ({})", requirement.toString());
             logger.error(e.getMessage(), e);

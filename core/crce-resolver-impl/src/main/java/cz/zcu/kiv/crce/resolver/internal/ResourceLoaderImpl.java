@@ -51,25 +51,25 @@ public class ResourceLoaderImpl implements ResourceLoader {
 
     @Override
     @Nonnull
-    public List<Resource> getResources(Repository repository, Requirement requirement) throws IOException {
-        return getResources(repository, Collections.singleton(requirement));
+    public List<Resource> getResources(Repository repository, Requirement requirement, boolean withDetails) throws IOException {
+        return getResources(repository, Collections.singleton(requirement), withDetails);
     }
 
     @Nonnull
     @Override
-    public List<Resource> getResources(Repository repository, Set<Requirement> requirements) throws IOException {
-        return getResources(repository, requirements, Operator.AND);
+    public List<Resource> getResources(Repository repository, Set<Requirement> requirements, boolean withDetails) throws IOException {
+        return getResources(repository, requirements, Operator.AND, withDetails);
     }
 
     @Nonnull
     @Override
-    public List<Resource> getResources(Repository repository, Set<Requirement> requirements, Operator op) throws IOException {
+    public List<Resource> getResources(Repository repository, Set<Requirement> requirements, Operator op, boolean withDetails) throws IOException {
         List<Resource> resources = Collections.emptyList();
         try {
             Requirement optRequirement = extractAndRemoveOptimizationRequirement(requirements);
 
             ResourceFilter filter = buildFilter(requirements, op);
-            resources = metadataDao.loadResources(repository, filter);
+            resources = metadataDao.loadResources(repository, withDetails, filter);
 
             if(optimizer != null && optRequirement != null) {
                 CostFunction costFunction = extractCostFunction(optRequirement);

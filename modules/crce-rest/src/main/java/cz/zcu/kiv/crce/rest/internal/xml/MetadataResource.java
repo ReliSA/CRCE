@@ -86,7 +86,7 @@ public class MetadataResource extends ResourceParent implements GetMetadata {
             if (filter != null) {
                 Requirement requirement = Activator.instance().getFilterParser().parse(filter, NsOsgiIdentity.NAMESPACE__OSGI_IDENTITY);
                 logger.debug("Filter used to get metadata: {}.", filter);
-                storeResources = Activator.instance().getStore().getResources(requirement);
+                storeResources = Activator.instance().getStore().getResources(requirement, true);
             } else {
                 storeResources = Activator.instance().getStore().getResources();
             }
