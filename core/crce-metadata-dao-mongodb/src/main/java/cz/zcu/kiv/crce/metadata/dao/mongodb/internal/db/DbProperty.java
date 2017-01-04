@@ -2,16 +2,24 @@ package cz.zcu.kiv.crce.metadata.dao.mongodb.internal.db;
 
 import java.util.Set;
 
+import org.mongojack.MongoCollection;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
  */
+@MongoCollection(name = "properties")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DbProperty {
 
     private String id;
     private String namespace;
+    private String resourceId;
 
     private Set<DbAttribute<?>> attributes;
 
@@ -22,6 +30,15 @@ public class DbProperty {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @JsonProperty(DbResource.RESOURCE_ID)
+    public String getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     @JsonProperty("namespace")

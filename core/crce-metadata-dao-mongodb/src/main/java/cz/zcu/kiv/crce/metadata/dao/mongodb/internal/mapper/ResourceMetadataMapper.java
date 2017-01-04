@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.dao.mongodb.internal.mapper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -48,21 +49,32 @@ public class ResourceMetadataMapper {
         Resource dest = metadataFactory.createResource(src.getId());
         metadataService.setUri(dest, src.getUri());
 
-        for (DbCapability dbCapability : src.getCapabilities()) {
-            //prevent creating duplicate crce.identity capabilities.
-            if(Objects.equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY, dbCapability.getNamespace())) {
-                mapCapability(dest, dbCapability, metadataFactory, metadataService);
-            } else {
-                dest.addRootCapability(mapCapability(dest, dbCapability, metadataFactory, metadataService));
+        mapCapability(dest, src.getIdentity(), metadataFactory, metadataService);
+
+        return dest;
+    }
+
+    public static Resource mapCaps(Resource dest, Collection<DbCapability> caps, MetadataFactory metadataFactory, MetadataService metadataService) {
+        for (DbCapability cap : caps) {
+            if(!Objects.equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY, cap.getNamespace())) {
+                dest.addRootCapability(mapCapability(dest, cap, metadataFactory, metadataService));
             }
         }
 
-        for (DbProperty dbProperty : src.getProperties()) {
-            dest.addProperty(mapProperty(dbProperty, metadataFactory));
+        return dest;
+    }
+
+    public static Resource mapReqs(Resource dest, Collection<DbRequirement> reqs, MetadataFactory metadataFactory) {
+        for (DbRequirement req : reqs) {
+            dest.addRequirement(mapRequirement(req, metadataFactory));
         }
 
-        for (DbRequirement dbRequirement : src.getRequirements()) {
-            dest.addRequirement(mapRequirement(dbRequirement, metadataFactory));
+        return dest;
+    }
+
+    public static Resource mapProps(Resource dest, Collection<DbProperty> props, MetadataFactory metadataFactory) {
+        for (DbProperty req : props) {
+            dest.addProperty(mapProperty(req, metadataFactory));
         }
 
         return dest;
@@ -165,46 +177,50 @@ public class ResourceMetadataMapper {
 
         Set<DbCapability> caps = new HashSet<>();
         for (Capability capability : src.getRootCapabilities()) {
-            caps.add(map(capability));
+            if(Objects.equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY, capability.getNamespace())) {
+                dest.setIdentity(map(capability, null));
+            }
+            caps.add(map(capability, src.getId()));
         }
         dest.setCapabilities(caps);
 
         Set<DbRequirement> reqs = new HashSet<>();
         for (Requirement requirement : src.getRequirements()) {
-            reqs.add(map(requirement));
+            reqs.add(map(requirement, src.getId()));
         }
         dest.setRequirements(reqs);
 
         Set<DbProperty> props = new HashSet<>();
         for (Property property : src.getProperties()) {
-            props.add(map(property));
+            props.add(map(property, src.getId()));
         }
         dest.setProperties(props);
 
         return dest;
     }
 
-    private static DbCapability map(Capability src) {
+    private static DbCapability map(Capability src, String resourceId) {
         DbCapability dest = new DbCapability();
 
         dest.setId(src.getId());
         dest.setNamespace(src.getNamespace());
+        dest.setResourceId(resourceId);
 
         Set<DbCapability> caps = new HashSet<>();
         for (Capability capability : src.getChildren()) {
-            caps.add(map(capability));
+            caps.add(map(capability, null));
         }
         dest.setChildren(caps);
 
         Set<DbRequirement> reqs = new HashSet<>();
         for (Requirement requirement : src.getRequirements()) {
-            reqs.add(map(requirement));
+            reqs.add(map(requirement, null));
         }
         dest.setRequirements(reqs);
 
         Set<DbProperty> props = new HashSet<>();
         for (Property property : src.getProperties()) {
-            props.add(map(property));
+            props.add(map(property, null));
         }
         dest.setProperties(props);
 
@@ -224,15 +240,16 @@ public class ResourceMetadataMapper {
         return dest;
     }
 
-    private static DbRequirement map(Requirement src) {
+    private static DbRequirement map(Requirement src, String resourceId) {
         DbRequirement dest = new DbRequirement();
 
         dest.setId(src.getId());
         dest.setNamespace(src.getNamespace());
+        dest.setResourceId(resourceId);
 
         Set<DbRequirement> reqs = new HashSet<>();
         for (Requirement requirement : src.getChildren()) {
-            reqs.add(map(requirement));
+            reqs.add(map(requirement, null));
         }
         dest.setChildren(reqs);
 
@@ -251,11 +268,12 @@ public class ResourceMetadataMapper {
         return dest;
     }
 
-    private static DbProperty map(Property src) {
+    private static DbProperty map(Property src, String resourceId) {
         DbProperty dest = new DbProperty();
 
         dest.setId(src.getId());
         dest.setNamespace(src.getNamespace());
+        dest.setResourceId(resourceId);
 
         Set<DbAttribute<?>> atts = new HashSet<>();
         for (Attribute<?> attribute : src.getAttributes()) {
@@ -298,8 +316,7 @@ public class ResourceMetadataMapper {
 
     public static Repository map(DbRepository src, MetadataFactory metadataFactory) {
         try {
-            Repository dest = metadataFactory.createRepository(new URI(src.getUri()), src.getId());
-            return dest;
+            return metadataFactory.createRepository(new URI(src.getUri()), src.getId());
         } catch (URISyntaxException e) {
             logger.error(e.getMessage(), e);
         }

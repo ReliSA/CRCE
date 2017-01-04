@@ -3,9 +3,13 @@ package cz.zcu.kiv.crce.metadata.dao.mongodb.internal.mapper;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
@@ -26,7 +30,7 @@ public class QueryBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryBuilder.class);
 
-    private static final DBQuery.Query IDENTITY_QUERY = DBQuery.is(DbResource.CAPABILITIES + "." + DbCapability.NAMESPACE, "crce.identity");
+    public static final DBObject RESOURCE_ID = new BasicDBObject(DbResource.RESOURCE_ID, 1);
 
     /**
      *
@@ -34,10 +38,10 @@ public class QueryBuilder {
      * @return query for all resources that dont have the given category
      */
     public static DBQuery.Query queryByMissingCategory(String category) {
-        DBQuery.Query cats = DBQuery.is(joinPath(joinPath(DbResource.CAPABILITIES, DbCapability.ATTRIBUTES), DbAttribute.NAME), "categories");
-        DBQuery.Query catsVal =  DBQuery.notIn(joinPath(joinPath(DbResource.CAPABILITIES, DbCapability.ATTRIBUTES), DbAttribute.VALUE), category);
+        DBQuery.Query cats = DBQuery.is(joinPath(joinPath(DbResource.IDENTITY, DbCapability.ATTRIBUTES), DbAttribute.NAME), "categories");
+        DBQuery.Query catsVal =  DBQuery.notIn(joinPath(joinPath(DbResource.IDENTITY, DbCapability.ATTRIBUTES), DbAttribute.VALUE), category);
 
-        return DBQuery.and(IDENTITY_QUERY, cats, catsVal);
+        return DBQuery.and(cats, catsVal);
     }
 
     /**
@@ -46,7 +50,16 @@ public class QueryBuilder {
      * @return query for resource with the given PK (resource id)
      */
     public static DBQuery.Query queryByPK(String pk) {
-        return DBQuery.is("id", pk);
+        return DBQuery.is("_id", pk);
+    }
+
+    /**
+     *
+     * @param pks  resource uuids
+     * @return query for resource with the given PK (resource id)
+     */
+    public static DBQuery.Query queryByPK(List<String> pks) {
+        return DBQuery.in("_id", pks);
     }
 
     /**
@@ -67,6 +80,11 @@ public class QueryBuilder {
         return DBQuery.is(DbResource.REPOSITORY_UUID, repositoryId);
     }
 
+    public static DBQuery.Query queryByResourceId(String resourceId) {
+        return DBQuery.is(DbResource.RESOURCE_ID, resourceId);
+    }
+
+
     /**
      *
      * @param filter  search filter instance
@@ -75,7 +93,7 @@ public class QueryBuilder {
     public static DBQuery.Query processCapabilityFilters(ResourceFilter filter) {
         logger.debug("processCapabilityFilters({})", filter);
 
-        return processCapabilityFilters(DbResource.CAPABILITIES, filter.getOperator(), filter.getCapabilityFilters());
+        return processCapabilityFilters("", filter.getOperator(), filter.getCapabilityFilters());
     }
 
     /**
@@ -126,7 +144,7 @@ public class QueryBuilder {
 
     private static DBQuery.Query processAttributeFilter(String prefix, Attribute<?> attribute) {
         DBQuery.Query name = DBQuery.is(joinPath(prefix, DbAttribute.NAME), attribute.getName());
-        DBQuery.Query type = DBQuery.is(joinPath(prefix, DbAttribute.TYPE), attribute.getType());
+        DBQuery.Query type = DBQuery.is(joinPath(prefix, DbAttribute.TYPE), attribute.getType().getName());
         DBQuery.Query value = processAttributeValue(prefix, attribute.getOperator(), attribute.getValue());
 
         return DBQuery.and(name, type, value);
@@ -163,6 +181,9 @@ public class QueryBuilder {
     }
 
     private static String joinPath(String prefix, String addon) {
+        if(StringUtils.isBlank(prefix)) {
+            return addon;
+        }
         return prefix + "." + addon;
     }
 

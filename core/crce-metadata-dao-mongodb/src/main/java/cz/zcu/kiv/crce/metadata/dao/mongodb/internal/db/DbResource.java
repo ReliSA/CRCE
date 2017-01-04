@@ -5,6 +5,7 @@ import java.util.Set;
 import org.mongojack.Id;
 import org.mongojack.MongoCollection;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,13 +17,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DbResource {
 
-    public static final String CAPABILITIES = "capabilities";
+    public static final String IDENTITY = "identityCapability";
     public static final String REPOSITORY_UUID = "repository_id";
     public static final String URI = "uri";
+    public static final String RESOURCE_ID = "resourceId";
 
     private String repositoryUuid;
     private String id;
     private String uri;
+
+    private DbCapability identity;
 
     private Set<DbCapability> capabilities;
     private Set<DbRequirement> requirements;
@@ -30,7 +34,7 @@ public class DbResource {
 
 
     @Id
-    @JsonProperty("id")
+    @JsonProperty(RESOURCE_ID)
     public String getId() {
         return id;
     }
@@ -57,7 +61,16 @@ public class DbResource {
         this.repositoryUuid = repositoryUuid;
     }
 
-    @JsonProperty(CAPABILITIES)
+    @JsonProperty(IDENTITY)
+    public DbCapability getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(DbCapability identity) {
+        this.identity = identity;
+    }
+
+    @JsonIgnore
     public Set<DbCapability> getCapabilities() {
         return capabilities;
     }
@@ -66,7 +79,7 @@ public class DbResource {
         this.capabilities = capabilities;
     }
 
-    @JsonProperty("requirements")
+    @JsonIgnore
     public Set<DbRequirement> getRequirements() {
         return requirements;
     }
@@ -75,7 +88,7 @@ public class DbResource {
         this.requirements = requirements;
     }
 
-    @JsonProperty("properties")
+    @JsonIgnore
     public Set<DbProperty> getProperties() {
         return properties;
     }
