@@ -81,7 +81,9 @@
         <module>crce-vo</module>
 
         <!--<module>crce-repository-maven-impl</module>-->
-        
+
+        <module>crce-test-plugin</module>
+
         <module>crce-webservices-indexer</module>
     </modules>
 
