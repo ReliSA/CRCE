@@ -1,11 +1,11 @@
 package cz.zcu.kiv.crce;
 
-import aQute.bnd.maven.PomParser;
-import aQute.bnd.maven.support.Pom;
-import com.sun.org.apache.xpath.internal.operations.Mod;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.namespace.NsMavenArtifact;
+import cz.zcu.kiv.crce.namespace.NsMvnArtifactIdentity;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
@@ -44,8 +44,6 @@ public class ExamplePlugin extends AbstractActionHandler {
 
     public Resource loadCrceIdentity(Resource resource) {
 
-        System.out.println("Resource: "+resource.getId());
-
         return resource;
     }
 
@@ -70,6 +68,9 @@ public class ExamplePlugin extends AbstractActionHandler {
 
     /**
      * Will try to load pom.xml file from provided maven artifact.
+     * If the &lt;version&gt; or &lt;groupId&gt; of artifact aren't specified,
+     * the parent ones (if &lt;parent&gt; exists) will be used.
+     *
      * @param artifactUrl Url to maven artifact (jar or zip).
      * @return Model of pom file.
      * @throws IOException
@@ -83,7 +84,35 @@ public class ExamplePlugin extends AbstractActionHandler {
 
         // create a model object for pom file
         MavenXpp3Reader reader = new MavenXpp3Reader();
-        return reader.read(new InputStreamReader(new ByteArrayInputStream(pom)));
+        Model pomModel = reader.read(new InputStreamReader(new ByteArrayInputStream(pom)));
+
+        return adjustModel(pomModel);
+    }
+
+    /**
+     * If some tags are not specified, this method will try to find them in &lt;parent&gt; tag.
+     * @param model Model to be adjusted.
+     * @return Adjusted model.
+     */
+    public Model adjustModel(Model model) {
+        boolean parentNull = model.getParent() == null;
+
+        // artifact id tag
+        if(model.getArtifactId() == null && !parentNull) {
+            model.setArtifactId(model.getParent().getArtifactId());
+        }
+
+        // version tag
+        if(model.getVersion() == null && !parentNull) {
+            model.setVersion(model.getParent().getVersion());
+        }
+
+        // group id tag
+        if(model.getGroupId() == null && !parentNull) {
+            model.setGroupId(model.getParent().getGroupId());
+        }
+
+        return model;
     }
 
     /**
@@ -118,8 +147,17 @@ public class ExamplePlugin extends AbstractActionHandler {
      * @param pomModel Model of pom file.
      * @param resource Resource to be filled with data.
      */
+    //TODO: test populate() method
     private void populate(Model pomModel, Resource resource) {
 
+        // get root capability for maven artifact
+        Capability rootCap = metadataService.getSingletonCapability(resource, NsMvnArtifactIdentity.NAMESPACE__MVN_ARTIFACT_IDENTITY);
+
+        // add stuff to that capability
+        // TODO: null checking
+        rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__ARTIFACT_ID, pomModel.getArtifactId());
+        rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__GROUP_ID, pomModel.getGroupId());
+        rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__VERSION, pomModel.getVersion());
     }
 
     @Override
