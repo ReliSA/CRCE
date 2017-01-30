@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.internal;
 
-import cz.zcu.kiv.crce.ExamplePlugin;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.Plugin;

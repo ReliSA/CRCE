@@ -1,11 +1,16 @@
 package cz.zcu.kiv.crce.internal;
 
-import cz.zcu.kiv.crce.ExamplePlugin;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.service.internal.MetadataServiceImpl;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
@@ -20,6 +25,15 @@ public class PluginTest {
     public static final String TEST_ARTIFACT_ID = "crce-target";
     public static final String TEST_VERSION = "2.1.1-SNAPSHOT";
 
+//    private static MetadataFactory metadataFactory;
+//    private static MetadataService metadataService;
+//
+//    @BeforeClass
+//    public static void before() {
+//        metadataFactory = new MetadataFactoryImpl();
+//        metadataService = new MetadataServiceImpl();
+//    }
+
     @Test
     public void testLoadPom() throws IOException, XmlPullParserException {
         //TODO
@@ -29,8 +43,8 @@ public class PluginTest {
         assertNotNull("Test jar doesn't exists!",artifactUrl);
         Model pomModel = ep.loadPom(artifactUrl);
         assertNotNull("Null returned!", pomModel);
-        assertEquals("Wrong value of artifact id!", TEST_ARTIFACT_ID, pomModel.getArtifactId());
+        assertEquals("Wrong artifact id!", TEST_ARTIFACT_ID, pomModel.getArtifactId());
         // version should be taken from <parent> tag
-        assertEquals("Wrong value of version!", TEST_VERSION, pomModel.getVersion());
+        assertEquals("Wrong version!", TEST_VERSION, pomModel.getVersion());
     }
 }

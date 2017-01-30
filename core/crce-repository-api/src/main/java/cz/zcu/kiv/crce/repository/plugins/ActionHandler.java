@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -8,6 +9,7 @@ import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * This interface defines an executable handler of various events which can
