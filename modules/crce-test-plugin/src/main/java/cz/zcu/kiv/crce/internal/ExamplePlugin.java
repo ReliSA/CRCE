@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.namespace.NsMavenArtifact;
 import cz.zcu.kiv.crce.namespace.NsMvnArtifactIdentity;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
@@ -16,7 +17,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.MalformedLinkException;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -44,16 +48,44 @@ public class ExamplePlugin extends AbstractActionHandler {
 
     public Resource loadCrceIdentity(Resource resource){
         Resource tmp = null;
+        URL url = null;
 
         try {
-            tmp = fillResource(null, resource);
-            resource = tmp;
+            url = getUrl(resource);
+            fillResource(url, resource);
+            addCategories(resource);
+        } catch (MalformedURLException ex) {
+            logger.error("Exception occurred while obtaining resource url: " + ex.getMessage());
+            throw new IllegalStateException("Unexpected malformed url exception!", ex);
+        } catch (XmlPullParserException ex) {
+            logger.error("Exception occurred while parsing artifact pom: " + ex.getMessage());
+            metadataService.addCategory(resource, NsMavenArtifact.CATEGORY__MAVEN_CORRUPTED);
+        } catch (IOException ex) {
+            logger.error("I/O exception occurred while loading maven artifact: " + ex.getMessage());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Exception occurred: "+ex.getMessage());
         }
 
-
         return resource;
+    }
+
+
+    /**
+     * Adds categories for mvn artifact.
+     * @param resource
+     */
+    public void addCategories(Resource resource) {
+        metadataService.addCategory(resource, NsMavenArtifact.CATEGORY__MAVEN_ARTIFACT);
+    }
+
+    /**
+     * Returns the URI taken from the resource identity capability.
+     * @param resource
+     * @return
+     */
+    public URL getUrl(Resource resource) throws MalformedURLException {
+        URI uri = metadataService.getUri(resource);
+        return uri.toURL();
     }
 
     /**
@@ -172,7 +204,6 @@ public class ExamplePlugin extends AbstractActionHandler {
     @Override
     public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
         loadCrceIdentity(resource);
-        logger.trace("Metadata service: "+metadataService.toString()+". Metadata factory: "+metadataFactory);
         return resource;
     }
 
@@ -183,6 +214,10 @@ public class ExamplePlugin extends AbstractActionHandler {
             loadCrceIdentity(r);
         }
         return super.afterBufferCommit(resources, buffer, store);
+    }
+
+    public void setMetadataService(MetadataService metadataService) {
+        this.metadataService = metadataService;
     }
 
     public void setMetadataFactory(MetadataFactory metadataFactory) {

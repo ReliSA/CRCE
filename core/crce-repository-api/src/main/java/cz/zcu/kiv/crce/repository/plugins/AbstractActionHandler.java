@@ -1,15 +1,13 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-
-import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.repository.Store;
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import cz.zcu.kiv.crce.repository.Store;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Abstract implementation of <code>ActionHandler</code> which do nothing and

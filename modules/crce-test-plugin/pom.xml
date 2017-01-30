@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>crce-modules-parent</artifactId>
-        <groupId>cz.zcu.kiv.crce</groupId>
-        <version>2.1.1-SNAPSHOT</version>
         <relativePath>../pom</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,15 @@
         <bundle.symbolicName>${namespace}.test.plugin</bundle.symbolicName>
         <bundle.namespace>${namespace}.test.plugin</bundle.namespace>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -60,6 +69,20 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+        </dependency>
+
+        <!--
+        Unable to resolve cz.zcu.kiv.crce.test.plugin [113](R 113.0): missing requirement [cz.zcu.kiv.crce.test.plugin [113](R 113.0)] osgi.wiring.package;
+        -->
+        <!-- === OSGi === -->
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
     </dependencies>
 </project>
