@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.search.impl.central;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,6 +15,11 @@ import java.util.Map;
 public class QueryBuilder {
 
     public static final String AND_CONCAT = "+AND+";
+
+    /**
+     * Name of the query parameter in the url.
+     */
+    public static final String QUERY_PARAM_NAME = "q";
 
     /**
      * A map which will hold the query.
@@ -56,22 +62,15 @@ public class QueryBuilder {
     }
 
     /**
-     * Returns the query which can be append to the url.
-     * paramName:"paramValue"+AND+paramName:"paramValue"...
-     *
-     * Additional parameters will be appended to the query so that the whole
-     * string will be formatted as:
-     * q=[query]&[additionalParam1]&[additionalParam2]...
+     * Returns the query as a string.
+     * @return Query with format param:"param-value"+AND+param:"param-value"...
      */
-    @Override
-    public String toString() {
+    public String queryToString() {
         if(this.query == null || this.query.isEmpty()) {
             return "";
         }
-
         // build the query
         StringBuilder sb = new StringBuilder();
-        sb.append("q=");
         for (String paramName : query.keySet()) {
             sb.append(paramName);
             sb.append(":\"");
@@ -82,8 +81,32 @@ public class QueryBuilder {
 
         // remove the last AND_CONCAT
         sb.delete(sb.length()-AND_CONCAT.length(),sb.length());
+        return sb.toString();
+    }
+
+    /**
+     * Returns the query which can be append to the url.
+     * paramName:"paramValue"+AND+paramName:"paramValue"...
+     *
+     * Additional parameters will be appended to the query so that the whole
+     * string will be formatted as:
+     * q=[query]&[additionalParam1]&[additionalParam2]...
+     */
+    @Override
+    public String toString() {
+        // build the query
+        StringBuilder sb = new StringBuilder();
+        String q = queryToString();
+        if(!q.isEmpty()) {
+            sb.append(QUERY_PARAM_NAME);
+            sb.append("=");
+            sb.append(q);
+        }
 
         // append additional parameters
+        if(additionalParams == null) {
+            return sb.toString();
+        }
         for(String paramName : additionalParams.keySet()) {
             sb.append("&");
             sb.append(paramName);
@@ -92,5 +115,26 @@ public class QueryBuilder {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Returns query and additional parameters as a map of parameters
+     * suitable for http client.
+     * @return
+     */
+    public Map<String, Object> asUrlParameters() {
+        Map<String, Object> tmp = new HashMap<>();
+
+        if(query != null) {
+            tmp.put(QUERY_PARAM_NAME, queryToString());
+        }
+
+        if(additionalParams != null) {
+            for(String paramName : additionalParams.keySet()) {
+                tmp.put(paramName, additionalParams.get(paramName));
+            }
+        }
+
+        return tmp;
     }
 }

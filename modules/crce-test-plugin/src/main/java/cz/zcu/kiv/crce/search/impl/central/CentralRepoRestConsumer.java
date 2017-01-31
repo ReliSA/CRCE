@@ -7,8 +7,9 @@ import cz.zcu.kiv.crce.search.impl.central.json.JsonResponseHeader;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * This class will fetch actual calls to rest api.
@@ -25,13 +26,11 @@ public class CentralRepoRestConsumer {
     public static final String ADDITIONAL_PARAMS = "&core=gav&rows=200&wt=json";
 
     /**
-     * Creates a request to REST service.
-     * @param queryBuilder
-     * @return
+     * Calls a REST service and returns the response.
+     * @param queryBuilder Query to be appended to the url.
+     * @return Response
      */
-    public Builder getRequest(QueryBuilder queryBuilder) {
-
-
+    public Response sendRequest(QueryBuilder queryBuilder) {
 
         Client client = ClientBuilder.newClient()
                 .register(CentralRepoJsonResponse.class)
@@ -39,7 +38,8 @@ public class CentralRepoRestConsumer {
                 .register(JsonResponseBody.class)
                 .register(JsonArtifactDescriptor.class);
 
-//        WebTarget resource = client.target();
-        return null;
+        //todo: fix this
+        WebTarget resource = client.target(REPO_URL).resolveTemplates(queryBuilder.asUrlParameters());
+        return resource.request(MediaType.APPLICATION_JSON_TYPE).get();
     }
 }
