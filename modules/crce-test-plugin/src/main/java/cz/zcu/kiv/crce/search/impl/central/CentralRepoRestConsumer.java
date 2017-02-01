@@ -4,6 +4,8 @@ import cz.zcu.kiv.crce.search.impl.central.json.CentralRepoJsonResponse;
 import cz.zcu.kiv.crce.search.impl.central.json.JsonArtifactDescriptor;
 import cz.zcu.kiv.crce.search.impl.central.json.JsonResponseBody;
 import cz.zcu.kiv.crce.search.impl.central.json.JsonResponseHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -18,12 +20,16 @@ import javax.ws.rs.core.Response;
  */
 public class CentralRepoRestConsumer {
 
+    private static final Logger logger = LoggerFactory.getLogger(CentralRepoRestConsumer.class);
+
     /**
      * Base url for query and additional parameters to be appended.
      */
-    public static final String REPO_URL = "http://http://search.maven.org/solrsearch/select";
+    public static final String REPO_URL = "http://search.maven.org/solrsearch/select";
 
-    public static final String ADDITIONAL_PARAMS = "&core=gav&rows=200&wt=json";
+    public CentralRepoRestConsumer() {
+        System.setProperty("javax.xml.bind.context.factory","org.eclipse.persistence.jaxb.JAXBContextFactory");
+    }
 
     /**
      * Calls a REST service and returns the response.
@@ -39,7 +45,8 @@ public class CentralRepoRestConsumer {
                 .register(JsonArtifactDescriptor.class);
 
         //todo: fix this
-        WebTarget resource = client.target(REPO_URL).resolveTemplates(queryBuilder.asUrlParameters());
+        logger.debug("Sending request to: "+REPO_URL+"?"+queryBuilder.toString());
+        WebTarget resource = client.target(queryBuilder.getUrlTemplate(REPO_URL)).resolveTemplatesFromEncoded(queryBuilder.asUrlParameters());
         return resource.request(MediaType.APPLICATION_JSON_TYPE).get();
     }
 }

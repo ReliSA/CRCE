@@ -12,6 +12,7 @@ import java.util.Map;
  *
  * @author Zdenek Vales
  */
+//todo: delete unused methods
 public class QueryBuilder {
 
     public static final String AND_CONCAT = "+AND+";
@@ -59,6 +60,14 @@ public class QueryBuilder {
     public QueryBuilder addAdditionalParameter(AdditionalQueryParam parameter, String value) {
         additionalParams.put(parameter.paramName, value);
         return this;
+    }
+
+    /**
+     * Adds core=gav and wt=json parameters.
+     * @return This query builder.
+     */
+    public QueryBuilder addStandardAdditionalParameters() {
+        return addAdditionalParameter(AdditionalQueryParam.CORE, "gav").addAdditionalParameter(AdditionalQueryParam.SERVICE,"json");
     }
 
     /**
@@ -126,7 +135,10 @@ public class QueryBuilder {
         Map<String, Object> tmp = new HashMap<>();
 
         if(query != null) {
-            tmp.put(QUERY_PARAM_NAME, queryToString());
+//            tmp.put(QUERY_PARAM_NAME, queryToString());
+            for(String paramName : query.keySet()) {
+                tmp.put(paramName, query.get(paramName));
+            }
         }
 
         if(additionalParams != null) {
@@ -136,5 +148,49 @@ public class QueryBuilder {
         }
 
         return tmp;
+    }
+
+    public String getQueryTemplate() {
+        StringBuilder sb = new StringBuilder();
+
+        if(query == null || query.isEmpty()) {
+            return sb.toString();
+        }
+
+        for (String paramName : query.keySet()) {
+            sb.append(paramName);
+
+            //todo: figure out how to properly use quotes
+            sb.append(":{");
+            sb.append(paramName);
+            sb.append("}");
+            sb.append(AND_CONCAT);
+        }
+        // remove the last AND_CONCAT
+        sb.delete(sb.length()-AND_CONCAT.length(),sb.length());
+
+        return sb.toString();
+    }
+
+    //todo: better comment
+    /**
+     * Creates a query template for jersey client.
+     * @param rootUrl Root url. "?query..." will be added to it.
+     * @return Query template
+     */
+    public String getUrlTemplate(String rootUrl) {
+        StringBuilder sb = new StringBuilder(rootUrl);
+        sb.append("?");
+        if(query != null && !query.isEmpty()) {
+            sb.append(QUERY_PARAM_NAME).append("=").append(getQueryTemplate());
+        }
+
+        if(additionalParams != null && !additionalParams.isEmpty()) {
+            for(String paramName : additionalParams.keySet()) {
+                sb.append("&").append(paramName).append("={").append(paramName).append("}");
+            }
+        }
+
+        return sb.toString();
     }
 }

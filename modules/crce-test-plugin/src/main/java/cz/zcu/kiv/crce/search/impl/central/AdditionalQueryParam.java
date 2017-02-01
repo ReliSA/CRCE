@@ -8,7 +8,7 @@ package cz.zcu.kiv.crce.search.impl.central;
 public enum AdditionalQueryParam {
 
     /**
-     * Basically only working value is 'cov'
+     * Basically only working value is 'gav'
      */
     CORE("core"),
 

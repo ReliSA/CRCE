@@ -1,5 +1,9 @@
 package cz.zcu.kiv.crce.search.impl.central.json;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+
 /**
  * This class represents an object which describes the artifact.
  * In the json returned by the maven repo, this object is used in
@@ -7,47 +11,66 @@ package cz.zcu.kiv.crce.search.impl.central.json;
  *
  * @author Zdenek Vales
  */
-public class JsonArtifactDescriptor {
+@XmlRootElement
+public class JsonArtifactDescriptor implements Serializable{
+
+    /**
+     * Use these values to fill the template:
+     * group id with '/' as separator
+     * artifact id
+     * version
+     * artifact id
+     * version
+     */
+    public static final String DOWNLOAD_URL_TEMPLATE = "http://search.maven.org/remotecontent?filepath=%s/%s/%s/%s-%s.jar";
 
     /**
      * Artifact id in format:
      * GroupId:ArtifactId:Version
      */
+    @XmlElement
     private String id;
 
     /**
      * Group id.
      */
+    @XmlElement
     private String g;
 
     /**
      * Artifact id.
      */
+    @XmlElement
     private String a;
 
     /**
      * Version.
      */
+    @XmlElement
     private String v;
 
     /**
      * Packaging.
      */
+    @XmlElement
     private String p;
 
     /**
      * Artifact timestamp.
      */
+    @XmlElement
     private long timestamp;
 
     /**
      * Tags assigned to this artifact.
      */
+    @XmlElement
     private String[] tags;
 
     /**
      * Possible downloads.
      */
+    @XmlElement
     private String[] ec;
 
 
@@ -113,5 +136,10 @@ public class JsonArtifactDescriptor {
 
     public void setEc(String[] ec) {
         this.ec = ec;
+    }
+
+    // todo: check the download link availability / validity
+    public String jarDownloadLink() {
+        return String.format(DOWNLOAD_URL_TEMPLATE, getG().replace('.','/'), getA(), getV(), getA(), getV());
     }
 }

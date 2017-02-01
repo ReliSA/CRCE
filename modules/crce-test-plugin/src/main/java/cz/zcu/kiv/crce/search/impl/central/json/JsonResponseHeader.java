@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.search.impl.central.json;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -8,10 +11,14 @@ import java.util.Map;
  *
  * @author Zdenek Vales
  */
-public class JsonResponseHeader {
+@XmlRootElement
+public class JsonResponseHeader implements Serializable{
 
+    @XmlElement
     private int status;
+    @XmlElement
     private int QTime;
+    @XmlElement
     private Map<String, String> params;
 
     public int getStatus() {

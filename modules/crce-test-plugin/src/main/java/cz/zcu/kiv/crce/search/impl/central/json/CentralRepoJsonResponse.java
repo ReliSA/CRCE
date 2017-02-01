@@ -1,14 +1,21 @@
 package cz.zcu.kiv.crce.search.impl.central.json;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+
 /**
  * Json obtained from the central maven repo will have this structure.
  *
  * @author Zdenek Vales
  */
-public class CentralRepoJsonResponse {
+@XmlRootElement
+public class CentralRepoJsonResponse implements Serializable {
 
+    @XmlElement
     private JsonResponseHeader responseHeader;
 
+    @XmlElement
     private JsonResponseBody response;
 
     public JsonResponseHeader getResponseHeader() {
