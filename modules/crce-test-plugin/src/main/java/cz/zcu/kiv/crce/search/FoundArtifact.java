@@ -36,13 +36,13 @@ public interface FoundArtifact {
      *
      * @return Link to the pom.xml or null.
      */
-    URL getPomDownloadLink();
+    String getPomDownloadLink();
 
     /**
      * Returns the download link to jar containing the artifact.
      *
      * @return Link to the jar or null (that really shouldn't happen).
      */
-    URL getJarDownloadLink();
+    String getJarDownloadLink();
 
 }

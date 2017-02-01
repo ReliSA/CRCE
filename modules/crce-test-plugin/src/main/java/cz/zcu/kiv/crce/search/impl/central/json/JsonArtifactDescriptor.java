@@ -21,8 +21,9 @@ public class JsonArtifactDescriptor implements Serializable{
      * version
      * artifact id
      * version
+     * extension - either jar or pom
      */
-    public static final String DOWNLOAD_URL_TEMPLATE = "http://search.maven.org/remotecontent?filepath=%s/%s/%s/%s-%s.jar";
+    public static final String DOWNLOAD_URL_TEMPLATE = "http://search.maven.org/remotecontent?filepath=%s/%s/%s/%s-%s.%s";
 
     /**
      * Artifact id in format:
@@ -140,6 +141,10 @@ public class JsonArtifactDescriptor implements Serializable{
 
     // todo: check the download link availability / validity
     public String jarDownloadLink() {
-        return String.format(DOWNLOAD_URL_TEMPLATE, getG().replace('.','/'), getA(), getV(), getA(), getV());
+        return String.format(DOWNLOAD_URL_TEMPLATE, getG().replace('.','/'), getA(), getV(), getA(), getV(), "jar");
+    }
+
+    public String pomDownloadLink() {
+        return String.format(DOWNLOAD_URL_TEMPLATE, getG().replace('.','/'), getA(), getV(), getA(), getV(), "pom");
     }
 }

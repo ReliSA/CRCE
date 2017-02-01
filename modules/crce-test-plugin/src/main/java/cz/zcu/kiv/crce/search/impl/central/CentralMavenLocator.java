@@ -4,11 +4,12 @@ import cz.zcu.kiv.crce.search.FoundArtifact;
 import cz.zcu.kiv.crce.search.MavenLocator;
 import cz.zcu.kiv.crce.search.impl.central.json.CentralRepoJsonResponse;
 import cz.zcu.kiv.crce.search.impl.central.json.JsonArtifactDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Response;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This locator uses the central maven repo to search for artifacts - http://search.maven.org/.
@@ -18,6 +19,8 @@ import java.util.Collection;
  * @author Zdenek Vales
  */
 public class CentralMavenLocator implements MavenLocator {
+
+    private static final Logger logger = LoggerFactory.getLogger(CentralMavenLocator.class);
 
     private CentralRepoRestConsumer restConsumer;
 
@@ -31,67 +34,50 @@ public class CentralMavenLocator implements MavenLocator {
 
     @Override
     public FoundArtifact locate(String groupId, String artifactId, String version) {
-
-
-        // todo: move this part of code to the separate method / class
-        QueryBuilder qb = new QueryBuilder()
-                .addParameter(QueryParam.GROUP_ID, groupId)
-                .addParameter(QueryParam.ARTIFACT_ID, artifactId)
-                .addParameter(QueryParam.VERSION, version)
-                .addStandardAdditionalParameters();
-        Response response = restConsumer.sendRequest(qb);
-
-        if(response.getStatusInfo().getStatusCode() != Response.Status.OK.getStatusCode()) {
-            // no artifact found
-            return null;
-        }
-        CentralRepoJsonResponse jsonResponse = response.readEntity(CentralRepoJsonResponse.class);
+        QueryBuilder qb = QueryBuilder.createStandard(groupId, artifactId, version);
+        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
 
         if(jsonResponse.getResponse().getNumFound() == 0 ) {
             // no artifact found
             return null;
         }
 
+        // todo: maybe use a dozer for this?
         // convert the found artifact
-        final JsonArtifactDescriptor artifactDescriptor = jsonResponse.getResponse().getDocs()[0];
-
-        return new FoundArtifact() {
-            @Override
-            public String getGroupId() {
-                return artifactDescriptor.getG();
-            }
-
-            @Override
-            public String getArtifactId() {
-                return artifactDescriptor.getA();
-            }
-
-            @Override
-            public String getVersion() {
-                return artifactDescriptor.getV();
-            }
-
-            @Override
-            public URL getPomDownloadLink() {
-                return null;
-            }
-
-            @Override
-            public URL getJarDownloadLink() {
-                try {
-                    return new URL(artifactDescriptor.jarDownloadLink());
-                } catch (MalformedURLException e) {
-                    // error occured
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        };
+        JsonArtifactDescriptor artifactDescriptor = jsonResponse.getResponse().getDocs()[0];
+        return new SimpleFoundArtifact(artifactDescriptor.getG(),
+                artifactDescriptor.getA(),
+                artifactDescriptor.getV(),
+                artifactDescriptor.jarDownloadLink(),
+                artifactDescriptor.pomDownloadLink());
     }
 
     @Override
     public Collection<FoundArtifact> locate(String groupId, String artifactId) {
-        return null;
+
+        List<FoundArtifact> foundArtifacts = new ArrayList<>();
+
+        QueryBuilder qb = new QueryBuilder()
+                .addParameter(QueryParam.GROUP_ID, groupId)
+                .addParameter(QueryParam.ARTIFACT_ID, artifactId)
+                .addStandardAdditionalParameters();
+        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+
+        if(jsonResponse.getResponse().getNumFound() == 0 ) {
+            // no artifact found
+            return foundArtifacts;
+        }
+
+        // todo: maybe use a dozer for this?
+        // convert the found artifacts
+        for(JsonArtifactDescriptor ad : jsonResponse.getResponse().getDocs()) {
+            foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
+                    ad.getA(),
+                    ad.getV(),
+                    ad.jarDownloadLink(),
+                    ad.pomDownloadLink()));
+        }
+
+        return foundArtifacts;
     }
 }

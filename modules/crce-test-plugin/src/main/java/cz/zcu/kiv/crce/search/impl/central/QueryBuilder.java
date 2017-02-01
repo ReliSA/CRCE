@@ -23,6 +23,21 @@ public class QueryBuilder {
     public static final String QUERY_PARAM_NAME = "q";
 
     /**
+     * Prepares a quer builder with specified artifact parameters and standard additional parameters.
+     * @param groupId Group id.
+     * @param artifactId Artifact id.
+     * @param version Version.
+     * @return Standard query builder.
+     */
+    public static QueryBuilder createStandard(String groupId, String artifactId, String version) {
+        return new QueryBuilder()
+                .addParameter(QueryParam.GROUP_ID, groupId)
+                .addParameter(QueryParam.ARTIFACT_ID, artifactId)
+                .addParameter(QueryParam.VERSION, version)
+                .addStandardAdditionalParameters();
+    }
+
+    /**
      * A map which will hold the query.
      * Key represents the param name, the value is param value.
      */
@@ -150,6 +165,14 @@ public class QueryBuilder {
         return tmp;
     }
 
+    /**
+     * Converts the query to template. The format is
+     * paramName:{paramName}+AND+paramName:{paramName}...
+     *
+     * To be filled with values from asUrlParameters() method.
+     *
+     * @return A template for query.
+     */
     public String getQueryTemplate() {
         StringBuilder sb = new StringBuilder();
 
@@ -172,10 +195,13 @@ public class QueryBuilder {
         return sb.toString();
     }
 
-    //todo: better comment
     /**
-     * Creates a query template for jersey client.
-     * @param rootUrl Root url. "?query..." will be added to it.
+     * Creates a template for the whole url. This will be filled with values from
+     * asUrlParameters() method. The format is:
+     *
+     * rootUrl?q=qParamName:{qParamName}+AND+...&additionalParamName={additionalParamName}&additionalParamName={additionalParamName}....
+     *
+     * @param rootUrl Root url.
      * @return Query template
      */
     public String getUrlTemplate(String rootUrl) {

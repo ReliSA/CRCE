@@ -7,6 +7,7 @@ import cz.zcu.kiv.crce.search.impl.central.json.JsonResponseHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -32,6 +33,41 @@ public class CentralRepoRestConsumer {
     }
 
     /**
+     * Calls a REST API of the mvn repo and if the response is OK and json is successfully parsed,
+     * returns the parsed object.
+     * @param queryBuilder Query specifiaction.
+     * @return Parsed json or null.
+     */
+    public CentralRepoJsonResponse getJson(QueryBuilder queryBuilder) {
+        // get response
+        Response response = sendRequest(queryBuilder);
+        if(response == null ) {
+            logger.error("Response is null!");
+            return null;
+        } else if(response.getStatus() != Response.Status.OK.getStatusCode()) {
+            logger.error("Response not OK! Status code: "+response.getStatus());
+            return null;
+        }
+
+        // get parsed json
+        CentralRepoJsonResponse jsonResponse = null;
+        try {
+            jsonResponse = response.readEntity(CentralRepoJsonResponse.class);
+        } catch (ProcessingException ex) {
+            logger.error("Error while processing the data from response! "+ex.getMessage());
+            return null;
+        } catch (IllegalStateException ex) {
+            logger.error("Error while trying to read the data from response! "+ex.getMessage());
+            return null;
+        } catch (Exception ex) {
+            logger.error("Unexpected exception: "+ex.getMessage());
+            return null;
+        }
+
+        return jsonResponse;
+    }
+
+    /**
      * Calls a REST service and returns the response.
      * @param queryBuilder Query to be appended to the url.
      * @return Response
@@ -44,7 +80,6 @@ public class CentralRepoRestConsumer {
                 .register(JsonResponseBody.class)
                 .register(JsonArtifactDescriptor.class);
 
-        //todo: fix this
         logger.debug("Sending request to: "+REPO_URL+"?"+queryBuilder.toString());
         WebTarget resource = client.target(queryBuilder.getUrlTemplate(REPO_URL)).resolveTemplatesFromEncoded(queryBuilder.asUrlParameters());
         return resource.request(MediaType.APPLICATION_JSON_TYPE).get();

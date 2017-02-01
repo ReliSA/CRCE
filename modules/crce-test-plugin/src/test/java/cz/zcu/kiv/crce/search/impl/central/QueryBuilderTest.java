@@ -28,4 +28,16 @@ public class QueryBuilderTest {
         qb.addParameter(QueryParam.VERSION, "VERSION-1.0.2");
         assertEquals("Wrong query 2!", expected3, qb.toString());
     }
+
+    @Test
+    public void testBuildStandardQuery() {
+        String expected2 = "q=g:\"group-id\"+AND+a:\"artifact.some.id\"+AND+v:\"VERSION-1.0.1\"&core=gav&wt=json";
+        String expected3 = "q=g:\"group-id\"+AND+a:\"artifact.some.id\"+AND+v:\"VERSION-1.0.2\"&core=gav&wt=json";
+
+        QueryBuilder qb = QueryBuilder.createStandard("group-id", "artifact.some.id", "VERSION-1.0.1");
+        assertEquals("Wrong query 2!", expected2, qb.toString());
+
+        qb.addParameter(QueryParam.VERSION, "VERSION-1.0.2");
+        assertEquals("Wrong query 2!", expected3, qb.toString());
+    }
 }
