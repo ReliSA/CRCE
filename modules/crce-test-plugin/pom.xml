@@ -38,6 +38,10 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.bundlerepository</artifactId>
         </dependency>
+        <dependency>
+            <artifactId>org.apache.felix.utils</artifactId>
+            <groupId>org.apache.felix</groupId>
+        </dependency>
 
 
         <!--
@@ -72,21 +76,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--
-        Unable to resolve cz.zcu.kiv.crce.test.plugin [113](R 113.0): missing requirement [cz.zcu.kiv.crce.test.plugin [113](R 113.0)] osgi.wiring.package;
-        -->
-        <!-- === OSGi === -->
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-        </dependency>
-
-
         <!-- jersey -->
 
         <dependency>
@@ -99,7 +88,7 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-moxy</artifactId>
-            <version>2.25.1</version>
+            <version>${jersey.version}</version>
         </dependency>
 
 
