@@ -82,9 +82,10 @@
 
         <!--<module>crce-repository-maven-impl</module>-->
 
-        <module>crce-test-plugin</module>
+        <!--<module>crce-test-plugin2</module>-->
 
         <module>crce-webservices-indexer</module>
+        <module>crce-test-plugin-2</module>
     </modules>
 
     <profiles>

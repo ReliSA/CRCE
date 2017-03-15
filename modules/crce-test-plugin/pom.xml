@@ -78,18 +78,18 @@
 
         <!-- jersey -->
 
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.glassfish.jersey.core</groupId>-->
+            <!--<artifactId>jersey-client</artifactId>-->
+            <!--<version>${jersey.version}</version>-->
+        <!--</dependency>-->
 
         <!-- needed for parsing json responses -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-moxy</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.glassfish.jersey.media</groupId>-->
+            <!--<artifactId>jersey-media-moxy</artifactId>-->
+            <!--<version>${jersey.version}</version>-->
+        <!--</dependency>-->
 
 
         <!-- unmarshalling -->
