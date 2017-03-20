@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.test.plugin2.search.impl.central;
+package cz.zcu.kiv.crce.test.plugin2.search.impl;
 
 
 import cz.zcu.kiv.crce.test.plugin2.search.FoundArtifact;

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.test.plugin2.search.impl.central.aether;
+package cz.zcu.kiv.crce.test.plugin2.search.impl.aether;
 
 /**
  * Use this class to build version ranges when using Aether locator. User should not need to use this class directly.

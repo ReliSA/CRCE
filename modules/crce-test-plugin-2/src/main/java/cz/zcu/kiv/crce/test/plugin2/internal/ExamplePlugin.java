@@ -10,7 +10,7 @@ import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import cz.zcu.kiv.crce.test.plugin2.namespace.NsMavenArtifact;
 import cz.zcu.kiv.crce.test.plugin2.namespace.NsMvnArtifactIdentity;
-import org.apache.felix.bundlerepository.impl.FileUtil;
+//import org.apache.felix.bundlerepository.impl.FileUtil;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 //import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -114,7 +114,6 @@ public class ExamplePlugin extends AbstractActionHandler {
      * @param artifactUrl Url to maven artifact (jar or zip).
      * @return Model of pom file.
      * @throws IOException
-     * @throws XmlPullParserException
      */
     public Model loadPom(final URL artifactUrl) throws /*IOException, XmlPullParserException */Exception{
         byte[] pom = loadEntry(artifactUrl, POM_NAME);

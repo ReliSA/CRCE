@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.test.plugin2.search.impl.central.rest;
 
 import cz.zcu.kiv.crce.test.plugin2.search.FoundArtifact;
 import cz.zcu.kiv.crce.test.plugin2.search.MavenLocator;
-import cz.zcu.kiv.crce.test.plugin2.search.impl.central.SimpleFoundArtifact;
+import cz.zcu.kiv.crce.test.plugin2.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.test.plugin2.search.impl.central.rest.json.CentralRepoJsonResponse;
 import cz.zcu.kiv.crce.test.plugin2.search.impl.central.rest.json.JsonArtifactDescriptor;
 import org.slf4j.Logger;
