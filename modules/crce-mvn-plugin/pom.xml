@@ -1,0 +1,179 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>crce-modules-parent</artifactId>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <version>2.1.1-SNAPSHOT</version>
+        <relativePath>../pom/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>crce-mvn-plugin</artifactId>
+    <packaging>bundle</packaging>
+
+    <url>http://maven.apache.org</url>
+
+
+    <name>CRCE - maven plugin </name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bundle.symbolicName>${namespace}.mvn.plugin</bundle.symbolicName>
+        <bundle.namespace>${namespace}.mvn.plugin</bundle.namespace>
+        <jersey.version>2.25.1</jersey.version>
+        <aether.version>1.1.0</aether.version>
+        <maven.version>3.1.0</maven.version>
+        <wagon.version>1.0</wagon.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.service.obr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.inject</artifactId>
+            <version>0.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager</artifactId>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.felix</groupId>-->
+            <!--<artifactId>org.apache.felix.bundlerepository</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<artifactId>org.apache.felix.utils</artifactId>-->
+            <!--<groupId>org.apache.felix</groupId>-->
+        <!--</dependency>-->
+
+        <!--
+
+        CRCE dependencies
+
+        -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-plugin-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-repository-api</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- jersey -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <!-- needed for parsing json responses -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+
+        <!-- unmarshalling -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <version>2.7.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- aether -->
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-wagon</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+    </dependencies>
+</project>

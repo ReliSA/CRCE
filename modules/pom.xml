@@ -85,7 +85,7 @@
         <!--<module>crce-test-plugin2</module>-->
 
         <module>crce-webservices-indexer</module>
-        <module>crce-test-plugin-2</module>
+        <module>crce-mvn-plugin</module>
     </modules>
 
     <profiles>
