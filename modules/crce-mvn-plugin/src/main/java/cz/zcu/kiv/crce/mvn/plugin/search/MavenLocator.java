@@ -32,7 +32,14 @@ public interface MavenLocator {
      * @param artifactId Artifact id.
      * @param fromVersion The oldest version to be located.
      * @param toVersion The newest version to be located.
-     * @return
+     * @return Collection of found artifacts or empty collection if nothing is found.
      */
     Collection<FoundArtifact> locate(String groupId, String artifactId, String fromVersion, String toVersion);
+
+    /**
+     * Locates the artifacts in the repo if they're containing includedPackage.
+     * @param includedPackage Name of the package included in the artifact.
+     * @return Collection of artifacts containing this package or empty collection if nothing is found.
+     */
+    Collection<FoundArtifact> locate(String includedPackage);
 }

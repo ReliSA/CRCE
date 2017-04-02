@@ -63,4 +63,15 @@ public class SimpleFoundArtifact implements FoundArtifact {
     public String getJarDownloadLink() {
         return jarDownload;
     }
+
+    @Override
+    public String toString() {
+        return "SimpleFoundArtifact{" +
+                "groupId='" + groupId + '\'' +
+                ", artifactId='" + artifactId + '\'' +
+                ", version='" + version + '\'' +
+                ", jarDownload='" + jarDownload + '\'' +
+                ", pomDownload='" + pomDownload + '\'' +
+                '}';
+    }
 }

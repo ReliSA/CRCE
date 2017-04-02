@@ -85,6 +85,11 @@ public class CentralMavenRestLocator implements MavenLocator {
 
     @Override
     public Collection<FoundArtifact> locate(String groupId, String artifactId, String fromVersion, String toVersion) {
-        return null;
+        throw new UnsupportedOperationException("Sorry, not implemented yet.");
+    }
+
+    @Override
+    public Collection<FoundArtifact> locate(String includedPackage) {
+        throw new UnsupportedOperationException("Sorry, not implemented yet.");
     }
 }

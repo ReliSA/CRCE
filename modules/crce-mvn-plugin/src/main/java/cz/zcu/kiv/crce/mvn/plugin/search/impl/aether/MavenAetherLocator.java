@@ -145,20 +145,20 @@ public class MavenAetherLocator implements MavenLocator {
 //        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+VersionRangeBuilder.singleVersion(version));
         Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+version);
 
-        ArtifactDescriptorRequest artifactDescriptorRequest = new ArtifactDescriptorRequest();
-        artifactDescriptorRequest.setArtifact(artifact);
-        artifactDescriptorRequest.setRepositories(newRepositories());
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact(artifact);
+        artifactRequest.setRepositories(newRepositories());
 
-        ArtifactDescriptorResult artifactDescriptorResult = null;
+        ArtifactResult artifactResult = null;
         try {
-            artifactDescriptorResult = repositorySystem.readArtifactDescriptor(session, artifactDescriptorRequest);
-        } catch (ArtifactDescriptorException e) {
+            artifactResult = repositorySystem.resolveArtifact(session, artifactRequest);
+        } catch (ArtifactResolutionException e) {
             logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
             e.printStackTrace();
             return null;
         }
 
-        FoundArtifact foundArtifact = new SimpleFoundArtifact(artifactDescriptorResult.getArtifact());
+        FoundArtifact foundArtifact = new SimpleFoundArtifact(artifactResult.getArtifact());
 
         return foundArtifact;
     }
@@ -194,6 +194,35 @@ public class MavenAetherLocator implements MavenLocator {
 
     @Override
     public Collection<FoundArtifact> locate(String groupId, String artifactId, String fromVersion, String toVersion) {
+        RepositorySystem repositorySystem = newRepositorySystem();
+        RepositorySystemSession session = newSession(repositorySystem);
+
+        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+VersionRangeBuilder.versionRange(fromVersion, toVersion));
+
+        VersionRangeRequest versionRangeRequest = new VersionRangeRequest();
+        versionRangeRequest.setArtifact(artifact);
+        versionRangeRequest.setRepositories(newRepositories());
+
+        VersionRangeResult versionRangeResult = null;
+        try {
+            versionRangeResult = repositorySystem.resolveVersionRange(session, versionRangeRequest);
+        } catch (VersionRangeResolutionException e) {
+            logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+
+
+        List<FoundArtifact> res = new ArrayList<>();
+        for (Version v : versionRangeResult.getVersions()) {
+            res.add(new SimpleFoundArtifact(groupId, artifactId, v.toString(), "", ""));
+        }
+
+        return res;
+    }
+
+    @Override
+    public Collection<FoundArtifact> locate(String includedPackage) {
         return null;
     }
 }
