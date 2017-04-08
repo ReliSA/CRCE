@@ -3,7 +3,15 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.aether;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.wagon.Wagon;
+import org.codehaus.plexus.*;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -21,7 +29,14 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.index.*;
+import org.sonatype.nexus.index.context.IndexCreator;
+import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.updater.IndexUpdater;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -29,8 +44,12 @@ import java.util.*;
 /**
  * This locator uses the Eclipse Aether to search through central maven repo for artifacts.
  *
+ * Note that FoundArtifacts returned by locate method will have pomUrl and jarUrl set to an empty string.
+ * Also when resolving, those properties are not goind to be used.
+ *
  * @author Zdendek Vales
  */
+// todo: use nexus indexer for searching and aether for resolving artifacts
 public class MavenAetherLocator implements MavenLocator {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenAetherLocator.class);
@@ -66,6 +85,12 @@ public class MavenAetherLocator implements MavenLocator {
     private String repositoryType;
     private String repositoryUrl;
 
+//    private PlexusContainer plexusContainer;
+//    private IndexUpdater indexUpdater;
+//    private NexusIndexer nexusIndexer;
+//    private List<IndexCreator> creators;
+//    private Wagon httpWagon;
+
 
     public MavenAetherLocator() {
         init();
@@ -79,6 +104,11 @@ public class MavenAetherLocator implements MavenLocator {
         InputStream is = MavenAetherLocator.class.getResourceAsStream(CONFIG_FILE_NAME);
         Properties properties = new Properties();
         logger.info("Initializing "+MavenAetherLocator.class.getName()+".");
+
+//        nexusIndexer = new DefaultNexusIndexer();
+//        creators = new ArrayList<>();
+//        creators.add(new MinimalArtifactInfoIndexCreator());
+
         if (is == null) {
             logger.debug("No properties file found.");
             // no file
@@ -104,7 +134,40 @@ public class MavenAetherLocator implements MavenLocator {
                 logger.error("Exception while closing the stream: "+e.getMessage());
             }
         }
+
+//        try {
+//            nexusIndexer.addIndexingContext("def-repo", repositoryId, new File(repositoryUrl), new File("/search/index"), repositoryUrl, null, creators);
+//        } catch (IOException | UnsupportedExistingLuceneIndexException e) {
+//            logger.error("Initialization of nexus indexer failed: "+e.getMessage());
+//            e.printStackTrace();
+//        }
     }
+
+//    private void initIndexer() throws ComponentLookupException, PlexusContainerException, IOException, UnsupportedExistingLuceneIndexException {
+//        final DefaultContainerConfiguration config = new DefaultContainerConfiguration();
+//        config.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+//        this.plexusContainer = new DefaultPlexusContainer( config );
+//
+//        // lookup the indexer components from plexus
+//        nexusIndexer = plexusContainer.lookup( NexusIndexer.class );
+//        this.indexUpdater = plexusContainer.lookup( IndexUpdater.class );
+//        // lookup wagon used to remotely fetch index
+//        this.httpWagon = plexusContainer.lookup( Wagon.class, "http" );
+//
+//        File centralLocalCache = new File( "target/central-cache" );
+//        File centralIndexDir = new File( "target/central-index" );
+//
+//        // Creators we want to use (search for fields it defines)
+//        List<IndexCreator> indexers = new ArrayList<IndexCreator>();
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "min" ) );
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "jarContent" ) );
+//        indexers.add( plexusContainer.lookup( IndexCreator.class, "maven-plugin" ) );
+//
+//        // Create context for central repository index
+//        IndexingContext centralContext =
+//                nexusIndexer.addIndexingContext( "central-context", "central", centralLocalCache, centralIndexDir,
+//                        "http://repo1.maven.org/maven2", null, indexers );
+//    }
 
     /**
      * Initializes a new repository system for aether.
@@ -139,11 +202,35 @@ public class MavenAetherLocator implements MavenLocator {
     @Override
     public FoundArtifact locate(String groupId, String artifactId, String version) {
 
+//        BooleanQuery bq = new BooleanQuery();
+//        bq.add(new TermQuery(new Term("artifactId", artifactId)), BooleanClause.Occur.MUST);
+//        bq.add(new TermQuery(new Term("groupId", groupId)), BooleanClause.Occur.MUST);
+//        bq.add(new TermQuery(new Term("version", version)), BooleanClause.Occur.MUST);
+//
+//        FlatSearchRequest request = new FlatSearchRequest(bq);
+//        FlatSearchResponse response = null;
+//        try {
+//            response = nexusIndexer.searchFlat(request);
+//        } catch (IOException e) {
+//            logger.error("Unexpected exception occurred while locating artifact.");
+//            e.printStackTrace();
+//        }
+//
+//        Set<ArtifactInfo> artifactInfos = response.getResults();
+//        if(artifactInfos.isEmpty()) {
+//            return null;
+//        } else {
+//            ArtifactInfo ai = artifactInfos.iterator().next();
+//            FoundArtifact result = new SimpleFoundArtifact(ai.groupId, ai.artifactId, ai.version, "", "");
+//            return result;
+//        }
+
+
         RepositorySystem repositorySystem = newRepositorySystem();
         RepositorySystemSession session = newSession(repositorySystem);
 
 //        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+VersionRangeBuilder.singleVersion(version));
-        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+version);
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, "jar", version);
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact(artifact);
@@ -168,7 +255,7 @@ public class MavenAetherLocator implements MavenLocator {
         RepositorySystem repositorySystem = newRepositorySystem();
         RepositorySystemSession session = newSession(repositorySystem);
 
-        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+VersionRangeBuilder.allVersions());
+        Artifact artifact = new DefaultArtifact(groupId, artifactId, "jar", VersionRangeBuilder.allVersions());
 
         VersionRangeRequest versionRangeRequest = new VersionRangeRequest();
         versionRangeRequest.setArtifact(artifact);
@@ -223,6 +310,41 @@ public class MavenAetherLocator implements MavenLocator {
 
     @Override
     public Collection<FoundArtifact> locate(String includedPackage) {
+//        RepositorySystem repositorySystem = newRepositorySystem();
+//        RepositorySystemSession session = newSession(repositorySystem);
+
+
         return null;
+    }
+
+    @Override
+    public FoundArtifact resolve(FoundArtifact artifact) {
+        RepositorySystem repositorySystem = newRepositorySystem();
+        RepositorySystemSession session = newSession(repositorySystem);
+
+        // resolve artifact
+        Artifact toBeResolved = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "", artifact.getVersion());
+
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact(toBeResolved);
+        artifactRequest.setRepositories(newRepositories());
+
+        ArtifactResult artifactResult = null;
+        try {
+            artifactResult = repositorySystem.resolveArtifact(session, artifactRequest);
+        } catch (ArtifactResolutionException e) {
+            logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+
+        FoundArtifact result = new SimpleFoundArtifact(artifactResult.getArtifact());
+
+        return result;
+    }
+
+    @Override
+    public Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts) {
+        throw new UnsupportedOperationException("Sorry, not implemented yet.");
     }
 }

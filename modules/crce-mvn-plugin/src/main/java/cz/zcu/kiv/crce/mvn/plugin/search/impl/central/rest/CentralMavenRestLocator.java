@@ -90,6 +90,36 @@ public class CentralMavenRestLocator implements MavenLocator {
 
     @Override
     public Collection<FoundArtifact> locate(String includedPackage) {
+        List<FoundArtifact> foundArtifacts = new ArrayList<>();
+
+        QueryBuilder qb = new QueryBuilder()
+                .addParameter(QueryParam.CLASS_NAME, includedPackage);
+        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+        if(jsonResponse.getResponse().getNumFound() == 0 ) {
+            // no artifact found
+            return foundArtifacts;
+        }
+
+        // todo: maybe use dozer for this?
+        // convert the found artifacts
+        for(JsonArtifactDescriptor ad : jsonResponse.getResponse().getDocs()) {
+            foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
+                    ad.getA(),
+                    ad.getV(),
+                    ad.jarDownloadLink(),
+                    ad.pomDownloadLink()));
+        }
+
+        return foundArtifacts;
+    }
+
+    @Override
+    public FoundArtifact resolve(FoundArtifact artifact) {
+        throw new UnsupportedOperationException("Sorry, not implemented yet.");
+    }
+
+    @Override
+    public Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts) {
         throw new UnsupportedOperationException("Sorry, not implemented yet.");
     }
 }

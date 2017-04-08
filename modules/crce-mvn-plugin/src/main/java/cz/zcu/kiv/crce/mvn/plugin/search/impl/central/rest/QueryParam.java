@@ -7,9 +7,11 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
  */
 public enum QueryParam {
 
+    CLASS_NAME("fc"),
     ARTIFACT_ID("a"),
     GROUP_ID("g"),
     VERSION("v");
+
 
     public final String paramName;
 

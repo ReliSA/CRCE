@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class CentralMavenLocatorTest {
 
@@ -54,5 +53,43 @@ public class CentralMavenLocatorTest {
             assertNotNull("Pom download link is null!", artifact.getPomDownloadLink());
             assertEquals("Wrong pom download link!", pd, artifact.getPomDownloadLink());
         }
+    }
+
+    @Test
+    public void testLocateArtifactByGroupId() {
+        String groupId = "org.hibernate";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(groupId, null);
+        assertNotNull("Null returned!", artifacts);
+        assertFalse("No artifacts found for group id "+groupId, artifacts.isEmpty());
+        for(FoundArtifact artifact : artifacts) {
+            assertEquals("Wrong group id!", groupId, artifact.getGroupId());
+            assertNotNull("Null artifact id!", artifact.getArtifactId());
+            assertNotNull("Null version!", artifact.getVersion());
+        }
+    }
+
+    @Test
+    public void testLocateArtifactByIncludedPackage() {
+        String packageName = "org.hibernate.dialect.function";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(packageName);
+        assertNotNull("Null returned!", artifacts);
+        assertFalse("No artifacts containing package "+packageName+" found!", artifacts.isEmpty());
+    }
+
+    @Test
+    public void testLocateArtifactByIncludedPackageBad() {
+        String badPackageName = "asdasdasdagasd";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(badPackageName);
+        assertNotNull("Null returned!", artifacts);
+        assertTrue("Artifacts containing package "+badPackageName+" found!", artifacts.isEmpty());
     }
 }

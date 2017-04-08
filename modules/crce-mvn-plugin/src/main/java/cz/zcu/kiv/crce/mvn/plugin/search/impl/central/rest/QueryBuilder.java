@@ -57,10 +57,13 @@ public class QueryBuilder {
      * Adds a parameter to the query. If the same parameter is already in the query,
      * it will be overwritten. The parameters in the generated query will be insertion-ordered.
      * @param parameter Parameter.
-     * @param value Actual value.
+     * @param value Actual value. If null, just returns the query builder.
      * @return This query builder.
      */
     public QueryBuilder addParameter(QueryParam parameter, String value) {
+        if(value == null) {
+            return this;
+        }
         query.put(parameter.paramName, value);
         return this;
     }
@@ -69,10 +72,13 @@ public class QueryBuilder {
      * Adds an additional parameter. If the same parameter is already in the query,
      * it will be overwritten. The parameters in the generated query will be insertion-ordered.
      * @param parameter Parameter.
-     * @param value Actual value.
+     * @param value Actual value. If null, just returns the query builder.
      * @return This query builder.
      */
     public QueryBuilder addAdditionalParameter(AdditionalQueryParam parameter, String value) {
+        if(value == null) {
+            return this;
+        }
         additionalParams.put(parameter.paramName, value);
         return this;
     }

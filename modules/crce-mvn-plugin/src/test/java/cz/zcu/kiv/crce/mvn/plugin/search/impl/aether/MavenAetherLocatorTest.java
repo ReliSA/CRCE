@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.aether;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -51,6 +52,23 @@ public class MavenAetherLocatorTest {
         for(FoundArtifact artifact : artifacts) {
             assertEquals("Wrong group id!", groupId, artifact.getGroupId());
             assertEquals("Wrong artifact id!", artifactId, artifact.getArtifactId());
+            assertNotNull("Null version!", artifact.getVersion());
+        }
+    }
+
+    @Test
+    @Ignore
+    public void testLocateArtifactByGroupId() {
+        String groupId = "org.hibernate";
+
+        MavenAetherLocator locator = new MavenAetherLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(groupId, null);
+        assertNotNull("Null returned!", artifacts);
+        assertFalse("No artifacts found for group id "+groupId, artifacts.isEmpty());
+        for(FoundArtifact artifact : artifacts) {
+            assertEquals("Wrong group id!", groupId, artifact.getArtifactId());
+            assertNotNull("Null artifact id!", artifact.getArtifactId());
             assertNotNull("Null version!", artifact.getVersion());
         }
     }
