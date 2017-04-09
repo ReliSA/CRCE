@@ -102,7 +102,7 @@
             </plugin>
             <plugin>
                 <!-- Fixes build with JDK1.8 by setting javax.xml.accessExternalSchema property.
-                This is fixed in maven-jaxb2-plugin, but we use jaxb2-maven-plugin.
+                This is fixed in maven-jaxb2-plugin2, but we use jaxb2-maven-plugin2.
                 See also:
                 http://docs.oracle.com/javase/7/docs/api/javax/xml/XMLConstants.html#ACCESS_EXTERNAL_SCHEMA
                 http://stackoverflow.com/questions/26344590/how-to-specify-javax-xml-accessexternalschema-for-the-jaxb2-maven-plugin

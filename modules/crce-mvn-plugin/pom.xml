@@ -22,7 +22,7 @@
         <bundle.namespace>${namespace}.mvn.plugin</bundle.namespace>
         <jersey.version>2.25.1</jersey.version>
         <aether.version>1.1.0</aether.version>
-        <maven.version>3.1.0</maven.version>
+        <maven.version>3.3.9</maven.version>
         <wagon.version>1.0</wagon.version>
     </properties>
 
@@ -41,47 +41,15 @@
             <artifactId>org.osgi.service.obr</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.sisu</groupId>
-            <artifactId>org.eclipse.sisu.plexus</artifactId>
-            <version>0.2.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.plexus</groupId>
-                    <artifactId>plexus-classworlds</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.sisu</groupId>
-            <artifactId>org.eclipse.sisu.inject</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-            <version>3.2.1</version>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>cz.zcu.kiv.crce.wrapper</groupId>
-            <artifactId>org.codehaus.plexus.plexus-utils</artifactId>
-            <version>3.0.17</version>
+            <artifactId>org.apache.httpcomponents.httpclient</artifactId>
+            <version>4.2.6</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.codehaus.plexus</groupId>-->
-            <!--<artifactId>plexus-classworlds</artifactId>-->
-            <!--<version>2.5.1</version>-->
-        <!--</dependency>-->
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>3.0</version>
-        </dependency>
-
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -150,6 +118,55 @@
             <version>2.7.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- maven -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-repository-metadata</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model-builder</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-builder-support</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${maven.version}</version>
+        </dependency>
+
+        <!-- plexus -->
+        <dependency>
+            <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+            <artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
+            <version>1.19</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+            <artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+            <artifactId>org.codehaus.plexus.plexus-utils</artifactId>
+            <version>3.0.17</version>
+        </dependency>
+        
         <!-- aether -->
         <dependency>
             <groupId>org.eclipse.aether</groupId>
@@ -172,11 +189,6 @@
             <version>${aether.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-aether-provider</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-transport-file</artifactId>
             <version>${aether.version}</version>
@@ -190,43 +202,6 @@
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-transport-wagon</artifactId>
             <version>${aether.version}</version>
-        </dependency>
-
-        <!-- nexus indexer -->
-        <dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-indexer</artifactId>
-            <version>3.0.4</version>
-        </dependency>
-
-        <!-- maven indexing and plexus -->
-        <dependency>
-            <groupId>org.apache.maven.indexer</groupId>
-            <artifactId>indexer-core</artifactId>
-            <version>5.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-guice</artifactId>
-            <version>3.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-http-lightweight</artifactId>
-            <version>2.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-provider-api</artifactId>
-            <version>2.3</version>
-        </dependency>
-
-        <!-- lucene -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>3.6.2</version>
         </dependency>
     </dependencies>
 </project>

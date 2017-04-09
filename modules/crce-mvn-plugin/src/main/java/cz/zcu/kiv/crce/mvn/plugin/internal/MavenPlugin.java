@@ -13,8 +13,6 @@ import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -22,6 +20,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -33,7 +32,7 @@ import java.util.zip.ZipInputStream;
  */
 public class ExamplePlugin extends AbstractActionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExamplePlugin.class);
+    private static final Logger logger = Logger.getLogger(ExamplePlugin.class.getName());
 
     public static final String POM_NAME = "pom.xml";
 
@@ -41,9 +40,9 @@ public class ExamplePlugin extends AbstractActionHandler {
     private volatile MetadataFactory metadataFactory;
 
     public ExamplePlugin() {
-        logger.trace("New instance.");
+        logger.info("New instance.");
     }
-//
+
     public Resource loadCrceIdentity(Resource resource){
         URL url = null;
 
@@ -52,16 +51,16 @@ public class ExamplePlugin extends AbstractActionHandler {
             fillResource(url, resource);
             addCategories(resource);
         } catch (MalformedURLException ex) {
-            logger.error("Exception occurred while obtaining resource url: " + ex.getMessage());
+            logger.severe("Exception occurred while obtaining resource url: " + ex.getMessage());
             throw new IllegalStateException("Unexpected malformed url exception!", ex);
         } catch (XmlPullParserException ex) {
-            logger.error("Exception occurred while parsing artifact pom: " + ex.getMessage());
+            logger.severe("Exception occurred while parsing artifact pom: " + ex.getMessage());
             metadataService.addCategory(resource, NsMavenArtifact.CATEGORY__MAVEN_CORRUPTED);
         } catch (IOException ex) {
-            logger.error("I/O exception occurred while loading maven artifact: " + ex.getMessage());
+            logger.severe("I/O exception occurred while loading maven artifact: " + ex.getMessage());
         } catch (Exception ex) {
             // todo: ignore non-mvn stuff
-            logger.error("Exception occurred: "+ex.getMessage());
+            logger.severe("Exception occurred: "+ex.getMessage());
         }
 
         return resource;
@@ -160,10 +159,13 @@ public class ExamplePlugin extends AbstractActionHandler {
      * @param artifactUrl Url to maven artifact.
      * @param name Name of the file in jar.
      * @return Bytes from file.
-     * @throws IOException
      */
-    private byte[] loadEntry(final URL artifactUrl, String name) throws IOException {
-        try (InputStream is = FileUtil.openURL(artifactUrl); ZipInputStream jis = new ZipInputStream(is)) {
+    private byte[] loadEntry(final URL artifactUrl, String name) {
+        InputStream is = null;
+        ZipInputStream jis = null;
+        try {
+            is = FileUtil.openURL(artifactUrl);
+            jis = new ZipInputStream(is);
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
                 if (name.equalsIgnoreCase(e.getName())) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -173,6 +175,22 @@ public class ExamplePlugin extends AbstractActionHandler {
                         baos.write(buf, 0, n);
                     }
                     return baos.toByteArray();
+                }
+            }
+        } catch (IOException e) {
+            logger.severe("Exception while loading entry: "+e.getMessage());
+        } finally {
+            if (jis != null) {
+                try {
+                    jis.close();
+                } catch (IOException e) {
+                    logger.severe("Exception while closing the zip stream: "+e.getMessage());
+                }
+            } else if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    logger.severe("Exception while closing the stream: "+e.getMessage());
                 }
             }
         }
@@ -202,15 +220,18 @@ public class ExamplePlugin extends AbstractActionHandler {
 
     @Override
     public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
+        logger.info("After upload to buffer.");
         loadCrceIdentity(resource);
         return resource;
     }
 
     @Override
     public List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
-        logger.trace("Metadata service: "+metadataService.toString()+". Metadata factory: "+metadataFactory);
+        logger.info("After buffer commit.");
         for (Resource r : resources) {
+            logger.info("Loading crce identity for resource "+metadataService.getFileName(r));
             loadCrceIdentity(r);
+            logger.info("Capabilities added: "+metadataService.getSingletonCapability(r, NsMvnArtifactIdentity.NAMESPACE__MVN_ARTIFACT_IDENTITY));
         }
         return super.afterBufferCommit(resources, buffer, store);
     }

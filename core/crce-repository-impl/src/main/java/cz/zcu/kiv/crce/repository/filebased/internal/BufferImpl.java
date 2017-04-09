@@ -368,7 +368,7 @@ public class BufferImpl implements Buffer, EventHandler {
                 try {
                     executable.executeOnBuffer(res, store, buffer, properties);
                 } catch (Exception e) {
-                	logger.error( "Executable plugin threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
+                	logger.error( "Executable plugin2 threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
                 }
                 ah.afterExecuteInBuffer(res, executable, properties, buffer);
             }

@@ -14,7 +14,7 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 
 
 /**
- * Activator of this plugin (indexer).
+ * Activator of this plugin2 (indexer).
  * 
  * @author Jan Smajcl (smajcl@students.zcu.cz)
  */

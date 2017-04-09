@@ -89,7 +89,7 @@ public interface ActionHandler extends Plugin {
      * TODO proposed variant:
      * Resource[] onExecuteInStore(Resource[] resources, Store store);
      *
-     * TODO how to choose, which plugins will be executed? do an Executable plugin
+     * TODO how to choose, which plugins will be executed? do an Executable plugin2
      * and pass it (or set of such plugins) as method parameter?
      * or all plugins will be executed with no choice?
      *

@@ -18,7 +18,7 @@ import org.osgi.service.event.EventAdmin;
 
 /**
  * This abstract class implements all methods of <code>Plugin</code> interface.
- * It can be extended of any plugin - it's recommended to keep unified
+ * It can be extended of any plugin2 - it's recommended to keep unified
  * behaviour of plugins.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)
@@ -34,7 +34,7 @@ public abstract class AbstractPlugin implements Plugin, Comparable<Plugin>, Mana
     private Version version = new Version("0.0.0");
     private int priority = 0;
     private List<String> keywords = Collections.emptyList();
-    private String description = "Abstract plugin";
+    private String description = "Abstract plugin2";
 
     @Override
     public String getPluginId() {
