@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 public class MavenAetherLocatorTest {
 
     @Test
+    @Ignore
     public void testLocateArtifact() {
         String groupId = "org.hibernate";
         String artifactId = "hibernate-core";
@@ -40,6 +41,7 @@ public class MavenAetherLocatorTest {
     }
 
     @Test
+    @Ignore
     public void testLocateArtifacts() {
         String groupId = "org.hibernate";
         String artifactId = "hibernate-core";
@@ -86,6 +88,7 @@ public class MavenAetherLocatorTest {
     }
 
     @Test
+    @Ignore
     public void testLocateArtifactsVersionRange() {
         String groupId = "org.hibernate";
         String artifactId = "hibernate-core";

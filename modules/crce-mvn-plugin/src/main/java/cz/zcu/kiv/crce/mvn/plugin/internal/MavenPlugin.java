@@ -30,18 +30,15 @@ import java.util.zip.ZipInputStream;
  *
  * Created by Zdenek Vales on 27.12.2016.
  */
-public class ExamplePlugin extends AbstractActionHandler {
+public class MavenPlugin extends AbstractActionHandler {
 
-    private static final Logger logger = Logger.getLogger(ExamplePlugin.class.getName());
+    // todo: use slf4j
+    private static final Logger logger = Logger.getLogger(MavenPlugin.class.getName());
 
     public static final String POM_NAME = "pom.xml";
 
     private volatile MetadataService metadataService;
     private volatile MetadataFactory metadataFactory;
-
-    public ExamplePlugin() {
-        logger.info("New instance.");
-    }
 
     public Resource loadCrceIdentity(Resource resource){
         URL url = null;
@@ -59,7 +56,6 @@ public class ExamplePlugin extends AbstractActionHandler {
         } catch (IOException ex) {
             logger.severe("I/O exception occurred while loading maven artifact: " + ex.getMessage());
         } catch (Exception ex) {
-            // todo: ignore non-mvn stuff
             logger.severe("Exception occurred: "+ex.getMessage());
         }
 
@@ -203,7 +199,6 @@ public class ExamplePlugin extends AbstractActionHandler {
      * @param pomModel Model of pom file.
      * @param resource Resource to be filled with data.
      */
-    //TODO: test populate() method
     private void populate(Model pomModel, Resource resource) {
 
         // todo: external id to the crce identity
@@ -232,6 +227,7 @@ public class ExamplePlugin extends AbstractActionHandler {
             logger.info("Loading crce identity for resource "+metadataService.getFileName(r));
             loadCrceIdentity(r);
             logger.info("Capabilities added: "+metadataService.getSingletonCapability(r, NsMvnArtifactIdentity.NAMESPACE__MVN_ARTIFACT_IDENTITY));
+            logger.info("All capabilities: "+r.getCapabilities());
         }
         return super.afterBufferCommit(resources, buffer, store);
     }

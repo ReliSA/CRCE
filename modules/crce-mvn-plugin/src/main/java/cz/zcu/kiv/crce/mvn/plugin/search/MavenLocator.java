@@ -3,12 +3,10 @@ package cz.zcu.kiv.crce.mvn.plugin.search;
 import java.util.Collection;
 
 /**
- * Interface locating maven artifacts in a maven repo.
+ * Interface for locating artifacts in a maven repo.
  *
  * Created by Zdenek Vales on 30.1.2017.
  */
-
-// todo: separate methods for searching and resolving artifacts
 public interface MavenLocator {
 
     /**

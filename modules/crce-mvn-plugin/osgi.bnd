@@ -4,13 +4,22 @@
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
+Import-Package:\
+  !org.eclipse.sisu,\
+  !org.apache.http.*,\
+  *
+
 Embed-Dependency:\
   aether-api,\
   aether-util,\
-  aether-impl,\
+  aether-impl, \
   maven-artifact,\
   maven-model,\
   maven-model-builder,\
   maven-builder-support,\
   maven-aether-provider,\
   maven-repository-metadata
+
+
+
+

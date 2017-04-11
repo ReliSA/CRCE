@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <bundle.symbolicName>${namespace}.mvn.plugin</bundle.symbolicName>
         <bundle.namespace>${namespace}.mvn.plugin</bundle.namespace>
-        <jersey.version>2.25.1</jersey.version>
+        <jersey.version>2.9.1</jersey.version>
         <aether.version>1.1.0</aether.version>
         <maven.version>3.3.9</maven.version>
         <wagon.version>1.0</wagon.version>
@@ -170,6 +170,11 @@
         <!-- aether -->
         <dependency>
             <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${aether.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
             <version>${aether.version}</version>
         </dependency>
@@ -193,15 +198,28 @@
             <artifactId>aether-transport-file</artifactId>
             <version>${aether.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-http</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-wagon</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
+        <!-- needed for osgi -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.httpcomponents</groupId>-->
+            <!--<artifactId>httpcore</artifactId>-->
+            <!--<version>4.3.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.aether</groupId>-->
+            <!--<artifactId>aether-transport-http</artifactId>-->
+            <!--<version>${aether.version}</version>-->
+        <!--</dependency>-->
+
+        <!-- needed for osgi -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.maven.wagon</groupId>-->
+            <!--<artifactId>wagon-provider-api</artifactId>-->
+            <!--<version>2.12</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.aether</groupId>-->
+            <!--<artifactId>aether-transport-wagon</artifactId>-->
+            <!--<version>${aether.version}</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

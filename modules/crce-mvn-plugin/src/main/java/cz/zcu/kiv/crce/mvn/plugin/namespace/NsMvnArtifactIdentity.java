@@ -10,7 +10,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
  */
 public interface NsMvnArtifactIdentity {
 
-    String NAMESPACE__MVN_ARTIFACT_IDENTITY = "osgi.identity";
+    String NAMESPACE__MVN_ARTIFACT_IDENTITY = "mvn.identity";
 
     AttributeType<String> ATTRIBUTE__GROUP_ID = new SimpleAttributeType<>("groupId", String.class);
     AttributeType<String> ATTRIBUTE__ARTIFACT_ID = new SimpleAttributeType<>("artifactId", String.class);

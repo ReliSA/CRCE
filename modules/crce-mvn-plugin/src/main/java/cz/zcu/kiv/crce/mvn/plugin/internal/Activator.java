@@ -16,7 +16,7 @@ public class Activator extends DependencyActivatorBase {
     public void init(BundleContext bundleContext, DependencyManager dependencyManager) throws Exception {
         dependencyManager.add(createComponent()
                 .setInterface(Plugin.class.getName(), null)
-                .setImplementation(ExamplePlugin.class)
+                .setImplementation(MavenPlugin.class)
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
         );
