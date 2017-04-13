@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.search;
 
+import java.io.File;
 import java.util.Collection;
 
 /**
@@ -12,15 +13,15 @@ public interface MavenResolver {
 
     /**
      * Resolves the artifact from repository.
-     * @param artifact Artifact to be resolved.
+     * @param foundArtifact Artifact to be resolved.
      * @return Resolved artifact or null if the artifact cannot be resolved.
      */
-    FoundArtifact resolve(FoundArtifact artifact);
+    File resolve(FoundArtifact foundArtifact);
 
     /**
      * Resolves the collection of artifacts from repository.
-     * @param artifacts Artifacts to be resolved.
+     * @param foundArtifacts Artifacts to be resolved.
      * @return Resolved artifacts or empty list if artifacts cannot be resolved.
      */
-    Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts);
+    Collection<File> resolveArtifacts(Collection<FoundArtifact> foundArtifacts);
 }

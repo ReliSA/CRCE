@@ -2,11 +2,29 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.MavenAetherLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.VersionRangeBuilder;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
+import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.*;
+import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
+import org.eclipse.aether.spi.connector.transport.TransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -34,6 +52,8 @@ public class MavenAetherResolver implements MavenResolver {
     private String repositoryUrl;
 
     private List<RemoteRepository> repositories;
+    private RepositorySystem repositorySystem;
+    private RepositorySystemSession repositorySystemSession;
 
 
     public MavenAetherResolver() {
@@ -56,6 +76,35 @@ public class MavenAetherResolver implements MavenResolver {
     private RemoteRepository newCentralRepository()
     {
         return new RemoteRepository.Builder(repositoryId, repositoryType, repositoryUrl).build();
+    }
+
+    /**
+     * Initializes a new repository system for aether.
+     * @return Repository system.
+     */
+    private RepositorySystem newRepositorySystem() {
+        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
+        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
+        locator.addService( TransporterFactory.class, FileTransporterFactory.class );
+
+        return locator.getService(RepositorySystem.class);
+    }
+
+    /**
+     * Initializes a new repository session for aether. This is used to keep common settings for artifact
+     * resolutions.
+     * @param system Initialized repository system.
+     * @return Repository session.
+     */
+    private RepositorySystemSession newSession(RepositorySystem system )
+    {
+        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+
+        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
+        session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
+
+        return session;
     }
 
     /**
@@ -98,17 +147,49 @@ public class MavenAetherResolver implements MavenResolver {
         }
 
         repositories = newRepositories();
+        repositorySystem = newRepositorySystem();
+        repositorySystemSession = newSession(repositorySystem);
     }
 
     @Override
-    public FoundArtifact resolve(FoundArtifact artifact) {
-        // todo: implementation + tests
-        return null;
+    public File resolve(FoundArtifact foundArtifact) {
+        // todo: tests
+        repositorySystem = newRepositorySystem();
+        repositorySystemSession = newSession(repositorySystem);
+        Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
+                                                foundArtifact.getArtifactId(),
+                                                "jar",
+                                                foundArtifact.getVersion());
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact(artifact);
+        artifactRequest.setRepositories(newRepositories());
+
+        ArtifactResult artifactResult = null;
+        try {
+            artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
+        } catch (ArtifactResolutionException e) {
+            logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
+            return null;
+        }
+
+        if(artifactResult.isResolved()) {
+            return artifactResult.getArtifact().getFile();
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts) {
-        // todo: implementation + tests
-        return null;
+    public Collection<File> resolveArtifacts(Collection<FoundArtifact> foundArtifacts) {
+        // todo: tests
+        List<File> res = new ArrayList<>();
+        for(FoundArtifact foundArtifact : foundArtifacts) {
+            File f = resolve(foundArtifact);
+            if(f != null) {
+                res.add(f);
+            }
+        }
+
+        return res;
     }
 }
