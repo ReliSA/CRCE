@@ -81,6 +81,15 @@
         <servlet-name>UploadServlet</servlet-name>
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MavenServlet</servlet-name>
+        <servlet-class>cz.zcu.kiv.crce.webui.internal.MavenServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MavenServlet</servlet-name>
+        <url-pattern>/maven-search</url-pattern>
+    </servlet-mapping>
     
     <listener>
         <listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>

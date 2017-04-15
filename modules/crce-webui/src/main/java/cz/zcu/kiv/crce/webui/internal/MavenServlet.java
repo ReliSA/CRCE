@@ -1,5 +1,11 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
+import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenMockResolver;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,7 +13,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A servlet for maven search page.
@@ -59,16 +68,46 @@ public class MavenServlet extends HttpServlet {
      * Handles searching by maven coordinates.
      */
     private void searchByCoordinates(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        logger.debug("Searching for maven artifacts by coordinates...");
         String gid = req.getParameter(GROUP_ID_PARAM);
         String aid = req.getParameter(ARTIFACT_ID_PARAM);
         String ver = req.getParameter(VERSION_PARAM);
+        logger.debug("Searching for maven artifacts by coordinates: gid={}; aid={}; version={}",gid, aid, ver);
 
         // check parameters
+        if(gid == null || aid == null || ver == null) {
+            // todo: display some error message?
+            logger.warn("Not all parameters were specified.");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // perform search
+        MavenLocator locator = new CentralMavenRestLocator();
+        MavenResolver resolver = new MavenMockResolver();
+        FoundArtifact foundArtifact = locator.locate(gid, aid, ver);
+        if(foundArtifact == null) {
+            // todo: display some error message?
+            logger.warn("No artifact found...");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
+        // todo: fix the error with NoClassDefFound
+        File resolvedArtifact = resolver.resolve(foundArtifact);
+        if(resolvedArtifact == null) {
+            // this really shouldn't happen
+            logger.warn("Artifact couldn't been resolved.");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // upload to buffer
+        try {
+            Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
+        } catch (RefusedArtifactException e) {
+            logger.warn("Artifact revoked: ", e.getMessage());
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // redirect to buffer page?
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
@@ -81,6 +120,8 @@ public class MavenServlet extends HttpServlet {
         logger.debug("Searching for maven artifacts by package name...");
         String packageName = req.getParameter(PACKAGE_NAME_PARAM);
         String versionFilter = req.getParameter(VERSION_FILTER_PARAM);
+
+        String.format("%s%s",packageName, versionFilter);
 
         // check parameters
 
