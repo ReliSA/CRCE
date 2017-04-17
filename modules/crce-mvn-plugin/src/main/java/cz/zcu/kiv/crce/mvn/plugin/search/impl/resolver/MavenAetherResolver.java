@@ -2,7 +2,9 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.MavenAetherLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.VersionRangeBuilder;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -13,12 +15,12 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.*;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
+import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ import java.util.*;
  *
  * Created by Zdenek Vales on 9.4.2017.
  */
-// todo: tests
 public class MavenAetherResolver implements MavenResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenAetherLocator.class);
@@ -84,8 +85,8 @@ public class MavenAetherResolver implements MavenResolver {
     private RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
         locator.addService( TransporterFactory.class, FileTransporterFactory.class );
-//        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
 
         return locator.getService(RepositorySystem.class);
     }
@@ -152,23 +153,22 @@ public class MavenAetherResolver implements MavenResolver {
 
     @Override
     public File resolve(FoundArtifact foundArtifact) {
-        // todo: implementation + tests
-
-//        Artifact artifact = new DefaultArtifact(groupId+":"+artifactId+":"+VersionRangeBuilder.singleVersion(version));
+        // todo: tests
+        repositorySystem = newRepositorySystem();
+        repositorySystemSession = newSession(repositorySystem);
         Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
                                                 foundArtifact.getArtifactId(),
                                                 "jar",
                                                 foundArtifact.getVersion());
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact(artifact);
-        artifactRequest.setRepositories(repositories);
+        artifactRequest.setRepositories(newRepositories());
 
         ArtifactResult artifactResult = null;
         try {
             artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
         } catch (ArtifactResolutionException e) {
             logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
-            e.printStackTrace();
             return null;
         }
 
@@ -180,8 +180,16 @@ public class MavenAetherResolver implements MavenResolver {
     }
 
     @Override
-    public Collection<File> resolveArtifacts(Collection<FoundArtifact> artifacts) {
-        // todo: implementation + tests
-        return null;
+    public Collection<File> resolveArtifacts(Collection<FoundArtifact> foundArtifacts) {
+        // todo: tests
+        List<File> res = new ArrayList<>();
+        for(FoundArtifact foundArtifact : foundArtifacts) {
+            File f = resolve(foundArtifact);
+            if(f != null) {
+                res.add(f);
+            }
+        }
+
+        return res;
     }
 }
