@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenAetherResolver;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenMockResolver;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class MavenServlet extends HttpServlet {
 
         // perform search
         MavenLocator locator = new CentralMavenRestLocator();
-        MavenResolver resolver = new MavenMockResolver();
+        MavenResolver resolver = new MavenAetherResolver();
         FoundArtifact foundArtifact = locator.locate(gid, aid, ver);
         if(foundArtifact == null) {
             // todo: display some error message?

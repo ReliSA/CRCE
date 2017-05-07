@@ -42,18 +42,4 @@ public interface MavenLocator {
      * @return Collection of artifacts containing this package or empty collection if nothing is found.
      */
     Collection<FoundArtifact> locate(String includedPackage);
-
-    /**
-     * Resolves the artifact from repository.
-     * @param artifact Artifact to be resolved.
-     * @return Resolved artifact or null if the artifact cannot be resolved.
-     */
-    FoundArtifact resolve(FoundArtifact artifact);
-
-    /**
-     * Resolves the collection of artifacts from repository.
-     * @param artifacts Artifacts to be resolved.
-     * @return Resolved artifacts or empty list if artifacts cannot be resolved.
-     */
-    Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts);
 }

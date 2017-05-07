@@ -112,14 +112,4 @@ public class CentralMavenRestLocator implements MavenLocator {
 
         return foundArtifacts;
     }
-
-    @Override
-    public FoundArtifact resolve(FoundArtifact artifact) {
-        throw new UnsupportedOperationException("Sorry, not implemented yet.");
-    }
-
-    @Override
-    public Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts) {
-        throw new UnsupportedOperationException("Sorry, not implemented yet.");
-    }
 }

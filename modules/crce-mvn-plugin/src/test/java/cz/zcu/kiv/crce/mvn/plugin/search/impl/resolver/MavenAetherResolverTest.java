@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.MavenAetherLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,14 +17,13 @@ import static org.junit.Assert.assertTrue;
 public class MavenAetherResolverTest {
 
     @Test
-    // todo: fix
     public void testResolve() {
-        MavenLocator mavenLocator = new MavenAetherLocator();
+        MavenLocator mavenLocator = new CentralMavenRestLocator();
         MavenResolver mavenResolver = new MavenAetherResolver();
 
-        String groupId = "org.hibernate";
-        String artifactId = "hibernate-core";
-        String version = "5.2.0.Final";
+        String groupId = "io.airlift";
+        String artifactId = "airline";
+        String version = "0.6";
 
         FoundArtifact foundArtifact = mavenLocator.locate(groupId, artifactId, version);
         assertNotNull("Artifact not located!", foundArtifact);
@@ -33,4 +32,5 @@ public class MavenAetherResolverTest {
         assertNotNull("Artifact not resolved!", file);
         assertTrue("Non existent file returned!", file.exists());
     }
+
 }

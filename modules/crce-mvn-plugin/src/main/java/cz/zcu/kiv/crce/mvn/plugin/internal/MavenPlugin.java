@@ -40,7 +40,7 @@ public class MavenPlugin extends AbstractActionHandler {
     private volatile MetadataService metadataService;
     private volatile MetadataFactory metadataFactory;
 
-    public Resource loadCrceIdentity(Resource resource){
+    public Resource loadMavenIdentity(Resource resource){
         URL url = null;
 
         try {
@@ -214,18 +214,11 @@ public class MavenPlugin extends AbstractActionHandler {
     }
 
     @Override
-    public Resource afterUploadToBuffer(Resource resource, Buffer buffer, String name) throws RefusedArtifactException {
-        logger.info("After upload to buffer.");
-        loadCrceIdentity(resource);
-        return resource;
-    }
-
-    @Override
     public List<Resource> afterBufferCommit(List<Resource> resources, Buffer buffer, Store store) {
         logger.info("After buffer commit.");
         for (Resource r : resources) {
             logger.info("Loading crce identity for resource "+metadataService.getFileName(r));
-            loadCrceIdentity(r);
+            loadMavenIdentity(r);
             logger.info("Capabilities added: "+metadataService.getSingletonCapability(r, NsMvnArtifactIdentity.NAMESPACE__MVN_ARTIFACT_IDENTITY));
             logger.info("All capabilities: "+r.getCapabilities());
         }

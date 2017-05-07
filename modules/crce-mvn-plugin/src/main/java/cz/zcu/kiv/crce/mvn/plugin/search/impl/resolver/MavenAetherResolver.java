@@ -2,9 +2,7 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.MavenAetherLocator;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.VersionRangeBuilder;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -15,12 +13,13 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.*;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
-import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +60,7 @@ public class MavenAetherResolver implements MavenResolver {
     }
 
     /**
-     * Creates a list of repositories containing central repository.
+     * Creates a list of repositories containing the central repository.
      * @return
      */
     private List<RemoteRepository> newRepositories()
@@ -101,6 +100,7 @@ public class MavenAetherResolver implements MavenResolver {
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
+        // todo: configurable path to local repository
         LocalRepository localRepo = new LocalRepository( "target/local-repo" );
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
 
@@ -112,9 +112,9 @@ public class MavenAetherResolver implements MavenResolver {
      * default ones are used.
      */
     private void init() {
-        InputStream is = MavenAetherLocator.class.getResourceAsStream(CONFIG_FILE_NAME);
+        InputStream is = MavenAetherResolver.class.getResourceAsStream(CONFIG_FILE_NAME);
         Properties properties = new Properties();
-        logger.info("Initializing "+MavenAetherLocator.class.getName()+".");
+        logger.info("Initializing "+MavenAetherResolver.class.getName()+".");
 
 //        nexusIndexer = new DefaultNexusIndexer();
 //        creators = new ArrayList<>();
@@ -133,7 +133,7 @@ public class MavenAetherResolver implements MavenResolver {
                 repositoryType = properties.getProperty(REPOSITORY_TYPE_PROPERTY_NAME, REPOSITORY_TYPE_DEF);
                 repositoryUrl = properties.getProperty(REPOSITORY_URL_PROPERTY_NAME, REPOSITORY_URL_DEF);
             } catch (IOException e) {
-                logger.error("Exception while configuring "+MavenAetherLocator.class.getName()+". "+e.getMessage());
+                logger.error("Exception while configuring "+MavenAetherResolver.class.getName()+". "+e.getMessage());
                 repositoryId = REPOSITORY_ID_DEF;
                 repositoryType = REPOSITORY_TYPE_DEF;
                 repositoryUrl = REPOSITORY_URL_DEF;
@@ -156,13 +156,14 @@ public class MavenAetherResolver implements MavenResolver {
         // todo: tests
         repositorySystem = newRepositorySystem();
         repositorySystemSession = newSession(repositorySystem);
+        repositories = newRepositories();
         Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
                                                 foundArtifact.getArtifactId(),
                                                 "jar",
                                                 foundArtifact.getVersion());
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact(artifact);
-        artifactRequest.setRepositories(newRepositories());
+        artifactRequest.setRepositories(repositories);
 
         ArtifactResult artifactResult = null;
         try {

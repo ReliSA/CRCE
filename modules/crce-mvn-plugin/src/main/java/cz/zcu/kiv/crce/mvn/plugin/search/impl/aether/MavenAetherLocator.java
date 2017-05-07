@@ -34,6 +34,7 @@ import java.util.*;
  * @author Zdendek Vales
  */
 // todo: use nexus indexer for searching and aether for resolving artifacts
+@Deprecated
 public class MavenAetherLocator implements MavenLocator {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenAetherLocator.class);
@@ -299,36 +300,5 @@ public class MavenAetherLocator implements MavenLocator {
 
 
         return null;
-    }
-
-    @Override
-    public FoundArtifact resolve(FoundArtifact artifact) {
-        RepositorySystem repositorySystem = newRepositorySystem();
-        RepositorySystemSession session = newSession(repositorySystem);
-
-        // resolve artifact
-        Artifact toBeResolved = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), "", artifact.getVersion());
-
-        ArtifactRequest artifactRequest = new ArtifactRequest();
-        artifactRequest.setArtifact(toBeResolved);
-        artifactRequest.setRepositories(newRepositories());
-
-        ArtifactResult artifactResult = null;
-        try {
-            artifactResult = repositorySystem.resolveArtifact(session, artifactRequest);
-        } catch (ArtifactResolutionException e) {
-            logger.error("Unexpected error occurred while resolving artifact: "+e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-
-        FoundArtifact result = new SimpleFoundArtifact(artifactResult.getArtifact());
-
-        return result;
-    }
-
-    @Override
-    public Collection<FoundArtifact> resolveArtifacts(Collection<FoundArtifact> artifacts) {
-        throw new UnsupportedOperationException("Sorry, not implemented yet.");
     }
 }

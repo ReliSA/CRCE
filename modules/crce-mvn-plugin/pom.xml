@@ -49,6 +49,11 @@
             <artifactId>org.apache.httpcomponents.httpclient</artifactId>
             <version>4.2.6</version>
         </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+            <artifactId>org.apache.httpcomponents.httpcore</artifactId>
+            <version>4.2.5</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -195,17 +200,23 @@
             <artifactId>aether-transport-file</artifactId>
             <version>${aether.version}</version>
         </dependency>
-        <!-- needed for osgi -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.httpcomponents</groupId>-->
-            <!--<artifactId>httpcore</artifactId>-->
-            <!--<version>4.3.2</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-transport-http</artifactId>
             <version>${aether.version}</version>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.2</version>
+        </dependency>
+
 
         <!-- needed for osgi -->
         <!--<dependency>-->
@@ -213,10 +224,10 @@
             <!--<artifactId>wagon-provider-api</artifactId>-->
             <!--<version>2.12</version>-->
         <!--</dependency>-->
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-wagon</artifactId>
-            <version>${aether.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.aether</groupId>-->
+            <!--<artifactId>aether-transport-wagon</artifactId>-->
+            <!--<version>${aether.version}</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>
