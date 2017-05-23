@@ -14,10 +14,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.AssertFalse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A servlet for maven search page.
@@ -125,10 +128,35 @@ public class MavenServlet extends HttpServlet {
         String.format("%s%s",packageName, versionFilter);
 
         // check parameters
+        if(packageName == null) {
+            // todo: display some error message?
+            logger.warn("Package name not specified.");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // perform search
+        MavenLocator locator = new CentralMavenRestLocator();
+        MavenResolver resolver = new MavenAetherResolver();
+        List<FoundArtifact> foundArtifacts = new ArrayList<>(locator.locate(packageName));
+        List<File> resolvedArtifacts = new ArrayList<>(resolver.resolveArtifacts(foundArtifacts));
+        if(resolvedArtifacts == null) {
+            // this really shouldn't happen
+            logger.warn("Artifact couldn't been resolved.");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // upload to buffer
+        try {
+            for(File resolvedArtifact : resolvedArtifacts) {
+                Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
+            }
+        } catch (RefusedArtifactException e) {
+            logger.warn("Artifact revoked: ", e.getMessage());
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            return;
+        }
 
         // redirect to buffer page?
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
