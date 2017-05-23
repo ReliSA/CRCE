@@ -95,6 +95,7 @@ public class CentralMavenLocatorTest {
     }
 
     @Test
+    // todo: something is buggy about the version filter or list of located artifacts
     public void testFilterVersion() {
         String packageName = "org.hibernate.dialect.MimerSQLDialect";
 

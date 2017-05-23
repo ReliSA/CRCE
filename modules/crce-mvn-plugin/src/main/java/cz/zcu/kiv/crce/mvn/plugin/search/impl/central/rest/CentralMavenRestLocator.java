@@ -1,7 +1,5 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
-import aQute.bnd.osgi.Clazz;
-import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
@@ -95,7 +93,8 @@ public class CentralMavenRestLocator implements MavenLocator {
         List<FoundArtifact> foundArtifacts = new ArrayList<>();
 
         QueryBuilder qb = new QueryBuilder()
-                .addParameter(QueryParam.CLASS_NAME, includedPackage);
+                .addParameter(QueryParam.CLASS_NAME, includedPackage)
+                .addStandardAdditionalParameters();
         CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
         if(jsonResponse.getResponse().getNumFound() == 0 ) {
             // no artifact found
@@ -147,8 +146,7 @@ public class CentralMavenRestLocator implements MavenLocator {
 
         // select the highest version for each artifact list
         List<FoundArtifact> highestVersions = new ArrayList<>();
-        for(String key : artifacts.keySet()) {
-            List<FoundArtifact> tmp = artifacts.get(key);
+        for(List<FoundArtifact> tmp : artifacts.values()) {
             FoundArtifact highestVersionArt = null;
             DefaultArtifactVersion highestVersion = null;
             for(FoundArtifact fa : tmp) {
@@ -187,8 +185,7 @@ public class CentralMavenRestLocator implements MavenLocator {
 
         // select the lowest version for each artifact list
         List<FoundArtifact> lowestVersions = new ArrayList<>();
-        for(String key : artifacts.keySet()) {
-            List<FoundArtifact> tmp = artifacts.get(key);
+        for(List<FoundArtifact> tmp : artifacts.values()) {
             FoundArtifact lowestVersionArt = null;
             DefaultArtifactVersion lowestVersion = null;
             for(FoundArtifact fa : tmp) {

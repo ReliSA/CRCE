@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.webui.internal;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenAetherResolver;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenMockResolver;
@@ -20,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,6 +38,9 @@ public class MavenServlet extends HttpServlet {
     public static final String SEARCH_BY_PARAM_NAME = "by";
     public static final String SEARCH_BY_COORDINATES = "gav";
     public static final String SEARCH_BY_PACKAGE_NAME = "pname";
+
+    public static final String LOWEST_VERSION = "lv";
+    public static final String HIGHEST_VERSION = "hv";
 
     // those correspond with name attribute of html input element
     public static final String GROUP_ID_PARAM = "gid";
@@ -125,10 +130,10 @@ public class MavenServlet extends HttpServlet {
         String packageName = req.getParameter(PACKAGE_NAME_PARAM);
         String versionFilter = req.getParameter(VERSION_FILTER_PARAM);
 
-        String.format("%s%s",packageName, versionFilter);
+        logger.debug("Package name: "+packageName+"; version filter: "+versionFilter);
 
         // check parameters
-        if(packageName == null) {
+        if(packageName == null || versionFilter == null) {
             // todo: display some error message?
             logger.warn("Package name not specified.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
@@ -138,8 +143,13 @@ public class MavenServlet extends HttpServlet {
         // perform search
         MavenLocator locator = new CentralMavenRestLocator();
         MavenResolver resolver = new MavenAetherResolver();
-        List<FoundArtifact> foundArtifacts = new ArrayList<>(locator.locate(packageName));
-        List<File> resolvedArtifacts = new ArrayList<>(resolver.resolveArtifacts(foundArtifacts));
+        Collection<FoundArtifact> foundArtifacts = locator.locate(packageName);
+        VersionFilter vf = VersionFilter.HIGHEST_ONLY;
+        if(versionFilter.equals(LOWEST_VERSION)) {
+            vf = VersionFilter.LOWEST_ONLY;
+        }
+        foundArtifacts = locator.filter(foundArtifacts, vf);
+        Collection<File> resolvedArtifacts = resolver.resolveArtifacts(foundArtifacts);
         if(resolvedArtifacts == null) {
             // this really shouldn't happen
             logger.warn("Artifact couldn't been resolved.");

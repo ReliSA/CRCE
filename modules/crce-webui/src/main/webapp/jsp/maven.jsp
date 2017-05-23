@@ -30,9 +30,9 @@
 
         Filter:<br>
         <label for="lv">Lowest version</label>
-        <input type="radio" id="lv" name="verFilter"><br>
-        <label for="nv">Newest version</label>
-        <input type="radio" id="nv" name="verFilter"><br>
+        <input type="radio" id="lv" name="verFilter" value="lv"><br>
+        <label for="hv">Highest version</label>
+        <input type="radio" id="hv" name="verFilter" value="hv"><br>
 
         <input type="submit" value="Search">
     </form>
