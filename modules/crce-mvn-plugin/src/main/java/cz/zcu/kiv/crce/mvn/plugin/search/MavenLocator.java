@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.mvn.plugin.search;
 
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
+
 import java.util.Collection;
 
 /**
@@ -42,4 +44,13 @@ public interface MavenLocator {
      * @return Collection of artifacts containing this package or empty collection if nothing is found.
      */
     Collection<FoundArtifact> locate(String includedPackage);
+
+    /**
+     * Filters the found artifacts by version.
+     *
+     * @param foundArtifacts Collection to be filtered.
+     * @param versionFilter Version filter.
+     * @return Filtered collection.
+     */
+    Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, VersionFilter versionFilter);
 }

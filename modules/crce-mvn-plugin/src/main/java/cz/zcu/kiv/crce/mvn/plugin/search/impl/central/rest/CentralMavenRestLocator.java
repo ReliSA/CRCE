@@ -1,16 +1,18 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
+import aQute.bnd.osgi.Clazz;
+import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.CentralRepoJsonResponse;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.JsonArtifactDescriptor;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * This locator uses the central maven repo to search for artifacts - http://search.maven.org/.
@@ -111,5 +113,97 @@ public class CentralMavenRestLocator implements MavenLocator {
         }
 
         return foundArtifacts;
+    }
+
+    @Override
+    public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, VersionFilter versionFilter) {
+        switch (versionFilter) {
+            case HIGHEST_ONLY:
+                return getHighestVersions(foundArtifacts);
+            case LOWEST_ONLY:
+                return getLowestVersions(foundArtifacts);
+            default:
+                return foundArtifacts;
+        }
+    }
+
+    /**
+     * Return the highest versions of all found artifacts.
+     * @param foundArtifacts
+     * @return
+     */
+    private Collection<FoundArtifact> getHighestVersions(Collection<FoundArtifact> foundArtifacts) {
+        // group artifacts by their groupId and artifactId
+        Map<String, List<FoundArtifact>> artifacts = new HashMap<>();
+        for(FoundArtifact foundArtifact : foundArtifacts) {
+            String name = foundArtifact.getGroupId()+":"+foundArtifact.getArtifactId();
+            if(artifacts.containsKey(name)) {
+                artifacts.get(name).add(foundArtifact);
+            } else {
+                artifacts.put(name, new ArrayList<FoundArtifact>());
+                artifacts.get(name).add(foundArtifact);
+            }
+        }
+
+        // select the highest version for each artifact list
+        List<FoundArtifact> highestVersions = new ArrayList<>();
+        for(String key : artifacts.keySet()) {
+            List<FoundArtifact> tmp = artifacts.get(key);
+            FoundArtifact highestVersionArt = null;
+            DefaultArtifactVersion highestVersion = null;
+            for(FoundArtifact fa : tmp) {
+                DefaultArtifactVersion dav = new DefaultArtifactVersion(fa.getVersion());
+                if(highestVersion == null) {
+                    highestVersionArt = fa;
+                    highestVersion = new DefaultArtifactVersion(fa.getVersion());
+                } else if (highestVersion.compareTo(dav) <= 0) {
+                    highestVersionArt = fa;
+                    highestVersion = dav;
+                }
+            }
+            highestVersions.add(highestVersionArt);
+        }
+
+        return highestVersions;
+    }
+
+    /**
+     * Return the lowest versions of all found artifacts.
+     * @param foundArtifacts
+     * @return
+     */
+    private Collection<FoundArtifact> getLowestVersions(Collection<FoundArtifact> foundArtifacts) {
+        // group artifacts by their groupId and artifactId
+        Map<String, List<FoundArtifact>> artifacts = new HashMap<>();
+        for(FoundArtifact foundArtifact : foundArtifacts) {
+            String name = foundArtifact.getGroupId()+":"+foundArtifact.getArtifactId();
+            if(artifacts.containsKey(name)) {
+                artifacts.get(name).add(foundArtifact);
+            } else {
+                artifacts.put(name, new ArrayList<FoundArtifact>());
+                artifacts.get(name).add(foundArtifact);
+            }
+        }
+
+        // select the lowest version for each artifact list
+        List<FoundArtifact> lowestVersions = new ArrayList<>();
+        for(String key : artifacts.keySet()) {
+            List<FoundArtifact> tmp = artifacts.get(key);
+            FoundArtifact lowestVersionArt = null;
+            DefaultArtifactVersion lowestVersion = null;
+            for(FoundArtifact fa : tmp) {
+                DefaultArtifactVersion dav = new DefaultArtifactVersion(fa.getVersion());
+                if(lowestVersion == null) {
+                    lowestVersionArt = fa;
+                    lowestVersion = new DefaultArtifactVersion(fa.getVersion());
+                } else if (lowestVersion.compareTo(dav) >= 0) {
+                    lowestVersionArt = fa;
+                    lowestVersion = dav;
+                }
+            }
+            lowestVersions.add(lowestVersionArt);
+        }
+
+        return lowestVersions;
     }
 }

@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -91,5 +92,25 @@ public class CentralMavenLocatorTest {
         Collection<FoundArtifact> artifacts = locator.locate(badPackageName);
         assertNotNull("Null returned!", artifacts);
         assertTrue("Artifacts containing package "+badPackageName+" found!", artifacts.isEmpty());
+    }
+
+    @Test
+    public void testFilterVersion() {
+        String packageName = "org.hibernate.dialect.MimerSQLDialect";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(packageName);
+        assertFalse("No artifacts found!", artifacts.isEmpty());
+        int count = artifacts.size();
+
+        Collection<FoundArtifact> highest = locator.filter(artifacts, VersionFilter.HIGHEST_ONLY);
+        int hSize = highest.size();
+        Collection<FoundArtifact> lowest = locator.filter(artifacts, VersionFilter.LOWEST_ONLY);
+        int lSize = lowest.size();
+
+        assertTrue("Highest versions count "+(hSize)+" should be lower than total count "+(count)+"!", hSize < count );
+        assertTrue("Lowest versions count "+(lSize)+" should be lower than total count "+(count)+"!", lSize < count );
+        assertEquals("Lowest version count sohuld be the same as the highest version count!", lSize, hSize);
     }
 }

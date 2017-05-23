@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.aether;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -299,6 +300,11 @@ public class MavenAetherLocator implements MavenLocator {
 //        RepositorySystemSession session = newSession(repositorySystem);
 
 
+        return null;
+    }
+
+    @Override
+    public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, VersionFilter versionFilter) {
         return null;
     }
 }
