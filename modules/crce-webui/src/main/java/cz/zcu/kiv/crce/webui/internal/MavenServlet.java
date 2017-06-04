@@ -6,7 +6,6 @@ import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenAetherResolver;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenMockResolver;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,20 +14,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.AssertFalse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A servlet for maven search page.
  *
  * Created by Zdenek Vales on 11.4.2017.
  */
+
+// todo: feedback, use threads for big result sets, use groupId filtering
 public class MavenServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7359560802939893940L;

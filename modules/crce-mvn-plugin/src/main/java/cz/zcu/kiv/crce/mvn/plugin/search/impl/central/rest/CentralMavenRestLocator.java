@@ -10,6 +10,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.Json;
 import java.util.*;
 
 /**
@@ -22,6 +23,11 @@ import java.util.*;
 public class CentralMavenRestLocator implements MavenLocator {
 
     private static final Logger logger = LoggerFactory.getLogger(CentralMavenRestLocator.class);
+
+    /**
+     * Maximum number of found artifacts returned by one query.
+     */
+    public static final int MAX_ARTIFACTS_PER_QUERY = 50;
 
     private CentralRepoRestConsumer restConsumer;
 
@@ -91,19 +97,37 @@ public class CentralMavenRestLocator implements MavenLocator {
     @Override
     public Collection<FoundArtifact> locate(String includedPackage) {
         List<FoundArtifact> foundArtifacts = new ArrayList<>();
+        List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
+        int foundArtifactsCount = 0;
 
+        // perform the first query to get the number of total results found
         QueryBuilder qb = new QueryBuilder()
                 .addParameter(QueryParam.CLASS_NAME, includedPackage)
-                .addStandardAdditionalParameters();
+                .addStandardAdditionalParameters()
+                .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
         CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
-        if(jsonResponse.getResponse().getNumFound() == 0 ) {
+        foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+        if(foundArtifactsCount == 0 ) {
             // no artifact found
             return foundArtifacts;
         }
 
+
+        // fetch found artifacts
+        // fetch only MAX_ARTIFACTS_PER_QUERY per 1 query
+        int start = 0;
+        qb = qb.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(MAX_ARTIFACTS_PER_QUERY));
+        while(start < foundArtifactsCount) {
+            // set new start
+            qb = qb.addAdditionalParameter(AdditionalQueryParam.START, Integer.toString(start));
+            jsonResponse = restConsumer.getJson(qb);
+            jsonArtifactDescriptors.addAll(Arrays.asList(jsonResponse.getResponse().getDocs()));
+            start = Math.min(foundArtifactsCount, start+MAX_ARTIFACTS_PER_QUERY);
+        }
+
         // todo: maybe use dozer for this?
         // convert the found artifacts
-        for(JsonArtifactDescriptor ad : jsonResponse.getResponse().getDocs()) {
+        for(JsonArtifactDescriptor ad : jsonArtifactDescriptors) {
             foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
                     ad.getA(),
                     ad.getV(),

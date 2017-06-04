@@ -5,6 +5,7 @@ import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -75,12 +76,15 @@ public class CentralMavenLocatorTest {
     @Test
     public void testLocateArtifactByIncludedPackage() {
         String packageName = "org.hibernate.dialect.function";
+        // update this number as needed...
+        int expCount = 880;
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
 
         Collection<FoundArtifact> artifacts = locator.locate(packageName);
         assertNotNull("Null returned!", artifacts);
         assertFalse("No artifacts containing package "+packageName+" found!", artifacts.isEmpty());
+        assertEquals("Wrong number of artifacts located!", expCount, artifacts.size());
     }
 
     @Test
@@ -95,7 +99,6 @@ public class CentralMavenLocatorTest {
     }
 
     @Test
-    // todo: something is buggy about the version filter or list of located artifacts
     public void testFilterVersion() {
         String packageName = "org.hibernate.dialect.MimerSQLDialect";
 
@@ -114,4 +117,17 @@ public class CentralMavenLocatorTest {
         assertTrue("Lowest versions count "+(lSize)+" should be lower than total count "+(count)+"!", lSize < count );
         assertEquals("Lowest version count sohuld be the same as the highest version count!", lSize, hSize);
     }
+
+    @Test
+    public void testLocateArtifacts2() {
+        String fc = "org.specs.runner.Junit";
+        int expCount = 54;
+
+        CentralMavenRestLocator cmrl = new CentralMavenRestLocator();
+        Collection<FoundArtifact> foundArtifacts = cmrl.locate(fc);
+
+        assertNotNull("Null returned!", foundArtifacts);
+        assertEquals("Wrong number of found artifacts!", expCount, foundArtifacts.size());
+    }
+
 }

@@ -10,31 +10,67 @@
     <!-- search by maven coordinates -->
     <form method="post" action="maven-search?by=gav">
         <h3>Search by maven coordinates</h3>
-        <label for="aid">Artifact ID:</label>
-        <input type="text" id="aid" name="aid"><br>
+        <table>
+            <tr>
+                <td>
+                    <label for="aid">Artifact ID:</label>
+                </td>
+                <td>
+                    <input type="text" id="aid" name="aid">
+                </td>
+            </tr>
 
-        <label for="gid">Group ID:</label>
-        <input type="text" id="gid" name="gid"><br>
+            <tr>
+                <td>
+                    <label for="gid">Group ID:</label>
+                </td>
+                <td>
+                    <input type="text" id="gid" name="gid">
+                </td>
+            </tr>
 
-        <label for="ver">Version:</label>
-        <input type="text" id="ver" name="ver"><br>
+            <tr>
+                <td>
+                    <label for="ver">Version:</label>
+                </td>
+                <td>
+                    <input type="text" id="ver" name="ver">
+                </td>
+            </tr>
 
-        <input type="submit" value="Search">
+            <tr>
+                <td><input type="submit" value="Search"></td>
+            </tr>
+        </table>
     </form>
 
     <!-- search by package name -->
     <form method="post" action="maven-search?by=pname">
         <h3>Search by package name</h3>
-        <label for="pname">Package name:</label>
-        <input type="text" id="pname" name="pname"><br>
+        <table>
+            <tr>
+                <td><label for="pname">Package name:</label></td>
+                <td><input type="text" id="pname" name="pname"></td>
+            </tr>
 
-        Filter:<br>
-        <label for="lv">Lowest version</label>
-        <input type="radio" id="lv" name="verFilter" value="lv"><br>
-        <label for="hv">Highest version</label>
-        <input type="radio" id="hv" name="verFilter" value="hv"><br>
+            <tr>
+                <td>Filter:</td>
+            </tr>
 
-        <input type="submit" value="Search">
+            <tr>
+                <td><label for="lv">Lowest version</label></td>
+                <td><input type="radio" id="lv" name="verFilter" value="lv"></td>
+            </tr>
+
+            <tr>
+                <td><label for="hv">Highest version</label></td>
+                <td><input type="radio" id="hv" name="verFilter" value="hv"></td>
+            </tr>
+
+            <tr>
+                <td><input type="submit" value="Search"></td>
+            </tr>
+        </table>
     </form>
 </div>
 
