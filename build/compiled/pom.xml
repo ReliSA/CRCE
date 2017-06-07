@@ -127,4 +127,6 @@
         </dependency>
     </dependencies>
 
+    <version>2.1.1</version>
+    <groupId>cz.zcu.kiv.crce</groupId>
 </project>

@@ -57,7 +57,7 @@
 
     <modules>
         <module>pom</module>
-        <module>provision</module>
+        
 
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
@@ -69,7 +69,7 @@
 
         <!-- UI & Optional Plugins -->
         <module>crce-handler-metrics</module>
-        <module>crce-webui</module>
+        
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
@@ -83,6 +83,9 @@
         <!--<module>crce-repository-maven-impl</module>-->
         
         <module>crce-webservices-indexer</module>
+        <module>crce-external-repository</module>
+        <module>crce-webui-vaadin</module>
+        <module>provision</module>
     </modules>
 
     <profiles>

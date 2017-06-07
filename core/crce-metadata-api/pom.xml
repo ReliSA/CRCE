@@ -64,4 +64,5 @@
         </repository>
     </repositories>
 
+    <groupId>cz.zcu.kiv.crce</groupId>
 </project>
