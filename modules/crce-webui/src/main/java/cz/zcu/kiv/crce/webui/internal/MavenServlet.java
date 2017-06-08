@@ -145,6 +145,7 @@ public class MavenServlet extends HttpServlet {
         if(versionFilter.equals(LOWEST_VERSION)) {
             vf = VersionFilter.LOWEST_ONLY;
         }
+        foundArtifacts = locator.filter(foundArtifacts, "org.hibernate");
         foundArtifacts = locator.filter(foundArtifacts, vf);
         Collection<File> resolvedArtifacts = resolver.resolveArtifacts(foundArtifacts);
         if(resolvedArtifacts == null) {
@@ -155,9 +156,13 @@ public class MavenServlet extends HttpServlet {
         }
 
         // upload to buffer
+        // todo: find out why putting new artifacts to buffer fails
+        // todo: add groupId filtering
+        logger.debug(resolvedArtifacts.size()+" artifacts resolved.");
         try {
             for(File resolvedArtifact : resolvedArtifacts) {
                 Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
+                break;
             }
         } catch (RefusedArtifactException e) {
             logger.warn("Artifact revoked: ", e.getMessage());

@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  * @author Zdenek Vales
  */
 //todo: delete unused methods
-public class QueryBuilder {
+public class QueryBuilder implements Cloneable {
 
     public static final String AND_CONCAT = "+AND+";
 
@@ -51,6 +52,32 @@ public class QueryBuilder {
     public QueryBuilder() {
         this.query = new LinkedHashMap<>();
         this.additionalParams = new LinkedHashMap<>();
+    }
+
+    /**
+     * Clones this query builder.
+     * @return
+     */
+    public QueryBuilder clone() {
+        try {
+            super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        } finally {
+            QueryBuilder qb = new QueryBuilder();
+            qb.setAdditionalParams(new LinkedHashMap<>(additionalParams));
+            qb.setQuery(new LinkedHashMap<>(query));
+
+            return qb;
+        }
+    }
+
+    protected void setQuery(Map<String, String> query) {
+        this.query = query;
+    }
+
+    protected void setAdditionalParams(Map<String, String> additionalParams) {
+        this.additionalParams = additionalParams;
     }
 
     /**

@@ -97,7 +97,7 @@ public class CentralMavenRestLocator implements MavenLocator {
     @Override
     public Collection<FoundArtifact> locate(String includedPackage) {
         List<FoundArtifact> foundArtifacts = new ArrayList<>();
-        List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
+//        List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
         int foundArtifactsCount = 0;
 
         // perform the first query to get the number of total results found
@@ -114,25 +114,28 @@ public class CentralMavenRestLocator implements MavenLocator {
 
 
         // fetch found artifacts
-        // fetch only MAX_ARTIFACTS_PER_QUERY per 1 query
         int start = 0;
-        qb = qb.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(MAX_ARTIFACTS_PER_QUERY));
-        while(start < foundArtifactsCount) {
-            // set new start
-            qb = qb.addAdditionalParameter(AdditionalQueryParam.START, Integer.toString(start));
-            jsonResponse = restConsumer.getJson(qb);
-            jsonArtifactDescriptors.addAll(Arrays.asList(jsonResponse.getResponse().getDocs()));
-            start = Math.min(foundArtifactsCount, start+MAX_ARTIFACTS_PER_QUERY);
+        int threadCount = Math.max(1, (int)Math.ceil((double)foundArtifactsCount / MAX_ARTIFACTS_PER_QUERY));
+        List<FetchResultSetThread> threadPool = new ArrayList<>(threadCount);
+
+        // start downloading threads
+        for (int i = 0; i < threadCount; i++) {
+            logger.debug("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
+//            System.out.println("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
+            FetchResultSetThread t = new FetchResultSetThread(qb.clone(), start, MAX_ARTIFACTS_PER_QUERY);
+            threadPool.add(t);
+            t.start();
+            start += MAX_ARTIFACTS_PER_QUERY;
         }
 
-        // todo: maybe use dozer for this?
-        // convert the found artifacts
-        for(JsonArtifactDescriptor ad : jsonArtifactDescriptors) {
-            foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
-                    ad.getA(),
-                    ad.getV(),
-                    ad.jarDownloadLink(),
-                    ad.pomDownloadLink()));
+        // join threads and get found artifacts
+        for (FetchResultSetThread t : threadPool) {
+            try {
+                t.join();
+                foundArtifacts.addAll(t.getFoundArtifacts());
+            } catch (InterruptedException e) {
+                logger.error("Error while joining result downloading thread: "+e.getMessage());
+            }
         }
 
         return foundArtifacts;
@@ -148,6 +151,17 @@ public class CentralMavenRestLocator implements MavenLocator {
             default:
                 return foundArtifacts;
         }
+    }
+
+    @Override
+    public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId) {
+        List<FoundArtifact> filtered = new ArrayList<>();
+        for(FoundArtifact fa : foundArtifacts) {
+            if(fa.getGroupId().matches(groupId+"(.*)")) {
+               filtered.add(fa);
+            }
+        }
+        return filtered;
     }
 
     /**

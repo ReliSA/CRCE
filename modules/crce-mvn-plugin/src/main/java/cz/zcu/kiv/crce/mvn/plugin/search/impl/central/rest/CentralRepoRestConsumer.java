@@ -43,9 +43,15 @@ public class CentralRepoRestConsumer {
         Response response = sendRequest(queryBuilder);
         if(response == null ) {
             logger.error("Response is null!");
+//            System.out.println("Response is null!");
             return null;
         } else if(response.getStatus() != Response.Status.OK.getStatusCode()) {
             logger.error("Response not OK! Status code: "+response.getStatus());
+//            System.out.println("Response not OK! Status code: "+response.getStatus()+"\nQuery: "+queryBuilder.toString());
+            if(response.getStatus() == 504) {
+                // timeout, try again
+                return getJson(queryBuilder);
+            }
             return null;
         }
 
@@ -55,12 +61,15 @@ public class CentralRepoRestConsumer {
             jsonResponse = response.readEntity(CentralRepoJsonResponse.class);
         } catch (ProcessingException ex) {
             logger.error("Error while processing the data from response! "+ex.getMessage());
+//            System.out.println("Error while processing the data from response! "+ex.getMessage());
             return null;
         } catch (IllegalStateException ex) {
             logger.error("Error while trying to read the data from response! "+ex.getMessage());
+//            System.out.println("Error while trying to read the data from response! "+ex.getMessage());
             return null;
         } catch (Exception ex) {
             logger.error("Unexpected exception: "+ex.getMessage());
+//            System.out.println("Unexpected exception: "+ex.getMessage());
             return null;
         }
 

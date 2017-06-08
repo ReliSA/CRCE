@@ -53,4 +53,14 @@ public interface MavenLocator {
      * @return Filtered collection.
      */
     Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, VersionFilter versionFilter);
+
+    /**
+     * Filters the found artifacts by group id. Only those with the beginning of group id same
+     * as the provided one will pass.
+     *
+     * @param foundArtifacts Collection to be filtered.
+     * @param groupId Group id filter.
+     * @return Filtered collection.
+     */
+    Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId);
 }

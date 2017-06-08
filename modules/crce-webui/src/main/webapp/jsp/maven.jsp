@@ -54,17 +54,32 @@
             </tr>
 
             <tr>
-                <td>Filter:</td>
+                <td>Version filter:</td>
             </tr>
 
             <tr>
-                <td><label for="lv">Lowest version</label></td>
-                <td><input type="radio" id="lv" name="verFilter" value="lv"></td>
+                <td><input type="radio" id="lv" name="verFilter" value="lv">
+                <label for="lv">Lowest version</label></td>
             </tr>
 
             <tr>
-                <td><label for="hv">Highest version</label></td>
-                <td><input type="radio" id="hv" name="verFilter" value="hv"></td>
+                <td><input type="radio" id="hv" name="verFilter" value="hv" checked="true">
+                <label for="hv">Highest version</label></td>
+            </tr>
+
+            <tr>
+                <td>GroupId filter:</td>
+            </tr>
+
+            <tr>
+                <td><input type="radio" id="hmatch" name="gidFilter" value="hmatch" checked="true">
+                <label for="hmatch">Highest groupId match</label></td>
+            </tr>
+
+            <tr>
+                <td><input type="radio" id="manualg" name="gidFilter" value="manualg">
+                <label for="manualg">Manual groupId filter</label></td>
+                <td><input type="text" id="manualgf" name="manualgf"></td>
             </tr>
 
             <tr>

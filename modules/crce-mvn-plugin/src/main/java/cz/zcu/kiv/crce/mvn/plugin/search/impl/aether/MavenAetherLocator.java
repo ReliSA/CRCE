@@ -304,6 +304,11 @@ public class MavenAetherLocator implements MavenLocator {
     }
 
     @Override
+    public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId) {
+        return null;
+    }
+
+    @Override
     public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, VersionFilter versionFilter) {
         return null;
     }

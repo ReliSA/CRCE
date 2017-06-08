@@ -7,12 +7,13 @@ import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.mvn.plugin.namespace.NsMavenArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.namespace.NsMvnArtifactIdentity;
 import cz.zcu.kiv.crce.repository.Buffer;
-import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.AbstractActionHandler;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -20,7 +21,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -33,7 +33,7 @@ import java.util.zip.ZipInputStream;
 public class MavenPlugin extends AbstractActionHandler {
 
     // todo: use slf4j
-    private static final Logger logger = Logger.getLogger(MavenPlugin.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MavenPlugin.class.getName());
 
     public static final String POM_NAME = "pom.xml";
 
@@ -41,6 +41,7 @@ public class MavenPlugin extends AbstractActionHandler {
     private volatile MetadataFactory metadataFactory;
 
     public Resource loadMavenIdentity(Resource resource){
+        logger.debug("Using maven plugin");
         URL url = null;
 
         try {
@@ -48,15 +49,15 @@ public class MavenPlugin extends AbstractActionHandler {
             fillResource(url, resource);
             addCategories(resource);
         } catch (MalformedURLException ex) {
-            logger.severe("Exception occurred while obtaining resource url: " + ex.getMessage());
+            logger.error("Exception occurred while obtaining resource url: " + ex.getMessage());
             throw new IllegalStateException("Unexpected malformed url exception!", ex);
         } catch (XmlPullParserException ex) {
-            logger.severe("Exception occurred while parsing artifact pom: " + ex.getMessage());
+            logger.error("Exception occurred while parsing artifact pom: " + ex.getMessage());
             metadataService.addCategory(resource, NsMavenArtifact.CATEGORY__MAVEN_CORRUPTED);
         } catch (IOException ex) {
-            logger.severe("I/O exception occurred while loading maven artifact: " + ex.getMessage());
+            logger.error("I/O exception occurred while loading maven artifact: " + ex.getMessage());
         } catch (Exception ex) {
-            logger.severe("Exception occurred: "+ex.getMessage());
+            logger.error("Exception occurred: "+ex.getMessage());
         }
 
         return resource;
@@ -174,19 +175,19 @@ public class MavenPlugin extends AbstractActionHandler {
                 }
             }
         } catch (IOException e) {
-            logger.severe("Exception while loading entry: "+e.getMessage());
+            logger.error("Exception while loading entry: "+e.getMessage());
         } finally {
             if (jis != null) {
                 try {
                     jis.close();
                 } catch (IOException e) {
-                    logger.severe("Exception while closing the zip stream: "+e.getMessage());
+                    logger.error("Exception while closing the zip stream: "+e.getMessage());
                 }
             } else if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    logger.severe("Exception while closing the stream: "+e.getMessage());
+                    logger.error("Exception while closing the stream: "+e.getMessage());
                 }
             }
         }
