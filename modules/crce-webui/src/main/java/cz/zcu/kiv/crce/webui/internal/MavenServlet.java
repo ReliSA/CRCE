@@ -140,7 +140,7 @@ public class MavenServlet extends HttpServlet {
         // perform search
         MavenLocator locator = new CentralMavenRestLocator();
         MavenResolver resolver = new MavenAetherResolver();
-        Collection<FoundArtifact> foundArtifacts = locator.locate(packageName);
+        Collection<FoundArtifact> foundArtifacts = locator.locate(packageName, true);
         VersionFilter vf = VersionFilter.HIGHEST_ONLY;
         if(versionFilter.equals(LOWEST_VERSION)) {
             vf = VersionFilter.LOWEST_ONLY;
@@ -162,7 +162,7 @@ public class MavenServlet extends HttpServlet {
         try {
             for(File resolvedArtifact : resolvedArtifacts) {
                 Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
-                break;
+//                break;
             }
         } catch (RefusedArtifactException e) {
             logger.warn("Artifact revoked: ", e.getMessage());

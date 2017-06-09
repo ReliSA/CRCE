@@ -41,9 +41,10 @@ public interface MavenLocator {
     /**
      * Locates the artifacts in the repo if they're containing includedPackage.
      * @param includedPackage Name of the package included in the artifact.
+     * @param highestGroupIdMatch If true, only artifacts with groupId same as the longest possible part of includedPackage will be returned.
      * @return Collection of artifacts containing this package or empty collection if nothing is found.
      */
-    Collection<FoundArtifact> locate(String includedPackage);
+    Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch);
 
     /**
      * Filters the found artifacts by version.
@@ -63,4 +64,6 @@ public interface MavenLocator {
      * @return Filtered collection.
      */
     Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId);
+
+    // todo: locate by included package + highest groupId match
 }

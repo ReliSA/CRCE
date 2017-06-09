@@ -10,7 +10,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.json.Json;
 import java.util.*;
 
 /**
@@ -95,21 +94,49 @@ public class CentralMavenRestLocator implements MavenLocator {
     }
 
     @Override
-    public Collection<FoundArtifact> locate(String includedPackage) {
+    public Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch) {
         List<FoundArtifact> foundArtifacts = new ArrayList<>();
 //        List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
         int foundArtifactsCount = 0;
 
         // perform the first query to get the number of total results found
-        QueryBuilder qb = new QueryBuilder()
-                .addParameter(QueryParam.CLASS_NAME, includedPackage)
-                .addStandardAdditionalParameters()
-                .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
-        foundArtifactsCount = jsonResponse.getResponse().getNumFound();
-        if(foundArtifactsCount == 0 ) {
-            // no artifact found
-            return foundArtifacts;
+        QueryBuilder qb = new QueryBuilder();
+        if(highestGroupIdMatch) {
+            // add 'AND g:....' to query and get first set of results with the longest groupId possible
+            String groupId = includedPackage;
+            while (foundArtifactsCount == 0) {
+                qb = new QueryBuilder()
+                        .addParameter(QueryParam.CLASS_NAME, includedPackage)
+                        .addParameter(QueryParam.GROUP_ID, groupId)
+                        .addStandardAdditionalParameters()
+                        .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
+                CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+                foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+
+                String[] tmp = groupId.split("\\.");
+
+                // groupId can't be any shorter
+                if(tmp.length  < 1) {
+                    break;
+                }
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < tmp.length-1; i++) {
+                    sb.append(tmp[i]+".");
+                }
+                groupId = sb.toString();
+                groupId = groupId.substring(0, groupId.length()-1);
+            }
+        } else {
+            qb = new QueryBuilder()
+                    .addParameter(QueryParam.CLASS_NAME, includedPackage)
+                    .addStandardAdditionalParameters()
+                    .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
+            CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+            foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+            if(foundArtifactsCount == 0 ) {
+                // no artifact found
+                return foundArtifacts;
+            }
         }
 
 

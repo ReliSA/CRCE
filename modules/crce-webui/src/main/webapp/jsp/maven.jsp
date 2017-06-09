@@ -72,6 +72,11 @@
             </tr>
 
             <tr>
+                <td><input type="radio" id="nogId" name="gidFilter" value="nogId">
+                    <label for="nogId">Highest groupId match</label></td>
+            </tr>
+
+            <tr>
                 <td><input type="radio" id="hmatch" name="gidFilter" value="hmatch" checked="true">
                 <label for="hmatch">Highest groupId match</label></td>
             </tr>

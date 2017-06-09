@@ -295,7 +295,7 @@ public class MavenAetherLocator implements MavenLocator {
     }
 
     @Override
-    public Collection<FoundArtifact> locate(String includedPackage) {
+    public Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch) {
 //        RepositorySystem repositorySystem = newRepositorySystem();
 //        RepositorySystemSession session = newSession(repositorySystem);
 
