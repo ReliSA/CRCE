@@ -84,7 +84,7 @@
             <tr>
                 <td><input type="radio" id="manualg" name="gidFilter" value="manualg">
                 <label for="manualg">Manual groupId filter</label></td>
-                <td><input type="text" id="manualgf" name="manualgf"></td>
+                <td><input type="text" id="manualgf" name="manualgVal"></td>
             </tr>
 
             <tr>
