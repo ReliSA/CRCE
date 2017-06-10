@@ -39,12 +39,31 @@ public interface MavenLocator {
     Collection<FoundArtifact> locate(String groupId, String artifactId, String fromVersion, String toVersion);
 
     /**
-     * Locates the artifacts in the repo if they're containing includedPackage.
+     *
+     * Locates artifacts in the repo which contain includedPackage.
+     *
+     * @param includedPackage Name of the package included in the artifact.
+     * @param groupIdFilter GroupId filter which will be used.
+     * @param highestGroupIdMatch If true, only artifacts with groupId same as the longest possible part of groupIdFilter will be returned.
+     * @return
+     */
+    Collection<FoundArtifact> locate(String includedPackage, String groupIdFilter, boolean highestGroupIdMatch);
+
+    /**
+     * Locates artifacts in the repo which contain includedPackage. Uses includedPackage as a groupIdFilter.
+     *
      * @param includedPackage Name of the package included in the artifact.
      * @param highestGroupIdMatch If true, only artifacts with groupId same as the longest possible part of includedPackage will be returned.
      * @return Collection of artifacts containing this package or empty collection if nothing is found.
      */
     Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch);
+
+    /**
+     * Locates the artifacts in the repo if they're containing includedPackage.
+     * @param includedPackage Name of the package included in the artifact.
+     * @return Collection of artifacts containing this package or empty collection if nothing is found.
+     */
+    Collection<FoundArtifact> locate(String includedPackage);
 
     /**
      * Filters the found artifacts by version.

@@ -304,6 +304,16 @@ public class MavenAetherLocator implements MavenLocator {
     }
 
     @Override
+    public Collection<FoundArtifact> locate(String includedPackage, String groupIdFilter, boolean highestGroupIdMatch) {
+        return null;
+    }
+
+    @Override
+    public Collection<FoundArtifact> locate(String includedPackage) {
+        return null;
+    }
+
+    @Override
     public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId) {
         return null;
     }

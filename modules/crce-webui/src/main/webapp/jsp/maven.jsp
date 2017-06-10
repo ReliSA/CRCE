@@ -38,6 +38,13 @@
                 </td>
             </tr>
 
+            <!-- feedback for searching by coordinates -->
+            <c:if test="${requestScope.feedback1 != null}">
+                <tr>
+                    <td colspan="2"><c:out value="${requestScope.feedback1}"/></td>
+                </tr>
+            </c:if>
+
             <tr>
                 <td><input type="submit" value="Search"></td>
             </tr>
@@ -87,9 +94,23 @@
                 <td><input type="text" id="manualgf" name="manualgVal"></td>
             </tr>
 
+            <!-- feedback for searching by package name -->
+                <c:if test="${requestScope.feedback2 != null}">
+                    <tr>
+                        <td colspan="2"><c:out value="${requestScope.feedback2}"/></td>
+                    </tr>
+                </c:if>
+
             <tr>
                 <td><input type="submit" value="Search"></td>
             </tr>
+
+            <!-- main feedback -->
+            <c:if test="${requestScope.feedback3 != null}">
+                <tr>
+                    <td colspan="2"><c:out value="${requestScope.feedback3}"/></td>
+                </tr>
+            </c:if>
         </table>
     </form>
 </div>

@@ -33,6 +33,10 @@ public class MavenServlet extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MavenServlet.class);
 
+    public static final String COORDINATES_FEEDBACK = "feedback1";
+    public static final String PACKAGE_NAME_FEEDBACK = "feedback2";
+    public static final String MAIN_FEEDBACK = "feedback3";
+
     public static final String SEARCH_BY_PARAM_NAME = "by";
     public static final String SEARCH_BY_COORDINATES = "gav";
     public static final String SEARCH_BY_PACKAGE_NAME = "pname";
@@ -72,7 +76,9 @@ public class MavenServlet extends HttpServlet {
         } else if (searchBy.equalsIgnoreCase(SEARCH_BY_PACKAGE_NAME)) {
             searchByPackageName(req, resp);
         } else {
-            logger.debug("Unknown '"+SEARCH_BY_PARAM_NAME+"' parameter value: "+searchBy);
+            String msg = "Unknown '"+SEARCH_BY_PARAM_NAME+"' parameter value: "+searchBy;
+            logger.debug(msg);
+            req.setAttribute(MAIN_FEEDBACK, "Unknow search method: "+searchBy+".");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
         }
     }
@@ -87,9 +93,11 @@ public class MavenServlet extends HttpServlet {
         logger.debug("Searching for maven artifacts by coordinates: gid={}; aid={}; version={}",gid, aid, ver);
 
         // check parameters
-        if(gid == null || aid == null || ver == null) {
-            // todo: display some error message?
+        if( gid == null || gid.isEmpty() ||
+            aid == null || aid.isEmpty() ||
+            ver == null || ver.isEmpty()) {
             logger.warn("Not all parameters were specified.");
+            req.setAttribute(COORDINATES_FEEDBACK, "Group Id, artifact Id or version is missing.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
@@ -99,16 +107,16 @@ public class MavenServlet extends HttpServlet {
         MavenResolver resolver = new MavenAetherResolver();
         FoundArtifact foundArtifact = locator.locate(gid, aid, ver);
         if(foundArtifact == null) {
-            // todo: display some error message?
             logger.warn("No artifact found...");
+            req.setAttribute(MAIN_FEEDBACK, "0 artifacts found.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
-        // todo: fix the error with NoClassDefFound
+
         File resolvedArtifact = resolver.resolve(foundArtifact);
         if(resolvedArtifact == null) {
             // this really shouldn't happen
-            logger.warn("Artifact couldn't been resolved.");
+            req.setAttribute(MAIN_FEEDBACK, "Error while resolving artifact.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
@@ -118,11 +126,13 @@ public class MavenServlet extends HttpServlet {
             Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
         } catch (RefusedArtifactException e) {
             logger.warn("Artifact revoked: ", e.getMessage());
+            req.setAttribute(MAIN_FEEDBACK, "Error while putting artifact to buffer.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
 
         // redirect to buffer page?
+        req.setAttribute(MAIN_FEEDBACK, "1 artifact put to buffer.");
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
     }
 
@@ -139,9 +149,12 @@ public class MavenServlet extends HttpServlet {
         logger.debug("Package name: "+packageName+"; version filter: "+versionFilter+"; groupId filter: "+groupIdFilter);
 
         // check parameters
-        if(packageName == null || versionFilter == null || groupIdFilter == null) {
+        if( packageName == null || packageName.isEmpty() ||
+            versionFilter == null || versionFilter.isEmpty() ||
+            groupIdFilter == null || groupIdFilter.isEmpty()) {
             // todo: display some error message?
-            logger.warn("Package name, version filter or group di filter not specified.");
+            logger.warn("Package name, version filter or group id filter not specified.");
+            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Package name, version filter or group id filter is missing.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
@@ -183,6 +196,7 @@ public class MavenServlet extends HttpServlet {
         if(resolvedArtifacts == null) {
             // this really shouldn't happen
             logger.warn("Artifact couldn't been resolved.");
+            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while locating artifacts.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
@@ -195,11 +209,12 @@ public class MavenServlet extends HttpServlet {
             }
         } catch (RefusedArtifactException e) {
             logger.warn("Artifact revoked: ", e.getMessage());
+            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
 
-        // redirect to buffer page?
+        req.setAttribute(MAIN_FEEDBACK, resolvedArtifacts.size()+" artifacts put to buffer.");
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
     }
 

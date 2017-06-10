@@ -86,7 +86,7 @@ public class CentralMavenLocatorTest {
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
 
-        Collection<FoundArtifact> artifacts = locator.locate(packageName, false);
+        Collection<FoundArtifact> artifacts = locator.locate(packageName);
         assertNotNull("Null returned!", artifacts);
         assertFalse("No artifacts containing package " + packageName + " found!", artifacts.isEmpty());
         assertEquals("Wrong number of artifacts located!", expCount, artifacts.size());
@@ -100,7 +100,7 @@ public class CentralMavenLocatorTest {
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
 
-        Collection<FoundArtifact> artifacts = locator.locate(packageName, false);
+        Collection<FoundArtifact> artifacts = locator.locate(packageName);
         artifacts = locator.filter(artifacts, VersionFilter.HIGHEST_ONLY);
 
         assertNotNull("Null returned!",artifacts);
@@ -131,7 +131,7 @@ public class CentralMavenLocatorTest {
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
 
-        Collection<FoundArtifact> artifacts = locator.locate(badPackageName, false);
+        Collection<FoundArtifact> artifacts = locator.locate(badPackageName);
         assertNotNull("Null returned!", artifacts);
         assertTrue("Artifacts containing package "+badPackageName+" found!", artifacts.isEmpty());
     }
@@ -142,7 +142,7 @@ public class CentralMavenLocatorTest {
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
 
-        Collection<FoundArtifact> artifacts = locator.locate(packageName, false);
+        Collection<FoundArtifact> artifacts = locator.locate(packageName);
         assertFalse("No artifacts found!", artifacts.isEmpty());
         int count = artifacts.size();
 
@@ -162,7 +162,7 @@ public class CentralMavenLocatorTest {
         int expCount = 54;
 
         CentralMavenRestLocator cmrl = new CentralMavenRestLocator();
-        Collection<FoundArtifact> foundArtifacts = cmrl.locate(fc, false);
+        Collection<FoundArtifact> foundArtifacts = cmrl.locate(fc);
 
         assertNotNull("Null returned!", foundArtifacts);
         assertEquals("Wrong number of found artifacts!", expCount, foundArtifacts.size());
@@ -209,6 +209,35 @@ public class CentralMavenLocatorTest {
         assertEquals("Wrong groupId!", expectedGid, fa.getGroupId());
         assertTrue("Wrong aId "+fa.getArtifactId()+"!", fa.getArtifactId().equals(expectedAid) || fa.getArtifactId().equals(expectedAid2));
         assertTrue("Wrong version "+fa.getVersion()+"!", fa.getVersion().equals(expectedVersion) || fa.getVersion().equals(expectedVersion2));
+    }
+
+    @Test
+    public void testLocateArtifactByIncludedPackageManualGroupIdFilterVersion() {
+        String fc = "org.hibernate.dialect.MimerSQLDialect";
+        String groupIdFilter = "org.ow2.easybeans";
+        String expectedAId = "easybeans-uberjar-hibernate";
+        String expectedVersionH = "1.1.1";
+        String expectedVersionL = "1.0.0";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+        Collection<FoundArtifact> beforeFilter = locator.locate(fc, groupIdFilter, false);
+        assertNotNull("Null returned for search!", beforeFilter);
+
+        Collection<FoundArtifact> hv = locator.filter(beforeFilter, VersionFilter.HIGHEST_ONLY);
+        Collection<FoundArtifact> lv = locator.filter(beforeFilter, VersionFilter.LOWEST_ONLY);
+
+        assertEquals("Only one artifact expected for highest version!", 1, hv.size());
+        Iterator<FoundArtifact> faIt = hv.iterator();
+        FoundArtifact fa = faIt.next();
+        assertEquals("Wrong groupId!", groupIdFilter, fa.getGroupId());
+        assertEquals("Wrong artifactId!", expectedAId, fa.getArtifactId());
+        assertEquals("Wrong highest version!", expectedVersionH, fa.getVersion());
+
+        faIt = lv.iterator();
+        fa = faIt.next();
+        assertEquals("Wrong groupId!", groupIdFilter, fa.getGroupId());
+        assertEquals("Wrong artifactId!", expectedAId, fa.getArtifactId());
+        assertEquals("Wrong lowest version!", expectedVersionL, fa.getVersion());
     }
 
 }

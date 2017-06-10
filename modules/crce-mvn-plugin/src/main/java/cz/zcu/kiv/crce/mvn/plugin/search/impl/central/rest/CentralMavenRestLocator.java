@@ -94,16 +94,15 @@ public class CentralMavenRestLocator implements MavenLocator {
     }
 
     @Override
-    public Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch) {
+    public Collection<FoundArtifact> locate(String includedPackage, String groupIdFilter, boolean highestGroupIdMatch) {
         List<FoundArtifact> foundArtifacts = new ArrayList<>();
-//        List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
         int foundArtifactsCount = 0;
 
         // perform the first query to get the number of total results found
         QueryBuilder qb = new QueryBuilder();
-        if(highestGroupIdMatch) {
+        if(highestGroupIdMatch && groupIdFilter != null && !groupIdFilter.isEmpty()) {
             // add 'AND g:....' to query and get first set of results with the longest groupId possible
-            String groupId = includedPackage;
+            String groupId = groupIdFilter;
             while (foundArtifactsCount == 0) {
                 qb = new QueryBuilder()
                         .addParameter(QueryParam.CLASS_NAME, includedPackage)
@@ -126,7 +125,20 @@ public class CentralMavenRestLocator implements MavenLocator {
                 groupId = sb.toString();
                 groupId = groupId.substring(0, groupId.length()-1);
             }
+        } else if (groupIdFilter != null && !groupIdFilter.isEmpty()) {
+            // use manual groupId filter
+            qb = new QueryBuilder()
+                    .addParameter(QueryParam.CLASS_NAME, includedPackage)
+                    .addParameter(QueryParam.GROUP_ID, groupIdFilter)
+                    .addStandardAdditionalParameters()
+                    .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
+            CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+            foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+            if(foundArtifactsCount == 0) {
+                return foundArtifacts;
+            }
         } else {
+            // no groupId filter
             qb = new QueryBuilder()
                     .addParameter(QueryParam.CLASS_NAME, includedPackage)
                     .addStandardAdditionalParameters()
@@ -148,7 +160,6 @@ public class CentralMavenRestLocator implements MavenLocator {
         // start downloading threads
         for (int i = 0; i < threadCount; i++) {
             logger.debug("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
-//            System.out.println("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
             FetchResultSetThread t = new FetchResultSetThread(qb.clone(), start, MAX_ARTIFACTS_PER_QUERY);
             threadPool.add(t);
             t.start();
@@ -166,6 +177,16 @@ public class CentralMavenRestLocator implements MavenLocator {
         }
 
         return foundArtifacts;
+    }
+
+    @Override
+    public Collection<FoundArtifact> locate(String includedPackage, boolean highestGroupIdMatch) {
+        return locate(includedPackage, includedPackage, highestGroupIdMatch);
+    }
+
+    @Override
+    public Collection<FoundArtifact> locate(String includedPackage) {
+        return locate(includedPackage, "", false);
     }
 
     @Override
