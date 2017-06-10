@@ -91,7 +91,7 @@
             <tr>
                 <td><input type="radio" id="manualg" name="gidFilter" value="manualg">
                 <label for="manualg">Manual groupId filter</label></td>
-                <td><input type="text" id="manualgf" name="manualgVal"></td>
+                <td><input type="text" id="manualgVal" name="manualgVal"></td>
             </tr>
 
             <!-- feedback for searching by package name -->

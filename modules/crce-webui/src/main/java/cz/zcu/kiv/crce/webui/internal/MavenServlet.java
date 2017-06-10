@@ -159,8 +159,16 @@ public class MavenServlet extends HttpServlet {
             return;
         }
 
-        if(groupIdFilter == MANUAL_GROUP_ID) {
+        if(groupIdFilter.equals(MANUAL_GROUP_ID)) {
             manualG = req.getParameter(MANUAL_GROUP_ID_VAL);
+            if(manualG == null || manualG.isEmpty()) {
+                logger.warn("Manual groupId filter si missing.");
+                req.setAttribute(PACKAGE_NAME_FEEDBACK, "Value for manual groupId filter is missing.");
+                req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+                return;
+            } else {
+                logger.debug("Value of manual groupId filter: "+manualG);
+            }
         }
 
         // perform search
@@ -170,7 +178,7 @@ public class MavenServlet extends HttpServlet {
         Collection<FoundArtifact> foundArtifacts = new ArrayList<>();
         switch (groupIdFilter) {
             case NO_GROUP_ID_FILTER:
-                foundArtifacts = locator.locate(packageName, false);
+                foundArtifacts = locator.locate(packageName);
                 break;
 
             case HIGHEST_GROUP_ID:
@@ -178,7 +186,7 @@ public class MavenServlet extends HttpServlet {
                 break;
 
             case MANUAL_GROUP_ID:
-                // todo:
+                foundArtifacts = locator.locate(packageName, manualG, false);
                 break;
 
             default:
@@ -190,7 +198,6 @@ public class MavenServlet extends HttpServlet {
         if(versionFilter.equals(LOWEST_VERSION)) {
             vf = VersionFilter.LOWEST_ONLY;
         }
-        foundArtifacts = locator.filter(foundArtifacts, "org.hibernate");
         foundArtifacts = locator.filter(foundArtifacts, vf);
         Collection<File> resolvedArtifacts = resolver.resolveArtifacts(foundArtifacts);
         if(resolvedArtifacts == null) {
