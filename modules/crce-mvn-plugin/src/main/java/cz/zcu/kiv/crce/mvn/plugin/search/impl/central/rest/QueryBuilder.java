@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -59,17 +58,19 @@ public class QueryBuilder implements Cloneable {
      * @return
      */
     public QueryBuilder clone() {
+        QueryBuilder qb;
+
         try {
             super.clone();
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         } finally {
-            QueryBuilder qb = new QueryBuilder();
+            qb = new QueryBuilder();
             qb.setAdditionalParams(new LinkedHashMap<>(additionalParams));
             qb.setQuery(new LinkedHashMap<>(query));
-
-            return qb;
         }
+
+        return qb;
     }
 
     protected void setQuery(Map<String, String> query) {

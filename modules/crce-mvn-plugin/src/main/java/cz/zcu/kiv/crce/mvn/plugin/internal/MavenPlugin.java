@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.mvn.plugin.namespace.NsMavenArtifact;
@@ -38,7 +37,7 @@ public class MavenPlugin extends AbstractActionHandler {
     public static final String POM_NAME = "pom.xml";
 
     private volatile MetadataService metadataService;
-    private volatile MetadataFactory metadataFactory;
+//    private volatile MetadataFactory metadataFactory;
 
     public Resource loadMavenIdentity(Resource resource){
         logger.debug("Using maven plugin");
@@ -230,7 +229,7 @@ public class MavenPlugin extends AbstractActionHandler {
         this.metadataService = metadataService;
     }
 
-    public void setMetadataFactory(MetadataFactory metadataFactory) {
-        this.metadataFactory = metadataFactory;
-    }
+//    public void setMetadataFactory(MetadataFactory metadataFactory) {
+//        this.metadataFactory = metadataFactory;
+//    }
 }

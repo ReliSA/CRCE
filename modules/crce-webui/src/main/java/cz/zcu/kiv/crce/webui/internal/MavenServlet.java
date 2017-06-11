@@ -66,9 +66,12 @@ public class MavenServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // search by coordinates or package name?
-        String searchBy = null;
+        String searchBy = "";
         if (req.getParameter(SEARCH_BY_PARAM_NAME) != null) {
             searchBy = req.getParameter(SEARCH_BY_PARAM_NAME);
+        } else {
+            req.setAttribute(MAIN_FEEDBACK, "No search method.");
+            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
         }
 
         if(searchBy.equalsIgnoreCase(SEARCH_BY_COORDINATES)) {
@@ -122,13 +125,16 @@ public class MavenServlet extends HttpServlet {
         }
 
         // upload to buffer
+        FileInputStream in = new FileInputStream(resolvedArtifact);
         try {
-            Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
+            Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), in);
         } catch (RefusedArtifactException e) {
             logger.warn("Artifact revoked: ", e.getMessage());
             req.setAttribute(MAIN_FEEDBACK, "Error while putting artifact to buffer.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
+        } finally {
+            in.close();
         }
 
         // redirect to buffer page?
@@ -210,15 +216,18 @@ public class MavenServlet extends HttpServlet {
 
         // upload to buffer
         logger.debug(resolvedArtifacts.size()+" artifacts resolved.");
-        try {
-            for(File resolvedArtifact : resolvedArtifacts) {
-                Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), new FileInputStream(resolvedArtifact));
+        for(File resolvedArtifact : resolvedArtifacts) {
+            FileInputStream fi = new FileInputStream(resolvedArtifact);
+            try {
+                Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), fi);
+            } catch (RefusedArtifactException e) {
+                logger.warn("Artifact revoked: ", e.getMessage());
+                req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
+                req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+                return;
+            } finally {
+                fi.close();
             }
-        } catch (RefusedArtifactException e) {
-            logger.warn("Artifact revoked: ", e.getMessage());
-            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
-            return;
         }
 
         req.setAttribute(MAIN_FEEDBACK, resolvedArtifacts.size()+" artifacts put to buffer.");
