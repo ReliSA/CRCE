@@ -84,5 +84,4 @@ public interface MavenLocator {
      */
     Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId);
 
-    // todo: locate by included package + highest groupId match
 }

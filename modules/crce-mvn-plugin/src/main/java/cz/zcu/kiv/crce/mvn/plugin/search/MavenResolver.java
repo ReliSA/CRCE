@@ -8,7 +8,6 @@ import java.util.Collection;
  *
  * Created by Zdenek Vales on 9.4.2017.
  */
-// TODO: resolve methods will probably have to return URI of resolved artifacts or something like that
 public interface MavenResolver {
 
     /**

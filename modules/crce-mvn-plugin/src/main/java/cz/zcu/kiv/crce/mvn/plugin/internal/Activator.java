@@ -18,7 +18,6 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(MavenPlugin.class)
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
-                .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
         );
     }
 

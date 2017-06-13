@@ -240,4 +240,28 @@ public class CentralMavenLocatorTest {
         assertEquals("Wrong lowest version!", expectedVersionL, fa.getVersion());
     }
 
+    @Test
+    public void testLocateArtifactByIncludedPackageWrongManualGid() {
+        String fc = "org.hibernate.dialect.MimerSQLDialect";
+        String groupIdFilter = "asdf.asdf.asdf";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+        Collection<FoundArtifact> artifacts = locator.locate(fc, groupIdFilter, false);
+
+        assertNotNull("Null returned!", artifacts);
+        assertTrue("No artifacts expected for manual groupId filter "+groupIdFilter+"!", artifacts.isEmpty());
+    }
+
+    @Test
+    public void testLocateArtifactByIncludedPackageWrongAutoGid() {
+        String fc = "org.hibernate.dialect.MimerSQLDialect";
+        String groupIdFilter = "asdf";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+        Collection<FoundArtifact> artifacts = locator.locate(fc, groupIdFilter, false);
+
+        assertNotNull("Null returned!", artifacts);
+        assertTrue("No artifacts expected for manual groupId filter "+groupIdFilter+"!", artifacts.isEmpty());
+    }
+
 }

@@ -31,7 +31,7 @@ public class CentralMavenRestLocator implements MavenLocator {
     private CentralRepoRestConsumer restConsumer;
 
     public CentralMavenRestLocator() {
-        restConsumer = new CentralRepoRestConsumer();
+        this(new CentralRepoRestConsumer());
     }
 
     public CentralMavenRestLocator(CentralRepoRestConsumer restConsumer) {
@@ -49,7 +49,6 @@ public class CentralMavenRestLocator implements MavenLocator {
             return null;
         }
 
-        // todo: maybe use a dozer for this?
         // convert the found artifact
         JsonArtifactDescriptor artifactDescriptor = jsonResponse.getResponse().getDocs()[0];
         return new SimpleFoundArtifact(artifactDescriptor.getG(),
@@ -75,7 +74,6 @@ public class CentralMavenRestLocator implements MavenLocator {
             return foundArtifacts;
         }
 
-        // todo: maybe use dozer for this?
         // convert the found artifacts
         for(JsonArtifactDescriptor ad : jsonResponse.getResponse().getDocs()) {
             foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
@@ -120,7 +118,7 @@ public class CentralMavenRestLocator implements MavenLocator {
                 }
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < tmp.length-1; i++) {
-                    sb.append(tmp[i]+".");
+                    sb.append(tmp[i]).append(".");
                 }
                 groupId = sb.toString();
                 groupId = groupId.substring(0, groupId.length()-1);
@@ -214,8 +212,8 @@ public class CentralMavenRestLocator implements MavenLocator {
 
     /**
      * Return the highest versions of all found artifacts.
-     * @param foundArtifacts
-     * @return
+     * @param foundArtifacts Collection to be filtered.
+     * @return Highest versions of all artifacts from foundArtifacts collection.
      */
     private Collection<FoundArtifact> getHighestVersions(Collection<FoundArtifact> foundArtifacts) {
         // group artifacts by their groupId and artifactId
@@ -253,8 +251,8 @@ public class CentralMavenRestLocator implements MavenLocator {
 
     /**
      * Return the lowest versions of all found artifacts.
-     * @param foundArtifacts
-     * @return
+     * @param foundArtifacts Collection to be filtered.
+     * @return Lowest versions of all artifacts from foundArtifacts collection.
      */
     private Collection<FoundArtifact> getLowestVersions(Collection<FoundArtifact> foundArtifacts) {
         // group artifacts by their groupId and artifactId

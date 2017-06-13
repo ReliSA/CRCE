@@ -142,7 +142,6 @@ public class JsonArtifactDescriptor implements Serializable{
         this.ec = ec;
     }
 
-    // todo: check the download link availability / validity
     public String jarDownloadLink() {
         return String.format(DOWNLOAD_URL_TEMPLATE, getG().replace('.','/'), getA(), getV(), getA(), getV(), "jar");
     }

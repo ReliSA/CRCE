@@ -37,7 +37,6 @@ public class MavenPlugin extends AbstractActionHandler {
     public static final String POM_NAME = "pom.xml";
 
     private volatile MetadataService metadataService;
-//    private volatile MetadataFactory metadataFactory;
 
     public Resource loadMavenIdentity(Resource resource){
         logger.debug("Using maven plugin");
@@ -228,8 +227,4 @@ public class MavenPlugin extends AbstractActionHandler {
     public void setMetadataService(MetadataService metadataService) {
         this.metadataService = metadataService;
     }
-
-//    public void setMetadataFactory(MetadataFactory metadataFactory) {
-//        this.metadataFactory = metadataFactory;
-//    }
 }

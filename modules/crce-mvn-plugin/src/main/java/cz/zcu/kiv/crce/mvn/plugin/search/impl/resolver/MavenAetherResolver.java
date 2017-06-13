@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 
+import cz.zcu.kiv.crce.mvn.plugin.search.Configurable;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.aether.MavenAetherLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -23,56 +23,43 @@ import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
  * This implementation uses the Aether library to resolve artifacts from maven repositories.
  *
+ * A list of repositories can be configured in property file like this:
+ * reposityN.id=
+ * repositoryN.type=
+ * repositoryN.url=
+ *
+ * where N is the number of repository. N needs to start at 0 and always increase by 1.
+ * If N is 0,1,3 only respositories 0 and 1 would be used.
+ *
+ *
  * Created by Zdenek Vales on 9.4.2017.
  */
-public class MavenAetherResolver implements MavenResolver {
+public class MavenAetherResolver implements MavenResolver, Configurable {
 
-    private static final Logger logger = LoggerFactory.getLogger(MavenAetherLocator.class);
+    private static final Logger logger = LoggerFactory.getLogger(MavenAetherResolver.class);
 
-    private static final String REPOSITORY_ID_DEF = "central";
-    private static final String REPOSITORY_TYPE_DEF = "default";
-    private static final String REPOSITORY_URL_DEF = "http://repo1.maven.org/maven2/";
+    public static final String REPOSITORY_ID_DEF = "central";
+    public static final String REPOSITORY_TYPE_DEF = "default";
+    public static final String REPOSITORY_URL_DEF = "http://repo1.maven.org/maven2/";
+    public static final String LOCAL_REPOSITORY_PATH_DEF = "target/local-repo";
 
     private static final String CONFIG_FILE_NAME = "/search/mavenAetherLocator.properties";
-    public static final String REPOSITORY_ID_PROPERTY_NAME = "repository.id";
-    public static final String REPOSITORY_TYPE_PROPERTY_NAME = "repository.type";
-    public static final String REPOSITORY_URL_PROPERTY_NAME = "repository.url";
-
-    private String repositoryId;
-    private String repositoryType;
-    private String repositoryUrl;
-
-    private List<RemoteRepository> repositories;
-    private RepositorySystem repositorySystem;
-    private RepositorySystemSession repositorySystemSession;
-
-
-    public MavenAetherResolver() {
-        init();
-    }
+    public static final String LOCAL_REPOSITORY_PATH_PROPERTY_NAME = "repository.local.path";
+    public static final String REPOSITORY_N_ID_PROPERTY_NAME = "repository%d.id";
+    public static final String REPOSITORY_N_TYPE_PROPERTY_NAME = "repository%d.type";
+    public static final String REPOSITORY_N_URL_PROPERTY_NAME = "repository%d.url";
 
     /**
-     * Creates a list of repositories containing the central repository.
+     * Creates a repository object with values loaded in init() method.
      * @return
      */
-    private List<RemoteRepository> newRepositories()
-    {
-        return new ArrayList<RemoteRepository>( Arrays.asList( newCentralRepository() ) );
-    }
-
-    /**
-     * Creates a new central repository object.
-     * @return
-     */
-    private RemoteRepository newCentralRepository()
+    private static RemoteRepository newRepository(String repositoryId, String repositoryType, String repositoryUrl)
     {
         return new RemoteRepository.Builder(repositoryId, repositoryType, repositoryUrl).build();
     }
@@ -81,7 +68,7 @@ public class MavenAetherResolver implements MavenResolver {
      * Initializes a new repository system for aether.
      * @return Repository system.
      */
-    private RepositorySystem newRepositorySystem() {
+    private static RepositorySystem newRepositorySystem() {
         DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
         locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
@@ -96,15 +83,36 @@ public class MavenAetherResolver implements MavenResolver {
      * @param system Initialized repository system.
      * @return Repository session.
      */
-    private RepositorySystemSession newSession(RepositorySystem system )
+    private static RepositorySystemSession newSession(RepositorySystem system, String localRepoPath)
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-        // todo: configurable path to local repository
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
+        LocalRepository localRepo = new LocalRepository( localRepoPath );
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
 
         return session;
+    }
+
+    private static String getNRepoId(int n) {
+        return String.format(REPOSITORY_N_ID_PROPERTY_NAME, n);
+    }
+
+    private static String getNRepoType(int n) {
+        return String.format(REPOSITORY_N_TYPE_PROPERTY_NAME, n);
+    }
+
+    private static String getNRepoUrl(int n) {
+        return String.format(REPOSITORY_N_URL_PROPERTY_NAME, n);
+    }
+
+    private String localRepoPath;
+
+    private List<RemoteRepository> repositories;
+    private RepositorySystem repositorySystem;
+    private RepositorySystemSession repositorySystemSession;
+
+
+    public MavenAetherResolver() {
+        init();
     }
 
     /**
@@ -112,51 +120,79 @@ public class MavenAetherResolver implements MavenResolver {
      * default ones are used.
      */
     private void init() {
-        InputStream is = MavenAetherResolver.class.getResourceAsStream(CONFIG_FILE_NAME);
-        Properties properties = new Properties();
-        logger.info("Initializing "+MavenAetherResolver.class.getName()+".");
+        try {
+            reconfigure(null);
+        } catch (FileNotFoundException e) {
+            // this really shouldn't happen
+            logger.error("Error while loading configuration from default file: "+e.getMessage());
+        }
+    }
 
-//        nexusIndexer = new DefaultNexusIndexer();
-//        creators = new ArrayList<>();
-//        creators.add(new MinimalArtifactInfoIndexCreator());
+    public List<RemoteRepository> getRepositories() {
+        return repositories;
+    }
 
-        if (is == null) {
-            logger.debug("No properties file found.");
-            // no file
-            repositoryId = REPOSITORY_ID_DEF;
-            repositoryType = REPOSITORY_TYPE_DEF;
-            repositoryUrl = REPOSITORY_URL_DEF;
+    public String getLocalRepoPath() {
+        return localRepoPath;
+    }
+
+    @Override
+    public void reconfigure(File sourceFile) throws FileNotFoundException {
+        InputStream is;
+
+        // bad file => use the default one
+        if(sourceFile == null) {
+            logger.debug("No configuration file, using the default one.");
+            is = this.getClass().getResourceAsStream(CONFIG_FILE_NAME);
         } else {
-            try {
-                properties.load(is);
-                repositoryId = properties.getProperty(REPOSITORY_ID_PROPERTY_NAME, REPOSITORY_ID_DEF);
-                repositoryType = properties.getProperty(REPOSITORY_TYPE_PROPERTY_NAME, REPOSITORY_TYPE_DEF);
-                repositoryUrl = properties.getProperty(REPOSITORY_URL_PROPERTY_NAME, REPOSITORY_URL_DEF);
-            } catch (IOException e) {
-                logger.error("Exception while configuring "+MavenAetherResolver.class.getName()+". "+e.getMessage());
-                repositoryId = REPOSITORY_ID_DEF;
-                repositoryType = REPOSITORY_TYPE_DEF;
-                repositoryUrl = REPOSITORY_URL_DEF;
+            is = new FileInputStream(sourceFile);
+        }
+
+        // load properties
+        repositories = new ArrayList<>();
+        Properties properties = new Properties();
+        localRepoPath = null;
+        try {
+            properties.load(is);
+
+            // load single properties first
+            localRepoPath = properties.getProperty(LOCAL_REPOSITORY_PATH_PROPERTY_NAME, LOCAL_REPOSITORY_PATH_DEF);
+
+            // load N repositories
+            int n = 0;
+            while(properties.getProperty(getNRepoId(n)) != null) {
+                String repositoryId = properties.getProperty(getNRepoId(n), REPOSITORY_ID_DEF);
+                String repositoryType = properties.getProperty(getNRepoType(n), REPOSITORY_TYPE_DEF);
+                String repositoryUrl = properties.getProperty(getNRepoUrl(n), REPOSITORY_URL_DEF);
+
+                repositories.add(newRepository(repositoryId, repositoryType, repositoryUrl));
+                n++;
             }
 
-            try {
-                is.close();
-            } catch (IOException e) {
-                logger.error("Exception while closing the stream: "+e.getMessage());
+        } catch (IOException e) {
+            logger.error("Exception while configuring "+MavenAetherResolver.class.getSimpleName()+". "+e.getMessage()+", using default values.");
+            if(repositories.isEmpty()) {
+                repositories.add(newRepository(REPOSITORY_ID_DEF, REPOSITORY_TYPE_DEF, REPOSITORY_URL_DEF));
+            }
+
+            if(localRepoPath == null) {
+                localRepoPath = LOCAL_REPOSITORY_PATH_DEF;
             }
         }
 
-        repositories = newRepositories();
+        try {
+            is.close();
+        } catch (IOException e) {
+            logger.error("Exception while closing the stream: "+e.getMessage());
+        }
+
         repositorySystem = newRepositorySystem();
-        repositorySystemSession = newSession(repositorySystem);
+        repositorySystemSession = newSession(repositorySystem, localRepoPath);
+
     }
 
     @Override
     public File resolve(FoundArtifact foundArtifact) {
-        // todo: tests
-        repositorySystem = newRepositorySystem();
-        repositorySystemSession = newSession(repositorySystem);
-        repositories = newRepositories();
         Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
                                                 foundArtifact.getArtifactId(),
                                                 "jar",
@@ -165,7 +201,7 @@ public class MavenAetherResolver implements MavenResolver {
         artifactRequest.setArtifact(artifact);
         artifactRequest.setRepositories(repositories);
 
-        ArtifactResult artifactResult = null;
+        ArtifactResult artifactResult;
         try {
             artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
         } catch (ArtifactResolutionException e) {
@@ -182,7 +218,6 @@ public class MavenAetherResolver implements MavenResolver {
 
     @Override
     public Collection<File> resolveArtifacts(Collection<FoundArtifact> foundArtifacts) {
-        // todo: tests
         List<File> res = new ArrayList<>();
         for(FoundArtifact foundArtifact : foundArtifacts) {
             File f = resolve(foundArtifact);
