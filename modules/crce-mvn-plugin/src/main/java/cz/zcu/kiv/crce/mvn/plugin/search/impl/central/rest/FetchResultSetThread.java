@@ -45,9 +45,14 @@ public class FetchResultSetThread extends Thread {
         CentralRepoRestConsumer restConsumer = new CentralRepoRestConsumer();
         queryBuilder = queryBuilder.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(rows));
         queryBuilder = queryBuilder.addAdditionalParameter(AdditionalQueryParam.START, Integer.toString(start));
-        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(queryBuilder);
-        if(jsonResponse.getResponse().getNumFound() > 0) {
-            jsonArtifactDescriptors.addAll(Arrays.asList(jsonResponse.getResponse().getDocs()));
+        CentralRepoJsonResponse jsonResponse = null;
+        try {
+            jsonResponse = restConsumer.getJson(queryBuilder);
+            if(jsonResponse.getResponse().getNumFound() > 0) {
+                jsonArtifactDescriptors.addAll(Arrays.asList(jsonResponse.getResponse().getDocs()));
+            }
+        } catch (ServerErrorException e) {
+            // error
         }
 
         // parse results

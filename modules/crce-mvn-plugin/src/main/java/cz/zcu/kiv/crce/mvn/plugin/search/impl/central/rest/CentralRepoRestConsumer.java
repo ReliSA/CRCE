@@ -38,7 +38,7 @@ public class CentralRepoRestConsumer {
      * @param queryBuilder Query specifiaction.
      * @return Parsed json or null.
      */
-    public CentralRepoJsonResponse getJson(QueryBuilder queryBuilder) {
+    public CentralRepoJsonResponse getJson(QueryBuilder queryBuilder) throws ServerErrorException {
         // get response
         Response response = sendRequest(queryBuilder);
         if(response == null ) {
@@ -48,11 +48,7 @@ public class CentralRepoRestConsumer {
         } else if(response.getStatus() != Response.Status.OK.getStatusCode()) {
             logger.error("Response not OK! Status code: "+response.getStatus());
 //            System.out.println("Response not OK! Status code: "+response.getStatus()+"\nQuery: "+queryBuilder.toString());
-            if(response.getStatus() == 504) {
-                // timeout, try again
-                return getJson(queryBuilder);
-            }
-            return null;
+            throw new ServerErrorException(response.getStatus());
         }
 
         // get parsed json

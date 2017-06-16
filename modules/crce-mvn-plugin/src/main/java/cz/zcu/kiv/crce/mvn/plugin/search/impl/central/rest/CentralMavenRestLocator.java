@@ -42,7 +42,12 @@ public class CentralMavenRestLocator implements MavenLocator {
     public FoundArtifact locate(String groupId, String artifactId, String version) {
         logger.debug("Locating artifact.");
         QueryBuilder qb = QueryBuilder.createStandard(groupId, artifactId, version);
-        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+        CentralRepoJsonResponse jsonResponse = null;
+        try {
+            jsonResponse = restConsumer.getJson(qb);
+        } catch (ServerErrorException e) {
+            return null;
+        }
 
         if(jsonResponse.getResponse().getNumFound() == 0 ) {
             // no artifact found
@@ -67,7 +72,12 @@ public class CentralMavenRestLocator implements MavenLocator {
                 .addParameter(QueryParam.GROUP_ID, groupId)
                 .addParameter(QueryParam.ARTIFACT_ID, artifactId)
                 .addStandardAdditionalParameters();
-        CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+        CentralRepoJsonResponse jsonResponse = null;
+        try {
+            jsonResponse = restConsumer.getJson(qb);
+        } catch (ServerErrorException e) {
+            return foundArtifacts;
+        }
 
         if(jsonResponse.getResponse().getNumFound() == 0 ) {
             // no artifact found
@@ -107,7 +117,12 @@ public class CentralMavenRestLocator implements MavenLocator {
                         .addParameter(QueryParam.GROUP_ID, groupId)
                         .addStandardAdditionalParameters()
                         .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-                CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+                CentralRepoJsonResponse jsonResponse = null;
+                try {
+                    jsonResponse = restConsumer.getJson(qb);
+                } catch (ServerErrorException e) {
+                    return foundArtifacts;
+                }
                 foundArtifactsCount = jsonResponse.getResponse().getNumFound();
 
                 String[] tmp = groupId.split("\\.");
@@ -130,7 +145,12 @@ public class CentralMavenRestLocator implements MavenLocator {
                     .addParameter(QueryParam.GROUP_ID, groupIdFilter)
                     .addStandardAdditionalParameters()
                     .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-            CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+            CentralRepoJsonResponse jsonResponse = null;
+            try {
+                jsonResponse = restConsumer.getJson(qb);
+            } catch (ServerErrorException e) {
+                return foundArtifacts;
+            }
             foundArtifactsCount = jsonResponse.getResponse().getNumFound();
             if(foundArtifactsCount == 0) {
                 return foundArtifacts;
@@ -141,7 +161,12 @@ public class CentralMavenRestLocator implements MavenLocator {
                     .addParameter(QueryParam.CLASS_NAME, includedPackage)
                     .addStandardAdditionalParameters()
                     .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-            CentralRepoJsonResponse jsonResponse = restConsumer.getJson(qb);
+            CentralRepoJsonResponse jsonResponse = null;
+            try {
+                jsonResponse = restConsumer.getJson(qb);
+            } catch (ServerErrorException e) {
+                return foundArtifacts;
+            }
             foundArtifactsCount = jsonResponse.getResponse().getNumFound();
             if(foundArtifactsCount == 0 ) {
                 // no artifact found
