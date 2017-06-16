@@ -43,6 +43,7 @@ public class MavenServlet extends HttpServlet {
 
     public static final String LOWEST_VERSION = "lv";
     public static final String HIGHEST_VERSION = "hv";
+    public static final String NO_VERSION_FILTER = "noV";
 
     public static final String NO_GROUP_ID_FILTER = "nogId";
     public static final String HIGHEST_GROUP_ID = "hmatch";
@@ -56,6 +57,9 @@ public class MavenServlet extends HttpServlet {
     public static final String PACKAGE_NAME_PARAM = "pname";
     public static final String VERSION_FILTER_PARAM = "verFilter";
     public static final String GROUP_FILTER_PARAM_NAME = "gidFilter";
+
+    private MavenLocator locator = new CentralMavenRestLocator();
+    private MavenResolver resolver = new MavenAetherResolver();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -93,12 +97,15 @@ public class MavenServlet extends HttpServlet {
         String gid = req.getParameter(GROUP_ID_PARAM);
         String aid = req.getParameter(ARTIFACT_ID_PARAM);
         String ver = req.getParameter(VERSION_PARAM);
+        String verFilter = req.getParameter(VERSION_FILTER_PARAM);
+        VersionFilter vf = VersionFilter.HIGHEST_ONLY;
         logger.debug("Searching for maven artifacts by coordinates: gid={}; aid={}; version={}",gid, aid, ver);
 
         // check parameters
         if( gid == null || gid.isEmpty() ||
             aid == null || aid.isEmpty() ||
-            ver == null || ver.isEmpty()) {
+               (ver == null || ver.isEmpty()) && verFilter.equals(NO_VERSION_FILTER)
+            ) {
             logger.warn("Not all parameters were specified.");
             req.setAttribute(COORDINATES_FEEDBACK, "Group Id, artifact Id or version is missing.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
@@ -106,18 +113,26 @@ public class MavenServlet extends HttpServlet {
         }
 
         // perform search
-        MavenLocator locator = new CentralMavenRestLocator();
-        MavenResolver resolver = new MavenAetherResolver();
-        FoundArtifact foundArtifact = locator.locate(gid, aid, ver);
-        if(foundArtifact == null) {
+        Collection<FoundArtifact> foundArtifacts = new ArrayList<>();
+        if(ver == null || ver.isEmpty() || !verFilter.equals(NO_VERSION_FILTER)) {
+            foundArtifacts = locator.locate(gid, aid);
+            if(verFilter.equals(LOWEST_VERSION)) {
+                vf = VersionFilter.LOWEST_ONLY;
+            }
+            foundArtifacts = locator.filter(foundArtifacts, vf);
+        } else {
+            foundArtifacts.add(locator.locate(gid, aid, ver));
+        }
+
+        if(foundArtifacts.isEmpty()) {
             logger.warn("No artifact found...");
             req.setAttribute(MAIN_FEEDBACK, "0 artifacts found.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
             return;
         }
 
-        File resolvedArtifact = resolver.resolve(foundArtifact);
-        if(resolvedArtifact == null) {
+        Collection<File> resolvedArtifacts = resolver.resolveArtifacts(foundArtifacts);
+        if(resolvedArtifacts == null) {
             // this really shouldn't happen
             req.setAttribute(MAIN_FEEDBACK, "Error while resolving artifact.");
             req.getRequestDispatcher("resource?link=maven").forward(req, resp);
@@ -125,21 +140,7 @@ public class MavenServlet extends HttpServlet {
         }
 
         // upload to buffer
-        FileInputStream in = new FileInputStream(resolvedArtifact);
-        try {
-            Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), in);
-        } catch (RefusedArtifactException e) {
-            logger.warn("Artifact revoked: ", e.getMessage());
-            req.setAttribute(MAIN_FEEDBACK, "Error while putting artifact to buffer.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
-            return;
-        } finally {
-            in.close();
-        }
-
-        // redirect to buffer page?
-        req.setAttribute(MAIN_FEEDBACK, "1 artifact put to buffer.");
-        req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+        addResolvedArtifactsToBuffer(req, resp, resolvedArtifacts);
     }
 
     /**
@@ -178,9 +179,6 @@ public class MavenServlet extends HttpServlet {
         }
 
         // perform search
-        MavenLocator locator = new CentralMavenRestLocator();
-        MavenResolver resolver = new MavenAetherResolver();
-        // todo: seearch with manual groupId filter
         Collection<FoundArtifact> foundArtifacts = new ArrayList<>();
         switch (groupIdFilter) {
             case NO_GROUP_ID_FILTER:
@@ -215,11 +213,17 @@ public class MavenServlet extends HttpServlet {
         }
 
         // upload to buffer
+        addResolvedArtifactsToBuffer(req, resp, resolvedArtifacts);
+    }
+
+    private void addResolvedArtifactsToBuffer(HttpServletRequest req, HttpServletResponse resp, Collection<File> resolvedArtifacts) throws IOException, ServletException {
         logger.debug(resolvedArtifacts.size()+" artifacts resolved.");
+        int bufferCounter = 0;
         for(File resolvedArtifact : resolvedArtifacts) {
             FileInputStream fi = new FileInputStream(resolvedArtifact);
             try {
                 Activator.instance().getBuffer(req).put(resolvedArtifact.getName(), fi);
+                bufferCounter++;
             } catch (RefusedArtifactException e) {
                 logger.warn("Artifact revoked: ", e.getMessage());
                 req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
@@ -230,9 +234,7 @@ public class MavenServlet extends HttpServlet {
             }
         }
 
-        req.setAttribute(MAIN_FEEDBACK, resolvedArtifacts.size()+" artifacts put to buffer.");
+        req.setAttribute(MAIN_FEEDBACK, bufferCounter+" artifacts put to buffer.");
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
     }
-
-
 }

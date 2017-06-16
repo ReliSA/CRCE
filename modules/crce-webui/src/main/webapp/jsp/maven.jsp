@@ -6,9 +6,9 @@
 </jsp:include>
 
 <div id="telo">
-    <h2>Search for maven artifacts</h2>
+    <h2>Maven artifacts search</h2>
     <!-- search by maven coordinates -->
-    <form method="post" action="maven-search?by=gav">
+    <form method="post" action="maven-search?by=gav" class="formular">
         <h3>Search by maven coordinates</h3>
         <table>
             <tr>
@@ -38,10 +38,29 @@
                 </td>
             </tr>
 
+            <tr>
+                <td>Version filter:</td>
+            </tr>
+
+            <tr>
+                <td><input type="radio" id="noV" name="verFilter" value="noV">
+                <label for="noV">No version filter</label></td>
+            </tr>
+
+            <tr>
+                <td><input type="radio" id="lv" name="verFilter" value="lv">
+                <label for="lv">Lowest version</label></td>
+            </tr>
+
+            <tr>
+                <td><input type="radio" id="hv" name="verFilter" value="hv" checked="true">
+                <label for="hv">Highest version</label></td>
+            </tr>
+
             <!-- feedback for searching by coordinates -->
             <c:if test="${requestScope.feedback1 != null}">
                 <tr>
-                    <td colspan="2"><c:out value="${requestScope.feedback1}"/></td>
+                    <td colspan="2" class="chyba"><c:out value="${requestScope.feedback1}"/></td>
                 </tr>
             </c:if>
 
@@ -52,7 +71,7 @@
     </form>
 
     <!-- search by package name -->
-    <form method="post" action="maven-search?by=pname">
+    <form method="post" action="maven-search?by=pname" class="formular">
         <h3>Search by package name</h3>
         <table>
             <tr>
@@ -80,7 +99,7 @@
 
             <tr>
                 <td><input type="radio" id="nogId" name="gidFilter" value="nogId">
-                    <label for="nogId">Highest groupId match</label></td>
+                    <label for="nogId">No groupId filter</label></td>
             </tr>
 
             <tr>
@@ -97,7 +116,7 @@
             <!-- feedback for searching by package name -->
                 <c:if test="${requestScope.feedback2 != null}">
                     <tr>
-                        <td colspan="2"><c:out value="${requestScope.feedback2}"/></td>
+                        <td colspan="2" class="chyba"><c:out value="${requestScope.feedback2}"/></td>
                     </tr>
                 </c:if>
 

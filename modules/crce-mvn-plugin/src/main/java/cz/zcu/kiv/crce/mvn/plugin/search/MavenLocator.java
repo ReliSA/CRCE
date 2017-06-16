@@ -13,6 +13,7 @@ public interface MavenLocator {
 
     /**
      * Locates the artifact in the repo and returns it.
+     *
      * @param groupId Artifact group id.
      * @param artifactId Artifact id.
      * @param version Artifact version.
