@@ -26,7 +26,7 @@ public class FetchResultSetThread extends Thread {
 
     /**
      * Constructor.
-     * @param queryBuilder Query builder containing the original query.
+     * @param queryBuilder Query builder containing the original query. The object will be changed in constructor. Use the clone() method.
      * @param start Number of the starting result.
      * @param rows How many results should be fetched.
      */
@@ -35,6 +35,20 @@ public class FetchResultSetThread extends Thread {
         this.rows = rows;
         this.queryBuilder = queryBuilder;
         foundArtifacts = new ArrayList<>();
+        this.queryBuilder = this.queryBuilder.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(rows));
+        this.queryBuilder = this.queryBuilder.addAdditionalParameter(AdditionalQueryParam.START, Integer.toString(start));
+    }
+
+    /**
+     * Constructor.
+     * Query builder is not modified (start and rows parameters are expected to be already set).
+     *
+     * @param queryBuilder
+     */
+    public FetchResultSetThread(QueryBuilder queryBuilder) {
+        this.queryBuilder = queryBuilder;
+        this.rows = 0;
+        this.start = 0;
     }
 
     @Override
@@ -43,8 +57,6 @@ public class FetchResultSetThread extends Thread {
         List<JsonArtifactDescriptor> jsonArtifactDescriptors = new ArrayList<>();
         List<FoundArtifact> foundArtifactsTmp = new ArrayList<>();
         CentralRepoRestConsumer restConsumer = new CentralRepoRestConsumer();
-        queryBuilder = queryBuilder.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(rows));
-        queryBuilder = queryBuilder.addAdditionalParameter(AdditionalQueryParam.START, Integer.toString(start));
         CentralRepoJsonResponse jsonResponse = null;
         try {
             jsonResponse = restConsumer.getJson(queryBuilder);

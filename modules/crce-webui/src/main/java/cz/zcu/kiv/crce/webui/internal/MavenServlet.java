@@ -7,6 +7,10 @@ import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenAetherResolver;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,49 +21,52 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * A servlet for maven search page.
  *
  * Created by Zdenek Vales on 11.4.2017.
  */
-
-// todo: feedback, use threads for big result sets, use groupId filtering
 public class MavenServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7359560802939893940L;
 
     private static final Logger logger = LoggerFactory.getLogger(MavenServlet.class);
 
-    public static final String COORDINATES_FEEDBACK = "feedback1";
-    public static final String PACKAGE_NAME_FEEDBACK = "feedback2";
-    public static final String MAIN_FEEDBACK = "feedback3";
-
-    public static final String SEARCH_BY_PARAM_NAME = "by";
-    public static final String SEARCH_BY_COORDINATES = "gav";
-    public static final String SEARCH_BY_PACKAGE_NAME = "pname";
+    public static final String COORDINATES_FEEDBACK = "coordFeedback";
+    public static final String PACKAGE_NAME_FEEDBACK = "packageFeedback";
+    public static final String MAIN_FEEDBACK = "mainFeedback";
+    public static final String CONF_FEEDBACK = "confFeedback";
 
     public static final String LOWEST_VERSION = "lv";
     public static final String HIGHEST_VERSION = "hv";
-    public static final String NO_VERSION_FILTER = "noV";
+    public static final String NO_VERSION_FILTER = "no-v";
 
-    public static final String NO_GROUP_ID_FILTER = "nogId";
-    public static final String HIGHEST_GROUP_ID = "hmatch";
-    public static final String MANUAL_GROUP_ID = "manualg";
-    public static final String MANUAL_GROUP_ID_VAL = "manualgVal";
+    public static final String NO_GROUP_ID_FILTER = "no-gid";
+    public static final String HIGHEST_GROUP_ID = "h-match";
+    public static final String MANUAL_GROUP_ID = "manual-gid";
+    public static final String MANUAL_GROUP_ID_VAL = "manual-gid-val";
 
     // those correspond with name attribute of html input element
     public static final String GROUP_ID_PARAM = "gid";
     public static final String ARTIFACT_ID_PARAM = "aid";
     public static final String VERSION_PARAM = "ver";
     public static final String PACKAGE_NAME_PARAM = "pname";
-    public static final String VERSION_FILTER_PARAM = "verFilter";
-    public static final String GROUP_FILTER_PARAM_NAME = "gidFilter";
+    public static final String PACKAGE_VERSION_FILTER = "package-ver-filter";
+    public static final String COORD_VERSION_FILTER = "coord-ver-filter";
+    public static final String GROUP_FILTER_PARAM_NAME = "gid-filter";
+    public static final String RESOLVER_CONFIGRATION = "resolver-conf-file";
+
+    // 'search' button names
+    public static final String COORD_SEARCH = "coord-search";
+    public static final String PACKAGE_SEARCH = "package-search";
 
     private MavenLocator locator = new CentralMavenRestLocator();
-    private MavenResolver resolver = new MavenAetherResolver();
+    private MavenAetherResolver resolver = new MavenAetherResolver();
+
+    private Map<String, String> parameters;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -69,24 +76,54 @@ public class MavenServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // search by coordinates or package name?
-        String searchBy = "";
-        if (req.getParameter(SEARCH_BY_PARAM_NAME) != null) {
-            searchBy = req.getParameter(SEARCH_BY_PARAM_NAME);
-        } else {
-            req.setAttribute(MAIN_FEEDBACK, "No search method.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
-        }
+        // first of all load configuration if needed
+        loadConfiguration(req, resp);
 
-        if(searchBy.equalsIgnoreCase(SEARCH_BY_COORDINATES)) {
+        // search by coordinates or package name?
+        if(parameters.containsKey(COORD_SEARCH)) {
             searchByCoordinates(req, resp);
-        } else if (searchBy.equalsIgnoreCase(SEARCH_BY_PACKAGE_NAME)) {
+        } else if (parameters.containsKey(PACKAGE_SEARCH)) {
             searchByPackageName(req, resp);
-        } else {
-            String msg = "Unknown '"+SEARCH_BY_PARAM_NAME+"' parameter value: "+searchBy;
+        } else  {
+            String msg = "Unknown action.";
             logger.debug(msg);
-            req.setAttribute(MAIN_FEEDBACK, "Unknow search method: "+searchBy+".");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, MAIN_FEEDBACK, msg);
+            return;
+        }
+    }
+
+    /**
+     * Check if any configuration files were uploaded and reconfigure components.
+     * Uses apache commons library to get the uploadded file and must be called before any
+     * 'getParameter()' method is called on the request object.
+     *
+     * @param req Request.
+     * @param resp Response.
+     */
+    private void loadConfiguration(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        parameters = new HashMap<>();
+        try {
+            List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
+            for(FileItem fi : items) {
+                if(!fi.isFormField()) {
+                    String fieldName = fi.getFieldName();
+                    if(fieldName.equals(RESOLVER_CONFIGRATION)) {
+                        // load configuration file for resolver
+                        InputStream is = fi.getInputStream();
+                        resolver.reconfigure(is);
+                        is.close();
+                    }
+                } else {
+                    // normal parameter
+                    String fieldName = fi.getFieldName();
+                    String fieldValue = fi.getString();
+                    parameters.put(fieldName, fieldValue);
+                }
+            }
+        } catch (FileUploadException | IOException e) {
+            logger.error("Exception while getting the uploaded file: "+e.getMessage());
+            displayFeedback(req, resp, CONF_FEEDBACK, "Error while getting uploaded configuration file.");
+            return;
         }
     }
 
@@ -97,7 +134,7 @@ public class MavenServlet extends HttpServlet {
         String gid = req.getParameter(GROUP_ID_PARAM);
         String aid = req.getParameter(ARTIFACT_ID_PARAM);
         String ver = req.getParameter(VERSION_PARAM);
-        String verFilter = req.getParameter(VERSION_FILTER_PARAM);
+        String verFilter = req.getParameter(COORD_VERSION_FILTER);
         VersionFilter vf = VersionFilter.HIGHEST_ONLY;
         logger.debug("Searching for maven artifacts by coordinates: gid={}; aid={}; version={}",gid, aid, ver);
 
@@ -107,8 +144,7 @@ public class MavenServlet extends HttpServlet {
                (ver == null || ver.isEmpty()) && verFilter.equals(NO_VERSION_FILTER)
             ) {
             logger.warn("Not all parameters were specified.");
-            req.setAttribute(COORDINATES_FEEDBACK, "Group Id, artifact Id or version is missing.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, COORDINATES_FEEDBACK, "Group Id, artifact Id or version is missing.");
             return;
         }
 
@@ -126,16 +162,14 @@ public class MavenServlet extends HttpServlet {
 
         if(foundArtifacts.isEmpty()) {
             logger.warn("No artifact found...");
-            req.setAttribute(MAIN_FEEDBACK, "0 artifacts found.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, MAIN_FEEDBACK, "0 artifacts found.");
             return;
         }
 
         Collection<File> resolvedArtifacts = resolver.resolveArtifacts(foundArtifacts);
         if(resolvedArtifacts == null) {
             // this really shouldn't happen
-            req.setAttribute(MAIN_FEEDBACK, "Error while resolving artifact.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, MAIN_FEEDBACK, "Error while resolving artifact.");
             return;
         }
 
@@ -149,7 +183,7 @@ public class MavenServlet extends HttpServlet {
     private void searchByPackageName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Searching for maven artifacts by package name...");
         String packageName = req.getParameter(PACKAGE_NAME_PARAM);
-        String versionFilter = req.getParameter(VERSION_FILTER_PARAM);
+        String versionFilter = req.getParameter(PACKAGE_VERSION_FILTER);
         String groupIdFilter = req.getParameter(GROUP_FILTER_PARAM_NAME);
         String manualG = "";
 
@@ -161,8 +195,7 @@ public class MavenServlet extends HttpServlet {
             groupIdFilter == null || groupIdFilter.isEmpty()) {
             // todo: display some error message?
             logger.warn("Package name, version filter or group id filter not specified.");
-            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Package name, version filter or group id filter is missing.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, PACKAGE_NAME_FEEDBACK, "Package name, version filter or group id filter is missing.");
             return;
         }
 
@@ -170,8 +203,7 @@ public class MavenServlet extends HttpServlet {
             manualG = req.getParameter(MANUAL_GROUP_ID_VAL);
             if(manualG == null || manualG.isEmpty()) {
                 logger.warn("Manual groupId filter si missing.");
-                req.setAttribute(PACKAGE_NAME_FEEDBACK, "Value for manual groupId filter is missing.");
-                req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+                displayFeedback(req, resp, PACKAGE_NAME_FEEDBACK, "Value for manual groupId filter is missing");
                 return;
             } else {
                 logger.debug("Value of manual groupId filter: "+manualG);
@@ -207,8 +239,7 @@ public class MavenServlet extends HttpServlet {
         if(resolvedArtifacts == null) {
             // this really shouldn't happen
             logger.warn("Artifact couldn't been resolved.");
-            req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while locating artifacts.");
-            req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+            displayFeedback(req, resp, PACKAGE_NAME_FEEDBACK, "Error while locating artifacts.");
             return;
         }
 
@@ -226,15 +257,24 @@ public class MavenServlet extends HttpServlet {
                 bufferCounter++;
             } catch (RefusedArtifactException e) {
                 logger.warn("Artifact revoked: ", e.getMessage());
-                req.setAttribute(PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
-                req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+                displayFeedback(req, resp, PACKAGE_NAME_FEEDBACK, "Error while putting artifact to buffer.");
                 return;
             } finally {
                 fi.close();
             }
         }
 
-        req.setAttribute(MAIN_FEEDBACK, bufferCounter+" artifacts put to buffer.");
+        displayFeedback(req, resp, MAIN_FEEDBACK, bufferCounter+" artifacts put to buffer.");
+    }
+
+    /**
+     * Sets the feedback attribute and redirects to maven search page immediately.
+     * @param feedbackName Name of the feedback.
+     * @param feedback Feedback to be displayed
+     */
+    private void displayFeedback(HttpServletRequest req, HttpServletResponse resp, String feedbackName, String feedback) throws ServletException, IOException {
+        req.setAttribute(feedbackName, feedback);
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
+        return;
     }
 }

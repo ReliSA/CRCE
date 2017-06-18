@@ -34,7 +34,7 @@ public class MavenAetherResolverTest {
         assertEquals(resolver.getLocalRepoPath(), MavenAetherResolver.LOCAL_REPOSITORY_PATH_DEF);
 
         // new config with null file => should be default
-        resolver.reconfigure(null);
+        resolver.reconfigure((File)null);
         repositories = resolver.getRepositories();
         assertEquals("Only one remote repository expected to be configured!", 1, repositories.size());
         repo = repositories.get(0);

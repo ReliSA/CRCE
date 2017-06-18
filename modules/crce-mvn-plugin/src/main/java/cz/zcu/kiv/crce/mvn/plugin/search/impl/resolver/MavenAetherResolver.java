@@ -121,7 +121,7 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
      */
     private void init() {
         try {
-            reconfigure(null);
+            reconfigure((File)null);
         } catch (FileNotFoundException e) {
             // this really shouldn't happen
             logger.error("Error while loading configuration from default file: "+e.getMessage());
@@ -137,23 +137,13 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
     }
 
     @Override
-    public void reconfigure(File sourceFile) throws FileNotFoundException {
-        InputStream is;
-
-        // bad file => use the default one
-        if(sourceFile == null) {
-            logger.debug("No configuration file, using the default one.");
-            is = this.getClass().getResourceAsStream(CONFIG_FILE_NAME);
-        } else {
-            is = new FileInputStream(sourceFile);
-        }
-
+    public void reconfigure(InputStream sourceStream) {
         // load properties
         repositories = new ArrayList<>();
         Properties properties = new Properties();
         localRepoPath = null;
         try {
-            properties.load(is);
+            properties.load(sourceStream);
 
             // load single properties first
             localRepoPath = properties.getProperty(LOCAL_REPOSITORY_PATH_PROPERTY_NAME, LOCAL_REPOSITORY_PATH_DEF);
@@ -180,14 +170,29 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
             }
         }
 
+        repositorySystem = newRepositorySystem();
+        repositorySystemSession = newSession(repositorySystem, localRepoPath);
+    }
+
+    @Override
+    public void reconfigure(File sourceFile) throws FileNotFoundException {
+        InputStream is;
+
+        // bad file => use the default one
+        if(sourceFile == null) {
+            logger.debug("No configuration file, using the default one.");
+            is = this.getClass().getResourceAsStream(CONFIG_FILE_NAME);
+        } else {
+            is = new FileInputStream(sourceFile);
+        }
+
+        reconfigure(is);
+
         try {
             is.close();
         } catch (IOException e) {
             logger.error("Exception while closing the stream: "+e.getMessage());
         }
-
-        repositorySystem = newRepositorySystem();
-        repositorySystemSession = newSession(repositorySystem, localRepoPath);
 
     }
 

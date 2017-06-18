@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.mvn.plugin.search;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Interface for classes with changeable configuration.
@@ -19,5 +20,15 @@ public interface Configurable {
      *                   class to handle null values.
      */
     void reconfigure(File sourceFile) throws FileNotFoundException;
+
+    /**
+     * Reload configuration from sourceStream.
+     * Format of the file is up to the implementation class.
+     * All possible configuration should be overwritten by this method.
+     * Stream is not closed by this method.
+     *
+     * @param sourceStream Source stream which should contain file with configuration. Cant' be null.
+     */
+    void reconfigure(InputStream sourceStream);
 
 }
