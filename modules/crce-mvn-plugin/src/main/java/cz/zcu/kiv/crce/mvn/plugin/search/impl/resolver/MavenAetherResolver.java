@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver;
 
+import cz.zcu.kiv.crce.mvn.plugin.internal.FileUtil;
 import cz.zcu.kiv.crce.mvn.plugin.search.Configurable;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
@@ -201,8 +202,39 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
 
     }
 
+    /**
+     * Downloads pom file for found artifact.
+     * @param foundArtifact
+     * @return
+     */
+    private File downloadPom(FoundArtifact foundArtifact) {
+        Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
+                                                foundArtifact.getArtifactId(),
+                                                "pom",
+                                                foundArtifact.getVersion());
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact(artifact);
+        artifactRequest.setRepositories(repositories);
+
+        ArtifactResult artifactResult;
+        try {
+            artifactResult = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
+        } catch (ArtifactResolutionException e) {
+            logger.error("Unexpected error occurred while resolving pom for artifact: "+e.getMessage());
+            return null;
+        }
+
+        if(artifactResult.isResolved()) {
+            return  artifactResult.getArtifact().getFile();
+        } else {
+            return  null;
+        }
+    }
+
     @Override
     public File resolve(FoundArtifact foundArtifact) {
+
+        // download jar
         Artifact artifact = new DefaultArtifact(foundArtifact.getGroupId(),
                                                 foundArtifact.getArtifactId(),
                                                 "jar",
@@ -220,7 +252,28 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
         }
 
         if(artifactResult.isResolved()) {
-            return artifactResult.getArtifact().getFile();
+            File art = artifactResult.getArtifact().getFile();
+            logger.trace("Checking file "+art+" for pom...");
+            try {
+                if(FileUtil.isFilePresentInJar(art.getPath(), "pom.xml")) {
+                    logger.trace("Pom.xml file is present.");
+                } else {
+                    logger.trace("Pom.xml file is not present!");
+
+                    File pom = downloadPom(foundArtifact);
+                    if(pom == null) {
+                        logger.error("Pom is null!");
+                        return  null;
+                    } else {
+                        FileUtil.addPomToJar(art.getPath(), pom.getPath());
+                    }
+                }
+            } catch (IOException e) {
+                logger.error("Exception while checking if artifact contains pom file!");
+                return null;
+            }
+
+            return art;
         } else {
             return null;
         }
@@ -238,4 +291,5 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
 
         return res;
     }
+
 }

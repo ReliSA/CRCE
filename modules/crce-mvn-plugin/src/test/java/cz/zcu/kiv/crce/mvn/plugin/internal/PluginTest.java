@@ -4,12 +4,20 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.internal.MetadataServiceImpl;
+import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
+import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.CentralMavenRestLocator;
+import cz.zcu.kiv.crce.mvn.plugin.search.impl.resolver.MavenAetherResolver;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
@@ -66,6 +74,30 @@ public class PluginTest {
         assertEquals("GroupIds are not same!", model1.getGroupId(), model2.getGroupId());
         assertEquals("ArtifactIds are not same!", model1.getArtifactId(), model2.getArtifactId());
         assertEquals("Versions are not same!", model1.getVersion(), model2.getVersion());
+    }
+
+    /**
+     * Complex test.
+     */
+    @Test
+    public void testLocateResolveLoadPom() throws IOException, XmlPullParserException {
+        MavenLocator locator = new CentralMavenRestLocator();
+        MavenResolver resolver = new MavenAetherResolver();
+        MavenPlugin mp = new MavenPlugin();
+        String groupId = "org.hibernate";
+        String artifactId = "hibernate-core";
+        String version = "5.2.7.Final";
+
+        FoundArtifact artifact = locator.locate(groupId, artifactId, version);
+        assertNotNull("Null returned by locate() method!", artifact);
+        File file = resolver.resolve(artifact);
+        assertNotNull("Null returned by resolve() method!", file);
+        Model model = mp.loadPom(file.toURI().toURL());
+        assertNotNull("Null returned by loadPom() method!", model);
+
+        assertEquals("Wrong groupId!", groupId, model.getGroupId());
+        assertEquals("Wrong artifactId!", artifactId, model.getArtifactId());
+        assertEquals("Wrong version!", version, model.getVersion());
     }
 
     /**

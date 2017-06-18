@@ -19,9 +19,14 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 /**
@@ -30,65 +35,46 @@ import java.util.jar.JarInputStream;
 @SuppressWarnings("PMD")
 public class FileUtil
 {
-//    public static void downloadSource(
-//        PrintStream out, PrintStream err,
-//        URL srcURL, String dirStr, boolean extract)
-//    {
-//        // Get the file name from the URL.
-//        String fileName = (srcURL.getFile().lastIndexOf('/') > 0)
-//            ? srcURL.getFile().substring(srcURL.getFile().lastIndexOf('/') + 1)
-//            : srcURL.getFile();
-//
-//        try
-//        {
-//            out.println("Connecting...");
-//
-//            File dir = new File(dirStr);
-//            if (!dir.exists())
-//            {
-//                err.println("Destination directory does not exist.");
-//            }
-//            File file = new File(dir, fileName);
-//            InputStream is;
-//            try (OutputStream os = new FileOutputStream(file)) {
-//                URLConnection conn = srcURL.openConnection();
-//                FileUtil.setProxyAuth(conn);
-//                int total = conn.getContentLength();
-//                is = conn.getInputStream();
-//                if (total > 0)
-//                {
-//                    out.println("Downloading " + fileName
-//                        + " ( " + total + " bytes ).");
-//                }
-//                else
-//                {
-//                    out.println("Downloading " + fileName + ".");
-//                }
-//                byte[] buffer = new byte[4096];
-//                int count = 0;
-//                for (int len = is.read(buffer); len > 0; len = is.read(buffer))
-//                {
-//                    count += len;
-//                    os.write(buffer, 0, len);
-//                }
-//            }
-//            is.close();
-//
-//            if (extract)
-//            {
-//                is = new FileInputStream(file);
-//                JarInputStream jis = new JarInputStream(is);
-//                out.println("Extracting...");
-//                unjar(jis, dir);
-//                jis.close();
-//                file.delete();
-//            }
-//        }
-//        catch (Exception ex)
-//        {
-//            err.println(ex);
-//        }
-//    }
+
+
+    /**
+     * Checks whether a file is present in existing jar archive.
+     *
+     * @param pathToJar Path to an existing jar archive.
+     * @param filename Full name of the file (without the initial '/') to be checked.
+     * @return True or false.
+     *
+     * @throws IOException
+     */
+    public static boolean isFilePresentInJar(String pathToJar, String filename) throws IOException {
+        JarFile jar = new JarFile(pathToJar);
+        JarEntry entry = jar.getJarEntry(filename);
+        return  entry != null;
+    }
+
+    /**
+     * This method adds a pom file to the root of existing jar archive. If there's already a pom in the archive,
+     * it will be overwritten.
+     *
+     * @param pathToJar Path to an existing jar archive.
+     * @param pathToPom Path to existing pom which will be added to the archive.
+     * @throws IOException Thrown when bad stuff happens.
+     */
+    public static void addPomToJar(String pathToJar, String pathToPom) throws IOException {
+        Map<String, String> env = new HashMap<>();
+//        env.put("create", "true");
+
+        // locate the jar and create file system
+        URI uri = URI.create("jar:file:"+Paths.get(pathToJar).toUri().getPath());
+        FileSystem jarfs = FileSystems.newFileSystem(uri,env);
+
+        // locate other file and create filename in the archive
+        Path otherFile = Paths.get(pathToPom);
+        Path pathInJar = jarfs.getPath("/pom.xml");
+
+        // copy the pom to the archive
+        Files.copy(otherFile, pathInJar, StandardCopyOption.REPLACE_EXISTING);
+    }
 
     public static void unjar(JarInputStream jis, File dir)
         throws IOException
