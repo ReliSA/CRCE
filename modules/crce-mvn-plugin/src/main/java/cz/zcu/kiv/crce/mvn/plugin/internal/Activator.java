@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
@@ -18,6 +19,7 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(Plugin.class.getName(), null)
                 .setImplementation(MavenPlugin.class)
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))
+                .add(createServiceDependency().setRequired(true).setService(ResourceDAO.class))
         );
     }
 

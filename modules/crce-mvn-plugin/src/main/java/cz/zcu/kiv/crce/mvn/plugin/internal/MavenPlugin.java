@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.mvn.plugin.internal;
 
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.mvn.plugin.namespace.NsMavenArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.namespace.NsMvnArtifactIdentity;
@@ -37,6 +38,7 @@ public class MavenPlugin extends AbstractActionHandler {
     public static final String POM_NAME = "pom.xml";
 
     private volatile MetadataService metadataService;
+    private volatile ResourceDAO resourceDAO;
 
     public Resource loadMavenIdentity(Resource resource){
         logger.debug("Using maven plugin");
@@ -210,6 +212,8 @@ public class MavenPlugin extends AbstractActionHandler {
         rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__ARTIFACT_ID, pomModel.getArtifactId());
         rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__GROUP_ID, pomModel.getGroupId());
         rootCap.setAttribute(NsMvnArtifactIdentity.ATTRIBUTE__VERSION, pomModel.getVersion());
+
+        metadataService.addRootCapability(resource, rootCap);
     }
 
     @Override
@@ -220,8 +224,18 @@ public class MavenPlugin extends AbstractActionHandler {
             loadMavenIdentity(r);
             logger.info("Capabilities added: "+metadataService.getSingletonCapability(r, NsMvnArtifactIdentity.NAMESPACE__MVN_ARTIFACT_IDENTITY));
             logger.info("All capabilities: "+r.getCapabilities());
+
+            saveToDB(r);
         }
         return super.afterBufferCommit(resources, buffer, store);
+    }
+
+    private void saveToDB(Resource resource) {
+        try {
+            resourceDAO.saveResource(resource);
+        } catch (IOException e) {
+            logger.error("Could not save indexed resource {}. Exception: {}", resource, e);
+        }
     }
 
     public void setMetadataService(MetadataService metadataService) {

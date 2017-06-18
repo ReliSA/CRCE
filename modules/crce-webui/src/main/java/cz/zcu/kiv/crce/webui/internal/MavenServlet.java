@@ -131,10 +131,10 @@ public class MavenServlet extends HttpServlet {
      * Handles searching by maven coordinates.
      */
     private void searchByCoordinates(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String gid = req.getParameter(GROUP_ID_PARAM);
-        String aid = req.getParameter(ARTIFACT_ID_PARAM);
-        String ver = req.getParameter(VERSION_PARAM);
-        String verFilter = req.getParameter(COORD_VERSION_FILTER);
+        String gid = parameters.get(GROUP_ID_PARAM);
+        String aid = parameters.get(ARTIFACT_ID_PARAM);
+        String ver = parameters.get(VERSION_PARAM);
+        String verFilter = parameters.get(COORD_VERSION_FILTER);
         VersionFilter vf = VersionFilter.HIGHEST_ONLY;
         logger.debug("Searching for maven artifacts by coordinates: gid={}; aid={}; version={}",gid, aid, ver);
 
@@ -182,9 +182,9 @@ public class MavenServlet extends HttpServlet {
      */
     private void searchByPackageName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         logger.debug("Searching for maven artifacts by package name...");
-        String packageName = req.getParameter(PACKAGE_NAME_PARAM);
-        String versionFilter = req.getParameter(PACKAGE_VERSION_FILTER);
-        String groupIdFilter = req.getParameter(GROUP_FILTER_PARAM_NAME);
+        String packageName = parameters.get(PACKAGE_NAME_PARAM);
+        String versionFilter = parameters.get(PACKAGE_VERSION_FILTER);
+        String groupIdFilter = parameters.get(GROUP_FILTER_PARAM_NAME);
         String manualG = "";
 
         logger.debug("Package name: "+packageName+"; version filter: "+versionFilter+"; groupId filter: "+groupIdFilter);
@@ -200,7 +200,7 @@ public class MavenServlet extends HttpServlet {
         }
 
         if(groupIdFilter.equals(MANUAL_GROUP_ID)) {
-            manualG = req.getParameter(MANUAL_GROUP_ID_VAL);
+            manualG = parameters.get(MANUAL_GROUP_ID_VAL);
             if(manualG == null || manualG.isEmpty()) {
                 logger.warn("Manual groupId filter si missing.");
                 displayFeedback(req, resp, PACKAGE_NAME_FEEDBACK, "Value for manual groupId filter is missing");
@@ -264,7 +264,7 @@ public class MavenServlet extends HttpServlet {
             }
         }
 
-        displayFeedback(req, resp, MAIN_FEEDBACK, bufferCounter+" artifacts put to buffer.");
+        displayFeedback(req, resp, MAIN_FEEDBACK, bufferCounter+" artifact(s) resolved");
     }
 
     /**
