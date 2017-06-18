@@ -159,6 +159,11 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
                 n++;
             }
 
+            // no repositories configured
+            if(repositories.isEmpty()) {
+                repositories.add(newRepository(REPOSITORY_ID_DEF, REPOSITORY_TYPE_DEF, REPOSITORY_URL_DEF));
+            }
+
         } catch (IOException e) {
             logger.error("Exception while configuring "+MavenAetherResolver.class.getSimpleName()+". "+e.getMessage()+", using default values.");
             if(repositories.isEmpty()) {

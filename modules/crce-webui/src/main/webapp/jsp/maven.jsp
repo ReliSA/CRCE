@@ -28,14 +28,6 @@
     		</table>
     		<h3>Search by maven coordinates</h3>
     		<table>
-                <tr>
-                    <td>
-                        <label for="aid">Artifact ID</label>
-                    </td>
-                    <td>
-                        <input type="text" id="aid" name="aid">
-                    </td>
-                </tr>
 
                 <tr>
                     <td>
@@ -43,6 +35,15 @@
                     </td>
                     <td>
                         <input type="text" id="gid" name="gid">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label for="aid">Artifact ID</label>
+                    </td>
+                    <td>
+                        <input type="text" id="aid" name="aid">
                     </td>
                 </tr>
 
@@ -60,7 +61,7 @@
                 </tr>
 
                 <tr>
-                    <td colspan="2"><input type="radio" id="no-v" name="coord-ver-filter" value="noV">
+                    <td colspan="2"><input type="radio" id="no-v" name="coord-ver-filter" value="no-v" checked="true">
                     <label for="no-v">No version filter (only if all three coordinates are set)</label></td>
                 </tr>
 
@@ -70,7 +71,7 @@
                 </tr>
 
                 <tr>
-                    <td><input type="radio" id="hv" name="coord-ver-filter" value="hv" checked="true">
+                    <td><input type="radio" id="hv" name="coord-ver-filter" value="hv">
                     <label for="hv">Highest version</label></td>
                 </tr>
 

@@ -111,4 +111,17 @@ public class MavenAetherResolverTest {
         assertTrue("Non existent file returned!", file.exists());
     }
 
+    @Test
+    public void testResolve2() {
+        MavenLocator locator = new CentralMavenRestLocator();
+        MavenResolver resolver = new MavenAetherResolver();
+        String groupId = "org.hibernate";
+        String artifactId = "hibernate-core";
+        String version = "5.2.7.Final";
+
+        FoundArtifact artifact = locator.locate(groupId, artifactId, version);
+        File file = resolver.resolve(artifact);
+        assertNotNull("Artifact not reseolved!", file);
+        assertTrue("Non existent file returned!", file.exists());
+    }
 }
