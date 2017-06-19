@@ -18,10 +18,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Zdenek Vales
@@ -55,29 +59,46 @@ public class PluginTest {
     }
 
     /**
-     * Verify that the method is not dependent on file name or extension.
+     * Try to load pom from jar without pom, then add pom and try it again.
      */
     @Test
-    // todo: find out what to do when the artifact doesn't contain pom.xml
-    public void testLoadPom2() throws IOException, XmlPullParserException {
+    public void testLoadPom2() throws IOException, XmlPullParserException, URISyntaxException {
         // both files contain same artifact
+        String origName = "/hibernate-core-5.2.7.Final-orig.jar";
         String name1="/hibernate-core-5.2.7.Final.jar";
-        String name2="/test-hibernate-core";
+        String pomPath = "/hibernate-core-pom.xml";
+        String gid = "org.hibernate";
+        String aId = "hibernate-core";
+        String v = "5.2.7.Final";
         MavenPlugin mp = new MavenPlugin();
 
-        Model model1 = mp.loadPom(getResource(name1));
-        Model model2 = mp.loadPom(getResource(name2));
+        // copy orig jar to test jar so that test jar won't contain pom.xml
+        Path p = Paths.get(getResource(origName).toURI());
+        Path p2 = Paths.get(getResource(name1).toURI());
+        Files.copy(p, p2, StandardCopyOption.REPLACE_EXISTING);
 
-        assertNotNull("Model for name "+name1+" is null!", model1);
-        assertNotNull("Model for name "+name2+" is null!", model2);
+        // try to load model without pom
+        assertFalse("Jar shouldn't contain pom.xml file yet!", FileUtil.isFilePresentInJar(p2.toString(), "pom.xml"));
+        Model model = null;
+        try {
+            model = mp.loadPom(getResource(name1));
+        } catch (IllegalArgumentException e) {
+            // ok
+        } catch (Exception e) {
+            fail("Unexpected exception while load pom model: "+e.getMessage());
+        }
 
-        assertEquals("GroupIds are not same!", model1.getGroupId(), model2.getGroupId());
-        assertEquals("ArtifactIds are not same!", model1.getArtifactId(), model2.getArtifactId());
-        assertEquals("Versions are not same!", model1.getVersion(), model2.getVersion());
+        // add pom to the jar and load model again
+        FileUtil.addPomToJar(p2.toString(), getResource(pomPath).getPath());
+        assertTrue("Jar should now contain pom.xml file!", FileUtil.isFilePresentInJar(p2.toString(), "pom.xml"));
+        model = mp.loadPom(getResource(name1));
+        assertEquals("Wrong groupId!", gid, model.getGroupId());
+        assertEquals("Wrong artifactId!", aId, model.getArtifactId());
+        assertEquals("Wrong version!", v, model.getVersion());
     }
 
     /**
-     * Complex test.
+     * Test complete functionality.
      */
     @Test
     public void testLocateResolveLoadPom() throws IOException, XmlPullParserException {

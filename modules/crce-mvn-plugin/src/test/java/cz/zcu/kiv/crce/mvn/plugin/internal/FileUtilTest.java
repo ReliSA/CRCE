@@ -22,7 +22,7 @@ public class FileUtilTest {
     @Test
     public void testIsFilePresentInJar() throws IOException {
         String jarWithFile = "/test-jar.jar";
-        String jarWithoutFile = "/hibernate-core-5.2.7.Final.jar";
+        String jarWithoutFile = "/hibernate-core-5.2.7.Final-orig.jar";
         String filename = "pom.xml";
 
         assertTrue("Jar "+jarWithFile+" should contain pom.xml!", FileUtil.isFilePresentInJar(getResource(jarWithFile).getPath(), filename));
@@ -46,7 +46,7 @@ public class FileUtilTest {
         Files.copy(p, p2, StandardCopyOption.REPLACE_EXISTING);
 
         // check that the copy doesn't contain pom.xml
-        assertFalse("Working copy should not contain pom.xml!", FileUtil.isFilePresentInJar(jarWithoutFileCopy, filename));
+        assertFalse("Working copy should not contain pom.xml!", FileUtil.isFilePresentInJar(p2.toString(), filename));
 
         // add pom file
         FileUtil.addPomToJar(jarWithoutFileCopy, pathToPom);

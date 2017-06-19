@@ -77,7 +77,7 @@ public class FileUtil
         JarOutputStream jarOut = new JarOutputStream(out);
 
         // create new entry
-        JarEntry pomEntry = new JarEntry(pomFile.getName());
+        JarEntry pomEntry = new JarEntry("pom.xml");
         pomEntry.setTime(pomFile.lastModified());
         jarOut.putNextEntry(pomEntry);
 
