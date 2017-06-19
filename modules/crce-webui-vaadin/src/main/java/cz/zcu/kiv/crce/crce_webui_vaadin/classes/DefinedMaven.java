@@ -25,7 +25,7 @@ import com.vaadin.ui.Tree;
 
 import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
 
-public class DefinedMaven {
+public class DefinedMaven{
 	private Tree definedMavenTree = new Tree("Result Search");
 	private String groupText;
 	private String artifactText;

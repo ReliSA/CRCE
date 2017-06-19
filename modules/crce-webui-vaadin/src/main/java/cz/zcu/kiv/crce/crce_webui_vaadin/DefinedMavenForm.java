@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.VaadinSession;
@@ -18,9 +19,9 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.classes.DefinedMaven;
 import cz.zcu.kiv.crce.crce_webui_vaadin.other.TypePackaging;
 import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
 
-@SuppressWarnings("serial")
-public class DefinedMavenForm extends FormLayout {
-	private DefinedMaven definedMaven;
+public class DefinedMavenForm extends FormLayout implements Serializable{
+	private static final long serialVersionUID = 4172878715304331198L;
+	private transient DefinedMaven definedMaven;
 	private TextField definedUrl = new TextField();
 	private Label caption = new Label("Defined Maven repository");
 	private TextField group = new TextField("Group Id");

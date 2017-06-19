@@ -1,13 +1,16 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.classes;
 
 import java.io.File;
+import java.io.Serializable;
+
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
 
 import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
 
-public class LocalMaven {
+public class LocalMaven implements Serializable{
+	private static final long serialVersionUID = 1928618487572353592L;
 	private Tree localMavenTree = new Tree();
 	private String path;// = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 	public Tree getTree(VaadinSession session) {
@@ -33,7 +36,7 @@ public class LocalMaven {
 	private void list(File file) {
 		File[] children = file.listFiles();
 		for (File child : children) {
-			if ((child.isDirectory()) && (child.getName().charAt(0) != '.')) {
+			if (child.isDirectory() && child.getName().charAt(0) != '.') {
 				localMavenTree.addItem(child.getAbsolutePath());
 				localMavenTree.setItemCaption(child.getAbsolutePath(), child.getName());
 				localMavenTree.setParent(child.getAbsolutePath(), child.getParentFile().getAbsolutePath());

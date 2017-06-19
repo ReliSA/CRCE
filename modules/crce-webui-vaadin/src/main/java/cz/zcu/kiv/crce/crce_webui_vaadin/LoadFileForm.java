@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
@@ -59,7 +60,7 @@ public class LoadFileForm extends FormLayout {
 			notif.show(Page.getCurrent());
 			try {
 				area.setCaption("Content of File " + file.getName());
-				area.setValue(new String(Files.readAllBytes(file.toPath())));
+				area.setValue(new String(Files.readAllBytes(file.toPath()),Charset.forName("UTF-8")));
 				area.setVisible(true);
 				area.setHeight("600px");
 			} catch (IOException e) {
