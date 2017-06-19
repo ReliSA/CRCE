@@ -15,9 +15,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -89,7 +89,9 @@ public class PluginTest {
         }
 
         // add pom to the jar and load model again
-        FileUtil.addPomToJar(p2.toString(), getResource(pomPath).getPath());
+        InputStream in = new FileInputStream(new File(getResource(pomPath).getPath()));
+        FileUtil.addPomToJar(p2.toString(), in);
+        in.close();
         assertTrue("Jar should now contain pom.xml file!", FileUtil.isFilePresentInJar(p2.toString(), "pom.xml"));
         model = mp.loadPom(getResource(name1));
         assertEquals("Wrong groupId!", gid, model.getGroupId());

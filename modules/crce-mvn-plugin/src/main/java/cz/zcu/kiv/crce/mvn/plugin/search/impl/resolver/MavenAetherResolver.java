@@ -265,7 +265,9 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
                         logger.error("Pom is null!");
                         return  null;
                     } else {
-                        FileUtil.addPomToJar(art.getPath(), pom.getPath());
+                        InputStream in = new FileInputStream(new File(pom.getPath()));
+                        FileUtil.addPomToJar(art.getPath(), in);
+                        in.close();
                     }
                 }
             } catch (IOException e) {

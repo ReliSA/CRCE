@@ -3,7 +3,9 @@ package cz.zcu.kiv.crce.mvn.plugin.internal;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -49,7 +51,9 @@ public class FileUtilTest {
         assertFalse("Working copy should not contain pom.xml!", FileUtil.isFilePresentInJar(p2.toString(), filename));
 
         // add pom file
-        FileUtil.addPomToJar(jarWithoutFileCopy, pathToPom);
+        InputStream in = new FileInputStream(new File(pathToPom));
+        FileUtil.addPomToJar(jarWithoutFileCopy, in);
+        in.close();
 
         // check that the copy now contains pom.xml
         assertTrue("Working copy should now contain pom.xml!", FileUtil.isFilePresentInJar(jarWithoutFileCopy, filename));
@@ -64,7 +68,7 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testUnjar() throws IOException {
+    public void testUnjar() throws FileUtilOperationException, IOException {
         // test jar contains only pom.xml and META-INF/MANIFEST.MF files
         String testJar = "/test-jar.jar";
         String dir = "D:/tmp/bp/test/test-jar-dir";

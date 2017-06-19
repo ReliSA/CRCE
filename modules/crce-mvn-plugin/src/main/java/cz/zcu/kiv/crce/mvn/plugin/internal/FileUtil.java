@@ -21,15 +21,9 @@ package cz.zcu.kiv.crce.mvn.plugin.internal;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
-import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 
 /**
@@ -62,15 +56,12 @@ public class FileUtil
      * it will be overwritten.
      *
      * @param pathToJar Path to an existing jar archive.
-     * @param pathToPom Path to existing pom which will be added to the archive.
+     * @param pomInputStrem Stream containing the pom.xml file.
      * @throws IOException Thrown when bad stuff happens.
      */
-    public static void addPomToJar(String pathToJar, String pathToPom) throws IOException {
+    public static void addPomToJar(String pathToJar, InputStream pomInputStrem) throws IOException {
         // apparently this method shown here: http://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
         // doesn't work at all, but the solution below works just fine
-
-        // create file with pom
-        File pomFile = new File(pathToPom);
 
         // open jar file
         FileOutputStream out = new FileOutputStream(pathToJar);
@@ -78,15 +69,12 @@ public class FileUtil
 
         // create new entry
         JarEntry pomEntry = new JarEntry("pom.xml");
-        pomEntry.setTime(pomFile.lastModified());
         jarOut.putNextEntry(pomEntry);
 
         // write pom file to archive
-        FileInputStream in = new FileInputStream(pomFile);
-        while(in.available() > 0) {
-            jarOut.write(in.read());
+        while(pomInputStrem.available() > 0) {
+            jarOut.write(pomInputStrem.read());
         }
-        in.close();
         jarOut.close();
         out.close();
     }
@@ -98,30 +86,35 @@ public class FileUtil
      * @param jarFileName Name of the jar file.
      * @param targetDir Target directory.
      */
-    public static void unJar(String jarFileName, String targetDir) throws IOException {
+    public static void unJar(String jarFileName, String targetDir) throws IOException, FileUtilOperationException {
         JarFile jar = new JarFile(jarFileName);
         Enumeration<JarEntry> enumEntries = jar.entries();
 
         // check the target dir
         File target = new File(targetDir);
         if(!target.exists()) {
-            target.mkdir();
+            // not really necessary at all, but findbugs made me
+            if(!target.mkdir()) {
+                throw new FileUtilOperationException("Failed to create target directory for extracting a jar archive.");
+            }
         }
 
         while(enumEntries.hasMoreElements()) {
             JarEntry entry = enumEntries.nextElement();
             File f = new File(targetDir + File.separator + entry.getName());
             if(entry.isDirectory()) {
-                f.mkdir();
+                if(!f.mkdir()) {
+                    throw new FileUtilOperationException("Failed to create an extracted directory.");
+                }
                 continue;
             }
 
             InputStream is = jar.getInputStream(entry);
-            FileOutputStream out = new FileOutputStream(f);
-            while(is.available() > 0) {
-                out.write(is.read());
+            try (OutputStream out = new FileOutputStream(f)) {
+                while(is.available() > 0) {
+                    out.write(is.read());
+                }
             }
-            out.close();
             is.close();
         }
         jar.close();
