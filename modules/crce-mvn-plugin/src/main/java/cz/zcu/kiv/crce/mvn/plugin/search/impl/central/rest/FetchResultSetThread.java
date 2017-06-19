@@ -4,6 +4,8 @@ import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.CentralRepoJsonResponse;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.JsonArtifactDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,9 +18,7 @@ import java.util.List;
  */
 public class FetchResultSetThread extends Thread {
 
-    private final int start;
-
-    private final int rows;
+    private static final Logger logger = LoggerFactory.getLogger(FetchResultSetThread.class.getName());
 
     private QueryBuilder queryBuilder;
 
@@ -31,8 +31,6 @@ public class FetchResultSetThread extends Thread {
      * @param rows How many results should be fetched.
      */
     public FetchResultSetThread(QueryBuilder queryBuilder, int start, int rows) {
-        this.start = start;
-        this.rows = rows;
         this.queryBuilder = queryBuilder;
         foundArtifacts = new ArrayList<>();
         this.queryBuilder = this.queryBuilder.addAdditionalParameter(AdditionalQueryParam.ROWS, Integer.toString(rows));
@@ -47,8 +45,6 @@ public class FetchResultSetThread extends Thread {
      */
     public FetchResultSetThread(QueryBuilder queryBuilder) {
         this.queryBuilder = queryBuilder;
-        this.rows = 0;
-        this.start = 0;
     }
 
     @Override
@@ -65,6 +61,7 @@ public class FetchResultSetThread extends Thread {
             }
         } catch (ServerErrorException e) {
             // error
+            logger.error("Exception while downloading a json response: {}.", e.getMessage());
         }
 
         // parse results

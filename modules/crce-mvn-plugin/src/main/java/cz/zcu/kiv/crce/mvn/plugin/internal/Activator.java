@@ -1,12 +1,11 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.plugin.Plugin;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.plugin.Plugin;
 
 /**
  * Activator class required by crce.

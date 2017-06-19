@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.webui.internal;
 
+import cz.zcu.kiv.crce.mvn.plugin.search.Configurable;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenResolver;
@@ -63,9 +64,6 @@ public class MavenServlet extends HttpServlet {
     public static final String COORD_SEARCH = "coord-search";
     public static final String PACKAGE_SEARCH = "package-search";
 
-    private MavenLocator locator = new CentralMavenRestLocator();
-    private MavenAetherResolver resolver = new MavenAetherResolver();
-
     private Map<String, String> parameters;
 
     @Override
@@ -76,14 +74,17 @@ public class MavenServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        MavenLocator locator = new CentralMavenRestLocator();
+        MavenAetherResolver resolver = new MavenAetherResolver();
+
         // first of all load configuration if needed
-        loadConfiguration(req, resp);
+        loadConfiguration(req, resp, resolver);
 
         // search by coordinates or package name?
         if(parameters.containsKey(COORD_SEARCH)) {
-            searchByCoordinates(req, resp);
+            searchByCoordinates(req, resp, locator, resolver);
         } else if (parameters.containsKey(PACKAGE_SEARCH)) {
-            searchByPackageName(req, resp);
+            searchByPackageName(req, resp, locator, resolver);
         } else  {
             String msg = "Unknown action.";
             logger.debug(msg);
@@ -100,7 +101,7 @@ public class MavenServlet extends HttpServlet {
      * @param req Request.
      * @param resp Response.
      */
-    private void loadConfiguration(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void loadConfiguration(HttpServletRequest req, HttpServletResponse resp, Configurable resolver) throws ServletException, IOException {
         parameters = new HashMap<>();
         try {
             List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
@@ -130,7 +131,7 @@ public class MavenServlet extends HttpServlet {
     /**
      * Handles searching by maven coordinates.
      */
-    private void searchByCoordinates(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void searchByCoordinates(HttpServletRequest req, HttpServletResponse resp, MavenLocator locator, MavenResolver resolver) throws ServletException, IOException {
         String gid = parameters.get(GROUP_ID_PARAM);
         String aid = parameters.get(ARTIFACT_ID_PARAM);
         String ver = parameters.get(VERSION_PARAM);
@@ -180,7 +181,7 @@ public class MavenServlet extends HttpServlet {
     /**
      * Handles searching by package name.
      */
-    private void searchByPackageName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    private void searchByPackageName(HttpServletRequest req, HttpServletResponse resp, MavenLocator locator, MavenResolver resolver) throws ServletException, IOException {
         logger.debug("Searching for maven artifacts by package name...");
         String packageName = parameters.get(PACKAGE_NAME_PARAM);
         String versionFilter = parameters.get(PACKAGE_VERSION_FILTER);
@@ -275,6 +276,5 @@ public class MavenServlet extends HttpServlet {
     private void displayFeedback(HttpServletRequest req, HttpServletResponse resp, String feedbackName, String feedback) throws ServletException, IOException {
         req.setAttribute(feedbackName, feedback);
         req.getRequestDispatcher("resource?link=maven").forward(req, resp);
-        return;
     }
 }

@@ -19,15 +19,18 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 
 /**
  * This class is used instead of FileUtil from felix bundlerepository which somehow causes errors when running crce.
@@ -49,7 +52,9 @@ public class FileUtil
     public static boolean isFilePresentInJar(String pathToJar, String filename) throws IOException {
         JarFile jar = new JarFile(pathToJar);
         JarEntry entry = jar.getJarEntry(filename);
-        return  entry != null;
+        boolean res = entry != null;
+        jar.close();
+        return res;
     }
 
     /**
@@ -61,64 +66,65 @@ public class FileUtil
      * @throws IOException Thrown when bad stuff happens.
      */
     public static void addPomToJar(String pathToJar, String pathToPom) throws IOException {
-        Map<String, String> env = new HashMap<>();
-//        env.put("create", "true");
+        // apparently this method shown here: http://docs.oracle.com/javase/7/docs/technotes/guides/io/fsp/zipfilesystemprovider.html
+        // doesn't work at all, but the solution below works just fine
 
-        // locate the jar and create file system
-        URI uri = URI.create("jar:file:"+Paths.get(pathToJar).toUri().getPath());
-        FileSystem jarfs = FileSystems.newFileSystem(uri,env);
+        // create file with pom
+        File pomFile = new File(pathToPom);
 
-        // locate other file and create filename in the archive
-        Path otherFile = Paths.get(pathToPom);
-        Path pathInJar = jarfs.getPath("/pom.xml");
+        // open jar file
+        FileOutputStream out = new FileOutputStream(pathToJar);
+        JarOutputStream jarOut = new JarOutputStream(out);
 
-        // copy the pom to the archive
-        Files.copy(otherFile, pathInJar, StandardCopyOption.REPLACE_EXISTING);
+        // create new entry
+        JarEntry pomEntry = new JarEntry(pomFile.getName());
+        pomEntry.setTime(pomFile.lastModified());
+        jarOut.putNextEntry(pomEntry);
+
+        // write pom file to archive
+        FileInputStream in = new FileInputStream(pomFile);
+        while(in.available() > 0) {
+            jarOut.write(in.read());
+        }
+        in.close();
+        jarOut.close();
+        out.close();
     }
 
-    public static void unjar(JarInputStream jis, File dir)
-        throws IOException
-    {
-        // Reusable buffer.
-        byte[] buffer = new byte[4096];
+    /**
+     * Extracts the contents of jar file to the targetDir. If the targetDir doesn't exist
+     * it will be created.
+     *
+     * @param jarFileName Name of the jar file.
+     * @param targetDir Target directory.
+     */
+    public static void unJar(String jarFileName, String targetDir) throws IOException {
+        JarFile jar = new JarFile(jarFileName);
+        Enumeration<JarEntry> enumEntries = jar.entries();
 
-        // Loop through JAR entries.
-        for (JarEntry je = jis.getNextJarEntry();
-             je != null;
-             je = jis.getNextJarEntry())
-        {
-            if (je.getName().startsWith("/"))
-            {
-                throw new IOException("JAR resource cannot contain absolute paths.");
-            }
+        // check the target dir
+        File target = new File(targetDir);
+        if(!target.exists()) {
+            target.mkdir();
+        }
 
-            File target = new File(dir, je.getName());
-
-            // Check to see if the JAR entry is a directory.
-            if (je.isDirectory())
-            {
-                if (!target.exists())
-                {
-                    if (!target.mkdirs())
-                    {
-                        throw new IOException("Unable to create target directory: "
-                            + target);
-                    }
-                }
-                // Just continue since directories do not have content to copy.
+        while(enumEntries.hasMoreElements()) {
+            JarEntry entry = enumEntries.nextElement();
+            File f = new File(targetDir + File.separator + entry.getName());
+            if(entry.isDirectory()) {
+                f.mkdir();
                 continue;
             }
 
-            int lastIndex = je.getName().lastIndexOf('/');
-            String name = (lastIndex >= 0) ?
-                je.getName().substring(lastIndex + 1) : je.getName();
-            String destination = (lastIndex >= 0) ?
-                je.getName().substring(0, lastIndex) : "";
-
-            // JAR files use '/', so convert it to platform separator.
-            destination = destination.replace('/', File.separatorChar);
-            copy(jis, dir, name, destination, buffer);
+            InputStream is = jar.getInputStream(entry);
+            FileOutputStream out = new FileOutputStream(f);
+            while(is.available() > 0) {
+                out.write(is.read());
+            }
+            out.close();
+            is.close();
         }
+        jar.close();
     }
 
     public static void copy(

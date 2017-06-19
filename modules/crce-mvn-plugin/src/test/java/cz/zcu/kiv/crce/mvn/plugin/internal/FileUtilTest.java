@@ -54,9 +54,37 @@ public class FileUtilTest {
         // check that the copy now contains pom.xml
         assertTrue("Working copy should now contain pom.xml!", FileUtil.isFilePresentInJar(jarWithoutFileCopy, filename));
 
+        // check that the original pom still exists
+        File pomFile = new File(pathToPom);
+        assertTrue("Original pom file should still exist!", pomFile.exists());
+
         // delete working copy
         File f = new File(jarWithoutFileCopy);
         f.delete();
+    }
+
+    @Test
+    public void testUnjar() throws IOException {
+        // test jar contains only pom.xml and META-INF/MANIFEST.MF files
+        String testJar = "/test-jar.jar";
+        String dir = "D:/tmp/bp/test/test-jar-dir";
+        String expectedFile = dir+"/pom.xml";
+        String expectedFile2 = dir+"/META-INF/MANIFEST.MF";
+
+        // delete the target dir if it exists
+        File targetDir = new File(dir);
+        if(targetDir.exists()) {
+            targetDir.delete();
+        }
+
+        // unjar
+        FileUtil.unJar(getResource(testJar).getPath(), dir);
+
+        File f = new File(expectedFile);
+        File f2 = new File(expectedFile2);
+        assertTrue("Target dir should exist!", targetDir.exists());
+        assertTrue("Pom.xml should exist in unzipped archive!", f.exists());
+        assertTrue("Manifest file should exist in unzipped archive!", f2.exists());
     }
 
     /**
