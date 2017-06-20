@@ -1,1 +1,10 @@
-test pom
+<project>
+    <modelVersion >4.0.0</modelVersion>
+    <groupId>org.zcu.thesis</groupId>
+    <artifactId>thesis</artifactId>
+    <version>0.1</version>
+    <packaging>jar</packaging>
+</project>
+
+
+

@@ -70,10 +70,14 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
      * @return Repository system.
      */
     private static RepositorySystem newRepositorySystem() {
-        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
-        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
-        locator.addService( TransporterFactory.class, FileTransporterFactory.class );
+        DefaultServiceLocator locator = MavenRepositorySystemUtils
+                                        .newServiceLocator();
+        locator.addService(RepositoryConnectorFactory.class,
+                BasicRepositoryConnectorFactory.class);
+        locator.addService( TransporterFactory.class,
+                HttpTransporterFactory.class );
+        locator.addService( TransporterFactory.class,
+                FileTransporterFactory.class );
 
         return locator.getService(RepositorySystem.class);
     }
