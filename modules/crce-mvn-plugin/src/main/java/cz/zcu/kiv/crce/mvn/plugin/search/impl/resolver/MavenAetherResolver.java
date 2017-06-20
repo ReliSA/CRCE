@@ -294,15 +294,15 @@ public class MavenAetherResolver implements MavenResolver, Configurable {
         return res;
     }
 
-private RepositorySystem repositorySystem = null;
 private List<RemoteRepository> repositories = new ArrayList<>();
+    RepositorySystem repositorySystem = newRepositorySystem();
+    RepositorySystemSession session = newSession(repositorySystem);
 private static RepositorySystemSession newSession(RepositorySystem repositorySystem) {
     return null;
 }
 
+
 public Artifact resolve(String groupId, String artifactId, String version) {
-    RepositorySystem repositorySystem = newRepositorySystem();
-    RepositorySystemSession session = newSession(repositorySystem);
     Artifact artifact = new DefaultArtifact(groupId,
             artifactId,
             "jar",
