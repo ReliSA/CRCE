@@ -302,7 +302,8 @@ private static RepositorySystemSession newSession(RepositorySystem repositorySys
 }
 
 
-public Artifact resolve(String groupId, String artifactId, String version) {
+public Artifact resolve(String groupId, String artifactId,
+                        String version) {
     Artifact artifact = new DefaultArtifact(groupId,
             artifactId,
             "jar",
