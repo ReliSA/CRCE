@@ -300,8 +300,7 @@ private static RepositorySystemSession newSession(RepositorySystem repositorySys
     return null;
 }
 
-public Artifact resolve(String groupId, String artifactId, String version)
-{
+public Artifact resolve(String groupId, String artifactId, String version) {
     RepositorySystem repositorySystem = newRepositorySystem();
     RepositorySystemSession session = newSession(repositorySystem);
     Artifact artifact = new DefaultArtifact(groupId,
@@ -318,10 +317,8 @@ public Artifact resolve(String groupId, String artifactId, String version)
         artifactResult = repositorySystem.resolveArtifact(session,
                 artifactRequest);
     } catch (ArtifactResolutionException e) {
-        e.printStackTrace();
         return null;
     }
-
     return artifactResult.getArtifact();
 }
 
