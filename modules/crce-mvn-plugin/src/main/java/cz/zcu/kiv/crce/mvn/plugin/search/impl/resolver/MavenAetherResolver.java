@@ -88,17 +88,19 @@ private static RepositorySystem newRepositorySystem() {
      * @param system Initialized repository system.
      * @return Repository session.
      */
-    private static RepositorySystemSession newSession(
-            RepositorySystem system,
-            String localRepositoryPath)
-    {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils
-                                                .newSession();
-        LocalRepository localRepo = new LocalRepository( localRepositoryPath );
-        session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
+private static RepositorySystemSession newSession(
+        RepositorySystem system,
+        String localRepositoryPath)
+{
+    DefaultRepositorySystemSession session =
+            MavenRepositorySystemUtils.newSession();
+    LocalRepository localRepo =
+            new LocalRepository(localRepositoryPath);
+    session.setLocalRepositoryManager(system
+            .newLocalRepositoryManager(session, localRepo));
 
-        return session;
-    }
+    return session;
+}
 
     private static String getNRepoId(int n) {
         return String.format(REPOSITORY_N_ID_PROPERTY_NAME, n);
