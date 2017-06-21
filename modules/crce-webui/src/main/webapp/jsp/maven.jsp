@@ -87,10 +87,10 @@
                 </tr>
             </table>
 
-    		<h3>Search by package name</h3>
+    		<h3>Search by fully qualified name</h3>
             <table>
                 <tr>
-                    <td><label for="pname">Package name:</label></td>
+                    <td><label for="pname">Fully qualified name:</label></td>
                     <td><input type="text" id="pname" name="pname"></td>
                 </tr>
 
