@@ -2,10 +2,8 @@ package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.MavenLocator;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.CentralRepoJsonResponse;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.JsonArtifactDescriptor;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,25 +40,13 @@ public class CentralMavenRestLocator implements MavenLocator {
     public FoundArtifact locate(String groupId, String artifactId, String version) {
         logger.debug("Locating artifact.");
         QueryBuilder qb = QueryBuilder.createStandard(groupId, artifactId, version);
-        CentralRepoJsonResponse jsonResponse = null;
-        try {
-            jsonResponse = restConsumer.getJson(qb);
-        } catch (ServerErrorException e) {
+        int foundArtifactCount = getResultsCounts(qb);
+
+        if(foundArtifactCount == 0) {
             return null;
         }
 
-        if(jsonResponse.getResponse().getNumFound() == 0 ) {
-            // no artifact found
-            return null;
-        }
-
-        // convert the found artifact
-        JsonArtifactDescriptor artifactDescriptor = jsonResponse.getResponse().getDocs()[0];
-        return new SimpleFoundArtifact(artifactDescriptor.getG(),
-                artifactDescriptor.getA(),
-                artifactDescriptor.getV(),
-                artifactDescriptor.jarDownloadLink(),
-                artifactDescriptor.pomDownloadLink());
+        return fetchResults(qb, foundArtifactCount).iterator().next();
     }
 
     @Override
@@ -72,28 +58,12 @@ public class CentralMavenRestLocator implements MavenLocator {
                 .addParameter(QueryParam.GROUP_ID, groupId)
                 .addParameter(QueryParam.ARTIFACT_ID, artifactId)
                 .addStandardAdditionalParameters();
-        CentralRepoJsonResponse jsonResponse = null;
-        try {
-            jsonResponse = restConsumer.getJson(qb);
-        } catch (ServerErrorException e) {
-            return foundArtifacts;
+        int foundArtifactsCount = getResultsCounts(qb);
+        if(foundArtifactsCount == 0) {
+            return  foundArtifacts;
         }
 
-        if(jsonResponse.getResponse().getNumFound() == 0 ) {
-            // no artifact found
-            return foundArtifacts;
-        }
-
-        // convert the found artifacts
-        for(JsonArtifactDescriptor ad : jsonResponse.getResponse().getDocs()) {
-            foundArtifacts.add(new SimpleFoundArtifact(ad.getG(),
-                    ad.getA(),
-                    ad.getV(),
-                    ad.jarDownloadLink(),
-                    ad.pomDownloadLink()));
-        }
-
-        return foundArtifacts;
+        return fetchResults(qb, foundArtifactsCount);
     }
 
     @Override
@@ -115,15 +85,8 @@ public class CentralMavenRestLocator implements MavenLocator {
                 qb = new QueryBuilder()
                         .addParameter(QueryParam.CLASS_NAME, includedPackage)
                         .addParameter(QueryParam.GROUP_ID, groupId)
-                        .addStandardAdditionalParameters()
-                        .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-                CentralRepoJsonResponse jsonResponse = null;
-                try {
-                    jsonResponse = restConsumer.getJson(qb);
-                } catch (ServerErrorException e) {
-                    return foundArtifacts;
-                }
-                foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+                        .addStandardAdditionalParameters();
+                foundArtifactsCount = getResultsCounts(qb);
 
                 String[] tmp = groupId.split("\\.");
 
@@ -143,15 +106,8 @@ public class CentralMavenRestLocator implements MavenLocator {
             qb = new QueryBuilder()
                     .addParameter(QueryParam.CLASS_NAME, includedPackage)
                     .addParameter(QueryParam.GROUP_ID, groupIdFilter)
-                    .addStandardAdditionalParameters()
-                    .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-            CentralRepoJsonResponse jsonResponse = null;
-            try {
-                jsonResponse = restConsumer.getJson(qb);
-            } catch (ServerErrorException e) {
-                return foundArtifacts;
-            }
-            foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+                    .addStandardAdditionalParameters();
+            foundArtifactsCount = getResultsCounts(qb);
             if(foundArtifactsCount == 0) {
                 return foundArtifacts;
             }
@@ -159,47 +115,16 @@ public class CentralMavenRestLocator implements MavenLocator {
             // no groupId filter
             qb = new QueryBuilder()
                     .addParameter(QueryParam.CLASS_NAME, includedPackage)
-                    .addStandardAdditionalParameters()
-                    .addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
-            CentralRepoJsonResponse jsonResponse = null;
-            try {
-                jsonResponse = restConsumer.getJson(qb);
-            } catch (ServerErrorException e) {
-                return foundArtifacts;
-            }
-            foundArtifactsCount = jsonResponse.getResponse().getNumFound();
-            if(foundArtifactsCount == 0 ) {
-                // no artifact found
+                    .addStandardAdditionalParameters();
+            foundArtifactsCount = getResultsCounts(qb);
+            if(foundArtifactsCount == 0) {
                 return foundArtifacts;
             }
         }
 
 
         // fetch found artifacts
-        int start = 0;
-        int threadCount = Math.max(1, (int)Math.ceil((double)foundArtifactsCount / MAX_ARTIFACTS_PER_QUERY));
-        List<FetchResultSetThread> threadPool = new ArrayList<>(threadCount);
-
-        // start downloading threads
-        for (int i = 0; i < threadCount; i++) {
-            logger.debug("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
-            FetchResultSetThread t = new FetchResultSetThread(qb.clone(), start, MAX_ARTIFACTS_PER_QUERY);
-            threadPool.add(t);
-            t.start();
-            start += MAX_ARTIFACTS_PER_QUERY;
-        }
-
-        // join threads and get found artifacts
-        for (FetchResultSetThread t : threadPool) {
-            try {
-                t.join();
-                foundArtifacts.addAll(t.getFoundArtifacts());
-            } catch (InterruptedException e) {
-                logger.error("Error while joining result downloading thread: "+e.getMessage());
-            }
-        }
-
-        return foundArtifacts;
+        return fetchResults(qb, foundArtifactsCount);
     }
 
     @Override
@@ -233,6 +158,60 @@ public class CentralMavenRestLocator implements MavenLocator {
             }
         }
         return filtered;
+    }
+
+    /**
+     * Performs the query with ROWS=0 parameter to get the total number of found results.
+     *
+     * @param qb QueryBuilder with prepared search criteria.
+     * @return Total number of found results.
+     */
+    private int getResultsCounts(QueryBuilder qb) {
+
+        qb.addAdditionalParameter(AdditionalQueryParam.ROWS,"0");
+        CentralRepoJsonResponse jsonResponse = null;
+        try {
+            jsonResponse = restConsumer.getJson(qb);
+        } catch (ServerErrorException e) {
+            return 0;
+        }
+        int foundArtifactsCount = jsonResponse.getResponse().getNumFound();
+        return foundArtifactsCount;
+    }
+
+    /**
+     * Fetch results in download threads.
+     *
+     * @param qb QueryBuilder with prepared search criteria.
+     * @param foundArtifactsCount Number of found results to be downloaded.
+     * @return Downloaded results.
+     */
+    private Collection<FoundArtifact> fetchResults(QueryBuilder qb, int foundArtifactsCount) {
+        int start = 0;
+        int threadCount = Math.max(1, (int)Math.ceil((double)foundArtifactsCount / MAX_ARTIFACTS_PER_QUERY));
+        List<FetchResultSetThread> threadPool = new ArrayList<>(threadCount);
+        List<FoundArtifact> foundArtifacts = new ArrayList<>();
+
+        // start downloading threads
+        for (int i = 0; i < threadCount; i++) {
+            logger.debug("Starting result downloading thread for "+MAX_ARTIFACTS_PER_QUERY+" results starting at "+start);
+            FetchResultSetThread t = new FetchResultSetThread(qb.clone(), start, MAX_ARTIFACTS_PER_QUERY);
+            threadPool.add(t);
+            t.start();
+            start += MAX_ARTIFACTS_PER_QUERY;
+        }
+
+        // join threads and get found artifacts
+        for (FetchResultSetThread t : threadPool) {
+            try {
+                t.join();
+                foundArtifacts.addAll(t.getFoundArtifacts());
+            } catch (InterruptedException e) {
+                logger.error("Error while joining result downloading thread: "+e.getMessage());
+            }
+        }
+
+        return foundArtifacts;
     }
 
     /**

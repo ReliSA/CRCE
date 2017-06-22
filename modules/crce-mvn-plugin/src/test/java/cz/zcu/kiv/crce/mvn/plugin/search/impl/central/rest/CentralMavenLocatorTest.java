@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
+import com.fasterxml.jackson.databind.deser.impl.NoClassDefFoundDeserializer;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
@@ -262,6 +263,32 @@ public class CentralMavenLocatorTest {
 
         assertNotNull("Null returned!", artifacts);
         assertTrue("No artifacts expected for manual groupId filter "+groupIdFilter+"!", artifacts.isEmpty());
+    }
+
+    @Test
+    public void testLocateArtifactVersionFilter() {
+        String groupId = "org.hibernate";
+        String artifactId = "hibernate-core";
+        String lowestVersion = "3.3.0.CR1";
+        String highestVersion = "5.2.10.Final";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+        Collection<FoundArtifact> foundArtifacts = locator.locate(groupId, artifactId);
+        assertNotNull("Null returned!", foundArtifacts);
+        Collection<FoundArtifact> lowestVersions = locator.filter(foundArtifacts, VersionFilter.LOWEST_ONLY);
+        Collection<FoundArtifact> highestVersions = locator.filter(foundArtifacts, VersionFilter.HIGHEST_ONLY);
+
+        assertEquals("Only 1 artifact in lowestVersions expected!", 1, lowestVersions.size());
+        FoundArtifact fa = lowestVersions.iterator().next();
+        assertEquals("Wrong groupId of lowest version!", groupId, fa.getGroupId());
+        assertEquals("Wrong artifactId of lowest version!", artifactId, fa.getArtifactId());
+        assertEquals("Wrong version of lowest version!", lowestVersion, fa.getVersion());
+
+        assertEquals("Only 1 artifact in highestVersions expected!", 1, highestVersions.size());
+        fa = highestVersions.iterator().next();
+        assertEquals("Wrong groupId of highest version!", groupId, fa.getGroupId());
+        assertEquals("Wrong artifactId of highest version!", artifactId, fa.getArtifactId());
+        assertEquals("Wrong version of highest version!", highestVersion, fa.getVersion());
     }
 
 }
