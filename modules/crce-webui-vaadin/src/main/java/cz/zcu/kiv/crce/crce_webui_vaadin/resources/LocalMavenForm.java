@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin;
+package cz.zcu.kiv.crce.crce_webui_vaadin.resources;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.MarginInfo;

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin;
+package cz.zcu.kiv.crce.crce_webui_vaadin.resources;
 
 import java.io.Serializable;
 import java.util.EnumSet;

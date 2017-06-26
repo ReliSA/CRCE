@@ -28,10 +28,10 @@ public class MenuForm extends FormLayout{
 		upload.addItem("File", e ->{myUI.setContentBodyLoadFile();});
 		
 		// submenu repository
-		repository.addItem("Refresh", null);
+		repository.addItem("Plugins", e ->{myUI.setContentBodyPlugins();});
 		
 		// submenu settings
-		settings.addItem("Repository", e ->{myUI.setContentSettings();});
+		settings.addItem("Paths", e ->{myUI.setContentSettings();});
 		
 		headHL.addComponents(logo,menu);
 		headHL.setComponentAlignment(menu,Alignment.MIDDLE_LEFT);

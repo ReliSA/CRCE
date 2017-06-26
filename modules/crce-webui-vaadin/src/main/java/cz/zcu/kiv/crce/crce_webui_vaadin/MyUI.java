@@ -9,6 +9,12 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import cz.zcu.kiv.crce.crce_webui_vaadin.repository.PluginsForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.CentralMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.DefinedMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.LoadFileForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.LocalMavenForm;
+
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
  * (or tab) or some part of a html page where a Vaadin application is embedded.
@@ -25,6 +31,7 @@ public class MyUI extends UI {
 	private LocalMavenForm localMavenForm = new LocalMavenForm();
 	private CentralMavenForm centralMavenForm = new CentralMavenForm();
 	private DefinedMavenForm definedMavenForm = new DefinedMavenForm();
+	private PluginsForm pluginsForm = new PluginsForm();
 	private SettingsForm settingsForm = new SettingsForm();
 	
 	
@@ -70,6 +77,10 @@ public class MyUI extends UI {
     
     public void setContentBodyLoadFile(){
     	body.setContent(loadFileForm);
+    }
+    
+    public void setContentBodyPlugins(){
+    	body.setContent(pluginsForm);
     }
     
     public void setContentSettings(){
