@@ -149,17 +149,6 @@ public class CentralMavenRestLocator implements MavenLocator {
         }
     }
 
-    @Override
-    public Collection<FoundArtifact> filter(Collection<FoundArtifact> foundArtifacts, String groupId) {
-        List<FoundArtifact> filtered = new ArrayList<>();
-        for(FoundArtifact fa : foundArtifacts) {
-            if(fa.getGroupId().matches(groupId+"(.*)")) {
-               filtered.add(fa);
-            }
-        }
-        return filtered;
-    }
-
     /**
      * Performs the query with ROWS=0 parameter to get the total number of found results.
      *

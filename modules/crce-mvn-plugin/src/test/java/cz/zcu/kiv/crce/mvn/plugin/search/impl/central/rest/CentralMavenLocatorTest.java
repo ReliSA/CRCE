@@ -1,16 +1,12 @@
 package cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest;
 
-import com.fasterxml.jackson.databind.deser.impl.NoClassDefFoundDeserializer;
 import cz.zcu.kiv.crce.mvn.plugin.search.FoundArtifact;
-import cz.zcu.kiv.crce.mvn.plugin.search.impl.SimpleFoundArtifact;
 import cz.zcu.kiv.crce.mvn.plugin.search.impl.VersionFilter;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -107,23 +103,6 @@ public class CentralMavenLocatorTest {
         assertNotNull("Null returned!",artifacts);
         assertFalse("No artifacts containing package "+packageName+" found!", artifacts.isEmpty());
         assertTrue("Wrong number of artifacts ("+artifacts.size()+"!", artifacts.size() < expCount);
-    }
-
-    @Test
-    public void testGroupIdFilter() {
-        Collection<FoundArtifact> foundArtifacts = new ArrayList<>();
-        foundArtifacts.add(new SimpleFoundArtifact("asdf","","","",""));
-        foundArtifacts.add(new SimpleFoundArtifact("test.group","","","",""));
-        foundArtifacts.add(new SimpleFoundArtifact("groupId","","","",""));
-        FoundArtifact fa = new SimpleFoundArtifact("test.group.id.artifact", "", "", "", "");
-        foundArtifacts.add(fa);
-        String groupIdFilter = "test.group.id";
-
-        CentralMavenRestLocator locator = new CentralMavenRestLocator();
-        foundArtifacts = locator.filter(foundArtifacts, groupIdFilter);
-
-        assertEquals("Only one item expected to pass!", 1, foundArtifacts.size());
-        assertTrue("Artifact with correct groupId should be included!", foundArtifacts.contains(fa));
     }
 
     @Test
