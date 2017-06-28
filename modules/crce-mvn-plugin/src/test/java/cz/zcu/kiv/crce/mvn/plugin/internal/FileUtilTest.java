@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.mvn.plugin.internal;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -68,6 +69,7 @@ public class FileUtilTest {
     }
 
     @Test
+    @Ignore
     public void testUnjar() throws FileUtilOperationException, IOException {
         // test jar contains only pom.xml and META-INF/MANIFEST.MF files
         String testJar = "/test-jar.jar";

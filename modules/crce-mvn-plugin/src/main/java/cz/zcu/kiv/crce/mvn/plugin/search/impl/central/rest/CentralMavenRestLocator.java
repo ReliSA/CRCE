@@ -91,7 +91,7 @@ public class CentralMavenRestLocator implements MavenLocator {
                 String[] tmp = groupId.split("\\.");
 
                 // groupId can't be any shorter
-                if(tmp.length  < 1) {
+                if(tmp.length  <= 1) {
                     break;
                 }
                 StringBuilder sb = new StringBuilder();

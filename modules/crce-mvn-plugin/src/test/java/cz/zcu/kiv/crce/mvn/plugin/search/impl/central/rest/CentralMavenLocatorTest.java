@@ -117,6 +117,17 @@ public class CentralMavenLocatorTest {
     }
 
     @Test
+    public void testLocateArtifactByIncludedPackageBad2() {
+        String badPackageName = "asdasdasdagasd";
+
+        CentralMavenRestLocator locator = new CentralMavenRestLocator();
+
+        Collection<FoundArtifact> artifacts = locator.locate(badPackageName, true);
+        assertNotNull("Null returned!", artifacts);
+        assertTrue("Artifacts containing package "+badPackageName+" found!", artifacts.isEmpty());
+    }
+
+    @Test
     public void testFilterVersion() {
         String packageName = "org.hibernate.dialect.MimerSQLDialect";
 
@@ -152,7 +163,7 @@ public class CentralMavenLocatorTest {
     public void testLocateArtifactByIncludedPackageHighestGMatch() {
         String fc = "org.hibernate.dialect.MimerSQLDialect";
         String expectedGid = "org.hibernate";
-        int expCount = 174;
+        int expCount = 175;
 
         CentralMavenRestLocator locator = new CentralMavenRestLocator();
         Collection<FoundArtifact> foundArtifacts = locator.locate(fc, true);

@@ -5,7 +5,10 @@ import cz.zcu.kiv.crce.mvn.plugin.search.impl.central.rest.json.CentralRepoJsonR
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Zdenek Vales on 15.6.2017.
@@ -75,6 +78,7 @@ public class PerformanceTest {
      * Test differences in times needed to download set of results with and without paralelization.
      */
     @Test
+    @Ignore
     public void testThreadVsNonThreadPerformance() throws ServerErrorException {
         long nonParalelTime = 0L;
         long paralelTime = 0L;
