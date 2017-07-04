@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.vo.internal.dozer.convertor;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import org.dozer.DozerConverter;
 import org.dozer.Mapper;
@@ -68,7 +70,14 @@ public class RequirementConvertor extends DozerConverter<Requirement, GenericReq
 
         Attribute tmp;
         for (AttributeVO attribute : vo.getAttributes()) {
-            tmp = metadataFactory.createAttribute(new GenericAttributeType(attribute.getName(), attribute.getType()), attribute.getValue());
+            Object value;
+            //TODO refactor this
+            if(Objects.equals(attribute.getType(), "java.util.List")) {
+                value = Arrays.asList(attribute.getValue().split(","));
+            } else {
+                value = attribute.getValue();
+            }
+            tmp = metadataFactory.createAttribute(new GenericAttributeType(attribute.getName(), attribute.getType()), value);
             requirement.addAttribute(tmp);
         }
 

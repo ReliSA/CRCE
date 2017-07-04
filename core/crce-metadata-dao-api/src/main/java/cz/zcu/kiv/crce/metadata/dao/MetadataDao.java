@@ -37,8 +37,14 @@ public interface MetadataDao {
     @CheckForNull
     Resource loadResource(URI uri) throws IOException;
 
+    @CheckForNull
+    Resource loadResource(String uid, boolean withDetails) throws IOException;
+
     @Nonnull
-    List<Resource> loadResources(Repository repository) throws IOException;
+    List<Resource> loadResourcesWithoutCategory(String category, boolean withDetails) throws IOException;
+
+    @Nonnull
+    List<Resource> loadResources(Repository repository, boolean withDetails) throws IOException;
 
     /**
      * Loads all resources in the given repository and whose capabilities match the given filter (at least one capability must match).
@@ -48,7 +54,7 @@ public interface MetadataDao {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> loadResources(Repository repository, ResourceFilter filter) throws IOException;
+    List<Resource> loadResources(Repository repository, boolean withDetails, ResourceFilter filter) throws IOException;
 
     /**
      * Saves metadata of <code>Resource</code>.

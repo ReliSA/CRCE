@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
@@ -268,7 +269,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
-        List<Resource> resources = metadataDao.loadResources(repository);
+        List<Resource> resources = metadataDao.loadResources(repository, true);
         List<Resource> resourcesToCommit = pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(resources, this, store);
 
         List<Resource> commitedResources = new ArrayList<>();
@@ -380,27 +381,38 @@ public class BufferImpl implements Buffer, EventHandler {
     @Override
     public List<Resource> getResources() {
         try {
-            return metadataDao.loadResources(repository);
+            return metadataDao.loadResources(repository, true);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
         return Collections.emptyList();
     }
 
+    @Nullable
     @Override
-    public List<Resource> getResources(Requirement requirement) {
+    public Resource getResource(String uid, boolean withDetails) {
+        try {
+            return metadataDao.loadResource(uid, withDetails);
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement, boolean withDetails) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Nonnull
     @Override
-    public List<Resource> getResources(Set<Requirement> requirement) {
+    public List<Resource> getResources(Set<Requirement> requirement, boolean withDetails) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Nonnull
     @Override
-    public List<Resource> getPossibleResources(Set<Requirement> requirement) {
+    public List<Resource> getPossibleResources(Set<Requirement> requirement, boolean withDetails) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

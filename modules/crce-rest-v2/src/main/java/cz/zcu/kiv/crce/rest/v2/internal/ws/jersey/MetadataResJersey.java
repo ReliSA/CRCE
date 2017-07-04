@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -23,6 +24,7 @@ import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.v2.internal.Activator;
+import cz.zcu.kiv.crce.rest.v2.internal.Headers;
 import cz.zcu.kiv.crce.rest.v2.internal.ws.MetadataRes;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
@@ -58,7 +60,7 @@ public class MetadataResJersey implements MetadataRes {
     public Response metadata(@PathParam("name") String name) {
         logger.info("Serving /metadata/catalogue" + name + " GET request");
         Requirement r = Activator.instance().getMetadataService().createIdentityRequirement(name);
-        List<Resource> resources = Activator.instance().getStore().getResources(r);
+        List<Resource> resources = Activator.instance().getStore().getResources(r, false);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
         return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {
@@ -71,7 +73,7 @@ public class MetadataResJersey implements MetadataRes {
     public Response metadata(@PathParam("name") String name, @PathParam("version") String version) {
         logger.info("Serving /metadata/catalogue" + name + "/" + version + " GET request");
         Requirement r = Activator.instance().getMetadataService().createIdentityRequirement(name, version);
-        List<Resource> resources = Activator.instance().getStore().getResources(r);
+        List<Resource> resources = Activator.instance().getStore().getResources(r, true);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
         return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
@@ -84,14 +86,22 @@ public class MetadataResJersey implements MetadataRes {
         List<Requirement> requirements = Activator.instance().getMappingService().map(constraint.getRequirements());
 
         List<Resource> resources;
+        //ugly hack to measure experiment time
+        long duration = System.nanoTime();
         if(constraint.andRequirements()) {
-            resources = Activator.instance().getStore().getResources(new HashSet<>(requirements));
+            resources = Activator.instance().getStore().getResources(new HashSet<>(requirements), false);
         } else {
-            resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements));
+            resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements), false);
         }
+        duration = System.nanoTime() - duration;
+        duration = TimeUnit.NANOSECONDS.toMillis(duration);
+
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
-        return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
+        Response.ResponseBuilder b =  Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {});
+        b.header(Headers.REQUEST_DURATION, duration);
+
+        return b.build();
     }
 
     /**
@@ -105,15 +115,7 @@ public class MetadataResJersey implements MetadataRes {
     @Override
     public Response metadataDetails(@PathParam("id")String uuid) {
         logger.info("Serving /metadata/" + uuid + " GET request");
-        List<Resource> resources = Activator.instance().getStore().getResources();
-
-        Resource toRet = null;
-        for (Resource resource : resources) {
-            if(uuid.equals(resource.getId())) {
-                toRet = resource;
-                break;
-            }
-        }
+        Resource toRet = Activator.instance().getStore().getResource(uuid, true);
 
         if(toRet == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -138,7 +140,7 @@ public class MetadataResJersey implements MetadataRes {
         }
 
 
-        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version));
+        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version), true);
         List<Compatibility> diffs = new LinkedList<>();
 
         for (Resource re : res) {
@@ -162,7 +164,7 @@ public class MetadataResJersey implements MetadataRes {
             return createNotAvailableResponse();
         }
 
-        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version));
+        List<Resource> res = act.getStore().getResources(act.getMetadataService().createIdentityRequirement(externalId, version), true);
         List<Resource> compatible = new LinkedList<>();
         Resource tmp;
         for (Resource re : res) {

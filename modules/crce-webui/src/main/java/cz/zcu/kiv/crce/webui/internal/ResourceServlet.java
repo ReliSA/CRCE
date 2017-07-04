@@ -140,7 +140,7 @@ public class ResourceServlet extends HttpServlet {
                     resources = Activator.instance().getBuffer(req).getResources();
                 } else {
                     try {
-                        resources = Activator.instance().getBuffer(req).getResources(filter);
+                        resources = Activator.instance().getBuffer(req).getResources(filter, true);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
                         resources = Activator.instance().getBuffer(req).getResources();
@@ -181,7 +181,7 @@ public class ResourceServlet extends HttpServlet {
                     resources = Activator.instance().getStore(id).getResources();
                 } else {
                     try {
-                        resources = Activator.instance().getStore(id).getResources(filter);
+                        resources = Activator.instance().getStore(id).getResources(filter, false);
                     } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                         setError(session, false, errorMessage);
                         resources = Activator.instance().getStore(id).getResources();
@@ -235,7 +235,7 @@ public class ResourceServlet extends HttpServlet {
                 Version v = new Version(version);
                 resFilter.addAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION, v);
 
-                List<Resource> res = Activator.instance().getStore(id).getResources(resFilter);
+                List<Resource> res = Activator.instance().getStore(id).getResources(resFilter, false);
                 if (!res.isEmpty()) {
                     lower = Activator.instance().getCompatibilityService().listLowerCompatibilities(res.get(0));
                     Collections.sort(lower, CompatibilityVersionComparator.getBaseComparator());
@@ -279,7 +279,7 @@ public class ResourceServlet extends HttpServlet {
                 storeResources = Activator.instance().getStore(id).getResources();
             } else {
                 try {
-                    storeResources = Activator.instance().getStore(id).getResources(filter);
+                    storeResources = Activator.instance().getStore(id).getResources(filter, false);
                 } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
                     setError(session, false, filter + " is not a valid filter");
@@ -293,7 +293,7 @@ public class ResourceServlet extends HttpServlet {
                 bufferResources = Activator.instance().getBuffer(req).getResources();
             } else {
                 try {
-                    bufferResources = Activator.instance().getBuffer(req).getResources(filter);
+                    bufferResources = Activator.instance().getBuffer(req).getResources(filter, true);
                 } catch (Exception e) { // TODO there was catch of InvalidSyntaxException, why?
                     logger.warn("Invalid syntax", e);
                     setError(session, false, filter + " is not a valid filter");

@@ -21,10 +21,11 @@
         <namespace>cz.zcu.kiv.crce</namespace>
         <version.jdk>1.7</version.jdk>
         <version.maven>3.0.4</version.maven>
-        <version.mongodb>2.11.3</version.mongodb>
+        <version.mongodb>2.13.3</version.mongodb>
         <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
         <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web>
+        <version.jpa>1.0.0.Final</version.jpa>
         <version.org.apache.felix.dependencymanager>3.2.0</version.org.apache.felix.dependencymanager>
         <version.com.fasterxml.jackson>2.6.1</version.com.fasterxml.jackson>
         <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
@@ -224,6 +225,13 @@
                 <artifactId>pax-web-spi</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!-- JPA -->
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${version.jpa}</version>
             </dependency>
 
             <!-- === LOGGING === -->
@@ -670,6 +678,10 @@
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>
             <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+        <repository>
+            <id>tmatesoft</id>
+            <url>https://maven.tmatesoft.com/content/repositories/releases/</url>
         </repository>
     </repositories>
 

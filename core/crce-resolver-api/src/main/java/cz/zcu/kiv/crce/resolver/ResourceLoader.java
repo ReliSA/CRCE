@@ -19,7 +19,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
 public interface ResourceLoader {
 
     @Nonnull
-    List<Resource> getResources(Repository repository, Requirement requirement) throws IOException;
+    List<Resource> getResources(Repository repository, Requirement requirement, boolean withDetails) throws IOException;
 
     /**
      *
@@ -29,7 +29,7 @@ public interface ResourceLoader {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> getResources(Repository repository, Set<Requirement> requirement) throws IOException;
+    List<Resource> getResources(Repository repository, Set<Requirement> requirement, boolean withDetails) throws IOException;
 
     /**
      *
@@ -40,5 +40,5 @@ public interface ResourceLoader {
      * @throws IOException
      */
     @Nonnull
-    List<Resource> getResources(Repository repository, Set<Requirement> requirement, Operator op) throws IOException;
+    List<Resource> getResources(Repository repository, Set<Requirement> requirement, Operator op, boolean withDetails) throws IOException;
 }

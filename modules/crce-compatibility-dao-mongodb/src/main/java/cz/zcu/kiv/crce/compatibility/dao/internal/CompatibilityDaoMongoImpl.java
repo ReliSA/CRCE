@@ -1,18 +1,14 @@
 package cz.zcu.kiv.crce.compatibility.dao.internal;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 import org.bson.types.ObjectId;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -24,24 +20,18 @@ import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.compatibility.dao.internal.mapping.MongoCompatibilityMapper;
+import cz.zcu.kiv.crce.metadata.dao.mongodb.BaseMongoDao;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 /**
  * Implementation of CompatibilityDao for MongoDB.
  *
- * Implements ManagedService - change of database on air is supported. This feature is however
- * meant primarily for use during integration tests. Use with caution.
- *
- * Database access is thread safe due to MongoDB inner implementation. Currently whole database (DB instance) is
- * locked - multiple read locks and single write lock with higher priority than the read locks.
- * Read more at http://docs.mongodb.org/ecosystem/drivers/java-concurrency/
- * and http://docs.mongodb.org/manual/faq/concurrency/
  *
  * Date: 17.11.13
  *
  * @author Jakub Danek
  */
-public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedService {
+public class CompatibilityDaoMongoImpl extends BaseMongoDao implements CompatibilityDao {
 
     private static final Logger logger = LoggerFactory.getLogger(CompatibilityDaoMongoImpl.class);
     /*
@@ -52,66 +42,13 @@ public class CompatibilityDaoMongoImpl implements CompatibilityDao, ManagedServi
     private static final int V_HIGHER = 1;
     private static final int V_LOWER = 2;
 
-    /*
-            OSGi stuff
-     */
-    @Override
-    public void updated(Dictionary<String, ?> props) throws ConfigurationException {
-        String name = DbContext.DEFAULT_DB_NAME;
-
-        if ( props != null) {
-            Object o = props.get("cz.zcu.kiv.crce.mongodb.dbname");
-            if ( o != null )
-                 name = (String) o;
-        }
-
-        if ( !dbName.equals(name) ) {
-            logger.info("Changing database to: {}", name);
-            openDB(name);
-            logger.info("Database has been changed.");
-        }
-    }
-
-    /**
-     * Name of currently used database.
-     */
-    private volatile String dbName = DbContext.DEFAULT_DB_NAME;
-    /**
-     * Convenient collection reference
-     */
-    private DBCollection col;
-    /**
-     * Currently used database reference.
-     */
-    private DB db;
-    private Object dbLock;
-    /**
-     * MongoClient reference holding current connection.
-     */
-    private MongoClient client;
-
     private CompatibilityFactory factory; /*injected by DependencyManager*/
 
-    /**
-     * Creates new CompatibilityDao implementation for MongoDB
-     * @param client MongoDB driver client with open connection.
-     */
-    public CompatibilityDaoMongoImpl(MongoClient client) {
-        this.client = client;
-        this.dbLock = new Object();
-        openDB(dbName);
-    }
+    private DBCollection col;
 
-    /**
-     * Thread-safe method for switching database on-air.
-     * @param name name of the new database
-     */
-    private void openDB(String name) {
-        synchronized (dbLock) {
-            dbName = name;
-            db = client.getDB(name);
-            col = db.getCollection("compatibility");
-        }
+    public CompatibilityDaoMongoImpl(MongoClient client) {
+        super(client);
+        this.col = getCollection("compatibility");
     }
 
     @Override

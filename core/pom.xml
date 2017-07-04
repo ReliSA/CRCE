@@ -23,7 +23,7 @@
 
         <module>crce-metadata-json-impl</module>
         <module>crce-metadata-impl</module>
-        <module>crce-metadata-dao-impl</module>
+        <module>crce-metadata-dao-mongodb</module>
         <module>crce-metadata-indexer-impl</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-repository-impl</module>

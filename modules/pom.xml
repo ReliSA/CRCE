@@ -74,6 +74,8 @@
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
 
+        <module>crce-optimizer-functions</module>
+
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>

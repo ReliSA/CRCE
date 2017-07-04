@@ -18,6 +18,8 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
+import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter;
@@ -27,6 +29,8 @@ import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.ResultOptimizerVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
 
 /**
@@ -132,6 +136,50 @@ public class MappingServiceDozer implements MappingService {
         }
 
         return req;
+    }
+
+    @Nonnull
+    @Override
+    public List<CostFunctionDescriptorVO> mapCostFunction(List<CostFunctionFactory> descriptors) {
+        List<CostFunctionDescriptorVO> vos = new LinkedList<>();
+
+        CostFunctionDescriptorVO vo;
+        for (CostFunctionFactory descriptor : descriptors) {
+            vo = mapCostFunction(descriptor);
+            if(vo != null) {
+                vos.add(vo);
+            }
+        }
+
+        return vos;
+    }
+
+    @Nullable
+    @Override
+    public CostFunctionDescriptorVO mapCostFunction(@Nullable CostFunctionFactory descriptor) {
+        return descriptor != null ? mapper.map(descriptor, CostFunctionDescriptorVO.class) : null;
+    }
+
+    @Nonnull
+    @Override
+    public List<ResultOptimizerVO> mapResultOptimizer(List<ResultOptimizer> descriptors) {
+        List<ResultOptimizerVO> vos = new LinkedList<>();
+
+        ResultOptimizerVO vo;
+        for (ResultOptimizer descriptor : descriptors) {
+            vo = mapResultOptimizer(descriptor);
+            if(vo != null) {
+                vos.add(vo);
+            }
+        }
+
+        return vos;
+    }
+
+    @Nullable
+    @Override
+    public ResultOptimizerVO mapResultOptimizer(@Nullable ResultOptimizer descriptor) {
+        return descriptor != null ? mapper.map(descriptor, ResultOptimizerVO.class) : null;
     }
 
     /**

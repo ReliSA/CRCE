@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.apache.felix.dm.annotation.api.Component;
@@ -41,7 +42,6 @@ import cz.zcu.kiv.crce.metadata.dao.internal.mapper.ResolvingMapper;
 import cz.zcu.kiv.crce.metadata.dao.internal.mapper.SequenceMapper;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import javax.annotation.CheckForNull;
 
 /**
  *
@@ -73,6 +73,11 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
+    public Resource loadResource(String uid, boolean withDetails) throws IOException {
+        throw new UnsupportedOperationException("Too lazy to implement this.");
+    }
+
+    @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
         logger.debug("loadResource(uri={})", uri);
 
@@ -83,6 +88,29 @@ public class MetadataDaoImpl implements MetadataDao {
 
             if (dbResource != null) {
                 result = loadResource(dbResource, session);
+            }
+        } catch (PersistenceException e) {
+            throw new IOException("Could not load resource.", e);
+        }
+
+        logger.debug("loadResource(uri) returns {}", result);
+        return result;
+    }
+
+    @Override
+    public List<Resource> loadResourcesWithoutCategory(String category, boolean withDetails) throws IOException {
+        logger.debug("loadResourcesWithoutCateogry(category={})", category);
+
+        List<Resource> result = new ArrayList<>();
+
+        try (SqlSession session = sessionManager.getSession()) {
+            List<DbResource> dbResources = session.selectList(RESOURCE_MAPPER + "selectResourceByMissingCategory", category);
+
+            if (dbResources != null) {
+                for (DbResource dbResource : dbResources) {
+                    result.add(loadResource(dbResource, session));
+                }
+
             }
         } catch (PersistenceException e) {
             throw new IOException("Could not load resource.", e);
@@ -282,7 +310,7 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
-    public synchronized List<Resource> loadResources(Repository repository) throws IOException {
+    public synchronized List<Resource> loadResources(Repository repository, boolean withDetails) throws IOException {
         logger.debug("loadResources(repository={})", repository);
 
         List<Resource> result = Collections.emptyList();
@@ -315,7 +343,7 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
-    public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceFilter filter) throws IOException {
+    public List<Resource> loadResources(@Nonnull Repository repository, boolean withDetails, @Nonnull ResourceFilter filter) throws IOException {
         logger.debug("loadResources(repository={}, filter={})", repository,
                 logger.isTraceEnabled() ? filter.toString() :  "(" + filter.getCapabilityFilters().size() + ")");
 

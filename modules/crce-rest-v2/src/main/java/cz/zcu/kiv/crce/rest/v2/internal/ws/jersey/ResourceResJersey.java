@@ -58,7 +58,7 @@ public class ResourceResJersey implements ResourceRes {
     public Response resources(@PathParam("name")String name) {
         logger.info("Serving /resources/catalogue" + name + " GET request");
         Requirement r = Activator.instance().getMetadataService().createIdentityRequirement(name);
-        List<Resource> resources = Activator.instance().getStore().getResources(r);
+        List<Resource> resources = Activator.instance().getStore().getResources(r, false);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
         return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
@@ -70,7 +70,7 @@ public class ResourceResJersey implements ResourceRes {
     public Response resources(@PathParam("name")String name, @PathParam("version")String version) {
         logger.info("Serving /resources/catalogue" + name + "/" + version + " GET request");
         Requirement r = Activator.instance().getMetadataService().createIdentityRequirement(name, version);
-        List<Resource> resources = Activator.instance().getStore().getResources(r);
+        List<Resource> resources = Activator.instance().getStore().getResources(r, true);
         List<BasicResourceVO> vos = Activator.instance().getMappingService().mapBasic(resources);
 
         return Response.ok().entity(new GenericEntity<List<BasicResourceVO>>(vos) {}).build();
@@ -87,15 +87,7 @@ public class ResourceResJersey implements ResourceRes {
     @Path("{id}")
     public Response resourceBinary(@PathParam("id") String uuid) {
         logger.info("Serving /resources/" + uuid + " GET request");
-        List<Resource> resources = Activator.instance().getStore().getResources();
-
-        Resource toRet = null;
-        for (Resource resource : resources) {
-            if(uuid.equals(resource.getId())) {
-                toRet = resource;
-                break;
-            }
-        }
+        Resource toRet = Activator.instance().getStore().getResource(uuid, false);
 
         if(toRet == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

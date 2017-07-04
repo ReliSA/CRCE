@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -50,8 +51,15 @@ public interface Store {
     @Nonnull
     List<Resource> getResources();
 
+    /**
+     *
+     * @return resource with the given uid or null
+     */
+    @Nullable
+    Resource getResource(String uid, boolean withDetails);
+
     @Nonnull
-    List<Resource> getResources(Requirement requirement);
+    List<Resource> getResources(Requirement requirement, boolean withDetails);
 
     /**
      *
@@ -59,7 +67,7 @@ public interface Store {
      * @return resources that provide the whole set of requirements
      */
     @Nonnull
-    List<Resource> getResources(Set<Requirement> requirement);
+    List<Resource> getResources(Set<Requirement> requirement, boolean withDetails);
 
     /**
      *
@@ -67,7 +75,7 @@ public interface Store {
      * @return resources that provide at least a portion of the requirements
      */
     @Nonnull
-    List<Resource> getPossibleResources(Set<Requirement> requirement);
+    List<Resource> getPossibleResources(Set<Requirement> requirement, boolean withDetails);
 
 
     /**
