@@ -5,6 +5,7 @@ import org.apache.felix.dm.annotation.api.Property;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.FunctionProvider;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunction;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
 
@@ -19,7 +20,7 @@ import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
  */
 public class EqualCostFunction implements CostFunction {
 
-    protected static final String ID_VALUE = "equal-cost";
+    protected static final String ID_VALUE = "cf-equal-cost";
     protected static final String DESCRIPTION_VALUE = "Optimizes result set by the total amount of components (usually" +
             " you want to return as few components as possible in this scenario.";
 
@@ -40,8 +41,8 @@ public class EqualCostFunction implements CostFunction {
      */
     @Component(provides = CostFunctionFactory.class,
             properties = {
-                    @Property(name = CostFunctionFactory.ID, value = EqualCostFunction.ID_VALUE),
-                    @Property(name = CostFunctionFactory.DESCRIPTION, value = EqualCostFunction.DESCRIPTION_VALUE)
+                    @Property(name = FunctionProvider.ID, value = EqualCostFunction.ID_VALUE),
+                    @Property(name = FunctionProvider.DESCRIPTION, value = EqualCostFunction.DESCRIPTION_VALUE)
             })
     public static class ComponentCountFactory extends CostFunctionFactory {
 

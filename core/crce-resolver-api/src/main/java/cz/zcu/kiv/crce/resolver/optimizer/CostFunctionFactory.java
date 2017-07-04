@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.resolver.optimizer;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.plugin.FunctionProvider;
 
 /**
  * <p>
@@ -24,10 +25,7 @@ import cz.zcu.kiv.crce.metadata.Requirement;
  *
  * @author Jakub Danek
  */
-public abstract class CostFunctionFactory {
-    //property name constants, used e.g. for OSGi service specificaiton
-    public static final String ID = "cfId";
-    public static final String DESCRIPTION = "cfDescription";
+public abstract class CostFunctionFactory implements FunctionProvider {
 
     private final String id;
     private final String description;
@@ -41,6 +39,7 @@ public abstract class CostFunctionFactory {
      *
      * @return ID of the cost function
      */
+    @Override
     public String getId() {
         return id;
     }
@@ -49,6 +48,7 @@ public abstract class CostFunctionFactory {
      *
      * @return documentation of the configuration interface
      */
+    @Override
     public String getDescription() {
         return description;
     }
