@@ -13,6 +13,7 @@ public class NsResultOptimizer {
     public static final String NAMESPACE__RESULT_OPTIMIZER = "result.optimize-by";
 
     public static final AttributeType<String> ATTRIBUTE__FUNCTION_ID = new SimpleAttributeType<>("function-ID", String.class);
+    public static final AttributeType<String> ATTRIBUTE__METHOD_ID = new SimpleAttributeType<>("method-ID", String.class);
 
     /**
      * Optimization mode directive name

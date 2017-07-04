@@ -33,6 +33,7 @@ import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionRepository;
 import cz.zcu.kiv.crce.resolver.optimizer.NsResultOptimizer;
 import cz.zcu.kiv.crce.resolver.optimizer.OptimizationMode;
 import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
+import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizerRepository;
 
 /**
  *
@@ -47,7 +48,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
     @ServiceDependency private volatile MetadataDao metadataDao;
     @ServiceDependency private volatile MetadataFactory metadataFactory; // NOPMD will be used
     @ServiceDependency private volatile CostFunctionRepository costFunctionRepository;
-    @ServiceDependency(required = false) private volatile ResultOptimizer optimizer;
+    @ServiceDependency private volatile ResultOptimizerRepository optimizerRepository;
 
     @Override
     @Nonnull
@@ -71,15 +72,18 @@ public class ResourceLoaderImpl implements ResourceLoader {
             ResourceFilter filter = buildFilter(requirements, op);
             resources = metadataDao.loadResources(repository, withDetails, filter);
 
-            if(optimizer != null && optRequirement != null) {
+            if(optRequirement != null) {
+                ResultOptimizer optimizer = extractOptimizer(optRequirement);
                 CostFunction costFunction = extractCostFunction(optRequirement);
                 OptimizationMode mode = extractOptimizationMode(optRequirement);
 
-                if(costFunction != null) {
+                if(optimizer == null) {
+                    logger.info("Optimization request has been sent, yet no or unknown optimization method was specified!");
+                } else if(costFunction == null) {
+                    logger.info("Optimization request has been sent, yet no or unknown optimization function was specified!");
+                } else {
                     logger.debug("Optimizing resultset by cost function: {}", costFunction.getId());
                     resources = optimizer.optimizeResult(requirements, resources, costFunction, mode);
-                } else {
-                    logger.info("Optimization request has been sent, yet no or unknown optimization function was specified!");
                 }
             }
 
@@ -122,6 +126,22 @@ public class ResourceLoaderImpl implements ResourceLoader {
         OptimizationMode mode = OptimizationMode.parse(modeString);
 
         return mode != null ? mode : OptimizationMode.MIN;
+    }
+
+    /**
+     *
+     * @param requirement request specifying the optimization mode
+     * @return specified optimization mode or MIN (default)
+     */
+    @Nullable
+    private ResultOptimizer extractOptimizer(Requirement requirement) {
+        //TODO Requirement should implement AttributeProvider interface to avoid this
+        List<Attribute<String>> id = requirement.getAttributes(NsResultOptimizer.ATTRIBUTE__METHOD_ID);
+
+        if(id.isEmpty()) {
+            return null;
+        }
+        return optimizerRepository.findOne(id.get(0).getValue());
     }
 
     /**
