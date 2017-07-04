@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.rest.v2.internal.ws;
 
-import javax.ws.rs.core.Response;
+import java.util.List;
+
+import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
 
 /**
  * Date: 17.6.16
@@ -9,8 +11,8 @@ import javax.ws.rs.core.Response;
  */
 public interface CostFunctionRes {
 
-    Response findOne(String id);
+    CostFunctionDescriptorVO findOne(String id);
 
-    Response list();
+    List<CostFunctionDescriptorVO> list();
 
 }
