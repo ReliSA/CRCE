@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlValue;
  *
  * @author Jakub Danek
  */
-@XmlRootElement(name = "optimizer")
+@XmlRootElement(name = "optimizer-function")
 public class CostFunctionDescriptorVO implements Serializable {
 
     private String id;

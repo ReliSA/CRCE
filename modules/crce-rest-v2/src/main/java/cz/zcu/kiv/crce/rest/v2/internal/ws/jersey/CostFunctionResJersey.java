@@ -7,9 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
  *
  * @author Jakub Danek
  */
-@Path("/optimizers")
+@Path("/optimizers/functions")
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CostFunctionResJersey implements CostFunctionRes {
@@ -34,21 +32,19 @@ public class CostFunctionResJersey implements CostFunctionRes {
     @GET
     @Path("{id}")
     @Override
-    public Response findOne(@PathParam("id") String id) {
+    public CostFunctionDescriptorVO findOne(@PathParam("id") String id) {
         logger.debug("Searching for cost function with id: {}", id);
         CostFunctionFactory desc = Activator.instance().getCostFunctionRepository().findOne(id);
-        CostFunctionDescriptorVO vo = Activator.instance().getMappingService().mapCostFunction(desc);
-
-        return Response.ok(vo).build();
+        return Activator.instance().getMappingService().mapCostFunction(desc);
     }
 
     @GET
     @Override
-    public Response list() {
+    public List<CostFunctionDescriptorVO> list() {
         logger.debug("Listing cost functions.");
         List<CostFunctionFactory> descs = Activator.instance().getCostFunctionRepository().list();
         List<CostFunctionDescriptorVO> vos = Activator.instance().getMappingService().mapCostFunction(descs);
         logger.debug("Found {} cost functions. Sending {} cost functions.", descs.size(), vos.size());
-        return Response.ok().entity(new GenericEntity<List<CostFunctionDescriptorVO>>(vos) {}).build();
+        return vos;
     }
 }
