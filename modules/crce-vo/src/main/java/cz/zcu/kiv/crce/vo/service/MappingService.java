@@ -10,11 +10,13 @@ import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
+import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
 import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.ResultOptimizerVO;
 
 /**
  *
@@ -94,5 +96,11 @@ public interface MappingService {
 
     @Nullable
     CostFunctionDescriptorVO mapCostFunction(@Nullable CostFunctionFactory descriptor);
+
+    @Nonnull
+    List<ResultOptimizerVO> mapResultOptimizer(List<ResultOptimizer> descriptors);
+
+    @Nullable
+    ResultOptimizerVO mapResultOptimizer(@Nullable ResultOptimizer descriptor);
 
 }
