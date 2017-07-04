@@ -66,6 +66,10 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
 
     @Override
     public List<Resource> optimizeResult(Set<Requirement> requirements, List<Resource> fullSet, CostFunction cost, OptimizationMode mode) {
+        return runOptimizeResult(null, requirements, fullSet, cost, mode);
+    }
+
+    public List<Resource> runOptimizeResult(String id, Set<Requirement> requirements, List<Resource> fullSet, CostFunction cost, OptimizationMode mode) {
         if(fullSet.isEmpty()) {
             logger.info("No candidates, nothing to optimize.");
             return fullSet;
@@ -74,8 +78,8 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
         logger.info("Attempting result optimization.");
         LpSolve lp = null;
         try {
-            lp = createLpProblem(fullSet.size(), mode);
-            lp = buildConstraints(lp, new LinkedList<>(requirements), fullSet, cost);
+            lp = createLpProblem(id, fullSet.size(), mode);
+            lp = buildConstraints(id, lp, new LinkedList<>(requirements), fullSet, cost);
             lp.solve();
 
             List<Resource> toReturn = new LinkedList<>();
@@ -106,12 +110,14 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
      * Create {@link LpSolve} instance with general configuration such as min/max mode for the
      * optimization function etc.
      *
+     *
+     * @param id
      * @param columns     number of resources in the full result set
      * @param mode optimization mode (min/max)
      * @return new LpSolve instance
      * @throws LpSolveException
      */
-    private LpSolve createLpProblem(int columns, OptimizationMode mode) throws LpSolveException {
+    protected LpSolve createLpProblem(String id, int columns, OptimizationMode mode) throws LpSolveException {
         LpSolve solve = LpSolve.makeLp(0, columns);
 
         switch (mode) {
@@ -132,6 +138,8 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
 
     /**
      *
+     *
+     * @param id
      * @param lpSolve   problem instance
      * @param requirements list of requirements (constraints, rows)
      * @param fullSet list of candidate resources (columns)
@@ -139,7 +147,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
      * @return problem instance with constraints set
      * @throws LpSolveException
      */
-    private LpSolve buildConstraints(LpSolve lpSolve, List<Requirement> requirements, List<Resource> fullSet, CostFunction cost) throws LpSolveException {
+    protected LpSolve buildConstraints(String id, LpSolve lpSolve, List<Requirement> requirements, List<Resource> fullSet, CostFunction cost) throws LpSolveException {
         final int columns = fullSet.size();
         final int constraints = requirements.size();
         logger.debug("Optimization - columns: {}, constraints: {}", columns, constraints);
@@ -160,10 +168,10 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
                     lpSolve.setBinary(j + 1, true);
                 }
 
-                row[j] = getConstraintCellValue(req, res);
+                row[j] = getConstraintCellValue(id, req, res);
             }
 
-            lpSolve.addConstraint(row, LpSolve.EQ, CONSTRAINT_RIGHT_SIDE);
+            addConstraintRow(id, lpSolve, row, req);
         }
 
         lpSolve.setObjFn(costs);
@@ -171,14 +179,20 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
         return lpSolve;
     }
 
+    protected void addConstraintRow(String id, LpSolve lpSolve, double[] row, Requirement req) throws LpSolveException {
+        lpSolve.addConstraint(row, LpSolve.EQ, CONSTRAINT_RIGHT_SIDE);
+    }
+
     /**
      * Checks whether the resource provides the requirement.
      *
+     *
+     * @param id
      * @param req requirement
      * @param res resource
      * @return 1 if resource provides the requirement, 0 otherwise
      */
-    private int getConstraintCellValue(Requirement req, Resource res) {
+    protected int getConstraintCellValue(String id, Requirement req, Resource res) {
         for (Capability capability : res.getCapabilities(req.getNamespace())) {
             if(compare(req, capability)) {
                 return 1;
@@ -196,7 +210,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
      * @param cap capability to be checked
      * @return true if req and cap match
      */
-    private boolean compare(Requirement req, Capability cap) {
+    protected boolean compare(Requirement req, Capability cap) {
         logger.debug("Optimization - comparing requirement with capability: {} - {}", req.getNamespace(), cap.getId());
         if(!req.getNamespace().equals(cap.getNamespace())) {
             logger.debug("Optimization - non-matching namespace: {} - {}", req.getNamespace(), cap.getNamespace());
