@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.plugin.FunctionProvider;
 
 /**
  * Optimizer interface for picking the most suitable set of resources which fullfil the given
@@ -18,7 +19,7 @@ import cz.zcu.kiv.crce.metadata.Resource;
  * @author Jakub Danek
  */
 @ParametersAreNonnullByDefault
-public interface ResultOptimizer {
+public interface ResultOptimizer extends FunctionProvider {
 
     /**
      * Optimize fullSet based on the given cost function and optimization mode.

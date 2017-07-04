@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
+import cz.zcu.kiv.crce.plugin.FunctionProvider;
 import cz.zcu.kiv.crce.plugin.Plugin;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunction;
 import cz.zcu.kiv.crce.resolver.optimizer.OptimizationMode;
@@ -38,12 +40,29 @@ import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
  *
  * @author Jakub Danek
  */
-@Component(provides = {Plugin.class, ResultOptimizer.class})
+@Component(provides = {Plugin.class, ResultOptimizer.class},
+            properties = {
+                @Property(name = FunctionProvider.ID, value = IlpLPSolveOptimizer.ID),
+                @Property(name = FunctionProvider.DESCRIPTION, value = IlpLPSolveOptimizer.DESCRIPTION)
+            })
 public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimizer {
+
+    public static final String ID = "ro-ilp-direct-dependencies";
+    public static final String DESCRIPTION = "Optimizes returend result set considering only the query requirements, not transitive dependencies.";
 
     private static final Logger logger = LoggerFactory.getLogger(IlpLPSolveOptimizer.class);
 
-    private static final int CONSTRAINT_RIGHT_SIDE = 1;
+    protected static final int CONSTRAINT_RIGHT_SIDE = 1;
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    public String getDescription() {
+        return DESCRIPTION;
+    }
 
     @Override
     public List<Resource> optimizeResult(Set<Requirement> requirements, List<Resource> fullSet, CostFunction cost, OptimizationMode mode) {
