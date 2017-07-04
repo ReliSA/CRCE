@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.resolver.optimizer;
 
-import java.util.List;
+import cz.zcu.kiv.crce.plugin.FunctionProviderRepository;
 
 /**
  * Repository interface for listing cost functions available in the system.
@@ -9,18 +9,5 @@ import java.util.List;
  *
  * @author Jakub Danek
  */
-public interface CostFunctionRepository {
-
-    /**
-     *
-     * @return all available cost function factories
-     */
-    List<CostFunctionFactory> list();
-
-    /**
-     *
-     * @param id desired cost function id
-     * @return cost function factory for the function with the given id
-     */
-    CostFunctionFactory findOne(String id);
+public interface CostFunctionRepository extends FunctionProviderRepository<CostFunctionFactory> {
 }

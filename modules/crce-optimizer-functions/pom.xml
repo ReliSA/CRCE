@@ -20,7 +20,7 @@
         <bundle.namespace>${namespace}.optimizer</bundle.namespace>
         <crce.metadata.api.version>3.0.0</crce.metadata.api.version>
         <crce.resolver.api.version>2.2.0-SNAPSHOT</crce.resolver.api.version>
-        <crce.plugin.api.version>2.1.0</crce.plugin.api.version>
+        <crce.plugin.api.version>2.1.1-SNAPSHOT</crce.plugin.api.version>
         <crce.lpsolve.version>5.5.2.3</crce.lpsolve.version>
     </properties>
 
