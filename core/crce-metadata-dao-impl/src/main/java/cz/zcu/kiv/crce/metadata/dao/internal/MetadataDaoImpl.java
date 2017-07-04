@@ -73,6 +73,11 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
+    public Resource loadResource(String uid, boolean withDetails) throws IOException {
+        throw new UnsupportedOperationException("Too lazy to implement this.");
+    }
+
+    @Override
     public synchronized Resource loadResource(URI uri) throws IOException { // TODO, only an URI as an argument is not nice
         logger.debug("loadResource(uri={})", uri);
 
@@ -93,7 +98,7 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
-    public List<Resource> loadResourcesWithoutCategory(String category) throws IOException {
+    public List<Resource> loadResourcesWithoutCategory(String category, boolean withDetails) throws IOException {
         logger.debug("loadResourcesWithoutCateogry(category={})", category);
 
         List<Resource> result = new ArrayList<>();
@@ -305,7 +310,7 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
-    public synchronized List<Resource> loadResources(Repository repository) throws IOException {
+    public synchronized List<Resource> loadResources(Repository repository, boolean withDetails) throws IOException {
         logger.debug("loadResources(repository={})", repository);
 
         List<Resource> result = Collections.emptyList();
@@ -338,7 +343,7 @@ public class MetadataDaoImpl implements MetadataDao {
     }
 
     @Override
-    public List<Resource> loadResources(@Nonnull Repository repository, @Nonnull ResourceFilter filter) throws IOException {
+    public List<Resource> loadResources(@Nonnull Repository repository, boolean withDetails, @Nonnull ResourceFilter filter) throws IOException {
         logger.debug("loadResources(repository={}, filter={})", repository,
                 logger.isTraceEnabled() ? filter.toString() :  "(" + filter.getCapabilityFilters().size() + ")");
 
