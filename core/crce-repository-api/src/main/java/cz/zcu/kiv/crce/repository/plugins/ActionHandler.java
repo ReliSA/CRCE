@@ -1,13 +1,13 @@
 package cz.zcu.kiv.crce.repository.plugins;
 
-import java.util.List;
-import java.util.Properties;
-
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+import cz.zcu.kiv.crce.repository.Store;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * This interface defines an executable handler of various events which can
@@ -89,7 +89,7 @@ public interface ActionHandler extends Plugin {
      * TODO proposed variant:
      * Resource[] onExecuteInStore(Resource[] resources, Store store);
      *
-     * TODO how to choose, which plugins will be executed? do an Executable plugin
+     * TODO how to choose, which plugins will be executed? do an Executable plugin2
      * and pass it (or set of such plugins) as method parameter?
      * or all plugins will be executed with no choice?
      *

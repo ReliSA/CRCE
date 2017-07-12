@@ -17,11 +17,11 @@ import cz.zcu.kiv.crce.repository.Store;
  * - misto Repository (mnozina Resourcu dostupnych v bufferu nebo v store) se
  *   predava reference na Store, prip. i Buffer, z nich je referenci na Repository
  *   mozno ziskat, ale krome toho lze se Store i Bufferem manipulovat (napr.
- *   mazat z nej Resourcy nebo i spustit dalsi Executable plugin).
+ *   mazat z nej Resourcy nebo i spustit dalsi Executable plugin2).
  * - pridana metoda pro zajisteni vyhradniho (neparalelniho behu).
  */
 /**
- * This interface specifies the kind of plugin which can be executed at any time
+ * This interface specifies the kind of plugin2 which can be executed at any time
  * by external event, e.g. on user's request.
  *
  * <p> The selection of resources contains resources that are to be e.g. tested.
@@ -43,35 +43,35 @@ import cz.zcu.kiv.crce.repository.Store;
 public interface Executable extends Plugin {
 
     /**
-     * Executes the plugin on the selection of resources stored in <i>buffer</i>.
+     * Executes the plugin2 on the selection of resources stored in <i>buffer</i>.
      *
-     * @param resources the set of resources that this plugin will run on.
+     * @param resources the set of resources that this plugin2 will run on.
      * @param buffer
      * @param store
-     * @param properties plugin configuration properties.
+     * @param properties plugin2 configuration properties.
      */
     void executeOnBuffer(@Nonnull List<Resource> resources, @Nonnull Store store, @Nonnull Buffer buffer, @Nonnull Properties properties);
 
     /**
-     * Executes the plugin on the selection of resources stored in <i>store</i>.
+     * Executes the plugin2 on the selection of resources stored in <i>store</i>.
      *
-     * @param resources the set of resources that this plugin will run on.
+     * @param resources the set of resources that this plugin2 will run on.
      * @param store
-     * @param properties plugin configuration properties.
+     * @param properties plugin2 configuration properties.
      */
     void executeOnStore(@Nonnull List<Resource> resources, @Nonnull Store store, @Nonnull Properties properties);
 
     /**
-     * Returns <code>true</code> if the plugin needs to be executed exclusively
+     * Returns <code>true</code> if the plugin2 needs to be executed exclusively
      * (no other Executables will be executed at the same time until execution
-     * of this plugin finishes).
-     * @return <code>true</code> if the plugin needs to be executed exclusively.
+     * of this plugin2 finishes).
+     * @return <code>true</code> if the plugin2 needs to be executed exclusively.
      */
     boolean isExclusive();
 
     /**
      * Returns the instance of <code>Properties</code> which can be used to
-     * reconfigure this plugin for specific execution.
+     * reconfigure this plugin2 for specific execution.
      * <em>Note:</em> Implementing class is responsible to clean changed properties
      * after execution if needed.
      * @return the instance of <code>Properties</code>.

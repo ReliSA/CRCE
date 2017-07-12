@@ -1,0 +1,28 @@
+#-----------------------------------------------------------------
+# Use this file to add customized Bnd instructions for the bundle
+#-----------------------------------------------------------------
+
+Bundle-Activator: ${bundle.namespace}.internal.Activator
+
+Import-Package:\
+  !org.eclipse.sisu,\
+  #!org.apache.http.*,\
+  org.eclipse.persistence.internal.jaxb.many,\
+  *
+
+Embed-Dependency:\
+  #aether-api,\
+  aether-util,\
+  aether-impl, \
+  maven-artifact,\
+  maven-model,\
+  maven-model-builder,\
+  maven-builder-support,\
+  maven-aether-provider,\
+  maven-repository-metadata,\
+  aether-transport-http
+
+
+
+
+

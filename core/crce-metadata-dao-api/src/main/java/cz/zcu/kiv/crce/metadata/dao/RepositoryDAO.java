@@ -9,7 +9,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import cz.zcu.kiv.crce.metadata.Repository;
 
 /**
- * This type of plugin defines DAO class for reading and storing the metadata of
+ * This type of plugin2 defines DAO class for reading and storing the metadata of
  * a repository.
  *
  * @author Jiri Kucera (jiri.kucera@kalwi.eu)

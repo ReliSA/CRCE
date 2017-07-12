@@ -97,31 +97,31 @@ public interface PluginManager {
     <T extends Plugin> List<T> getPlugins(Class<T> type, @Nullable String keyword);
 
     /**
-     * Returns an instance of preferred plugin implementation of specified type.
+     * Returns an instance of preferred plugin2 implementation of specified type.
      *
-     * <p> If more implementations of plugin with given type are present,
+     * <p> If more implementations of plugin2 with given type are present,
      * then the one with the highest priority is returned.
      *
      * @param <T>
      * @param type the <code>Class</code> object representing the type of
-     * returned plugin.
-     * @return the instance of plugin.
+     * returned plugin2.
+     * @return the instance of plugin2.
      */
     @Nonnull
     <T extends Plugin> T getPlugin(Class<T> type);
 
     /**
-     * Returns an instance of preferred plugin implementation of specified type
+     * Returns an instance of preferred plugin2 implementation of specified type
      * and keyword.
      *
-     * <p> If more implementations of plugin with given type and keyword are
+     * <p> If more implementations of plugin2 with given type and keyword are
      * present, then the one with the highest priority is returned.
      *
      * @param <T>
      * @param type the <code>Class</code> object representing the type of
-     * returned plugin.
+     * returned plugin2.
      * @param keyword a keyword specifying the selection of plugins.
-     * @return the instance of plugin.
+     * @return the instance of plugin2.
      */
     @Nonnull
     <T extends Plugin> T getPlugin(Class<T> type, @Nullable String keyword);

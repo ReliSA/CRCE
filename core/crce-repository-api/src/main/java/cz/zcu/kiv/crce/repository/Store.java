@@ -58,7 +58,7 @@ public interface Store {
 
     /**
      * TODO analyze requirements for this method:
-     * - add an executable plugin
+     * - add an executable plugin2
      * @param resources
      * @param executable
      * @param properties

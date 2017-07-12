@@ -29,6 +29,6 @@ public abstract class AbstractResourceIndexer extends AbstractPlugin implements 
 
     @Override
     public String getPluginDescription() {
-        return "ResourceIndexer plugin implementation";
+        return "ResourceIndexer plugin2 implementation";
     }
 }

@@ -197,7 +197,7 @@ public class Options {
         }
 
         public static MavenArtifactProvisionOption pluginApi() {
-            return maven("crce-plugin-api");
+            return maven("crce-plugin2-api");
         }
 
         public static MavenArtifactProvisionOption resolverApi() {

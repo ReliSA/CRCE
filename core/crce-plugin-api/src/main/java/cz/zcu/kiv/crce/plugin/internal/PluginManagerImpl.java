@@ -36,7 +36,7 @@ public class PluginManagerImpl implements PluginManager {
 
     /**
      * Map of maps containing sets of plugins associated with a keyword.
-     * The key to outer map is a plugin type, value is inner map.
+     * The key to outer map is a plugin2 type, value is inner map.
      * The key to inner map is a keyword associated to a set of plugins.
      */
     private final Map<Class<?>, Map<String, Set<? extends Plugin>>> plugins = new HashMap<>();
@@ -124,7 +124,7 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     /**
-     * Callback method called on adding new plugin.
+     * Callback method called on adding new plugin2.
      * @param plugin
      */
     synchronized void register(Plugin plugin) {
@@ -145,7 +145,7 @@ public class PluginManagerImpl implements PluginManager {
     }
 
     /**
-     * Callback method called on removing existing plugin.
+     * Callback method called on removing existing plugin2.
      * @param plugin
      */
     synchronized void unregister(Plugin plugin) {

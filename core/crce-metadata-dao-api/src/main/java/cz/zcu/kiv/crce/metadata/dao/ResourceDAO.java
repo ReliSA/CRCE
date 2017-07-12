@@ -16,7 +16,7 @@ import cz.zcu.kiv.crce.metadata.dao.filter.ResourceDAOFilter;
  * Plugin implementing this class manages retrieving and storing metadata of an
  * artifact.
  *
- * <p> Typical usage of <code>ResourceDAO</code> plugin is in repository core to
+ * <p> Typical usage of <code>ResourceDAO</code> plugin2 is in repository core to
  * manipulate and manage metadata resource while uploading artifacts, retrieving
  * them, copying etc.
  *

@@ -253,6 +253,11 @@ public class ResourceServlet extends HttpServlet {
                 return true;
             }
 
+            case "maven": {
+                logger.debug("Maven search page.");
+                return true;
+            }
+
             default:
                 return false;
         }

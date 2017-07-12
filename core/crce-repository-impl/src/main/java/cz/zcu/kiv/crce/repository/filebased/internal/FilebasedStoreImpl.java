@@ -264,7 +264,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                 try {
                     executable.executeOnStore(res, store, properties);
                 } catch (Exception e) {
-                	logger.error( "Executable plugin threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
+                	logger.error( "Executable plugin2 threw an exception while executed in buffer: {}", executable.getPluginDescription(), e);
                 }
                 ah.afterExecuteInStore(res, executable, properties, store);
             }
