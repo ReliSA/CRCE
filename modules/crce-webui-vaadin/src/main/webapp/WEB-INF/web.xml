@@ -12,7 +12,7 @@
  </context-param>
  <servlet>
   <servlet-name>MyUIServlet</servlet-name>
-  <servlet-class>cz.zcu.kiv.crce.crce_webui_vaadin.MyUI$MyUIServlet</servlet-class>
+  <servlet-class>cz.zcu.kiv.crce.crce_webui_vaadin.webui.MyUI$MyUIServlet</servlet-class>
  </servlet>
  <servlet-mapping>
   <servlet-name>MyUIServlet</servlet-name>

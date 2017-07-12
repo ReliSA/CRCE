@@ -1,6 +1,7 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin;
+package cz.zcu.kiv.crce.crce_webui_vaadin.webui;
 
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.FormLayout;
@@ -14,6 +15,7 @@ import com.vaadin.ui.MenuBar.MenuItem;
 public class MenuForm extends FormLayout{
 	public MenuForm(MyUI myUI) {
 		HorizontalLayout headHL = new HorizontalLayout();
+		HorizontalLayout menuHL = new HorizontalLayout();
 		Label logo = new Label("<p style=\"font-size:50px;font-family:'Fredoka One';padding-left:10px;"
 				+ "margin:0px 0px 0px 0px;color:rgb(23,116,216)\">CRCE UI</p>",ContentMode.HTML);
 		MenuBar menu = new MenuBar();
@@ -28,15 +30,34 @@ public class MenuForm extends FormLayout{
 		upload.addItem("File", e ->{myUI.setContentBodyLoadFile();});
 		
 		// submenu repository
+		repository.addItem("Buffer", e ->{myUI.setContentBodyBuffer();});
+		repository.addItem("Store", null);
 		repository.addItem("Plugins", e ->{myUI.setContentBodyPlugins();});
 		
 		// submenu settings
 		settings.addItem("Paths", e ->{myUI.setContentSettings();});
 		
-		headHL.addComponents(logo,menu);
-		headHL.setComponentAlignment(menu,Alignment.MIDDLE_LEFT);
+		// Menu login
+		MenuBar menuLogin = new MenuBar();
+		MenuItem menuItemLogin = menuLogin.addItem(myUI.getSession().getAttribute("singed").toString(), null);
+		menuItemLogin.addItem("Logout", e ->{
+			myUI.getSession().setAttribute("singed", null);
+			myUI.logout();
+		});
+		
+		menuHL.addComponents(logo, menu);
+		menuHL.setComponentAlignment(menu, Alignment.MIDDLE_LEFT);
+		menuHL.setSpacing(true);
+		
+		headHL.addComponents(menuHL, menuLogin);
+		//Alignment.BOTTOM_RIGHT
+		headHL.setComponentAlignment(menuHL,Alignment.MIDDLE_LEFT);
+		headHL.setComponentAlignment(menuLogin,Alignment.MIDDLE_RIGHT);
+		headHL.setSizeFull();
+		
+		//headHL.setSpacing(true);
+		headHL.setMargin(new MarginInfo(false,true,false,false));
 		headHL.setSpacing(true);
-		headHL.setMargin(false);
 		addComponent(headHL);
 	}
 }

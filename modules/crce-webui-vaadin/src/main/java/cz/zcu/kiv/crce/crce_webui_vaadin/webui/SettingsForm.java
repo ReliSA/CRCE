@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin;
+package cz.zcu.kiv.crce.crce_webui_vaadin.webui;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.Page;

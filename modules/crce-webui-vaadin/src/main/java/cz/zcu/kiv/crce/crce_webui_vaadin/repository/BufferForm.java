@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.repository;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Grid;
@@ -10,35 +11,32 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator;
-import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.repository.Buffer;
 
 @SuppressWarnings("serial")
-public class PluginsForm extends FormLayout{
-	private Label labelForm = new Label("Plugins");
-	private Grid gridPlugins = new Grid();
+public class BufferForm extends FormLayout{
+	private Label labelForm = new Label("Artefact in Buffer");
+	private Grid gridBuffer = new Grid();
 	private HorizontalLayout formLayout;
 	
-	public PluginsForm(){
+	public BufferForm(VaadinSession session){
 		VerticalLayout content = new VerticalLayout();
 		VerticalLayout fieldLayout = new VerticalLayout();
 		
 		labelForm.addStyleName(ValoTheme.LABEL_BOLD);
 		
-		gridPlugins.setContainerDataSource(new BeanItemContainer<>(Plugin.class, Activator.instance().getPluginManager().getPlugins()));
-		gridPlugins.getColumn("pluginKeywords").setHidden(true);
-		gridPlugins.getColumn("pluginId").setHidable(true);
-		gridPlugins.getColumn("pluginDescription").setHidable(true);
-		gridPlugins.getColumn("pluginPriority").setHidable(true);
-		gridPlugins.getColumn("pluginVersion").setHidable(true);
-		gridPlugins.setColumnOrder("pluginId", "pluginDescription");
-		gridPlugins.addStyleName("my-style");
+		Buffer buffer = Activator.instance().getBuffer(session.getSession());
 		
-		fieldLayout.addComponents(labelForm, gridPlugins);
+		gridBuffer.setContainerDataSource(new BeanItemContainer<>(Resource.class, buffer.getResources()));
+		gridBuffer.addStyleName("my-style");
+		
+		fieldLayout.addComponents(labelForm, gridBuffer);
 		fieldLayout.setSpacing(true);
 		
 		formLayout = new HorizontalLayout(fieldLayout);
 		formLayout.setSizeFull();
-		gridPlugins.setSizeFull();
+		gridBuffer.setSizeFull();
 		formLayout.setExpandRatio(fieldLayout, 1);
 		
 		content.addComponent(formLayout);

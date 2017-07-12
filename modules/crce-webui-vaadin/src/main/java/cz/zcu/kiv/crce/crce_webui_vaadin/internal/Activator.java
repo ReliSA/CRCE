@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -16,6 +15,8 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaadin.server.WrappedSession;
+
 import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
@@ -25,142 +26,147 @@ import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 
-public class Activator extends DependencyActivatorBase{
-	
+public class Activator extends DependencyActivatorBase {
+
 	private static final Logger logger = LoggerFactory.getLogger(Activator.class);
-	
+
 	private static volatile Activator instance;
-	
+
 	private volatile BundleContext bundleContext;
-    private volatile MetadataFactory metadataFactory;
-    private volatile ResourceDAO resourceDAO;
-    private volatile PluginManager pluginManager;
-    private volatile SessionRegister sessionRegister;
-    private volatile MetadataService metadataService;
-    private volatile CompatibilitySearchService compatibilityService;
-	
+	private volatile MetadataFactory metadataFactory;
+	private volatile ResourceDAO resourceDAO;
+	private volatile PluginManager pluginManager;
+	private volatile SessionRegister sessionRegister;
+	private volatile MetadataService metadataService;
+	private volatile CompatibilitySearchService compatibilityService;
+
 	public static Activator instance() {
-        if (instance == null) {
-            throw new IllegalStateException("Activator instance is null.");
-        }
-        return instance;
-    }
+		if (instance == null) {
+			throw new IllegalStateException("Activator instance is null.");
+		}
+		return instance;
+	}
 
-    public PluginManager getPluginManager() {
-        return pluginManager;
-    }
+	public PluginManager getPluginManager() {
+		return pluginManager;
+	}
 
-    public SessionRegister getSessionRegister() {
-        if (sessionRegister == null) {
-            throw new IllegalStateException("sessionRegister is null.");
-        }
-        return sessionRegister;
-    }
+	public SessionRegister getSessionRegister() {
+		if (sessionRegister == null) {
+			throw new IllegalStateException("sessionRegister is null.");
+		}
+		return sessionRegister;
+	}
 
-    public ResourceDAO getResourceDAO() {
-        return resourceDAO;
-    }
+	public ResourceDAO getResourceDAO() {
+		return resourceDAO;
+	}
 
-    public MetadataFactory getMetadataFactory() {
-        return metadataFactory;
-    }
-    
-    @Nonnull
-    public Map<String, String> getRepositories() {
-        Map<String, String> stores = new HashMap<>();
-        
-        Collection<ServiceReference<Store>> serviceReferences;
-        try {
-            serviceReferences = bundleContext.getServiceReferences(Store.class, null);
-        } catch (InvalidSyntaxException e) {
-            logger.error("Invalid filter.", e); // this should not happen
-            return stores;
-        }
+	public MetadataFactory getMetadataFactory() {
+		return metadataFactory;
+	}
 
-        if (serviceReferences == null) {
-            logger.trace("No stores found.");
-            return stores;
-        }
+	@Nonnull
+	public Map<String, String> getRepositories() {
+		Map<String, String> stores = new HashMap<>();
 
-        for (ServiceReference<Store> serviceReference : serviceReferences) {
-            String id = (String) serviceReference.getProperty("id");
-            String name = (String) serviceReference.getProperty("name");
-            if (id != null) {
-                stores.put(id, name != null ? name : id);
-            }
-        }
+		Collection<ServiceReference<Store>> serviceReferences;
+		try {
+			serviceReferences = bundleContext.getServiceReferences(Store.class, null);
+		} catch (InvalidSyntaxException e) {
+			logger.error("Invalid filter.", e); // this should not happen
+			return stores;
+		}
 
-        return stores;
-    }
+		if (serviceReferences == null) {
+			logger.trace("No stores found.");
+			return stores;
+		}
 
-    public Store getStore(String repositoryId) {
-        String filter = "(id=" + repositoryId + ")";
+		for (ServiceReference<Store> serviceReference : serviceReferences) {
+			String id = (String) serviceReference.getProperty("id");
+			String name = (String) serviceReference.getProperty("name");
+			if (id != null) {
+				stores.put(id, name != null ? name : id);
+			}
+		}
 
-        Collection<ServiceReference<Store>> serviceReferences;
-        try {
-            serviceReferences = bundleContext.getServiceReferences(Store.class, filter);
-        } catch (InvalidSyntaxException ex) {
-            logger.error("Invalid filter: " + filter);
-            return null;
-        }
+		return stores;
+	}
 
-        if (serviceReferences == null || serviceReferences.isEmpty()) {
-            logger.warn("Store not found for repository ID: {}", repositoryId);
-            return null;
-        }
+	public Store getStore(String repositoryId) {
+		String filter = "(id=" + repositoryId + ")";
 
-        if (serviceReferences.size() > 1) {
-            logger.warn("More than one stores found for repository ID: {}, using the first one.", repositoryId);
-        }
+		Collection<ServiceReference<Store>> serviceReferences;
+		try {
+			serviceReferences = bundleContext.getServiceReferences(Store.class, filter);
+		} catch (InvalidSyntaxException ex) {
+			logger.error("Invalid filter: " + filter);
+			return null;
+		}
 
-        return bundleContext.getService(serviceReferences.iterator().next());
-    }
+		if (serviceReferences == null || serviceReferences.isEmpty()) {
+			logger.warn("Store not found for repository ID: {}", repositoryId);
+			return null;
+		}
 
-    public CompatibilitySearchService getCompatibilityService() {
-        if(compatibilityService != null) {
-            return compatibilityService;
-        } else {
-            throw new ServiceUnavailableException("This installation does not support compatibility services!", "");
-        }
-    }
+		if (serviceReferences.size() > 1) {
+			logger.warn("More than one stores found for repository ID: {}, using the first one.", repositoryId);
+		}
 
-    public boolean isCompatibilityServicePresent() {
-        return compatibilityService != null;
-    }
+		return bundleContext.getService(serviceReferences.iterator().next());
+	}
 
-    public Buffer getBuffer(HttpServletRequest req) {
-        if (req == null) {
-            return null;
-        }
+	public CompatibilitySearchService getCompatibilityService() {
+		if (compatibilityService != null) {
+			return compatibilityService;
+		} else {
+			throw new ServiceUnavailableException("This installation does not support compatibility services!", "");
+		}
+	}
 
-        String sid = req.getSession(true).getId();
-        return sessionRegister.getSessionData(sid).getBuffer();
-    }
+	public boolean isCompatibilityServicePresent() {
+		return compatibilityService != null;
+	}
 
-    public MetadataService getMetadataService() {
-        return metadataService;
-    }
+	public Buffer getBuffer(WrappedSession wSes) {
+		if (wSes == null) {
+			return null;
+		}
 
-    @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
-    @Override
-    public void init(BundleContext context, DependencyManager manager) throws Exception {
-        instance = this;
+		String sid = wSes.getId();
+		return sessionRegister.getSessionData(sid).getBuffer();
+	}
+	
+	/*
+	 * public Buffer getBuffer(HttpServletRequest req) { if (req == null) {
+	 * return null; }
+	 * 
+	 * String sid = req.getSession(true).getId(); return
+	 * sessionRegister.getSessionData(sid).getBuffer(); }
+	 */
 
-        manager.add(createComponent()
-                .setImplementation(this)
-                .add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
-                .add(createServiceDependency().setService(PluginManager.class).setRequired(true))
-                .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
-                .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-                .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false))
-        );
+	public MetadataService getMetadataService() {
+		return metadataService;
+	}
 
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD", justification = "Workaround for providing DM components.")
+	@Override
+	public void init(BundleContext context, DependencyManager manager) throws Exception {
+		instance = this;
 
-        logger.debug("WebUI activator initialized.");
-    }
+		manager.add(createComponent().setImplementation(this)
+				.add(createServiceDependency().setService(SessionRegister.class).setRequired(true))
+				.add(createServiceDependency().setService(PluginManager.class).setRequired(true))
+				.add(createServiceDependency().setService(MetadataFactory.class).setRequired(true))
+				.add(createServiceDependency().setService(MetadataService.class).setRequired(true))
+				.add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false)));
 
-    @Override
-    public void destroy(BundleContext context, DependencyManager manager) throws Exception {
-        // nothing to do
-    }
+		logger.debug("WebUI activator initialized.");
+	}
+
+	@Override
+	public void destroy(BundleContext context, DependencyManager manager) throws Exception {
+		// nothing to do
+	}
 }
