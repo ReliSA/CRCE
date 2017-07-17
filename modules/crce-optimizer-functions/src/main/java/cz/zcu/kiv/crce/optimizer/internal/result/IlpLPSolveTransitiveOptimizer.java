@@ -129,16 +129,23 @@ public class IlpLPSolveTransitiveOptimizer extends IlpLPSolveOptimizer {
         Queue<Resource> toProcess = new LinkedList<>(basicSet);
 
         List<Requirement> transitive = new LinkedList<>();
+        Set<Resource> processed = new HashSet<>();
         Resource tmp;
         List<Resource> found;
         while (!toProcess.isEmpty()) {
             tmp = toProcess.remove();
-            if(!tmp.getRequirements().isEmpty()) {
-                found = store.getPossibleResources(new HashSet<>(tmp.getRequirements()), true);
+            //avoid lifelock due to cyclic associations
+            if(processed.contains(tmp)) continue;
+
+            //limiting optimization to JAVA api, this should be configurable through requirements API though!
+            if(!tmp.getRequirements("crce.api.java.package").isEmpty()) {
+                found = store.getPossibleResources(new HashSet<>(tmp.getRequirements("crce.api.java.package")), true);
                 toProcess.addAll(found);
                 basicSet.addAll(found);
-                transitive.addAll(tmp.getRequirements());
+                transitive.addAll(tmp.getRequirements("crce.api.java.package"));
             }
+
+            processed.add(tmp);
         }
 
         return transitive;
