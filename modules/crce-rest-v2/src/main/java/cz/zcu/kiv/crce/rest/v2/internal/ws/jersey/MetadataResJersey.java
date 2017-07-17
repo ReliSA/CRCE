@@ -89,9 +89,9 @@ public class MetadataResJersey implements MetadataRes {
         //ugly hack to measure experiment time
         long duration = System.nanoTime();
         if(constraint.andRequirements()) {
-            resources = Activator.instance().getStore().getResources(new HashSet<>(requirements), false);
+            resources = Activator.instance().getStore().getResources(new HashSet<>(requirements), true);
         } else {
-            resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements), false);
+            resources = Activator.instance().getStore().getPossibleResources(new HashSet<>(requirements), true);
         }
         duration = System.nanoTime() - duration;
         duration = TimeUnit.NANOSECONDS.toMillis(duration);
