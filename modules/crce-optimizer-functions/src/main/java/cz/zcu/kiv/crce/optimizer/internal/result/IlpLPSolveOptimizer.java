@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.optimizer.internal.result;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -220,8 +222,17 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
             return false;
         }
 
+        //restricts set of attributes meaningful to compatibility check - this needs
+        //further analysis.
+        Set<String> allowedAttributes = new HashSet<>(Arrays.asList(new String[]{"static", "name", "paramTypes", "returnType", "constructor"}));
+
         boolean canDo = true;
         for (Attribute attribute : req.getAttributes()) {
+
+            if(!allowedAttributes.contains(attribute.getName())) {
+                continue;
+            }
+
             if(!Objects.equals(cap.getAttributeValue(attribute.getAttributeType()), attribute.getValue())) {
                 logger.debug("Optimization - non-matching attribute: {} - {}", cap.getAttributeValue(attribute.getAttributeType()), attribute.getValue());
                 canDo = false;
