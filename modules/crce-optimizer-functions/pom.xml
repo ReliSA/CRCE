@@ -19,6 +19,7 @@
         <bundle.symbolicName>${namespace}.optimizer-functions</bundle.symbolicName>
         <bundle.namespace>${namespace}.optimizer</bundle.namespace>
         <crce.metadata.api.version>3.0.0</crce.metadata.api.version>
+        <crce.metadata.service.api.version>3.0.1-SNAPSHOT</crce.metadata.service.api.version>
         <crce.resolver.api.version>2.2.0-SNAPSHOT</crce.resolver.api.version>
         <crce.repository.api.version>2.2.0-SNAPSHOT</crce.repository.api.version>
         <crce.plugin.api.version>2.1.1-SNAPSHOT</crce.plugin.api.version>
@@ -63,6 +64,11 @@
             <groupId>cz.zcu.kiv.crce.wrapper</groupId>
             <artifactId>com.datumbox.lpsolve</artifactId>
             <version>${crce.lpsolve.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>${crce.metadata.service.api.version}</version>
         </dependency>
     </dependencies>
 
