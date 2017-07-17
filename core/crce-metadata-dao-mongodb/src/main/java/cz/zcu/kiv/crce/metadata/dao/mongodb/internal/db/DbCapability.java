@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.metadata.dao.mongodb.internal.db;
 
 import java.util.Set;
 
+import org.mongojack.Id;
 import org.mongojack.MongoCollection;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -32,6 +33,7 @@ public class DbCapability {
     private Set<DbCapability> children;
 
     @JsonProperty("id")
+    @Id
     public String getId() {
         return id;
     }
