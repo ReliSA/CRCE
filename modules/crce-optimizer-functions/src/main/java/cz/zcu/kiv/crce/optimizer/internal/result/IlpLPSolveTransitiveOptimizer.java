@@ -133,10 +133,12 @@ public class IlpLPSolveTransitiveOptimizer extends IlpLPSolveOptimizer {
         List<Resource> found;
         while (!toProcess.isEmpty()) {
             tmp = toProcess.remove();
-            found = store.getPossibleResources(new HashSet<>(tmp.getRequirements()), true);
-            toProcess.addAll(found);
-            basicSet.addAll(found);
-            transitive.addAll(tmp.getRequirements());
+            if(!tmp.getRequirements().isEmpty()) {
+                found = store.getPossibleResources(new HashSet<>(tmp.getRequirements()), true);
+                toProcess.addAll(found);
+                basicSet.addAll(found);
+                transitive.addAll(tmp.getRequirements());
+            }
         }
 
         return transitive;

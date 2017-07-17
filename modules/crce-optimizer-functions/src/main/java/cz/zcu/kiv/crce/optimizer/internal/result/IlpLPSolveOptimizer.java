@@ -52,7 +52,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
 
     private static final Logger logger = LoggerFactory.getLogger(IlpLPSolveOptimizer.class);
 
-    protected static final int CONSTRAINT_RIGHT_SIDE = 1;
+    protected static final double CONSTRAINT_RIGHT_SIDE = 1.0;
 
     @Override
     public String getId() {
@@ -80,6 +80,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
         try {
             lp = createLpProblem(id, fullSet.size(), mode);
             lp = buildConstraints(id, lp, new LinkedList<>(requirements), fullSet, cost);
+            lp.printLp();
             lp.solve();
 
             List<Resource> toReturn = new LinkedList<>();
@@ -148,7 +149,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
      * @throws LpSolveException
      */
     protected LpSolve buildConstraints(String id, LpSolve lpSolve, List<Requirement> requirements, List<Resource> fullSet, CostFunction cost) throws LpSolveException {
-        final int columns = fullSet.size();
+        final int columns = fullSet.size() + 1;
         final int constraints = requirements.size();
         logger.debug("Optimization - columns: {}, constraints: {}", columns, constraints);
         final double costs[] = new double[columns];
@@ -160,15 +161,17 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
             row = new double[columns];
             req = requirements.get(i);
 
+            //all indexes for lpSolve must be incremented by 1
+            //lpSolve starts with indexes at 1 (not 0 as java)
             for (int j = 0; j < fullSet.size(); j++) {
                 res = fullSet.get(j);
 
                 if(i == 0) {
-                    costs[j] = cost.getCost(res);
+                    costs[j + 1] = cost.getCost(res);
                     lpSolve.setBinary(j + 1, true);
                 }
 
-                row[j] = getConstraintCellValue(id, req, res);
+                row[j + 1] = getConstraintCellValue(id, req, res);
             }
 
             addConstraintRow(id, lpSolve, row, req);
