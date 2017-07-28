@@ -84,7 +84,7 @@ public class IlpLPSolveOptimizer extends AbstractPlugin implements ResultOptimiz
             lp = buildConstraints(id, lp, new LinkedList<>(requirements), fullSet, cost);
             lp.printLp();
             lp.solve();
-
+            lp.printConstraints(fullSet.size());
             List<Resource> toReturn = new LinkedList<>();
             double[] res = lp.getPtrVariables();
             for (int i = 0; i < res.length; i++) {
