@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.felix.dm.annotation.api.Component;
 import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.apache.felix.dm.annotation.api.Start;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -336,12 +336,19 @@ public class MetadataServiceImpl implements MetadataService {
     @Nonnull
     @Override
     public Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace) {
+        return getSingletonCapability(resource, namespace, true);
+    }
+
+    @Nullable
+    @Override
+    public Capability getSingletonCapability(@Nonnull Resource resource, @Nonnull String namespace, boolean create) {
         List<Capability> capabilities = resource.getCapabilities(namespace);
 
         assert capabilities.size() < 2;
 
         Capability capability;
         if (capabilities.isEmpty()) {
+            if(!create) return null;
             capability = metadataFactory.createCapability(namespace);
             resource.addCapability(capability);
             resource.addRootCapability(capability);
