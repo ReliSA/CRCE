@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.resolver.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -25,6 +27,8 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.dao.filter.CapabilityFilter;
 import cz.zcu.kiv.crce.metadata.dao.filter.ResourceFilter;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceView;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunction;
@@ -47,6 +51,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
 
     @ServiceDependency private volatile MetadataDao metadataDao;
     @ServiceDependency private volatile MetadataFactory metadataFactory; // NOPMD will be used
+    @ServiceDependency private volatile MetadataService metadataService;
     @ServiceDependency private volatile CostFunctionRepository costFunctionRepository;
     @ServiceDependency private volatile ResultOptimizerRepository optimizerRepository;
 
@@ -92,10 +97,38 @@ public class ResourceLoaderImpl implements ResourceLoader {
             logger.error("Stacktrace: ", e);
         }
 
+        resources = decomposeViews(resources);
+
         if (logger.isDebugEnabled()) {
             logger.debug("getResources(requirement={}) returns {}", requirements.toString(), resources.size());
         }
+
+
         return resources;
+    }
+
+    private List<Resource> decomposeViews(List<Resource> resources) throws IOException {
+        List<Resource> toReturn = new ArrayList<>(resources.size());
+
+        Capability viewCap;
+        for (Resource resource : resources) {
+            viewCap = metadataService.getSingletonCapability(resource, NsCrceView.NAMESPACE__CRCE_VIEW_IDENTITY, false);
+            if(viewCap == null) {
+                toReturn.add(resource);
+            } else {
+                Attribute<List<String>> at = viewCap.getAttribute(NsCrceView.ATTRIBUTE__RESOURCE_IDS);
+                if(at == null) continue;
+                List<String> uids = at.getValue();
+                for (String uid : uids) {
+                    Resource tmp = metadataDao.loadResource(uid, true);
+                    if(tmp == null) continue;
+                    toReturn.add(tmp);
+                }
+            }
+        }
+
+
+        return toReturn;
     }
 
     /**
