@@ -124,12 +124,14 @@ public class MetaDataDaoMongo extends BaseMongoDao implements MetadataDao {
     @Override
     public void deleteResource(URI uri) throws IOException {
         DBQuery.Query uriQ = QueryBuilder.queryResourceByURI(uri.toString());
-        DbResource res = resources.findOne();
-        DBQuery.Query q = QueryBuilder.queryByResourceId(res.getId());
-        capabilities.remove(q);
-        requirements.remove(q);
-        properties.remove(q);
-        resources.remove(uriQ);
+        DbResource res = resources.findOne(uriQ);
+        if(res != null) {
+            DBQuery.Query q = QueryBuilder.queryByResourceId(res.getId());
+            capabilities.remove(q);
+            requirements.remove(q);
+            properties.remove(q);
+            resources.remove(uriQ);
+        }
     }
 
     @Override

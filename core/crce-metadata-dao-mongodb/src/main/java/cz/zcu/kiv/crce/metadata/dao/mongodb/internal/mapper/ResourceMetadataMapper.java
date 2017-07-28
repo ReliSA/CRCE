@@ -47,9 +47,9 @@ public class ResourceMetadataMapper {
 
     public static Resource map(DbResource src, MetadataFactory metadataFactory, MetadataService metadataService) {
         Resource dest = metadataFactory.createResource(src.getId());
-        metadataService.setUri(dest, src.getUri());
 
         mapCapability(dest, src.getIdentity(), metadataFactory, metadataService);
+        metadataService.setUri(dest, src.getUri());
 
         return dest;
     }
@@ -57,7 +57,7 @@ public class ResourceMetadataMapper {
     public static Resource mapCaps(Resource dest, Collection<DbCapability> caps, MetadataFactory metadataFactory, MetadataService metadataService) {
         for (DbCapability cap : caps) {
             if(!Objects.equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY, cap.getNamespace())) {
-                dest.addRootCapability(mapCapability(dest, cap, metadataFactory, metadataService));
+                metadataService.addRootCapability(dest, mapCapability(dest, cap, metadataFactory, metadataService));
             }
         }
 
@@ -81,12 +81,9 @@ public class ResourceMetadataMapper {
     }
 
     private static Capability mapCapability(Resource res, DbCapability src, MetadataFactory metadataFactory, MetadataService metadataService) {
-        Capability cap;
+        Capability cap = metadataFactory.createCapability(src.getNamespace(), src.getId());
         if(Objects.equals(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY, src.getNamespace())) {
-            cap = metadataService.getIdentity(res);
-        } else {
-            cap = metadataFactory.createCapability(src.getNamespace(), src.getId());
-            res.addCapability(cap);
+            metadataService.addRootCapability(res, cap);
         }
 
         for (DbAttribute dbAttribute : src.getAttributes()) {
