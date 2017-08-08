@@ -110,7 +110,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyLoadFile(){
-    	loadFileForm = new LoadFileForm();
+    	loadFileForm = new LoadFileForm(this.getSession());
     	body.setContent(loadFileForm);
     }
     
@@ -125,7 +125,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyPlugins(){
-    	pluginsForm = new PluginsForm();
+    	pluginsForm = new PluginsForm(this);
     	body.setContent(pluginsForm);
     }
     

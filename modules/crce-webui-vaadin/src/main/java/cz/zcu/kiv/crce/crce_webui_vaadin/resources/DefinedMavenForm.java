@@ -15,9 +15,10 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import cz.zcu.kiv.crce.crce_webui_vaadin.classes.DefinedMaven;
+
 import cz.zcu.kiv.crce.crce_webui_vaadin.other.TypePackaging;
-import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes.DefinedMaven;
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes.SettingsUrl;
 
 public class DefinedMavenForm extends FormLayout implements Serializable{
 	private static final long serialVersionUID = 4172878715304331198L;

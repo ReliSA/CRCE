@@ -83,7 +83,7 @@
         <!--<module>crce-repository-maven-impl</module>-->
         
         <module>crce-webservices-indexer</module>
-        <module>crce-external-repository</module>
+        
         <module>crce-webui-vaadin</module>
         <module>provision</module>
     </modules>

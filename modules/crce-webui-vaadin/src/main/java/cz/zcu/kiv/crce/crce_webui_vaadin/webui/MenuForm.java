@@ -27,7 +27,7 @@ public class MenuForm extends FormLayout{
 		upload.addItem("Local", e ->{myUI.setContentBodyLocalMaven();});
 		upload.addItem("Central", e ->{myUI.setContentBodyCentralMaven();});
 		upload.addItem("Defined", e ->{myUI.setContentBodyDefinedMaven();});
-		upload.addItem("File", e ->{myUI.setContentBodyLoadFile();});
+		upload.addItem("File/url", e ->{myUI.setContentBodyLoadFile();});
 		
 		// submenu repository
 		repository.addItem("Buffer", e ->{myUI.setContentBodyBuffer();});

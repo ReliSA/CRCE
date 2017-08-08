@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.classes;
+package cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes;
 
 import java.io.File;
 import java.io.Serializable;
@@ -7,10 +7,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
 
-import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
-
+@SuppressWarnings("serial")
 public class LocalMaven implements Serializable{
-	private static final long serialVersionUID = 1928618487572353592L;
 	private Tree localMavenTree = new Tree();
 	private String path;// = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
 	public Tree getTree(VaadinSession session) {
@@ -60,3 +58,4 @@ public class LocalMaven implements Serializable{
 		}
 	}
 }
+

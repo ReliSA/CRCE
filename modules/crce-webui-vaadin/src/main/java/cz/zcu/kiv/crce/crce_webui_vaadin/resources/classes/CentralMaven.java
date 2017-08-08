@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.classes;
+package cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,7 +7,6 @@ import java.nio.channels.ReadableByteChannel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
-import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
 
 public class CentralMaven {
 	private static String centralMavenUrl;

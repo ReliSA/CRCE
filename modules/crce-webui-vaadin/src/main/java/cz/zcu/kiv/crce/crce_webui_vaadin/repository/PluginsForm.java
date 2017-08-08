@@ -10,15 +10,22 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator;
+import cz.zcu.kiv.crce.crce_webui_vaadin.webui.MyUI;
 import cz.zcu.kiv.crce.plugin.Plugin;
 
 @SuppressWarnings("serial")
 public class PluginsForm extends FormLayout{
 	private Label labelForm = new Label("Plugins");
 	private Grid gridPlugins = new Grid();
+	private Grid gridKeyWords = new Grid();
+	private PluginFormEdit pluginFormEdit;
 	private HorizontalLayout formLayout;
+	private MyUI myUI;
 	
-	public PluginsForm(){
+	public PluginsForm(MyUI myUI){
+		this.myUI = myUI;
+		pluginFormEdit = new PluginFormEdit(this);
+		
 		VerticalLayout content = new VerticalLayout();
 		VerticalLayout fieldLayout = new VerticalLayout();
 		
@@ -30,20 +37,39 @@ public class PluginsForm extends FormLayout{
 		gridPlugins.getColumn("pluginDescription").setHidable(true);
 		gridPlugins.getColumn("pluginPriority").setHidable(true);
 		gridPlugins.getColumn("pluginVersion").setHidable(true);
-		gridPlugins.setColumnOrder("pluginId", "pluginDescription");
+		gridPlugins.setColumnOrder("pluginId", "pluginDescription", "pluginKeywords");
 		gridPlugins.addStyleName("my-style");
+		
+		gridKeyWords.setWidth("200px");
+		gridKeyWords.addStyleName("my-style");
 		
 		fieldLayout.addComponents(labelForm, gridPlugins);
 		fieldLayout.setSpacing(true);
 		
-		formLayout = new HorizontalLayout(fieldLayout);
+		formLayout = new HorizontalLayout(fieldLayout, pluginFormEdit);
+		formLayout.setSpacing(true);
 		formLayout.setSizeFull();
 		gridPlugins.setSizeFull();
 		formLayout.setExpandRatio(fieldLayout, 1);
+		pluginFormEdit.setVisible(false);
 		
 		content.addComponent(formLayout);
 		content.setMargin(new MarginInfo(false, true));
 		content.setSpacing(true);
+		
+		gridPlugins.addSelectionListener(e -> {
+			if (e.getSelected().isEmpty()) {
+				pluginFormEdit.setVisible(false);
+			} else {
+				Plugin plugin = (Plugin) e.getSelected().iterator().next();
+				pluginFormEdit.setPlugin(plugin);
+			}
+		});
+		
 		addComponent(content);
+	}
+	
+	public void update(){
+		myUI.setContentBodyPlugins();
 	}
 }

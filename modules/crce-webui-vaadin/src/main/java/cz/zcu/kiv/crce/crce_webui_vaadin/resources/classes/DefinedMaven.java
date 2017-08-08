@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.classes;
+package cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes;
 
 import java.util.Arrays;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -22,8 +22,6 @@ import org.eclipse.aether.version.Version;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Tree;
-
-import cz.zcu.kiv.crce.external.web.impl.SettingsUrl;
 
 public class DefinedMaven{
 	private Tree definedMavenTree = new Tree("Result Search");
@@ -138,3 +136,5 @@ public class DefinedMaven{
 		return session;
 	}
 }
+
+

@@ -7,7 +7,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
-import cz.zcu.kiv.crce.crce_webui_vaadin.classes.LocalMaven;
+
+import cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes.LocalMaven;
 
 @SuppressWarnings("serial")
 public class LocalMavenForm extends FormLayout{

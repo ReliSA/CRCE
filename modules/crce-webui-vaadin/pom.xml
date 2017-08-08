@@ -138,9 +138,12 @@
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cz.zcu.kiv.crce</groupId>
-			<artifactId>crce-external-repository</artifactId>
-			<version>1.0</version>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cz.zcu.kiv.crce</groupId>
@@ -153,14 +156,6 @@
 			<artifactId>crce-compatibility-api</artifactId>
 			<version>2.1.1-SNAPSHOT</version>
 			<type>bundle</type>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
 		</dependency>
 	</dependencies>
 	
@@ -239,10 +234,8 @@
 						<DynamicImport-Package>
 							*
 						</DynamicImport-Package>
-						<Import-Package>
-							cz.zcu.kiv.crce.external.web.impl
-						</Import-Package>
-						<Bundle-Activator>cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator</Bundle-Activator>
+						<Import-Package>!${bundle.namespace}.internal.*</Import-Package>
+						<Bundle-Activator>${bundle.namespace}.internal.Activator</Bundle-Activator>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-ClassPath>
 							WEB-INF/classes,
