@@ -13,7 +13,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes.SettingsUrl;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.SettingsUrl;
 
 @SuppressWarnings("serial")
 public class SettingsForm extends FormLayout {
@@ -24,11 +24,9 @@ public class SettingsForm extends FormLayout {
 	}
 
 	public SettingsForm(VaadinSession session) {
-		TextField localMavenUrl = new TextField("Local Maven path");
 		TextField centralMavenUrl = new TextField("Central Maven url");
 		TextField localAetherRepo = new TextField("Local Aether repository");
 
-		localMavenUrl.setWidth("400px");
 		centralMavenUrl.setWidth("400px");
 		localAetherRepo.setWidth("400px");
 
@@ -36,11 +34,9 @@ public class SettingsForm extends FormLayout {
 
 		if (session.getAttribute("settingsUrl") == null) {
 			SettingsUrl settingsUrl = new SettingsUrl();
-			localMavenUrl.setValue(settingsUrl.getLocalMavenUrl());
 			centralMavenUrl.setValue(settingsUrl.getCentralMavenUrl());
 			localAetherRepo.setValue(settingsUrl.getLocalAetherUrl());
 		} else {
-			localMavenUrl.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).getLocalMavenUrl());
 			centralMavenUrl.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).getCentralMavenUrl());
 			localAetherRepo.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).getLocalAetherUrl());
 		}
@@ -55,7 +51,7 @@ public class SettingsForm extends FormLayout {
 		saveButton.setClickShortcut(KeyCode.ENTER);
 		
 		VerticalLayout content = new VerticalLayout();
-		content.addComponents(localMavenUrl, centralMavenUrl, localAetherRepo, buttonsLayout);
+		content.addComponents(centralMavenUrl, localAetherRepo, buttonsLayout);
 		content.setSpacing(true);
 
 		HorizontalLayout formLayout = new HorizontalLayout();
@@ -70,7 +66,6 @@ public class SettingsForm extends FormLayout {
 			else{
 				settingsUrl = (SettingsUrl) getSession().getAttribute("settingsUrl");
 			}
-			settingsUrl.setLocalMavenUrl(localMavenUrl.getValue());
 			settingsUrl.setCentralMavenUrl(centralMavenUrl.getValue());
 			settingsUrl.setLocalAetherUrl(localAetherRepo.getValue());
 			getSession().setAttribute("settingsUrl", settingsUrl);
@@ -83,7 +78,6 @@ public class SettingsForm extends FormLayout {
 		defaultButton.addClickListener(e ->{
 			SettingsUrl settingsUrl = new SettingsUrl();
 			getSession().setAttribute("settingsUrl", settingsUrl);
-			localMavenUrl.setValue(settingsUrl.getLocalMavenUrl());
 			centralMavenUrl.setValue(settingsUrl.getCentralMavenUrl());
 			localAetherRepo.setValue(settingsUrl.getLocalAetherUrl());
 		});

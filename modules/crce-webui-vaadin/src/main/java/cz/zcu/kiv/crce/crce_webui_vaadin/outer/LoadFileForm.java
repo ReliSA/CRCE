@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.resources;
+package cz.zcu.kiv.crce.crce_webui_vaadin.outer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +27,6 @@ import com.vaadin.ui.Upload.SucceededListener;
 import com.vaadin.ui.VerticalLayout;
 
 import cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator;
-import cz.zcu.kiv.crce.repository.Buffer;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 @SuppressWarnings("serial")
@@ -72,8 +71,7 @@ public class LoadFileForm extends FormLayout {
 				URL url = new URL(urlText.getValue());
 				file = new File(url.toString());
 				InputStream input = url.openStream();
-				Buffer buffer = Activator.instance().getBuffer(session.getSession());
-				buffer.put(file.getName(), input);
+				Activator.instance().getBuffer(session.getSession()).put(file.getName(), input);
 				Notification notif = new Notification("Info", "Artefact from url upload sucess",
 						Notification.Type.ASSISTIVE_NOTIFICATION);
 				notif.setPosition(Position.TOP_RIGHT);
@@ -105,8 +103,8 @@ public class LoadFileForm extends FormLayout {
 
 		public void uploadSucceeded(SucceededEvent event) {
 			try {
-				Buffer buffer = Activator.instance().getBuffer(session.getSession());
-				buffer.put(file.getName(), Files.newInputStream(file.toPath(), StandardOpenOption.READ));
+				Activator.instance().getBuffer(session.getSession())
+					.put(file.getName(), Files.newInputStream(file.toPath(), StandardOpenOption.READ));
 				Notification notif = new Notification("Info", "Artefact from file upload sucess",
 						Notification.Type.ASSISTIVE_NOTIFICATION);
 				notif.setPosition(Position.TOP_RIGHT);

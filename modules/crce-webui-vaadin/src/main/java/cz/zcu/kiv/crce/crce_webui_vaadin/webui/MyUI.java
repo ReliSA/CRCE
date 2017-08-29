@@ -1,22 +1,22 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.webui;
 
 import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.CentralMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.DefinedMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LoadFileForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LocalMavenForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.BufferForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.StoreForm;
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.CentralMavenForm;
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.DefinedMavenForm;
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.LoadFileForm;
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.LocalMavenForm;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -91,11 +91,13 @@ public class MyUI extends UI {
 	
 	private void cleanupAfterLogout(){
 		getSession().setAttribute("settingsUrl", null);
+		getSession().getSession().invalidate();
+		Page.getCurrent().setLocation(VaadinServlet.getCurrent().getServletContext().getContextPath());
 		content.removeAllComponents();
 	}
     
     public void setContentBodyLocalMaven(){
-    	localMavenForm = new LocalMavenForm(getSession());
+    	localMavenForm = new LocalMavenForm(this);
     	body.setContent(localMavenForm);
     }
     
@@ -105,7 +107,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyDefinedMaven(){
-    	definedMavenForm = new DefinedMavenForm(getSession());
+    	definedMavenForm = new DefinedMavenForm(this);
     	body.setContent(definedMavenForm);
     }
     
@@ -115,7 +117,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyBuffer(){
-    	bufferForm = new BufferForm(getSession());
+    	bufferForm = new BufferForm(this);
     	body.setContent(bufferForm);
     }
     

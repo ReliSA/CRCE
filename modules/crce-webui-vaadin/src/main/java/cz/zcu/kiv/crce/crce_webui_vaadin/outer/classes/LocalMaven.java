@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes;
+package cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes;
 
 import java.io.File;
 import java.io.Serializable;
@@ -10,15 +10,15 @@ import com.vaadin.ui.Tree;
 @SuppressWarnings("serial")
 public class LocalMaven implements Serializable{
 	private Tree localMavenTree = new Tree();
-	private String path;// = System.getProperty("user.home") + File.separator + ".m2" + File.separator + "repository";
+	private String path;
 	public Tree getTree(VaadinSession session) {
 		// get local Maven path
 		if(session.getAttribute("settingsUrl") == null){
 			SettingsUrl settings = new SettingsUrl();
-			path = settings.getLocalMavenUrl();
+			path = settings.getLocalAetherUrl();
 		}
 		else{
-			path = ((SettingsUrl)session.getAttribute("settingsUrl")).getLocalMavenUrl();
+			path = ((SettingsUrl)session.getAttribute("settingsUrl")).getLocalAetherUrl();
 		}
 			
 		File f = new File(path);

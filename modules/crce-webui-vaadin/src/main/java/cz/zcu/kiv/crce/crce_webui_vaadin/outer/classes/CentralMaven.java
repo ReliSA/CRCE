@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes;
+package cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes;
 
 import java.io.IOException;
 import java.net.URL;

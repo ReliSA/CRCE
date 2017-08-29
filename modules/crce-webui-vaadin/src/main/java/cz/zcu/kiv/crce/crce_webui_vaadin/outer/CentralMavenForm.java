@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.resources;
+package cz.zcu.kiv.crce.crce_webui_vaadin.outer;
 
 import java.util.EnumSet;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -15,7 +15,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import cz.zcu.kiv.crce.crce_webui_vaadin.other.TypePackaging;
-import cz.zcu.kiv.crce.crce_webui_vaadin.resources.classes.CentralMaven;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.CentralMaven;
 
 @SuppressWarnings("serial")
 public class CentralMavenForm extends FormLayout {
