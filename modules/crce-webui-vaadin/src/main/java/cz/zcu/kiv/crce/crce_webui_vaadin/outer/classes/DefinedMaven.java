@@ -128,7 +128,7 @@ public class DefinedMaven {
 
 		ArtifactRequest artifactRequest = new ArtifactRequest();
 		Artifact artifact = new DefaultArtifact(artifactText.split(":")[0] + ":" + artifactText.split(":")[1] + ":" +
-				artifactText.split(":")[2]);
+				artifactText.split(":")[3] + ":" + artifactText.split(":")[2]);
 
 		artifactRequest.setArtifact(artifact);
 
