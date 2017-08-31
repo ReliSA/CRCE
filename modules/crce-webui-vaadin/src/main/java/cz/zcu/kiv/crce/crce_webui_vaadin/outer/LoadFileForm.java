@@ -80,7 +80,6 @@ public class LoadFileForm extends FormLayout {
 				new Notification("Could not open or load file from url", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
 				.show(Page.getCurrent());
 			}
-
 		});
 		
 		addComponent(content);

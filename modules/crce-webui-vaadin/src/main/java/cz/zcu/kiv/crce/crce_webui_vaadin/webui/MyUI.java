@@ -102,7 +102,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyCentralMaven(){
-    	centralMavenForm = new CentralMavenForm(getSession());
+    	centralMavenForm = new CentralMavenForm(this);
     	body.setContent(centralMavenForm);
     }
     

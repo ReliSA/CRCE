@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.crce_webui_vaadin.outer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,12 +56,12 @@ public class LocalMavenForm extends FormLayout {
 			localMavenTree.addShortcutListener(new ShortcutListener("", KeyCode.ENTER, null) {
 				@Override
 				public void handleAction(Object sender, Object target) {
-					if (localMavenTree.getValue() != null && myUI.getWindows().isEmpty()){
-						if(localMavenTree.areChildrenAllowed((Object) localMavenTree.getValue())){
+					if (localMavenTree.getValue() != null && myUI.getWindows().isEmpty()) {
+						if (localMavenTree.areChildrenAllowed((Object) localMavenTree.getValue())) {
 							myUI.addWindow(new RemovePathModal(new File(localMavenTree.getValue().toString()), myUI));
-						}
-						else{
-							myUI.addWindow(new CheckUploadModal(new File(localMavenTree.getValue().toString()), myUI.getSession()));
+						} else {
+							myUI.addWindow(new CheckUploadModal(new File(localMavenTree.getValue().toString()),
+									myUI.getSession()));
 						}
 					}
 				}
@@ -68,7 +69,7 @@ public class LocalMavenForm extends FormLayout {
 		}
 		addComponent(content);
 	}
-	
+
 	private static class CheckUploadModal extends Window {
 		public CheckUploadModal(File file, VaadinSession session) {
 			super("Upload " + file.getName() + " to buffer?");
@@ -77,7 +78,7 @@ public class LocalMavenForm extends FormLayout {
 			content.setHeight("100px");
 
 			HorizontalLayout buttonLayout = new HorizontalLayout();
-			
+
 			Button acceptButton = new Button("OK");
 			acceptButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 			Button cancelButton = new Button("Cancel");
@@ -93,19 +94,23 @@ public class LocalMavenForm extends FormLayout {
 			center();
 			setClosable(false);
 			setResizable(false);
-			
-			acceptButton.addClickListener(e ->{
+
+			acceptButton.addClickListener(e -> {
 				try {
-					Activator.instance().getBuffer(session.getSession()).put(file.getName(), Files.newInputStream(file.toPath(), StandardOpenOption.READ));
-					Notification notif = new Notification("Info", "Artifact to buffer upload sucess", 
-							Notification.Type.ASSISTIVE_NOTIFICATION);
-					notif.setPosition(Position.TOP_RIGHT);
-					notif.show(Page.getCurrent());
+					InputStream is = Files.newInputStream(file.toPath(), StandardOpenOption.READ);
+					try {
+						Activator.instance().getBuffer(session.getSession()).put(file.getName(), is);
+						Notification notif = new Notification("Info", "Artifact to buffer upload sucess",
+								Notification.Type.ASSISTIVE_NOTIFICATION);
+						notif.setPosition(Position.TOP_RIGHT);
+						notif.show(Page.getCurrent());
+					} finally {
+						is.close();
+						close();
+					}
 				} catch (IOException | RefusedArtifactException ex) {
 					new Notification("Could not open file", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
-					.show(Page.getCurrent());
-				} finally {
-					close();
+							.show(Page.getCurrent());
 				}
 			});
 
@@ -116,16 +121,16 @@ public class LocalMavenForm extends FormLayout {
 			setContent(content);
 		}
 	}
-	
+
 	private static class RemovePathModal extends Window {
-		public RemovePathModal(File file, MyUI myUI){
+		public RemovePathModal(File file, MyUI myUI) {
 			super("Remove path " + file.getName() + "?");
 			VerticalLayout content = new VerticalLayout();
 			content.setWidth("400px");
 			content.setHeight("100px");
 
 			HorizontalLayout buttonLayout = new HorizontalLayout();
-			
+
 			Button removeButton = new Button("Remove");
 			removeButton.setStyleName(ValoTheme.BUTTON_DANGER);
 			Button cancelButton = new Button("Cancel");
@@ -141,32 +146,32 @@ public class LocalMavenForm extends FormLayout {
 			center();
 			setClosable(false);
 			setResizable(false);
-			
-			removeButton.addClickListener(e ->{
+
+			removeButton.addClickListener(e -> {
 				Path directory = file.toPath();
 				try {
 					Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-					   @Override
-					   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-					       Files.delete(file);
-					       return FileVisitResult.CONTINUE;
-					   }
+						@Override
+						public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+							Files.delete(file);
+							return FileVisitResult.CONTINUE;
+						}
 
-					   @Override
-					   public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-					       Files.delete(dir);
-					       return FileVisitResult.CONTINUE;
-					   }
+						@Override
+						public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+							Files.delete(dir);
+							return FileVisitResult.CONTINUE;
+						}
 					});
 				} catch (IOException ex) {
 					new Notification("Could not remove path!", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
-					.show(Page.getCurrent());
-				} finally{
+							.show(Page.getCurrent());
+				} finally {
 					close();
 					myUI.setContentBodyLocalMaven();
 				}
 			});
-			
+
 			cancelButton.addClickListener(e -> {
 				close();
 			});

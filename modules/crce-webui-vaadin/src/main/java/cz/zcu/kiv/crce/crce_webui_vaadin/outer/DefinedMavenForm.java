@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.crce_webui_vaadin.outer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -154,7 +155,8 @@ public class DefinedMavenForm extends FormLayout implements Serializable {
 					public void handleAction(Object sender, Object target) {
 						if (tree.getValue() != null && !(tree.areChildrenAllowed((Object) tree.getValue()))
 								&& myUI.getWindows().isEmpty()) {
-							myUI.addWindow(new CheckUploadModal(tree.getValue().toString(), settings, myUI.getSession()));
+							myUI.addWindow(
+									new CheckUploadModal(tree.getValue().toString(), settings, myUI.getSession()));
 						}
 					}
 				});
@@ -209,18 +211,24 @@ public class DefinedMavenForm extends FormLayout implements Serializable {
 			uploadButton.addClickListener(e -> {
 				// First check the artifact storage in the local repository
 				if (DefinedMaven.resolveArtefact(artifactText, settings)) {
-					File file = new File(settings.getLocalAetherUrl() + "/" + artifactText.split(":")[0].replace('.', '/') + "/" +
-							artifactText.split(":")[1] + "/" + artifactText.split(":")[2] + "/" + artifactText.split(":")[1] + 
-							"-" + artifactText.split(":")[2] +"." + artifactText.split(":")[3]);
+					File file = new File(settings.getLocalAetherUrl() + "/"
+							+ artifactText.split(":")[0].replace('.', '/') + "/" + artifactText.split(":")[1] + "/"
+							+ artifactText.split(":")[2] + "/" + artifactText.split(":")[1] + "-"
+							+ artifactText.split(":")[2] + "." + artifactText.split(":")[3]);
 					try {
-						Activator.instance().getBuffer(session.getSession()).put(file.getName(), Files.newInputStream(file.toPath(), StandardOpenOption.READ));
-						Notification notif = new Notification("Info", "Artifact to buffer upload sucess", 
-								Notification.Type.ASSISTIVE_NOTIFICATION);
-						notif.setPosition(Position.TOP_RIGHT);
-						notif.show(Page.getCurrent());
+						InputStream is = Files.newInputStream(file.toPath(), StandardOpenOption.READ);
+						try {
+							Activator.instance().getBuffer(session.getSession()).put(file.getName(), is);
+							Notification notif = new Notification("Info", "Artifact to buffer upload sucess",
+									Notification.Type.ASSISTIVE_NOTIFICATION);
+							notif.setPosition(Position.TOP_RIGHT);
+							notif.show(Page.getCurrent());
+						} finally {
+							is.close();
+						}
 					} catch (IOException | RefusedArtifactException ex) {
 						new Notification("Could not open file", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
-						.show(Page.getCurrent());
+								.show(Page.getCurrent());
 					}
 				} else {
 					new Notification("Problem with resolving artifact", Notification.Type.WARNING_MESSAGE)

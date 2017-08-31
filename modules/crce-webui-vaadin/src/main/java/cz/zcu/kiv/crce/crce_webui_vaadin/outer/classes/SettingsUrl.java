@@ -4,6 +4,7 @@ public class SettingsUrl{
 	private String centralMavenUrl = "http://repo.maven.apache.org/maven2/";
 	private String localAetherUrl = "aether-local-repo";
 	private String externalAetherUrl = "http://repo.maven.apache.org/maven2/";
+	private boolean enableGroupSearch = false;
 	
 	public String getCentralMavenUrl() {
 		return centralMavenUrl;
@@ -29,4 +30,11 @@ public class SettingsUrl{
 		this.externalAetherUrl = url;
 	}
 
+	public boolean isEnableGroupSearch() {
+		return enableGroupSearch;
+	}
+
+	public void setEnableGroupSearch(boolean enableGroupSearch) {
+		this.enableGroupSearch = enableGroupSearch;
+	}
 }

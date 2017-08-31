@@ -1,21 +1,35 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.outer;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.EnumSet;
+
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_vaadin.other.TypePackaging;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.CentralMaven;
+import cz.zcu.kiv.crce.crce_webui_vaadin.webui.MyUI;
+import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 @SuppressWarnings("serial")
 public class CentralMavenForm extends FormLayout {
@@ -28,21 +42,20 @@ public class CentralMavenForm extends FormLayout {
 	private Button clearButton = new Button("Clear");
 	private Label notFound = new Label("No artifact found");
 	private Tree tree;
-	
+
 	public CentralMavenForm() {
 		HorizontalLayout content = new HorizontalLayout();
 		addComponent(content);
 	}
 
-	public CentralMavenForm(VaadinSession session){
+	public CentralMavenForm(MyUI myUI) {
 		VerticalLayout userForm = new VerticalLayout();
 		HorizontalLayout content = new HorizontalLayout();
 		packaging.addItems(EnumSet.allOf(TypePackaging.class));
 		packaging.select(TypePackaging.jar);
 		packaging.setNullSelectionAllowed(false);
-		
+
 		searchButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-		searchButton.setClickShortcut(KeyCode.ENTER);
 
 		HorizontalLayout buttons = new HorizontalLayout(searchButton, clearButton);
 		buttons.setSpacing(true);
@@ -50,30 +63,37 @@ public class CentralMavenForm extends FormLayout {
 		userForm.setSpacing(true);
 		userForm.setMargin(new MarginInfo(false, true));
 		content.addComponent(userForm);
-		
+
 		// Add tree
-		searchButton.addClickListener(e ->{
+		searchButton.addClickListener(e -> {
 			// erasing any previous components shown
-			if(content.getComponentIndex(notFound) != -1){
+			if (content.getComponentIndex(notFound) != -1) {
 				content.removeComponent(notFound);
 			}
-			if(content.getComponentIndex(tree) != -1){
+			if (content.getComponentIndex(tree) != -1) {
 				content.removeComponent(tree);
 			}
-			// check exist component from central Maven repository 
-			tree = new CentralMaven(session).getTree(group.getValue(),artifact.getValue(),
-					version.getValue(),packaging.getValue());
-			if(tree == null){
+			// check exist component from central Maven repository
+			tree = new CentralMaven(myUI.getSession()).getTree(group.getValue(), artifact.getValue(), version.getValue(),
+					packaging.getValue());
+			if (tree == null) {
 				content.addComponent(notFound);
-			}
-			else{
+			} else {
+				tree.addShortcutListener(new ShortcutListener("", KeyCode.ENTER, null) {
+					@Override
+					public void handleAction(Object sender, Object target) {
+						if (tree.getValue() != null && !(tree.areChildrenAllowed((Object) tree.getValue()))
+								&& myUI.getWindows().isEmpty()) {
+							myUI.addWindow(new CheckUploadModal(tree.getValue().toString(), myUI.getSession()));
+						}
+					}
+				});
 				content.addComponent(tree);
 			}
 		});
-		
 
 		// Clear user form
-		clearButton.addClickListener(e ->{
+		clearButton.addClickListener(e -> {
 			content.removeAllComponents();
 			group.clear();
 			artifact.clear();
@@ -81,10 +101,59 @@ public class CentralMavenForm extends FormLayout {
 			packaging.select(TypePackaging.jar);
 			content.addComponent(userForm);
 		});
-		
+
 		content.setSpacing(true);
 		addComponent(content);
 	}
-	
-	
+
+	private static class CheckUploadModal extends Window {
+		public CheckUploadModal(String urlText, VaadinSession session) {
+			super("Upload " + urlText.substring(urlText.lastIndexOf('/') + 1) + " to buffer?");
+			VerticalLayout content = new VerticalLayout();
+			content.setWidth("500px");
+			content.setHeight("100px");
+
+			HorizontalLayout buttonLayout = new HorizontalLayout();
+
+			Button uploadButton = new Button("Upload");
+			uploadButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
+			Button cancelButton = new Button("Cancel");
+
+			buttonLayout.addComponents(uploadButton, cancelButton);
+
+			buttonLayout.setSpacing(true);
+			buttonLayout.setMargin(true);
+
+			content.addComponent(buttonLayout);
+			content.setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
+
+			center();
+			setClosable(false);
+			setResizable(false);
+
+			uploadButton.addClickListener(e -> {
+				File file;
+				try {
+					URL url = new URL(urlText);
+					file = new File(url.toString());
+					InputStream input = url.openStream();
+					Activator.instance().getBuffer(session.getSession()).put(file.getName(), input);
+					Notification notif = new Notification("Info", "Artefact from central maven upload sucess",
+							Notification.Type.ASSISTIVE_NOTIFICATION);
+					notif.setPosition(Position.TOP_RIGHT);
+					notif.show(Page.getCurrent());
+				} catch (IOException | RefusedArtifactException ex) {
+					new Notification("Could not open or load file from url", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
+					.show(Page.getCurrent());
+				}
+				close();
+			});
+
+			cancelButton.addClickListener(e -> {
+				close();
+			});
+
+			setContent(content);
+		}
+	}
 }
