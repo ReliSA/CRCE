@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-        <relativePath>../pom</relativePath>
-        <groupId>cz.zcu.kiv.crce</groupId>
-        <artifactId>crce-modules-parent</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
-    </parent>
+		<relativePath>../pom</relativePath>
+		<groupId>cz.zcu.kiv.crce</groupId>
+		<artifactId>crce-modules-parent</artifactId>
+		<version>2.1.1-SNAPSHOT</version>
+	</parent>
 	<!-- <groupId>cz.zcu.kiv.crce</groupId> -->
 	<artifactId>crce-webui-vaadin</artifactId>
 	<packaging>war</packaging>
@@ -19,7 +19,7 @@
 
 	<properties>
 		<bundle.symbolicName>CRCE - Web UI (Vaadin)</bundle.symbolicName>
-        <bundle.namespace>${namespace}.crce_webui_vaadin</bundle.namespace>
+		<bundle.namespace>${namespace}.crce_webui_vaadin</bundle.namespace>
 		<vaadin.version>7.7.10</vaadin.version>
 		<vaadin.plugin.version>7.7.10</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
@@ -74,11 +74,6 @@
 				<version>3.3.9</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.7.22</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-artifact</artifactId>
 				<version>3.3.9</version>
@@ -87,6 +82,36 @@
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-utils</artifactId>
 				<version>3.0.22</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.indexer</groupId>
+				<artifactId>indexer-core</artifactId>
+				<version>5.1.2-4333789</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-http-lightweight</artifactId>
+				<version>2.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.sisu</groupId>
+				<artifactId>org.eclipse.sisu.plexus</artifactId>
+				<version>0.3.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.aether</groupId>
+				<artifactId>aether-util</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.7.22</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.sisu</groupId>
+				<artifactId>sisu-guice</artifactId>
+				<version>3.2.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -134,16 +159,36 @@
 			<artifactId>maven-aether-provider</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-artifact</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.indexer</groupId>
+			<artifactId>indexer-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-http-lightweight</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.sisu</groupId>
+			<artifactId>org.eclipse.sisu.plexus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.aether</groupId>
+			<artifactId>aether-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.sisu</groupId>
+			<artifactId>sisu-guice</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cz.zcu.kiv.crce</groupId>
@@ -158,7 +203,7 @@
 			<type>bundle</type>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -239,13 +284,13 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-ClassPath>
 							WEB-INF/classes,
-							WEB-INF/lib/aether-api-1.1.0.jar,
+							WEB-INF/lib/aether-api-1.13.1.jar,
 							WEB-INF/lib/aether-connector-basic-1.1.0.jar,
 							WEB-INF/lib/aether-impl-1.1.0.jar,
 							WEB-INF/lib/aether-spi-1.1.0.jar,
 							WEB-INF/lib/aether-transport-file-1.1.0.jar,
 							WEB-INF/lib/aether-transport-http-1.1.0.jar,
-							WEB-INF/lib/aether-util-1.1.0.jar,
+							WEB-INF/lib/aether-util-1.13.1.jar,
 							WEB-INF/lib/atmosphere-runtime-2.2.9.vaadin2.jar,
 							WEB-INF/lib/commons-codec-1.6.jar,
 							WEB-INF/lib/crce-external-repository-1.0.jar,
@@ -271,7 +316,18 @@
 							WEB-INF/lib/vaadin-server-7.7.10.jar,
 							WEB-INF/lib/vaadin-shared-7.7.10.jar,
 							WEB-INF/lib/vaadin-slf4j-jdk14-1.6.1.jar,
-							WEB-INF/lib/vaadin-themes-7.7.10.jar
+							WEB-INF/lib/vaadin-themes-7.7.10.jar,
+							WEB-INF/lib/org.eclipse.sisu.plexus-0.3.3.jar,
+							WEB-INF/lib/org.eclipse.sisu.inject-0.3.3.jar,
+							WEB-INF/lib/wagon-provider-api-2.3.jar,
+							WEB-INF/lib/wagon-http-shared4-2.3.jar,
+							WEB-INF/lib/wagon-http-lightweight-2.3.jar,
+							WEB-INF/lib/indexer-core-5.1.2-4333789.jar,
+							WEB-INF/lib/indexer-artifact-5.1.2-4333789.jar,
+							WEB-INF/lib/lucene-core-3.6.2.jar,
+							WEB-INF/lib/lucene-queries-3.6.2.jar,
+							WEB-INF/lib/lucene-memory-3.6.2.jar,
+							WEB-INF/lib/lucene-highlighter-3.6.2.jar
 						</Bundle-ClassPath>
 						<Webapp-Context>crce-vaadin</Webapp-Context>
 						<Web-ContextPath>crce-vaadin</Web-ContextPath>

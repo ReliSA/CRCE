@@ -35,6 +35,7 @@ public class MenuForm extends FormLayout{
 		repository.addItem("Plugins", e ->{myUI.setContentBodyPlugins();});
 		
 		// submenu settings
+		settings.addItem("Index", e ->{myUI.setContentBodyCheckMavenIndexForm();});
 		settings.addItem("Paths", e ->{myUI.setContentSettings();});
 		
 		// Menu login

@@ -456,7 +456,7 @@
 			</dependency>
 
 			<!-- Other 3rd party dependencies -->
-
+			
 			<dependency>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-utils</artifactId>
@@ -470,7 +470,6 @@
 				<type>jar</type>
 				<scope>provided</scope>
 			</dependency>
-
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
@@ -483,7 +482,6 @@
 				<version>3.3.2</version>
 				<scope>provided</scope>
 			</dependency>
-
 			<dependency>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>org.apache.felix.utils</artifactId>

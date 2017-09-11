@@ -19,6 +19,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
@@ -38,6 +39,8 @@ public class CentralMavenForm extends FormLayout {
 	private TextField artifact = new TextField("Artifact Id");
 	private TextField version = new TextField("Version");
 	private NativeSelect packaging = new NativeSelect("Packaging");
+	private OptionGroup directIndexOption = new OptionGroup("Direct or search index");
+	private NativeSelect rangeOption = new NativeSelect("Range");
 	private Button searchButton = new Button("Search");
 	private Button clearButton = new Button("Clear");
 	private Label notFound = new Label("No artifact found");
@@ -51,15 +54,32 @@ public class CentralMavenForm extends FormLayout {
 	public CentralMavenForm(MyUI myUI) {
 		VerticalLayout userForm = new VerticalLayout();
 		HorizontalLayout content = new HorizontalLayout();
+		HorizontalLayout versionLayout = new HorizontalLayout();
 		packaging.addItems(EnumSet.allOf(TypePackaging.class));
 		packaging.select(TypePackaging.jar);
 		packaging.setNullSelectionAllowed(false);
+		
+		group.setWidth("250px");
+		artifact.setWidth("250px");
+		
+		directIndexOption.addItems("Direct", "Index");
+		directIndexOption.setValue("Direct");
+		
+		rangeOption.addItem("<=");
+		rangeOption.addItem("=");
+		rangeOption.addItem(">=");
+		rangeOption.select("=");
+		rangeOption.setNullSelectionAllowed(false);
+		rangeOption.setEnabled(false);
+		
+		versionLayout.addComponents(version, rangeOption);
+		versionLayout.setSpacing(true);
 
 		searchButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
 		HorizontalLayout buttons = new HorizontalLayout(searchButton, clearButton);
 		buttons.setSpacing(true);
-		userForm.addComponents(caption, group, artifact, version, packaging, buttons);
+		userForm.addComponents(caption, group, artifact, versionLayout, packaging, directIndexOption, buttons);
 		userForm.setSpacing(true);
 		userForm.setMargin(new MarginInfo(false, true));
 		content.addComponent(userForm);
@@ -74,8 +94,29 @@ public class CentralMavenForm extends FormLayout {
 				content.removeComponent(tree);
 			}
 			// check exist component from central Maven repository
-			tree = new CentralMaven(myUI.getSession()).getTree(group.getValue(), artifact.getValue(), version.getValue(),
-					packaging.getValue());
+			if(directIndexOption.getValue().equals("Direct")){
+				tree = new CentralMaven(myUI.getSession()).getTree(group.getValue(), artifact.getValue(), version.getValue(),
+						packaging.getValue(), directIndexOption.getValue(), null);
+			}
+			else{
+				if(group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()){
+					Notification notif = new Notification("Incomplete assignment!",
+							Notification.Type.WARNING_MESSAGE);
+					notif.setDelayMsec(5000);
+					notif.show(Page.getCurrent());
+				}
+				else if(group.getValue().charAt(0) == '*' || group.getValue().charAt(0) == '?' || artifact.getValue().charAt(0) == '*'
+						|| artifact.getValue().charAt(0) == '?'){
+					Notification notif = new Notification("Can not start a search term with '*' or '?'",
+							Notification.Type.WARNING_MESSAGE);
+					notif.setDelayMsec(5000);
+					notif.show(Page.getCurrent());
+				}
+				else{
+					tree = new CentralMaven(myUI.getSession()).getTree(group.getValue(), artifact.getValue(), version.getValue(),
+							packaging.getValue(), directIndexOption.getValue(), rangeOption.getValue().toString());
+				}
+			}
 			if (tree == null) {
 				content.addComponent(notFound);
 			} else {
@@ -89,6 +130,21 @@ public class CentralMavenForm extends FormLayout {
 					}
 				});
 				content.addComponent(tree);
+			}
+		});
+		
+		directIndexOption.addValueChangeListener(e ->{
+			if(directIndexOption.getValue().equals("Direct")){
+				rangeOption.setEnabled(false);
+				group.setRequired(false);
+				artifact.setRequired(false);
+			}
+			else{
+				rangeOption.setEnabled(true);
+				group.setRequired(true);
+				group.setRequiredError("The item can not be empty!");
+				artifact.setRequired(true);
+				artifact.setRequiredError("The item can not be empty!");
 			}
 		});
 

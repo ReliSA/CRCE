@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.webui;
 
 import javax.servlet.annotation.WebServlet;
+
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.Page;
@@ -11,6 +13,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.CentralMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.outer.CheckMavenIndexForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.DefinedMavenForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LoadFileForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LocalMavenForm;
@@ -27,12 +30,14 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.repository.StoreForm;
  */
 @SuppressWarnings("serial")
 @Theme("mytheme")
+@Push
 public class MyUI extends UI {
 	private Panel head = new Panel();
 	private Panel body = new Panel();
 	private Panel footer = new Panel();
 	private LocalMavenForm localMavenForm;
 	private CentralMavenForm centralMavenForm;
+	private CheckMavenIndexForm checkMavenIndexFrom;
 	private DefinedMavenForm definedMavenForm;
 	private LoadFileForm loadFileForm;
 	private BufferForm bufferForm;
@@ -104,6 +109,11 @@ public class MyUI extends UI {
     public void setContentBodyCentralMaven(){
     	centralMavenForm = new CentralMavenForm(this);
     	body.setContent(centralMavenForm);
+    }
+    
+    public void setContentBodyCheckMavenIndexForm(){
+    	checkMavenIndexFrom = new CheckMavenIndexForm(this);
+    	body.setContent(checkMavenIndexFrom);
     }
     
     public void setContentBodyDefinedMaven(){
