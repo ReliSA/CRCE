@@ -18,7 +18,7 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.other.KeyWord;
 import cz.zcu.kiv.crce.plugin.Plugin;
 
 @SuppressWarnings("serial")
-public class PluginFormEdit extends FormLayout{
+public class PluginEditForm extends FormLayout{
 	private int nameMaxLenght = 45;
 	private Label labelKeyWords = new Label("Plugin key words");
 	private Grid gridKeyWords = new Grid();
@@ -26,7 +26,7 @@ public class PluginFormEdit extends FormLayout{
 	private TextField version = new TextField("Version");
 	private Button editButton = new Button("Edit");
 	private Plugin plugin;
-	public PluginFormEdit(PluginsForm pluginsForm){
+	public PluginEditForm(PluginsForm pluginsForm){
 		HorizontalLayout content = new HorizontalLayout();
 		VerticalLayout editLayout = new VerticalLayout();
 		VerticalLayout keyWordLayout = new VerticalLayout();

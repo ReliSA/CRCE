@@ -18,13 +18,13 @@ public class PluginsForm extends FormLayout{
 	private Label labelForm = new Label("Plugins");
 	private Grid gridPlugins = new Grid();
 	private Grid gridKeyWords = new Grid();
-	private PluginFormEdit pluginFormEdit;
+	private PluginEditForm pluginEditForm;
 	private HorizontalLayout formLayout;
 	private MyUI myUI;
 	
 	public PluginsForm(MyUI myUI){
 		this.myUI = myUI;
-		pluginFormEdit = new PluginFormEdit(this);
+		pluginEditForm = new PluginEditForm(this);
 		
 		VerticalLayout content = new VerticalLayout();
 		VerticalLayout fieldLayout = new VerticalLayout();
@@ -46,12 +46,12 @@ public class PluginsForm extends FormLayout{
 		fieldLayout.addComponents(labelForm, gridPlugins);
 		fieldLayout.setSpacing(true);
 		
-		formLayout = new HorizontalLayout(fieldLayout, pluginFormEdit);
+		formLayout = new HorizontalLayout(fieldLayout, pluginEditForm);
 		formLayout.setSpacing(true);
 		formLayout.setSizeFull();
 		gridPlugins.setSizeFull();
 		formLayout.setExpandRatio(fieldLayout, 1);
-		pluginFormEdit.setVisible(false);
+		pluginEditForm.setVisible(false);
 		
 		content.addComponent(formLayout);
 		content.setMargin(new MarginInfo(false, true));
@@ -59,10 +59,10 @@ public class PluginsForm extends FormLayout{
 		
 		gridPlugins.addSelectionListener(e -> {
 			if (e.getSelected().isEmpty()) {
-				pluginFormEdit.setVisible(false);
+				pluginEditForm.setVisible(false);
 			} else {
 				Plugin plugin = (Plugin) e.getSelected().iterator().next();
-				pluginFormEdit.setPlugin(plugin);
+				pluginEditForm.setPlugin(plugin);
 			}
 		});
 		

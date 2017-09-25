@@ -31,7 +31,7 @@ public class MenuForm extends FormLayout{
 		
 		// submenu repository
 		repository.addItem("Buffer", e ->{myUI.setContentBodyBuffer();});
-		repository.addItem("Store", null);
+		repository.addItem("Store", e->{myUI.setContentBodyStore();});
 		repository.addItem("Plugins", e ->{myUI.setContentBodyPlugins();});
 		
 		// submenu settings

@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.crce_webui_vaadin.repository;
 
-import java.io.IOException;
+import java.util.List;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -26,15 +26,14 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_vaadin.webui.MyUI;
-import cz.zcu.kiv.crce.metadata.Resource;
 
-@SuppressWarnings("serial")
 public class BufferForm extends FormLayout{
+	private static final long serialVersionUID = 6675695008606881678L;
 	private Label labelForm = new Label("Artefact in Buffer");
 	private TextField idText = new TextField();
 	private Grid gridBuffer = new Grid();
 	private PopupView popup;
-	private Resource resourceSelect;
+	private transient ResourceBean resourceBeanSelect;
 	private ResourceService resourceService;
 	
 	public BufferForm(MyUI myUI){
@@ -45,24 +44,33 @@ public class BufferForm extends FormLayout{
 		resourceService = new ResourceService(Activator.instance().getMetadataService());
 		
 		Button buttonDetail = new Button("Detail");
+		buttonDetail.setWidth("100px");
 		Button buttonRemove = new Button("Remove");
+		buttonRemove.setWidth("100px");
+		Button buttonPush = new Button("Push to Store");
+		buttonPush.setDescription("Push all artefact from Buffer to Store");
+		buttonPush.setStyleName(ValoTheme.BUTTON_FRIENDLY);
 		
 		buttonDetail.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		buttonDetail.setClickShortcut(KeyCode.ENTER);
 		
 		labelForm.addStyleName(ValoTheme.LABEL_BOLD);
 		
-		gridBuffer.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, resourceService.getAllResourceBean(myUI.getSession().getSession())));
+		List<ResourceBean> resourceBeanList = resourceService.getAllResourceBeanFromBuffer(myUI.getSession().getSession());
+		
+		gridBuffer.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, resourceBeanList));
 		gridBuffer.getColumn("resource").setHidden(true);
+		gridBuffer.getColumn("size").setHidden(true);
 		gridBuffer.setColumnOrder("presentationName", "symbolicName", "version", "categories");
 		gridBuffer.addStyleName("my-style");
 		
-		idText.setInputPrompt("search by name...");
+		idText.setInputPrompt("search by presentation name...");
+		idText.setWidth("270px");
 		
 		Button findButton = new Button(FontAwesome.CHECK);
 		findButton.addClickListener(e ->{
 			gridBuffer.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, 
-					resourceService.getFindResourceBean(myUI.getSession().getSession(), idText.getValue())));
+					resourceService.getFindResourceBeanFromBuffer(myUI.getSession().getSession(), idText.getValue())));
 		});
 		Button clearButton = new Button(FontAwesome.TIMES);
 		clearButton.addClickListener(e -> {
@@ -73,8 +81,20 @@ public class BufferForm extends FormLayout{
 		filtering.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		filtering.addComponents(idText, findButton, clearButton);
 		
+		HorizontalLayout filteringPushLayout = new HorizontalLayout();
+		filteringPushLayout.addComponents(filtering, buttonPush);
+		filteringPushLayout.setSpacing(true);
+		filteringPushLayout.setSizeFull();
+		filteringPushLayout.setComponentAlignment(buttonPush, Alignment.MIDDLE_RIGHT);
 		
-		fieldLayout.addComponents(labelForm, filtering, gridBuffer);
+		if(resourceBeanList.isEmpty()){
+			buttonPush.setVisible(false);
+		}
+		else{
+			buttonPush.setVisible(true);
+		}
+	
+		fieldLayout.addComponents(labelForm, filteringPushLayout, gridBuffer);
 		fieldLayout.setSpacing(true);
 		
 		HorizontalLayout formLayout = new HorizontalLayout(fieldLayout);
@@ -108,30 +128,45 @@ public class BufferForm extends FormLayout{
 		
 		gridBuffer.addSelectionListener(e ->{
 			buttonLayout.setVisible(true);
-			resourceSelect = ((ResourceBean)e.getSelected().iterator().next()).getResource();
+			resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+		});
+		
+		buttonDetail.addClickListener(e ->{
+			myUI.setContentArtefactDetailForm(resourceBeanSelect, false);
 		});
 		
 		buttonRemove.addClickListener(e ->{
 			popup.setPopupVisible(true);
 			yesRemoveButton.addClickListener(ev -> {
-				try {
-					boolean result = Activator.instance().getBuffer(myUI.getSession().getSession()).remove(resourceSelect);
-					if(result){
-						Notification notif = new Notification("Info", "Artefact sucess removed",
-								Notification.Type.ASSISTIVE_NOTIFICATION);
-						notif.setPosition(Position.TOP_RIGHT);
-						notif.show(Page.getCurrent());
-					}
-					else{
-						new Notification("Could not remove artefact from buffer", Notification.Type.WARNING_MESSAGE)
-						.show(Page.getCurrent());
-					}
-					myUI.setContentBodyBuffer();
-				} catch (IOException ex) {
-					new Notification("Error while removing the artifact", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
+				boolean result = resourceService.removeResourceFromBuffer(myUI.getSession().getSession(), 
+						resourceBeanSelect.getResource());
+				if(result){
+					Notification notif = new Notification("Info", "Artifact sucess removed",
+							Notification.Type.ASSISTIVE_NOTIFICATION);
+					notif.setPosition(Position.TOP_RIGHT);
+					notif.show(Page.getCurrent());
+				}
+				else{
+					new Notification("Could not remove artefact from buffer", Notification.Type.WARNING_MESSAGE)
 					.show(Page.getCurrent());
 				}
+				myUI.setContentBodyBuffer();
 			});
+		});
+		
+		buttonPush.addClickListener(e ->{
+			boolean result = resourceService.pushResourcesToStore(myUI.getSession());
+			if(result){
+				Notification notif = new Notification("Info", "All artifacts have been successfully moved to the Store.",
+						Notification.Type.ASSISTIVE_NOTIFICATION);
+				notif.setPosition(Position.TOP_RIGHT);
+				notif.show(Page.getCurrent());
+			}
+			else{
+				new Notification("Could not commit artifacts to Store", Notification.Type.WARNING_MESSAGE)
+				.show(Page.getCurrent());
+			}
+			myUI.setContentBodyBuffer();
 		});
 		
 		addComponent(content);

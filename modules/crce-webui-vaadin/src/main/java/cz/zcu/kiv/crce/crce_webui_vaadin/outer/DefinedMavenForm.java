@@ -67,6 +67,8 @@ public class DefinedMavenForm extends FormLayout implements Serializable {
 		HorizontalLayout treeLayout = new HorizontalLayout();
 		VerticalLayout formLayout = new VerticalLayout();
 		HorizontalLayout content = new HorizontalLayout();
+		
+		caption.addStyleName(ValoTheme.LABEL_BOLD);
 
 		definedUrl.setWidth("450px");
 

@@ -8,10 +8,11 @@ public class ResourceBean{
 	private String symbolicName;
 	private String version;
 	private String categories;
+	private long size;
 	private Resource resource;
 	
 	public ResourceBean(String presentationName, String symbolicName, Version version, 
-			String[] categories, Resource resource) {
+			String[] categories, long size, Resource resource) {
 		this.presentationName = presentationName;
 		this.symbolicName = symbolicName;
 		if(version == null){
@@ -29,6 +30,7 @@ public class ResourceBean{
 		else{
 			this.categories = "unknown-categories";
 		}
+		this.size = size;
 		this.resource = resource;
 	}
 
@@ -50,6 +52,10 @@ public class ResourceBean{
 
 	public String getCategories() {
 		return categories;
+	}
+	
+	public long getSize() {
+		return size;
 	}
 
 	@Override

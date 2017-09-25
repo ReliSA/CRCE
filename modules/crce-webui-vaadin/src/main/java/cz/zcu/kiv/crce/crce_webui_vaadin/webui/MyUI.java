@@ -17,9 +17,12 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.outer.CheckMavenIndexForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.DefinedMavenForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LoadFileForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.outer.LocalMavenForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.repository.ArtefactDetailForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.BufferForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.repository.NewCapabilityForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.StoreForm;
+import cz.zcu.kiv.crce.crce_webui_vaadin.repository.classes.ResourceBean;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -42,6 +45,8 @@ public class MyUI extends UI {
 	private LoadFileForm loadFileForm;
 	private BufferForm bufferForm;
 	private StoreForm storeForm;
+	private ArtefactDetailForm artefactDetailForm;
+	private NewCapabilityForm newCapabilityForm;
 	private PluginsForm pluginsForm;
 	private SettingsForm settingsForm;
 	private VerticalLayout content = new VerticalLayout();
@@ -132,8 +137,18 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyStore(){
-    	storeForm = new StoreForm();
+    	storeForm = new StoreForm(this);
     	body.setContent(storeForm);
+    }
+    
+    public void setContentArtefactDetailForm(ResourceBean resourceBean, boolean isFromStore){
+    	artefactDetailForm = new ArtefactDetailForm(this, resourceBean, isFromStore);
+    	body.setContent(artefactDetailForm);
+    }
+    
+    public void setContentNewCapabilityForm(ResourceBean resourceBean, boolean isFromStore){
+    	newCapabilityForm = new NewCapabilityForm(this, resourceBean, isFromStore);
+    	body.setContent(newCapabilityForm);
     }
     
     public void setContentBodyPlugins(){

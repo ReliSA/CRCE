@@ -44,6 +44,8 @@ public class LocalMavenForm extends FormLayout {
 
 	public LocalMavenForm(MyUI myUI) {
 		VerticalLayout content = new VerticalLayout();
+		caption.addStyleName(ValoTheme.LABEL_BOLD);
+		
 		// Tree of Maven local repository
 		Tree localMavenTree = localMaven.getTree(myUI.getSession());
 		content.setMargin(new MarginInfo(false, true));

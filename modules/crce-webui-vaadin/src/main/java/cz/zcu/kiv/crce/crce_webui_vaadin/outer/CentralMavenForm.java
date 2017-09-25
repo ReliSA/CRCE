@@ -59,6 +59,8 @@ public class CentralMavenForm extends FormLayout {
 		packaging.select(TypePackaging.jar);
 		packaging.setNullSelectionAllowed(false);
 		
+		caption.addStyleName(ValoTheme.LABEL_BOLD);
+		
 		group.setWidth("250px");
 		artifact.setWidth("250px");
 		
