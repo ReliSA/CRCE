@@ -18,7 +18,7 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in crce-modules-reactor module:
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module:
 
 `mvn pax:provision`
 
