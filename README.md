@@ -48,6 +48,12 @@ Started up, the application is accessible at:
 
 Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).
 
-## Code update
+### lpsolve installation
+
+To solve the issue with mathematical solver, you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.
+
+> Note that on Windows, you do not have to place the libs to `\WINDOWS` or `\WINDOWS\SYSTEM32` as the guide states. Put it wherever you wish and add the directory to your `Path`.
+
+## Code updates
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.
