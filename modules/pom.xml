@@ -58,7 +58,6 @@
     <modules>
         <module>pom</module>
         
-
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <!--<module>crce-metadata-cosi-bundle</module>-->
@@ -86,6 +85,7 @@
         
         <module>crce-webui-vaadin</module>
         <module>provision</module>
+        <module>crce-external-repository</module>
     </modules>
 
     <profiles>

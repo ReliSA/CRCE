@@ -7,6 +7,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
 
+import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+
 @SuppressWarnings("serial")
 public class LocalMaven implements Serializable{
 	private Tree localMavenTree = new Tree();

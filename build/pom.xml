@@ -27,7 +27,7 @@
 		<version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
 		<version.org.osgi>4.3.1</version.org.osgi>
 		<!-- <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web> -->
-		<version.org.ops4j.pax.web>6.0.6</version.org.ops4j.pax.web>
+		<version.org.ops4j.pax.web>6.0.7</version.org.ops4j.pax.web>
 		<version.org.apache.felix.dependencymanager>3.2.0</version.org.apache.felix.dependencymanager>
 		<version.com.fasterxml.jackson>2.6.1</version.com.fasterxml.jackson>
 		<version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
@@ -149,7 +149,8 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.9</version>
+					<version>3.0.2</version>
+					<!-- <version>2.9</version> -->
 				</plugin>
 				<plugin>
 					<groupId>org.apache.cxf</groupId>

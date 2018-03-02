@@ -7,7 +7,9 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
-import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.MavenIndex;
+
+import cz.zcu.kiv.crce.crce_external_repository.api.MavenIndex;
+import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_vaadin.webui.MyUI;
 
 @SuppressWarnings("serial")
@@ -47,7 +49,7 @@ public class CheckMavenIndexForm extends FormLayout {
 		public void run() {
 			try {
 				MavenIndex check = new MavenIndex();
-				result = check.checkIndex(session);
+				result = check.checkIndex((SettingsUrl)session.getAttribute("settingsUrl"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
@@ -56,6 +58,7 @@ public class CheckMavenIndexForm extends FormLayout {
 				myUI.access(() -> bar.setIndeterminate(false));
 				if (result != null) {
 					myUI.access(() -> statusLabel.setValue(result));
+					session.setAttribute("mavenIndex", true);
 				}
 				else{
 					myUI.access(() -> statusLabel.setValue("Error when creating index!"));

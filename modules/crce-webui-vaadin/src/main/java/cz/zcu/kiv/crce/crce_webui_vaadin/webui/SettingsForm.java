@@ -14,7 +14,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+
+//import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.SettingsUrl;
 
 @SuppressWarnings("serial")
 public class SettingsForm extends FormLayout {

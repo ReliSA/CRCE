@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,21 +37,19 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
 
-import com.vaadin.server.VaadinSession;
-
 public class MavenIndex {
 	private String centralCachePath = "repository-index/central-cache";
 	private String centralIndexPath = "repository-index/central-index";
 
-	public String checkIndex(VaadinSession session) throws Exception {
+	public String checkIndex(SettingsUrl settings) throws Exception {
 		final MavenIndex indexCentralRepository = new MavenIndex();
-		return indexCentralRepository.perform(session);
+		return indexCentralRepository.perform(settings);
 	}
 
-	public List<ArtifactInfo> searchArtefact(VaadinSession session, String group, String artifact, 
+	public List<ArtifactInfo> searchArtefact(SettingsUrl settings, String group, String artifact, 
 			String version, String packaging, String range) throws Exception {
 		final MavenIndex indexCentralRepository = new MavenIndex();
-		return indexCentralRepository.getArtefact(session, group, artifact, version, packaging, range);
+		return indexCentralRepository.getArtefact(settings, group, artifact, version, packaging, range);
 	}
 
 	private final PlexusContainer plexusContainer;
@@ -61,13 +59,16 @@ public class MavenIndex {
 	private IndexingContext centralContext;
 
 	public MavenIndex() throws PlexusContainerException, ComponentLookupException {
+		/*final DefaultContainerConfiguration config = new DefaultContainerConfiguration();
+        config.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
+        this.plexusContainer = new DefaultPlexusContainer(config);*/
 		this.plexusContainer = new DefaultPlexusContainer();
 		this.indexer = plexusContainer.lookup(Indexer.class);
 		this.indexUpdater = plexusContainer.lookup(IndexUpdater.class);
 		this.httpWagon = plexusContainer.lookup(Wagon.class, "http");
 	}
 
-	private String perform(VaadinSession session)
+	private String perform(SettingsUrl settings)
 			throws IOException, ComponentLookupException, InvalidVersionSpecificationException {
 		File centralLocalCache = new File(centralCachePath);
 		File centralIndexDir = new File(centralIndexPath);
@@ -80,13 +81,13 @@ public class MavenIndex {
 
 		// Create context for central repository index
 
-		if (session.getAttribute("settingsUrl") == null) {
+		if (settings == null) {
 			SettingsUrl settingsUrl = new SettingsUrl();
 			centralContext = indexer.createIndexingContext("central-context", "central", centralLocalCache,
 					centralIndexDir, settingsUrl.getCentralMavenUrl(), null, true, true, indexers);
 		} else {
 			centralContext = indexer.createIndexingContext("central-context", "central", centralLocalCache,
-					centralIndexDir, ((SettingsUrl) session.getAttribute("settingsUrl")).getCentralMavenUrl(), null,
+					centralIndexDir, settings.getCentralMavenUrl(), null,
 					true, true, indexers);
 		}
 
@@ -114,7 +115,6 @@ public class MavenIndex {
 		
 		closeIndexer();
 		
-		session.setAttribute("mavenIndex", true);
 		if (updateResult.isFullUpdate()) {
 			return "Full update happened!";
 		} else if (updateResult.getTimestamp().equals(centralContextCurrentTimestamp)) {
@@ -125,7 +125,7 @@ public class MavenIndex {
 		}
 	}
 
-	private List<ArtifactInfo> getArtefact(VaadinSession session, String group, String artifact, String version, String packaging, String range)
+	private List<ArtifactInfo> getArtefact(SettingsUrl settings, String group, String artifact, String version, String packaging, String range)
 			throws IOException, ComponentLookupException, InvalidVersionSpecificationException {
 		
 		File centralLocalCache = new File(centralCachePath);
@@ -139,13 +139,13 @@ public class MavenIndex {
 
 		// Create context for central repository index
 
-		if (session.getAttribute("settingsUrl") == null) {
+		if (settings == null) {
 			SettingsUrl settingsUrl = new SettingsUrl();
 			centralContext = indexer.createIndexingContext("central-context", "central", centralLocalCache,
 					centralIndexDir, settingsUrl.getCentralMavenUrl(), null, true, true, indexers);
 		} else {
 			centralContext = indexer.createIndexingContext("central-context", "central", centralLocalCache,
-					centralIndexDir, ((SettingsUrl) session.getAttribute("settingsUrl")).getCentralMavenUrl(), null,
+					centralIndexDir, settings.getCentralMavenUrl(), null,
 					true, true, indexers);
 		}
 

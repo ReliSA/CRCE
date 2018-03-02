@@ -48,7 +48,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
+			<!--<dependency>
 				<groupId>org.eclipse.aether</groupId>
 				<artifactId>aether-impl</artifactId>
 				<version>1.1.0</version>
@@ -112,7 +112,7 @@
 				<groupId>org.sonatype.sisu</groupId>
 				<artifactId>sisu-guice</artifactId>
 				<version>3.2.6</version>
-			</dependency>
+			</dependency>-->
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -138,7 +138,7 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.eclipse.aether</groupId>
 			<artifactId>aether-impl</artifactId>
 		</dependency>
@@ -157,7 +157,7 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-aether-provider</artifactId>
-		</dependency>
+		</dependency> 
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-artifact</artifactId>
@@ -189,7 +189,7 @@
 		<dependency>
 			<groupId>org.sonatype.sisu</groupId>
 			<artifactId>sisu-guice</artifactId>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>cz.zcu.kiv.crce</groupId>
 			<artifactId>crce-metadata-osgi-bundle</artifactId>
@@ -200,6 +200,12 @@
 			<groupId>cz.zcu.kiv.crce</groupId>
 			<artifactId>crce-compatibility-api</artifactId>
 			<version>2.1.1-SNAPSHOT</version>
+			<type>bundle</type>
+		</dependency>
+		<dependency>
+			<groupId>cz.zcu.kiv.crce</groupId>
+			<artifactId>crce-external-repository</artifactId>
+			<version>1.0</version>
 			<type>bundle</type>
 		</dependency>
 	</dependencies>
@@ -279,11 +285,14 @@
 						<DynamicImport-Package>
 							*
 						</DynamicImport-Package>
-						<Import-Package>!${bundle.namespace}.internal.*</Import-Package>
+						<Import-Package>
+							cz.zcu.kiv.crce.crce_external_repository.api, 
+							!${bundle.namespace}.internal.*
+						</Import-Package>
 						<Bundle-Activator>${bundle.namespace}.internal.Activator</Bundle-Activator>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-ClassPath>
-							WEB-INF/classes,
+							WEB-INF/classes<!-- , 
 							WEB-INF/lib/aether-api-1.13.1.jar,
 							WEB-INF/lib/aether-connector-basic-1.1.0.jar,
 							WEB-INF/lib/aether-impl-1.1.0.jar,
@@ -293,7 +302,7 @@
 							WEB-INF/lib/aether-util-1.13.1.jar,
 							WEB-INF/lib/atmosphere-runtime-2.2.9.vaadin2.jar,
 							WEB-INF/lib/commons-codec-1.6.jar,
-							WEB-INF/lib/crce-external-repository-1.0.jar,
+							WEB-INF/lib/crce-external-repository-1.0.jar, 
 							WEB-INF/lib/flute-1.3.0.gg2.jar,
 							WEB-INF/lib/guava-18.0.jar,
 							WEB-INF/lib/httpclient-4.3.5.jar,
@@ -327,7 +336,7 @@
 							WEB-INF/lib/lucene-core-3.6.2.jar,
 							WEB-INF/lib/lucene-queries-3.6.2.jar,
 							WEB-INF/lib/lucene-memory-3.6.2.jar,
-							WEB-INF/lib/lucene-highlighter-3.6.2.jar
+							WEB-INF/lib/lucene-highlighter-3.6.2.jar -->
 						</Bundle-ClassPath>
 						<Webapp-Context>crce-vaadin</Webapp-Context>
 						<Web-ContextPath>crce-vaadin</Web-ContextPath>

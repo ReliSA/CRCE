@@ -75,6 +75,8 @@ public class ResourceService implements Serializable{
 		return resources;
 	}
 	
+	// Dořešit!!! V modulu crce-repository-impl ve třídě BufferImpl v metodě isInBuffer (na konci třídy) je kontrola na začátek řetězce
+	// .getPath().startsWith(baseDir.getAbsolutePath())- proč? Pokud se toto zaremuje, resource LZE z Bufferu odebrat
 	public boolean removeResourceFromBuffer(WrappedSession wSession, Resource resource){
 		boolean result;
 		try {

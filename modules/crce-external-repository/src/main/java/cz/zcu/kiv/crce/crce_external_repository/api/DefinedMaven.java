@@ -1,6 +1,9 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -23,34 +26,36 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.version.Version;
 
-import com.vaadin.server.FontAwesome;
-import com.vaadin.ui.Tree;
-
 public class DefinedMaven {
-	private Tree definedMavenTree = new Tree("Result Search");
+	private ArtifactTree definedArtefact;
 	private String groupText;
 	private String idText;
 	private String versionText;
 	private String packagingText;
+
 	private SettingsUrl settings;
 
 	public DefinedMaven(SettingsUrl settings) {
 		this.settings = settings;
 	}
 
-	public Tree getTree(String group, String idText, String version, Object packaging) {
+	public ArtifactTree getArtifact(String group, String idText, String version, Object packaging) {
 		// validator empty entries
 		if (group.equals("") || idText.equals("")) {
 			return null;
 		} else {
-			// reset tree
-			definedMavenTree.removeAllItems();
 			this.groupText = group;
 			this.idText = idText;
 			this.versionText = version;
 			this.packagingText = packaging.toString();
 			callAetherLib();
-			return definedMavenTree;
+			/*
+			 * System.out.println(new File(settings.getLocalAetherUrl()).mkdirs());
+			 * List<String> pomoc = new ArrayList<String>(); pomoc.add("0.0.0");
+			 * 
+			 * definedArtefact = new ArtifactTree("cz.pokus", "pokusId", pomoc, "jar");
+			 */
+			return definedArtefact;
 		}
 	}
 
@@ -59,8 +64,6 @@ public class DefinedMaven {
 				.build();
 		RepositorySystem repoSystem = newRepositorySystem();
 		RepositorySystemSession session = newSession(repoSystem, settings.getLocalAetherUrl());
-
-		// Artifact artifact = new DefaultArtifact("groupId:artifactId:(0,]");
 		Artifact artifact;
 		if (!versionText.equals("")) {
 			artifact = new DefaultArtifact(groupText + ":" + idText + ":" + "[" + versionText + "]");
@@ -71,22 +74,18 @@ public class DefinedMaven {
 		try {
 			VersionRangeResult versionResult = repoSystem.resolveVersionRange(session, request);
 			if (versionResult.getVersions().isEmpty()) {
-				definedMavenTree = null;
+				definedArtefact = null;
 			} else {
-				String[] pom = artifact.getGroupId().split("\\.");
-				definedMavenTree.addItem(pom[0]);
-				for (int i = 1; i < pom.length; i++) {
-					definedMavenTree.addItem(pom[i]);
-					definedMavenTree.setParent(pom[i], pom[i - 1]);
-				}
-
+				List<String> versionTextList = new ArrayList<String>();
 				if (versionResult.getVersions().size() > 1) {
 					for (Version v : versionResult.getVersions()) {
-						addArtefactToTree(artifact, v, pom[pom.length - 1]);
+						versionTextList.add(v.toString());
 					}
 				} else {
-					addArtefactToTree(artifact, versionResult.getHighestVersion(), pom[pom.length - 1]);
+					versionTextList.add(versionResult.getHighestVersion().toString());
 				}
+				definedArtefact = new ArtifactTree(artifact.getGroupId(), artifact.getArtifactId(), versionTextList,
+						packagingText);
 			}
 
 		} catch (VersionRangeResolutionException e) {
@@ -94,41 +93,13 @@ public class DefinedMaven {
 		}
 	}
 
-	private void addArtefactToTree(Artifact artifact, Version version, String parent) {
-		definedMavenTree.addItem(artifact.getArtifactId());
-		definedMavenTree.setParent(artifact.getArtifactId(), parent);
-		definedMavenTree.addItem(version.toString());
-		definedMavenTree.setParent(version.toString(), artifact.getArtifactId());
-
-		// konečný artefact je komplet url link např. pro wget - UPRAVIT DLE
-		// POTŘEBY
-		/*
-		 * String artifactText = settings.getExternalAetherUrl() + "/" +
-		 * groupText + "/" + idText + "/" + version + "." + packagingText;
-		 */
-		String artifactText = groupText + ":" + idText + ":" + version + ":" + packagingText;
-
-		definedMavenTree.addItem(artifactText);
-		definedMavenTree.setParent(artifactText, version.toString());
-		definedMavenTree.setItemCaption(artifactText,
-				artifact.getArtifactId() + "-" + version.toString() + "." + packagingText);
-		definedMavenTree.setChildrenAllowed(artifactText, false);
-		if (packagingText.equals("jar") || packagingText.equals("war")) {
-			definedMavenTree.setItemIcon(artifactText, FontAwesome.GIFT);
-		} else if (packagingText.equals("xml") || packagingText.equals("pom")) {
-			definedMavenTree.setItemIcon(artifactText, FontAwesome.CODE);
-		} else {
-			definedMavenTree.setItemIcon(artifactText, FontAwesome.FILE);
-		}
-	}
-
-	public static boolean resolveArtefact(String artifactText, SettingsUrl settings) {
+	public static boolean resolveArtifact(String artifactText, SettingsUrl settings) {
 		RepositorySystem repoSystem = newRepositorySystem();
 		RepositorySystemSession session = newSession(repoSystem, settings.getLocalAetherUrl());
 
 		ArtifactRequest artifactRequest = new ArtifactRequest();
-		Artifact artifact = new DefaultArtifact(artifactText.split(":")[0] + ":" + artifactText.split(":")[1] + ":" +
-				artifactText.split(":")[3] + ":" + artifactText.split(":")[2]);
+		Artifact artifact = new DefaultArtifact(artifactText.split(":")[0] + ":" + artifactText.split(":")[1] + ":"
+				+ artifactText.split(":")[3] + ":" + artifactText.split(":")[2]);
 
 		artifactRequest.setArtifact(artifact);
 
@@ -148,6 +119,13 @@ public class DefinedMaven {
 		locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
 		locator.addService(TransporterFactory.class, FileTransporterFactory.class);
 		locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
+		locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler(){
+            @Override
+            public void serviceCreationFailed( Class<?> type, Class<?> impl, Throwable exception )
+            {
+                exception.printStackTrace();
+            }
+        });
 		return locator.getService(RepositorySystem.class);
 	}
 

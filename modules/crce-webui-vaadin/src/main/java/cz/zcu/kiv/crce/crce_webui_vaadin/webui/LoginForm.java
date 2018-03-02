@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.crce_webui_vaadin.webui;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
@@ -19,6 +20,7 @@ public class LoginForm extends FormLayout{
 	private TextField login = new TextField("Name");
 	private PasswordField password = new PasswordField("Password");
 	private Button loginButton = new Button("Log in");
+	private Button guestButton = new Button("Guest");
 	private Label error = new Label();
 	private HorizontalLayout loginFormLayout = new HorizontalLayout();
 	private HorizontalLayout submitErrorLayout = new HorizontalLayout();
@@ -36,7 +38,7 @@ public class LoginForm extends FormLayout{
 		loginFormLayout.addComponents(login, password);
 		loginFormLayout.setSpacing(true);
 		
-		submitErrorLayout.addComponents(loginButton, error);
+		submitErrorLayout.addComponents(loginButton, guestButton, error);
 		submitErrorLayout.setSpacing(true);
 
 		panelLayout.addComponents(loginFormLayout, submitErrorLayout);
@@ -53,15 +55,21 @@ public class LoginForm extends FormLayout{
 			
 			// kontrola vstupu např. volání služby apod.
 			// v případě neúspěchu doplnění error hlášky např:
-			/*submitErrorLayout.removeComponent(error);
+			submitErrorLayout.removeComponent(error);
 			error = new Label("<p style=\"font-family:'Arial';color:rgb(237,18,29)\">Incorrect login</p>",
 					ContentMode.HTML);
-			submitErrorLayout.addComponent(error);*/
+			submitErrorLayout.addComponent(error);
 			
 			// v případě úspěchu:
-			myUI.getSession().setAttribute("singed", login.getValue());
+			/*myUI.getSession().setAttribute("singed", login.getValue());
+			myUI.loginExistSession();*/
+		});
+		
+		guestButton.addClickListener(e -> {
+			myUI.getSession().setAttribute("singed", "guest");
 			myUI.loginExistSession();
 		});
+		
 		addComponent(content);
 	}
 }

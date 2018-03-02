@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
 public class SettingsUrl{
 	private String centralMavenUrl = "http://repo.maven.apache.org/maven2/";
@@ -38,3 +38,4 @@ public class SettingsUrl{
 		this.enableGroupSearch = enableGroupSearch;
 	}
 }
+

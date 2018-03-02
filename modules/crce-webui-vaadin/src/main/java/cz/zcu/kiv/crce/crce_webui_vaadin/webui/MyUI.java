@@ -24,6 +24,7 @@ import cz.zcu.kiv.crce.crce_webui_vaadin.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.StoreForm;
 import cz.zcu.kiv.crce.crce_webui_vaadin.repository.classes.ResourceBean;
 
+
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
  * (or tab) or some part of a html page where a Vaadin application is embedded.
