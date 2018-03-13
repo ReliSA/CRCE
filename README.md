@@ -8,6 +8,8 @@ CRCE is an experimental repository, designed to support research into component-
 - **MongoDB**, tested on v3.4.10
 - **Maven 3**, tested on 3.5.2
 
+For linux, switching to JDK 7 can be done via `sudo update-alternatives --config java`.
+
 ## Build
 
 1. `crce-parent` in `/pom` directory
@@ -18,7 +20,7 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module:
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (`/modules` directory):
 
 `mvn pax:provision`
 
