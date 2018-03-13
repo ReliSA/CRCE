@@ -4,11 +4,11 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 7** set in `JAVA_HOME` environment variable, tested on 1.7.0_80 (there is a problem with web UI using JDK 8, need to update dependencies)
-- **MongoDB**, tested on v3.4.10
+- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE (there is a problem with running web UI on JDK 8, need to update dependencies), tested on 1.7.0_80
+- **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-For linux, switching to JDK 7 can be done via `sudo update-alternatives --config java`.
+On linux, switching to JDK 7 for development/build can be done via `sudo update-alternatives --config java`.
 
 ## Build
 
@@ -20,7 +20,7 @@ For linux, switching to JDK 7 can be done via `sudo update-alternatives --config
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (`/modules` directory):
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (`/modules` directory); note the JDK 7 requirement above:
 
 `mvn pax:provision`
 
