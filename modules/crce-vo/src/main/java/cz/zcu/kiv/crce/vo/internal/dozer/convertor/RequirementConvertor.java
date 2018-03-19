@@ -1,14 +1,15 @@
 package cz.zcu.kiv.crce.vo.internal.dozer.convertor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 
 import org.dozer.DozerConverter;
 import org.dozer.Mapper;
 import org.dozer.MapperAware;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
@@ -63,22 +64,15 @@ public class RequirementConvertor extends DozerConverter<Requirement, GenericReq
 
     @Override
     public Requirement convertFrom(GenericRequirementVO vo, Requirement requirement) {
-        if(requirement == null) {
+        if (requirement == null) {
             requirement = metadataFactory.createRequirement(vo.getNamespace(), vo.getId());
         }
 
-
-        Attribute tmp;
         for (AttributeVO attribute : vo.getAttributes()) {
-            Object value;
-            //TODO refactor this
-            if(Objects.equals(attribute.getType(), "java.util.List")) {
-                value = Arrays.asList(attribute.getValue().split(","));
-            } else {
-                value = attribute.getValue();
-            }
-            tmp = metadataFactory.createAttribute(new GenericAttributeType(attribute.getName(), attribute.getType()), value);
-            requirement.addAttribute(tmp);
+            AttributeType type = new GenericAttributeType(attribute.getName(), attribute.getType());
+            Object value = retype(attribute.getType(), attribute.getValue());
+
+            requirement.addAttribute(metadataFactory.createAttribute(type, value));
         }
 
         for (GenericRequirementVO child : vo.getChildren()) {
@@ -96,4 +90,30 @@ public class RequirementConvertor extends DozerConverter<Requirement, GenericReq
     public void setMapper(Mapper mapper) {
         this.mapper = mapper;
     }
+
+    /**
+     * Retypes string to a new object according to the type passed as argument.
+     * @param type Target variable type.
+     * @param value String value.
+     * @return Retyped object.
+     */
+    private Object retype(String type, String value) {
+        switch (type) {
+            case "Boolean":
+            case "java.lang.Boolean":
+                return Boolean.valueOf(value);
+
+            case "List":
+            case "java.util.List":
+                if (value.equals("")) {
+                    return Collections.emptyList();
+                } else {
+                    return Arrays.asList(value.split(","));
+                }
+
+            default:
+                return value;
+        }
+    }
+
 }

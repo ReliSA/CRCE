@@ -27,6 +27,11 @@ public class GenericAttributeType implements AttributeType<Object> {
                 this.type = String.class;
                 break;
 
+            case "Boolean":
+            case "java.lang.Boolean":
+                this.type = Boolean.class;
+                break;
+
             case "Long":
             case "java.lang.Long":
                 this.type = Long.class;
