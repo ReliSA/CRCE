@@ -400,6 +400,11 @@ public class MetadataDeserializer {
                             callback.addAttribute(new SimpleAttributeType<>(name, String.class), valueNode.asText(), operator);
                             continue;
 
+                        case "Boolean":
+                        case "java.lang.Boolean":
+                            callback.addAttribute(new SimpleAttributeType<>(name, Boolean.class), valueNode.asBoolean(), operator);
+                            continue;
+
                         case "Long":
                         case "java.lang.Long":
                             callback.addAttribute(new SimpleAttributeType<>(name, Long.class), valueNode.asLong(), operator);
@@ -418,10 +423,6 @@ public class MetadataDeserializer {
                         case "List":
                         case "java.util.List":
                             callback.addAttribute(new ListAttributeType(name), deserializeList(valueNode), operator);
-                            continue;
-
-                        case "Boolean":
-                            callback.addAttribute(new SimpleAttributeType<>(name, Boolean.class), valueNode.asBoolean(), operator);
                             continue;
 
                         case "URI":

@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.vo.internal.dozer.convertor;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -13,6 +15,7 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.impl.GenericAttributeType;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import cz.zcu.kiv.crce.vo.model.metadata.AttributeVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DirectiveVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
@@ -99,9 +102,26 @@ public class RequirementConvertor extends DozerConverter<Requirement, GenericReq
      */
     private Object retype(String type, String value) {
         switch (type) {
+            default:
+            case "String":
+            case "java.lang.String":
+                return value;
+
             case "Boolean":
             case "java.lang.Boolean":
                 return Boolean.valueOf(value);
+
+            case "Long":
+            case "java.lang.Long":
+                return Long.valueOf(value);
+
+            case "Double":
+            case "java.lang.Double":
+                return Double.valueOf(value);
+
+            case "Version":
+            case "cz.zcu.kiv.crce.metadata.type.Version":
+                return new Version(value);
 
             case "List":
             case "java.util.List":
@@ -111,8 +131,13 @@ public class RequirementConvertor extends DozerConverter<Requirement, GenericReq
                     return Arrays.asList(value.split(","));
                 }
 
-            default:
-                return value;
+            case "URI":
+            case "java.net.URI":
+                try {
+                    return new URI(value);
+                } catch (URISyntaxException ex) {
+                    throw new IllegalArgumentException("Invalid URI: " + value, ex);
+                }
         }
     }
 
