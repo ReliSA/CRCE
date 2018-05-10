@@ -617,6 +617,13 @@
                 <version>${version.com.fasterxml.jackson}</version>
                 <scope>compile</scope>
             </dependency>
+            <!-- Jackson module for YAML -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-core-asl</artifactId>
