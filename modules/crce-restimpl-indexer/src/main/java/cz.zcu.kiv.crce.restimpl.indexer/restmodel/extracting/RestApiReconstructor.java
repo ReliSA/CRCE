@@ -17,6 +17,10 @@ public interface RestApiReconstructor {
      */
     Collection<Endpoint> extractEndpoints();
 
+    /**
+     * Returns REST framework od specification identified in archive.
+     * @return REST framework od specification identified in archive
+     */
     String getFramework();
 
 

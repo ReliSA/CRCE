@@ -8,17 +8,17 @@ import java.util.Set;
 /**
  * Created by ghessova on 05.03.2018.
  */
-public class ClassType extends PathPart {
+public class ClassStruct extends PathPart {
 
     private String parent;
     private List<Method> methods = new ArrayList<>();
     private Set<Field> fields = new HashSet<>();
     private String[] interfaces;
 
-    public ClassType() {
+    public ClassStruct() {
     }
 
-    public ClassType(String name, String parent) {
+    public ClassStruct(String name, String parent) {
         this.name = name;
         this.parent = parent;
     }
@@ -57,7 +57,7 @@ public class ClassType extends PathPart {
 
     @Override
     public String toString() {
-        return "ClassType{" +
+        return "ClassStruct{" +
                 "name=" + name +
                 ", methods=" + methods +
                 ", fields=" + fields +

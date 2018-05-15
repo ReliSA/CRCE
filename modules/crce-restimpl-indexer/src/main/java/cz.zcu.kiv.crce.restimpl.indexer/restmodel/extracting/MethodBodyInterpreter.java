@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting;
 
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.DataType;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.MethodSignature;
@@ -12,7 +12,8 @@ import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.EndpointResponse;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.ParameterCategory;
 import org.objectweb.asm.Opcodes;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.*;
@@ -28,11 +29,22 @@ public class MethodBodyInterpreter {
     private Map<Integer, StoredElement> localVariables;
     private EndpointResponse response;
     private Set<EndpointResponse> responses;
-    private Map<String, ClassType> classesMap;
+    private Map<String, ClassStruct> classesMap;
 
+    private static final Logger logger = LoggerFactory.getLogger(MethodBodyInterpreter.class);
+
+
+    /**
+     * maximum depth of immersion for the processing of known methods returning common response entity
+     */
     private final int MAX_DEPTH = 3;
 
-    MethodBodyInterpreter(RestApiDefinition definition, Map<String, ClassType> classesMap) {
+    /**
+     * Constructor
+     * @param definition REST API definition
+     * @param classesMap map of all classes in the archive
+     */
+    MethodBodyInterpreter(RestApiDefinition definition, Map<String, ClassStruct> classesMap) {
         this.definition = definition;
         this.classesMap = classesMap;
     }
@@ -40,6 +52,7 @@ public class MethodBodyInterpreter {
     /**
      * Searches method body instructions for HTTP responses.
      * @param bodyLog operations list (instructions)
+     * @param depth depth of immersion
      * @return set of responses
      */
     public Set<EndpointResponse> interpretBody(List<Operation> bodyLog, int depth) {
@@ -75,7 +88,7 @@ public class MethodBodyInterpreter {
                         localVariables.put(operation.getIndex(), stack.pop());
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("No element in stack (or null)", e);
                 }
                 break;
             case LOAD:
@@ -90,7 +103,7 @@ public class MethodBodyInterpreter {
                     }
 
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("No element in local variable storage", e);
                 }
                 break;
             case CALL:  // if method return type is not void, push result to stack
@@ -138,7 +151,7 @@ public class MethodBodyInterpreter {
                 else  if (!isStatusSettingMethod(operation) && !isEntitySettingMethod(operation)) { // other method, only return type is known
                     String returnType = getReturnType(operation);
                     if (returnsResponse(returnType)) {
-                        ClassType owner = classesMap.get(operation.getOwner());
+                        ClassStruct owner = classesMap.get(operation.getOwner());
                         if (owner != null) {
                             for (Method method : owner.getMethods()) {
                                 if (method.getName().equals(operation.getName()) && method.getDesc().equals(operation.getDesc())) {
@@ -164,7 +177,7 @@ public class MethodBodyInterpreter {
                             String entityType = element.getDataType();
                             response.setStructure(entityType);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error("No parameter in stack (or null)", e);
                         }
                     }
                 }
@@ -267,6 +280,9 @@ public class MethodBodyInterpreter {
         return -1;
     }
 
+    /**
+     * Resets interpreter's state.
+     */
     private void reset() {
         stack = new ArrayDeque<>();
         response = new EndpointResponse();
@@ -274,6 +290,9 @@ public class MethodBodyInterpreter {
         localVariables = new HashMap<>();
     }
 
+    /**
+     * Class for representing an element stored in stack or local variable storage.
+     */
     class StoredElement {
 
         private String dataType;

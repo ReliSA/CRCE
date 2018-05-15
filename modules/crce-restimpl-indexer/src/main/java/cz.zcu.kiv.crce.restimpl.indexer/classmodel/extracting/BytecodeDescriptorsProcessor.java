@@ -4,6 +4,8 @@ import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.DataType;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.MethodSignature;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,9 @@ import java.util.regex.Pattern;
 
 /**
  * Created by ghessova on 24.04.2018.
+ *
+ * Class for extracting information from bytecode descriptors and signatures
+ * (for methods, classes, fields).
  *
  * A descriptor is a string representing the type of a field or method.
  * Descriptors are represented in the class file format using modified UTF-8 strings.
@@ -28,13 +33,15 @@ public class BytecodeDescriptorsProcessor {
 
     private static Pattern voidPattern = Pattern.compile("V");
 
+    private static final Logger logger = LoggerFactory.getLogger(BytecodeDescriptorsProcessor.class);
+
+
     private static boolean isPrimitive(String dataType) {
         return dataType.matches(baseTypeRegex);
     }
 
     public static boolean isPrimitiveOrString(String dataType) {
         return "java/lang/String".equals(dataType) || isPrimitive(dataType);
-
     }
 
     /**
@@ -57,7 +64,7 @@ public class BytecodeDescriptorsProcessor {
             method.setParameters(parameters);
             method.setReturnType(methodSignature.getReturnType());
         } catch (Exception e) {
-            e.printStackTrace(); // todo log
+            logger.error("Error when processing method with desc: " + desc, e);
         }
 
     }
@@ -94,7 +101,7 @@ public class BytecodeDescriptorsProcessor {
     }
 
     /**
-     *
+     * Gets type parameter from class type signature.
      * @param classTypeSign
      * @return
      */
@@ -122,7 +129,7 @@ public class BytecodeDescriptorsProcessor {
                 wrapper = processFieldDescriptor(desc, i);
                 dataTypes.add(wrapper.dataType);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error when processing parameters descriptor", e);
                 break;
             }
         }
@@ -191,7 +198,7 @@ public class BytecodeDescriptorsProcessor {
             outerWrapper.end = innerWrapper.end;
             return outerWrapper;
         } catch (Exception e) {
-            //e.printStackTrace();
+            logger.error("Error in field descriptor processing", e);
             return null;
         }
 

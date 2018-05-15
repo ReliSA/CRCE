@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting;
 
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Annotation;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.DataType;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
@@ -21,7 +21,7 @@ public class MyClassVisitor extends ClassVisitor {
     @Override
     public void visit(int version, int access, String name,
                       String signature, String superName, String[] interfaces) {
-        ClassType clazz = new ClassType(name, superName);
+        ClassStruct clazz = new ClassStruct(name, superName);
         clazz.setInterfaces(interfaces);
         state.setClassType(clazz);
         super.visit(version, access, name, signature, superName, interfaces);
@@ -57,7 +57,7 @@ public class MyClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        ResultCollector.getInstance().addResource(State.getInstance().getClassType());
+        ResultCollector.getInstance().addClass(State.getInstance().getClassType());
         super.visitEnd();
     }
 

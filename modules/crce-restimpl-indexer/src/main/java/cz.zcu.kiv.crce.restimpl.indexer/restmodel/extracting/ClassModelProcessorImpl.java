@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting;
 
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.PathPart;
@@ -43,7 +43,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
 
 
     @Override
-    public boolean isResource(ClassType clazz) {
+    public boolean isResource(ClassStruct clazz) {
         for (String annotationName : clazz.getAnnotations().keySet()) {
             if (definition == null) {
                 for (RestApiDefinition restApiDefinition : definitions.values()) {
@@ -63,7 +63,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
     }
 
     @Override
-    public boolean isRequestFilter(ClassType clazz) {
+    public boolean isRequestFilter(ClassStruct clazz) {
         String[] interfaces = clazz.getInterfaces();
         if (interfaces == null) {
             return false;
@@ -77,7 +77,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
     }
 
     @Override
-    public boolean canBeParameterBean(ClassType clazz, Variable variable) {
+    public boolean canBeParameterBean(ClassStruct clazz, Variable variable) {
         if (clazz == null) {
             return false;
         }
@@ -175,7 +175,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
     }
 
     @Override
-    public boolean isSubresource(ClassType clazz) {
+    public boolean isSubresource(ClassStruct clazz) {
         if (!definition.supportSubresources()) return false; // framework does not allow subresources (spring)
         for (Method method : clazz.getMethods()) {
             if (isEndpoint(method)) return true;
@@ -234,7 +234,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
     }
 
 
-    public Set<RequestParameter> getParamsFromBean(Endpoint endpoint, Variable paramBeanVariable, Set<String> pathTemplates, Map<String, ClassType> classesMap) {
+    public Set<RequestParameter> getParamsFromBean(Endpoint endpoint, Variable paramBeanVariable, Set<String> pathTemplates, Map<String, ClassStruct> classesMap) {
         Set<RequestParameter> parameters = new HashSet<>();
         // retrieve all adepts for endpoint parameters
         Set<Field> fields = getAllFields(paramBeanVariable, definition.isFieldParamSetterRequired(), classesMap);
@@ -264,10 +264,10 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
 
     }
 
-    private Set<Field> getAllFields(Variable variable, boolean setterRequired, Map<String, ClassType> classesMap) {
+    private Set<Field> getAllFields(Variable variable, boolean setterRequired, Map<String, ClassStruct> classesMap) {
         Set<Field> fields = new HashSet<>();
         Set<Field> classFields;
-        for (ClassType clazz = classesMap.get(variable.getDataType().getBasicType());
+        for (ClassStruct clazz = classesMap.get(variable.getDataType().getBasicType());
              clazz != null;
              clazz = classesMap.get(clazz.getParent())) {
             classFields = clazz.getFields();
@@ -298,7 +298,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
         return false;
     }
 
-    public boolean isExceptionHandler(ClassType clazz) {
+    public boolean isExceptionHandler(ClassStruct clazz) {
         if (definition == null) {
             for (RestApiDefinition restApiDefinition : definitions.values()) {
                 if (isExceptionHandler(clazz, restApiDefinition)) {
@@ -313,7 +313,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
         }
     }
 
-    private boolean isExceptionHandler(ClassType clazz, RestApiDefinition definition) {
+    private boolean isExceptionHandler(ClassStruct clazz, RestApiDefinition definition) {
         ExceptionHandler handlerDef = definition.getExceptionHandler();
         if (handlerDef == null) {
             return false;
@@ -334,7 +334,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
         return false;
     }
 
-    public Map<String, Set<EndpointResponse>> prepareExceptionsMappings(Set<ClassType> exceptionHandlers, Map<String, ClassType> classesMap) {
+    public Map<String, Set<EndpointResponse>> prepareExceptionsMappings(Set<ClassStruct> exceptionHandlers, Map<String, ClassStruct> classesMap) {
         Map<String, Set<EndpointResponse>> mappings = new HashMap<>();
         ExceptionHandler exceptionHandlerDef = definition.getExceptionHandler();
         if (exceptionHandlerDef == null) {
@@ -343,7 +343,7 @@ public class ClassModelProcessorImpl implements ClassModelProcessor {
         Set<EndpointResponse> responses;
         String mappingMethod = exceptionHandlerDef.getMethod();
         MethodBodyInterpreter interpreter = new MethodBodyInterpreter(definition, classesMap);
-        for (ClassType handler : exceptionHandlers) {
+        for (ClassStruct handler : exceptionHandlers) {
             for (Method method : handler.getMethods()) {
                 if (mappingMethod.equals(method.getName()) && definition.getGenericResponseClasses().contains(method.getReturnType().getBasicType()) && method.getParameters().size() == 1) {
                     responses = interpreter.interpretBody(method.getBodyLog(), 0);

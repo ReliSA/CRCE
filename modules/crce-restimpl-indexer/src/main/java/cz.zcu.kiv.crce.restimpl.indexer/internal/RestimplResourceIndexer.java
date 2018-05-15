@@ -6,7 +6,7 @@ import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.MyClassVisitor;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.ResultCollector;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting.RestApiReconstructor;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting.RestApiReconstructorImpl;
@@ -27,6 +27,10 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Created by ghessova on 23.03.2018.
+ *
+ * @author Gabriela Hessova
+ *
+ * Indexer for REST model extraction from input archive.
  */
 public class RestimplResourceIndexer extends AbstractResourceIndexer {
 
@@ -36,10 +40,22 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
 
     private static final Logger logger = LoggerFactory.getLogger(RestimplResourceIndexer.class);
 
-
+    /**
+     * Indexer's entry point.
+     *
+     * Indexing consists of three steps:
+     * 1. Class model representation is created from the archive.
+     * 2. REST API model is created based on analysis of the class model.
+     * 3. REST model is converted to metadata, which are added to the resource.
+     *
+     * @param input archive input stream
+     * @param resource CRCE resource the metadata are set to
+     * @return list of categories assigned by this indexer ('restimpl' or empty list)
+     */
     @Override
     public List<String> index(InputStream input, Resource resource) {
 
+        // ARCHIVE PROCESSING
         WebXmlParser.Result webXmlResult = null;
         try {   // borrowed code..  -  parsing input stream and collecting class entry information
             ZipInputStream jis = new ZipInputStream(input);
@@ -54,30 +70,40 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
                 }
             }
         } catch (IOException e) {
-            logger.error("Could not index resource.", e);
+            logger.error("Could not create class model.", e);
         }
+        Map<String, ClassStruct> classes = ResultCollector.getInstance().getClasses();
+        logger.debug("Class model extracted");
 
-        Map<String, ClassType> classes = ResultCollector.getInstance().getResources();
+        // REST API RECONSTRUCTION
         RestApiReconstructor restApiReconstructor = new RestApiReconstructorImpl(classes, webXmlResult);
+        Collection<Endpoint> endpoints = null;
+        try {
+            endpoints = restApiReconstructor.extractEndpoints();
+        } catch (Exception e) {
+           logger.error("Could not extract endpoints", e);
+        }
+        String framework = restApiReconstructor.getFramework(); // 'undefined' when no framework was identified
 
-        Collection<Endpoint> endpoints = restApiReconstructor.extractEndpoints();
-        String framework = restApiReconstructor.getFramework();
-
-        if (endpoints.isEmpty()) {
+        // CONVERTING REST API MODEL TO METADATA
+        if (endpoints == null || endpoints.isEmpty()) {
             return Collections.emptyList();
         }
         else {
+            logger.debug("REST API model extracted");
             // save endpoints and metadata
-            RestimplMetadataManager metadataManager = new RestimplMetadataManager(metadataFactory, metadataService);
+            RestimplMetadataManager metadataManager = new RestimplMetadataManager(metadataFactory);
             metadataManager.setMetadata(resource, endpoints, framework);
 
             // label the resource with categories and other common attributes
             metadataService.addCategory(resource, RestimplMetadataConstants.MAIN_CATEGORY); // assign main category tag
+            logger.debug("Restimpl indexing finished");
 
             return Collections.singletonList(RestimplMetadataConstants.MAIN_CATEGORY);
         }
     }
 
+    // borrowed code
     private static InputStream getEntryInputStream(ZipInputStream jis) throws IOException	{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];

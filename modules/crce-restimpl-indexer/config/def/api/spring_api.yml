@@ -109,6 +109,14 @@ consumes:
       valueKeys:
         - consumes
 
+default_http_methods:
+  - GET
+  - POST
+  - PUT
+  - PATCH
+  - DELETE
+  - OPTIONS
+  - HEAD
 
 http_method:
   - 

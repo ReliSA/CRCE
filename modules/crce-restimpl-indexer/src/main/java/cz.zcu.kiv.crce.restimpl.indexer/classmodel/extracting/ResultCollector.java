@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting;
 
 
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class ResultCollector {
 
-    private Map<String, ClassType> resources;
+    private Map<String, ClassStruct> resources;
 
     private static ResultCollector ourInstance = new ResultCollector();
     public static ResultCollector getInstance() {
@@ -21,11 +21,11 @@ public class ResultCollector {
         this.resources = new HashMap<>();
     }
 
-    public Map<String, ClassType> getResources() {
+    public Map<String, ClassStruct> getClasses() {
         return resources;
     }
 
-    public void addResource(ClassType resource) {
+    public void addClass(ClassStruct resource) {
         resources.put(resource.getName(), resource);
     }
 }

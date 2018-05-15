@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.restimpl.indexer.internal;
 
 import cz.zcu.kiv.crce.metadata.*;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
-import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.EndpointRequestBody;
@@ -17,15 +16,22 @@ import java.util.*;
 public class RestimplMetadataManager {
 
     private volatile MetadataFactory metadataFactory;
-    private volatile MetadataService metadataService;
 
-    RestimplMetadataManager(MetadataFactory metadataFactory, MetadataService metadataService) {
+    /**
+     * Constructor for metadataFactory injection.
+     * @param metadataFactory metadata factory
+     */
+    RestimplMetadataManager(MetadataFactory metadataFactory) {
         this.metadataFactory = metadataFactory;
-        this.metadataService = metadataService;
     }
 
+    /**
+     * Convert REST API model represented by a set of endpoint into CRCE metadata and sets them to the resource.
+     * @param resource CRCE resource representing the input component
+     * @param endpoints set of REST API endpoint
+     * @param framework REST API framework od specification name
+     */
     public void setMetadata(Resource resource, Collection<Endpoint> endpoints, String framework) {
-        System.out.println(metadataService); // for pmd
         // Capability - restimpl identity
         Capability restimplIdentityCapability = metadataFactory.createCapability(RestimplMetadataConstants.NS__RESTIMPL_IDENTITY);
         restimplIdentityCapability.setAttribute(RestimplMetadataConstants.ATTR__RESTIMPL_FRAMEWORK, framework);
@@ -47,7 +53,6 @@ public class RestimplMetadataManager {
         return capabilities;
 
     }
-
 
     private Capability createEndpointCapability(Endpoint endpoint) {
         Capability endpointCapability = metadataFactory.createCapability(RestimplMetadataConstants.NS__RESTIMPL_ENDPOINT);

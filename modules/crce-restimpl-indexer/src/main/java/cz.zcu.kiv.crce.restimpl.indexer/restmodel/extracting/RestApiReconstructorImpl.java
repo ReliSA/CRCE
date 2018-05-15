@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.DataType;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.PathPartAttributes;
@@ -30,14 +30,13 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
 
     private static final Logger logger = LoggerFactory.getLogger(RestApiReconstructorImpl.class);
 
-
     // current working directory is crce\modules\runner
     private static final String DEFS_DIR = "../crce-restimpl-indexer/config/def/api";
 
-    private Map<String, ClassType> classesMap;
+    private Map<String, ClassStruct> classesMap;
 
-    private Set<ClassType> resources;
-    private Set<ClassType> filters;
+    private Set<ClassStruct> resources;
+    private Set<ClassStruct> filters;
     private Map<String, Set<EndpointResponse>> exceptionsMappings;
     private ClassModelProcessor classModelProcessor;
     private MethodBodyInterpreter interpreter;
@@ -47,7 +46,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
      * Constructor - assigns classesMap and loads REST API definitions from YAML config files defined by DEFS_DIR field.
      * @param classesMap class model represented by map where keys are full qualified class names
      */
-    public RestApiReconstructorImpl(Map<String, ClassType> classesMap, WebXmlParser.Result webXmlResult ) {
+    public RestApiReconstructorImpl(Map<String, ClassStruct> classesMap, WebXmlParser.Result webXmlResult ) {
         this.classesMap = classesMap;
         Map<String, RestApiDefinition> definitions = loadDefinitions();
         this.classModelProcessor = new ClassModelProcessorImpl(definitions);
@@ -70,7 +69,6 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
                 definitions.put(restApiDefinition.getFramework(), restApiDefinition);
             } catch (IOException e) {
                 logger.error("Failed to read REST API definition from " + file.getAbsolutePath(), e);
-                e.printStackTrace();
             }
         }
         return definitions;
@@ -85,7 +83,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
         detectResources(classesMap.values());
         this.interpreter = new MethodBodyInterpreter(classModelProcessor.getDefinition(), classesMap); // the correct definition has been picked by now
         Collection<Endpoint> endpoints = new ArrayList<>();
-        for (ClassType resource : resources) {
+        for (ClassStruct resource : resources) {
             PathPartAttributes resourceAttributes = classModelProcessor.getPathAttributes(resource);
             for (Method method : resource.getMethods()) {
                 if (classModelProcessor.isEndpoint(method)) {
@@ -113,11 +111,11 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
      * Detects REST API resource classes (controllers) among given classes.
      * @param classes collection of classes
      */
-    private void detectResources(Collection<ClassType> classes) {
+    private void detectResources(Collection<ClassStruct> classes) {
         resources = new HashSet<>();
-        Set<ClassType> exceptionHandlers = new HashSet<>();
+        Set<ClassStruct> exceptionHandlers = new HashSet<>();
         filters = new HashSet<>();
-        for (ClassType clazz : classes) {
+        for (ClassStruct clazz : classes) {
             if (isRegisteredProvider(clazz)) {
                 if (classModelProcessor.isResource(clazz)) {
                     resources.add(clazz);
@@ -136,7 +134,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
         }
     }
 
-    private boolean isRegisteredProvider(ClassType clazz) {
+    private boolean isRegisteredProvider(ClassStruct clazz) {
         if (webXmlResult == null) {  // providers are not set in web.xml
             return true;
         }
@@ -202,6 +200,10 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
     }
 
     private void setDefaultHttpMethods(Endpoint endpoint, RestApiDefinition definition) {
+        Set<String> defaultMethods = definition.getDefaultHttpMethods();
+        if (defaultMethods == null || defaultMethods.isEmpty() ) {
+            return;
+        }
         if (endpoint.getHttpMethods().isEmpty()) {
             endpoint.getHttpMethods().addAll(definition.getDefaultHttpMethods());
         }
@@ -226,7 +228,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
         DataType returnType = method.getReturnType();
         String returnTypeString = returnType.getBasicType();
         // is this a class defined in this archive ?
-        ClassType clazz = classesMap.get(returnTypeString);
+        ClassStruct clazz = classesMap.get(returnTypeString);
 
         if (clazz != null && classModelProcessor.isSubresource(clazz)) {
             PathPartAttributes resourceAttributes = classModelProcessor.getPathAttributes(clazz);
@@ -424,7 +426,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
      */
     private boolean canBeParameterBean(Variable parameter) {
         String dataType = parameter.getDataType().getBasicType();
-        ClassType clazz = classesMap.get(dataType);
+        ClassStruct clazz = classesMap.get(dataType);
         return classModelProcessor.canBeParameterBean(clazz, parameter);
     }
 

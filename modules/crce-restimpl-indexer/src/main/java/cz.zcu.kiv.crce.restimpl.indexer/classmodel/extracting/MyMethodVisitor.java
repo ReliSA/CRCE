@@ -8,12 +8,18 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by ghessova on 22.01.2018.
+ *
+ * Method visitor.
+ *
+ * Extracts local variable names (formal parameters) and method body instructions.
  *
  * see:
  * http://asm.ow2.org/doc/tutorial-asm-2.0.html
@@ -25,6 +31,9 @@ public class MyMethodVisitor extends MethodVisitor {
     private State state = State.getInstance();
     private Method method;
     private List<String> log = new ArrayList<>();
+
+    //private static final Logger logger = LoggerFactory.getLogger(MyMethodVisitor.class);
+
 
     MyMethodVisitor(Method method) {
         super(Opcodes.ASM5);

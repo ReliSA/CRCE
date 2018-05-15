@@ -2,7 +2,7 @@ package cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting;
 
 
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Annotation;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassType;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.PathPart;
 
 /**
@@ -18,7 +18,7 @@ public class State {
 
     private int parametersProcessed = 0;
 
-    private ClassType classType;
+    private ClassStruct classType;
 
     private Annotation annotation;
 
@@ -32,11 +32,11 @@ public class State {
         this.annotation = annotation;
     }
 
-    public ClassType getClassType() {
+    public ClassStruct getClassType() {
         return classType;
     }
 
-    public void setClassType(ClassType classType) {
+    public void setClassType(ClassStruct classType) {
         this.classType = classType;
         this.pathPart = classType;
     }
