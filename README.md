@@ -12,13 +12,13 @@ CRCE is an experimental repository, designed to support research into component-
 
 1. `crce-parent` in `/pom` directory
 2. `shared-build-settings` in `/build`
-3. everything in `/third-party`
+3. everything in `/third-party` (bash: `.../third-party$ for d in * ; do cd $d; mvn clean install; cd .. ; done`)
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module:
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
 
 `mvn pax:provision`
 
