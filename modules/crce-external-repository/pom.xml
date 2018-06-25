@@ -206,6 +206,11 @@
 				<artifactId>sisu-guice</artifactId>
 				<version>3.2.6</version>
 			</dependency>
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>1.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -353,6 +358,10 @@
 			<groupId>org.sonatype.sisu</groupId>
 			<artifactId>sisu-guice</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -369,7 +378,8 @@
 						<Export-Package>
 							cz.zcu.kiv.crce.crce_external_repository.api, 
 							org.apache.maven.index.*, 
-							org.apache.maven.wagon.*
+							org.apache.maven.wagon.*, 
+							javax.inject.*
 						</Export-Package>
 						<DynamicImport-Package>*</DynamicImport-Package>
 						<Import-Package> 

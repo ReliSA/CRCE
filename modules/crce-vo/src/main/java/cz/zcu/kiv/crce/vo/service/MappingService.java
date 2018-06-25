@@ -7,10 +7,16 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
+import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.ResultOptimizerVO;
 
 /**
  *
@@ -75,4 +81,26 @@ public interface MappingService {
      */
     @Nullable
     CompatibilityVO mapCompatibility(@Nullable Compatibility diff);
+
+    /**
+     * Maps list of requirement vos into list of requirement entities.
+     *
+     * @param requirements to be mapped, not null
+     * @return
+     */
+    @Nonnull
+    List<Requirement> map(List<GenericRequirementVO> requirements);
+
+    @Nonnull
+    List<CostFunctionDescriptorVO> mapCostFunction(List<CostFunctionFactory> descriptors);
+
+    @Nullable
+    CostFunctionDescriptorVO mapCostFunction(@Nullable CostFunctionFactory descriptor);
+
+    @Nonnull
+    List<ResultOptimizerVO> mapResultOptimizer(List<ResultOptimizer> descriptors);
+
+    @Nullable
+    ResultOptimizerVO mapResultOptimizer(@Nullable ResultOptimizer descriptor);
+
 }

@@ -14,15 +14,23 @@ import org.dozer.config.BeanContainer;
 import org.osgi.framework.FrameworkUtil;
 
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionFactory;
+import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizer;
 import cz.zcu.kiv.crce.vo.internal.dozer.OSGiDozerClassLoader;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.BasicResourceConvertor;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.DetailedResourceConverter;
 import cz.zcu.kiv.crce.vo.internal.dozer.convertor.IdentityCapabilityConvertor;
+import cz.zcu.kiv.crce.vo.internal.dozer.convertor.RequirementConvertor;
 import cz.zcu.kiv.crce.vo.model.compatibility.CompatibilityVO;
 import cz.zcu.kiv.crce.vo.model.metadata.BasicResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
+import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
+import cz.zcu.kiv.crce.vo.model.optimizer.ResultOptimizerVO;
 import cz.zcu.kiv.crce.vo.service.MappingService;
 
 /**
@@ -37,6 +45,7 @@ public class MappingServiceDozer implements MappingService {
 
     private DozerBeanMapper mapper;
     private MetadataService metadataService;
+    private MetadataFactory metadataFactory;
 
 
     @Override
@@ -113,6 +122,66 @@ public class MappingServiceDozer implements MappingService {
         return mapper.map(diff, CompatibilityVO.class);
     }
 
+    @Nonnull
+    @Override
+    public List<Requirement> map(List<GenericRequirementVO> requirements) {
+        List<Requirement> req = new LinkedList<>();
+
+        Requirement r;
+        for (GenericRequirementVO requirement : requirements) {
+            r = mapper.map(requirement, Requirement.class);
+            if(r != null) {
+                req.add(r);
+            }
+        }
+
+        return req;
+    }
+
+    @Nonnull
+    @Override
+    public List<CostFunctionDescriptorVO> mapCostFunction(List<CostFunctionFactory> descriptors) {
+        List<CostFunctionDescriptorVO> vos = new LinkedList<>();
+
+        CostFunctionDescriptorVO vo;
+        for (CostFunctionFactory descriptor : descriptors) {
+            vo = mapCostFunction(descriptor);
+            if(vo != null) {
+                vos.add(vo);
+            }
+        }
+
+        return vos;
+    }
+
+    @Nullable
+    @Override
+    public CostFunctionDescriptorVO mapCostFunction(@Nullable CostFunctionFactory descriptor) {
+        return descriptor != null ? mapper.map(descriptor, CostFunctionDescriptorVO.class) : null;
+    }
+
+    @Nonnull
+    @Override
+    public List<ResultOptimizerVO> mapResultOptimizer(List<ResultOptimizer> descriptors) {
+        List<ResultOptimizerVO> vos = new LinkedList<>();
+
+        ResultOptimizerVO vo;
+        for (ResultOptimizer descriptor : descriptors) {
+            vo = mapResultOptimizer(descriptor);
+            if(vo != null) {
+                vos.add(vo);
+            }
+        }
+
+        return vos;
+    }
+
+    @Nullable
+    @Override
+    public ResultOptimizerVO mapResultOptimizer(@Nullable ResultOptimizer descriptor) {
+        return descriptor != null ? mapper.map(descriptor, ResultOptimizerVO.class) : null;
+    }
+
     /**
      * Called by OSGi
      */
@@ -130,6 +199,7 @@ public class MappingServiceDozer implements MappingService {
         converters.add(new BasicResourceConvertor(metadataService));
         converters.add(new DetailedResourceConverter(metadataService));
         converters.add(new IdentityCapabilityConvertor());
+        converters.add(new RequirementConvertor(metadataFactory));
         mapper.setCustomConverters(converters);
 
         // Force loading of the dozer.xml now instead of loading it
@@ -139,5 +209,9 @@ public class MappingServiceDozer implements MappingService {
 
     public void setMetadataService(MetadataService metadataService) {
         this.metadataService = metadataService;
+    }
+
+    public void setMetadataFactory(MetadataFactory metadataFactory) {
+        this.metadataFactory = metadataFactory;
     }
 }

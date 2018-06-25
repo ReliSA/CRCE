@@ -29,6 +29,9 @@ public interface MetadataFactory {
     @Nonnull
     Resource createResource(String id);
 
+    //TODO move this to (Store?)
+    Resource createResourceView(Resource... resources);
+
     /**
      * Creates an empty requirement with given name.
      * @param namespace Name of created requirement.

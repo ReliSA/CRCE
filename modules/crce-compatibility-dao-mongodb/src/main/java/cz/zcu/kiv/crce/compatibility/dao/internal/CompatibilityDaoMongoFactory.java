@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
+import cz.zcu.kiv.crce.metadata.dao.mongodb.DbContext;
 
 /**
  * Factory for CompatibilityDao implementation using MongoDB.

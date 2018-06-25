@@ -10,6 +10,8 @@ import cz.zcu.kiv.crce.metadata.Attribute;
  * Date: 10.3.16
  *
  * @author Jakub Danek
+ * @since 3.0.0
+ * @version 3.0.0
  */
 public class CapabilityFilter {
 
@@ -51,7 +53,7 @@ public class CapabilityFilter {
         this.subFilters.add(subFilter);
     }
 
-    public void addSubFilters(List<CapabilityFilter> subFilters) {
+    public void addSubFilters(Collection<CapabilityFilter> subFilters) {
         this.subFilters.addAll(subFilters);
     }
 
@@ -73,13 +75,21 @@ public class CapabilityFilter {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CapabilityFilter)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CapabilityFilter)) {
+            return false;
+        }
 
         CapabilityFilter that = (CapabilityFilter) o;
 
-        if (namespace != null ? !namespace.equals(that.namespace) : that.namespace != null) return false;
-        if (!attributes.equals(that.attributes)) return false;
+        if (namespace != null ? !namespace.equals(that.namespace) : that.namespace != null) {
+            return false;
+        }
+        if (!attributes.equals(that.attributes)) {
+            return false;
+        }
         return subFilters.equals(that.subFilters);
 
     }

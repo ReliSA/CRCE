@@ -19,7 +19,8 @@ import com.vaadin.server.WrappedSession;
 
 import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+//import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.plugin.PluginManager;
 import cz.zcu.kiv.crce.repository.Buffer;
@@ -34,7 +35,8 @@ public class Activator extends DependencyActivatorBase {
 
 	private volatile BundleContext bundleContext;
 	private volatile MetadataFactory metadataFactory;
-	private volatile ResourceDAO resourceDAO;
+	//private volatile ResourceDAO resourceDAO;
+	private volatile MetadataDao metadataDao;
 	private volatile PluginManager pluginManager;
 	private volatile SessionRegister sessionRegister;
 	private volatile MetadataService metadataService;
@@ -58,8 +60,12 @@ public class Activator extends DependencyActivatorBase {
 		return sessionRegister;
 	}
 
-	public ResourceDAO getResourceDAO() {
+	/*public ResourceDAO getResourceDAO() {
 		return resourceDAO;
+	}*/
+	
+	public MetadataDao getMetadataDAO() {
+		return metadataDao;
 	}
 
 	public MetadataFactory getMetadataFactory() {

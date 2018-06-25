@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import cz.zcu.kiv.crce.metadata.Attribute;
@@ -111,6 +112,19 @@ public interface MetadataService {
      */
     @Nonnull
     Capability getSingletonCapability(Resource resource, String namespace);
+
+    /**
+     * Returns a capability of the given namespace which exists only as a singleton
+     * in scope of the given resource.<p>
+     * If the requested capability doesn't exist, then either a new one is created and set as
+     * a root capability (if create is set to true) or null is returned.
+     *
+     * @param resource
+     * @param namespace
+     * @return
+     */
+    @Nullable
+    Capability getSingletonCapability(Resource resource, String namespace, boolean create);
 
     /**
      * Creates requirement for particular resource name (crce.identity name)

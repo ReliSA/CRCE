@@ -74,7 +74,7 @@
     </distributionManagement>
 
     <repositories>
-        Central repository - must be listed first as a default repo for downloading of artifacts
+        <!-- Central repository - must be listed first as a default repo for downloading of artifacts -->
         <repository>
             <id>central</id>
             <url>http://uk.maven.org/maven2</url>
@@ -86,7 +86,7 @@
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository>
 
-        Fallback repositories
+        <!-- Fallback repositories -->
         <repository>
             <id>maven.kalwi.eu.snapshots</id>
             <name>kalwi.eu snapshots repository</name>

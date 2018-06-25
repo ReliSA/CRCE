@@ -4,6 +4,7 @@ import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.vo.internal.service.MappingServiceDozer;
 import cz.zcu.kiv.crce.vo.service.MappingService;
@@ -13,18 +14,10 @@ public final class Activator extends DependencyActivatorBase {
 
     private static volatile Activator instance;
 
-    /*
-     * Injected by Dependency Manager.
-     */
-    private volatile MetadataService metadataService;
-
     public static Activator instance() {
         return instance;
     }
 
-    public MetadataService getMetadataService() {
-        return metadataService;
-    }
 
      @Override
     public void destroy(BundleContext context, DependencyManager manager) throws Exception {
@@ -40,11 +33,7 @@ public final class Activator extends DependencyActivatorBase {
         manager.add(createComponent()
                         .setInterface(MappingService.class.getName(), null)
                         .setImplementation(MappingServiceDozer.class)
-                        .add(createServiceDependency().setService(MetadataService.class).setRequired(true)));
-
-        manager.add(createComponent()
-                        .setImplementation(this)
                         .add(createServiceDependency().setService(MetadataService.class).setRequired(true))
-        );
+                        .add(createServiceDependency().setService(MetadataFactory.class).setRequired(true)));
     }
 }

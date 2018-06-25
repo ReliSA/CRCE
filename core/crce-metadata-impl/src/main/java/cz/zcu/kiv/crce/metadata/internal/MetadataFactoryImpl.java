@@ -7,6 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.felix.dm.annotation.api.Component;
@@ -15,13 +18,15 @@ import org.apache.felix.dm.annotation.api.ServiceDependency;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.Operator;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceView;
 
 /**
  * Implementation of
@@ -53,6 +58,76 @@ public class MetadataFactoryImpl implements MetadataFactory {
     @Override
     public Resource createResource(String id) {
         return new ResourceImpl(id);
+    }
+
+    //TODO move to (Store?)
+    @Override
+    public Resource createResourceView(Resource... resources) {
+        Resource view = createResource();
+        Capability identityCap = createCapability(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY);
+        identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__NAME, view.getId());
+        identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__EXTERNAL_ID, view.getId());
+        try {
+            identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__URI, new URI("http://nofile"));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            //not gonna happen
+        }
+
+
+        Capability viewCap = createCapability(NsCrceView.NAMESPACE__CRCE_VIEW_IDENTITY);
+
+        List<String> ids = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        List<String> categories  = new ArrayList<>();
+
+        Capability identity;
+        Attribute<String> nameAt;
+        Attribute<Long> sizeAt;
+        Attribute<List<String>> categoryAt;
+
+        String name;
+        Long size = 0L;
+
+        boolean first = true;
+        for (Resource resource : resources) {
+            ids.add(resource.getId());
+
+            identity = resource.getRootCapabilities(NsCrceIdentity.NAMESPACE__CRCE_IDENTITY).get(0);
+            if(first) {
+                String repository = identity.getAttributeStringValue(NsCrceIdentity.ATTRIBUTE__REPOSITORY_ID);
+                identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__REPOSITORY_ID, repository != null ? repository : "");
+            }
+
+            nameAt = identity.getAttribute(NsCrceIdentity.ATTRIBUTE__NAME);
+            name = nameAt != null ? nameAt.getValue() : "-";
+            names.add(name);
+
+            sizeAt = identity.getAttribute(NsCrceIdentity.ATTRIBUTE__SIZE);
+            if(sizeAt != null) {
+                size += sizeAt.getValue();
+            }
+
+            categoryAt = identity.getAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES);
+            if(categoryAt != null) {
+                categories.addAll(categoryAt.getValue());
+            }
+            if(first) first = false;
+        }
+
+        viewCap.setAttribute(NsCrceView.ATTRIBUTE__RESOURCE_IDS, ids);
+        viewCap.setAttribute(NsCrceView.ATTRIBUTE__RESOURCE_NAMES, names);
+        identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES, categories);
+        if(size != 0L) {
+            identityCap.setAttribute(NsCrceIdentity.ATTRIBUTE__SIZE, size);
+        }
+
+        view.addCapability(identityCap);
+        view.addRootCapability(identityCap);
+        view.addCapability(viewCap);
+        view.addRootCapability(viewCap);
+
+        return view;
     }
 
     @Override

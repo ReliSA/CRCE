@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.BundleContext;
@@ -23,8 +24,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
@@ -34,6 +34,7 @@ import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
+import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
 
 /**
@@ -44,8 +45,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
     private volatile BundleContext context;
     private volatile PluginManager pluginManager;
-    private volatile ResourceDAO resourceDAO;
-    private volatile RepositoryDAO repositoryDAO;
+    private volatile MetadataDao metadataDao;
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile MetadataFactory metadataFactory;
     private volatile MetadataService metadataService; // NOPMD
@@ -70,7 +70,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     void init() {
         Dictionary<String, String> props = new java.util.Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
-        props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
+        props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + MetadataDao.class.getName() + "*)");
         context.registerService(EventHandler.class.getName(), this, props);
     }
 
@@ -79,7 +79,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
      */
     synchronized void start() {
         try {
-            repository = repositoryDAO.loadRepository(baseDir.toURI());
+            repository = metadataDao.loadRepository(baseDir.toURI());
         } catch (IOException ex) {
             logger.error("Could not load repository for {}", baseDir, ex);
         }
@@ -87,7 +87,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         if (repository == null) {
             repository = metadataFactory.createRepository(baseDir.toURI());
             try {
-                repositoryDAO.saveRepository(repository);
+                metadataDao.saveRepository(repository);
             } catch (IOException ex) {
                 logger.error("Could not save repository for {}", baseDir, ex);
             }
@@ -156,7 +156,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
             resource = tmp;
         }
 
-        if (resourceDAO.existsResource(metadataService.getUri(resource), repository)) {
+        if (metadataDao.existsResource(metadataService.getUri(resource), repository)) {
             throw new RefusedArtifactException("Resource with the same symbolic name and version already exists in Store: " + resource.getId());
         }
         if ("file".equals(metadataService.getUri(resource).getScheme())) {
@@ -201,7 +201,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
         metadataService.getIdentity(resource).setAttribute("status", String.class, "stored");
 
-        resourceDAO.saveResource(resource); // TODO is saving necessary after move? define exact contract
+        metadataDao.saveResource(resource); // TODO is saving necessary after move? define exact contract
 
 //        m_pluginManager.getPlugin(RepositoryDAO.class).saveRepository(m_repository);
 
@@ -218,9 +218,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         resource = pluginManager.getPlugin(ActionHandler.class).beforeDeleteFromStore(resource, this);
 
         if (!isInStore(resource)) {
-            if (resourceDAO.existsResource(metadataService.getUri(resource))) {
+            if (metadataDao.existsResource(metadataService.getUri(resource))) {
             	logger.warn( "Removing resource is not in store but it is in internal repository: {}", resource.getId());
-                resourceDAO.deleteResource(metadataService.getUri(resource));
+                metadataDao.deleteResource(metadataService.getUri(resource));
             }
             pluginManager.getPlugin(ActionHandler.class).afterDeleteFromStore(resource, this);
             return false;
@@ -234,7 +234,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 //        try {
-            resourceDAO.deleteResource(metadataService.getUri(resource));
+            metadataDao.deleteResource(metadataService.getUri(resource));
 //        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -271,10 +271,21 @@ public class FilebasedStoreImpl implements Store, EventHandler {
         }).start();
     }
 
+    @Nullable
+    @Override
+    public Resource getResource(String uid, boolean withDetails) {
+        try {
+            return metadataDao.loadResource(uid, withDetails);
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return null;
+    }
+
     @Override
     public synchronized List<Resource> getResources() {
         try {
-            return resourceDAO.loadResources(repository);
+            return metadataDao.loadResources(repository, false);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
@@ -282,16 +293,26 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     @Override
-    public synchronized List<Resource> getResources(Requirement requirement) {
-        return getResources(Collections.singleton(requirement));
+    public synchronized List<Resource> getResources(Requirement requirement, boolean withDetails) {
+        return getResources(Collections.singleton(requirement), withDetails);
     }
 
     @Nonnull
     @Override
-    public synchronized List<Resource> getResources(Set<Requirement> requirement) {
+    public synchronized List<Resource> getResources(Set<Requirement> requirement, boolean withDetails) {
+        return internalGetResources(requirement, Operator.AND, withDetails);
+    }
+
+    @Nonnull
+    @Override
+    public synchronized List<Resource> getPossibleResources(Set<Requirement> requirement, boolean withDetails) {
+       return internalGetResources(requirement, Operator.OR, withDetails);
+    }
+
+    private List<Resource> internalGetResources(Set<Requirement> requirement, Operator op, boolean withDetails) {
         List<Resource> resources = Collections.emptyList();
         try {
-            resources = resourceLoader.getResources(repository, requirement);
+            resources = resourceLoader.getResources(repository, requirement, op, withDetails);
         } catch (IOException e) {
             logger.error("Could not load resources for requirement ({})", requirement.toString());
             logger.error(e.getMessage(), e);
@@ -330,7 +351,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                     if ("repository.xml".equals(file.getName())) {
                         continue;
                     }
-                    if (resourceIndexerService != null && !resourceDAO.existsResource(file.toURI())) {
+                    if (resourceIndexerService != null && !metadataDao.existsResource(file.toURI())) {
                         Resource resource;
                         try {
                             resource = resourceIndexerService.indexResource(file);
@@ -351,7 +372,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
                         logger.info("Indexed resource {} is valid.", resource.getId());
 
                         try {
-                            resourceDAO.saveResource(resource);
+                            metadataDao.saveResource(resource);
                         } catch (IOException e) {
                             logger.error("Could not save indexed resource for file {}: {}", file, resource, e);
                         }

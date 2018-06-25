@@ -57,21 +57,25 @@
 
     <modules>
         <module>pom</module>
-        
+        <module>provision</module>
+
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <!--<module>crce-metadata-cosi-bundle</module>-->
         <!--<module>crce-efp-indexer</module>-->
+        <module>crce-external-repository</module>
 
         <!-- Libraries -->
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-metrics</module>
-        
+        <module>crce-webui-vaadin</module>
+        <!-- <module>crce-handler-metrics</module> -->
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
+
+        <module>crce-optimizer-functions</module>
 
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
@@ -82,10 +86,6 @@
         <!--<module>crce-repository-maven-impl</module>-->
         
         <module>crce-webservices-indexer</module>
-        
-        <module>crce-webui-vaadin</module>
-        <module>provision</module>
-        <module>crce-external-repository</module>
     </modules>
 
     <profiles>

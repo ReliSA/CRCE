@@ -23,6 +23,18 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectResourceByMissingCategory" parameterType="String" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbResource">
+        SELECT r.resource_id, r.repository_id, r.id, r.uri
+        FROM resource r, capability c LEFT JOIN capability_attribute ca
+        ON ca.capability_id = c.capability_id
+        AND ca.name = 'categories'
+        AND ca.string_value = #{category}
+        WHERE r.resource_id = c.resource_id
+        AND c.namespace = 'crce.identity'
+        AND ca.capability_id IS NULL
+
+    </select>
+
 
     <!-- Capability -->
     <select id="selectCapabilities" parameterType="Long" resultType="cz.zcu.kiv.crce.metadata.dao.internal.db.DbCapability">

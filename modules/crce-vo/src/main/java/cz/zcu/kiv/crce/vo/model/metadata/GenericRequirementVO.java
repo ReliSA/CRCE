@@ -24,6 +24,10 @@ public class GenericRequirementVO extends ValueObject {
      */
     private List<AttributeVO> attributes = new ArrayList<>();
     /**
+     * List of directives attached to the requirement
+     */
+    private List<DirectiveVO> directives = new ArrayList<>();
+    /**
      * List of requirement's sub-requirements.
      */
     private List<GenericRequirementVO> children = new ArrayList<>();
@@ -46,5 +50,27 @@ public class GenericRequirementVO extends ValueObject {
 
     public void setChildren(List<GenericRequirementVO> children) {
         this.children = children;
+    }
+
+    @Nonnull
+    @XmlElementRef
+    public List<DirectiveVO> getDirectives() {
+        return directives;
+    }
+
+    public void setDirectives(List<DirectiveVO> directives) {
+        this.directives = directives;
+    }
+
+    public void addAttribute(AttributeVO vo) {
+        this.attributes.add(vo);
+    }
+
+    public void addChild(GenericRequirementVO child) {
+        this.children.add(child);
+    }
+
+    public void addDirective(DirectiveVO vo) {
+        this.directives.add(vo);
     }
 }

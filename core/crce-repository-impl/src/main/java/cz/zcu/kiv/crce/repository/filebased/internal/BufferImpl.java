@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
@@ -26,8 +27,7 @@ import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.dao.RepositoryDAO;
-import cz.zcu.kiv.crce.metadata.dao.ResourceDAO;
+import cz.zcu.kiv.crce.metadata.dao.MetadataDao;
 import cz.zcu.kiv.crce.metadata.indexer.ResourceIndexerService;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.validation.MetadataValidator;
@@ -52,8 +52,7 @@ public class BufferImpl implements Buffer, EventHandler {
     private volatile PluginManager pluginManager;
     private volatile Store store;
     private volatile MetadataFactory metadataFactory;
-    private volatile ResourceDAO resourceDAO;
-    private volatile RepositoryDAO repositoryDAO;
+    private volatile MetadataDao metadataDao;
     private volatile ResourceIndexerService resourceIndexerService;
     private volatile MetadataService metadataService;
     private volatile MetadataValidator metadataValidator;
@@ -81,7 +80,7 @@ public class BufferImpl implements Buffer, EventHandler {
     void init() {
         Dictionary<String, String> props = new Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
-        props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + ResourceDAO.class.getName() + "*)");
+        props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + MetadataDao.class.getName() + "*)");
         context.registerService(EventHandler.class.getName(), this, props);
 
         baseDir = context.getDataFile(sessionProperties.get(SessionRegister.SERVICE_SESSION_ID));
@@ -103,7 +102,7 @@ public class BufferImpl implements Buffer, EventHandler {
      */
     void start() {
         try {
-            repository = repositoryDAO.loadRepository(baseDir.toURI());
+            repository = metadataDao.loadRepository(baseDir.toURI());
         } catch (IOException ex) {
             logger.error("Could not load repository for {}", baseDir, ex);
         }
@@ -111,7 +110,7 @@ public class BufferImpl implements Buffer, EventHandler {
         if (repository == null) {
             repository = metadataFactory.createRepository(baseDir.toURI());
             try {
-                repositoryDAO.saveRepository(repository);
+                metadataDao.saveRepository(repository);
             } catch (IOException ex) {
                 logger.error("Could not save repository for {}", baseDir, ex);
             }
@@ -223,7 +222,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
         metadataService.getIdentity(resource).setAttribute("status", String.class, "buffered");
 
-        resourceDAO.saveResource(resource);
+        metadataDao.saveResource(resource);
 
         return pluginManager.getPlugin(ActionHandler.class).afterUploadToBuffer(resource, this, name2);
     }
@@ -249,7 +248,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
 //        ResourceDAO resourceDao = m_pluginManager.getPlugin(ResourceDAO.class);
 //        try {
-            resourceDAO.deleteResource(metadataService.getUri(resource));
+            metadataDao.deleteResource(metadataService.getUri(resource));
 //        } finally {
             // once the artifact file was removed, the resource has to be removed
             // from the repository even in case of exception on removing metadata
@@ -270,7 +269,7 @@ public class BufferImpl implements Buffer, EventHandler {
 
     @Override
     public synchronized List<Resource> commit(boolean move) throws IOException {
-        List<Resource> resources = resourceDAO.loadResources(repository);
+        List<Resource> resources = metadataDao.loadResources(repository, true);
         List<Resource> resourcesToCommit = pluginManager.getPlugin(ActionHandler.class).beforeBufferCommit(resources, this, store);
 
         List<Resource> commitedResources = new ArrayList<>();
@@ -315,7 +314,7 @@ public class BufferImpl implements Buffer, EventHandler {
                     continue;
                 }
                 try {
-                    resourceDAO.deleteResource(resource);
+                    metadataDao.deleteResource(resource);
                 } catch (IOException e) {
                     // once the artifact file was removed, the resource has to be removed
                     // from the repository even in case of exception on removing metadata
@@ -382,21 +381,38 @@ public class BufferImpl implements Buffer, EventHandler {
     @Override
     public List<Resource> getResources() {
         try {
-            return resourceDAO.loadResources(repository);
+            return metadataDao.loadResources(repository, true);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
         return Collections.emptyList();
     }
 
+    @Nullable
     @Override
-    public List<Resource> getResources(Requirement requirement) {
+    public Resource getResource(String uid, boolean withDetails) {
+        try {
+            return metadataDao.loadResource(uid, withDetails);
+        } catch (IOException e) {
+            logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Resource> getResources(Requirement requirement, boolean withDetails) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Nonnull
     @Override
-    public List<Resource> getResources(Set<Requirement> requirement) {
+    public List<Resource> getResources(Set<Requirement> requirement, boolean withDetails) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Nonnull
+    @Override
+    public List<Resource> getPossibleResources(Set<Requirement> requirement, boolean withDetails) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

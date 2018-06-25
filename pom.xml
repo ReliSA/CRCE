@@ -12,7 +12,7 @@
     <name>CRCE - Reactor</name>
 
     <modules>
-       <!--  <module>pom</module> -->
+        <module>pom</module>
         <module>build</module>
         <module>core</module>
         <module>modules</module>

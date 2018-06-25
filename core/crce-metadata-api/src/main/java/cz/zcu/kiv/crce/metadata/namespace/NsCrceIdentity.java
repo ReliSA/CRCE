@@ -23,6 +23,7 @@ public final class NsCrceIdentity {
 
     public static final AttributeType<String> ATTRIBUTE__EXTERNAL_ID = new SimpleAttributeType<>("external-id", String.class);
     public static final AttributeType<String> ATTRIBUTE__NAME = new SimpleAttributeType<>("name", String.class);
+    public static final AttributeType<String> ATTRIBUTE__REPOSITORY_ID = new SimpleAttributeType<>("repository-id", String.class);
     public static final AttributeType<URI> ATTRIBUTE__URI = new SimpleAttributeType<>("uri", URI.class);
     public static final AttributeType<String> ATTRIBUTE__FILE_NAME = new SimpleAttributeType<>("file-name", String.class);
     public static final AttributeType<Long> ATTRIBUTE__SIZE = new SimpleAttributeType<>("size", Long.class);
