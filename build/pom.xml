@@ -77,7 +77,8 @@
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.2</version>
+                    <!-- <version>1.2</version> -->
+                    <version>1.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>

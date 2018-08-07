@@ -69,7 +69,7 @@
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <module>crce-webui-vaadin</module>
+        <module>crce-webui-v2</module>
         <!-- <module>crce-handler-metrics</module> -->
 
         <!--<module>crce-rest</module>-->
