@@ -1,4 +1,4 @@
-crce-webui-vaadin
+crce-webui-v2
 ==============
 
 Template for a simple Vaadin application that only requires a Servlet 3.0 container to run.
@@ -9,7 +9,7 @@ Workflow
 
 To compile the entire project, run "mvn install".
 
-To run the application, run "mvn jetty:run" and open http://localhost:8080/ .
+To run the application, run "mvn jetty:run" and open http://localhost:8080/crce-webui .
 
 To produce a deployable production mode WAR:
 - change productionMode to true in the servlet class configuration (nested in the UI class)
