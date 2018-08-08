@@ -18,6 +18,8 @@ On linux, switching to JDK 7 for development/build can be done via `sudo update-
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
+On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.
+
 ## Start up
 
 Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
