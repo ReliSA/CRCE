@@ -1,0 +1,396 @@
+
+framework: spring
+
+resource_annotations:
+  - org/springframework/web/bind/annotation/RestController
+#  - org/springframework/web/bind/annotation/Controller
+
+endpoint_annotations:
+  - org/springframework/web/bind/annotation/RequestMapping
+  - org/springframework/web/bind/annotation/GetMapping
+  - org/springframework/web/bind/annotation/PostMapping
+  - org/springframework/web/bind/annotation/PutMapping
+  - org/springframework/web/bind/annotation/DeleteMapping
+  - org/springframework/web/bind/annotation/PatchMapping
+
+url:
+  - 
+    annotation: org/springframework/web/bind/annotation/RequestMapping
+    processing_way: from_value
+    valueKeys:
+      - value
+      - path
+  -
+    annotation: org/springframework/web/bind/annotation/GetMapping
+    processing_way: from_value
+    valueKeys:
+      - value
+      - path
+  -
+    annotation: org/springframework/web/bind/annotation/PostMapping
+    processing_way: from_value
+    valueKeys:
+      - value
+      - path
+  -
+    annotation: org/springframework/web/bind/annotation/PutMapping
+    processing_way: from_value
+    valueKeys:
+      - value
+      - path
+  -
+        annotation: org/springframework/web/bind/annotation/DeleteMapping
+        processing_way: from_value
+        valueKeys:
+          - value
+          - path
+  -
+        annotation: org/springframework/web/bind/annotation/PatchMapping
+        processing_way: from_value
+        valueKeys:
+          - value
+          - path
+  -
+       annotation: org/springframework/web/bind/annotation/HeadMapping
+       processing_way: from_value
+       valueKeys:
+         - value
+         - path
+
+produces:
+  -   annotation: org/springframework/web/bind/annotation/RequestMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+  -   annotation: org/springframework/web/bind/annotation/GetMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+  -   annotation: org/springframework/web/bind/annotation/PostMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+  -   annotation: org/springframework/web/bind/annotation/DeleteMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+  -   annotation: org/springframework/web/bind/annotation/PutMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+  -   annotation: org/springframework/web/bind/annotation/PatchMapping
+      processing_way: from_value
+      valueKeys:
+        - produces
+
+consumes:
+  -   annotation: org/springframework/web/bind/annotation/RequestMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+  -   annotation: org/springframework/web/bind/annotation/GetMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+  -   annotation: org/springframework/web/bind/annotation/PostMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+  -   annotation: org/springframework/web/bind/annotation/DeleteMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+  -   annotation: org/springframework/web/bind/annotation/PutMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+  -   annotation: org/springframework/web/bind/annotation/PatchMapping
+      processing_way: from_value
+      valueKeys:
+        - consumes
+
+default_http_methods:
+  - GET
+  - POST
+  - PUT
+  - PATCH
+  - DELETE
+  - OPTIONS
+  - HEAD
+
+http_method:
+  - 
+      annotation: org/springframework/web/bind/annotation/RequestMapping
+      processing_way: from_value
+      valueKeys:
+        - method
+  - 
+      annotation: org/springframework/web/bind/annotation/GetMapping
+      processing_way: from_name
+      result: GET
+  - 
+      annotation: org/springframework/web/bind/annotation/PostMapping
+      processing_way: from_name
+      result: POST
+  - 
+      annotation: org/springframework/web/bind/annotation/PutMapping
+      processing_way: from_name
+      result: PUT
+  - 
+      annotation: org/springframework/web/bind/annotation/PatchMapping
+      processing_way: from_name
+      result: DELETE
+  - 
+      annotation: org/springframework/web/bind/annotation/PatchMapping
+      processing_way: from_name
+      result: PATCH
+
+endpoint_parameters:
+  -    annotation: org/springframework/web/bind/annotation/RequestParam
+       processing_way: from_name
+       result: request  # request can mean query or form
+  -    annotation: org/springframework/web/bind/annotation/PathVariable
+       processing_way: from_name
+       result: path
+  -    annotation: org/springframework/web/bind/annotation/MatrixParam
+       processing_way: from_name
+       result: matrix
+  -    annotation: org/springframework/web/bind/annotation/RequestHeader
+       processing_way: from_name
+       result: header
+  -    annotation: org/springframework/web/bind/annotation/CookieValue
+       processing_way: from_name
+       result: cookie
+
+parameter_name:
+  annotationProcessors:
+    -
+       annotation: org/springframework/web/bind/annotation/RequestParam
+       processing_way: from_value
+       valueKeys:
+        -  value
+    -
+       annotation: org/springframework/web/bind/annotation/PathVariable
+       processing_way: from_value
+       valueKeys:
+        -  value
+    -
+       annotation: org/springframework/web/bind/annotation/MatrixParam
+       processing_way: from_value
+       valueKeys:
+        -  value
+    -
+       annotation: org/springframework/web/bind/annotation/RequestHeader
+       processing_way: from_value
+       valueKeys:
+        -  value
+    -
+       annotation: org/springframework/web/bind/annotation/CookieValue
+       processing_way: from_value
+       valueKeys:
+        -  value
+  from_name: true
+
+parameter_requirement:
+# PathVariable is always required
+  annotationProcessors:
+    -
+       annotation: org/springframework/web/bind/annotation/RequestParam
+       processing_way: from_value
+       valueKeys:
+        -  required
+
+    -
+       annotation: org/springframework/web/bind/annotation/MatrixParam
+       processing_way: from_value
+       valueKeys:
+        -  required
+    -
+       annotation: org/springframework/web/bind/annotation/RequestHeader
+       processing_way: from_value
+       valueKeys:
+        -  required
+    -
+       annotation: org/springframework/web/bind/annotation/CookieValue
+       processing_way: from_value
+       valueKeys:
+        -  required
+  parametersDefault: true
+  fieldsDefault: false
+
+
+default_parameter_value:
+   - 
+       annotation: org/springframework/web/bind/annotation/RequestParam
+       processing_way: from_value
+       valueKeys:
+        -  defaultValue
+   - 
+       annotation: org/springframework/web/bind/annotation/PathVariable
+       processing_way: from_value
+       valueKeys:
+        -  defaultValue
+   - 
+       annotation: org/springframework/web/bind/annotation/MatrixParam
+       processing_way: from_value
+       valueKeys:
+        -  defaultValue
+
+
+
+
+cookie_name:
+  annotationProcessors:
+    -  annotation: org/springframework/web/bind/annotation/CookieValue
+       processing_way: from_value
+       valueKeys:
+          -  value
+
+  from_name: true
+
+default_cookie_value:
+   -
+       annotation: org/springframework/web/bind/annotation/CookieValue
+       processing_way: from_value
+       valueKeys:
+         -  defaultValue
+
+header_name:
+  annotationProcessors:
+    -  annotation: org/springframework/web/bind/annotation/RequestHeader
+       processing_way: from_value
+       valueKeys:
+          -  value
+
+  from_name: false
+
+default_header_value:
+    -  annotation: org/springframework/web/bind/annotation/RequestHeader
+       processing_way: from_value
+       valueKeys:
+          - defaultValue
+
+parameter_bean_annotations: []
+
+body:
+  withoutAnnotations: false
+  annotations:
+    - org/springframework/web/bind/annotation/RequestBody
+  excludingAnnotations: []
+
+subresources:
+  true
+
+generic_response_classes:
+  - org/springframework/http/ResponseEntity
+
+status_setting_methods:
+  owner: org/springframework/http/ResponseEntity
+  mapping:
+    ok: 200
+    created: 201
+    accepted: 202
+    noContent: 204
+    serverError: 500
+  simpleName: status
+  returnType: org/springframework/http/ResponseEntity
+
+entity_setting_methods:
+   - owner: org/springframework/http/ResponseEntity
+     simpleName: ok
+     returnType: org/springframework/http/ResponseEntity
+   - owner: org/springframework/http/ResponseEntity$BodyBuilder
+     simpleName: body
+     returnType: org/springframework/http/ResponseEntity
+
+status_fields:
+  owner: org/springframework/http/HttpStatus
+  mapping:
+    CONTINUE: 100
+    SWITCHING_PROTOCOLS: 101
+    PROCESSING: 102
+    CHECKPOINT: 103
+    OK: 200
+    CREATED: 201
+    ACCEPTED: 202
+    NON_AUTHORITATIVE_INFORMATION: 203
+    NO_CONTENT: 204
+    RESET_CONTENT: 205
+    PARTIAL_CONTENT: 206
+    MULTI_STATUS: 207
+    ALREADY_REPORTED: 208
+    IM_USED: 226
+    MULTIPLE_CHOICES: 300
+    MOVED_PERMANENTLY: 301
+    FOUND: 302
+
+    SEE_OTHER: 303
+    NOT_MODIFIED: 304
+
+    TEMPORARY_REDIRECT: 307
+    PERMANENT_REDIRECT: 308
+    BAD_REQUEST: 400
+    UNAUTHORIZED: 401
+    PAYMENT_REQUIRED: 402
+    FORBIDDEN: 403
+    NOT_FOUND: 404
+    METHOD_NOT_ALLOWED: 405
+    NOT_ACCEPTABLE: 406
+    PROXY_AUTHENTICATION_REQUIRED: 407
+    REQUEST_TIMEOUT: 408
+    CONFLICT: 409
+    GONE: 410
+    LENGTH_REQUIRED: 411
+    PRECONDITION_FAILED: 412
+    PAYLOAD_TOO_LARGE: 413
+
+    URI_TOO_LONG: 414
+
+    UNSUPPORTED_MEDIA_TYPE: 415
+    REQUESTED_RANGE_NOT_SATISFIABLE: 416
+    EXPECTATION_FAILED: 417
+    I_AM_A_TEAPOT: 418
+    UNPROCESSABLE_ENTITY: 422
+    LOCKED: 423
+    FAILED_DEPENDENCY: 424
+    UPGRADE_REQUIRED: 426
+    PRECONDITION_REQUIRED: 428
+    TOO_MANY_REQUESTS: 429
+    REQUEST_HEADER_FIELDS_TOO_LARGE: 431
+    UNAVAILABLE_FOR_LEGAL_REASONS: 451
+    INTERNAL_SERVER_ERROR: 500
+    NOT_IMPLEMENTED: 501
+    BAD_GATEWAY: 502
+    SERVICE_UNAVAILABLE: 503
+    GATEWAY_TIMEOUT: 504
+    HTTP_VERSION_NOT_SUPPORTED: 505
+    VARIANT_ALSO_NEGOTIATES: 506
+    INSUFFICIENT_STORAGE: 507
+    LOOP_DETECTED: 508
+    BANDWIDTH_LIMIT_EXCEEDED: 509
+    NOT_EXTENDED: 510
+    NETWORK_AUTHENTICATION_REQUIRED: 511
+
+cookie_class: javax/servlet/http/Cookie
+
+cookie_setting_method:
+     owner: javax/servlet/http/HttpServletResponse
+     simpleName: addCookie
+     returnType: V
+
+header_setting_method:
+   owner: org/springframework/http/ResponseEntity$BodyBuilder
+   simpleName: header
+   returnType: org/springframework/http/ResponseEntity$BodyBuilder
+
+#special_method_inputs:
+#  annotations:
+#  classes:
+#    -  javax.servlet.http.HttpServletRequest;
+#    - javax.servlet.http.HttpServletResponse;
+
+default_object_mime: application/json
+default_primitive_mime: application/json
+
+fieldParamAnnotations: false
+fieldParamSetterRequired: true
