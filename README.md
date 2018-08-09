@@ -4,7 +4,7 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE (there is a problem with running web UI on JDK 8, need to update dependencies), tested on 1.7.0_80
+- **JDK 8** set in `JAVA_HOME` environment variable before starting CRCE, tested on 1.8.0_171
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
