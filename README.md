@@ -18,7 +18,7 @@ On linux, switching to JDK 7 for development/build can be done via `sudo update-
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
-On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", see https://stackoverflow.com/a/50924208/261891.
+On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
 ## Start up
 
