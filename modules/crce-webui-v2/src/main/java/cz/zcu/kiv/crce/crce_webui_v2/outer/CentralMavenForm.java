@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.EnumSet;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -29,7 +28,6 @@ import cz.zcu.kiv.crce.crce_external_repository.api.CentralMaven;
 import cz.zcu.kiv.crce.crce_external_repository.api.ResultSearchArtifactTree;
 import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
-import cz.zcu.kiv.crce.crce_webui_v2.other.TypePackaging;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
@@ -39,7 +37,7 @@ public class CentralMavenForm extends FormLayout {
 	private TextField group = new TextField("Group Id");
 	private TextField artifact = new TextField("Artifact Id");
 	private TextField version = new TextField("Version");
-	private NativeSelect packaging = new NativeSelect("Packaging");
+	private TextField packaging = new TextField("Packaging");
 	private OptionGroup directIndexOption = new OptionGroup("Direct or search index");
 	private NativeSelect rangeOption = new NativeSelect("Range");
 	private Button searchButton = new Button("Search");
@@ -59,9 +57,6 @@ public class CentralMavenForm extends FormLayout {
 		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout versionLayout = new HorizontalLayout();
 		VerticalLayout formPanelButtonLayout = new VerticalLayout();
-		packaging.addItems(EnumSet.allOf(TypePackaging.class));
-		packaging.select(TypePackaging.jar);
-		packaging.setNullSelectionAllowed(false);
 
 		caption.addStyleName(ValoTheme.LABEL_BOLD);
 
@@ -76,6 +71,15 @@ public class CentralMavenForm extends FormLayout {
 			directIndexOption.setDescription(
 					"The central maven repository index is not created. Check its creation in the settings menu");
 		}
+
+		group.setRequired(true);
+		group.setRequiredError("The item can not be empty!");
+		artifact.setRequired(true);
+		artifact.setRequiredError("The item can not be empty!");
+		version.setRequired(true);
+		version.setRequiredError("The item can not be empty!");
+		packaging.setRequired(true);
+		packaging.setRequiredError("The item can not be empty!");
 
 		rangeOption.addItem("<=");
 		rangeOption.addItem("=");
@@ -108,101 +112,89 @@ public class CentralMavenForm extends FormLayout {
 			if (content.getComponentIndex(formPanelButtonLayout) != -1) {
 				content.removeComponent(formPanelButtonLayout);
 			}
-			// check exist component from central Maven repository
-			if (directIndexOption.getValue().equals("Direct")) {
-				ResultSearchArtifactTree artifactList = new CentralMaven(
-						(SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).getArtifactTree(group.getValue(),
-								artifact.getValue(), version.getValue(), packaging.getValue(),
-								directIndexOption.getValue(), null);
-				if (artifactList.getArtifactTreeList() != null && artifactList.getStatus().equals("direct")) {
-					ArtifactTree artifactTree = artifactList.getArtifactTreeList().get(0);
-					String[] pom = artifactTree.getGroupId().split("\\.");
-					tree.addItem(pom[0]);
-					for (int i = 1; i < pom.length; i++) {
-						tree.addItem(pom[i]);
-						tree.setParent(pom[i], pom[i - 1]);
-					}
-					// addArtifactToTree(artifactTree, pom[pom.length - 1]);
-					addArtifactToTree(artifactTree.getUrl(), artifactTree.getGroupId(), artifactTree.getArtefactId(),
-							artifactTree.getVersions().get(0), artifactTree.getPackaging(), pom[pom.length - 1]);
-
-					// for margin
-					HorizontalLayout treePanelLayout = new HorizontalLayout();
-					treePanelLayout.addComponent(tree);
-					treePanelLayout.setMargin(true);
-					treePanel.setContent(treePanelLayout);
-					formPanelButtonLayout.addComponents(treePanel, uploadButton);
-					formPanelButtonLayout.setMargin(true);
-					formPanelButtonLayout.setSpacing(true);
-					formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
-					uploadButton.setVisible(false);
-				} else if (artifactList.getArtifactTreeList() != null && artifactList.getStatus().equals("group")) {
-					for (ArtifactTree artifactTree : artifactList.getArtifactTreeList()) {
-						String[] pom = artifactTree.getGroupId().split("/");
-						String uniqueItemChildren, uniqueItemParent = "/";
-
-						/*
-						 * for central maven2 url - the correct is the listing over all items, but in
-						 * this case the first is empty and the second is maven2
-						 */
-						for (int i = 2; i < pom.length; i++) {
-							uniqueItemChildren = uniqueItemParent + pom[i] + "/";
-							if (tree.getItem(uniqueItemChildren) == null) {
-								tree.addItem(uniqueItemChildren);
-								tree.setItemCaption(uniqueItemChildren, pom[i]);
-								tree.setParent(uniqueItemChildren, uniqueItemParent);
-							}
-							uniqueItemParent = uniqueItemChildren;
+			if (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()
+					|| version.getValue().trim().isEmpty() || packaging.getValue().trim().isEmpty()) {
+				Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
+				notif.setDelayMsec(5000);
+				notif.show(Page.getCurrent());
+			} else {
+				// check exist component from central Maven repository
+				if (directIndexOption.getValue().equals("Direct")) {
+					ResultSearchArtifactTree artifactList = new CentralMaven(
+							(SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).getArtifactTree(
+									group.getValue(), artifact.getValue(), version.getValue(), packaging.getValue(),
+									directIndexOption.getValue(), null);
+					if (artifactList.getArtifactTreeList() != null && artifactList.getStatus().equals("direct")) {
+						ArtifactTree artifactTree = artifactList.getArtifactTreeList().get(0);
+						String[] pom = artifactTree.getGroupId().split("\\.");
+						tree.addItem(pom[0]);
+						for (int i = 1; i < pom.length; i++) {
+							tree.addItem(pom[i]);
+							tree.setParent(pom[i], pom[i - 1]);
 						}
-						addArtefactToTreeGroup(artifactTree, uniqueItemParent);
-						/*
-						 * for (int i = 1; i < pom.length; i++) { uniqueItem = uniqueItem + pom[i];
-						 * 
-						 * if (tree.getItem(pom[i]) == null) { tree.addItem(pom[i]);
-						 * tree.setParent(pom[i], pom[i - 1]); } else { tree.setParent(pom[i], pom[i -
-						 * 1]); } } addArtefactToTreeGroup(artifactTree, pom[pom.length - 1]);
-						 */
+						// addArtifactToTree(artifactTree, pom[pom.length - 1]);
+						addArtifactToTree(artifactTree.getUrl(), artifactTree.getGroupId(),
+								artifactTree.getArtefactId(), artifactTree.getVersions().get(0),
+								artifactTree.getPackaging(), pom[pom.length - 1]);
+
+						// for margin
+						HorizontalLayout treePanelLayout = new HorizontalLayout();
+						treePanelLayout.addComponent(tree);
+						treePanelLayout.setMargin(true);
+						treePanel.setContent(treePanelLayout);
+						formPanelButtonLayout.addComponents(treePanel, uploadButton);
+						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setSpacing(true);
+						formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
+						uploadButton.setVisible(false);
+					} else if (artifactList.getArtifactTreeList() != null && artifactList.getStatus().equals("group")) {
+						for (ArtifactTree artifactTree : artifactList.getArtifactTreeList()) {
+							String[] pom = artifactTree.getGroupId().split("/");
+							String uniqueItemChildren, uniqueItemParent = "/";
+
+							/*
+							 * for central maven2 url - the correct is the listing over all items, but in
+							 * this case the first is empty and the second is maven2
+							 */
+							for (int i = 2; i < pom.length; i++) {
+								uniqueItemChildren = uniqueItemParent + pom[i] + "/";
+								if (tree.getItem(uniqueItemChildren) == null) {
+									tree.addItem(uniqueItemChildren);
+									tree.setItemCaption(uniqueItemChildren, pom[i]);
+									tree.setParent(uniqueItemChildren, uniqueItemParent);
+								}
+								uniqueItemParent = uniqueItemChildren;
+							}
+							addArtefactToTreeGroup(artifactTree, uniqueItemParent);
+						}
+						// for margin
+						HorizontalLayout treePanelLayout = new HorizontalLayout();
+						treePanelLayout.addComponent(tree);
+						treePanelLayout.setMargin(true);
+						treePanel.setContent(treePanelLayout);
+						formPanelButtonLayout.addComponents(treePanel, uploadButton);
+						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setSpacing(true);
+						formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
+						uploadButton.setVisible(false);
+					} else {
+						// for margin
+						HorizontalLayout treePanelLayout = new HorizontalLayout();
+						treePanelLayout.addComponent(notFound);
+						treePanelLayout.setMargin(true);
+						treePanel.setContent(treePanelLayout);
+						formPanelButtonLayout.addComponents(treePanel);
+						formPanelButtonLayout.setMargin(true);
 					}
-					// for margin
-					HorizontalLayout treePanelLayout = new HorizontalLayout();
-					treePanelLayout.addComponent(tree);
-					treePanelLayout.setMargin(true);
-					treePanel.setContent(treePanelLayout);
-					formPanelButtonLayout.addComponents(treePanel, uploadButton);
-					formPanelButtonLayout.setMargin(true);
-					formPanelButtonLayout.setSpacing(true);
-					formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
-					uploadButton.setVisible(false);
-				} else {
-					// for margin
-					HorizontalLayout treePanelLayout = new HorizontalLayout();
-					treePanelLayout.addComponent(notFound);
-					treePanelLayout.setMargin(true);
-					treePanel.setContent(treePanelLayout);
-					formPanelButtonLayout.addComponents(treePanel);
-					formPanelButtonLayout.setMargin(true);
 				}
-			}
-			// index search
-			else {
-				if (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()) {
-					Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
-					notif.setDelayMsec(5000);
-					notif.show(Page.getCurrent());
-				} else if (group.getValue().charAt(0) == '*' || group.getValue().charAt(0) == '?'
+				// index search
+				else if (group.getValue().charAt(0) == '*' || group.getValue().charAt(0) == '?'
 						|| artifact.getValue().charAt(0) == '*' || artifact.getValue().charAt(0) == '?') {
 					Notification notif = new Notification("Can not start a search term with '*' or '?'",
 							Notification.Type.WARNING_MESSAGE);
 					notif.setDelayMsec(5000);
 					notif.show(Page.getCurrent());
 				} else {
-					/*
-					 * if(myUI.getSession().getAttribute("mavenIndex") == null) { Notification notif
-					 * = new Notification(
-					 * "The central maven repository index is not created. Check its creation in the settings menu"
-					 * , Notification.Type.WARNING_MESSAGE); notif.setDelayMsec(5000);
-					 * notif.show(Page.getCurrent()); } else {
-					 */
 					ResultSearchArtifactTree artifactList = new CentralMaven(
 							(SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).getArtifactTree(
 									group.getValue(), artifact.getValue(), version.getValue(), packaging.getValue(),
@@ -239,7 +231,6 @@ public class CentralMavenForm extends FormLayout {
 						formPanelButtonLayout.addComponents(treePanel);
 						formPanelButtonLayout.setMargin(true);
 					}
-					/* } */
 				}
 			}
 			content.addComponent(formPanelButtonLayout);
@@ -277,14 +268,8 @@ public class CentralMavenForm extends FormLayout {
 		directIndexOption.addValueChangeListener(e -> {
 			if (directIndexOption.getValue().equals("Direct")) {
 				rangeOption.setEnabled(false);
-				group.setRequired(false);
-				artifact.setRequired(false);
 			} else {
 				rangeOption.setEnabled(true);
-				group.setRequired(true);
-				group.setRequiredError("The item can not be empty!");
-				artifact.setRequired(true);
-				artifact.setRequiredError("The item can not be empty!");
 			}
 		});
 
@@ -295,7 +280,7 @@ public class CentralMavenForm extends FormLayout {
 			group.clear();
 			artifact.clear();
 			version.clear();
-			packaging.select(TypePackaging.jar);
+			packaging.clear();
 			tree.removeAllItems();
 			content.addComponent(userForm);
 		});

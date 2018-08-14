@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.EnumSet;
+//import java.util.EnumSet;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -17,7 +17,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeSelect;
+//import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
@@ -29,11 +29,11 @@ import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
 import cz.zcu.kiv.crce.crce_external_repository.api.DefinedMaven;
 import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
-import cz.zcu.kiv.crce.crce_webui_v2.other.TypePackaging;
+//import cz.zcu.kiv.crce.crce_webui_v2.other.TypePackaging;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
-public class DefinedMavenForm extends FormLayout{
+public class DefinedMavenForm extends FormLayout {
 	private static final long serialVersionUID = 4172878715304331198L;
 	private transient DefinedMaven definedMaven;
 	private TextField definedUrl = new TextField();
@@ -41,7 +41,8 @@ public class DefinedMavenForm extends FormLayout{
 	private TextField group = new TextField("Group Id");
 	private TextField artifact = new TextField("Artifact Id");
 	private TextField version = new TextField("Version");
-	private NativeSelect packaging = new NativeSelect("Packaging");
+	// private NativeSelect packaging = new NativeSelect("Packaging");
+	private TextField packaging = new TextField("Packaging");
 	private Button searchButton = new Button("Search");
 	private Button clearButton = new Button("Clear");
 	private Button uploadButton = new Button("Upload");
@@ -70,14 +71,21 @@ public class DefinedMavenForm extends FormLayout{
 		HorizontalLayout treeLayout = new HorizontalLayout();
 		VerticalLayout formLayout = new VerticalLayout();
 		HorizontalLayout content = new HorizontalLayout();
-		
+
 		caption.addStyleName(ValoTheme.LABEL_BOLD);
 
 		definedUrl.setWidth("450px");
 
-		packaging.addItems(EnumSet.allOf(TypePackaging.class));
-		packaging.select(TypePackaging.jar);
-		packaging.setNullSelectionAllowed(false);
+		// packaging.addItems(EnumSet.allOf(TypePackaging.class));
+		// packaging.select(TypePackaging.jar);
+		// packaging.setNullSelectionAllowed(false);
+
+		group.setRequired(true);
+		group.setRequiredError("The item can not be empty!");
+		artifact.setRequired(true);
+		artifact.setRequiredError("The item can not be empty!");
+		packaging.setRequired(true);
+		packaging.setRequiredError("The item can not be empty!");
 
 		searchButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
@@ -92,17 +100,17 @@ public class DefinedMavenForm extends FormLayout{
 		fieldLayout.addComponents(group, artifact, version, packaging, buttonsSearchClearLayout);
 		fieldLayout.setSpacing(true);
 		fieldLayout.setMargin(new MarginInfo(false, true, false, false));
-		
+
 		treeLayout.setMargin(true);
 		treePanel.setContent(treeLayout);
 		treePanel.setWidth("600px");
 		treePanel.setHeight("283px");
 		treePanel.setVisible(false);
 		buttonUploadResolveLayout.setVisible(false);
-		
+
 		buttonUploadResolveLayout.addComponents(resolveButton, uploadButton);
 		buttonUploadResolveLayout.setSpacing(true);
-		
+
 		treePanelButtonLayout.addComponents(treePanel, buttonUploadResolveLayout);
 		treePanelButtonLayout.setSpacing(true);
 		treePanelButtonLayout.setComponentAlignment(buttonUploadResolveLayout, Alignment.BOTTOM_CENTER);
@@ -135,7 +143,8 @@ public class DefinedMavenForm extends FormLayout{
 			group.clear();
 			artifact.clear();
 			version.clear();
-			packaging.select(TypePackaging.jar);
+			packaging.clear();
+			// packaging.select(TypePackaging.jar);
 			// erasing any previous components shown
 			if (treeLayout.getComponentIndex(notFound) != -1) {
 				treeLayout.removeComponent(notFound);
@@ -149,59 +158,66 @@ public class DefinedMavenForm extends FormLayout{
 
 		// search artefact from defined repository
 		searchButton.addClickListener(e1 -> {
-			SettingsUrl settings;
-			if (myUI.getSession().getAttribute("settingsUrl") == null) {
-				settings = new SettingsUrl();
+			if (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()
+					|| packaging.getValue().trim().isEmpty()) {
+				Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
+				notif.setDelayMsec(5000);
+				notif.show(Page.getCurrent());
 			} else {
-				settings = (SettingsUrl) myUI.getSession().getAttribute("settingsUrl");
-			}
-			// erasing any previous components shown
-			if (treeLayout.getComponentIndex(notFound) != -1) {
-				treeLayout.removeComponent(notFound);
-			}
-			if (treeLayout.getComponentIndex(tree) != -1) {
-				treeLayout.removeComponent(tree);
-			}
-
-			// předání hodnot
-			definedMaven = new DefinedMaven(settings);
-			ArtifactTree definedArtefact  = definedMaven.getArtifact(group.getValue(), artifact.getValue(), version.getValue(),
-					packaging.getValue());
-			if(definedArtefact == null){
-				treeLayout.addComponent(notFound);
-			}
-			else {
-				tree = new Tree();
-				String[] pom = definedArtefact.getGroupId().split("\\.");
-				tree.addItem(pom[0]);
-				for (int i = 1; i < pom.length; i++) {
-					tree.addItem(pom[i]);
-					tree.setParent(pom[i], pom[i - 1]);
-				}
-
-				if (definedArtefact.getVersions().size() > 1) {
-					for (String s : definedArtefact.getVersions()) {
-						addArtefactToTree(definedArtefact.getGroupId(), definedArtefact.getArtefactId(), s, 
-								definedArtefact.getPackaging(),pom[pom.length - 1]);
-					}
+				SettingsUrl settings;
+				if (myUI.getSession().getAttribute("settingsUrl") == null) {
+					settings = new SettingsUrl();
 				} else {
-					addArtefactToTree(definedArtefact.getGroupId(), definedArtefact.getArtefactId(), definedArtefact.getVersions().get(0), 
-							definedArtefact.getPackaging(),pom[pom.length - 1]);
+					settings = (SettingsUrl) myUI.getSession().getAttribute("settingsUrl");
 				}
-				
-				tree.addExpandListener(e2 ->{
-					buttonUploadResolveLayout.setVisible(true);
-				});
-				
-				tree.addCollapseListener(e3 -> {
-					buttonUploadResolveLayout.setVisible(false);
-				});
-				
-				treeLayout.addComponent(tree);
+				// erasing any previous components shown
+				if (treeLayout.getComponentIndex(notFound) != -1) {
+					treeLayout.removeComponent(notFound);
+				}
+				if (treeLayout.getComponentIndex(tree) != -1) {
+					treeLayout.removeComponent(tree);
+				}
+
+				// předání hodnot
+				definedMaven = new DefinedMaven(settings);
+				ArtifactTree definedArtefact = definedMaven.getArtifact(group.getValue(), artifact.getValue(),
+						version.getValue(), packaging.getValue());
+				if (definedArtefact == null) {
+					treeLayout.addComponent(notFound);
+				} else {
+					tree = new Tree();
+					String[] pom = definedArtefact.getGroupId().split("\\.");
+					tree.addItem(pom[0]);
+					for (int i = 1; i < pom.length; i++) {
+						tree.addItem(pom[i]);
+						tree.setParent(pom[i], pom[i - 1]);
+					}
+
+					if (definedArtefact.getVersions().size() > 1) {
+						for (String s : definedArtefact.getVersions()) {
+							addArtefactToTree(definedArtefact.getGroupId(), definedArtefact.getArtefactId(), s,
+									definedArtefact.getPackaging(), pom[pom.length - 1]);
+						}
+					} else {
+						addArtefactToTree(definedArtefact.getGroupId(), definedArtefact.getArtefactId(),
+								definedArtefact.getVersions().get(0), definedArtefact.getPackaging(),
+								pom[pom.length - 1]);
+					}
+
+					tree.addExpandListener(e2 -> {
+						buttonUploadResolveLayout.setVisible(true);
+					});
+
+					tree.addCollapseListener(e3 -> {
+						buttonUploadResolveLayout.setVisible(false);
+					});
+
+					treeLayout.addComponent(tree);
+				}
+				treePanel.setVisible(true);
 			}
-			treePanel.setVisible(true);
 		});
-		
+
 		uploadButton.addClickListener(e -> {
 			SettingsUrl settings;
 			if (myUI.getSession().getAttribute("settingsUrl") == null) {
@@ -210,7 +226,7 @@ public class DefinedMavenForm extends FormLayout{
 				settings = (SettingsUrl) myUI.getSession().getAttribute("settingsUrl");
 			}
 			// First check the artifact storage in the local repository
-			if(tree.getValue() != null && tree.getValue().toString().contains(":")) {
+			if (tree.getValue() != null && tree.getValue().toString().contains(":")) {
 				String artifactText = tree.getValue().toString();
 				if (DefinedMaven.resolveArtifact(artifactText, settings)) {
 					File file = new File(settings.getLocalAetherUrl() + "/"
@@ -236,14 +252,12 @@ public class DefinedMavenForm extends FormLayout{
 					new Notification("Problem with resolving artifact", Notification.Type.WARNING_MESSAGE)
 							.show(Page.getCurrent());
 				}
-			}
-			else {
-				new Notification("No artefact selected", Notification.Type.WARNING_MESSAGE)
-				.show(Page.getCurrent());
+			} else {
+				new Notification("No artefact selected", Notification.Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 		});
-		
-		resolveButton.addClickListener(e ->{
+
+		resolveButton.addClickListener(e -> {
 			SettingsUrl settings;
 			if (myUI.getSession().getAttribute("settingsUrl") == null) {
 				settings = new SettingsUrl();
@@ -251,7 +265,7 @@ public class DefinedMavenForm extends FormLayout{
 				settings = (SettingsUrl) myUI.getSession().getAttribute("settingsUrl");
 			}
 			// First check the artifact storage in the local repository
-			if(tree.getValue() != null && tree.getValue().toString().contains(":")) {
+			if (tree.getValue() != null && tree.getValue().toString().contains(":")) {
 				String artifactText = tree.getValue().toString();
 				if (DefinedMaven.resolveArtifact(artifactText, settings)) {
 					Notification notif = new Notification("Info", "Artefact sucess resolved to Maven local repository.",
@@ -262,17 +276,15 @@ public class DefinedMavenForm extends FormLayout{
 					new Notification("Problem with resolving artifact", Notification.Type.WARNING_MESSAGE)
 							.show(Page.getCurrent());
 				}
-			}
-			else {
-				new Notification("No artefact selected", Notification.Type.WARNING_MESSAGE)
-				.show(Page.getCurrent());
+			} else {
+				new Notification("No artefact selected", Notification.Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 		});
-		
+
 		content.setSpacing(true);
 		addComponent(content);
 	}
-	
+
 	private void addArtefactToTree(String group, String artifact, String version, String packaging, String parent) {
 		tree.addItem(artifact);
 		tree.setParent(artifact, parent);
@@ -281,15 +293,16 @@ public class DefinedMavenForm extends FormLayout{
 
 		// konečný artefact je komplet url link např. pro wget - UPRAVIT DLE
 		// POTŘEBY
-		/*String artifactText = settings.getExternalAetherUrl() + "/" +
-				groupText + "/" + idText + "/" + version + "." + packagingText;*/
-	 
+		/*
+		 * String artifactText = settings.getExternalAetherUrl() + "/" + groupText + "/"
+		 * + idText + "/" + version + "." + packagingText;
+		 */
+
 		String artifactText = group + ":" + artifact + ":" + version + ":" + packaging;
 
 		tree.addItem(artifactText);
 		tree.setParent(artifactText, version.toString());
-		tree.setItemCaption(artifactText,
-			artifact + "-" + version + "." + packaging);
+		tree.setItemCaption(artifactText, artifact + "-" + version + "." + packaging);
 		tree.setChildrenAllowed(artifactText, false);
 		if (packaging.equals("jar") || packaging.equals("war")) {
 			tree.setItemIcon(artifactText, FontAwesome.GIFT);

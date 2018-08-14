@@ -4,6 +4,7 @@ public class SettingsUrl{
 	private String centralMavenUrl = "http://repo.maven.apache.org/maven2/";
 	private String localAetherUrl = "aether-local-repo";
 	private String externalAetherUrl = "http://repo.maven.apache.org/maven2/";
+	private boolean enableDeleteLocalMaven = false;
 	private boolean enableGroupSearch = false;
 	
 	public String getCentralMavenUrl() {
@@ -28,6 +29,14 @@ public class SettingsUrl{
 
 	public void setExternalAetherUrl(String url) {
 		this.externalAetherUrl = url;
+	}
+	
+	public boolean isEnableDeleteLocalMaven() {
+		return enableDeleteLocalMaven;
+	}
+
+	public void setEnableDeleteLocalMaven(boolean enableDeleteLocalMaven) {
+		this.enableDeleteLocalMaven = enableDeleteLocalMaven;
 	}
 
 	public boolean isEnableGroupSearch() {

@@ -29,6 +29,7 @@ public class SettingsForm extends FormLayout {
 	public SettingsForm(VaadinSession session) {
 		TextField centralMavenUrl = new TextField("Central Maven url");
 		TextField localAetherRepo = new TextField("Local Aether repository");
+		CheckBox enableDeleteLocalMaven = new CheckBox("Enable delete local Maven repo");
 		CheckBox enableGroupSearch = new CheckBox("Enable only group search");
 
 		centralMavenUrl.setWidth("400px");
@@ -40,10 +41,12 @@ public class SettingsForm extends FormLayout {
 			SettingsUrl settingsUrl = new SettingsUrl();
 			centralMavenUrl.setValue(settingsUrl.getCentralMavenUrl());
 			localAetherRepo.setValue(settingsUrl.getLocalAetherUrl());
+			enableDeleteLocalMaven.setValue(false);
 			enableGroupSearch.setValue(false);
 		} else {
 			centralMavenUrl.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).getCentralMavenUrl());
 			localAetherRepo.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).getLocalAetherUrl());
+			enableDeleteLocalMaven.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).isEnableDeleteLocalMaven());
 			enableGroupSearch.setValue(((SettingsUrl) session.getAttribute("settingsUrl")).isEnableGroupSearch());
 		}
 
@@ -57,7 +60,7 @@ public class SettingsForm extends FormLayout {
 		saveButton.setClickShortcut(KeyCode.ENTER);
 		
 		VerticalLayout content = new VerticalLayout();
-		content.addComponents(centralMavenUrl, localAetherRepo, enableGroupSearch, buttonsLayout);
+		content.addComponents(centralMavenUrl, localAetherRepo, enableDeleteLocalMaven, enableGroupSearch, buttonsLayout);
 		content.setSpacing(true);
 
 		HorizontalLayout formLayout = new HorizontalLayout();
@@ -74,6 +77,7 @@ public class SettingsForm extends FormLayout {
 			}
 			settingsUrl.setCentralMavenUrl(centralMavenUrl.getValue());
 			settingsUrl.setLocalAetherUrl(localAetherRepo.getValue());
+			settingsUrl.setEnableDeleteLocalMaven(enableDeleteLocalMaven.getValue());
 			settingsUrl.setEnableGroupSearch(enableGroupSearch.getValue());
 			getSession().setAttribute("settingsUrl", settingsUrl);
 			Notification notif = new Notification("Info", "Settings saved successfully" ,
@@ -87,6 +91,7 @@ public class SettingsForm extends FormLayout {
 			getSession().setAttribute("settingsUrl", settingsUrl);
 			centralMavenUrl.setValue(settingsUrl.getCentralMavenUrl());
 			localAetherRepo.setValue(settingsUrl.getLocalAetherUrl());
+			enableDeleteLocalMaven.setValue(settingsUrl.isEnableDeleteLocalMaven());
 			enableGroupSearch.setValue(settingsUrl.isEnableGroupSearch());
 		});
 

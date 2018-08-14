@@ -24,6 +24,7 @@ import com.vaadin.ui.Tree;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.ui.VerticalLayout;
 
+import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.classes.LocalMaven;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
@@ -36,7 +37,7 @@ public class LocalMavenForm extends FormLayout {
 	private Panel formPanel = new Panel("Content");
 	private Button uploadButton = new Button("Upload");
 	private Button removeButton = new Button("Remove");
-	
+
 	public LocalMavenForm() {
 		HorizontalLayout content = new HorizontalLayout();
 		addComponent(content);
@@ -45,16 +46,22 @@ public class LocalMavenForm extends FormLayout {
 	public LocalMavenForm(MyUI myUI) {
 		VerticalLayout content = new VerticalLayout();
 		caption.addStyleName(ValoTheme.LABEL_BOLD);
-		
+
 		VerticalLayout formLayout = new VerticalLayout();
 		HorizontalLayout buttons = new HorizontalLayout();
-		
+
 		removeButton.setStyleName(ValoTheme.BUTTON_DANGER);
-		
-		buttons.addComponents(uploadButton, removeButton);
+
+		if (myUI.getSession().getAttribute("settingsUrl") == null
+				|| !((SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).isEnableDeleteLocalMaven()) {
+			buttons.addComponent(uploadButton);
+		} else {
+			buttons.addComponents(uploadButton, removeButton);
+		}
+
 		buttons.setSpacing(true);
 		buttons.setVisible(false);
-		
+
 		// Tree of Maven local repository
 		Tree localMavenTree = localMaven.getTree(myUI.getSession());
 		content.setMargin(new MarginInfo(false, true));
@@ -71,11 +78,11 @@ public class LocalMavenForm extends FormLayout {
 			formLayout.setComponentAlignment(buttons, Alignment.BOTTOM_CENTER);
 			content.addComponents(formLayout);
 			content.setSpacing(true);
-			
+
 			localMavenTree.addItemClickListener(e -> {
 				buttons.setVisible(true);
 			});
-			
+
 			removeButton.addClickListener(e -> {
 				if (localMavenTree.getValue() != null) {
 					File file = new File(localMavenTree.getValue().toString());
@@ -102,7 +109,7 @@ public class LocalMavenForm extends FormLayout {
 					}
 				}
 			});
-			
+
 			uploadButton.addClickListener(e -> {
 				if (localMavenTree.getValue() != null) {
 					if (!localMavenTree.areChildrenAllowed((Object) localMavenTree.getValue())) {
@@ -122,10 +129,10 @@ public class LocalMavenForm extends FormLayout {
 							new Notification("Could not open file", ex.getMessage(), Notification.Type.ERROR_MESSAGE)
 									.show(Page.getCurrent());
 						}
-						
+
 					} else {
 						new Notification("No artifact is selected for upload!", Notification.Type.WARNING_MESSAGE)
-						.show(Page.getCurrent());
+								.show(Page.getCurrent());
 					}
 				}
 			});
