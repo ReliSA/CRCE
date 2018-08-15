@@ -69,8 +69,8 @@
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
+        <!-- <module>crce-handler-metrics</module> --> <!-- findbugs - 1 bugs -->
         <module>crce-webui-v2</module>
-        <!-- <module>crce-handler-metrics</module> -->
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>

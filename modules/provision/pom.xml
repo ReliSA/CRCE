@@ -36,7 +36,7 @@
 
         <!-- === PAX-WEB === -->
 
-        <!-- <dependency>
+		<!-- <dependency>
 			<groupId>org.ops4j.pax.web</groupId>
 			<artifactId>pax-web-jsp</artifactId>
 		</dependency> -->
