@@ -66,20 +66,26 @@ public class CentralMavenForm extends FormLayout {
 		directIndexOption.addItems("Direct", "Index");
 		directIndexOption.setValue("Direct");
 
-		if (myUI.getSession().getAttribute("mavenIndex") == null) {
+		if (myUI.getSession().getAttribute("mavenIndex") == null
+				|| myUI.getSession().getAttribute("settingsUrl") != null
+						&& ((SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).isEnableGroupSearch()) {
 			directIndexOption.setItemEnabled("Index", false);
 			directIndexOption.setDescription(
-					"The central maven repository index is not created. Check its creation in the settings menu");
+					"The central maven repository index is not created or it is allowed to search only by group. Check the settings menu");
 		}
 
 		group.setRequired(true);
 		group.setRequiredError("The item can not be empty!");
-		artifact.setRequired(true);
-		artifact.setRequiredError("The item can not be empty!");
-		version.setRequired(true);
-		version.setRequiredError("The item can not be empty!");
-		packaging.setRequired(true);
-		packaging.setRequiredError("The item can not be empty!");
+
+		if (myUI.getSession().getAttribute("settingsUrl") == null
+				|| !((SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).isEnableGroupSearch()) {
+			artifact.setRequired(true);
+			artifact.setRequiredError("The item can not be empty!");
+			version.setRequired(true);
+			version.setRequiredError("The item can not be empty!");
+			packaging.setRequired(true);
+			packaging.setRequiredError("The item can not be empty!");
+		}
 
 		rangeOption.addItem("<=");
 		rangeOption.addItem("=");
@@ -112,8 +118,23 @@ public class CentralMavenForm extends FormLayout {
 			if (content.getComponentIndex(formPanelButtonLayout) != -1) {
 				content.removeComponent(formPanelButtonLayout);
 			}
-			if (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()
-					|| version.getValue().trim().isEmpty() || packaging.getValue().trim().isEmpty()) {
+			// check filling form
+			if (myUI.getSession().getAttribute("settingsUrl") == null
+					&& (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()
+							|| version.getValue().trim().isEmpty() || packaging.getValue().trim().isEmpty())) {
+				Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
+				notif.setDelayMsec(5000);
+				notif.show(Page.getCurrent());
+			} else if (myUI.getSession().getAttribute("settingsUrl") != null
+					&& !((SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).isEnableGroupSearch()
+					&& (group.getValue().trim().isEmpty() || artifact.getValue().trim().isEmpty()
+							|| version.getValue().trim().isEmpty() || packaging.getValue().trim().isEmpty())) {
+				Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
+				notif.setDelayMsec(5000);
+				notif.show(Page.getCurrent());
+			} else if (myUI.getSession().getAttribute("settingsUrl") != null
+					&& ((SettingsUrl) myUI.getSession().getAttribute("settingsUrl")).isEnableGroupSearch()
+					&& group.getValue().trim().isEmpty()) {
 				Notification notif = new Notification("Incomplete assignment!", Notification.Type.WARNING_MESSAGE);
 				notif.setDelayMsec(5000);
 				notif.show(Page.getCurrent());
@@ -236,7 +257,9 @@ public class CentralMavenForm extends FormLayout {
 			content.addComponent(formPanelButtonLayout);
 		});
 
-		tree.addCollapseListener(e -> {
+		tree.addCollapseListener(e ->
+
+		{
 			uploadButton.setVisible(false);
 		});
 
@@ -286,6 +309,7 @@ public class CentralMavenForm extends FormLayout {
 		});
 
 		content.setSpacing(true);
+
 		addComponent(content);
 	}
 
