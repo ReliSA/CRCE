@@ -28,7 +28,7 @@ public class SettingsForm extends FormLayout {
 
 	public SettingsForm(VaadinSession session) {
 		TextField centralMavenUrl = new TextField("Central Maven url");
-		TextField localAetherRepo = new TextField("Local Aether repository");
+		TextField localAetherRepo = new TextField("Local Maven repository");
 		CheckBox enableDeleteLocalMaven = new CheckBox("Enable delete local Maven repo");
 		CheckBox enableGroupSearch = new CheckBox("Enable only group search");
 
