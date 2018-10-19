@@ -4,11 +4,11 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE (there is a problem with running web UI on JDK 8, need to update dependencies), tested on 1.7.0_80
+- **JDK 8** set in `JAVA_HOME` environment variable before starting CRCE, tested on 1.8.0_181
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 7 for development/build can be done via `sudo update-alternatives --config java`.
+On linux, switching to JDK 8 for development/build can be done via `sudo update-alternatives --config java`.
 
 ## Build
 
@@ -47,7 +47,7 @@ The cause of the latter is a badly loaded binary of mathematical solver which do
 
 Started up, the application is accessible at:
 
-- web UI: http://localhost:8080/crce
+- web UI: http://localhost:8080/crce-webui
 - REST web services: http://localhost:8080/rest/v2/
 
 Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).

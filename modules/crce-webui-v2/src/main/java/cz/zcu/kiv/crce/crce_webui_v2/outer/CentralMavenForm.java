@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
@@ -12,6 +14,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
@@ -21,6 +24,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
 
 import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
@@ -28,12 +32,15 @@ import cz.zcu.kiv.crce.crce_external_repository.api.CentralMaven;
 import cz.zcu.kiv.crce.crce_external_repository.api.ResultSearchArtifactTree;
 import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
 @SuppressWarnings("serial")
 public class CentralMavenForm extends FormLayout {
 	private Label caption = new Label("Central Maven repository");
+	private Panel formPanel = new Panel("Content");
 	private TextField group = new TextField("Group Id");
 	private TextField artifact = new TextField("Artifact Id");
 	private TextField version = new TextField("Version");
@@ -46,6 +53,10 @@ public class CentralMavenForm extends FormLayout {
 	private Panel treePanel = new Panel("Result list");
 	private Button uploadButton = new Button("Upload");
 	private Tree tree = new Tree();
+	private VerticalLayout bufferLayout = new VerticalLayout();
+	private Panel bufferPanel = new Panel("Buffer");
+	private Grid bufferGrid = new Grid();
+	private ResourceService resourceService;
 
 	public CentralMavenForm() {
 		HorizontalLayout content = new HorizontalLayout();
@@ -54,9 +65,10 @@ public class CentralMavenForm extends FormLayout {
 
 	public CentralMavenForm(MyUI myUI) {
 		VerticalLayout userForm = new VerticalLayout();
-		HorizontalLayout content = new HorizontalLayout();
 		HorizontalLayout versionLayout = new HorizontalLayout();
 		VerticalLayout formPanelButtonLayout = new VerticalLayout();
+		HorizontalLayout contentForm = new HorizontalLayout();
+		VerticalLayout content = new VerticalLayout();
 
 		caption.addStyleName(ValoTheme.LABEL_BOLD);
 
@@ -101,22 +113,48 @@ public class CentralMavenForm extends FormLayout {
 
 		HorizontalLayout buttons = new HorizontalLayout(searchButton, clearButton);
 		buttons.setSpacing(true);
-		userForm.addComponents(caption, group, artifact, versionLayout, packaging, directIndexOption, buttons);
+		userForm.addComponents(group, artifact, versionLayout, packaging, directIndexOption, buttons);
 		userForm.setSpacing(true);
-		userForm.setMargin(new MarginInfo(false, true));
 
 		treePanel.setWidth("600px");
 		treePanel.setHeight("380px");
 
-		content.addComponent(userForm);
+		contentForm.addComponent(userForm);
+		contentForm.setMargin(true);
+		formPanel.setContent(contentForm);
+		formPanel.setHeight("570px");
+		
+		resourceService = new ResourceService(Activator.instance().getMetadataService());
+		List<ResourceBean> resourceBeanList = resourceService.getAllResourceBeanFromBuffer(myUI.getSession().getSession());
+		
+		HorizontalLayout bufferPanelLayout = new HorizontalLayout();
+		bufferGrid.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, resourceBeanList));
+		bufferGrid.getColumn("resource").setHidden(true);
+		bufferGrid.getColumn("size").setHidden(true);
+		bufferGrid.setColumnOrder("presentationName", "symbolicName", "version", "categories");
+		bufferGrid.addStyleName("my-style");
+		bufferGrid.setSelectionMode(SelectionMode.NONE);
+		bufferLayout.addComponent(bufferGrid);
+		bufferGrid.setSizeFull();
+		bufferPanelLayout.setSizeFull();
+		bufferPanelLayout.addComponent(bufferLayout);
+		bufferPanelLayout.setExpandRatio(bufferLayout, 1);
+		bufferPanel.setContent(bufferPanelLayout);
+		
+		if(!resourceBeanList.isEmpty()) {
+			bufferPanel.setVisible(true);
+		}
+		else {
+			bufferPanel.setVisible(false);
+		}
 
 		// Add tree
 		searchButton.addClickListener(e -> {
 			// clear tree
 			tree.removeAllItems(); // no function tree.clear();
 			// erasing any previous components shown
-			if (content.getComponentIndex(formPanelButtonLayout) != -1) {
-				content.removeComponent(formPanelButtonLayout);
+			if (contentForm.getComponentIndex(formPanelButtonLayout) != -1) {
+				contentForm.removeComponent(formPanelButtonLayout);
 			}
 			// check filling form
 			if (myUI.getSession().getAttribute("settingsUrl") == null
@@ -164,7 +202,7 @@ public class CentralMavenForm extends FormLayout {
 						treePanelLayout.setMargin(true);
 						treePanel.setContent(treePanelLayout);
 						formPanelButtonLayout.addComponents(treePanel, uploadButton);
-						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setMargin(new MarginInfo(false, true));
 						formPanelButtonLayout.setSpacing(true);
 						formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
 						uploadButton.setVisible(false);
@@ -194,7 +232,7 @@ public class CentralMavenForm extends FormLayout {
 						treePanelLayout.setMargin(true);
 						treePanel.setContent(treePanelLayout);
 						formPanelButtonLayout.addComponents(treePanel, uploadButton);
-						formPanelButtonLayout.setMargin(true);
+						//formPanelButtonLayout.setMargin(true);
 						formPanelButtonLayout.setSpacing(true);
 						formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
 						uploadButton.setVisible(false);
@@ -205,7 +243,7 @@ public class CentralMavenForm extends FormLayout {
 						treePanelLayout.setMargin(true);
 						treePanel.setContent(treePanelLayout);
 						formPanelButtonLayout.addComponents(treePanel);
-						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setMargin(new MarginInfo(false, true));
 					}
 				}
 				// index search
@@ -240,7 +278,7 @@ public class CentralMavenForm extends FormLayout {
 						treePanelLayout.setMargin(true);
 						treePanel.setContent(treePanelLayout);
 						formPanelButtonLayout.addComponents(treePanel, uploadButton);
-						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setMargin(new MarginInfo(false, true));
 						formPanelButtonLayout.setSpacing(true);
 						formPanelButtonLayout.setComponentAlignment(uploadButton, Alignment.BOTTOM_CENTER);
 						uploadButton.setVisible(false);
@@ -250,16 +288,15 @@ public class CentralMavenForm extends FormLayout {
 						treePanelLayout.setMargin(true);
 						treePanel.setContent(treePanelLayout);
 						formPanelButtonLayout.addComponents(treePanel);
-						formPanelButtonLayout.setMargin(true);
+						formPanelButtonLayout.setMargin(new MarginInfo(false, true));
 					}
 				}
 			}
-			content.addComponent(formPanelButtonLayout);
+			contentForm.addComponent(formPanelButtonLayout);
+			contentForm.setSpacing(true);
 		});
 
-		tree.addCollapseListener(e ->
-
-		{
+		tree.addCollapseListener(e -> {
 			uploadButton.setVisible(false);
 		});
 
@@ -275,6 +312,11 @@ public class CentralMavenForm extends FormLayout {
 					file = new File(url.toString());
 					InputStream input = url.openStream();
 					Activator.instance().getBuffer(myUI.getSession().getSession()).put(file.getName(), input);
+					bufferLayout.removeComponent(bufferGrid);
+					bufferGrid.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, 
+							resourceService.getAllResourceBeanFromBuffer(myUI.getSession().getSession())));
+					bufferLayout.addComponent(bufferGrid);
+					bufferPanel.setVisible(true);
 					Notification notif = new Notification("Info", "Artefact from central maven upload sucess",
 							Notification.Type.ASSISTIVE_NOTIFICATION);
 					notif.setPosition(Position.TOP_RIGHT);
@@ -299,17 +341,20 @@ public class CentralMavenForm extends FormLayout {
 		// Clear user form
 		clearButton.addClickListener(e -> {
 			formPanelButtonLayout.removeAllComponents();
-			content.removeAllComponents();
+			contentForm.removeAllComponents();
 			group.clear();
 			artifact.clear();
 			version.clear();
 			packaging.clear();
 			tree.removeAllItems();
-			content.addComponent(userForm);
+			contentForm.addComponent(userForm);
 		});
 
+		
+		content.addComponents(caption, formPanel, bufferPanel);
 		content.setSpacing(true);
-
+		content.setMargin(new MarginInfo(false, true));
+		
 		addComponent(content);
 	}
 

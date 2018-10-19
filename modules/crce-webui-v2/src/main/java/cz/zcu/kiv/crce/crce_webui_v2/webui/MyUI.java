@@ -128,7 +128,7 @@ public class MyUI extends UI {
     }
     
     public void setContentBodyLoadFile(){
-    	loadFileForm = new LoadFileForm(this.getSession());
+    	loadFileForm = new LoadFileForm(this);
     	body.setContent(loadFileForm);
     }
     

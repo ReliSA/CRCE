@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-//import java.util.EnumSet;
+import java.util.List;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
@@ -15,33 +16,35 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-//import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
 
 import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
 import cz.zcu.kiv.crce.crce_external_repository.api.DefinedMaven;
 import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
-//import cz.zcu.kiv.crce.crce_webui_v2.other.TypePackaging;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
-public class DefinedMavenForm extends FormLayout {
+public class DefinedMavenForm extends FormLayout{
 	private static final long serialVersionUID = 4172878715304331198L;
 	private transient DefinedMaven definedMaven;
+	private Panel formPanel = new Panel("Content");
 	private TextField definedUrl = new TextField();
 	private Label caption = new Label("Defined Maven repository");
 	private TextField group = new TextField("Group Id");
 	private TextField artifact = new TextField("Artifact Id");
 	private TextField version = new TextField("Version");
-	// private NativeSelect packaging = new NativeSelect("Packaging");
 	private TextField packaging = new TextField("Packaging");
 	private Button searchButton = new Button("Search");
 	private Button clearButton = new Button("Clear");
@@ -50,7 +53,11 @@ public class DefinedMavenForm extends FormLayout {
 	private Panel treePanel = new Panel("Result list");
 	private Label notFound = new Label("No artifact found");
 	private Tree tree;
-
+	private VerticalLayout bufferLayout = new VerticalLayout();
+	private Panel bufferPanel = new Panel("Buffer");
+	private Grid bufferGrid = new Grid();
+	private ResourceService resourceService;
+	
 	public DefinedMavenForm() {
 		HorizontalLayout content = new HorizontalLayout();
 		addComponent(content);
@@ -70,15 +77,12 @@ public class DefinedMavenForm extends FormLayout {
 		HorizontalLayout buttonUploadResolveLayout = new HorizontalLayout();
 		HorizontalLayout treeLayout = new HorizontalLayout();
 		VerticalLayout formLayout = new VerticalLayout();
-		HorizontalLayout content = new HorizontalLayout();
+		HorizontalLayout contentForm = new HorizontalLayout();
+		VerticalLayout content = new VerticalLayout();
 
 		caption.addStyleName(ValoTheme.LABEL_BOLD);
 
 		definedUrl.setWidth("450px");
-
-		// packaging.addItems(EnumSet.allOf(TypePackaging.class));
-		// packaging.select(TypePackaging.jar);
-		// packaging.setNullSelectionAllowed(false);
 
 		group.setRequired(true);
 		group.setRequiredError("The item can not be empty!");
@@ -117,12 +121,47 @@ public class DefinedMavenForm extends FormLayout {
 
 		treePanelLayout.addComponents(fieldLayout, treePanelButtonLayout);
 		treePanelLayout.setSpacing(true);
-
-		formLayout.addComponents(caption, definedCss, treePanelLayout);
+		
+		formLayout.addComponents(definedCss, treePanelLayout);
 		formLayout.setSpacing(true);
-		formLayout.setMargin(new MarginInfo(false, true));
+		formLayout.setMargin(true);
+		formLayout.addComponents(definedCss, treePanelLayout);
+		
+		formPanel.setContent(formLayout);
+		formPanel.setHeight("500px");
 
-		content.addComponents(formLayout);
+		contentForm.addComponents(formPanel);
+		
+		resourceService = new ResourceService(Activator.instance().getMetadataService());
+		List<ResourceBean> resourceBeanList = resourceService.getAllResourceBeanFromBuffer(myUI.getSession().getSession());
+		
+		HorizontalLayout bufferPanelLayout = new HorizontalLayout();
+		bufferGrid.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, resourceBeanList));
+		bufferGrid.getColumn("resource").setHidden(true);
+		bufferGrid.getColumn("size").setHidden(true);
+		bufferGrid.setColumnOrder("presentationName", "symbolicName", "version", "categories");
+		bufferGrid.addStyleName("my-style");
+		bufferGrid.setSelectionMode(SelectionMode.NONE);
+		bufferLayout.addComponent(bufferGrid);
+		bufferGrid.setSizeFull();
+		bufferPanelLayout.setSizeFull();
+		bufferPanelLayout.addComponent(bufferLayout);
+		bufferPanelLayout.setExpandRatio(bufferLayout, 1);
+		bufferPanel.setContent(bufferPanelLayout);
+		
+		if(!resourceBeanList.isEmpty()) {
+			bufferPanel.setVisible(true);
+		}
+		else {
+			bufferPanel.setVisible(false);
+		}
+		
+		content.addComponents(caption, contentForm, bufferPanel);
+		
+		contentForm.setSpacing(true);
+		contentForm.setSizeFull();
+		content.setSpacing(true);
+		content.setMargin(new MarginInfo(false, true));
 
 		// Setting url defined repository
 		setUrl.addClickListener(e -> {
@@ -237,6 +276,11 @@ public class DefinedMavenForm extends FormLayout {
 						InputStream is = Files.newInputStream(file.toPath(), StandardOpenOption.READ);
 						try {
 							Activator.instance().getBuffer(myUI.getSession().getSession()).put(file.getName(), is);
+							bufferLayout.removeComponent(bufferGrid);
+							bufferGrid.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, 
+									resourceService.getAllResourceBeanFromBuffer(myUI.getSession().getSession())));
+							bufferLayout.addComponent(bufferGrid);
+							bufferPanel.setVisible(true);
 							Notification notif = new Notification("Info", "Artifact to buffer upload sucess",
 									Notification.Type.ASSISTIVE_NOTIFICATION);
 							notif.setPosition(Position.TOP_RIGHT);
@@ -281,7 +325,6 @@ public class DefinedMavenForm extends FormLayout {
 			}
 		});
 
-		content.setSpacing(true);
 		addComponent(content);
 	}
 
