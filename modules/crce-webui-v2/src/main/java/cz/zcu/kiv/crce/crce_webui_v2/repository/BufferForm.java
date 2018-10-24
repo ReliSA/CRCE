@@ -72,6 +72,7 @@ public class BufferForm extends FormLayout{
 			gridBuffer.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, 
 					resourceService.getFindResourceBeanFromBuffer(myUI.getSession().getSession(), idText.getValue())));
 		});
+		
 		Button clearButton = new Button(FontAwesome.TIMES);
 		clearButton.addClickListener(e -> {
 			myUI.setContentBodyBuffer();

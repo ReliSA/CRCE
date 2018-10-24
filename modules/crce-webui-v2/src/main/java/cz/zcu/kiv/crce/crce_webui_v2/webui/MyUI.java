@@ -12,6 +12,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CentralMavenForm;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CheckMavenIndexForm;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.DefinedMavenForm;
@@ -19,10 +20,10 @@ import cz.zcu.kiv.crce.crce_webui_v2.outer.LoadFileForm;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.LocalMavenForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.ArtefactDetailForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.BufferForm;
-import cz.zcu.kiv.crce.crce_webui_v2.repository.NewCapabilityForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.StoreForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 
 
 /**
@@ -47,7 +48,6 @@ public class MyUI extends UI {
 	private BufferForm bufferForm;
 	private StoreForm storeForm;
 	private ArtefactDetailForm artefactDetailForm;
-	private NewCapabilityForm newCapabilityForm;
 	private PluginsForm pluginsForm;
 	private SettingsForm settingsForm;
 	private VerticalLayout content = new VerticalLayout();
@@ -101,6 +101,8 @@ public class MyUI extends UI {
 	}
 	
 	private void cleanupAfterLogout(){
+		ResourceService resourceService = new ResourceService(Activator.instance().getMetadataService());
+		resourceService.clearBuffer(getSession().getSession());
 		getSession().setAttribute("settingsUrl", null);
 		getSession().getSession().invalidate();
 		Page.getCurrent().setLocation(VaadinServlet.getCurrent().getServletContext().getContextPath());
@@ -145,11 +147,6 @@ public class MyUI extends UI {
     public void setContentArtefactDetailForm(ResourceBean resourceBean, boolean isFromStore){
     	artefactDetailForm = new ArtefactDetailForm(this, resourceBean, isFromStore);
     	body.setContent(artefactDetailForm);
-    }
-    
-    public void setContentNewCapabilityForm(ResourceBean resourceBean, boolean isFromStore){
-    	newCapabilityForm = new NewCapabilityForm(this, resourceBean, isFromStore);
-    	body.setContent(newCapabilityForm);
     }
     
     public void setContentBodyPlugins(){

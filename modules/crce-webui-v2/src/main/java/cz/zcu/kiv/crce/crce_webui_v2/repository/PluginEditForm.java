@@ -23,7 +23,7 @@ public class PluginEditForm extends FormLayout{
 	private Label labelKeyWords = new Label("Plugin key words");
 	private Grid gridKeyWords = new Grid();
 	private TextField priority = new TextField("Priority");
-	private TextField version = new TextField("Version");
+	//private TextField version = new TextField("Version");
 	private Button editButton = new Button("Edit");
 	private Plugin plugin;
 	public PluginEditForm(PluginsForm pluginsForm){
@@ -50,13 +50,14 @@ public class PluginEditForm extends FormLayout{
 		priority.setRequiredError("Item can not be empty!");
 		priority.addValidator(new StringLengthValidator("Item must have " + nameMaxLenght + " characters!", 1,
 				nameMaxLenght, false));
-		version.setWidth("200px");
+		/*version.setWidth("200px");
 		version.setRequired(true);
 		version.setRequiredError("Item can not be empty!");
 		version.addValidator(new StringLengthValidator("Item must have " + nameMaxLenght + " characters!", 1,
-				nameMaxLenght, false));
+				nameMaxLenght, false));*/
 		
-		editLayout.addComponents(priority, version, editButton);
+		//editLayout.addComponents(priority, version, editButton);
+		editLayout.addComponents(priority, editButton);
 		editLayout.setSpacing(true);
 		
 		content.addComponents(keyWordLayout, editLayout);
@@ -82,7 +83,7 @@ public class PluginEditForm extends FormLayout{
 			gridKeyWords.setContainerDataSource(new BeanItemContainer<>(KeyWord.class, keyWordList));
 		}
 		priority.setValue(plugin.getPluginPriority() + "");
-		version.setValue(plugin.getPluginVersion().toString());
+		//version.setValue(plugin.getPluginVersion().toString());
 		setVisible(true);
 	}
 }

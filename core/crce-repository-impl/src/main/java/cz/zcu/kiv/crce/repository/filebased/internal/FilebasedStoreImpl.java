@@ -285,7 +285,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     @Override
     public synchronized List<Resource> getResources() {
         try {
-            return metadataDao.loadResources(repository, false);
+        	// Edit rpesek - For webui-v2 retrieval of resources including details (capabilities, requirements)
+            // return metadataDao.loadResources(repository, false);
+        	return metadataDao.loadResources(repository, true);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }

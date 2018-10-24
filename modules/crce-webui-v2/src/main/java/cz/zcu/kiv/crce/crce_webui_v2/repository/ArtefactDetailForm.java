@@ -31,8 +31,6 @@ public class ArtefactDetailForm extends FormLayout{
 	private Button buttonBackProperties = new Button("Back");
 	private Button buttonBackCapabilities = new Button("Back");
 	private Button buttonBackRequirements = new Button("Back");
-	private Button buttonAddCapability = new Button("Add capability");
-	private Button buttonAddRequirements = new Button("Add requirement");
 	private Grid gridCapabilities = new Grid();
 	private Grid gridRequirements = new Grid();
 	
@@ -65,7 +63,7 @@ public class ArtefactDetailForm extends FormLayout{
 		VerticalLayout capabilityContentLayout = new VerticalLayout();
 		VerticalLayout capabilityTabLayout = new VerticalLayout();
 		HorizontalLayout buttonCapabilityLayout = new HorizontalLayout();
-		buttonCapabilityLayout.addComponents(buttonAddCapability, buttonBackCapabilities);
+		buttonCapabilityLayout.addComponents(buttonBackCapabilities);
 		buttonCapabilityLayout.setSpacing(true);
 		
 		buttonBackCapabilities.setWidth("130px");
@@ -96,15 +94,11 @@ public class ArtefactDetailForm extends FormLayout{
 		capabilityContentLayout.setSpacing(true);
 		capabilityContentLayout.setMargin(new MarginInfo(true, false));
 		
-		buttonAddCapability.addClickListener(e ->{
-			myUI.setContentNewCapabilityForm(resourceBean, isFromStore);
-		});
-		
 		// display requirement
 		VerticalLayout requirementContentLayout = new VerticalLayout();
 		VerticalLayout requirementTabLayout = new VerticalLayout();
 		HorizontalLayout buttonRequirementLayout = new HorizontalLayout();
-		buttonRequirementLayout.addComponents(buttonAddRequirements, buttonBackRequirements);
+		buttonRequirementLayout.addComponents(buttonBackRequirements);
 		buttonRequirementLayout.setSpacing(true);
 		
 		buttonBackRequirements.setWidth("130px");

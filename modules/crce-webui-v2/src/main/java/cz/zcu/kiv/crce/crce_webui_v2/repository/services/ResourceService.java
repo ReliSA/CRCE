@@ -89,6 +89,17 @@ public class ResourceService implements Serializable{
 		return result;
 	}
 	
+	public void clearBuffer(WrappedSession wSession) {
+		try {
+			for(Resource r : Activator.instance().getBuffer(wSession).getResources()) {
+				Activator.instance().getBuffer(wSession).remove(r);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public List<ResourceBean> getFindResourceBeanFromBuffer(WrappedSession session, String stringFilter){
 		boolean passesFilter = false;
 		ArrayList<ResourceBean> arrayList = new ArrayList<>();
