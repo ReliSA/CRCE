@@ -421,6 +421,6 @@ public class BufferImpl implements Buffer, EventHandler {
         if (!"file".equals(uri.getScheme())) {
             return false;
         }
-        return true; //new File(uri).getPath().startsWith(baseDir.getAbsolutePath());
+        return true; // rpesek edit: return new File(uri).getPath().startsWith(baseDir.getAbsolutePath());
     }
 }

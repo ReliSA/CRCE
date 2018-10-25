@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.crce_webui_v2.repository.services;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,6 +67,14 @@ public class ResourceService implements Serializable{
 	public long getSize() {
         return metadataService.getSize(resource);
     }
+	
+	public URI getUri(Resource resource) {
+		return metadataService.getUri(resource);
+	}
+	
+	public String getFileName(Resource resource) {
+		return metadataService.getFileName(resource);
+	}
 	
 	public List<ResourceBean> getAllResourceBeanFromBuffer(WrappedSession session){
 		List<ResourceBean> resources = new ArrayList<ResourceBean>();

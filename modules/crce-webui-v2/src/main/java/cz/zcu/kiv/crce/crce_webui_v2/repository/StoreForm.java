@@ -1,9 +1,17 @@
 package cz.zcu.kiv.crce.crce_webui_v2.repository;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
@@ -31,7 +39,7 @@ public class StoreForm extends FormLayout{
 	private TextField idText = new TextField();
 	private Grid gridStore = new Grid();
 	private PopupView popup;
-	private transient ResourceBean resourceBeanSelect;
+	private transient ResourceBean resourceBeanSelect = null;
 	private ResourceService resourceService;
 	
 	public StoreForm(MyUI myUI){
@@ -45,6 +53,7 @@ public class StoreForm extends FormLayout{
 		buttonDetail.setWidth("100px");
 		Button buttonRemove = new Button("Remove");
 		buttonRemove.setWidth("100px");
+		Button buttonDownload = new Button("Download");
 		
 		buttonDetail.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		buttonDetail.setClickShortcut(KeyCode.ENTER);
@@ -96,7 +105,7 @@ public class StoreForm extends FormLayout{
 		popup = new PopupView(null, panel);
 		popup.setWidth("150px");
 		
-		buttonLayout.addComponents(buttonDetail, buttonRemove);
+		buttonLayout.addComponents(buttonDetail, buttonRemove, buttonDownload);
 		buttonLayout.setSpacing(true);
 		buttonLayout.setVisible(false);
 		
@@ -109,12 +118,17 @@ public class StoreForm extends FormLayout{
 		gridStore.addSelectionListener(e ->{
 			buttonLayout.setVisible(true);
 			resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+			File srcFile = new File(resourceService.getUri(resourceBeanSelect.getResource()));        
+			StreamResource res = createFileResource(srcFile);
+			res.setFilename(resourceService.getFileName(resourceBeanSelect.getResource()));
+			FileDownloader fd = new FileDownloader(res);
+			fd.extend(buttonDownload);
 		});
 		
 		buttonDetail.addClickListener(e ->{
 			myUI.setContentArtefactDetailForm(resourceBeanSelect, true);
 		});
-		
+	
 		buttonRemove.addClickListener(e ->{
 			popup.setPopupVisible(true);
 			yesRemoveButton.addClickListener(ev -> {
@@ -134,5 +148,23 @@ public class StoreForm extends FormLayout{
 		});
 		
 		addComponent(content);
+	}
+	
+	@SuppressWarnings("serial")
+	private StreamResource createFileResource(File file) {
+		StreamResource sr = new StreamResource(new StreamSource() {
+			@Override
+		    public InputStream getStream() {
+				try {
+					return new FileInputStream(file);
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				return null;
+			}
+		}, null);
+		sr.setCacheTime(0);
+		return sr;
 	}
 }
