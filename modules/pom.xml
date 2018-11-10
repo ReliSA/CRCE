@@ -68,13 +68,13 @@
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-metrics</module>
+        <!--<module>crce-handler-metrics</module>-->
         <module>crce-webui</module>
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
 
-        <module>crce-optimizer-functions</module>
+        <!--<module>crce-optimizer-functions</module>-->
 
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
