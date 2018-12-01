@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.compatibility;
 
-import java.util.List;
-
 import cz.zcu.kiv.crce.metadata.type.Version;
+
+import java.util.List;
 
 /**
  * Factory interface for Compatibility.
@@ -15,7 +15,7 @@ public interface CompatibilityFactory {
 
     /**
      *
-     * Factory method for complete initialization of Compability implementation.
+     * Factory method for complete initialization of Compatibility implementation.
      *
      * @param id unique id
      * @param resourceName compared resource name (crce.identity)
@@ -32,7 +32,7 @@ public interface CompatibilityFactory {
 
     /**
      *
-     * Factory method for complete initialization of Compability implementation. Base name is set to the same
+     * Factory method for complete initialization of Compatibility implementation. Base name is set to the same
      * value as resource name.
      *
      * @param id unique id
