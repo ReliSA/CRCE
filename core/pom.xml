@@ -29,6 +29,8 @@
         <module>crce-repository-impl</module>
         <module>crce-resolver-impl</module>
 
+		<module>crce-concurrency</module>
+
         <module>crce-core</module>
     </modules>
 

@@ -79,7 +79,6 @@
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>
-        <module>crce-concurrency</module>
         <module>crce-vo</module>
 
         <!--<module>crce-repository-maven-impl</module>-->
