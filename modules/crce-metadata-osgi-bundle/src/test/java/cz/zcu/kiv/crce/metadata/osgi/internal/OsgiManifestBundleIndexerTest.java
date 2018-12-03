@@ -8,8 +8,8 @@ import cz.zcu.kiv.crce.metadata.internal.MetadataFactoryImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.service.internal.MetadataServiceImpl;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -62,8 +62,8 @@ public class OsgiManifestBundleIndexerTest {
         // jar name in resource folder
         final String jarName = "/test.jar";
         final File testJar = new File(OsgiManifestBundleIndexerTest.class.getResource(jarName).toURI());
-        final String testPropName = "Test-property";
-        final String expTestPropValue = "test";
+//        final String testPropName = "Test-property";
+//        final String expTestPropValue = "test";
         Resource r = new ResourceImpl("test-resource");
 
         // make sure that the test jar really exists
@@ -74,6 +74,7 @@ public class OsgiManifestBundleIndexerTest {
         // test that jar was indexed correctly
         List<Capability> capabilityList = r.getRootCapabilities();
         assertFalse("No capabilities indexed for test jar!", capabilityList.isEmpty());
+        assertFalse("No child capabilities indexed for test jar!", capabilityList.get(0).getChildren().isEmpty());
     }
 
 }
