@@ -4,10 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <relativePath>../pom</relativePath>
-        <groupId>cz.zcu.kiv.crce</groupId>
-        <artifactId>crce-modules-parent</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+         <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>provision-reactor</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>provision</artifactId>
@@ -171,6 +170,12 @@
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-core</artifactId>
+            <type>pom</type>
+        </dependency>
+		
+		<dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-default-modules</artifactId>
             <type>pom</type>
         </dependency>
     </dependencies>
