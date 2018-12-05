@@ -18,21 +18,23 @@
     <packaging>pom</packaging>
 
     <properties>
-	     <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
-        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
         <felix.fileinstall.poll>2000</felix.fileinstall.poll>
         <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
         <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
         <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
+		
+		
+		<org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
+        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.osgi.framework.system.packages.extra>
             javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
         </org.osgi.framework.system.packages.extra>
         <org.osgi.framework.bootdelegation>
             sun.*,com.sun.*
         </org.osgi.framework.bootdelegation>
+		
         <!--
              The following packages are not imported by any bundle,
              but they may be used by some efp assignment wrapped library, check it and remove them.

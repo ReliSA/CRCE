@@ -33,11 +33,6 @@
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
-        <felix.fileinstall.poll>2000</felix.fileinstall.poll>
-        <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
-        <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
-        <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
         <org.osgi.framework.system.packages.extra>
             javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
         </org.osgi.framework.system.packages.extra>

@@ -1,0 +1,6 @@
+#ignore local configuration
+/conf/
+
+#ignore pax generated runner files
+/runner/
+
