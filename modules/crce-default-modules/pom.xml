@@ -60,7 +60,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-vo</artifactId>
             <version>2.1.1-SNAPSHOT</version>
-			<type>pom</type>
         </dependency>
 		<dependency>
             <groupId>${project.groupId}</groupId>
