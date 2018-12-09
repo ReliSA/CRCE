@@ -9,11 +9,10 @@ WORKDIR /felix
 # 4.6.1 is compatible with Java 1.7
 ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-4.6.1.tar.gz ./apache-felix.tar.gz
 RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
-RUN cd felix-framework-4.6.1
-RUN FELIX_PATH=$(pwd)
+ENV FELIX_PATH /felix/felix-framework-4.6.1
 
 # Add CRCE modules to Felix autodeploy dir
-ADD ../modules/runner/bundles/* ./bundle/
+ADD ./deploy/runner/bundles/* ${FELIX_PATH}/bundle/
 
 # Run Felix
 CMD cd ${FELIX_PATH} && java -jar ./bin/felix.jar
