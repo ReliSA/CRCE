@@ -1,6 +1,10 @@
 # CRCE - Component Repository supporting Compatibility Evaluation
 
-CRCE is an experimental repository, designed to support research into component-based and modular systems undertaken by ReliSA research group at the Faculty of Applied Sciences, University of West Bohemia (http://relisa.kiv.zcu.cz).  The project website is over at Assembla: https://www.assembla.com/spaces/crce/wiki .
+CRCE is an experimental repository, designed to support research into component-based and modular systems undertaken by ReliSA research group at the Faculty of Applied Sciences, University of West Bohemia (http://relisa.kiv.zcu.cz).  The older project website is over at Assembla: https://www.assembla.com/spaces/crce/wiki .
+
+To cite CRCE as a research result, please use the following citation: 
+
+> P.Brada and K.Jezek, “Repository and Meta-Data Design for Efficient Component Consistency Verification,” Science of Computer Programming, vol. 97,  part  3,  pp.  349–365,  2015. Available: http://www.sciencedirect.com/science/article/pii/S0167642314002925
 
 ## Prerequisities
 
