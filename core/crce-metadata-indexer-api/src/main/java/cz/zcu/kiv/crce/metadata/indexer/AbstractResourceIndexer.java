@@ -1,9 +1,9 @@
 package cz.zcu.kiv.crce.metadata.indexer;
 
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
+
 import java.util.Collections;
 import java.util.List;
-
-import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 
 /**
  * Abstract implementation of <code>ResourceIndexer</code> which can be extended
@@ -31,4 +31,5 @@ public abstract class AbstractResourceIndexer extends AbstractPlugin implements 
     public String getPluginDescription() {
         return "ResourceIndexer plugin implementation";
     }
+
 }

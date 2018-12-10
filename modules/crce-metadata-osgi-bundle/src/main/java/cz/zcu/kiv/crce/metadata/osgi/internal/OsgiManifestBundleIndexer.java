@@ -151,6 +151,10 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         return result;
     }
 
+    public Map<String, List<AttributeType>> getIndexedAttributes() {
+        return NsMap.getAttributeMap();
+    }
+
     public Resource fillResource(final URL bundleUrl, Resource resource) throws IOException {
         fillResource(new Headers() {
             private final Manifest manifest;
