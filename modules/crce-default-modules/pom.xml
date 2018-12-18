@@ -29,22 +29,11 @@
             <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>2.1.1-SNAPSHOT</version>
         </dependency>
-		<dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-webui</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
-			<type>war</type>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-rest-v2</artifactId>
             <version>2.1.1-SNAPSHOT</version>
 			<type>war</type>
-        </dependency>
-		<dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-api</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -65,6 +54,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-webservices-indexer</artifactId>
             <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-webui</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+            <type>war</type>
         </dependency>
     </dependencies>
 

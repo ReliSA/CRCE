@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <relativePath>../pom</relativePath>
         <groupId>cz.zcu.kiv.crce</groupId>
-        <artifactId>crce-modules-parent</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
+        <relativePath />
     </parent>
 
     <artifactId>crce-compatibility-api</artifactId>
@@ -22,13 +22,12 @@
 
     <dependencies>
         <!--CRCE dependencies-->
-
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-core</artifactId>
-            <type>pom</type>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
         </dependency>
-
+        <!-- 3rd party dependencies -->
     </dependencies>
 
 </project>
