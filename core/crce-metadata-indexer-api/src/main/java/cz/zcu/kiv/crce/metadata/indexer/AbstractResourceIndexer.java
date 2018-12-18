@@ -1,10 +1,8 @@
 package cz.zcu.kiv.crce.metadata.indexer;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.AbstractPlugin;
 
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
