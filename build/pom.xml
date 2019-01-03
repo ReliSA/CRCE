@@ -161,6 +161,23 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- crce-webui -->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+
 <!--            <dependency>
 
                  | dependency pom representing the global classpath of imported bundles

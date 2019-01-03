@@ -58,7 +58,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-webui</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
+            <version>2.1.2-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>

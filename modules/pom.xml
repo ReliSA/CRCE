@@ -57,7 +57,7 @@
 
         <!-- UI & Optional Plugins -->
         <!--<module>crce-handler-metrics</module>-->
-        <module>crce-webui</module>
+        <!--<module>crce-webui</module>-->
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
