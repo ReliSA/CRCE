@@ -14,5 +14,8 @@ ENV FELIX_PATH /felix/felix-framework-5.0.0
 # Add CRCE modules to Felix autodeploy dir
 ADD ./runner/bundles/* ${FELIX_PATH}/bundle/
 
+# Set environmental variable for connection string to mongodb
+ENV mongo_connection mongodb://mongoserver:27017
+
 # Run Felix
-CMD cd ${FELIX_PATH} && java -Dgosh.args=--noi -jar ./bin/felix.jar
+CMD cd ${FELIX_PATH} && java -jar ./bin/felix.jar
