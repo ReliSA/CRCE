@@ -33,7 +33,7 @@ datum: & 1.1.2019\\
 %========================================
 \section{Zadání} %=====================================================================================================
 
-CRCE\footnote{Component Repository supporting Compatibility Evaluation} je komponentívé úložiště vyvíjené v rámci výzkumu na Katedře informatiky a výpočetní techniky na Západočeské univerzitě v Plzni. Jeho hlavní vlastností je podpora kontroly kompatibility verzí různých OSGi komponent nebo webových api.
+CRCE\footnote{Component Repository supporting Compatibility Evaluation} je komponentové úložiště vyvíjené v rámci výzkumu na Katedře informatiky a výpočetní techniky na Západočeské univerzitě v Plzni. Jeho hlavní vlastností je podpora kontroly kompatibility verzí různých OSGi komponent nebo webových api.
 
 \subsection{Motivace}
 
@@ -56,18 +56,18 @@ Vývoj projektu probíhá již několik let a vystřídalo se na něm mnoho výv
 %========================================
 \section{Analýza~architektury} %============================================================================================
 
-Celý projekt je rozdělen do čtyř hlavních modulů: sdílené nastavení sestavení, jádro, moduly a knihovny třetích stran. Ne zcela jasné je začlenění modulů pro nasazení mezi moduly CRCE. závislostí modulů na jádře pozorujeme dva typy deklarování závislostí. Prvním způsobem je závislost na agregačním modulu jádra, druhým je jmenovitá závislost na komponentách jádra. Tyto skutečnosti jsou patrné na celkovém diagramu na Obrázku \ref{fig:wholeCRCE}.
+Celý projekt je rozdělen do čtyř hlavních modulů: sdílené nastavení sestavení, jádro, moduly a knihovny třetích stran. Ne zcela jasné je začlenění modulu (jedná se o modul provision) pro nasazení mezi moduly CRCE. Závislostí modulů na jádře pozorujeme dva typy. Prvním typem je závislost na agregačním modulu jádra, druhým je jmenovitá závislost na komponentách jádra. Tyto skutečnosti jsou patrné na celkovém diagramu na Obrázku \ref{fig:wholeCRCE}.
 
 \begin{figure}[h!]
 \centering
 \includegraphics[width=135mm]{wholeCRCE.png}
-\label{fig:wholeCRCE}
 \caption{Diagram závislostí všech maven komponent projektu CRCE před provedenými úpravami.}
+\label{fig:wholeCRCE}
 \end{figure}
 
-Během analýzy modulu pro moduly CRCE jsme identifikovali několik kandidátů na přesun do jádra. Za kandidáty jsme volili takové komponenty, které využívá velká část ostatních modulů a zároveň tyto moduly mají závislosti do jádra. Tomuto pravidlu odporuje komponenta webového rozhraní, bez kterého úložiště nelze použít. Přesouvané komponenty jsou: crce-compatibility-api, crce-webui, crce-concurency (graficky znározněno na Obrázku \ref{fig:modulesCRCE}. 
+Během analýzy modulu pro moduly CRCE jsme identifikovali několik kandidátů na přesun do jádra. Za kandidáty jsme volili takové komponenty, které využívá velká část ostatních modulů a zároveň tyto moduly mají závislosti do jádra.  Komponenta webového rozhraní (crce-webui) tomuto pravidlu sice odporuje, představuje ale základní komponentu, bez které by úložiště nešlo použít. Přesouvané komponenty jsou: crce-compatibility-api, crce-webui, crce-concurency (graficky znározněno na Obrázku \ref{fig:modulesCRCE}. 
 
-Po identifikace kandidátů jsme z přesunu vyřadili komponentu metadata-osgi-bundle, protože není dostatečně obecná. Komponenta indexuje pouze OSGi komponenty. Bohužel přesouvaná komponenta webui obsahuje nevhodnou závislost na této komponentě. Tato závislost jde proti snadné záměně komponenty pro indexaci vstupů úložiště. Navrhli jsme tedy přidání metody do rozhraní indexeru pro zjištění jaké elementy indexer zpracovává.
+Po identifikace kandidátů jsme z přesunu vyřadili komponentu metadata-osgi-bundle, kvůli nedostatečné obecnosti. Komponenta je schopna indexovat pouze OSGI komponenty -- přesun do jádra by byl možný, pokud by uměla indexovat obecné JAR. Komponenta crce-webui bohužel obsahuje silnou závislost na této komponentě, která brání přesunu crce-webui do jádra. Závislost spočívá v použití několika konstant, které jsou v definované v metadata-osgi-bundle. Navrhli jsme tedy přidání metody do rozhraní indexeru pro zjištění jaké elementy indexer zpracovává a silnou závislost jsme nahradili slabou závislostí (stejné konstatny jsme dodefinovali i v crce-webui).
 
 \begin{figure}[h!]
 \centering
@@ -83,16 +83,32 @@ Po identifikace kandidátů jsme z přesunu vyřadili komponentu metadata-osgi-b
 %========================================
 \section{Provedené~změny} %=======================================================================================
 
-\begin{itemize}
-	\item Oddělení modulů pro spuštění CRCE do nového modulu deploy.
-		\subitem Vytvoření komponenty default-modules, která zachycuje verze spouštěných modulů.
-	\item Přesun komponent crce-compatibility-api, crce-webui, crce-concurency do jádra CRCE.
-		\subitem Vytvoření testů vlastností a defaultních rozhraní.
-		\subitem Rozšíření rozhraní indexerů.
-	\item Dokerizace základní instance CRCE.
-		\subitem Konfigurace DB connection pomocí proměnných prostředí (oddělení DB).
-		
-\end{itemize}
+V projektu jsme provedli několik změn, které by měly vést k zjednodušení práce budoucích vývojářů. Pro přehlednost dodávám, že v této sekci pojem \textit{modul} znační maven modul v kořenovém adresáři CRCE a pojem \textit{komponenta} značí jeden z maven modulů obshující konkrétní implementaci (\textit{crce-webui}, \textit{crce-metadata-api}, ...).
+
+\subsection{Nový modul pro sestavení}
+Do kořene CRCE byl přidán nový modul \textit{deploy}, do kterého byla přesunuta komponenta \textit{provision}, používaná ke spouštění CRCE. Jsou zde agregovány všechny komponenty z jádra a komponenty z modulu \textit{modules}, které jsou zachycené v \textit{crce-default-modules}. 
+
+Nově přidaná komponenta \textit{crce-default-modules} tedy slouží jako agregátor komponent z modulu \textit{modules}, které mají být použité ve výsledné distribuci.
+
+\subsection{Přesun vybraných modulů do jádra}
+Do jádra byly z modulu \textit{modules} přesunuty komponenty: \textit{crce-compatibility-api}, \textit{crce-webui} a \textit{crce-concurency}. V případě \textit{crce-webui} bylo nutné odstranit závislost na \textit{crce-core} (jinak by se jednalo o kruhovou závislost) a nahradit ji jednotlivými závislostmi na vybraných komponentách z jádra.
+
+V komponentě \textit{crce-compatibility-api} bylo nutné přidat výchozí (prázdnou) implementaci rozhraní \textit{Compatibility} a \textit{Diff}. Pro tyto implementace byl přidán unit test.
+
+Součástí přesunu komponent do jádra bylo přidání unit testu do \textit{crce-metadata-osgi-bundle}, který dokazuje schopnost této komponenty indexovat pouze OSGI bundly a ne obecné JAR.
+
+\subsubsection{Nahrazení silné závislosti v komponentě crce-webui}
+Komponenta \textit{crce-webui} obsahovala silnou závislost na komponentě \textit{crce-metadata-osgi-bundle}. Tato závislost spočívala v použití několika konstant, označujících indexované elementy, definovaných v rozhraní \textit{NsOsgiIdentity}. Konstanty byly použity ve třídě \textit{ResourceServlet} k filtrování zobrazovaných OSGI bundlů. 
+
+Po dohodě s vyučujícím jsme tuto závislost nahradili slabou závislostí -- konstatny stejného typu jsme dodefinovali i v komponentě \textit{crce-webui}. Silná závislost byla odstraněna, nicméně pokud se v budoucnu změní komponenta \textit{crce-metadata-osgi-bundle}, bude nutné kzontrolovat, zda změna neovlivnila \textit{crce-webui} a případné nesrovnalosti opravit.
+
+Aby bylo podobným závislostem v budoucnosti zamezeno, rozhraní idnexeru bylo rozšířeno o metodu, která vrací elementy, jež je indexer schopen detekovat. 
+
+
+\section{Dockerizace projektu}
+Do modulu \textit{deploy} byl přidán Dockerfile, kterým je možné sestavit docker image obsahující spustitelnou verzi CRCE. Do takto spuštěného CRCE lze doinstalovávat nové OSGI komponenty a není nutné celý projekt znovu sestavovat. 
+
+Součástí dockerizace bylo také přidání konfigurace připrojení k databázi Mongo. To je nyní řešení proměnnou prostředí \textit{mongo\_connection}. V případě, že tato proměnná není nastavena, použije se výchozí hodnota, která je dostačující pro databáze běžící na localhostu a standardním portu. Výhodou tohoto přístupu je možnost konfigurovat connection string v Dockerfile a při změně pouze znovu sestavit image.
 
 %========================================
 %========================================
@@ -103,9 +119,28 @@ Po identifikace kandidátů jsme z přesunu vyřadili komponentu metadata-osgi-b
 
 Provedené změny ovlivnily základní používání projektu při vývoji. 
 
-Pro sestavení na platformě Linux lze použít bash script build.bash, který automaticky spustí jednotlivé kroky sestavení pomocí programu Maven.
+Pro sestavení na platformě Linux lze použít bash script \textit{build.bash}, který automaticky spustí jednotlivé kroky sestavení pomocí nástroje Maven.
 
-Nastavení connection stringu je možné pomocí proměnné prostředí \texttt{mongo\_connection}. Příkladem takového parametru je: \emph{mongodb://localhost:27017}.
+V případě, že databáze neběží na localhostu, nebo standardním portu, je možné nastavit připojení strkze proměnnou prostředí \textit{mongo\_connection}. Tato proměná by v případě použití měla obsahovat celý connection string. Pokud není nastavená, pro připojení k databázi bude použita výchozí hodnota: \textit{mongodb://localhost:27017}.
+
+\subsection{Docker}
+K sestavení Docker image je možné použít Dockerfile, který se nachází v modulu \textit{deploy}. Sestavení image je provedeno příkazem:
+
+\begin{verbatim}
+docker build . -t crce-docker
+\end{verbatim} 
+
+Výsledný image obsahuje distribuci Apache Felix 5.0.0, JDK 1.7 a všechny OSGI bundly z CRCE. Spuštění lze provést příkazem:
+
+\begin{verbatim}
+docker run -it \ 
+	   -p 8080:8080 \
+	   --add-host mongoserver:172.17.0.1 \
+	   -v /felix/deploy:/felix/deploy
+	   crce-docker \
+\end{verbatim}
+
+Parametr \textit{add-host} slouží k přidání záznamu do /etc/hosts v kontejneru a image se pak může k databázi běžící na hostovacím stroji dostat pomocí hostname \textit{mongoserver}. IP adresa 172.17.0.1 je adresa, kterou docker přiřazuje hostovacímu stroji. Do adresáře \textit{/felix/deploy} na hostovacím stroji je možné vložit OSGI bundly a ty následně nainstalovat a spustit skrze Gogo shell. K běžící instanci je možné přistoupit na adrese \textit{http://localhost:8080/crce}.
 
 
 %========================================
