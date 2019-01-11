@@ -12,7 +12,7 @@ To cite CRCE as a research result, please use the following citation:
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 7 for development/build can be done via `sudo update-alternatives --config java`.
+On linux, switching to JDK 7 for development/build can be done via `update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
 ## Build
 
