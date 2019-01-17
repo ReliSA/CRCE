@@ -4,11 +4,14 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE (there is a problem with running web UI on JDK 8, need to update dependencies), tested on 1.7.0_80
+- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE 
+  - there is a problem with running on JRE 8 and building on JDK 8
+    - Web UI dependencies
+	- pax module strongly depends on JRE7
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 7 for development/build can be done via `sudo update-alternatives --config java`.
+On linux, switching to JDK 7 for development/build can be done via `sudo update-alternatives --config java`. For basic switch between work environment could be used tool SDKMan (https://sdkman.io/).
 
 ## Build
 
@@ -18,15 +21,26 @@ On linux, switching to JDK 7 for development/build can be done via `sudo update-
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
+With bash interpereter can be used shortcut by running script build.bash, which run each step once every time. If there was build error during use of general build script the best practice to complete process is manualy pass all other steps.
+
 On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
+Build `crce-modules-reactor` in `/deploy`.
 
-`mvn pax:provision`
+For run in docker run command in `/deploy`:
 
-The output log should write up some info about dependencies terminated by lines similar to the following:
+```docker build . -t crce-dock```
+
+For run on local machine run command in `/deploy`:
+
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
+
+```mvn pax:provision```
+
+
+In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
 
 ```
 Listening for transport dt_socket at address: 65505
