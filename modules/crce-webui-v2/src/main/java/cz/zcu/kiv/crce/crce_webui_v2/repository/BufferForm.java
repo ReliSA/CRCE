@@ -128,8 +128,14 @@ public class BufferForm extends FormLayout{
 		content.setSpacing(true);
 		
 		gridBuffer.addSelectionListener(e ->{
-			buttonLayout.setVisible(true);
-			resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+			if(!e.getSelected().isEmpty()){
+				resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+				buttonLayout.setVisible(true);
+			}
+			else{
+				resourceBeanSelect = null;
+				buttonLayout.setVisible(false);
+			}
 		});
 		
 		buttonDetail.addClickListener(e ->{

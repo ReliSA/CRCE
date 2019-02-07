@@ -21,6 +21,7 @@ public class MenuForm extends FormLayout{
 		MenuBar menu = new MenuBar();
 		MenuItem upload = menu.addItem("Upload", null);
 		MenuItem repository = menu.addItem("Repository", null);
+		MenuItem versioning = menu.addItem("Versioning",null);
 		MenuItem settings = menu.addItem("Settings", null);
 		
 		// submenu upload
@@ -33,6 +34,10 @@ public class MenuForm extends FormLayout{
 		repository.addItem("Buffer", e ->{myUI.setContentBodyBuffer();});
 		repository.addItem("Store", e->{myUI.setContentBodyStore();});
 		repository.addItem("Plugins", e ->{myUI.setContentBodyPlugins();});
+
+		// submenu versionng
+		versioning.addItem("New component", e ->{myUI.setContentBodyVersioningNew();});
+		versioning.addItem("List component", e -> {myUI.setContentBodyVersioning();});
 		
 		// submenu settings
 		settings.addItem("Index", e ->{myUI.setContentBodyCheckMavenIndexForm();});

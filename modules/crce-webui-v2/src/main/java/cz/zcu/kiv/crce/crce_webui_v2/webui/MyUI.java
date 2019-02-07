@@ -24,6 +24,8 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.StoreForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
+import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningForm;
+import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningNewForm;
 
 
 /**
@@ -47,6 +49,8 @@ public class MyUI extends UI {
 	private LoadFileForm loadFileForm;
 	private BufferForm bufferForm;
 	private StoreForm storeForm;
+	private VersioningForm versioningForm;
+	private VersioningNewForm versioningNewForm;
 	private ArtefactDetailForm artefactDetailForm;
 	private PluginsForm pluginsForm;
 	private SettingsForm settingsForm;
@@ -143,6 +147,16 @@ public class MyUI extends UI {
     	storeForm = new StoreForm(this);
     	body.setContent(storeForm);
     }
+
+    public void setContentBodyVersioning(){
+		versioningForm = new VersioningForm(this);
+		body.setContent(versioningForm);
+	}
+
+	public void setContentBodyVersioningNew(){
+		versioningNewForm = new VersioningNewForm(this);
+		body.setContent(versioningNewForm);
+	}
     
     public void setContentArtefactDetailForm(ResourceBean resourceBean, boolean isFromStore){
     	artefactDetailForm = new ArtefactDetailForm(this, resourceBean, isFromStore);

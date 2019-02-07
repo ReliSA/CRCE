@@ -116,13 +116,19 @@ public class StoreForm extends FormLayout{
 		content.setSpacing(true);
 		
 		gridStore.addSelectionListener(e ->{
-			buttonLayout.setVisible(true);
-			resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
-			File srcFile = new File(resourceService.getUri(resourceBeanSelect.getResource()));        
-			StreamResource res = createFileResource(srcFile);
-			res.setFilename(resourceService.getFileName(resourceBeanSelect.getResource()));
-			FileDownloader fd = new FileDownloader(res);
-			fd.extend(buttonDownload);
+			if(!e.getSelected().isEmpty()){
+				resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+				File srcFile = new File(resourceService.getUri(resourceBeanSelect.getResource()));
+				StreamResource res = createFileResource(srcFile);
+				res.setFilename(resourceService.getFileName(resourceBeanSelect.getResource()));
+				FileDownloader fd = new FileDownloader(res);
+				fd.extend(buttonDownload);
+				buttonLayout.setVisible(true);
+			}
+			else{
+				resourceBeanSelect = null;
+				buttonLayout.setVisible(false);
+			}
 		});
 		
 		buttonDetail.addClickListener(e ->{
