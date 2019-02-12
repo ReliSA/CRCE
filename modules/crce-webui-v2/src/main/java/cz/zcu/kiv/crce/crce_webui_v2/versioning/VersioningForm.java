@@ -1,31 +1,57 @@
 package cz.zcu.kiv.crce.crce_webui_v2.versioning;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentBean;
+import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentDetailBean;
+import cz.zcu.kiv.crce.crce_component_versioning.api.impl.VersioningService;
+import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
+import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
+import cz.zcu.kiv.crce.crce_webui_v2.versioning.services.FindCompositeService;
+import cz.zcu.kiv.crce.crce_webui_v2.versioning.classes.RandomStringGenerator;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 
 public class VersioningForm extends FormLayout {
     private static final long serialVersionUID = 7439970261502810719L;
     private Label labelForm = new Label("Composite components");
     private TextField idText = new TextField();
+    private Panel panelGridComponents = new Panel("Detail of the composite component");
     private Grid gridComponents = new Grid();
-    private PopupView popup;
+    private Tree treeDetailComponent = new Tree();
+    private PopupView popupRemove;
+    private ResourceService resourceService;
+    private transient VersioningService versioningService;
+    private transient FindCompositeService findCompositeService;
+    private transient ComponentBean componentBeanSelect;
+    private transient RandomStringGenerator randomStringGenerator;
 
     public VersioningForm(MyUI myUI){
         VerticalLayout content = new VerticalLayout();
-        VerticalLayout fieldLayout = new VerticalLayout();
+        VerticalLayout formLayout = new VerticalLayout();
+        HorizontalLayout gridTreeLayout = new HorizontalLayout();
         HorizontalLayout buttonLayout = new HorizontalLayout();
 
-        Button buttonDetail = new Button("Detail");
-        buttonDetail.setWidth("100px");
-        Button buttonRemove = new Button("Remove");
-        buttonRemove.setWidth("100px");
+        findCompositeService = new FindCompositeService();
+        versioningService = new VersioningService();
+        resourceService = new ResourceService(Activator.instance().getMetadataService());
+        randomStringGenerator = new RandomStringGenerator();
 
-        buttonDetail.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        buttonDetail.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+        Button buttonEdit = new Button("Edit");
+        buttonEdit.setWidth("100px");
+        Button buttonCopy = new Button("Copy");
+        buttonCopy.setWidth("100px");
+        Button buttonRemove = new Button("Remove");
+
+        buttonEdit.setStyleName(ValoTheme.BUTTON_PRIMARY);
+        buttonEdit.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
         labelForm.addStyleName(ValoTheme.LABEL_BOLD);
 
@@ -34,50 +60,135 @@ public class VersioningForm extends FormLayout {
 
         Button findButton = new Button(FontAwesome.CHECK);
         findButton.addClickListener(e ->{
-            //TODO
+            gridComponents.setContainerDataSource(new BeanItemContainer<>(ComponentBean.class,
+                    findCompositeService.getFindComponentBean(idText.getValue())));
         });
 
         Button clearButton = new Button(FontAwesome.TIMES);
         clearButton.addClickListener(e -> {
-            myUI.setContentBodyVersioning();
+            idText.clear();
+            gridComponents.setContainerDataSource(new BeanItemContainer<>(ComponentBean.class,
+                    versioningService.getCompositeComponentAll()));
         });
 
         CssLayout filtering = new CssLayout();
         filtering.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         filtering.addComponents(idText, findButton, clearButton);
 
-        fieldLayout.addComponents(labelForm, filtering, gridComponents);
-        fieldLayout.setSpacing(true);
+        panelGridComponents.setVisible(false);
 
-        HorizontalLayout formLayout = new HorizontalLayout(fieldLayout);
-        formLayout.setSizeFull();
+        gridComponents.setContainerDataSource(new BeanItemContainer<>(ComponentBean.class,
+                versioningService.getCompositeComponentAll()));
+        gridComponents.getColumn("id").setHidden(true);
+        gridComponents.getColumn("composite").setHidden(true);
+        gridComponents.setColumnOrder("name", "version");
+        gridComponents.addStyleName("my-style");
+
+        panelGridComponents.setContent(treeDetailComponent);
+        panelGridComponents.setHeight("400px");
+        gridTreeLayout.addComponents(gridComponents, panelGridComponents);
+        gridTreeLayout.setSpacing(true);
+        gridTreeLayout.setSizeFull();
+
         gridComponents.setSizeFull();
-        formLayout.setExpandRatio(fieldLayout, 1);
+        treeDetailComponent.setSizeFull();
+        gridTreeLayout.setExpandRatio(gridComponents, 1);
+        gridTreeLayout.setExpandRatio(panelGridComponents, 1);
 
-        // Popup verification of artifact remove
-        VerticalLayout buttonPopupLayout = new VerticalLayout();
-        Panel panel = new Panel("Really remove the artifact?");
+        // Popup verification of component remove
+        VerticalLayout buttonPopupLayoutRemove = new VerticalLayout();
+        Panel panelRemove = new Panel("Really remove the artifact?");
         Button yesRemoveButton = new Button("Confirm");
         yesRemoveButton.setStyleName(ValoTheme.BUTTON_DANGER);
-        buttonPopupLayout.addComponents(yesRemoveButton);
-        buttonPopupLayout.setMargin(true);
-        buttonPopupLayout.setSizeFull();
-        buttonPopupLayout.setComponentAlignment(yesRemoveButton, Alignment.BOTTOM_CENTER);
-        panel.setContent(buttonPopupLayout);
+        buttonPopupLayoutRemove.addComponents(yesRemoveButton);
+        buttonPopupLayoutRemove.setMargin(true);
+        buttonPopupLayoutRemove.setSizeFull();
+        buttonPopupLayoutRemove.setComponentAlignment(yesRemoveButton, Alignment.BOTTOM_CENTER);
+        panelRemove.setContent(buttonPopupLayoutRemove);
 
-        popup = new PopupView(null, panel);
-        popup.setWidth("150px");
+        popupRemove = new PopupView(null, panelRemove);
+        popupRemove.setWidth("150px");
 
-        buttonLayout.addComponents(buttonDetail, buttonRemove);
+        buttonLayout.addComponents(buttonEdit, buttonCopy, buttonRemove);
         buttonLayout.setSpacing(true);
         buttonLayout.setVisible(false);
 
-        content.addComponents(formLayout, buttonLayout, popup);
-        content.setComponentAlignment(buttonLayout, Alignment.MIDDLE_CENTER);
-        content.setComponentAlignment(popup, Alignment.MIDDLE_CENTER);
+        formLayout.addComponents(labelForm, filtering, gridTreeLayout);
+        formLayout.setSpacing(true);
+
+        content.addComponents(formLayout, buttonLayout, popupRemove);
+        content.setComponentAlignment(buttonLayout, Alignment.BOTTOM_LEFT);
+        content.setComponentAlignment(popupRemove, Alignment.BOTTOM_LEFT);
         content.setMargin(new MarginInfo(false, true));
         content.setSpacing(true);
 
+        gridComponents.addSelectionListener(e ->{
+            if(!e.getSelected().isEmpty()){
+                componentBeanSelect = (ComponentBean)e.getSelected().iterator().next();
+                treeDetailComponent = new Tree();
+                fillTreeDetailComponent(componentBeanSelect.getId(), null, myUI.getSession());
+                treeDetailComponent.setSelectable(false);
+                panelGridComponents.setContent(treeDetailComponent);
+                panelGridComponents.setVisible(true);
+                buttonLayout.setVisible(true);
+            }
+            else{
+                treeDetailComponent = new Tree();
+                componentBeanSelect = null;
+                panelGridComponents.setVisible(false);
+                buttonLayout.setVisible(false);
+            }
+        });
+
+        buttonRemove.addClickListener(e ->{
+            popupRemove.setPopupVisible(true);
+            yesRemoveButton.addClickListener(ev ->{
+                boolean result = versioningService.removeCompositeComponent(componentBeanSelect.getId());
+                if(result){
+                    Notification notif = new Notification("Info", "Collection sucess removed",
+                            Notification.Type.ASSISTIVE_NOTIFICATION);
+                    notif.setPosition(Position.TOP_RIGHT);
+                    notif.show(Page.getCurrent());
+                }
+                else{
+                    new Notification("Could not remove collection", Notification.Type.WARNING_MESSAGE)
+                            .show(Page.getCurrent());
+                }
+                myUI.setContentBodyVersioning();
+            });
+        });
+
         addComponent(content);
+    }
+
+    void fillTreeDetailComponent(String idComponent, String parent, VaadinSession session){
+        ComponentDetailBean componentDetailBean = versioningService.getCompositeComponentDetail(idComponent);
+
+        if(componentDetailBean != null) {
+            String item = componentDetailBean.getName() + "_" + randomStringGenerator.getRandomString();
+            treeDetailComponent.addItem(item);
+            treeDetailComponent.setItemCaption(item, componentDetailBean.getName() +
+                    " (" + componentDetailBean.getVersion() + ")");
+            // off the root
+            if(parent != null){
+                treeDetailComponent.setParent(item, parent);
+            }
+            for(String s : componentDetailBean.getContent()){
+                fillTreeDetailComponent(s, item, session);
+            }
+        }
+        // artefact in store
+        else{
+            for (ResourceBean resourceBean : resourceService.getAllResourceBeanFromStore(session)) {
+                if (resourceBean.getResource().getId().equals(idComponent)) {
+                    String item = resourceBean.getPresentationName() + "_" + randomStringGenerator.getRandomString();
+                    treeDetailComponent.addItem(item);
+                    treeDetailComponent.setItemCaption(item,
+                            resourceBean.getPresentationName() + " (" + resourceBean.getVersion() + ")");
+                    treeDetailComponent.setParent(item, parent);
+                    treeDetailComponent.setChildrenAllowed(item, false);
+                }
+            }
+        }
     }
 }

@@ -1,12 +1,12 @@
 package cz.zcu.kiv.crce.crce_component_versioning.api.impl;
 
-import com.mongodb.MongoException;
+import com.mongodb.*;
 import com.mongodb.client.MongoCursor;
 import cz.zcu.kiv.crce.crce_component_versioning.api.VersioningServiceApi;
 import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentBean;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentDetailBean;
 import org.bson.Document;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -43,6 +43,22 @@ public class VersioningService implements VersioningServiceApi {
     }
 
     @Override
+    public ComponentDetailBean getCompositeComponentDetail(String id) {
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.put("_id", id);
+        Document doc = collection.find(searchQuery).first();
+        if(doc != null){
+            ComponentDetailBean componentDetailBean = new ComponentDetailBean(doc.get("_id").toString(),
+                    doc.get("name").toString(), doc.get("version").toString(), (List) doc.get("child"));
+
+            return componentDetailBean;
+        }
+        else{
+            return null;
+        }
+    }
+
+    @Override
     public boolean setCompositeComponent(String name, String version, List<String> listId) {
         Document doc = new Document("_id", new ObjectId().toString())
                 .append("name", name)
@@ -54,6 +70,26 @@ public class VersioningService implements VersioningServiceApi {
             return true;
         }
         catch(MongoException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean removeCompositeComponent(String id) {
+        try{
+            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery.put("_id", id);
+            Document doc = collection.find(searchQuery).first();
+            if(doc != null){
+                collection.deleteOne(doc);
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+        catch (MongoException e){
             e.printStackTrace();
             return false;
         }
