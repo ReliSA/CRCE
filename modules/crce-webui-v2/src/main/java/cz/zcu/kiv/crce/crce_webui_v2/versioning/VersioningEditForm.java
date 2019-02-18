@@ -9,6 +9,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentBean;
+import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentDetailBean;
 import cz.zcu.kiv.crce.crce_component_versioning.api.impl.VersioningService;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
@@ -19,9 +20,9 @@ import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VersioningNewForm extends FormLayout{
-    private static final long serialVersionUID = 3539728975121021002L;
-    private Label labelDescription = new Label("Add a new collection");
+public class VersioningEditForm extends FormLayout {
+    public static final long serialVersionUID = -6571696339324055801L;
+    private Label labelDescription = new Label("Editing a collection.");
     private TextField name = new TextField("name");
     private TextField version = new TextField("version");
     private Label labelStore = new Label("Artifact in Store");
@@ -38,7 +39,7 @@ public class VersioningNewForm extends FormLayout{
     private transient ComponentBean componentBeanSelect;
     private transient ComponentBean newComponentBeanSelect;
 
-    public VersioningNewForm(MyUI myUI){
+    public VersioningEditForm(MyUI myUI, ComponentBean componentBeanTrans){
         VerticalLayout content = new VerticalLayout();
         VerticalLayout gridLeftLayout = new VerticalLayout();
         VerticalLayout gridRightLayout = new VerticalLayout();
@@ -124,6 +125,25 @@ public class VersioningNewForm extends FormLayout{
         content.setSpacing(true);
 
         List<ComponentBean> newComponentList = new ArrayList<>();
+        // fill list
+        for(String s : versioningService.getCompositeComponentDetail(componentBeanTrans.getId()).getContent()){
+            // is a composite component
+            ComponentDetailBean componentDetailBeanTrans =  versioningService.getCompositeComponentDetail(s);
+            if(componentDetailBeanTrans != null){
+                newComponentList.add(new ComponentBean(componentDetailBeanTrans.getId(), componentDetailBeanTrans.getName(),
+                        componentDetailBeanTrans.getVersion(), true));
+            }
+            // is an artifact in the store
+            else{
+                for(ResourceBean resourceBean : resourceService.getAllResourceBeanFromStore(myUI.getSession())){
+                    if(resourceBean.getResource().getId().equals(s)){
+                        newComponentList.add(new ComponentBean(resourceBean.getResource().getId(),
+                                resourceBean.getPresentationName(), resourceBean.getVersion(), false));
+                        break;
+                    }
+                }
+            }
+        }
         newCompositeGrid.setContainerDataSource(new BeanItemContainer<>(ComponentBean.class, newComponentList));
         newCompositeGrid.getColumn("id").setHidden(true);
         newCompositeGrid.setColumnOrder("name", "version", "composite");
@@ -140,7 +160,9 @@ public class VersioningNewForm extends FormLayout{
         removeButton.setEnabled(false);
         buttonLayout.addComponents(saveButton, removeButton);
         name.setWidth("270px");
+        name.setValue(componentBeanTrans.getName());
         version.setWidth("270px");
+        version.setValue(componentBeanTrans.getVersion());
         content.addComponents(labelDescription, name, version, gridLayout, newCompositeGrid, buttonLayout);
         content.setComponentAlignment(buttonLayout,Alignment.BOTTOM_CENTER);
 
@@ -216,19 +238,20 @@ public class VersioningNewForm extends FormLayout{
             for(ComponentBean cb: newComponentList){
                 idList.add(cb.getId());
             }
-            boolean status = versioningService.setCompositeComponent(name.getValue(), version.getValue(), idList);
+            boolean status = versioningService.updateCompositeComponent(componentBeanTrans.getId(), name.getValue(),
+                    version.getValue(), idList);
             if(status){
-                Notification notif = new Notification("Info", "The new composite component has been " +
-                        "successfully saved.", Notification.Type.ASSISTIVE_NOTIFICATION);
+                Notification notif = new Notification("Info", "The collection has been updated " +
+                        "successfully.", Notification.Type.ASSISTIVE_NOTIFICATION);
                 notif.setPosition(Position.TOP_RIGHT);
                 notif.show(Page.getCurrent());
 
             }
             else{
-                new Notification("Error saving new composite component.", Notification.Type.WARNING_MESSAGE)
+                new Notification("Error updating collection.", Notification.Type.WARNING_MESSAGE)
                         .show(Page.getCurrent());
             }
-            myUI.setContentBodyVersioningNew();
+            myUI.setContentBodyVersioning();
         });
 
         addComponent(content);

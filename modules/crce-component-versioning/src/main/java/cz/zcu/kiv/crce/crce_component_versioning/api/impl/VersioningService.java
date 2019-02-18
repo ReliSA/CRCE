@@ -10,6 +10,7 @@ import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentDetailBean;
 import org.bson.Document;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
@@ -89,6 +90,24 @@ public class VersioningService implements VersioningServiceApi {
                 return false;
             }
         }
+        catch (MongoException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updateCompositeComponent(String id, String name, String version, List<String> listId) {
+        try{
+            Bson filter = new Document("_id", id);
+            Bson newValue = new Document("name", name)
+                    .append("version", version)
+                    .append("child", listId);
+            Bson updateOperationDocument = new Document("$set", newValue);
+            collection.updateOne(filter, updateOperationDocument);
+            return true;
+        }
+
         catch (MongoException e){
             e.printStackTrace();
             return false;

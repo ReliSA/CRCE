@@ -27,6 +27,7 @@ public class VersioningForm extends FormLayout {
     private Grid gridComponents = new Grid();
     private Tree treeDetailComponent = new Tree();
     private PopupView popupRemove;
+    private PopupView popupCopy;
     private ResourceService resourceService;
     private transient VersioningService versioningService;
     private transient FindCompositeService findCompositeService;
@@ -95,6 +96,8 @@ public class VersioningForm extends FormLayout {
         gridTreeLayout.setExpandRatio(gridComponents, 1);
         gridTreeLayout.setExpandRatio(panelGridComponents, 1);
 
+        HorizontalLayout popupLayout = new HorizontalLayout();
+
         // Popup verification of component remove
         VerticalLayout buttonPopupLayoutRemove = new VerticalLayout();
         Panel panelRemove = new Panel("Really remove the artifact?");
@@ -109,6 +112,22 @@ public class VersioningForm extends FormLayout {
         popupRemove = new PopupView(null, panelRemove);
         popupRemove.setWidth("150px");
 
+        // Popup copy set artifact
+        VerticalLayout buttonPopupLayoutCopy = new VerticalLayout();
+        Panel panelCopy = new Panel("Input the version of the set.");
+        TextField textVersionSet = new TextField();
+        Button saveVersionButton = new Button("Save");
+        saveVersionButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
+        buttonPopupLayoutCopy.addComponents(textVersionSet, saveVersionButton);
+        buttonPopupLayoutCopy.setMargin(true);
+        buttonPopupLayoutCopy.setSpacing(true);
+        buttonPopupLayoutCopy.setSizeFull();
+        buttonPopupLayoutCopy.setComponentAlignment(saveVersionButton, Alignment.BOTTOM_CENTER);
+        panelCopy.setContent(buttonPopupLayoutCopy);
+
+        popupCopy = new PopupView(null, panelCopy);
+        popupCopy.setWidth("250px");
+
         buttonLayout.addComponents(buttonEdit, buttonCopy, buttonRemove);
         buttonLayout.setSpacing(true);
         buttonLayout.setVisible(false);
@@ -116,9 +135,11 @@ public class VersioningForm extends FormLayout {
         formLayout.addComponents(labelForm, filtering, gridTreeLayout);
         formLayout.setSpacing(true);
 
-        content.addComponents(formLayout, buttonLayout, popupRemove);
-        content.setComponentAlignment(buttonLayout, Alignment.BOTTOM_LEFT);
-        content.setComponentAlignment(popupRemove, Alignment.BOTTOM_LEFT);
+        popupLayout.addComponents(popupCopy, popupRemove);
+        popupLayout.addStyleName("margin-top: -10px");
+
+        content.addComponents(formLayout, buttonLayout, popupLayout);
+        //content.setComponentAlignment(buttonLayout, Alignment.BOTTOM_LEFT);
         content.setMargin(new MarginInfo(false, true));
         content.setSpacing(true);
 
@@ -145,7 +166,7 @@ public class VersioningForm extends FormLayout {
             yesRemoveButton.addClickListener(ev ->{
                 boolean result = versioningService.removeCompositeComponent(componentBeanSelect.getId());
                 if(result){
-                    Notification notif = new Notification("Info", "Collection sucess removed",
+                    Notification notif = new Notification("Info", "Collection sucess removed.",
                             Notification.Type.ASSISTIVE_NOTIFICATION);
                     notif.setPosition(Position.TOP_RIGHT);
                     notif.show(Page.getCurrent());
@@ -156,6 +177,31 @@ public class VersioningForm extends FormLayout {
                 }
                 myUI.setContentBodyVersioning();
             });
+        });
+
+        buttonCopy.addClickListener(e ->{
+            popupCopy.setPopupVisible(true);
+            textVersionSet.setValue(componentBeanSelect.getVersion());
+            saveVersionButton.addClickListener(ev ->{
+                boolean result = versioningService.setCompositeComponent(componentBeanSelect.getName(),
+                        textVersionSet.getValue(),
+                        versioningService.getCompositeComponentDetail(componentBeanSelect.getId()).getContent());
+                if(result){
+                    Notification notif = new Notification("Info", "Copy collection is success saved.",
+                            Notification.Type.ASSISTIVE_NOTIFICATION);
+                    notif.setPosition(Position.TOP_RIGHT);
+                    notif.show(Page.getCurrent());
+                }
+                else{
+                    new Notification("Could not save new version of collection", Notification.Type.WARNING_MESSAGE)
+                            .show(Page.getCurrent());
+                }
+                myUI.setContentBodyVersioning();
+            });
+        });
+
+        buttonEdit.addClickListener(e -> {
+            myUI.setContentBodyVersioningEdit(componentBeanSelect);
         });
 
         addComponent(content);

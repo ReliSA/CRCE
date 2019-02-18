@@ -41,4 +41,13 @@ public interface VersioningServiceApi {
      * @author Roman Pesek
      */
     boolean removeCompositeComponent(String id);
+
+    /**
+     * Interface for update the composite components.
+     * <p/>
+     * Date: 07.02.19
+     *
+     * @author Roman Pesek
+     */
+    boolean updateCompositeComponent(String id, String name, String version, List<String> listId);
 }

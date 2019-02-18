@@ -12,6 +12,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentBean;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CentralMavenForm;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CheckMavenIndexForm;
@@ -24,6 +25,7 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.StoreForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
+import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningEditForm;
 import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningForm;
 import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningNewForm;
 
@@ -51,6 +53,7 @@ public class MyUI extends UI {
 	private StoreForm storeForm;
 	private VersioningForm versioningForm;
 	private VersioningNewForm versioningNewForm;
+	private VersioningEditForm versioningEditForm;
 	private ArtefactDetailForm artefactDetailForm;
 	private PluginsForm pluginsForm;
 	private SettingsForm settingsForm;
@@ -156,6 +159,11 @@ public class MyUI extends UI {
 	public void setContentBodyVersioningNew(){
 		versioningNewForm = new VersioningNewForm(this);
 		body.setContent(versioningNewForm);
+	}
+
+	public void setContentBodyVersioningEdit(ComponentBean componentBean){
+		versioningEditForm = new VersioningEditForm(this, componentBean);
+		body.setContent(versioningEditForm);
 	}
     
     public void setContentArtefactDetailForm(ResourceBean resourceBean, boolean isFromStore){

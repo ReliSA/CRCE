@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1549973948422
+Bnd-LastModified: 1550485003496
 Build-Jdk: 1.8.0_202
 Built-By: rpesek
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
