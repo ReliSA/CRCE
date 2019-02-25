@@ -6,7 +6,7 @@
     <parent>
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>crce-parent</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.1-SNAPSHOT</version>
         <relativePath />
     </parent>
 
@@ -47,22 +47,22 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-indexer-impl</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-indexer-api</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-json-api</artifactId>
-            <version>2.1.0</version>
+            <version>2.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-json-impl</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

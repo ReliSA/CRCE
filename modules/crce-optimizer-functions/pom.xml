@@ -18,7 +18,7 @@
     <properties>
         <bundle.symbolicName>${namespace}.optimizer-functions</bundle.symbolicName>
         <bundle.namespace>${namespace}.optimizer</bundle.namespace>
-        <crce.metadata.api.version>3.0.0</crce.metadata.api.version>
+        <crce.metadata.api.version>3.0.1-SNAPSHOT</crce.metadata.api.version>
         <crce.metadata.service.api.version>3.0.1-SNAPSHOT</crce.metadata.service.api.version>
         <crce.resolver.api.version>2.2.0-SNAPSHOT</crce.resolver.api.version>
         <crce.repository.api.version>2.2.0-SNAPSHOT</crce.repository.api.version>
