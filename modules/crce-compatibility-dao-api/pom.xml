@@ -30,12 +30,12 @@
         </dependency>
 
         <!-- CRCE dependencies -->
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>crce-compatibility-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!-- moved to core -->
+        <!--<dependency>-->
+            <!--<groupId>${project.groupId}</groupId>-->
+            <!--<artifactId>crce-compatibility-api</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
 
     </dependencies>
 

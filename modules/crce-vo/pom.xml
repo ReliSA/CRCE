@@ -18,25 +18,15 @@
     <properties>
         <bundle.symbolicName>${namespace}.vo</bundle.symbolicName>
         <bundle.namespace>${namespace}.vo</bundle.namespace>
-        <crce.metadata.api.version>3.0.1-SNAPSHOT</crce.metadata.api.version>
+        <crce.metadata.api.version>3.0.0</crce.metadata.api.version>
     </properties>
 
 
     <dependencies>
         <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-api</artifactId>
-            <version>${crce.metadata.api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-compatibility-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-service-api</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
         </dependency>
 
         <!-- 3rd party deps -->

@@ -35,55 +35,33 @@
  */
 package cz.zcu.kiv.crce.metadata.osgi.internal;
 
+import cz.zcu.kiv.crce.metadata.*;
+import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiPackage;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiFragment;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiExecutionEnvironment;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiIdentity;
-import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiService;
-
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipInputStream;
-
-import org.apache.felix.utils.manifest.Attribute;
+import cz.zcu.kiv.crce.metadata.osgi.namespace.*;
+import cz.zcu.kiv.crce.metadata.service.MetadataService;
+import cz.zcu.kiv.crce.metadata.type.Version;
 import org.apache.felix.utils.manifest.Clause;
 import org.apache.felix.utils.manifest.Directive;
 import org.apache.felix.utils.manifest.Parser;
 import org.apache.felix.utils.version.VersionCleaner;
 import org.apache.felix.utils.version.VersionRange;
-
 import org.osgi.framework.Constants;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Operator;
-import cz.zcu.kiv.crce.metadata.Requirement;
-import cz.zcu.kiv.crce.metadata.Resource;
-import cz.zcu.kiv.crce.metadata.MetadataFactory;
-import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
-import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
-import cz.zcu.kiv.crce.metadata.service.MetadataService;
-import cz.zcu.kiv.crce.metadata.type.Version;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
 
 /**
  * This is original class DataModelHelperImpl adopted from org.apache.felix.bundlerepository.
@@ -143,16 +121,16 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             return Collections.emptyList();
         }
 
-        cz.zcu.kiv.crce.metadata.Attribute<String> pn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__PRESENTATION_NAME);
+        Attribute<String> pn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__PRESENTATION_NAME);
         if (pn != null) {
             metadataService.setPresentationName(resource, pn.getValue());
         }
-        cz.zcu.kiv.crce.metadata.Attribute<String> sn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
+        Attribute<String> sn = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__SYMBOLIC_NAME);
         if(sn != null) {
             metadataService.setExternalId(resource, sn.getValue());
         }
 
-        cz.zcu.kiv.crce.metadata.Attribute<Version> ver = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION);
+        Attribute<Version> ver = osgiIdentity.getAttribute(NsOsgiIdentity.ATTRIBUTE__VERSION);
         if(ver != null) {
             Capability identity = metadataService.getIdentity(resource);
             identity.setAttribute(NsCrceIdentity.ATTRIBUTE__VERSION, ver.getValue());
@@ -170,6 +148,10 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         List<String> result = new ArrayList<>();
         Collections.addAll(result, "osgi", "corrupted");
         return result;
+    }
+
+    public Map<String, List<AttributeType>> getIndexedAttributes() {
+        return NsMap.getAttributeMap();
     }
 
     public Resource fillResource(final URL bundleUrl, Resource resource) throws IOException {
@@ -190,6 +172,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
             @Override
             public String getHeader(String name) throws IOException {
                 String value = manifest.getMainAttributes().getValue(name);
+                // #5: this will only index properties in manifest which start with '%' symbol
                 if (value != null && value.startsWith("%")) {
                     if (localization == null) {
                         localization = new Properties();
@@ -370,9 +353,9 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private Capability createServiceCapability(Clause clause) {
         Capability capability = metadataFactory.createCapability(NsOsgiService.NAMESPACE__OSGI_SERVICE);
         capability.setAttribute(NsOsgiService.ATTRIBUTE__NAME, clause.getName());
-        Attribute[] attributes = clause.getAttributes();
+        org.apache.felix.utils.manifest.Attribute[] attributes = clause.getAttributes();
         if (attributes != null) {
-            for (Attribute attribute : attributes) {
+            for (org.apache.felix.utils.manifest.Attribute attribute : attributes) {
                 capability.setAttribute(new SimpleAttributeType<>(attribute.getName(), String.class), attribute.getValue());
             }
         }
@@ -460,7 +443,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
         Capability capability = metadataFactory.createCapability(NsOsgiPackage.NAMESPACE__OSGI_PACKAGE);
         capability.setAttribute(NsOsgiPackage.ATTRIBUTE__NAME, clause.getName());
         capability.setAttribute(NsOsgiPackage.ATTRIBUTE__VERSION, new Version(getVersion(clause)));
-        Attribute[] attributes = clause.getAttributes();
+        org.apache.felix.utils.manifest.Attribute[] attributes = clause.getAttributes();
         for (int i = 0; attributes != null && i < attributes.length; i++) {
             String key = attributes[i].getName();
             if (!key.equalsIgnoreCase(Constants.PACKAGE_SPECIFICATION_VERSION) && !key.equalsIgnoreCase(Constants.VERSION_ATTRIBUTE)) {
@@ -494,7 +477,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     private void createImportFilter(Requirement requirement, AttributeType<String> name, Clause clause) {
         requirement.addAttribute(name, clause.getName());
         appendVersion(requirement, NsOsgiPackage.ATTRIBUTE__VERSION, getVersionRange(clause));
-        Attribute[] attributes = clause.getAttributes();
+        org.apache.felix.utils.manifest.Attribute[] attributes = clause.getAttributes();
         Set<String> attrs = doImportPackageAttributes(requirement, attributes);
 
         // The next code is using the subset operator
@@ -518,7 +501,7 @@ public class OsgiManifestBundleIndexer extends AbstractResourceIndexer {
     }
 
     @SuppressWarnings("deprecation")
-    private Set<String> doImportPackageAttributes(Requirement requirement, Attribute[] attributes) {
+    private Set<String> doImportPackageAttributes(Requirement requirement, org.apache.felix.utils.manifest.Attribute[] attributes) {
         HashSet<String> set = new HashSet<>();
         for (int i = 0; attributes != null && i < attributes.length; i++) {
             String name = attributes[i].getName();

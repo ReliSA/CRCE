@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>crce-modules-parent</artifactId>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <version>2.1.1-SNAPSHOT</version>
+        <relativePath>../pom</relativePath>
+    </parent>
+
+    <artifactId>crce-default-modules</artifactId>
+    <version>2.1.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Default modules</name>
+
+    <scm>
+        <url>https://github.com/ReliSA/crce/tree/master/core/crce-core</url>
+        <connection>https://github.com/ReliSA/crce.git</connection>
+        <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-osgi-bundle</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-rest-v2</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+			<type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-mongodb</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-vo</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-webservices-indexer</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
+    <repositories>
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+    </repositories>
+
+</project>

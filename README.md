@@ -22,11 +22,20 @@ On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; 
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
+Build `crce-modules-reactor` in `/deploy`.
 
-`mvn pax:provision`
+For run in docker run command in `/deploy`:
 
-The output log should write up some info about dependencies terminated by lines similar to the following:
+```docker build . -t crce-dock```
+
+For run on local machine run command in `/deploy`:
+
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
+
+```mvn pax:provision```
+
+
+In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
 
 ```
 Listening for transport dt_socket at address: 65505

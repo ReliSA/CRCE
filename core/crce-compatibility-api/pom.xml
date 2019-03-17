@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
+        <relativePath />
+    </parent>
+
+    <artifactId>crce-compatibility-api</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>CRCE - Compatibility API</name>
+
+    <properties>
+        <bundle.symbolicName>${namespace}.compatibility.api</bundle.symbolicName>
+        <bundle.namespace>${namespace}.compatibility</bundle.namespace>
+    </properties>
+
+    <dependencies>
+        <!--CRCE dependencies-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+
+
+        <!-- 3rd party dependencies -->
+        <!--
+        in case OpenJDK 11 is installed on the system
+        see: https://stackoverflow.com/questions/52502189/java-11-package-javax-xml-bind-does-not-exist
+        -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

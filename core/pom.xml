@@ -20,6 +20,7 @@
         <module>crce-metadata-service-api</module>
         <module>crce-repository-api</module>
         <module>crce-resolver-api</module>
+        <module>crce-compatibility-api</module>
 
         <module>crce-metadata-json-impl</module>
         <module>crce-metadata-impl</module>
@@ -29,7 +30,12 @@
         <module>crce-repository-impl</module>
         <module>crce-resolver-impl</module>
 
+		<module>crce-concurrency</module>
+        <module>crce-webui</module>
+		
         <module>crce-core</module>
+		
+
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->

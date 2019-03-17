@@ -1,12 +1,13 @@
 package cz.zcu.kiv.crce.metadata.indexer;
 
-import java.io.InputStream;
-import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.plugin.Plugin;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Resource indexer indexes content of an artifact and stores obtained metadata
@@ -56,4 +57,12 @@ public interface ResourceIndexer extends Plugin {
      * @return
      */
     List<String> getRequiredCategories();
+
+    /**
+     * Returns a map of namespaces and relevant attributes this components indexes.
+     *
+     * @return Collection of attributes this component is capable of indexing. Each collection
+     * is mapped to its respective namespace.
+     */
+    Map<String, List<AttributeType>> getIndexedAttributes();
 }

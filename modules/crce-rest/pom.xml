@@ -193,11 +193,6 @@
             <artifactId>crce-metadata-osgi-bundle</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-compatibility-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- 3rd party dependencies -->
 

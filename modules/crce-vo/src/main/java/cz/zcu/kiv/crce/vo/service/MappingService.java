@@ -1,11 +1,5 @@
 package cz.zcu.kiv.crce.vo.service;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Requirement;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -17,6 +11,11 @@ import cz.zcu.kiv.crce.vo.model.metadata.DetailedResourceVO;
 import cz.zcu.kiv.crce.vo.model.metadata.GenericRequirementVO;
 import cz.zcu.kiv.crce.vo.model.optimizer.CostFunctionDescriptorVO;
 import cz.zcu.kiv.crce.vo.model.optimizer.ResultOptimizerVO;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 /**
  *
