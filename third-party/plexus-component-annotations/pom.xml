@@ -13,7 +13,7 @@
 
     <groupId>cz.zcu.kiv.crce.wrapper</groupId>
     <artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
-    <version>1.5.5</version>
+    <version>1.6</version>
     <packaging>bundle</packaging>
 
     <name>${bundle.symbolicName} ${wrapped.version} [osgi]</name>
@@ -22,7 +22,7 @@
         <bundle.symbolicName>org.codehaus.plexus.plexus-component-annotations</bundle.symbolicName>
         <wrapped.groupId>org.codehaus.plexus</wrapped.groupId>
         <wrapped.artifactId>plexus-component-annotations</wrapped.artifactId>
-        <wrapped.version>1.5.5</wrapped.version>
+        <wrapped.version>1.6</wrapped.version>
     </properties>
 
     <dependencies>

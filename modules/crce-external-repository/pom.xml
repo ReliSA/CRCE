@@ -82,13 +82,13 @@
 				<version>1.10.3</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpcore</artifactId>
+				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+				<artifactId>org.apache.httpcomponents.httpcore</artifactId>
 				<version>4.3.2</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
+				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+				<artifactId>org.apache.httpcomponents.httpclient</artifactId>
 				<version>4.3.5</version>
 			</dependency>
 			<dependency>
@@ -107,18 +107,18 @@
 				<version>3.3.9</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-annotations</artifactId>
+				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+				<artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
 				<version>1.6</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-interpolation</artifactId>
+				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+				<artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
 				<version>1.21</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-utils</artifactId>
+				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+				<artifactId>org.codehaus.plexus.plexus-utils</artifactId>
 				<version>3.0.22</version>
 			</dependency>
 			<dependency>
@@ -279,12 +279,12 @@
 			<artifactId>flute</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpcore</artifactId>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.apache.httpcomponents.httpcore</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.apache.httpcomponents.httpclient</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -299,17 +299,18 @@
 			<artifactId>maven-repository-metadata</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-annotations</artifactId>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-interpolation</artifactId>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-utils</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.eclipse.sisu</groupId>
 			<artifactId>org.eclipse.sisu.plexus</artifactId>
