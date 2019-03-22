@@ -27,7 +27,7 @@ public class CompatibilityVO extends ValueObject {
     /**
      * Version of the resource which was compared to the Base resource.
      * <p/>
-     * Implemented according to the OSGi versioning scheme:
+     * Implemented according to the OSGi collection scheme:
      * major.minor.micor-qualifier
      */
     private String otherVersion;
@@ -38,7 +38,7 @@ public class CompatibilityVO extends ValueObject {
     /**
      * Version of the resource which the resource has been compared to.
      * <p/>
-     * Implemented according to the OSGi versioning scheme:
+     * Implemented according to the OSGi collection scheme:
      * major.minor.micor-qualifier
      */
     private String baseVersion;

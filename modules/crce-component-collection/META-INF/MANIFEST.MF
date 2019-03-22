@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1552995711972
+Build-Jdk: 1.8.0_202
+Built-By: rpesek
+Bundle-Activator: cz.zcu.kiv.crce.crce_component_collection.internal.Act
+ ivator
+Bundle-Description: Component Repository supporting Compatibility Evalua
+ tion
+Bundle-DocURL: http://www.kiv.zcu.cz
+Bundle-ManifestVersion: 2
+Bundle-Name: CRCE - Support versification collection of components
+Bundle-SymbolicName: crce-component-collection
+Bundle-Vendor: ZČU KIV
+Bundle-Version: 1.0
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Export-Package: cz.zcu.kiv.crce.crce_component_collection.api;uses:="cz.
+ zcu.kiv.crce.crce_component_collection.api.bean";version="1.0.0",cz.zcu
+ .kiv.crce.crce_component_collection.api.bean;version="1.0.0",cz.zcu.kiv
+ .crce.crce_component_collection.api.impl;uses:="cz.zcu.kiv.crce.crce_co
+ mponent_collection.api,cz.zcu.kiv.crce.crce_component_collection.api.be
+ an";version="1.0.0"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-3.3.0.201609221906

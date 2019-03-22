@@ -34,7 +34,7 @@ public class ArtefactDetailForm extends FormLayout{
 	private Grid gridCapabilities = new Grid();
 	private Grid gridRequirements = new Grid();
 	
-	public ArtefactDetailForm(MyUI myUI, ResourceBean resourceBean, boolean isFromStore){
+	public ArtefactDetailForm(MyUI myUI, ResourceBean resourceBean, FormLayout returnPage){
 		VerticalLayout content = new VerticalLayout();
 		
 		resourceLabel.setValue("Details of artefact: " + resourceBean.getPresentationName());
@@ -128,38 +128,21 @@ public class ArtefactDetailForm extends FormLayout{
 		requirementContentLayout.setComponentAlignment(buttonRequirementLayout, Alignment.BOTTOM_CENTER);
 		requirementContentLayout.setSpacing(true);
 		requirementContentLayout.setMargin(new MarginInfo(true, false));
-		
-		
-	
+
 		tabsheet.addTab(propertyContentLayout).setCaption("Properties");
 		tabsheet.addTab(capabilityContentLayout).setCaption("Capability");
 		tabsheet.addTab(requirementContentLayout).setCaption("Requirement");
 		
 		buttonBackProperties.addClickListener(e ->{
-			if(isFromStore){
-				myUI.setContentBodyStore();
-			}
-			else{
-				myUI.setContentBodyBuffer();
-			}
+			myUI.setContentExistingPage(returnPage);
 		});
 		
 		buttonBackCapabilities.addClickListener(e ->{
-			if(isFromStore){
-				myUI.setContentBodyStore();
-			}
-			else{
-				myUI.setContentBodyBuffer();
-			}
+			myUI.setContentExistingPage(returnPage);
 		});
 		
 		buttonBackRequirements.addClickListener(e ->{
-			if(isFromStore){
-				myUI.setContentBodyStore();
-			}
-			else{
-				myUI.setContentBodyBuffer();
-			}
+			myUI.setContentExistingPage(returnPage);
 		});
 		
 		content.addComponents(resourceLabel, tabsheet);

@@ -132,7 +132,7 @@ public class StoreForm extends FormLayout{
 		});
 		
 		buttonDetail.addClickListener(e ->{
-			myUI.setContentArtefactDetailForm(resourceBeanSelect, true);
+			myUI.setContentArtefactDetailForm(resourceBeanSelect, this);
 		});
 	
 		buttonRemove.addClickListener(e ->{
