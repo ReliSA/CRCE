@@ -139,7 +139,7 @@ public class BufferForm extends FormLayout{
 		});
 		
 		buttonDetail.addClickListener(e ->{
-			myUI.setContentArtefactDetailForm(resourceBeanSelect, false);
+			myUI.setContentArtefactDetailForm(resourceBeanSelect, this);
 		});
 		
 		buttonRemove.addClickListener(e ->{

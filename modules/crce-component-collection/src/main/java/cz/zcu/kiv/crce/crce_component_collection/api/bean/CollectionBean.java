@@ -1,16 +1,16 @@
-package cz.zcu.kiv.crce.crce_component_versioning.api.bean;
+package cz.zcu.kiv.crce.crce_component_collection.api.bean;
 
-public class ComponentBean {
+public class CollectionBean {
     private String id;
     private String name;
     private String version;
-    private boolean composite;
+    private boolean collection;
 
-    public ComponentBean(String id, String name, String version, boolean composite) {
+    public CollectionBean(String id, String name, String version, boolean collection) {
         this.id = id;
         this.name = name;
         this.version = version;
-        this.composite = composite;
+        this.collection = collection;
     }
 
     public String getId() { return id; }
@@ -33,9 +33,9 @@ public class ComponentBean {
         this.version = version;
     }
 
-    public boolean isComposite() { return composite; }
+    public boolean isCollection() { return collection; }
 
-    public void setComposite(boolean composite) { this.composite = composite; }
+    public void setCollection(boolean collection) { this.collection = collection; }
 
     @Override
     public String toString(){

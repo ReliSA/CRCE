@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_webui_v2.versioning.classes;
+package cz.zcu.kiv.crce.crce_webui_v2.collection.classes;
 
 import java.nio.charset.Charset;
 import java.util.Random;

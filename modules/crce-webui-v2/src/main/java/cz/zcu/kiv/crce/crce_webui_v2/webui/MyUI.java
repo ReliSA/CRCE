@@ -8,11 +8,14 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import cz.zcu.kiv.crce.crce_component_versioning.api.bean.ComponentBean;
+import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
+import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionRangeParamDetailForm;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CentralMavenForm;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CheckMavenIndexForm;
@@ -25,9 +28,9 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.PluginsForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.StoreForm;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
-import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningEditForm;
-import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningForm;
-import cz.zcu.kiv.crce.crce_webui_v2.versioning.VersioningNewForm;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionEditForm;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionForm;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionNewForm;
 
 
 /**
@@ -51,9 +54,10 @@ public class MyUI extends UI {
 	private LoadFileForm loadFileForm;
 	private BufferForm bufferForm;
 	private StoreForm storeForm;
-	private VersioningForm versioningForm;
-	private VersioningNewForm versioningNewForm;
-	private VersioningEditForm versioningEditForm;
+	private CollectionForm collectionForm;
+	private CollectionNewForm collectionNewForm;
+	private CollectionEditForm collectionEditForm;
+	private CollectionRangeParamDetailForm collectionRangeParamDetailForm;
 	private ArtefactDetailForm artefactDetailForm;
 	private PluginsForm pluginsForm;
 	private SettingsForm settingsForm;
@@ -151,23 +155,28 @@ public class MyUI extends UI {
     	body.setContent(storeForm);
     }
 
-    public void setContentBodyVersioning(){
-		versioningForm = new VersioningForm(this);
-		body.setContent(versioningForm);
+    public void setContentBodyCollection(){
+		collectionForm = new CollectionForm(this);
+		body.setContent(collectionForm);
 	}
 
-	public void setContentBodyVersioningNew(){
-		versioningNewForm = new VersioningNewForm(this);
-		body.setContent(versioningNewForm);
+	public void setContentBodyCollectionNew(){
+		collectionNewForm = new CollectionNewForm(this);
+		body.setContent(collectionNewForm);
 	}
 
-	public void setContentBodyVersioningEdit(ComponentBean componentBean){
-		versioningEditForm = new VersioningEditForm(this, componentBean);
-		body.setContent(versioningEditForm);
+	public void setContentBodyCollectionEdit(CollectionBean collectionBean){
+		collectionEditForm = new CollectionEditForm(this, collectionBean);
+		body.setContent(collectionEditForm);
+	}
+
+	public void setContentBodyCollectionRangeParamDetailForm(CollectionDetailBean collectionDetailBean, FormLayout returnPage){
+		collectionRangeParamDetailForm = new CollectionRangeParamDetailForm(this, collectionDetailBean, returnPage);
+		body.setContent(collectionRangeParamDetailForm);
 	}
     
-    public void setContentArtefactDetailForm(ResourceBean resourceBean, boolean isFromStore){
-    	artefactDetailForm = new ArtefactDetailForm(this, resourceBean, isFromStore);
+    public void setContentArtefactDetailForm(ResourceBean resourceBean, FormLayout returnPage){
+    	artefactDetailForm = new ArtefactDetailForm(this, resourceBean, returnPage);
     	body.setContent(artefactDetailForm);
     }
     
@@ -180,5 +189,9 @@ public class MyUI extends UI {
     	settingsForm = new SettingsForm(this.getSession());
     	body.setContent(settingsForm);
     }
+
+    public void setContentExistingPage(FormLayout existingPage){
+		body.setContent(existingPage);
+	}
 }
 

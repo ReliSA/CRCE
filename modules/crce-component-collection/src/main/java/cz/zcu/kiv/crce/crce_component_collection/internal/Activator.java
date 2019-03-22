@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_component_versioning.internal;
+package cz.zcu.kiv.crce.crce_component_collection.internal;
 
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -25,7 +25,7 @@ public class Activator extends DependencyActivatorBase {
         instance = this;
 
         manager.add(createComponent().setImplementation(this));
-        logger.debug("Component versioning activator initialized.");
+        logger.debug("Component collection activator initialized.");
     }
 
     @Override

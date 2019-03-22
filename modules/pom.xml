@@ -52,7 +52,7 @@
         <!--<module>crce-metadata-cosi-bundle</module>-->
         <!--<module>crce-efp-indexer</module>-->
         <module>crce-external-repository</module>
-        <module>crce-component-versioning</module>
+        <module>crce-component-collection</module>
 
         <!-- Libraries -->
         <!--<module>crce-efp-assignment</module>-->
