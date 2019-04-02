@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1552830051756
-Build-Jdk: 1.8.0_191
-Built-By: zdenda
+Bnd-LastModified: 1554105023392
+Build-Jdk: 1.8.0_202
+Built-By: rpesek
 Bundle-Activator: cz.zcu.kiv.crce.crce_external_repository.internal.Acti
  vator
 Bundle-ClassPath: .,lib/aether-api-1.13.1.jar,lib/aether-util-1.13.1.jar
@@ -10,19 +10,16 @@ Bundle-ClassPath: .,lib/aether-api-1.13.1.jar,lib/aether-util-1.13.1.jar
  ort-http-1.1.0.jar,lib/maven-aether-provider-3.3.9.jar,lib/maven-artifa
  ct-3.3.9.jar,lib/maven-builder-support-3.3.9.jar,lib/slf4j-simple-1.7.2
  2.jar,lib/jsoup-1.10.3.jar,lib/commons-codec-1.6.jar,lib/maven-model-3.
- 3.9.jar,lib/maven-model-builder-3.3.9.jar,lib/flute-1.3.0.gg2.jar,lib/o
- rg.apache.httpcomponents.httpcore-4.3.2.jar,lib/org.apache.httpcomponen
- ts.httpclient-4.3.5.jar,lib/guava-18.0.jar,lib/sac-1.3.jar,lib/maven-re
- pository-metadata-3.3.9.jar,lib/org.codehaus.plexus.plexus-component-an
- notations-1.6.jar,lib/org.codehaus.plexus.plexus-interpolation-1.21.jar
- ,lib/org.codehaus.plexus.plexus-utils-3.0.22.jar,lib/org.eclipse.sisu.p
- lexus-0.3.3.jar,lib/org.eclipse.sisu.inject-0.3.3.jar,lib/indexer-core-
- 5.1.2-4333789.jar,lib/wagon-http-lightweight-2.3.jar,lib/wagon-provider
- -api-2.3.jar,lib/wagon-http-shared4-2.3.jar,lib/indexer-artifact-5.1.2-
- 4333789.jar,lib/lucene-core-3.6.2.jar,lib/lucene-queries-3.6.2.jar,lib/
- lucene-memory-3.6.2.jar,lib/lucene-highlighter-3.6.2.jar,lib/javax.anno
- tation-api-1.2.jar,lib/javax.ws.rs-api-2.0.jar,lib/jersey-container-ser
- vlet-core-2.9.1.jar,lib/jersey-media-multipart-2.9.1.jar
+ 3.9.jar,lib/maven-model-builder-3.3.9.jar,lib/flute-1.3.0.gg2.jar,lib/h
+ ttpcore-4.3.2.jar,lib/httpclient-4.3.5.jar,lib/guava-18.0.jar,lib/sac-1
+ .3.jar,lib/maven-repository-metadata-3.3.9.jar,lib/plexus-component-ann
+ otations-1.6.jar,lib/plexus-interpolation-1.21.jar,lib/plexus-utils-3.0
+ .22.jar,lib/org.eclipse.sisu.plexus-0.3.3.jar,lib/org.eclipse.sisu.inje
+ ct-0.3.3.jar,lib/indexer-core-5.1.2-4333789.jar,lib/wagon-http-lightwei
+ ght-2.3.jar,lib/wagon-provider-api-2.3.jar,lib/wagon-http-shared4-2.3.j
+ ar,lib/indexer-artifact-5.1.2-4333789.jar,lib/lucene-core-3.6.2.jar,lib
+ /lucene-queries-3.6.2.jar,lib/lucene-memory-3.6.2.jar,lib/lucene-highli
+ ghter-3.6.2.jar,lib/javax.annotation-api-1.2.jar
 Bundle-Description: Component Repository supporting Compatibility Evalua
  tion
 Bundle-DocURL: http://www.kiv.zcu.cz
@@ -54,39 +51,31 @@ Embedded-Artifacts: lib/aether-api-1.13.1.jar;g="org.sonatype.aether";a=
  .6",lib/maven-model-3.3.9.jar;g="org.apache.maven";a="maven-model";v="3
  .3.9",lib/maven-model-builder-3.3.9.jar;g="org.apache.maven";a="maven-m
  odel-builder";v="3.3.9",lib/flute-1.3.0.gg2.jar;g="com.vaadin.external.
- flute";a="flute";v="1.3.0.gg2",lib/org.apache.httpcomponents.httpcore-4
- .3.2.jar;g="cz.zcu.kiv.crce.wrapper";a="org.apache.httpcomponents.httpc
- ore";v="4.3.2",lib/org.apache.httpcomponents.httpclient-4.3.5.jar;g="cz
- .zcu.kiv.crce.wrapper";a="org.apache.httpcomponents.httpclient";v="4.3.
- 5",lib/guava-18.0.jar;g="com.google.guava";a="guava";v="18.0",lib/sac-1
- .3.jar;g="org.w3c.css";a="sac";v="1.3",lib/maven-repository-metadata-3.
- 3.9.jar;g="org.apache.maven";a="maven-repository-metadata";v="3.3.9",li
- b/org.codehaus.plexus.plexus-component-annotations-1.6.jar;g="cz.zcu.ki
- v.crce.wrapper";a="org.codehaus.plexus.plexus-component-annotations";v=
- "1.6",lib/org.codehaus.plexus.plexus-interpolation-1.21.jar;g="cz.zcu.k
- iv.crce.wrapper";a="org.codehaus.plexus.plexus-interpolation";v="1.21",
- lib/org.codehaus.plexus.plexus-utils-3.0.22.jar;g="cz.zcu.kiv.crce.wrap
- per";a="org.codehaus.plexus.plexus-utils";v="3.0.22",lib/org.eclipse.si
- su.plexus-0.3.3.jar;g="org.eclipse.sisu";a="org.eclipse.sisu.plexus";v=
- "0.3.3",lib/org.eclipse.sisu.inject-0.3.3.jar;g="org.eclipse.sisu";a="o
- rg.eclipse.sisu.inject";v="0.3.3",lib/indexer-core-5.1.2-4333789.jar;g=
- "org.apache.maven.indexer";a="indexer-core";v="5.1.2-4333789",lib/wagon
- -http-lightweight-2.3.jar;g="org.apache.maven.wagon";a="wagon-http-ligh
- tweight";v="2.3",lib/wagon-provider-api-2.3.jar;g="org.apache.maven.wag
- on";a="wagon-provider-api";v="2.3",lib/wagon-http-shared4-2.3.jar;g="or
- g.apache.maven.wagon";a="wagon-http-shared4";v="2.3",lib/indexer-artifa
- ct-5.1.2-4333789.jar;g="org.apache.maven.indexer";a="indexer-artifact";
- v="5.1.2-4333789",lib/lucene-core-3.6.2.jar;g="org.apache.lucene";a="lu
- cene-core";v="3.6.2",lib/lucene-queries-3.6.2.jar;g="org.apache.lucene"
- ;a="lucene-queries";v="3.6.2",lib/lucene-memory-3.6.2.jar;g="org.apache
- .lucene";a="lucene-memory";v="3.6.2",lib/lucene-highlighter-3.6.2.jar;g
- ="org.apache.lucene";a="lucene-highlighter";v="3.6.2",lib/javax.annotat
- ion-api-1.2.jar;g="javax.annotation";a="javax.annotation-api";v="1.2",l
- ib/javax.ws.rs-api-2.0.jar;g="javax.ws.rs";a="javax.ws.rs-api";v="2.0",
- lib/jersey-container-servlet-core-2.9.1.jar;g="org.glassfish.jersey.con
- tainers";a="jersey-container-servlet-core";v="2.9.1",lib/jersey-media-m
- ultipart-2.9.1.jar;g="org.glassfish.jersey.media";a="jersey-media-multi
- part";v="2.9.1"
+ flute";a="flute";v="1.3.0.gg2",lib/httpcore-4.3.2.jar;g="org.apache.htt
+ pcomponents";a="httpcore";v="4.3.2",lib/httpclient-4.3.5.jar;g="org.apa
+ che.httpcomponents";a="httpclient";v="4.3.5",lib/guava-18.0.jar;g="com.
+ google.guava";a="guava";v="18.0",lib/sac-1.3.jar;g="org.w3c.css";a="sac
+ ";v="1.3",lib/maven-repository-metadata-3.3.9.jar;g="org.apache.maven";
+ a="maven-repository-metadata";v="3.3.9",lib/plexus-component-annotation
+ s-1.6.jar;g="org.codehaus.plexus";a="plexus-component-annotations";v="1
+ .6",lib/plexus-interpolation-1.21.jar;g="org.codehaus.plexus";a="plexus
+ -interpolation";v="1.21",lib/plexus-utils-3.0.22.jar;g="org.codehaus.pl
+ exus";a="plexus-utils";v="3.0.22",lib/org.eclipse.sisu.plexus-0.3.3.jar
+ ;g="org.eclipse.sisu";a="org.eclipse.sisu.plexus";v="0.3.3",lib/org.ecl
+ ipse.sisu.inject-0.3.3.jar;g="org.eclipse.sisu";a="org.eclipse.sisu.inj
+ ect";v="0.3.3",lib/indexer-core-5.1.2-4333789.jar;g="org.apache.maven.i
+ ndexer";a="indexer-core";v="5.1.2-4333789",lib/wagon-http-lightweight-2
+ .3.jar;g="org.apache.maven.wagon";a="wagon-http-lightweight";v="2.3",li
+ b/wagon-provider-api-2.3.jar;g="org.apache.maven.wagon";a="wagon-provid
+ er-api";v="2.3",lib/wagon-http-shared4-2.3.jar;g="org.apache.maven.wago
+ n";a="wagon-http-shared4";v="2.3",lib/indexer-artifact-5.1.2-4333789.ja
+ r;g="org.apache.maven.indexer";a="indexer-artifact";v="5.1.2-4333789",l
+ ib/lucene-core-3.6.2.jar;g="org.apache.lucene";a="lucene-core";v="3.6.2
+ ",lib/lucene-queries-3.6.2.jar;g="org.apache.lucene";a="lucene-queries"
+ ;v="3.6.2",lib/lucene-memory-3.6.2.jar;g="org.apache.lucene";a="lucene-
+ memory";v="3.6.2",lib/lucene-highlighter-3.6.2.jar;g="org.apache.lucene
+ ";a="lucene-highlighter";v="3.6.2",lib/javax.annotation-api-1.2.jar;g="
+ javax.annotation";a="javax.annotation-api";v="1.2"
 Export-Package: cz.zcu.kiv.crce.crce_external_repository.api;uses:="org.
  apache.maven.index";version="1.0.0",org.apache.maven.index;uses:="org.a
  pache.maven.index.artifact,org.apache.maven.index.context,org.apache.ma
@@ -126,6 +115,6 @@ Export-Package: cz.zcu.kiv.crce.crce_external_repository.api;uses:="org.
  source;version="1.0.0",org.apache.maven.wagon.shared.http4;uses:="org.a
  pache.maven.wagon,org.apache.maven.wagon.authorization,org.apache.maven
  .wagon.repository,org.apache.maven.wagon.resource";version="1.0.0",java
- x.inject;version=1
+ x.inject;version="1.0.0"
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Tool: Bnd-3.3.0.201609221906

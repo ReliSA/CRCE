@@ -3,11 +3,7 @@ package cz.zcu.kiv.crce.crce_webui_v2.webui;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.*;
 import com.vaadin.ui.MenuBar.MenuItem;
 
 @SuppressWarnings("serial")
@@ -28,7 +24,7 @@ public class MenuForm extends FormLayout{
 		upload.addItem("Local", e ->{myUI.setContentBodyLocalMaven();});
 		upload.addItem("Central", e ->{myUI.setContentBodyCentralMaven();});
 		upload.addItem("Defined", e ->{myUI.setContentBodyDefinedMaven();});
-		upload.addItem("File/url", e ->{myUI.setContentBodyLoadFile();});
+		upload.addItem("File/Url", e ->{myUI.setContentBodyLoadFile();});
 		
 		// submenu repository
 		repository.addItem("Buffer", e ->{myUI.setContentBodyBuffer();});
@@ -40,8 +36,9 @@ public class MenuForm extends FormLayout{
 		versioning.addItem("List collections", e -> {myUI.setContentBodyCollection();});
 		
 		// submenu settings
-		settings.addItem("Index", e ->{myUI.setContentBodyCheckMavenIndexForm();});
-		settings.addItem("Paths", e ->{myUI.setContentSettings();});
+		settings.addItem("Check Maven index", e ->{myUI.setContentBodyCheckMavenIndexForm();});
+		settings.addItem("Option repository", e ->{myUI.setContentSettingsUrl();});
+		settings.addItem("Option collection", e ->{myUI.setContentSettingsRange();});
 		
 		// Menu login
 		MenuBar menuLogin = new MenuBar();

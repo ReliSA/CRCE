@@ -1,17 +1,7 @@
 package cz.zcu.kiv.crce.crce_webui_v2.repository.services;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
-
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -19,6 +9,11 @@ import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.osgi.namespace.NsOsgiBundle;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.metadata.type.Version;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.*;
 
 public class ResourceService implements Serializable{
 	private static final long serialVersionUID = 6161700434751771631L;
@@ -175,7 +170,7 @@ public class ResourceService implements Serializable{
 		return arrayList;
 	}
 	
-	public boolean removeResorceFromStore(VaadinSession session, Resource resource){
+	public boolean removeResourceFromStore(VaadinSession session, Resource resource){
 		boolean result;
 		try {
 			result = Activator.instance().getStore(getRepositoryId(session)).remove(resource);
@@ -186,7 +181,12 @@ public class ResourceService implements Serializable{
 		return result;
 	}
 
-	private String getRepositoryId(VaadinSession session) {
+	public Resource getResourceFromStore(VaadinSession session, String uid){
+		Resource resource = Activator.instance().getStore(getRepositoryId(session)).getResource(uid,true);
+		return resource;
+	}
+
+	public String getRepositoryId(VaadinSession session) {
 		String id = (String) session.getAttribute("repositoryId");
 		if (id == null) {
 			Map<String, String> stores = Activator.instance().getRepositories();

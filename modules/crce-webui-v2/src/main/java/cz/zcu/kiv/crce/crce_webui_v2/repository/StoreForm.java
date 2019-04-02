@@ -1,10 +1,5 @@
 package cz.zcu.kiv.crce.crce_webui_v2.repository;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.FileDownloader;
@@ -14,24 +9,17 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.PopupView;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class StoreForm extends FormLayout{
 	private static final long serialVersionUID = 7439970261502810719L;
@@ -39,6 +27,7 @@ public class StoreForm extends FormLayout{
 	private TextField idText = new TextField();
 	private Grid gridStore = new Grid();
 	private PopupView popup;
+	private FileDownloader fd;
 	private transient ResourceBean resourceBeanSelect = null;
 	private ResourceService resourceService;
 	
@@ -121,7 +110,11 @@ public class StoreForm extends FormLayout{
 				File srcFile = new File(resourceService.getUri(resourceBeanSelect.getResource()));
 				StreamResource res = createFileResource(srcFile);
 				res.setFilename(resourceService.getFileName(resourceBeanSelect.getResource()));
-				FileDownloader fd = new FileDownloader(res);
+				// clear previous button extensions
+				if(fd != null && buttonDownload.getExtensions().contains(fd)){
+					buttonDownload.removeExtension(fd);
+				}
+				fd = new FileDownloader(res);
 				fd.extend(buttonDownload);
 				buttonLayout.setVisible(true);
 			}
@@ -138,7 +131,7 @@ public class StoreForm extends FormLayout{
 		buttonRemove.addClickListener(e ->{
 			popup.setPopupVisible(true);
 			yesRemoveButton.addClickListener(ev -> {
-				boolean result = resourceService.removeResorceFromStore(myUI.getSession(), resourceBeanSelect.getResource());
+				boolean result = resourceService.removeResourceFromStore(myUI.getSession(), resourceBeanSelect.getResource());
 				if(result){
 					Notification notif = new Notification("Info", "Artifact sucess removed",
 							Notification.Type.ASSISTIVE_NOTIFICATION);

@@ -1,31 +1,19 @@
 package cz.zcu.kiv.crce.crce_webui_v2.repository;
 
-import java.util.List;
-
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.PopupView;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
+
+import java.util.List;
 
 public class BufferForm extends FormLayout{
 	private static final long serialVersionUID = 6675695008606881678L;
@@ -42,7 +30,7 @@ public class BufferForm extends FormLayout{
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		
 		resourceService = new ResourceService(Activator.instance().getMetadataService());
-		
+
 		Button buttonDetail = new Button("Detail");
 		buttonDetail.setWidth("100px");
 		Button buttonRemove = new Button("Remove");

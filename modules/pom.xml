@@ -58,8 +58,8 @@
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <!--<module>crce-handler-metrics</module>-->
-        <!--<module>crce-webui</module>-->
+        <!-- <module>crce-handler-metrics</module> --> <!-- findbugs - 1 bugs -->
+        <module>crce-webui-v2</module>
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
@@ -69,13 +69,10 @@
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>
         <module>crce-vo</module>
-        <module>crce-webui-v2</module>
 
         <!--<module>crce-repository-maven-impl</module>-->
         
-        <module>crce-webservices-indexer</module>
-
-		<module>crce-default-modules</module>
+        <!--<module>crce-webservices-indexer</module>-->
     </modules>
 
     <profiles>

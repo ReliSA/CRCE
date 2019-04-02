@@ -2,9 +2,7 @@ package cz.zcu.kiv.crce.crce_webui_v2.collection;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinSession;
+import com.vaadin.server.*;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
@@ -12,12 +10,18 @@ import com.vaadin.ui.themes.ValoTheme;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
 import cz.zcu.kiv.crce.crce_component_collection.api.impl.CollectionService;
+import cz.zcu.kiv.crce.crce_component_collection.api.impl.ExportCollectionService;
+import cz.zcu.kiv.crce.crce_component_collection.api.impl.LimitRange;
+import cz.zcu.kiv.crce.crce_component_collection.api.settings.SettingsLimitRange;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.classes.RandomStringGenerator;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.services.FindCollectionService;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
-import cz.zcu.kiv.crce.crce_webui_v2.collection.services.FindCollectionService;
-import cz.zcu.kiv.crce.crce_webui_v2.collection.classes.RandomStringGenerator;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
+
+import java.io.*;
+import java.util.zip.ZipOutputStream;
 
 public class CollectionForm extends FormLayout {
     private static final long serialVersionUID = 7439970261502810719L;
@@ -28,13 +32,27 @@ public class CollectionForm extends FormLayout {
     private Tree treeDetailCollection = new Tree();
     private PopupView popupRemove;
     private PopupView popupCopy;
+    private FileDownloader fd;
     private ResourceService resourceService;
     private transient CollectionService collectionService;
     private transient FindCollectionService findCollectionService;
     private transient CollectionBean collectionBeanSelect;
     private transient RandomStringGenerator randomStringGenerator;
+    private transient ExportCollectionService exportCollectionService;
+    private String exportPathText;
+    private LimitRange limitExportArtifactRange;
 
     public CollectionForm(MyUI myUI){
+        if (myUI.getSession().getAttribute("exportArtifactRange") == null) {
+            SettingsLimitRange settingsRange = new SettingsLimitRange();
+            exportPathText = settingsRange.getExportPath();
+            limitExportArtifactRange = settingsRange.getExportArtifactRange();
+        } else {
+            exportPathText = ((SettingsLimitRange) myUI.getSession().getAttribute("exportArtifactRange")).getExportPath();
+            limitExportArtifactRange = ((SettingsLimitRange) myUI.getSession()
+                   .getAttribute("exportArtifactRange")).getExportArtifactRange();
+        }
+
         VerticalLayout content = new VerticalLayout();
         VerticalLayout formLayout = new VerticalLayout();
         HorizontalLayout gridTreeLayout = new HorizontalLayout();
@@ -46,13 +64,16 @@ public class CollectionForm extends FormLayout {
         collectionService = new CollectionService();
         resourceService = new ResourceService(Activator.instance().getMetadataService());
         randomStringGenerator = new RandomStringGenerator();
+        exportCollectionService = new ExportCollectionService();
 
         Button buttonEdit = new Button("Edit");
         buttonEdit.setWidth("100px");
         Button buttonCopy = new Button("Copy");
         buttonCopy.setWidth("100px");
         Button buttonRemove = new Button("Remove");
-        Button downloadButton = new Button("Download");
+        Button buttonPrepare= new Button("Prepare");
+        Button buttonDownload = new Button("Download");
+        buttonDownload.setEnabled(false);
 
         buttonEdit.setStyleName(ValoTheme.BUTTON_PRIMARY);
         buttonEdit.setClickShortcut(ShortcutAction.KeyCode.ENTER);
@@ -129,7 +150,7 @@ public class CollectionForm extends FormLayout {
         popupCopy = new PopupView(null, panelCopy);
         popupCopy.setWidth("250px");
 
-        buttonLayout.addComponents(buttonEdit, buttonCopy, buttonRemove, downloadButton);
+        buttonLayout.addComponents(buttonEdit, buttonCopy, buttonRemove, buttonPrepare, buttonDownload);
         buttonLayout.setSpacing(true);
         buttonLayout.setVisible(false);
 
@@ -174,6 +195,7 @@ public class CollectionForm extends FormLayout {
                 treeDetailCollectionButtonLayout.setVisible(false);
                 buttonLayout.setVisible(false);
             }
+            buttonDownload.setEnabled(false);
         });
 
         buttonDetail.addClickListener(e ->{
@@ -241,10 +263,51 @@ public class CollectionForm extends FormLayout {
             myUI.setContentBodyCollectionEdit(collectionBeanSelect);
         });
 
+        buttonPrepare.addClickListener(e ->{
+            String textPath = exportPathText + File.separator + myUI.getSession().getSession().getId();
+            File path = new File(textPath);
+            if(exportCollectionService.exportCollection(collectionBeanSelect.getId(), path,
+                    resourceService.getRepositoryId(myUI.getSession()), limitExportArtifactRange)){
+                // prepare zip file
+                try{
+                    String sourceFile = textPath + File.separator + collectionBeanSelect.getName() + "-"
+                            + collectionBeanSelect.getVersion();
+                    String desFile = textPath + File.separator + collectionBeanSelect.getName() + "-"
+                            + collectionBeanSelect.getVersion() + ".zip";
+                    FileOutputStream fos = new FileOutputStream(desFile);
+                    ZipOutputStream zipOut = new ZipOutputStream(fos);
+                    File fileToZip = new File(sourceFile);
+                    exportCollectionService.zipFile(fileToZip, fileToZip.getName(), zipOut);
+                    zipOut.close();
+                    fos.close();
+                    // prepare stream to download
+                    File srcFile = new File(desFile);
+                    StreamResource res = createFileResource(srcFile);
+                    res.setFilename(collectionBeanSelect.getName() + "-" + collectionBeanSelect.getVersion() + ".zip");
+                    // clear previous button extensions
+                    if(fd != null && buttonDownload.getExtensions().contains(fd)){
+                        buttonDownload.removeExtension(fd);
+                    }
+                    fd = new FileDownloader(res);
+                    fd.extend(buttonDownload);
+                    buttonDownload.setEnabled(true);
+                }
+                catch(IOException ex){
+                    new Notification("Unable to create zip file.", Notification.Type.WARNING_MESSAGE)
+                            .show(Page.getCurrent());
+                    ex.printStackTrace();
+                }
+            }
+            else{
+                new Notification("Error preparing version export files.", Notification.Type.WARNING_MESSAGE)
+                        .show(Page.getCurrent());
+            }
+        });
+
         addComponent(content);
     }
 
-    void fillTreeDetailComponent(String idCollection, String parent, VaadinSession session){
+    private void fillTreeDetailComponent(String idCollection, String parent, VaadinSession session){
         CollectionDetailBean collectionDetailBean = collectionService.getCollectionComponentDetail(idCollection);
 
         if(collectionDetailBean != null) {
@@ -274,5 +337,23 @@ public class CollectionForm extends FormLayout {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("serial")
+    private StreamResource createFileResource(File file) {
+        StreamResource sr = new StreamResource(new StreamResource.StreamSource() {
+            @Override
+            public InputStream getStream() {
+                try {
+                    return new FileInputStream(file);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }, null);
+        sr.setCacheTime(0);
+        return sr;
     }
 }
