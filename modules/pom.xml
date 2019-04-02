@@ -86,7 +86,7 @@
 
         <!--<module>crce-repository-maven-impl</module>-->
         
-        <module>crce-webservices-indexer</module>
+        <!--<module>crce-webservices-indexer</module>-->
     </modules>
 
     <profiles>

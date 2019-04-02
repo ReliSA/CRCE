@@ -96,7 +96,6 @@ public class Activator extends DependencyActivatorBase {
 				stores.put(id, name != null ? name : id);
 			}
 		}
-
 		return stores;
 	}
 

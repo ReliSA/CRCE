@@ -15,6 +15,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
+import cz.zcu.kiv.crce.crce_component_collection.api.settings.SettingsLimitRange;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionRangeParamDetailForm;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.CentralMavenForm;
@@ -31,6 +32,14 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionEditForm;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionForm;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionNewForm;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 
 /**
@@ -60,7 +69,8 @@ public class MyUI extends UI {
 	private CollectionRangeParamDetailForm collectionRangeParamDetailForm;
 	private ArtefactDetailForm artefactDetailForm;
 	private PluginsForm pluginsForm;
-	private SettingsForm settingsForm;
+	private SettingsUrlForm settingsUrlForm;
+	private SettingRangeForm settingsRangeForm;
 	private VerticalLayout content = new VerticalLayout();
 	
 	@Override
@@ -84,8 +94,8 @@ public class MyUI extends UI {
 		head.setContent(menu);
 
 		// body components
-		LogoBackground logoBackgroung = new LogoBackground();
-		body.setContent(logoBackgroung);
+		LogoBackground logoBackground = new LogoBackground();
+		body.setContent(logoBackground);
 
 		// about component
 		AboutForm about = new AboutForm();
@@ -115,6 +125,36 @@ public class MyUI extends UI {
 		ResourceService resourceService = new ResourceService(Activator.instance().getMetadataService());
 		resourceService.clearBuffer(getSession().getSession());
 		getSession().setAttribute("settingsUrl", null);
+		String exportPathText;
+		// remove export path from collection
+		if (getSession().getAttribute("exportArtifactRange") == null) {
+			SettingsLimitRange settingsRange = new SettingsLimitRange();
+			exportPathText = settingsRange.getExportPath();
+		} else {
+			exportPathText = ((SettingsLimitRange) getSession().getAttribute("exportArtifactRange")).getExportPath();
+		}
+		File file = new File(exportPathText + File.separator + getSession().getSession().getId());
+		if(file.exists()){
+			Path directory = file.toPath();
+			try {
+				Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+					@Override
+					public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+						Files.delete(file);
+						return FileVisitResult.CONTINUE;
+					}
+
+					@Override
+					public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+						Files.delete(dir);
+						return FileVisitResult.CONTINUE;
+					}
+				});
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+		getSession().setAttribute("exportArtifactRange", null);
 		getSession().getSession().invalidate();
 		Page.getCurrent().setLocation(VaadinServlet.getCurrent().getServletContext().getContextPath());
 		content.removeAllComponents();
@@ -185,10 +225,15 @@ public class MyUI extends UI {
     	body.setContent(pluginsForm);
     }
     
-    public void setContentSettings(){
-    	settingsForm = new SettingsForm(this.getSession());
-    	body.setContent(settingsForm);
+    public void setContentSettingsUrl(){
+    	settingsUrlForm = new SettingsUrlForm(this.getSession());
+    	body.setContent(settingsUrlForm);
     }
+
+	public void setContentSettingsRange(){
+		settingsRangeForm = new SettingRangeForm(this.getSession());
+		body.setContent(settingsRangeForm);
+	}
 
     public void setContentExistingPage(FormLayout existingPage){
 		body.setContent(existingPage);

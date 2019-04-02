@@ -175,7 +175,7 @@ public class ResourceService implements Serializable{
 		return arrayList;
 	}
 	
-	public boolean removeResorceFromStore(VaadinSession session, Resource resource){
+	public boolean removeResourceFromStore(VaadinSession session, Resource resource){
 		boolean result;
 		try {
 			result = Activator.instance().getStore(getRepositoryId(session)).remove(resource);
@@ -186,7 +186,12 @@ public class ResourceService implements Serializable{
 		return result;
 	}
 
-	private String getRepositoryId(VaadinSession session) {
+	public Resource getResourceFromStore(VaadinSession session, String uid){
+		Resource resource = Activator.instance().getStore(getRepositoryId(session)).getResource(uid,true);
+		return resource;
+	}
+
+	public String getRepositoryId(VaadinSession session) {
 		String id = (String) session.getAttribute("repositoryId");
 		if (id == null) {
 			Map<String, String> stores = Activator.instance().getRepositories();

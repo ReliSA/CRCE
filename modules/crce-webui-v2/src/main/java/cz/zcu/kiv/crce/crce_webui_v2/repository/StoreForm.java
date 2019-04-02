@@ -39,6 +39,7 @@ public class StoreForm extends FormLayout{
 	private TextField idText = new TextField();
 	private Grid gridStore = new Grid();
 	private PopupView popup;
+	private FileDownloader fd;
 	private transient ResourceBean resourceBeanSelect = null;
 	private ResourceService resourceService;
 	
@@ -121,7 +122,11 @@ public class StoreForm extends FormLayout{
 				File srcFile = new File(resourceService.getUri(resourceBeanSelect.getResource()));
 				StreamResource res = createFileResource(srcFile);
 				res.setFilename(resourceService.getFileName(resourceBeanSelect.getResource()));
-				FileDownloader fd = new FileDownloader(res);
+				// clear previous button extensions
+				if(fd != null && buttonDownload.getExtensions().contains(fd)){
+					buttonDownload.removeExtension(fd);
+				}
+				fd = new FileDownloader(res);
 				fd.extend(buttonDownload);
 				buttonLayout.setVisible(true);
 			}
@@ -138,7 +143,7 @@ public class StoreForm extends FormLayout{
 		buttonRemove.addClickListener(e ->{
 			popup.setPopupVisible(true);
 			yesRemoveButton.addClickListener(ev -> {
-				boolean result = resourceService.removeResorceFromStore(myUI.getSession(), resourceBeanSelect.getResource());
+				boolean result = resourceService.removeResourceFromStore(myUI.getSession(), resourceBeanSelect.getResource());
 				if(result){
 					Notification notif = new Notification("Info", "Artifact sucess removed",
 							Notification.Type.ASSISTIVE_NOTIFICATION);

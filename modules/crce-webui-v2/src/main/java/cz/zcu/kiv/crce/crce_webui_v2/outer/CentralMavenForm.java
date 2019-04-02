@@ -46,7 +46,7 @@ public class CentralMavenForm extends FormLayout {
 	private TextField version = new TextField("Version");
 	private TextField packaging = new TextField("Packaging");
 	private OptionGroup directIndexOption = new OptionGroup("Direct or search index");
-	private NativeSelect rangeOption = new NativeSelect("Range");
+	private NativeSelect rangeOption = new NativeSelect("LimitRange");
 	private Button searchButton = new Button("Search");
 	private Button clearButton = new Button("Clear");
 	private Label notFound = new Label("No artifact found");

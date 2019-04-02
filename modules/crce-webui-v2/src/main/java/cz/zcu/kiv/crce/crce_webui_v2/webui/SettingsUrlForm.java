@@ -5,28 +5,19 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-
 import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
 
-//import cz.zcu.kiv.crce.crce_webui_vaadin.outer.classes.SettingsUrl;
-
 @SuppressWarnings("serial")
-public class SettingsForm extends FormLayout {
+public class SettingsUrlForm extends FormLayout {
 	
-	public SettingsForm() {
+	public SettingsUrlForm() {
 		HorizontalLayout content = new HorizontalLayout();
 		addComponent(content);
 	}
 
-	public SettingsForm(VaadinSession session) {
+	public SettingsUrlForm(VaadinSession session) {
 		TextField centralMavenUrl = new TextField("Central Maven url");
 		TextField localAetherRepo = new TextField("Local Maven repository");
 		CheckBox enableDeleteLocalMaven = new CheckBox("Enable delete local Maven repo");
@@ -79,6 +70,7 @@ public class SettingsForm extends FormLayout {
 			settingsUrl.setLocalAetherUrl(localAetherRepo.getValue());
 			settingsUrl.setEnableDeleteLocalMaven(enableDeleteLocalMaven.getValue());
 			settingsUrl.setEnableGroupSearch(enableGroupSearch.getValue());
+
 			getSession().setAttribute("settingsUrl", settingsUrl);
 			Notification notif = new Notification("Info", "Settings saved successfully" ,
 					Notification.Type.ASSISTIVE_NOTIFICATION);

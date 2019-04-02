@@ -42,7 +42,7 @@ public class BufferForm extends FormLayout{
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		
 		resourceService = new ResourceService(Activator.instance().getMetadataService());
-		
+
 		Button buttonDetail = new Button("Detail");
 		buttonDetail.setWidth("100px");
 		Button buttonRemove = new Button("Remove");
