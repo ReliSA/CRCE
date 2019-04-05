@@ -14,7 +14,7 @@ public interface ExportCollectionServiceApi {
      *
      * @author Roman Pesek
      */
-    boolean exportCollection(String idCollection, File path, String idSession, LimitRange range);
+    boolean exportCollection(String idCollection, File path, String idSession, LimitRange range, boolean details);
 
     /**
      * Interfaces for archiving folder in the zip file.

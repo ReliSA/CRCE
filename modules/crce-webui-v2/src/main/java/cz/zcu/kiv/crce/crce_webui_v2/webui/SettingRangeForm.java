@@ -23,14 +23,17 @@ public class SettingRangeForm extends FormLayout {
         exportRangeArtifact.addItems(LimitRange.MAX, LimitRange.MIN);
         exportRangeArtifact.setItemCaption(LimitRange.MAX, "Only max");
         exportRangeArtifact.setItemCaption(LimitRange.MIN, "Only min");
+        CheckBox exportWithMetadata = new CheckBox("Export artifact whit metadata");
 
         if(session.getAttribute("exportArtifactRange") == null){
             exportPath.setValue("tmp");
             exportRangeArtifact.select(LimitRange.MAX);
+            exportWithMetadata.setValue(false);
         }
         else{
             exportPath.setValue(((SettingsLimitRange) session.getAttribute("exportArtifactRange")).getExportPath());
             exportRangeArtifact.select(((SettingsLimitRange) session.getAttribute("exportArtifactRange")).getExportArtifactRange());
+            exportWithMetadata.setValue(((SettingsLimitRange) session.getAttribute("exportArtifactRange")).isExportArtifactWithMetadata());
         }
 
         HorizontalLayout buttonsLayout = new HorizontalLayout();
@@ -43,7 +46,7 @@ public class SettingRangeForm extends FormLayout {
         saveButton.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
         VerticalLayout content = new VerticalLayout();
-        content.addComponents(exportPath ,exportRangeArtifact, buttonsLayout);
+        content.addComponents(exportPath ,exportRangeArtifact, exportWithMetadata, buttonsLayout);
 
         content.setSpacing(true);
 
@@ -61,6 +64,7 @@ public class SettingRangeForm extends FormLayout {
             }
             settingsRange.setExportPath(exportPath.getValue());
             settingsRange.setExportArtifactRange((LimitRange) exportRangeArtifact.getValue());
+            settingsRange.setExportArtifactWithMetadata(exportWithMetadata.getValue());
             getSession().setAttribute("exportArtifactRange", settingsRange);
             Notification notif = new Notification("Info", "Settings saved successfully ",
                     Notification.Type.ASSISTIVE_NOTIFICATION);
@@ -73,6 +77,7 @@ public class SettingRangeForm extends FormLayout {
             getSession().setAttribute("exportArtifactRange", settingsRange);
             exportPath.setValue("tmp");
             exportRangeArtifact.select(LimitRange.MAX);
+            exportWithMetadata.setValue(false);
         });
 
         addComponent(formLayout);

@@ -12,7 +12,7 @@
 	<!-- <groupId>cz.zcu.kiv.crce</groupId> -->
 	<artifactId>crce-webui-v2</artifactId>
 	<packaging>war</packaging>
-	<version>1.6</version>
+	<version>1.7</version>
 	<name>CRCE - Web UI</name>
 
 	<!-- <prerequisites> <maven>3</maven> </prerequisites> -->

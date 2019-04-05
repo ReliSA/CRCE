@@ -41,16 +41,20 @@ public class CollectionForm extends FormLayout {
     private transient ExportCollectionService exportCollectionService;
     private String exportPathText;
     private LimitRange limitExportArtifactRange;
+    private boolean exportWithDetails;
 
     public CollectionForm(MyUI myUI){
         if (myUI.getSession().getAttribute("exportArtifactRange") == null) {
             SettingsLimitRange settingsRange = new SettingsLimitRange();
             exportPathText = settingsRange.getExportPath();
             limitExportArtifactRange = settingsRange.getExportArtifactRange();
+            exportWithDetails = settingsRange.isExportArtifactWithMetadata();
         } else {
             exportPathText = ((SettingsLimitRange) myUI.getSession().getAttribute("exportArtifactRange")).getExportPath();
             limitExportArtifactRange = ((SettingsLimitRange) myUI.getSession()
                    .getAttribute("exportArtifactRange")).getExportArtifactRange();
+            exportWithDetails = ((SettingsLimitRange) myUI.getSession().getAttribute("exportArtifactRange"))
+                    .isExportArtifactWithMetadata();
         }
 
         VerticalLayout content = new VerticalLayout();
@@ -267,7 +271,7 @@ public class CollectionForm extends FormLayout {
             String textPath = exportPathText + File.separator + myUI.getSession().getSession().getId();
             File path = new File(textPath);
             if(exportCollectionService.exportCollection(collectionBeanSelect.getId(), path,
-                    resourceService.getRepositoryId(myUI.getSession()), limitExportArtifactRange)){
+                    resourceService.getRepositoryId(myUI.getSession()), limitExportArtifactRange, exportWithDetails)){
                 // prepare zip file
                 try{
                     String sourceFile = textPath + File.separator + collectionBeanSelect.getName() + "-"

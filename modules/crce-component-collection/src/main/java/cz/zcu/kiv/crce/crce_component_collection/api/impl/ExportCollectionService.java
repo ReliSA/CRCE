@@ -25,7 +25,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
      }
 
     @Override
-    public boolean exportCollection(String idCollection, File path, String idRepository, LimitRange range) {
+    public boolean exportCollection(String idCollection, File path, String idRepository, LimitRange range, boolean details) {
         if(!path.exists()){
             try{
                 path.mkdirs();
@@ -73,7 +73,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
                             Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
                             File artifactMetadataFile  = new File(nextPath + File.separator + "metadata-"
                                     + helperResource.getFileName(resource) + ".xml");
-                            helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource);
+                            helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource, details);
                         }
                         catch(IOException ex){
                             ex.printStackTrace();
@@ -93,7 +93,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
                             Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
                             File artifactMetadataFile  = new File(nextPath + File.separator + "metadata-"
                                     + helperResource.getFileName(resource) + ".xml");
-                            helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource);
+                            helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource, details);
                         }
                         catch(IOException ex){
                             ex.printStackTrace();
@@ -104,7 +104,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
             }
 
             for(String s : collectionDetailBean.getSpecificArtifacts()){
-                exportCollection(s, nextPath, idRepository, range);
+                exportCollection(s, nextPath, idRepository, range, details);
             }
         }
         // artefact in store
@@ -117,7 +117,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
                 Files.copy(originalPath, copied, StandardCopyOption.REPLACE_EXISTING);
                 File artifactMetadataFile  = new File(path + File.separator + "metadata-"
                         + helperResource.getFileName(resource) + ".xml");
-                helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource);
+                helperFileWriter.createArtifactMetadataXmlFile(artifactMetadataFile, resource, details);
             }
             catch(IOException ex){
                 ex.printStackTrace();
