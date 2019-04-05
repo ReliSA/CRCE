@@ -164,7 +164,7 @@ public class HelperResource {
                if(min.getMicro() == max.getMicro() && min.getMicro() == custom.getMicro()){
                    return true;
                }
-               else if(min.getMicro() <= custom.getMicro() && custom.getMicro() <= max.getMicro()){
+               else if(min.getMicro() <= custom.getMicro() && custom.getMicro() < max.getMicro()){
                    return true;
                }
                else {
@@ -179,8 +179,8 @@ public class HelperResource {
                    return false;
                }
            }
-           else if(max.getMinor() == custom.getMinor()){
-               if(custom.getMicro() <= max.getMicro()){
+           else if(custom.getMinor() == max.getMinor()){
+               if(custom.getMicro() < max.getMicro()){
                    return true;
                }
                else {
@@ -211,7 +211,7 @@ public class HelperResource {
                }
            }
        }
-       else if(max.getMajor() == custom.getMajor()){
+       else if(custom.getMajor() == max.getMajor()){
            if(custom.getMinor() < max.getMinor()){
                return true;
            }
@@ -220,7 +220,7 @@ public class HelperResource {
            }
            //(custom == max)
            else{
-               if(custom.getMicro() <= max.getMicro()){
+               if(custom.getMicro() < max.getMicro()){
                    return true;
                }
                else{

@@ -12,10 +12,10 @@ import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
 import cz.zcu.kiv.crce.crce_component_collection.api.impl.CollectionService;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.classes.ArtifactRangeBean;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.classes.ParameterBean;
+import cz.zcu.kiv.crce.crce_webui_v2.collection.services.FindCollectionService;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
-import cz.zcu.kiv.crce.crce_webui_v2.collection.services.FindCollectionService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 
 import java.util.ArrayList;
@@ -26,36 +26,38 @@ public class CollectionNewForm extends FormLayout{
     private Label labelDescription = new Label("Add a new collection");
     private TextField name = new TextField("name");
     private TextField version = new TextField("version");
-    private Label labelStore = new Label("Artifact in Store");
-    private Label labelCollection = new Label("Saved collection");
+    private TabSheet tabSheetSource = new TabSheet();
+    private TabSheet tabSheetTarget = new TabSheet();
+    private Label labelSource = new Label("Saved artifacts and collections, creating new parameters, " +
+            "and defining range-based artifacts:");
+    private Label labelTarget = new Label("Result list artifacts, existing collections, parameters, " +
+            "and artifacts with a defined version range in new collection:");
     private TextField idTextStore = new TextField();
     private TextField idTextCollection = new TextField();
-    private Grid gridStore = new Grid();
-    private Grid gridCollection = new Grid();
-    private Grid newCollectionGrid = new Grid();
+    private Grid gridSourceArtifact = new Grid();
+    private Grid gridSourceCollection = new Grid();
+    private Grid gridTargetArtifact = new Grid();
+    private Grid gridTargetCollection = new Grid();
     private TextField nameParameter = new TextField("Name parameter");
     private TextField valueParameter = new TextField("Value parameter");
-    private Grid newParameterGrid = new Grid();
-    private TextField nameRange = new TextField("Name artifact");
-    private TextField valueRange = new TextField("Version range");
-    private Grid newRangeGrid = new Grid();
+    private TextField nameRange = new TextField("Symbolic name of artifact");
+    private TextField valueRange = new TextField("Version range - example input: 1.0.0,2.0.0");
+    private Grid gridTargetParameter = new Grid();
+    private Grid gridTargetRange = new Grid();
     private ResourceService resourceService;
     private transient CollectionService collectionService;
     private transient FindCollectionService findCollectionService;
-    private transient ResourceBean resourceBeanSelect;
-    private transient CollectionBean collectionBeanSelect;
-    private transient CollectionBean newCollectionBeanSelect;
-    private transient ParameterBean newParameterBeanSelect;
-    private transient ArtifactRangeBean newArtifactRangeBeanSelect;
+    private transient ResourceBean resourceBeanSelectSource;
+    private transient ResourceBean resourceBeanSelectTarget;
+    private transient CollectionBean collectionBeanSelectSource;
+    private transient CollectionBean collectionBeanSelectTarget;
+    private transient ParameterBean parameterBeanSelect;
+    private transient ArtifactRangeBean artifactRangeBeanSelect;
 
     public CollectionNewForm(MyUI myUI){
         VerticalLayout content = new VerticalLayout();
-        VerticalLayout gridArtifactLayout = new VerticalLayout();
-        VerticalLayout gridCollectionLayout = new VerticalLayout();
-        VerticalLayout panelParameterLayout = new VerticalLayout();
-        VerticalLayout panelRangeLayout = new VerticalLayout();
-        HorizontalLayout gridArtifactCollectionLayout = new HorizontalLayout();
-        HorizontalLayout panelParameterRangeLayout = new HorizontalLayout();
+        VerticalLayout artifactSourceContentLayout = new VerticalLayout();
+        VerticalLayout collectionSourceContentLayout = new VerticalLayout();
 
         name.setWidth("270px");
         name.setRequiredError("The item can not be empty!");
@@ -64,30 +66,29 @@ public class CollectionNewForm extends FormLayout{
         version.setRequiredError("The item can not be empty!");
         version.setRequired(true);
 
-        // grid artifact from store
+        // existing artifact from store
         resourceService = new ResourceService(Activator.instance().getMetadataService());
         findCollectionService = new FindCollectionService();
 
-        gridStore.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
+        gridSourceArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
                 resourceService.getAllResourceBeanFromStore(myUI.getSession())));
-        gridStore.getColumn("resource").setHidden(true);
-        gridStore.getColumn("size").setHidden(true);
-        gridStore.getColumn("symbolicName").setHidden(true);
-        gridStore.getColumn("categories").setHidden(true);
-        gridStore.setColumnOrder("presentationName", "version");
-        gridStore.addStyleName("my-style");
+        gridSourceArtifact.getColumn("resource").setHidden(true);
+        gridSourceArtifact.getColumn("size").setHidden(true);
+        gridSourceArtifact.getColumn("categories").setHidden(true);
+        gridSourceArtifact.setColumnOrder("presentationName", "symbolicName", "version");
+        gridSourceArtifact.addStyleName("my-style");
 
         idTextStore.setInputPrompt("search by presentation name...");
         idTextStore.setWidth("270px");
         Button findStoreButton = new Button(FontAwesome.CHECK);
         findStoreButton.addClickListener(e ->{
-            gridStore.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
+            gridSourceArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
                     resourceService.getFindResourceBeanFromStore(myUI.getSession(), idTextStore.getValue())));
         });
         Button clearStoreButton = new Button(FontAwesome.TIMES);
         clearStoreButton.addClickListener(e -> {
             idTextStore.clear();
-            gridStore.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
+            gridSourceArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class,
                     resourceService.getAllResourceBeanFromStore(myUI.getSession())));
         });
 
@@ -97,30 +98,33 @@ public class CollectionNewForm extends FormLayout{
 
         Button addFromStoreButton = new Button("Add artifact");
         addFromStoreButton.setEnabled(false);
-        gridArtifactLayout.addComponents(labelStore, filteringStore, gridStore, addFromStoreButton);
-        gridArtifactLayout.setComponentAlignment(addFromStoreButton, Alignment.BOTTOM_CENTER);
-        gridArtifactLayout.setSpacing(true);
+        artifactSourceContentLayout.addComponents(filteringStore, gridSourceArtifact, addFromStoreButton);
+        artifactSourceContentLayout.setComponentAlignment(addFromStoreButton, Alignment.BOTTOM_CENTER);
+        artifactSourceContentLayout.setSpacing(true);
+        gridSourceArtifact.setSizeFull();
+        artifactSourceContentLayout.setSizeFull();
+        artifactSourceContentLayout.setMargin(true);
 
-        //grid collection
+        // existing collections
         collectionService = new CollectionService();
-        gridCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
+        gridSourceCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
                 collectionService.getCollectionComponentAll()));
-        gridCollection.getColumn("id").setHidden(true);
-        gridCollection.getColumn("collection").setHidden(true);
-        gridCollection.setColumnOrder("name", "version");
-        gridCollection.addStyleName("my-style");
+        gridSourceCollection.getColumn("id").setHidden(true);
+        gridSourceCollection.getColumn("collection").setHidden(true);
+        gridSourceCollection.setColumnOrder("name", "version");
+        gridSourceCollection.addStyleName("my-style");
 
         idTextCollection.setInputPrompt("search by name...");
         idTextCollection.setWidth("270px");
         Button findCollectionButton = new Button(FontAwesome.CHECK);
         findCollectionButton.addClickListener(e ->{
-            gridCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
+            gridSourceCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
                     findCollectionService.getFindCollectionBean(idTextCollection.getValue())));
         });
         Button clearCollectionButton = new Button(FontAwesome.TIMES);
         clearCollectionButton.addClickListener(e -> {
             idTextCollection.clear();
-            gridCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
+            gridSourceCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
                     collectionService.getCollectionComponentAll()));
         });
 
@@ -130,97 +134,104 @@ public class CollectionNewForm extends FormLayout{
 
         Button addFromCollectionButton = new Button("Add collection");
         addFromCollectionButton.setEnabled(false);
-        gridCollectionLayout.addComponents(labelCollection, filteringCollection, gridCollection, addFromCollectionButton);
-        gridCollectionLayout.setComponentAlignment(addFromCollectionButton, Alignment.BOTTOM_CENTER);
-        gridCollectionLayout.setSpacing(true);
+        collectionSourceContentLayout.addComponents(filteringCollection, gridSourceCollection, addFromCollectionButton);
+        collectionSourceContentLayout.setComponentAlignment(addFromCollectionButton, Alignment.BOTTOM_CENTER);
+        collectionSourceContentLayout.setSpacing(true);
+        gridSourceCollection.setSizeFull();
+        collectionSourceContentLayout.setSizeFull();
+        collectionSourceContentLayout.setMargin(true);
 
-        gridArtifactCollectionLayout.addComponents(gridArtifactLayout,gridCollectionLayout);
-        gridArtifactCollectionLayout.setSpacing(true);
-        gridArtifactCollectionLayout.setSizeFull();
-        gridStore.setSizeFull();
-        gridCollection.setSizeFull();
-        gridArtifactCollectionLayout.setExpandRatio(gridArtifactLayout, 1);
-        gridArtifactCollectionLayout.setExpandRatio(gridCollectionLayout, 1);
-
-        // panel parameter
-        Panel parameterPanel = new Panel("Parameter");
-        VerticalLayout parameterTextFieldLayout = new VerticalLayout();
+        // source parameters
+        VerticalLayout parametersSourceContentLayout = new VerticalLayout();
         nameParameter.setWidth("310px");
         valueParameter.setWidth("310px");
-        parameterTextFieldLayout.addComponents(nameParameter, valueParameter);
-        parameterTextFieldLayout.setSpacing(true);
-        parameterTextFieldLayout.setMargin(true);
-        parameterPanel.setContent(parameterTextFieldLayout);
         Button addParameterButton = new Button("Add parameter");
-        panelParameterLayout.addComponents(parameterPanel,addParameterButton);
-        panelParameterLayout.setSpacing(true);
-        panelParameterLayout.setComponentAlignment(addParameterButton, Alignment.BOTTOM_CENTER);
+        parametersSourceContentLayout.addComponents(nameParameter, valueParameter, addParameterButton);
+        parametersSourceContentLayout.setSpacing(true);
+        parametersSourceContentLayout.setMargin(true);
 
-        // panel range version component
-        Panel rangePanel = new Panel("Artifact with a defined version range");
-        VerticalLayout rangeTextFieldLayout = new VerticalLayout();
+        // source range version component
+        VerticalLayout rangeSourceContentLayout = new VerticalLayout();
         nameRange.setWidth("310px");
         valueRange.setWidth("310px");
-        rangeTextFieldLayout.addComponents(nameRange, valueRange);
-        rangeTextFieldLayout.setSpacing(true);
-        rangeTextFieldLayout.setMargin(true);
-        rangePanel.setContent(rangeTextFieldLayout);
         Button addRangeButton = new Button("Add with range");
-        panelRangeLayout.addComponents(rangePanel, addRangeButton);
-        panelRangeLayout.setSpacing(true);
-        panelRangeLayout.setComponentAlignment(addRangeButton, Alignment.BOTTOM_CENTER);
+        rangeSourceContentLayout.addComponents(nameRange, valueRange ,addRangeButton);
+        rangeSourceContentLayout.setSpacing(true);
+        rangeSourceContentLayout.setMargin(true);
 
-        panelParameterRangeLayout.addComponents(panelParameterLayout, panelRangeLayout);
-        panelParameterRangeLayout.setSpacing(true);
-        panelParameterRangeLayout.setSizeFull();
-        panelParameterLayout.setSizeFull();
-        panelRangeLayout.setSizeFull();
-        panelParameterRangeLayout.setExpandRatio(panelParameterLayout,1);
-        panelParameterRangeLayout.setExpandRatio(panelRangeLayout, 1);
+        tabSheetSource.addTab(artifactSourceContentLayout).setCaption("Artifact");
+        tabSheetSource.addTab(collectionSourceContentLayout).setCaption("Collection");
+        tabSheetSource.addTab(parametersSourceContentLayout).setCaption("Parameters");
+        tabSheetSource.addTab(rangeSourceContentLayout).setCaption("List component");
 
-        List<CollectionBean> newCollectionList = new ArrayList<>();
-        newCollectionGrid.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, newCollectionList));
-        newCollectionGrid.getColumn("id").setHidden(true);
-        newCollectionGrid.setColumnOrder("name", "version", "collection");
-        newCollectionGrid.addStyleName("my-style");
-        newCollectionGrid.setSizeFull();
-
-        HorizontalLayout newParameterRangeGridLayout = new HorizontalLayout();
-        List<ParameterBean> newParameterList = new ArrayList<>();
-        newParameterGrid.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, newParameterList));
-        newParameterGrid.setColumnOrder("name", "value");
-        newParameterGrid.addStyleName("my-style");
-        newParameterGrid.setSizeFull();
-
-        List<ArtifactRangeBean> newRangeList = new ArrayList<>();
-        newRangeGrid.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, newRangeList));
-        newRangeGrid.setColumnOrder("name", "range");
-        newRangeGrid.addStyleName("my-style");
-        newRangeGrid.setSizeFull();
-
+        // copied artifact to grid
+        List<ResourceBean> targetArtifactList = new ArrayList<>();
+        gridTargetArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, targetArtifactList));
+        gridTargetArtifact.getColumn("resource").setHidden(true);
+        gridTargetArtifact.getColumn("size").setHidden(true);
+        gridTargetArtifact.getColumn("categories").setHidden(true);
+        gridTargetArtifact.setColumnOrder("presentationName", "symbolicName", "version");
+        gridTargetArtifact.addStyleName("my-style");
         Button removeArtifactButton = new Button("Remove from list");
         removeArtifactButton.setEnabled(false);
+        VerticalLayout artifactTargetContentLayout = new VerticalLayout();
+        artifactTargetContentLayout.addComponents(gridTargetArtifact, removeArtifactButton);
+        artifactTargetContentLayout.setComponentAlignment(removeArtifactButton, Alignment.BOTTOM_CENTER);
+        gridTargetArtifact.setSizeFull();
+        artifactTargetContentLayout.setSpacing(true);
+        artifactTargetContentLayout.setSizeFull();
+        artifactTargetContentLayout.setMargin(true);
+
+        // copied collection to grid
+        List<CollectionBean> targetCollectionList = new ArrayList<>();
+        gridTargetCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, targetCollectionList));
+        gridTargetCollection.getColumn("id").setHidden(true);
+        gridTargetCollection.setColumnOrder("name", "version", "collection");
+        gridTargetCollection.addStyleName("my-style");
+        Button removeCollectionButton = new Button("Remove from list");
+        removeCollectionButton.setEnabled(false);
+        VerticalLayout collectionTargetContentLayout = new VerticalLayout();
+        collectionTargetContentLayout.addComponents(gridTargetCollection, removeCollectionButton);
+        collectionTargetContentLayout.setComponentAlignment(removeCollectionButton, Alignment.BOTTOM_CENTER);
+        gridTargetCollection.setSizeFull();
+        collectionTargetContentLayout.setSpacing(true);
+        collectionTargetContentLayout.setSizeFull();
+        collectionTargetContentLayout.setMargin(true);
+
+        // copied parameter to grid
+        List<ParameterBean> targetParameterList = new ArrayList<>();
+        gridTargetParameter.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, targetParameterList));
+        gridTargetParameter.setColumnOrder("name", "value");
+        gridTargetParameter.addStyleName("my-style");
         Button removeParameterButton = new Button("Remove from list");
         removeParameterButton.setEnabled(false);
+        VerticalLayout parameterTargetContentLayout = new VerticalLayout();
+        parameterTargetContentLayout.addComponents(gridTargetParameter, removeParameterButton);
+        parameterTargetContentLayout.setComponentAlignment(removeParameterButton, Alignment.BOTTOM_CENTER);
+        gridTargetParameter.setSizeFull();
+        parameterTargetContentLayout.setSpacing(true);
+        parameterTargetContentLayout.setSizeFull();
+        parameterTargetContentLayout.setMargin(true);
+
+        // copied artifact whit defined range to grid
+        List<ArtifactRangeBean> targetRangeList = new ArrayList<>();
+        gridTargetRange.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, targetRangeList));
+        gridTargetRange.setColumnOrder("name", "range");
+        gridTargetRange.addStyleName("my-style");
         Button removeRangeButton = new Button("Remove from list");
         removeRangeButton.setEnabled(false);
+        VerticalLayout rangeTargetContentLayout = new VerticalLayout();
+        rangeTargetContentLayout.addComponents(gridTargetRange, removeRangeButton);
+        rangeTargetContentLayout.setComponentAlignment(removeRangeButton, Alignment.BOTTOM_CENTER);
+        gridTargetRange.setSizeFull();
+        rangeTargetContentLayout.setSpacing(true);
+        rangeTargetContentLayout.setSizeFull();
+        rangeTargetContentLayout.setMargin(true);
 
-        VerticalLayout newParameterLayout = new VerticalLayout();
-        VerticalLayout newRangeLayout = new VerticalLayout();
-        newParameterLayout.addComponents(newParameterGrid, removeParameterButton);
-        newParameterLayout.setSpacing(true);
-        newParameterLayout.setSizeFull();
-        newParameterLayout.setComponentAlignment(removeParameterButton, Alignment.BOTTOM_CENTER);
-        newRangeLayout.addComponents(newRangeGrid, removeRangeButton);
-        newRangeLayout.setSpacing(true);
-        newRangeLayout.setSizeFull();
-        newRangeLayout.setComponentAlignment(removeRangeButton, Alignment.BOTTOM_CENTER);
-
-        newParameterRangeGridLayout.addComponents(newParameterLayout, newRangeLayout);
-        newParameterRangeGridLayout.setSpacing(true);
-        newParameterRangeGridLayout.setSizeFull();
-        newParameterRangeGridLayout.setExpandRatio(newParameterLayout,1);
-        newParameterRangeGridLayout.setExpandRatio(newRangeLayout, 1);
+        tabSheetTarget.addTab(artifactTargetContentLayout).setCaption("Artifact");
+        tabSheetTarget.addTab(collectionTargetContentLayout).setCaption("Collection");
+        tabSheetTarget.addTab(parameterTargetContentLayout).setCaption("Parameters");
+        tabSheetTarget.addTab(rangeTargetContentLayout).setCaption("List component");
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         Button saveButton = new Button("Save");
@@ -232,95 +243,90 @@ public class CollectionNewForm extends FormLayout{
         buttonLayout.addComponents(saveButton, clearButton);
         buttonLayout.setSpacing(true);
 
+        // Line skip component (otherwise it doesn't make sense).
+        Label firstVerticalSpace = new Label(" ");
+        Label secondVerticalSpace = new Label(" ");
+
+        content.addComponents(labelDescription, name, version, firstVerticalSpace, labelSource, tabSheetSource,
+                secondVerticalSpace, labelTarget, tabSheetTarget, buttonLayout);
         content.setMargin(new MarginInfo(false,true));
         content.setSpacing(true);
-        content.addComponents(labelDescription, name, version, gridArtifactCollectionLayout, newCollectionGrid,
-                removeArtifactButton, panelParameterRangeLayout, newParameterRangeGridLayout, buttonLayout);
-        content.setComponentAlignment(removeArtifactButton, Alignment.BOTTOM_CENTER);
 
-        gridStore.addSelectionListener(e ->{
+        gridSourceArtifact.addSelectionListener(e ->{
             if(!e.getSelected().isEmpty()){
-                resourceBeanSelect = (ResourceBean)e.getSelected().iterator().next();
+                resourceBeanSelectSource = (ResourceBean)e.getSelected().iterator().next();
                 addFromStoreButton.setEnabled(true);
             }
             else{
-                resourceBeanSelect = null;
+                resourceBeanSelectSource = null;
             }
         });
 
-        gridCollection.addSelectionListener(e ->{
+        gridSourceCollection.addSelectionListener(e ->{
             if(!e.getSelected().isEmpty()){
-                collectionBeanSelect = (CollectionBean)e.getSelected().iterator().next();
+                collectionBeanSelectSource = (CollectionBean)e.getSelected().iterator().next();
                 addFromCollectionButton.setEnabled(true);
             }
             else{
-                collectionBeanSelect = null;
+                collectionBeanSelectSource = null;
             }
         });
 
-        newCollectionGrid.addSelectionListener(e ->{
+        gridTargetArtifact.addSelectionListener(e ->{
             if(!e.getSelected().isEmpty()){
-                newCollectionBeanSelect = (CollectionBean)e.getSelected().iterator().next();
+                resourceBeanSelectTarget = (ResourceBean)e.getSelected().iterator().next();
                 removeArtifactButton.setEnabled(true);
             }
             else{
-                newCollectionBeanSelect = null;
+                resourceBeanSelectTarget = null;
             }
         });
 
-        newParameterGrid.addSelectionListener(e ->{
+        gridTargetCollection.addSelectionListener(e ->{
             if(!e.getSelected().isEmpty()){
-                newParameterBeanSelect = (ParameterBean)e.getSelected().iterator().next();
+                collectionBeanSelectTarget = (CollectionBean)e.getSelected().iterator().next();
+                removeCollectionButton.setEnabled(true);
+            }
+            else{
+                collectionBeanSelectTarget = null;
+            }
+        });
+
+        gridTargetParameter.addSelectionListener(e ->{
+            if(!e.getSelected().isEmpty()){
+                parameterBeanSelect = (ParameterBean)e.getSelected().iterator().next();
                 removeParameterButton.setEnabled(true);
             }
             else{
-                newParameterBeanSelect = null;
+                parameterBeanSelect = null;
             }
         });
 
-        newRangeGrid.addSelectionListener(e ->{
+        gridTargetRange.addSelectionListener(e ->{
             if(!e.getSelected().isEmpty()){
-                newArtifactRangeBeanSelect = (ArtifactRangeBean)e.getSelected().iterator().next();
+                artifactRangeBeanSelect = (ArtifactRangeBean)e.getSelected().iterator().next();
                 removeRangeButton.setEnabled(true);
             }
             else{
-                newArtifactRangeBeanSelect = null;
+                artifactRangeBeanSelect = null;
             }
         });
 
         addFromStoreButton.addClickListener(e ->{
-            if(resourceBeanSelect != null){
-                boolean contains = false;
-                for(CollectionBean cb : newCollectionList){
-                    if(resourceBeanSelect.getResource().getId() == cb.getId()){
-                        contains = true;
-                    }
-                }
-                if(!contains){
-                    newCollectionList.add(new CollectionBean(resourceBeanSelect.getResource().getId(),
-                            resourceBeanSelect.getPresentationName(), resourceBeanSelect.getVersion(), false));
+            if(resourceBeanSelectSource != null){
+                targetArtifactList.add(resourceBeanSelectSource);
 
-                    newCollectionGrid.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, newCollectionList));
-                    newCollectionGrid.clearSortOrder();
-                }
+                gridTargetArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, targetArtifactList));
+                gridTargetArtifact.clearSortOrder();
             }
         });
 
         addFromCollectionButton.addClickListener(e ->{
-            if(collectionBeanSelect != null){
-                newCollectionList.add(collectionBeanSelect);
+            if(collectionBeanSelectSource != null){
+                targetCollectionList.add(collectionBeanSelectSource);
 
-                newCollectionGrid.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, newCollectionList));
-                newCollectionGrid.clearSortOrder();
-            }
-        });
-
-        removeArtifactButton.addClickListener(e ->{
-            if(newCollectionBeanSelect != null){
-                newCollectionList.remove(newCollectionBeanSelect);
-
-                newCollectionGrid.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, newCollectionList));
-                newCollectionGrid.clearSortOrder();
+                gridTargetCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, targetCollectionList));
+                gridTargetCollection.clearSortOrder();
             }
         });
 
@@ -331,9 +337,11 @@ public class CollectionNewForm extends FormLayout{
                 notif.show(Page.getCurrent());
             }
             else{
-                newParameterList.add(new ParameterBean(nameParameter.getValue(),valueParameter.getValue()));
-                newParameterGrid.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, newParameterList));
-                newParameterGrid.clearSortOrder();
+                targetParameterList.add(new ParameterBean(nameParameter.getValue(),valueParameter.getValue()));
+                gridTargetParameter.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, targetParameterList));
+                gridTargetParameter.clearSortOrder();
+                nameParameter.clear();
+                valueParameter.clear();
             }
         });
 
@@ -344,27 +352,47 @@ public class CollectionNewForm extends FormLayout{
                 notif.show(Page.getCurrent());
             }
             else{
-                newRangeList.add(new ArtifactRangeBean(nameRange.getValue(),valueRange.getValue()));
-                newRangeGrid.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, newRangeList));
-                newRangeGrid.clearSortOrder();
+                targetRangeList.add(new ArtifactRangeBean(nameRange.getValue(),valueRange.getValue()));
+                gridTargetRange.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, targetRangeList));
+                gridTargetRange.clearSortOrder();
+                nameRange.clear();
+                valueRange.clear();
+            }
+        });
+
+        removeArtifactButton.addClickListener(e ->{
+            if(resourceBeanSelectTarget != null){
+                targetArtifactList.remove(resourceBeanSelectTarget);
+
+                gridTargetArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, targetArtifactList));
+                gridTargetArtifact.clearSortOrder();
+            }
+        });
+
+        removeCollectionButton.addClickListener(e ->{
+            if(collectionBeanSelectTarget != null){
+                targetCollectionList.remove(collectionBeanSelectTarget);
+
+                gridTargetCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, targetCollectionList));
+                gridTargetCollection.clearSortOrder();
             }
         });
 
         removeParameterButton.addClickListener(e ->{
-            if(newParameterBeanSelect != null){
-                newParameterList.remove(newParameterBeanSelect);
+            if(parameterBeanSelect != null){
+                targetParameterList.remove(parameterBeanSelect);
 
-                newParameterGrid.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, newParameterList));
-                newParameterGrid.clearSortOrder();
+                gridTargetParameter.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, targetParameterList));
+                gridTargetParameter.clearSortOrder();
             }
         });
 
         removeRangeButton.addClickListener(e ->{
-            if(newArtifactRangeBeanSelect != null){
-                newRangeList.remove(newArtifactRangeBeanSelect);
+            if(artifactRangeBeanSelect != null){
+                targetRangeList.remove(artifactRangeBeanSelect);
 
-                newRangeGrid.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, newRangeList));
-                newRangeGrid.clearSortOrder();
+                gridTargetRange.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, targetRangeList));
+                gridTargetRange.clearSortOrder();
             }
         });
 
@@ -372,22 +400,26 @@ public class CollectionNewForm extends FormLayout{
             name.clear();
             version.clear();
 
-            newCollectionList.clear();
-            newCollectionGrid.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, newCollectionList));
-            newCollectionGrid.clearSortOrder();
+            targetArtifactList.clear();
+            gridTargetArtifact.setContainerDataSource(new BeanItemContainer<>(ResourceBean.class, targetArtifactList));
+            gridTargetArtifact.clearSortOrder();
+
+            targetCollectionList.clear();
+            gridTargetCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class, targetCollectionList));
+            gridTargetCollection.clearSortOrder();
 
             nameParameter.clear();
             valueParameter.clear();
             nameRange.clear();
             valueRange.clear();
 
-            newParameterList.clear();
-            newParameterGrid.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, newParameterList));
-            newParameterGrid.clearSortOrder();
+            targetParameterList.clear();
+            gridTargetParameter.setContainerDataSource(new BeanItemContainer<>(ParameterBean.class, targetParameterList));
+            gridTargetParameter.clearSortOrder();
 
-            newRangeList.clear();
-            newRangeGrid.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, newRangeList));
-            newRangeGrid.clearSortOrder();
+            targetRangeList.clear();
+            gridTargetRange.setContainerDataSource(new BeanItemContainer<>(ArtifactRangeBean.class, targetRangeList));
+            gridTargetRange.clearSortOrder();
         });
 
         saveButton.addClickListener(e ->{
@@ -400,13 +432,16 @@ public class CollectionNewForm extends FormLayout{
                 List<String> ids = new ArrayList<>();
                 List<String> parameters = new ArrayList<>();
                 List<String> artifactsWithRange = new ArrayList<>();
-                for(CollectionBean cb: newCollectionList){
+                for(ResourceBean rb : targetArtifactList){
+                    ids.add(rb.getResource().getId());
+                }
+                for(CollectionBean cb: targetCollectionList){
                     ids.add(cb.getId());
                 }
-                for(ParameterBean pb : newParameterList){
+                for(ParameterBean pb : targetParameterList){
                     parameters.add(pb.getName() + "=" + pb.getValue());
                 }
-                for(ArtifactRangeBean arb : newRangeList){
+                for(ArtifactRangeBean arb : targetRangeList){
                     artifactsWithRange.add(arb.getName() + "=[" + arb.getRange() + "]");
                 }
 
