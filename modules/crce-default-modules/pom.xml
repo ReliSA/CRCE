@@ -55,6 +55,22 @@
             <artifactId>crce-webservices-indexer</artifactId>
             <version>2.1.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-external-repository</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-component-versioning</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-webui-v2</artifactId>
+            <version>1.5</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->

@@ -31,7 +31,8 @@
         <module>crce-resolver-impl</module>
 
 		<module>crce-concurrency</module>
-        <module>crce-webui</module>
+        <!--<module>crce-webui</module>-->
+        <!--<module>crce-webui-v2</module>-->
 		
         <module>crce-core</module>
 		

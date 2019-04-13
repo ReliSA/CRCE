@@ -18,7 +18,7 @@
     <properties>
         <bundle.symbolicName>${namespace}.vo</bundle.symbolicName>
         <bundle.namespace>${namespace}.vo</bundle.namespace>
-        <crce.metadata.api.version>3.0.0</crce.metadata.api.version>
+        <crce.metadata.api.version>3.0.1-SNAPSHOT</crce.metadata.api.version>
     </properties>
 
 

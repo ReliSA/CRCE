@@ -69,6 +69,7 @@
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>
         <module>crce-vo</module>
+        <module>crce-webui-v2</module>
 
         <!--<module>crce-repository-maven-impl</module>-->
         
