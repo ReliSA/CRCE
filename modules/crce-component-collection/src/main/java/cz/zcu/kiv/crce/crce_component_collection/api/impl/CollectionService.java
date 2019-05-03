@@ -5,28 +5,20 @@ import com.mongodb.client.MongoCursor;
 import cz.zcu.kiv.crce.crce_component_collection.api.CollectionServiceApi;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
 import org.bson.Document;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CollectionService implements CollectionServiceApi {
-    private MongoClient mongoClient;
-    private MongoDatabase database;
+    private DBContextCollection dbContextCollection;
     private MongoCollection<Document> collection;
 
     public CollectionService() {
-        ((LoggerContext) LoggerFactory.getILoggerFactory()).getLogger("org.mongodb.driver").setLevel(Level.ERROR);
-
-        mongoClient = new MongoClient("localhost", 27017);
-        database = mongoClient.getDatabase("crce");
-        collection = database.getCollection("collection");
+        dbContextCollection = new DBContextCollection();
+        collection = dbContextCollection.getCollection();
     }
 
     @Override
@@ -119,5 +111,9 @@ public class CollectionService implements CollectionServiceApi {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public void closeMongoClient(){
+        dbContextCollection.getMongoClient().close();
     }
 }

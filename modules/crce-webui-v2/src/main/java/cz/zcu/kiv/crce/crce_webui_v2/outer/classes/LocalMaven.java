@@ -7,12 +7,23 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
 
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 
+/**
+ * Class to list the contents of the local Maven repository.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class LocalMaven implements Serializable{
 	private Tree localMavenTree = new Tree();
 	private String path;
+	/**
+	 * The method traverses the path in the file system (the attribute of the settingsUrl object).
+	 * The resulting file tree is stored in the Vaadin Tree object, which is the return type of the method.
+	 */
 	public Tree getTree(VaadinSession session) {
 		// get local Maven path
 		if(session.getAttribute("settingsUrl") == null){
@@ -33,6 +44,9 @@ public class LocalMaven implements Serializable{
 		}
 	}
 
+	/**
+	 * Recursive pass through a file tree.
+	 */
 	private void list(File file) {
 		File[] children = file.listFiles();
 		for (File child : children) {

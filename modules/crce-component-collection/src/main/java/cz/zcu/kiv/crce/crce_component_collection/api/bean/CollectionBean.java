@@ -1,5 +1,12 @@
 package cz.zcu.kiv.crce.crce_component_collection.api.bean;
 
+/**
+ * The bean represents a set of artifacts (collection).
+ * <p/>
+ * Date: 05.02.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionBean {
     private String id;
     private String name;

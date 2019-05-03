@@ -35,9 +35,15 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
+/**
+ * A form for uploading an artifact to a CRCE from a file system or url address.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class LoadFileForm extends FormLayout {
-	//private VaadinSession session;
 	private Panel filePanel = new Panel("Upload artefact from local file system");
 	private Panel urlPanel = new Panel("Upload artefact from remote url");
 	private Panel bufferPanel = new Panel("Buffer");
@@ -119,7 +125,15 @@ public class LoadFileForm extends FormLayout {
 		
 		addComponent(content);
 	}
-	
+
+	/**
+	 * Implementation of Vaadin framework components.
+	 * <p/>
+	 * Date: 02.05.19
+	 * @see <a href="https://vaadin.com/components/vaadin-upload/java-examples">vaadin-upload-component-example</a>
+	 *
+	 * @author Roman Pesek
+	 */
 	class FileUploader implements Receiver, SucceededListener {
 		private File file;
 		public OutputStream receiveUpload(String filename, String mimeType) {

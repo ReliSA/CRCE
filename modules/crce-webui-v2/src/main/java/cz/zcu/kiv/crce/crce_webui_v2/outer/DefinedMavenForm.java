@@ -27,15 +27,22 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
 
-import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
-import cz.zcu.kiv.crce.crce_external_repository.api.DefinedMaven;
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.ArtifactTree;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.DefinedMaven;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
+/**
+ * User artifact search dialog in external storage supported by the Aether library.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class DefinedMavenForm extends FormLayout{
 	private static final long serialVersionUID = 4172878715304331198L;
 	private transient DefinedMaven definedMaven;
@@ -217,7 +224,7 @@ public class DefinedMavenForm extends FormLayout{
 					treeLayout.removeComponent(tree);
 				}
 
-				// předání hodnot
+				// handing over values
 				definedMaven = new DefinedMaven(settings);
 				ArtifactTree definedArtefact = definedMaven.getArtifact(group.getValue(), artifact.getValue(),
 						version.getValue(), packaging.getValue());
@@ -334,8 +341,7 @@ public class DefinedMavenForm extends FormLayout{
 		tree.addItem(version);
 		tree.setParent(version, artifact);
 
-		// konečný artefact je komplet url link např. pro wget - UPRAVIT DLE
-		// POTŘEBY
+		// ultimate artefact is a complete url link eg for wget - EDIT BY NEEDS
 		/*
 		 * String artifactText = settings.getExternalAetherUrl() + "/" + groupText + "/"
 		 * + idText + "/" + version + "." + packagingText;
@@ -344,7 +350,7 @@ public class DefinedMavenForm extends FormLayout{
 		String artifactText = group + ":" + artifact + ":" + version + ":" + packaging;
 
 		tree.addItem(artifactText);
-		tree.setParent(artifactText, version.toString());
+		tree.setParent(artifactText, version);
 		tree.setItemCaption(artifactText, artifact + "-" + version + "." + packaging);
 		tree.setChildrenAllowed(artifactText, false);
 		if (packaging.equals("jar") || packaging.equals("war")) {

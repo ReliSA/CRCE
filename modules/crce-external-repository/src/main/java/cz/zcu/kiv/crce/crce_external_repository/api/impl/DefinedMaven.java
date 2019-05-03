@@ -1,9 +1,10 @@
-package cz.zcu.kiv.crce.crce_external_repository.api;
+package cz.zcu.kiv.crce.crce_external_repository.api.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cz.zcu.kiv.crce.crce_external_repository.api.DefinedMavenApi;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -26,7 +27,7 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.version.Version;
 
-public class DefinedMaven {
+public class DefinedMaven implements DefinedMavenApi {
 	private ArtifactTree definedArtefact;
 	private String groupText;
 	private String idText;
@@ -39,6 +40,7 @@ public class DefinedMaven {
 		this.settings = settings;
 	}
 
+	@Override
 	public ArtifactTree getArtifact(String group, String idText, String version, Object packaging) {
 		// validator empty entries
 		if (group.equals("") || idText.equals("")) {
@@ -136,7 +138,7 @@ public class DefinedMaven {
 		return session;
 	}
 
-	public static RemoteRepository newCentralRepository(String centralAetherUrl) {
+	private static RemoteRepository newCentralRepository(String centralAetherUrl) {
 		return new RemoteRepository.Builder("central", "default", centralAetherUrl).build();
 	}
 }

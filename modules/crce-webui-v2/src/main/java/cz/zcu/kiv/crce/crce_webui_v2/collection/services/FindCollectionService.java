@@ -9,6 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class FindCollectionService {
+    /**
+     * The full-text filter of the collection list.
+     * <p/>
+     * Date: 02.05.19
+     * @param stringFilter search string in collection name
+     *
+     * @author Roman Pesek
+     */
     public List<CollectionBean> getFindCollectionBean(String stringFilter){
         boolean passesFilter = false;
         CollectionService collectionService = new CollectionService();

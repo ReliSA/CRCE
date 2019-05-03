@@ -12,6 +12,14 @@ import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The form for listing the details of the selected collection. This is a list of parameters and artifacts
+ * defined by the version range.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionRangeParamDetailForm extends FormLayout {
     private Label label = new Label("Collection Details");
     private TabSheet tabsheet = new TabSheet();

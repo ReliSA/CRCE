@@ -21,6 +21,13 @@ import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A form for creating and saving a new collection.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionNewForm extends FormLayout{
     private static final long serialVersionUID = 3539728975121021002L;
     private Label labelDescription = new Label("Add a new collection");
@@ -106,7 +113,12 @@ public class CollectionNewForm extends FormLayout{
         artifactSourceContentLayout.setMargin(true);
 
         // existing collections
-        collectionService = new CollectionService();
+        if (myUI.getSession().getAttribute("collectionService") == null) {
+            collectionService = new CollectionService();
+            myUI.getSession().setAttribute("collectionService", collectionService);
+        } else {
+            collectionService = (CollectionService) myUI.getSession().getAttribute("collectionService");
+        }
         gridSourceCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
                 collectionService.getCollectionComponentAll()));
         gridSourceCollection.getColumn("id").setHidden(true);

@@ -2,6 +2,13 @@ package cz.zcu.kiv.crce.crce_component_collection.api.bean;
 
 import java.util.List;
 
+/**
+ * The bean represents detailed artifact data.
+ * <p/>
+ * Date: 05.02.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionDetailBean {
     private String id;
     private String name;

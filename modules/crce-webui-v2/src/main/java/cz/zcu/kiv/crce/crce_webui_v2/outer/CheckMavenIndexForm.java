@@ -8,10 +8,18 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 
-import cz.zcu.kiv.crce.crce_external_repository.api.MavenIndex;
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.MavenIndex;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 
+/**
+ * User dialog for running the central Maven Repository indexing process or verifying the index's timeliness.
+ * In a separate thread calls the checkIndex() MavenIndex class (in module crce-external-repository).
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class CheckMavenIndexForm extends FormLayout {
 	private Button checkButton = new Button("Check index");

@@ -23,6 +23,16 @@ import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import java.io.*;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * A form for listing records of stored collections. The user dialog allows you to list the details of the
+ * selected collection. It also allows you to call the edit form, make a copy of the collection to a new version,
+ * delete the collection from the records, and export and download the artifacts, including the metadata
+ * in the zip archive.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionForm extends FormLayout {
     private static final long serialVersionUID = 7439970261502810719L;
     private Label labelForm = new Label("Collection of components");
@@ -57,6 +67,13 @@ public class CollectionForm extends FormLayout {
                     .isExportArtifactWithMetadata();
         }
 
+        if (myUI.getSession().getAttribute("collectionService") == null) {
+            collectionService = new CollectionService();
+            myUI.getSession().setAttribute("collectionService", collectionService);
+        } else {
+            collectionService = (CollectionService) myUI.getSession().getAttribute("collectionService");
+        }
+
         VerticalLayout content = new VerticalLayout();
         VerticalLayout formLayout = new VerticalLayout();
         HorizontalLayout gridTreeLayout = new HorizontalLayout();
@@ -65,7 +82,6 @@ public class CollectionForm extends FormLayout {
         VerticalLayout treeDetailCollectionButtonLayout = new VerticalLayout();
 
         findCollectionService = new FindCollectionService();
-        collectionService = new CollectionService();
         resourceService = new ResourceService(Activator.instance().getMetadataService());
         randomStringGenerator = new RandomStringGenerator();
         exportCollectionService = new ExportCollectionService();
@@ -271,7 +287,8 @@ public class CollectionForm extends FormLayout {
             String textPath = exportPathText + File.separator + myUI.getSession().getSession().getId();
             File path = new File(textPath);
             if(exportCollectionService.exportCollection(collectionBeanSelect.getId(), path,
-                    resourceService.getRepositoryId(myUI.getSession()), limitExportArtifactRange, exportWithDetails)){
+                    resourceService.getRepositoryId(myUI.getSession()), limitExportArtifactRange, collectionService,
+                    exportWithDetails)){
                 // prepare zip file
                 try{
                     String sourceFile = textPath + File.separator + collectionBeanSelect.getName() + "-"

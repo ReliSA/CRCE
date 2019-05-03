@@ -377,7 +377,7 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Private-Package>cz.zcu.kiv.crce.crce_external_repository.internal.*</Private-Package>
 						<Export-Package>
-							cz.zcu.kiv.crce.crce_external_repository.api, 
+							cz.zcu.kiv.crce.crce_external_repository.api.*,
 							org.apache.maven.index.*, 
 							org.apache.maven.wagon.*, 
 							javax.inject.*
