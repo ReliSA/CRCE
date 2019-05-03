@@ -22,7 +22,14 @@ import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Collection change form. It is called from the collection summary form. The form is identical to the user dialog for
+ * creating a new collection. As an attribute, it takes the id of the set set.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class CollectionEditForm extends FormLayout {
     public static final long serialVersionUID = -6571696339324055801L;
     private Label labelDescription = new Label("Add a new collection");
@@ -110,7 +117,12 @@ public class CollectionEditForm extends FormLayout {
         artifactSourceContentLayout.setMargin(true);
 
         // existing collections
-        collectionService = new CollectionService();
+        if (myUI.getSession().getAttribute("collectionService") == null) {
+            collectionService = new CollectionService();
+            myUI.getSession().setAttribute("collectionService", collectionService);
+        } else {
+            collectionService = (CollectionService) myUI.getSession().getAttribute("collectionService");
+        }
         gridSourceCollection.setContainerDataSource(new BeanItemContainer<>(CollectionBean.class,
                 collectionService.getCollectionComponentAll()));
         gridSourceCollection.getColumn("id").setHidden(true);

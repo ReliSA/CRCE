@@ -11,8 +11,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The class methods export the set parameters and the xml artifact metadata to the file system.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class HelperFileWriter {
         BufferedWriter bufferedWriter = null;
+        /**
+        * A method for exporting artifact set parameters.
+        */
         public void createParametersXmlFile(File file, List<String> parameters) throws IOException {
             try{
                 if(!file.exists() && !file.createNewFile()){
@@ -46,6 +56,9 @@ public class HelperFileWriter {
             }
         }
 
+    /**
+     * Method to export file metadata in xml format. Maybe an implementation using the Response Web Service object.
+     */
         public void createArtifactMetadataXmlFile(File file, Resource resource, boolean details) throws  IOException{
             try{
                 if(!file.exists() && !file.createNewFile()){

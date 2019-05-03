@@ -7,8 +7,17 @@ import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 
+/**
+ * Form for setting user preferences for url addresses of external, central and local Maven storage. It also includes
+ * preference settings for enabling local Maven repository editing and enabling group content listing.
+ * The class object is kept as a session attribute.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class SettingsUrlForm extends FormLayout {
 	

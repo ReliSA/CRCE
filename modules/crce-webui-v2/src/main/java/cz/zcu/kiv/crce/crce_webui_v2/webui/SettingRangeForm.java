@@ -10,6 +10,14 @@ import com.vaadin.ui.themes.ValoTheme;
 import cz.zcu.kiv.crce.crce_component_collection.api.impl.LimitRange;
 import cz.zcu.kiv.crce.crce_component_collection.api.settings.SettingsLimitRange;
 
+/**
+ * A form for setting user preferences for exporting artifact sets and their metadata.
+ * The class object is kept as a session attribute.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class SettingRangeForm extends FormLayout {
     public SettingRangeForm(){
         HorizontalLayout content = new HorizontalLayout();

@@ -2,6 +2,13 @@ package cz.zcu.kiv.crce.crce_component_collection.api.settings;
 
 import cz.zcu.kiv.crce.crce_component_collection.api.impl.LimitRange;
 
+/**
+ * Class for setting attributes for exporting artifacts and metadata.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class SettingsLimitRange {
     private LimitRange exportArtifactRange = LimitRange.MAX;
     private String exportPath = "tmp";

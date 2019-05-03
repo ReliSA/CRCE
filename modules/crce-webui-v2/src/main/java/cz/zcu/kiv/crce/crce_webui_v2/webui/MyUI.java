@@ -15,6 +15,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionBean;
 import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
+import cz.zcu.kiv.crce.crce_component_collection.api.impl.CollectionService;
 import cz.zcu.kiv.crce.crce_component_collection.api.settings.SettingsLimitRange;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.CollectionRangeParamDetailForm;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
@@ -153,6 +154,10 @@ public class MyUI extends UI {
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
+		}
+		if (getSession().getAttribute("collectionService") != null) {
+			((CollectionService) getSession().getAttribute("collectionService")).closeMongoClient();
+			getSession().setAttribute("collectionService", null);
 		}
 		getSession().setAttribute("exportArtifactRange", null);
 		getSession().getSession().invalidate();

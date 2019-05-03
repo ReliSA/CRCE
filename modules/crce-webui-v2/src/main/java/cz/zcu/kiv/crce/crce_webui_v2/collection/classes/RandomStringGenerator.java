@@ -3,6 +3,13 @@ package cz.zcu.kiv.crce.crce_webui_v2.collection.classes;
 import java.nio.charset.Charset;
 import java.util.Random;
 
+/**
+ * Random text string generator. Used to distinguish collection items with the same name in a Vaadin Tree object.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class RandomStringGenerator {
     private Random random;
     private byte[] array;

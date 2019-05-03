@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_external_repository.api;
+package cz.zcu.kiv.crce.crce_external_repository.api.impl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,12 +7,13 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.zcu.kiv.crce.crce_external_repository.api.CentralMavenApi;
 import org.apache.maven.index.ArtifactInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-public class CentralMaven {
+public class CentralMaven implements CentralMavenApi {
 	private String centralMavenUrl;
 	private boolean enableGroupSearch;
 	private List<ArtifactTree> artifactTreeList = new ArrayList<ArtifactTree>();
@@ -22,8 +23,9 @@ public class CentralMaven {
 		this.settings = settings;
 	}
 
+	@Override
 	public ResultSearchArtifactTree getArtifactTree(String group, String artifact, String version, Object packaging, Object directIndex,
-			String range) {
+													String range) {
 		if (settings == null) {
 			SettingsUrl settings = new SettingsUrl();
 			centralMavenUrl = settings.getCentralMavenUrl();

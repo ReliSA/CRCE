@@ -28,7 +28,7 @@ import com.vaadin.ui.Tree;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.ui.VerticalLayout;
 
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.outer.classes.LocalMaven;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
@@ -36,6 +36,13 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
+/**
+ * User dialog for operations over the local Maven repository.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class LocalMavenForm extends FormLayout {
 	private LocalMaven localMaven = new LocalMaven();

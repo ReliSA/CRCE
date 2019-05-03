@@ -27,16 +27,23 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
 
-import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
-import cz.zcu.kiv.crce.crce_external_repository.api.CentralMaven;
-import cz.zcu.kiv.crce.crce_external_repository.api.ResultSearchArtifactTree;
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.ArtifactTree;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.CentralMaven;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.ResultSearchArtifactTree;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
 
+/**
+ * User dialog for operations over the central Maven repository.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 @SuppressWarnings("serial")
 public class CentralMavenForm extends FormLayout {
 	private Label caption = new Label("Central Maven repository");
@@ -368,8 +375,7 @@ public class CentralMavenForm extends FormLayout {
 		tree.setItemCaption(uniqueVersion, version);
 		tree.setParent(uniqueVersion, artifact);
 
-		// konečný artefact je komplet url link např. pro wget - UPRAVIT DLE
-		// POTŘEBY
+		// ultimate artefact is a complete url link eg for wget - EDIT BY NEEDS
 		String artifactText = url + group.replace('.', '/') + "/" + artifact + "/" + version + "/" + artifact + "-"
 				+ version + "." + packaging;
 
@@ -387,8 +393,7 @@ public class CentralMavenForm extends FormLayout {
 	}
 
 	private void addArtefactToTreeGroup(ArtifactTree artifactTree, String parent) {
-		// konečný artefact je komplet url link např. pro wget - UPRAVIT DLE
-		// POTŘEBY
+		// ultimate artefact is a complete url link eg for wget - EDIT BY NEEDS
 		String artifactText = artifactTree.getArtefactId();
 		String artifactUrl = artifactTree.getUrl();
 

@@ -11,6 +11,13 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class methods provide access to the resources contained in the Store and provide descriptive metadata.
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class HelperResource {
     private Resource resource;
     private transient MetadataService metadataService;

@@ -5,6 +5,13 @@ import cz.zcu.kiv.crce.crce_component_collection.api.bean.CollectionDetailBean;
 
 import java.util.List;
 
+/**
+ * The interface provides methods for managing artifact sets.
+ * <p/>
+ * Date: 05.02.19
+ *
+ * @author Roman Pesek
+ */
 public interface CollectionServiceApi {
     /**
      * Interface for accessing all records in the list of collection components.

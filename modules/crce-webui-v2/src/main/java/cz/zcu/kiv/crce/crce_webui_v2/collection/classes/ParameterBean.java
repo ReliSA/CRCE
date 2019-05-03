@@ -1,5 +1,12 @@
 package cz.zcu.kiv.crce.crce_webui_v2.collection.classes;
 
+/**
+ * Bean represents collection parameters (name / value).
+ * <p/>
+ * Date: 02.05.19
+ *
+ * @author Roman Pesek
+ */
 public class ParameterBean {
     private String name;
     private String value;

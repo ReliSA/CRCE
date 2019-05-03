@@ -16,7 +16,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ExportCollectionService implements ExportCollectionServiceApi {
-    private CollectionService collectionService = new CollectionService();
     private HelperFileWriter helperFileWriter = new HelperFileWriter();
     private HelperResource helperResource;
 
@@ -25,7 +24,8 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
      }
 
     @Override
-    public boolean exportCollection(String idCollection, File path, String idRepository, LimitRange range, boolean details) {
+    public boolean exportCollection(String idCollection, File path, String idRepository, LimitRange range,
+                                    CollectionService collectionService, boolean details) {
         if(!path.exists()){
             try{
                 path.mkdirs();
@@ -104,7 +104,7 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
             }
 
             for(String s : collectionDetailBean.getSpecificArtifacts()){
-                exportCollection(s, nextPath, idRepository, range, details);
+                exportCollection(s, nextPath, idRepository, range, collectionService, details);
             }
         }
         // artefact in store
