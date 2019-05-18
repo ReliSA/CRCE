@@ -22,7 +22,7 @@ On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; 
 
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
+Make sure your `JAVA_HOME` env variable is set and points to a JDK 8 root directory (e.g. `/usr/lib/jvm/java-8-openjdk-amd64/` on linux). Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
 
 `mvn pax:provision`
 
