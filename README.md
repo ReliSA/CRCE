@@ -20,6 +20,8 @@ On linux, switching to JDK 8 for development/build can be done via `sudo update-
 
 On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
+If build fails because of unresolved dependencies on older CRCE artefacts, an [archive with some of them](https://drive.google.com/file/d/1-Bnqt0MUuXdyokiRqognaFuLuYD5Cu7I/view?usp=sharing) is available (warning: 138MB file) -- as a crude workaround, extract its contents to local `.m2/repository/` directory.
+
 ## Start up
 
 Make sure your `JAVA_HOME` env variable is set and points to a JDK 8 root directory (e.g. `/usr/lib/jvm/java-8-openjdk-amd64/` on linux). Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
