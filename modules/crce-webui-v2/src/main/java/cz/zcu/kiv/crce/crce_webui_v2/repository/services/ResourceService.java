@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.crce_webui_v2.repository.services;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -24,6 +26,16 @@ public class ResourceService implements Serializable{
 	private static final long serialVersionUID = 6161700434751771631L;
 	private Resource resource;
     private transient MetadataService metadataService;
+  
+    /* fix FindBugs complaint, https://stackoverflow.com/a/30102528 */
+    private void writeObject(ObjectOutputStream stream)
+            throws IOException {
+        stream.defaultWriteObject();
+    }
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+    }
     
     public ResourceService(MetadataService metadataService){
         this.metadataService = metadataService;

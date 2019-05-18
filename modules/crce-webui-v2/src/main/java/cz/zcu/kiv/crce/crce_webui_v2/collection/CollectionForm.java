@@ -53,6 +53,16 @@ public class CollectionForm extends FormLayout {
     private LimitRange limitExportArtifactRange;
     private boolean exportWithDetails;
 
+    /* fix FindBugs complaint, https://stackoverflow.com/a/30102528 */
+    private void writeObject(ObjectOutputStream stream)
+            throws IOException {
+        stream.defaultWriteObject();
+    }
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+    }
+    
     public CollectionForm(MyUI myUI){
         if (myUI.getSession().getAttribute("exportArtifactRange") == null) {
             SettingsLimitRange settingsRange = new SettingsLimitRange();

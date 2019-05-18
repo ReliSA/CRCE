@@ -18,6 +18,9 @@ import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.collection.services.FindCollectionService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +64,16 @@ public class CollectionNewForm extends FormLayout{
     private transient ParameterBean parameterBeanSelect;
     private transient ArtifactRangeBean artifactRangeBeanSelect;
 
+    /* fix FindBugs complaint, https://stackoverflow.com/a/30102528 */
+    private void writeObject(ObjectOutputStream stream)
+            throws IOException {
+        stream.defaultWriteObject();
+    }
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+    }
+    
     public CollectionNewForm(MyUI myUI){
         VerticalLayout content = new VerticalLayout();
         VerticalLayout artifactSourceContentLayout = new VerticalLayout();
