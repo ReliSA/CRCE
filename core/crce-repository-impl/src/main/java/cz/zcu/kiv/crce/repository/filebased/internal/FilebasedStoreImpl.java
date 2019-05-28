@@ -62,7 +62,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
      */
     @SuppressWarnings({"UseOfObsoleteCollectionType", "unchecked"})
     void init() {
-        Dictionary<String, String> props = new java.util.Hashtable<>();
+        Dictionary<String, String> props = new Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + MetadataDao.class.getName() + "*)");
         context.registerService(EventHandler.class.getName(), this, props);
