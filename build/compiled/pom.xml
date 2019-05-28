@@ -30,6 +30,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
             </plugin>
             <plugin>
                 <!--
@@ -50,6 +54,7 @@
                          | each module can override these defaults in their osgi.bnd file
                         -->
                         <_include>-osgi.bnd</_include>
+                        <_noee>true</_noee>
                     </instructions>
                 </configuration>
             </plugin>
@@ -76,6 +81,8 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <configuration>
                     <xmlOutput>true</xmlOutput>
+                    <skip>true</skip>
+
                 </configuration>
                 <executions>
                     <execution>

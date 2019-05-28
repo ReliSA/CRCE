@@ -1,5 +1,5 @@
-# Use java 8 jdk which is compatible with CRCE
-FROM openjdk:8-jdk-stretch
+# Use java 11 jdk which is compatible with CRCE
+FROM openjdk:11.0.3-jdk-stretch
 
 # Prepare environment
 RUN mkdir /felix

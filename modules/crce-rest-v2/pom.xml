@@ -59,19 +59,40 @@
                         <supportedProjectType>war</supportedProjectType>
                     </supportedProjectTypes>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+                        <version>5.0.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
-                <version>3.1.0</version> <!-- 3.2.0 doesn't work for WAR (a bug?) -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <m_artifactExtension>war</m_artifactExtension>
+                    <source>10</source>
+                    <target>10</target>
                 </configuration>
             </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.felix</groupId>-->
+                <!--<artifactId>org.apache.felix.dependencymanager.annotation</artifactId>-->
+                <!--&lt;!&ndash;<version>3.1.0</version> &lt;!&ndash; 3.2.0 doesn't work for WAR (a bug?) &ndash;&gt;&ndash;&gt;-->
+                <!--<version>5.0.1</version>-->
+                <!--<configuration>-->
+                    <!--<m_artifactExtension>war</m_artifactExtension>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+        </dependency>
 
         <!-- Felix -->
 
