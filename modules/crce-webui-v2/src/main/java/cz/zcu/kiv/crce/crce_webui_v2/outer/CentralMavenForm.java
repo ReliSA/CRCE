@@ -1,41 +1,28 @@
 package cz.zcu.kiv.crce.crce_webui_v2.outer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeSelect;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
-
-import cz.zcu.kiv.crce.crce_external_repository.api.ArtifactTree;
-import cz.zcu.kiv.crce.crce_external_repository.api.CentralMaven;
-import cz.zcu.kiv.crce.crce_external_repository.api.ResultSearchArtifactTree;
-import cz.zcu.kiv.crce.crce_external_repository.api.SettingsUrl;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.ArtifactTree;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.CentralMaven;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.ResultSearchArtifactTree;
+import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
 import cz.zcu.kiv.crce.crce_webui_v2.internal.Activator;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.classes.ResourceBean;
 import cz.zcu.kiv.crce.crce_webui_v2.repository.services.ResourceService;
 import cz.zcu.kiv.crce.crce_webui_v2.webui.MyUI;
 import cz.zcu.kiv.crce.repository.RefusedArtifactException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
  * User dialog for operations over the central Maven repository.

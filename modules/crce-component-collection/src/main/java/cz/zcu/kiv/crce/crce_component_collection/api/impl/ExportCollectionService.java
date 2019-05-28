@@ -143,8 +143,10 @@ public class ExportCollectionService implements ExportCollectionServiceApi {
                     zipOut.closeEntry();
                 }
                 File[] children = fileToZip.listFiles();
-                for (File childFile : children) {
-                    zipFile(childFile, fileName + File.separator + childFile.getName(), zipOut);
+                if (children != null) {
+                    for (File childFile : children) {
+                        zipFile(childFile, fileName + File.separator + childFile.getName(), zipOut);
+                    }
                 }
                 return;
             }

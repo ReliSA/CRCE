@@ -1,27 +1,16 @@
 package cz.zcu.kiv.crce.plugin.internal;
 
-import static cz.zcu.kiv.crce.plugin.PluginManager.*;
+import cz.zcu.kiv.crce.plugin.Plugin;
+import cz.zcu.kiv.crce.plugin.PluginManager;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import cz.zcu.kiv.crce.plugin.Plugin;
-import cz.zcu.kiv.crce.plugin.PluginManager;
+import java.util.*;
 
 /**
  * Implementation of <code>PluginManager</code>.
@@ -231,17 +220,27 @@ public class PluginManagerImpl implements PluginManager {
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Plugins:\n");
-        for (Class<?> clazz : plugins.keySet()) {
-            sb.append("  ").append(clazz.getName()).append(":\n");
-            Map<String, Set<? extends Plugin>> map = plugins.get(clazz);
-            for (Map.Entry<String, Set<? extends Plugin>> entry : map.entrySet()) {
-                String keyword = entry.getKey();
+        for(Map.Entry<Class<?>, Map<String, Set<?extends  Plugin>>> entry : plugins.entrySet()) {
+            sb.append(" ").append(entry.getKey().getName()).append("\n");
+            for (Map.Entry<String, Set<? extends Plugin>> entryMap : entry.getValue().entrySet()) {
+                String keyword = entryMap.getKey();
                 sb.append("    ").append(keyword == null ? "[null]" : (NO_KEYWORDS.equals(keyword)) ? "[none]" : keyword).append(":\n");
-                for (Plugin plugin : entry.getValue()) {
+                for (Plugin plugin : entryMap.getValue()) {
                     sb.append("      ").append(plugin.getPluginId()).append("\n");
                 }
             }
         }
+//        for (Class<?> clazz : plugins.keySet()) {
+//            sb.append("  ").append(clazz.getName()).append(":\n");
+//            Map<String, Set<? extends Plugin>> map = plugins.get(clazz);
+//            for (Map.Entry<String, Set<? extends Plugin>> entry : map.entrySet()) {
+//                String keyword = entry.getKey();
+//                sb.append("    ").append(keyword == null ? "[null]" : (NO_KEYWORDS.equals(keyword)) ? "[none]" : keyword).append(":\n");
+//                for (Plugin plugin : entry.getValue()) {
+//                    sb.append("      ").append(plugin.getPluginId()).append("\n");
+//                }
+//            }
+//        }
 
         return sb.toString();
     }

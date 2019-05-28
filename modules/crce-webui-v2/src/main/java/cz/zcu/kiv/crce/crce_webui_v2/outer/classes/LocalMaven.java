@@ -1,13 +1,12 @@
 package cz.zcu.kiv.crce.crce_webui_v2.outer.classes;
 
-import java.io.File;
-import java.io.Serializable;
-
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Tree;
-
 import cz.zcu.kiv.crce.crce_external_repository.api.impl.SettingsUrl;
+
+import java.io.File;
+import java.io.Serializable;
 
 /**
  * Class to list the contents of the local Maven repository.
@@ -49,6 +48,9 @@ public class LocalMaven implements Serializable{
 	 */
 	private void list(File file) {
 		File[] children = file.listFiles();
+		if (children == null) {
+			return;
+		}
 		for (File child : children) {
 			if (child.isDirectory() && child.getName().charAt(0) != '.') {
 				localMavenTree.addItem(child.getAbsolutePath());

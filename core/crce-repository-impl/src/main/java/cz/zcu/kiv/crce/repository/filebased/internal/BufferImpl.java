@@ -1,28 +1,5 @@
 package cz.zcu.kiv.crce.repository.filebased.internal;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -39,6 +16,21 @@ import cz.zcu.kiv.crce.repository.SessionRegister;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Filebased implementation of <code>Buffer</code>.
@@ -121,11 +113,14 @@ public class BufferImpl implements Buffer, EventHandler {
      * Called by dependency manager
      */
     synchronized void stop() {
-//        m_repository = null;
-        for (File file : baseDir.listFiles()) {
-            if (!file.delete()) {
-                file.deleteOnExit();
-                logger.warn("Can not delete file from destroyed buffer, deleteOnExit was set: {}", file);
+        File[] files = baseDir.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (!file.delete()) {
+                    file.deleteOnExit();
+                    logger.warn("Can not delete file from destroyed buffer, deleteOnExit was set: {}", file);
+                }
             }
         }
         if (!baseDir.delete()) {

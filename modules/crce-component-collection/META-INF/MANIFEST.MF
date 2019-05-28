@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1556794213790
-Build-Jdk: 1.8.0_212
-Built-By: rpesek
+Bnd-LastModified: 1559038846562
+Build-Jdk: 1.8.0_191
+Built-By: zdenda
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_collection.internal.Act
  ivator
 Bundle-Description: Component Repository supporting Compatibility Evalua

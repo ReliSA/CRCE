@@ -1,10 +1,7 @@
 package cz.zcu.kiv.crce.crce_external_repository.api.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import cz.zcu.kiv.crce.crce_external_repository.api.DefinedMavenApi;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -15,17 +12,16 @@ import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.VersionRangeRequest;
-import org.eclipse.aether.resolution.VersionRangeResolutionException;
-import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.resolution.*;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.version.Version;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DefinedMaven implements DefinedMavenApi {
 	private ArtifactTree definedArtefact;
@@ -95,6 +91,7 @@ public class DefinedMaven implements DefinedMavenApi {
 		}
 	}
 
+	@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
 	public static boolean resolveArtifact(String artifactText, SettingsUrl settings) {
 		RepositorySystem repoSystem = newRepositorySystem();
 		RepositorySystemSession session = newSession(repoSystem, settings.getLocalAetherUrl());
