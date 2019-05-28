@@ -16,6 +16,7 @@
         <module>build</module>
         <module>core</module>
         <module>modules</module>
+        <module>deploy</module>
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->

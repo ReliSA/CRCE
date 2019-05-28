@@ -53,6 +53,7 @@
         <!--<module>crce-efp-indexer</module>-->
         <module>crce-external-repository</module>
         <module>crce-component-collection</module>
+        <module>crce-default-modules</module>
 
         <!-- Libraries -->
         <!--<module>crce-efp-assignment</module>-->
