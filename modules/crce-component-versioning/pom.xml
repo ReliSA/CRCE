@@ -18,7 +18,7 @@
         <bundle.symbolicName>CRCE  - Support versification composite components</bundle.symbolicName>
         <bundle.namespace>${namespace}.crce_component_versioning</bundle.namespace>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.jdk>1.8</version.jdk>
+        <version.jdk>10</version.jdk>
     </properties>
     <dependencyManagement>
         <dependencies>

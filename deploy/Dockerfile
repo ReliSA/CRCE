@@ -1,5 +1,5 @@
 # Use java 7 jdk which is compatible with CRCE
-FROM java:7-jdk
+FROM openjdk:11.0.3-jdk-stretch
 
 # Prepare environment
 RUN mkdir /felix
@@ -7,12 +7,12 @@ WORKDIR /felix
 
 # Download and upack Felix
 # 4.6.1 is compatible with Java 1.7
-ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-5.0.0.tar.gz ./apache-felix.tar.gz
+ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-6.0.3.tar.gz ./apache-felix.tar.gz
 RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
-ENV FELIX_PATH /felix/felix-framework-5.0.0
+ENV FELIX_PATH /felix/felix-framework-6.0.3
 
 # Remove duplicate gogo runtime
-RUN rm ${FELIX_PATH}/bundle/org.apache.felix.gogo.runtime-0.16.2.jar
+RUN rm ${FELIX_PATH}/bundle/org.apache.felix.gogo.runtime*
 
 # Add CRCE modules to Felix autodeploy dir
 ADD ./runner/bundles/* ${FELIX_PATH}/bundle/

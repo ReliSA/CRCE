@@ -17,7 +17,7 @@
 		<bundle.symbolicName>CRCE - External repository</bundle.symbolicName>
 		<bundle.namespace>${namespace}.crce_external_repository</bundle.namespace>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.jdk>1.8</version.jdk>
+		<version.jdk>10</version.jdk>
 		<!-- <maven.compiler.source>1.8</maven.compiler.source> -->
 		<!-- <maven.compiler.target>1.8</maven.compiler.target> -->
 		<!-- If there are no local customisations, this can also be "fetch" or 

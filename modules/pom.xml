@@ -40,7 +40,7 @@
              It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
         -->
 
-        <version.org.slf4j>1.7.7</version.org.slf4j>
+        <version.org.slf4j>1.7.26</version.org.slf4j>
         <version.logback>1.1.2</version.logback>
     </properties>
 
@@ -143,6 +143,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

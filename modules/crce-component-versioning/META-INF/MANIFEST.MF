@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1552830066617
-Build-Jdk: 1.8.0_191
+Bnd-LastModified: 1558293785414
+Build-Jdk: 11.0.2
 Built-By: zdenda
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
  ivator
@@ -20,5 +20,4 @@ Export-Package: cz.zcu.kiv.crce.crce_component_versioning.api;uses:="cz.
  .crce.crce_component_versioning.api.impl;uses:="cz.zcu.kiv.crce.crce_co
  mponent_versioning.api,cz.zcu.kiv.crce.crce_component_versioning.api.be
  an";version="1.0.0"
-Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Tool: Bnd-3.3.0.201609221906
