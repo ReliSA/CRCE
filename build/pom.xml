@@ -20,7 +20,7 @@
 
     <properties>
         <namespace>cz.zcu.kiv.crce</namespace>
-        <version.jdk>1.7</version.jdk>
+        <version.jdk>1.8</version.jdk>
         <version.maven>3.0.4</version.maven>
         <version.mongodb>2.13.3</version.mongodb>
         <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
