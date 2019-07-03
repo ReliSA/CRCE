@@ -20,19 +20,35 @@ On linux, switching to JDK 8 for development/build can be done via `sudo update-
 
 On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
+### Build docker image
+
+1. Build `crce-modules-reactor` in `/deploy` by running `mvn clean install`
+1. Build the project (as described previously)
+2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` 
+3. Now you can build docker with `docker build . -r <image-tag>`
+
 ## Start up
-
-Build `crce-modules-reactor` in `/deploy`.
-
-For run in docker run command in `/deploy`:
-
-```docker build . -t crce-dock```
 
 For run on local machine run command in `/deploy`:
 
 Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
 
 ```mvn pax:provision```
+
+### Running docker
+
+Assumig the image is build, crce can be run in docker by this command:
+
+```
+docker run -it \
+        -p 8080:8080 \
+        --add-host mongoserver:172.17.0.1 \
+        -v /felix/deploy:/felix/deploy \
+        <image-tag>
+```
+
+The `-add-host ...` and `-v ...` parameters allow docker to connect to mongoDb running locally and to install new bundles 
+(from provided directory). These parameters aren't necessary to run CRCE.
 
 
 In both cases the output log should write up some info about dependencies terminated by lines similar to the following:

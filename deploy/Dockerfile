@@ -15,7 +15,7 @@ ENV FELIX_PATH /felix/felix-framework-5.0.0
 RUN rm ${FELIX_PATH}/bundle/org.apache.felix.gogo.runtime-0.16.2.jar
 
 # Add CRCE modules to Felix autodeploy dir
-ADD ./runner/bundles/* ${FELIX_PATH}/bundle/
+ADD ./target/pax-runner-dir/bundles/* ${FELIX_PATH}/bundle/
 
 # Create directory for installing new bundles
 RUN mkdir ${FELIX_PATH}/dist
