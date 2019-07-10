@@ -38,26 +38,8 @@
     <dependencies>
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-metadata-api</artifactId>
-            <version>${crce.metadata.api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-resolver-api</artifactId>
-            <version>${crce.resolver.api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-repository-api</artifactId>
-            <version>${crce.repository.api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-plugin-api</artifactId>
-            <version>${crce.plugin.api.version}</version>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
         </dependency>
 
         <dependency>

@@ -13,7 +13,7 @@
 
     <groupId>cz.zcu.kiv.crce.wrapper</groupId>
     <artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
-    <version>1.19</version>
+    <version>1.21</version>
     <packaging>bundle</packaging>
 
     <name>${bundle.symbolicName} ${wrapped.version} [osgi]</name>
@@ -22,7 +22,7 @@
         <bundle.symbolicName>org.codehaus.plexus.plexus-interpolation</bundle.symbolicName>
         <wrapped.groupId>org.codehaus.plexus</wrapped.groupId>
         <wrapped.artifactId>plexus-interpolation</wrapped.artifactId>
-        <wrapped.version>1.19</wrapped.version>
+        <wrapped.version>1.21</wrapped.version>
     </properties>
 
     <dependencies>

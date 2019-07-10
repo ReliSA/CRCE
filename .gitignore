@@ -26,6 +26,8 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.classpath
+.project
 
 # Locally stored "Eclipse launch configurations"
 *.launch

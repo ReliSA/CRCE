@@ -1,0 +1,53 @@
+<configuration scan="true" scanPeriod="30 seconds">
+
+  <!-- Appenders -->
+  
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level {%thread} [%logger{36}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE-DEBUG" class="ch.qos.logback.core.FileAppender">
+    <file>logs/crce-debug.log</file>
+    <encoder>
+      <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level {%thread} [%logger{36}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE-INFO" class="ch.qos.logback.core.FileAppender">
+    <file>logs/crce.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <encoder>
+      <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level {%thread} [%logger{36}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE-ERROR" class="ch.qos.logback.core.FileAppender">
+    <file>logs/crce-error.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ERROR</level>
+    </filter>
+    <encoder>
+      <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} %-5level {%thread} [%logger{36}] %msg%n</pattern>
+    </encoder>
+  </appender>
+  
+  
+  <!-- Loggers -->
+  
+  <logger name="cz.zcu.kiv.crce" level="TRACE"/>
+  <!-- <logger name="cz.zcu.kiv.crce.something" level="DEBUG"/> -->
+
+  <root level="INFO">
+    <!-- <appender-ref ref="STDOUT"/> -->
+    <appender-ref ref="FILE-DEBUG"/>
+    <appender-ref ref="FILE-INFO"/>
+    <appender-ref ref="FILE-ERROR"/>
+  </root>
+
+</configuration>

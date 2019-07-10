@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <relativePath>../build</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>shared-build-settings</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>provision-reactor</artifactId>
+    <version>2.1.2-SNAPSHOT</version>
+
+    <name>CRCE - Provision - Reactor</name>
+
+    <packaging>pom</packaging>
+
+    <properties>
+        <felix.fileinstall.poll>2000</felix.fileinstall.poll>
+        <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
+        <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
+        <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
+		
+		
+		<org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
+        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.osgi.framework.system.packages.extra>
+            javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
+        </org.osgi.framework.system.packages.extra>
+        <org.osgi.framework.bootdelegation>
+            sun.*,com.sun.*
+        </org.osgi.framework.bootdelegation>
+		
+        <!--
+             The following packages are not imported by any bundle,
+             but they may be used by some efp assignment wrapped library, check it and remove them.
+
+             It would be better to export org.osgi.framework.system.packages.extra packages by a regular bundle than by system bundle.
+        -->
+
+        <version.org.slf4j>1.7.7</version.org.slf4j>
+        <version.logback>1.1.2</version.logback>
+        <vaadin.version>7.7.10</vaadin.version>
+    </properties>
+
+    <scm>
+        <url>https://github.com/ReliSA/crce/tree/master/build</url>
+        <connection>https://github.com/ReliSA/crce.git</connection>
+        <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <modules>
+		<module>provision</module>
+    </modules>
+	
+	<dependencyManagement>
+        <dependencies>
+
+            <!-- CRCE core dependencies -->
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-core</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
+                <type>pom</type>
+            </dependency>
+			
+			<dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-default-modules</artifactId>
+                <version>2.1.1-SNAPSHOT</version>
+                <type>pom</type>
+            </dependency>
+
+            <!-- 3rd party dependencies -->
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-json-jackson</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+
+            <!-- vaadin -->
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-server</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-push</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-client-compiled</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-themes</artifactId>
+                <version>${vaadin.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+	
+	<build>
+		<plugins>
+			<plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <configuration>
+                    <provision>
+                        <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=65505
+                        </param>
+                        <param>--platform=felix</param>
+                        <param>
+                            --repositories=http://uk.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
+                        </param>
+                        <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
+                        <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:ch.qos.logback/logback-core/${version.logback}@1</param>
+                        <param>mvn:ch.qos.logback/logback-classic/${version.logback}@1</param>
+                    </provision>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+
+    <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
+    <repositories>
+        <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+        <repository>
+            <id>tmatesoft</id>
+            <url>https://maven.tmatesoft.com/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+</project>

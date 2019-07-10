@@ -7,6 +7,7 @@
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>crce-parent</artifactId>
         <version>2.1.1-SNAPSHOT</version>
+        <!-- <version>2.1.0</version> -->
         <relativePath />
     </parent>
 
@@ -19,12 +20,13 @@
 
     <properties>
         <namespace>cz.zcu.kiv.crce</namespace>
-        <version.jdk>1.7</version.jdk>
+        <version.jdk>1.8</version.jdk>
         <version.maven>3.0.4</version.maven>
         <version.mongodb>2.13.3</version.mongodb>
         <version.org.apache.ace>0.8.1-incubator</version.org.apache.ace>
         <version.org.osgi>4.3.1</version.org.osgi>
-        <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web>
+        <version.org.ops4j.pax.web>6.0.7</version.org.ops4j.pax.web>
+        <!-- <version.org.ops4j.pax.web>3.0.3</version.org.ops4j.pax.web> -->
         <version.jpa>1.0.0.Final</version.jpa>
         <version.org.apache.felix.dependencymanager>3.2.0</version.org.apache.felix.dependencymanager>
         <version.com.fasterxml.jackson>2.6.1</version.com.fasterxml.jackson>
@@ -80,7 +82,8 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>3.3.0</version>
+                    <!-- <version>2.5.3</version> -->
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
@@ -118,17 +121,18 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.1</version> <!-- 3.2 and 3.3 have false positive "unused private method" bug -->
+                    <version>3.8</version>
+                    <!-- <version>3.1</version> --> <!-- 3.2 and 3.3 have false positive "unused private method" bug -->
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.0.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
@@ -161,6 +165,23 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- crce-webui -->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>2.9.1</version>
+            </dependency>
+
 <!--            <dependency>
 
                  | dependency pom representing the global classpath of imported bundles
@@ -203,29 +224,47 @@
             <!-- PAX-WEB -->
 
             <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- <dependency>
                 <groupId>org.ops4j.pax.web</groupId>
                 <artifactId>pax-web-extender-war</artifactId>
                 <version>${version.org.ops4j.pax.web}</version>
                 <scope>provided</scope>
-            </dependency>
+            </dependency> -->
             <dependency>
-                <groupId>org.ops4j.pax.web</groupId>
-                <artifactId>pax-web-jetty-bundle</artifactId>
-                <version>${version.org.ops4j.pax.web}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.ops4j.pax.web</groupId>
-                <artifactId>pax-web-jsp</artifactId>
-                <version>${version.org.ops4j.pax.web}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.ops4j.pax.web</groupId>
-                <artifactId>pax-web-spi</artifactId>
-                <version>${version.org.ops4j.pax.web}</version>
-                <scope>provided</scope>
-            </dependency>
+				<groupId>org.ops4j.pax.web</groupId>
+				<artifactId>pax-web-jetty-bundle</artifactId>
+				<version>${version.org.ops4j.pax.web}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+    			<groupId>org.ops4j.pax.web</groupId>
+    			<artifactId>pax-web-spi</artifactId>
+    			<version>${version.org.ops4j.pax.web}</version>
+    			<scope>provided</scope>
+			</dependency>
+			<dependency>
+    			<groupId>org.ops4j.pax.web</groupId>
+    			<artifactId>pax-web-api</artifactId>
+    			<version>${version.org.ops4j.pax.web}</version>
+    			<scope>provided</scope>
+			</dependency>
+			<dependency>
+    			<groupId>org.ops4j.pax.web</groupId>
+    			<artifactId>pax-web-extender-war</artifactId>
+    			<version>${version.org.ops4j.pax.web}</version>
+    			<scope>provided</scope>
+			</dependency>
+			<dependency>
+    			<groupId>org.ops4j.pax.web</groupId>
+    			<artifactId>pax-web-descriptor</artifactId>
+    			<version>${version.org.ops4j.pax.web}</version>
+    			<scope>provided</scope>
+			</dependency>
 
             <!-- JPA -->
             <dependency>
@@ -389,7 +428,7 @@
 
 
             <!-- Servlet API -->
-            <dependency>
+            <!-- <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
@@ -400,7 +439,7 @@
                 <artifactId>jsp-api</artifactId>
                 <version>2.0</version>
                 <scope>provided</scope>
-            </dependency>
+            </dependency> -->
 
             <!-- Apache ACE -->
             <dependency>
@@ -502,7 +541,8 @@
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm-all</artifactId>
-                <version>4.1</version>
+                <version>5.2</version>
+                <!-- <version>5.0.3</version> -->
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.bundles</groupId>
@@ -561,14 +601,16 @@
             <dependency> <!-- Required by pax-web-extender-war -->
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-finder</artifactId>
-                <version>3.13</version>
+                <version>4.5</version>
+                <!-- <version>3.13</version> -->
                 <!-- 3.14 - 3.16 doesn't work-->
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-bundleutils</artifactId>
-                <version>3.13</version>
+                <version>4.5</version>
+                <!-- <version>3.13</version> -->
             </dependency>
 
             <dependency>

@@ -1,9 +1,11 @@
 package cz.zcu.kiv.crce.metadata.indexer;
 
+import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.plugin.AbstractPlugin;
+
 import java.util.Collections;
 import java.util.List;
-
-import cz.zcu.kiv.crce.plugin.AbstractPlugin;
+import java.util.Map;
 
 /**
  * Abstract implementation of <code>ResourceIndexer</code> which can be extended
@@ -30,5 +32,10 @@ public abstract class AbstractResourceIndexer extends AbstractPlugin implements 
     @Override
     public String getPluginDescription() {
         return "ResourceIndexer plugin implementation";
+    }
+
+    @Override
+    public Map<String, List<AttributeType>> getIndexedAttributes() {
+        return Collections.emptyMap();
     }
 }

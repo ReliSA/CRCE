@@ -1,25 +1,5 @@
 package cz.zcu.kiv.crce.repository.filebased.internal;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.io.FileUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Repository;
 import cz.zcu.kiv.crce.metadata.Requirement;
@@ -36,6 +16,20 @@ import cz.zcu.kiv.crce.repository.plugins.ActionHandler;
 import cz.zcu.kiv.crce.repository.plugins.Executable;
 import cz.zcu.kiv.crce.resolver.Operator;
 import cz.zcu.kiv.crce.resolver.ResourceLoader;
+import org.apache.commons.io.FileUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Filebased implementation of <code>Store</code>.
@@ -68,7 +62,7 @@ public class FilebasedStoreImpl implements Store, EventHandler {
      */
     @SuppressWarnings({"UseOfObsoleteCollectionType", "unchecked"})
     void init() {
-        Dictionary<String, String> props = new java.util.Hashtable<>();
+        Dictionary<String, String> props = new Hashtable<>();
         props.put(EventConstants.EVENT_TOPIC, PluginManager.class.getName().replace(".", "/") + "/*");
         props.put(EventConstants.EVENT_FILTER, "(" + PluginManager.PROPERTY_PLUGIN_TYPES + "=*" + MetadataDao.class.getName() + "*)");
         context.registerService(EventHandler.class.getName(), this, props);
@@ -285,7 +279,9 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     @Override
     public synchronized List<Resource> getResources() {
         try {
-            return metadataDao.loadResources(repository, false);
+        	// Edit rpesek - For webui-v2 retrieval of resources including details (capabilities, requirements)
+            // return metadataDao.loadResources(repository, false);
+        	return metadataDao.loadResources(repository, true);
         } catch (IOException e) {
             logger.error("Could not load resources of repository {}.", baseDir.toURI(), e);
         }
@@ -345,7 +341,11 @@ public class FilebasedStoreImpl implements Store, EventHandler {
     }
 
     private void indexDirectory(File directory, Repository repository) {
-        for (File file : directory.listFiles()) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
             if (file.isFile()) {
                 try {
                     if ("repository.xml".equals(file.getName())) {

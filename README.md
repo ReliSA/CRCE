@@ -8,7 +8,7 @@ To cite CRCE as a research result, please use the following citation:
 
 ## Prerequisities
 
-- **JDK 7** set in `JAVA_HOME` environment variable before starting CRCE (there is a problem with running web UI on JDK 8, need to update dependencies), tested on 1.7.0_80
+- **JDK 8** set in `JAVA_HOME` environment variable before starting CRCE, tested on 1.8.0_181
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
@@ -24,13 +24,38 @@ On linux, switching to JDK 7 for development/build can be done via `update-java-
 
 On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
+### Build docker image
+
+1. Build `crce-modules-reactor` in `/deploy` by running `mvn clean install`
+1. Build the project (as described previously)
+2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` 
+3. Now you can build docker with `docker build . -r <image-tag>`
+
 ## Start up
 
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/modules` directory):
+For run on local machine run command in `/deploy`:
 
-`mvn pax:provision`
+Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
 
-The output log should write up some info about dependencies terminated by lines similar to the following:
+```mvn pax:provision```
+
+### Running docker
+
+Assumig the image is build, crce can be run in docker by this command:
+
+```
+docker run -it \
+        -p 8080:8080 \
+        --add-host mongoserver:172.17.0.1 \
+        -v /felix/deploy:/felix/deploy \
+        <image-tag>
+```
+
+The `-add-host ...` and `-v ...` parameters allow docker to connect to mongoDb running locally and to install new bundles 
+(from provided directory). These parameters aren't necessary to run CRCE.
+
+
+In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
 
 ```
 Listening for transport dt_socket at address: 65505
@@ -51,7 +76,7 @@ The cause of the latter is a badly loaded binary of mathematical solver which do
 
 Started up, the application is accessible at:
 
-- web UI: http://localhost:8080/crce
+- web UI: http://localhost:8080/crce-webui
 - REST web services: http://localhost:8080/rest/v2/
 
 Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).

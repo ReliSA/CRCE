@@ -33,17 +33,6 @@
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <felix.fileinstall.bundles.new.start>false</felix.fileinstall.bundles.new.start>
-        <felix.fileinstall.poll>2000</felix.fileinstall.poll>
-        <felix.fileinstall.dir>../conf</felix.fileinstall.dir>
-        <felix.fileinstall.filter>.*\\.cfg</felix.fileinstall.filter>
-        <logback.configurationFile>../conf/logback.xml</logback.configurationFile>
-        <org.osgi.framework.system.packages.extra>
-            javax.inject,javax.jmdns,javax.jms,javax.mail,javax.mail.internet,javax.microedition.io
-        </org.osgi.framework.system.packages.extra>
-        <org.osgi.framework.bootdelegation>
-            sun.*,com.sun.*
-        </org.osgi.framework.bootdelegation>
         <!--
              The following packages are not imported by any bundle,
              but they may be used by some efp assignment wrapped library, check it and remove them.
@@ -57,34 +46,34 @@
 
     <modules>
         <module>pom</module>
-        <module>provision</module>
 
         <!-- Indexers -->
         <module>crce-metadata-osgi-bundle</module>
         <!--<module>crce-metadata-cosi-bundle</module>-->
         <!--<module>crce-efp-indexer</module>-->
+        <module>crce-external-repository</module>
+        <module>crce-component-collection</module>
+        <module>crce-default-modules</module>
 
         <!-- Libraries -->
         <!--<module>crce-efp-assignment</module>-->
 
         <!-- UI & Optional Plugins -->
-        <module>crce-handler-metrics</module>
-        <module>crce-webui</module>
+        <!-- <module>crce-handler-metrics</module> --> <!-- findbugs - 1 bugs -->
+        <module>crce-webui-v2</module>
 
         <!--<module>crce-rest</module>-->
         <module>crce-rest-v2</module>
 
-        <module>crce-optimizer-functions</module>
 
-        <module>crce-compatibility-api</module>
+        <!--<module>crce-optimizer-functions</module>-->
         <module>crce-compatibility-dao-api</module>
         <module>crce-compatibility-dao-mongodb</module>
-        <module>crce-concurrency</module>
         <module>crce-vo</module>
 
         <!--<module>crce-repository-maven-impl</module>-->
         
-        <module>crce-webservices-indexer</module>
+        <!--<module>crce-webservices-indexer</module>-->
     </modules>
 
     <profiles>

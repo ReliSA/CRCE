@@ -13,7 +13,7 @@
 
     <groupId>cz.zcu.kiv.crce.wrapper</groupId>
     <artifactId>org.codehaus.plexus.plexus-utils</artifactId>
-    <version>3.0.17</version>
+    <version>3.0.22</version>
     <packaging>bundle</packaging>
 
     <name>${bundle.symbolicName} ${wrapped.version} [osgi]</name>
@@ -22,7 +22,7 @@
         <bundle.symbolicName>org.codehaus.plexus.plexus-utils</bundle.symbolicName>
         <wrapped.groupId>org.codehaus.plexus</wrapped.groupId>
         <wrapped.artifactId>plexus-utils</wrapped.artifactId>
-        <wrapped.version>3.0.17</wrapped.version>
+        <wrapped.version>3.0.22</wrapped.version>
     </properties>
 
     <dependencies>
