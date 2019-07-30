@@ -32,6 +32,7 @@
         <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
         <version.org.slf4j>1.7.7</version.org.slf4j>
         <version.xbean>4.14</version.xbean>
+        <version.jersey>2.29</version.jersey>
     </properties>
 
     <scm>
@@ -183,25 +184,13 @@
             <dependency>
                 <groupId>org.glassfish.jersey.containers</groupId>
                 <artifactId>jersey-container-servlet-core</artifactId>
-                <version>2.29</version>
+                <version>${version.jersey}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-multipart</artifactId>
-                <version>2.29</version>
+                <version>${version.jersey}</version>
             </dependency>
-
-<!--            <dependency>
-
-                 | dependency pom representing the global classpath of imported bundles
-
-                <type>pom</type>
-                <groupId>cz.zcu.kiv.crce.crce-reactor.build</groupId>
-                <artifactId>provision</artifactId>
-                <version>2.0.1-SNAPSHOT</version>
-                <scope>provided</scope>
-                <optional>true</optional>
-            </dependency>-->
 
             <!-- === Provided dependencies === -->
 
@@ -238,12 +227,6 @@
                 <version>2.5</version>
                 <scope>provided</scope>
             </dependency>
-            <!-- <dependency>
-                <groupId>org.ops4j.pax.web</groupId>
-                <artifactId>pax-web-extender-war</artifactId>
-                <version>${version.org.ops4j.pax.web}</version>
-                <scope>provided</scope>
-            </dependency> -->
             <dependency>
 				<groupId>org.ops4j.pax.web</groupId>
 				<artifactId>pax-web-jetty-bundle</artifactId>
@@ -355,7 +338,6 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>org.apache.felix.dependencymanager.shell</artifactId>
                 <version>${version.org.apache.felix.dependencymanager}</version>
-                <!-- 3.1.0 version is not available yet -->
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -434,21 +416,6 @@
                 <version>1.7.7</version>
                 <optional>true</optional> <!-- Dependency of JaCC excluded from provision -->
             </dependency>
-
-
-            <!-- Servlet API -->
-            <!-- <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>jsp-api</artifactId>
-                <version>2.0</version>
-                <scope>provided</scope>
-            </dependency> -->
 
             <!-- Apache ACE -->
             <dependency>
@@ -606,20 +573,21 @@
                 <version>20080701</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency> <!-- Required by pax-web-extender-war -->
+
+            <!--
+            Required by pax-web-extender-war
+            Note that this also requires org.ow2.asm:asm
+            -->
+            <dependency>
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-finder</artifactId>
                 <version>${version.xbean}</version>
-                <!--<version>4.5</version>-->
-                <!-- <version>3.13</version> -->
-                <!-- 3.14 - 3.16 doesn't work-->
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.xbean</groupId>
                 <artifactId>xbean-bundleutils</artifactId>
                 <version>${version.xbean}</version>
-                <!-- <version>3.13</version> -->
             </dependency>
 
             <dependency>

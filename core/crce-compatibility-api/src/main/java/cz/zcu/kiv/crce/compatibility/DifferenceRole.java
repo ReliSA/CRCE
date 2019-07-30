@@ -21,7 +21,7 @@ public enum DifferenceRole {
 
     private final String value;
 
-    private DifferenceRole(String value) {
+    DifferenceRole(String value) {
         this.value = value;
     }
 

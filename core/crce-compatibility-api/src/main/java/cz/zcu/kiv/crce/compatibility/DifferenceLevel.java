@@ -31,7 +31,7 @@ public enum DifferenceLevel {
 
     private final String value;
 
-    private DifferenceLevel(String value) {
+    DifferenceLevel(String value) {
         this.value = value;
     }
 

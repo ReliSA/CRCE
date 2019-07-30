@@ -31,7 +31,7 @@ public enum Difference {
 
     private String name;
 
-    private Difference(String name) {
+    Difference(String name) {
         this.name = name;
     }
 
