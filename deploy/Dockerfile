@@ -1,11 +1,11 @@
-# Use java 11 jdk which is compatible with CRCE
+# Use java 11 jdk
 FROM openjdk:11.0.3-jdk-stretch
 
 # Prepare environment
 RUN mkdir /felix
 WORKDIR /felix
 
-# Download and upack Felix
+# Download and unpack Felix (6.0.3 is the latest version)
 ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-6.0.3.tar.gz ./apache-felix.tar.gz
 RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
 ENV FELIX_PATH /felix/felix-framework-6.0.3
