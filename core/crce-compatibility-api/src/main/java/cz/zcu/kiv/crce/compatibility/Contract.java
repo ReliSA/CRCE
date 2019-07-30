@@ -14,7 +14,7 @@ public enum Contract {
 
     private final String value;
 
-    private Contract(String value) {
+    Contract(String value) {
         this.value = value;
     }
 
