@@ -4,38 +4,67 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 8** set in `JAVA_HOME` environment variable before starting CRCE, tested on 1.8.0_181
+- **JDK 11** set in `JAVA_HOME` environment variable before starting CRCE, tested on OpenJDK 11.0.4
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 8 for development/build can be done via `sudo update-alternatives --config java`.
+On linux, switching to JDK 11 for development/build can be done via `sudo update-alternatives --config java`.
 
 ## Build
+
+Build process consists of two parts. Compiling and building the code itself and building the docker image.
+
+### Build CRCE
+
+This process can be done automatically by running the `build-code.bash` script placed in the project root directory.
 
 1. `crce-parent` in `/pom` directory
 2. `shared-build-settings` in `/build`
 3. everything in `/third-party` (bash: `.../third-party$ for d in * ; do cd $d; mvn clean install; cd .. ; done`)
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
+6. `provision-reactor` in `/deploy`
 
 On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
 
+
+### Build docker image
+
+Docker image is placed in directory `/deploy` but before it can be used, bundles must be collected. 
+Bundles can be collected by running the following commands in `/deploy` directory:
+
+```bash
+mvn clean pax:directory
+./prepare-bundles.sh
+
+```
+
+The `prepare-bundles.sh` script is needed due to the issues further described in the Issues section.
+
+To finally build the image itself, execute the following commnad in `/deploy` directory:
+
+```bash
+docker build . -t ${image-tag}
+```
+
 ## Start up
 
-Build `crce-modules-reactor` in `/deploy`.
+Assuimg the dokcer image is already build, run it by following command:
 
-For run in docker run command in `/deploy`:
+```bash
+docker run -it \
+        -p 8080:8080 \
+        --add-host mongoserver:172.17.0.1 \
+        -v /felix/deploy:/felix/deploy \
+        ${image-tag}
+```
 
-```docker build . -t crce-dock```
-
-For run on local machine run command in `/deploy`:
-
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
-
-```mvn pax:provision```
+The `-p` parameter maps the port of docker virual machine to the real port on the computer. 
+The `--add-host` allows docker to connect to the Mongo database running locally (Docker *usually* uses 172.17.0.1 ip to access localhost from the container). The app expects the database to be listening on port 27017 by default.
+The `-v` parameter maps directory in container to the real directory in the host machine so that it can be used to install new bundles via CLI. 
 
 
-In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
+If everything works, the output log should write up some info about dependencies terminated by lines similar to the following:
 
 ```
 Listening for transport dt_socket at address: 65505
@@ -61,6 +90,16 @@ Started up, the application is accessible at:
 
 Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).
 
+### MongoDB
+
+Mongo DB can either be run locally or in docker using following command:
+
+```bash
+sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
+```
+
+Where `~/data` is directory on host machine to be used as a storage by Mongo.
+
 ### lpsolve installation
 
 To solve the issue with mathematical solver, you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.
@@ -70,3 +109,14 @@ To solve the issue with mathematical solver, you need to install [lpsolve librar
 ## Code updates
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.
+
+## Issues
+
+### Required runtime environment capability in some bundles
+
+Some bundles (mostly those from the third parties) either require a particular version of OSGi runtime environment or require the capability `osgi.ee` to be set to a specific value. This may or may not work with newer version of Java and to avoid runtime problems, these requirements need to be removed.
+
+To remove them, it is necessary to edit manifest (`META-INF/MANIFEST.MF`) of such bundle and remove lines containing:
+`Require-Capability: osgi.ee;` or `Bundle-RequiredExecutionEnvironment: J2SE-`. This is done in the `deploy/prepare-bundles.sh` script.
+
+An ideal solution would be to either found newer version of such bundles or replace them with different bundles with same functionality. This however may introduce compatibility issues (as some other bundles may depend on the current versions) or may not even be possible (replacement bundle does not exist). 

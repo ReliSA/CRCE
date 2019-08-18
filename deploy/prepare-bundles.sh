@@ -15,6 +15,8 @@ logFile="out.log"
 # directory with bundles to be processed
 bundleDir="target/pax-runner-dir/bundles"
 
+# path to manifest relative to the jar root
+manifesPath="META-INF/MANIFEST.MF"
 
 # This function processes one bundle.
 function process_bundle {
@@ -22,21 +24,21 @@ function process_bundle {
 
     # unzip jar to tmp folder
     unzip -q $1 -d $tmpFolder
-    manifestPath="$tmpFolder/META-INF/MANIFEST.MF"
+    manifestPath="$tmpFolder/${manifestPath}"
 
     # remove capabilities/requirements from MANIFEST.MF if needed and pack it back to jar
     if grep -q "$requireCapString" "$manifestPath"; then
         sed -i "/${requireCapString}/d" "$manifestPath"
-        echo "$requireCapString: $1" >> $logFile
+        echo "$requireCapString: $1" >> ${logFile}
         cd ${tmpFolder}
-        zip -u ../$1 "META-INF/MANIFEST.MF"
+        zip -u ../$1 "${manifestPath}"
         cd ..
     fi
     if grep -q "$reqEnvString" "$manifestPath"; then
         sed -i "/${reqEnvString}/d" "$manifestPath"
-        echo "$reqEnvString: $1" >> $logFile
+        echo "$reqEnvString: $1" >> ${logFile}
         cd ${tmpFolder}
-        zip -u ../$1 "META-INF/MANIFEST.MF"
+        zip -u ../$1 "${manifestPath}"
         cd ..
     fi
 
