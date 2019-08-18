@@ -8,13 +8,15 @@ To cite CRCE as a research result, please use the following citation:
 
 ## Prerequisities
 
-- **JDK 8** set in `JAVA_HOME` environment variable before starting CRCE, tested on 1.8.0_181
+- **JDK 11** set in `JAVA_HOME` environment variable before starting CRCE, tested on OpenJDK 11.0.4
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
 On linux, switching JDK version for development/build can be done via `sudo update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
 ## Build
+
+Build process consists of two parts. Compiling and building the code itself and building the docker image.
 
 On linux or similar, the `./build.bash` script in project root directory can be used to perform these build steps. See top of script source for parameters tweaking the build.
 
@@ -23,16 +25,29 @@ On linux or similar, the `./build.bash` script in project root directory can be 
 3. everything in `/third-party` (bash: `.../third-party$ for d in * ; do cd $d; mvn clean install; cd .. ; done`)
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
+6. `provision-reactor` in `/deploy`
 
 In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
 
+
 ### Build docker image
 
-1. Build `crce-modules-reactor` in `/deploy` by running `mvn clean install`
-1. Build the project (as described previously)
-2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` ; disregard possible Pax complaints.
-3. Build docker image with `docker build . -t <image-tag>` (possibly via `sudo`)
+Docker image is placed in directory `/deploy` but before it can be used, bundles must be collected. 
+Bundles can be collected by running the following commands in `/deploy` directory:
 
+```bash
+mvn clean pax:directory
+./prepare-bundles.sh
+
+```
+
+The `prepare-bundles.sh` script is needed due to the issues further described in the Issues section.
+
+To finally build the image itself, execute the following commnad in `/deploy` directory:
+
+```bash
+docker build . -t ${image-tag}
+```
 ## Start up
 
 To start on local machine, make sure the `/deploy/conf` folder exists and contains all important configuration (especially the `cz.zcu.kiv.crce.repository.filebased-store.cfg`. After that, you run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
@@ -53,7 +68,13 @@ docker run -it \
 
 The `--add-host ...` and `-v ...` parameters allow docker to connect to MongoDB (so use the correct IP address instead of the 172.17... above) and to install new bundles (from the provided directory).  If MongoDB is running locally on 127.0.0.1, add `--network="host"` to make localhost accessible.
 
-In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
+
+The `-p` parameter maps the port of docker virual machine to the real port on the computer. 
+The `--add-host` allows docker to connect to the Mongo database running locally (Docker *usually* uses 172.17.0.1 ip to access localhost from the container). The app expects the database to be listening on port 27017 by default.
+The `-v` parameter maps directory in container to the real directory in the host machine so that it can be used to install new bundles via CLI. 
+
+
+If everything works, the output log should write up some info about dependencies terminated by lines similar to the following:
 
 ```
 Listening for transport dt_socket at address: 65505
@@ -79,6 +100,16 @@ Started up, the application is accessible at:
 
 Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).
 
+### MongoDB
+
+Mongo DB can either be run locally or in docker using following command:
+
+```bash
+sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
+```
+
+Where `~/data` is directory on host machine to be used as a storage by Mongo.
+
 ### lpsolve installation
 
 To solve the issue with mathematical solver, you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.
@@ -96,3 +127,14 @@ Configuration is done via OSGI service called [Configuration Admin](https://osgi
 Details on how it's implemented in Felix can be found in  [Apache Felix Configuration Admin Service](https://felix.apache.org/documentation/subprojects/apache-felix-config-admin.html).
 
 By default, Felix will look into the `conf` directory for possible configuration (example of such directory can be found in `deploy/conf.default`)
+
+## Issues
+
+### Required runtime environment capability in some bundles
+
+Some bundles (mostly those from the third parties) either require a particular version of OSGi runtime environment or require the capability `osgi.ee` to be set to a specific value. This may or may not work with newer version of Java and to avoid runtime problems, these requirements need to be removed.
+
+To remove them, it is necessary to edit manifest (`META-INF/MANIFEST.MF`) of such bundle and remove lines containing:
+`Require-Capability: osgi.ee;` or `Bundle-RequiredExecutionEnvironment: J2SE-`. This is done in the `deploy/prepare-bundles.sh` script.
+
+An ideal solution would be to either found newer version of such bundles or replace them with different bundles with same functionality. This however may introduce compatibility issues (as some other bundles may depend on the current versions) or may not even be possible (replacement bundle does not exist). 
