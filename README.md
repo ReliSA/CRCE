@@ -12,7 +12,7 @@ To cite CRCE as a research result, please use the following citation:
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 7 for development/build can be done via `update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
+On linux, switching JDK version for development/build can be done via `sudo update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
 ## Build
 
@@ -22,7 +22,7 @@ On linux, switching to JDK 7 for development/build can be done via `update-java-
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
-On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
+On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
 
 ### Build docker image
 
