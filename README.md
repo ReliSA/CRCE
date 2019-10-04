@@ -12,7 +12,7 @@ To cite CRCE as a research result, please use the following citation:
 - **MongoDB**, tested on v2.6.10, v3.4.10
 - **Maven 3**, tested on 3.5.2
 
-On linux, switching to JDK 7 for development/build can be done via `update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
+On linux, switching JDK version for development/build can be done via `sudo update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
 ## Build
 
@@ -22,26 +22,24 @@ On linux, switching to JDK 7 for development/build can be done via `update-java-
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
-On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
+On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
 
 ### Build docker image
 
 1. Build `crce-modules-reactor` in `/deploy` by running `mvn clean install`
 1. Build the project (as described previously)
 2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` 
-3. Now you can build docker with `docker build . -r <image-tag>`
+3. Build docker image with `docker build . -t <image-tag>` (possibly via `sudo`)
 
 ## Start up
 
-For run on local machine run command in `/deploy`:
-
-Run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
+To start on local machine, run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
 
 ```mvn pax:provision```
 
-### Running docker
+### Running with docker
 
-Assumig the image is build, crce can be run in docker by this command:
+Assumig the image is build, CRCE can be run in docker by this command:
 
 ```
 docker run -it \
@@ -51,8 +49,7 @@ docker run -it \
         <image-tag>
 ```
 
-The `-add-host ...` and `-v ...` parameters allow docker to connect to mongoDb running locally and to install new bundles 
-(from provided directory). These parameters aren't necessary to run CRCE.
+The `--add-host ...` and `-v ...` parameters allow docker to connect to mongoDb running locally (so use the correct IP address instead of the 172.17... above) and to install new bundles (from the provided directory). These parameters aren't necessary to run CRCE.
 
 
 In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
