@@ -9,6 +9,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>compiled-bundle-settings</artifactId>
+    <version>2.1.2-SNAPSHOT</version>
 
     <name>CRCE - Build - Compiled bundle instructions</name>
 
