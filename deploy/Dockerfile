@@ -31,4 +31,4 @@ COPY ./felix-configuration/config.properties ${FELIX_PATH}/conf/
 ENV mongo_connection mongodb://mongoserver:27017
 
 # Run Felix
-CMD cd ${FELIX_PATH} && java -jar ./bin/felix.jar
+CMD cd ${FELIX_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
