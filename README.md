@@ -120,13 +120,13 @@ To solve the issue with mathematical solver, you need to install [lpsolve librar
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.
 
-
 ## Configuration
 
 Configuration is done via OSGI service called [Configuration Admin](https://osgi.org/specification/osgi.cmpn/7.0.0/service.cm.html). 
 Details on how it's implemented in Felix can be found in  [Apache Felix Configuration Admin Service](https://felix.apache.org/documentation/subprojects/apache-felix-config-admin.html).
 
-By default, Felix will look into the `conf` directory for possible configuration (example of such directory can be found in `deploy/conf.default`)
+By default, Felix will look into the `config` directory for possible configuration (example of such directory can be found in `deploy/conf.default`)
+
 
 ## Issues
 

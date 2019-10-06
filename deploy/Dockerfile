@@ -22,7 +22,7 @@ RUN mkdir ${FELIX_PATH}/dist
 # Copy configuration for Configuration Admin service
 # 'conf' is the directory to watch (configured by 'felix.fileinstall.dir')
 #RUN mkdir ${FELIX_PATH}/load
-ADD ./conf/* ${FELIX_PATH}/conf/
+ADD ./conf.default/* ${FELIX_PATH}/conf/
 
 # Felix framework configuration override
 COPY ./felix-configuration/config.properties ${FELIX_PATH}/conf/

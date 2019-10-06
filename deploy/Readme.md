@@ -21,3 +21,11 @@ File used to create docker image.
 ## felix-configuration directory
 
 Felix framework configuration files.
+
+## prepare-bundles.sh script
+
+Used to process bundles so they can be run with Java 11
+
+
+
+ 
