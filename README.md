@@ -33,7 +33,7 @@ On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; 
 
 ## Start up
 
-To start on local machine, run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
+To start on local machine, make sure the `/deploy/conf` folder exists and contains all important configuration (especially the `cz.zcu.kiv.crce.repository.filebased-store.cfg`. After that, you run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
 
 ```mvn pax:provision```
 
@@ -87,3 +87,11 @@ To solve the issue with mathematical solver, you need to install [lpsolve librar
 ## Code updates
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.
+
+
+## Configuration
+
+Configuration is done via OSGI service called [Configuration Admin](https://osgi.org/specification/osgi.cmpn/7.0.0/service.cm.html). 
+Details on how it's implemented in Felix can be found in  [Apache Felix Configuration Admin Service](https://felix.apache.org/documentation/subprojects/apache-felix-config-admin.html).
+
+By default, Felix will look into the `conf` directory for possible configuration (example of such directory can be found in `deploy/conf.default`)
