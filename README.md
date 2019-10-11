@@ -16,19 +16,21 @@ On linux, switching JDK version for development/build can be done via `sudo upda
 
 ## Build
 
+On linux or similar, the `./build.bash` script in project root directory can be used to perform these build steps. See top of script source for parameters tweaking the build.
+
 1. `crce-parent` in `/pom` directory
 2. `shared-build-settings` in `/build`
 3. everything in `/third-party` (bash: `.../third-party$ for d in * ; do cd $d; mvn clean install; cd .. ; done`)
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 
-On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
+In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
 
 ### Build docker image
 
 1. Build `crce-modules-reactor` in `/deploy` by running `mvn clean install`
 1. Build the project (as described previously)
-2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` 
+2. Run `mvn pax:directory` in `/deploy` dir to collect all bundles into the `/target/pax-runner-dir/bundles/` ; disregard possible Pax complaints.
 3. Build docker image with `docker build . -t <image-tag>` (possibly via `sudo`)
 
 ## Start up
@@ -39,7 +41,7 @@ To start on local machine, make sure the `/deploy/conf` folder exists and contai
 
 ### Running with docker
 
-Assumig the image is build, CRCE can be run in docker by this command:
+Assuming the image is build and Mongo DB is running at an accessible address, CRCE can be run in docker by this command:
 
 ```
 docker run -it \
@@ -49,8 +51,7 @@ docker run -it \
         <image-tag>
 ```
 
-The `--add-host ...` and `-v ...` parameters allow docker to connect to mongoDb running locally (so use the correct IP address instead of the 172.17... above) and to install new bundles (from the provided directory). These parameters aren't necessary to run CRCE.
-
+The `--add-host ...` and `-v ...` parameters allow docker to connect to MongoDB (so use the correct IP address instead of the 172.17... above) and to install new bundles (from the provided directory).  If MongoDB is running locally on 127.0.0.1, add `--network="host"` to make localhost accessible.
 
 In both cases the output log should write up some info about dependencies terminated by lines similar to the following:
 
