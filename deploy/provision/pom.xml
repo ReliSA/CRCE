@@ -35,10 +35,6 @@
 
         <!-- === PAX-WEB === -->
 
-		<!-- <dependency>
-			<groupId>org.ops4j.pax.web</groupId>
-			<artifactId>pax-web-jsp</artifactId>
-		</dependency> -->
 		<dependency>
 			<groupId>org.ops4j.pax.web</groupId>
 			<artifactId>pax-web-jetty-bundle</artifactId>
@@ -231,6 +227,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
         </dependency>
 
         <!-- CRCE core implementations -->

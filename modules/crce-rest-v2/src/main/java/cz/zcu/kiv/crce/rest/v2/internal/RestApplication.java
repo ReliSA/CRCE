@@ -1,12 +1,12 @@
 package cz.zcu.kiv.crce.rest.v2.internal;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.logging.LoggingFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.core.Application;
-
-import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.jackson.JacksonFeature;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Registers features to Jersey.
@@ -19,7 +19,7 @@ public class RestApplication extends Application {
     public Set<Class<?>> getClasses() {
         final Set<Class<?>> classes = new HashSet<>();
         classes.add(MultiPartFeature.class);
-        classes.add(LoggingFilter.class);
+        classes.add(LoggingFeature.class);
         classes.add(JacksonFeature.class);
         return classes;
     }
