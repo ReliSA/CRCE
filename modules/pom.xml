@@ -76,6 +76,7 @@
         <module>crce-webservices-indexer</module>
 
 		<module>crce-default-modules</module>
+        <module>crce-api-compatibility-checker</module>
     </modules>
 
     <profiles>
