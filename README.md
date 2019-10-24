@@ -106,6 +106,18 @@ To solve the issue with mathematical solver, you need to install [lpsolve librar
 
 > Note that on Windows, you do not have to place the libs to `\WINDOWS` or `\WINDOWS\SYSTEM32` as the guide states. Put it wherever you wish and add the directory to your `Path`.
 
+## Debugging
+
+Remote debugging is possible when running CRCE in Docker. To enable remote debug, application needs to be started with following flags:
+
+```bash
+-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+```
+
+And expose the port 5005 by adding `-p 5005:5005` to the `docker run` command.
+
+Check the `deploy/Dockerfile` to see the difference between running the app in normal and debug mode.
+
 ## Code updates
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.

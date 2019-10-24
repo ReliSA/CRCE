@@ -30,5 +30,8 @@ COPY ./felix-configuration/config.properties ${FELIX_PATH}/conf/
 # Set environmental variable for connection string to mongodb
 ENV mongo_connection mongodb://mongoserver:27017
 
-# Run Felix
+# Run Felix (with debug enabled)
 CMD cd ${FELIX_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+
+# Run Felix (with debug disabled)
+# CMD cd ${FELIX_PATH} && java -jar ./bin/felix.jar
