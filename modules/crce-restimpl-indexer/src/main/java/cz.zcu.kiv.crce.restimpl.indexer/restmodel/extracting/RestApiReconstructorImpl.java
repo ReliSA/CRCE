@@ -3,11 +3,7 @@ package cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.DataType;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.PathPartAttributes;
-import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Variable;
+import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.*;
 import cz.zcu.kiv.crce.restimpl.indexer.definition.RestApiDefinition;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.EndpointRequestBody;
@@ -17,8 +13,8 @@ import cz.zcu.kiv.crce.restimpl.indexer.util.WebXmlParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +27,7 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
     private static final Logger logger = LoggerFactory.getLogger(RestApiReconstructorImpl.class);
 
     // current working directory is crce\modules\runner
-    private static final String DEFS_DIR = "../crce-restimpl-indexer/config/def/api";
+    private static final String DEFS_DIR = "config/def/api";
 
     private Map<String, ClassStruct> classesMap;
 
@@ -61,14 +57,22 @@ public class RestApiReconstructorImpl implements RestApiReconstructor {
     private Map<String, RestApiDefinition> loadDefinitions() {
         Map<String, RestApiDefinition> definitions = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        File[] files = new File(DEFS_DIR).listFiles();
-        assert files != null;
-        for (File file : files) {
+
+        // quick and dirty solution just to get this working
+        // basically, this should be replaced with something that
+        // lists all files in DEFS_DIR directory and loads them
+        // also, it has to work in OSGI runtime. gl;hf
+        URL[] urls = new URL[] {
+                getClass().getClassLoader().getResource(DEFS_DIR+"/jaxrs_api.yml"),
+                getClass().getClassLoader().getResource(DEFS_DIR+"/spring_api.yml")
+        };
+
+        for (URL fileUrl: urls) {
             try {
-                RestApiDefinition restApiDefinition = mapper.readValue(file, RestApiDefinition.class);
+                RestApiDefinition restApiDefinition = mapper.readValue(fileUrl, RestApiDefinition.class);
                 definitions.put(restApiDefinition.getFramework(), restApiDefinition);
             } catch (IOException e) {
-                logger.error("Failed to read REST API definition from " + file.getAbsolutePath(), e);
+                logger.error("Failed to read REST API definition from " + fileUrl.toString(), e);
             }
         }
         return definitions;

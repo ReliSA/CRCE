@@ -33,9 +33,9 @@
     <build>
         <resources>
             <resource>
-                <directory>config</directory>
+                <directory>src/main/resources</directory>
                 <includes>
-                    <include>api_definitions/*.yaml</include>
+                    <include>**/*.yml</include>
                 </includes>
             </resource>
         </resources>

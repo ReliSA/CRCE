@@ -8,8 +8,8 @@ import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.MyClassVisitor;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting.ResultCollector;
 import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting.RestApiReconstructor;
-import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.restimpl.indexer.restmodel.extracting.RestApiReconstructorImpl;
+import cz.zcu.kiv.crce.restimpl.indexer.restmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.restimpl.indexer.util.WebXmlParser;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -21,7 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -55,6 +58,8 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
     @Override
     public List<String> index(InputStream input, Resource resource) {
 
+        logger.info("Indexing resource "+resource.getId());
+
         // ARCHIVE PROCESSING
         WebXmlParser.Result webXmlResult = null;
         try {   // borrowed code..  -  parsing input stream and collecting class entry information
@@ -62,9 +67,11 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
             ClassVisitor classVisitor = new MyClassVisitor(Opcodes.ASM5);
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
                 if (e.getName().endsWith(".class")) {
+                    logger.debug("Parsing class file");
                     parseClass(new ClassReader(getEntryInputStream(jis)), classVisitor);
                 }
                 else if (e.getName().endsWith("web.xml") && webXmlResult == null) {
+                    logger.debug("Parsing web.xml");
                     WebXmlParser webXmlParser = new WebXmlParser();
                     webXmlResult = webXmlParser.parseWebXml(getEntryInputStream(jis));
                 }
@@ -87,6 +94,7 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
 
         // CONVERTING REST API MODEL TO METADATA
         if (endpoints == null || endpoints.isEmpty()) {
+            logger.info("No endpoints found for resource "+resource.getId());
             return Collections.emptyList();
         }
         else {

@@ -12,9 +12,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -33,11 +33,9 @@ public class WebXmlParser {
     private DispatcherDefinition loadDefinition() throws IOException{
         DispatcherDefinition definition = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        File file = new File(
-                getClass().getClassLoader().getResource(DEF_FILE).getFile()
-        );
+        URL defFileUrl = getClass().getClassLoader().getResource(DEF_FILE);
 
-        definition = mapper.readValue(file, DispatcherDefinition.class);
+        definition = mapper.readValue(defFileUrl, DispatcherDefinition.class);
 
         return definition;
 
