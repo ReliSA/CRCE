@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class WebXmlParser {
 
-    private final String DEF_FILE = "../crce-restimpl-indexer/config/def/dispatcher.yml";
+    private final String DEF_FILE = "config/def/dispatcher.yml";
 
     private DispatcherDefinition definition;
 
@@ -33,7 +33,9 @@ public class WebXmlParser {
     private DispatcherDefinition loadDefinition() throws IOException{
         DispatcherDefinition definition = null;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        File file = new File(DEF_FILE);
+        File file = new File(
+                getClass().getClassLoader().getResource(DEF_FILE).getFile()
+        );
 
         definition = mapper.readValue(file, DispatcherDefinition.class);
 
