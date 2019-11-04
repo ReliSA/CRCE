@@ -206,7 +206,7 @@
                         <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=65505
                         </param>
                         <param>--platform=felix</param>
-                        <param>--ee=file:/home/zdenda/prg/skola/sar/crce/deploy/J2SE-11.Profile</param>
+                        <param>--ee=file:./J2SE-11.Profile</param>
                         <!--<param>&#45;&#45;ee=JavaSE-1.6</param>-->
                         <param>
                             --repositories=http://uk.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
