@@ -7,7 +7,7 @@
         <relativePath>../build</relativePath>
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>shared-build-settings</artifactId>
-        <version>2.1.1-SNAPSHOT</version>
+        <version>2.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>provision-reactor</artifactId>
