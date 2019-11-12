@@ -1,0 +1,44 @@
+# based on example from: https://docs.gitlab.com/ee/ci/examples/artifactory_and_gitlab/index.html
+# reference: https://docs.gitlab.com/ee/ci/yaml/
+# other article that helped: https://about.gitlab.com/blog/2016/12/14/continuous-delivery-of-a-spring-boot-application-with-gitlab-ci-and-kubernetes/
+
+image: docker:latest
+services:
+  - docker:dind
+
+# stages defined in this pipeline
+stages:
+  - build
+  - deploy
+
+# 1st job - build code
+# make sure to use maven image with jdk 11
+build:
+  image: maven:3.6.2-jdk-11
+  stage: build
+  script:
+    - cd pom && mvn clean install
+    - cd ../build && mvn clean install
+    - cd ../third-party && for d in * ; do cd $d; mvn clean install; cd .. ; done
+    - cd ../core && mvn clean install
+    - cd ../modules && mvn clean install
+    - cd ../deploy && mvn clean install && mvn pax:directory && ./prepare-bundles.sh
+    - cd ..
+  artifacts:
+    paths:
+      - deploy/*
+
+# create docker image
+# and deploy it to my test repo
+# does not work yet
+docker-build:
+  stage: deploy
+  script:
+    - cd deploy
+    - docker build . -t crce-11
+    - docker push cajovahouba/crce-test-repo:crce-11-gl   
+
+
+
+
+
