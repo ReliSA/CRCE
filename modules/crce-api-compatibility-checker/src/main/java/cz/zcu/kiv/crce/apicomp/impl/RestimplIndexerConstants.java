@@ -3,14 +3,24 @@ package cz.zcu.kiv.crce.apicomp.impl;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 
 public interface RestimplIndexerConstants {
 
+    String IDENTITY_CAPABILITY_NAMESPACE = "restimpl.identity";
+
     String MAIN_CATEGORY = "restimpl";
 
+    // capabilities namespaces
+    String NS__CRCE_IDENTITY = NsCrceIdentity.NAMESPACE__CRCE_IDENTITY;
+    String NS__RESTIMPL_IDENTITY = MAIN_CATEGORY + ".identity";
     String NS__RESTIMPL_ENDPOINT = MAIN_CATEGORY + ".endpoint";
 
+    // properties namespaces
+    String NS_RESTIMPL_REQUEST_BODY = NS__RESTIMPL_ENDPOINT + ".requestbody";
     String NS_RESTIMPL_REQUESTPARAMETER = NS__RESTIMPL_ENDPOINT + ".requestparameter";
+    String NS_RESTIMPL_RESPONSEPARAMETER = NS__RESTIMPL_ENDPOINT + ".responseparameter";
+    String NS_RESTIMPL_RESPONSE = NS__RESTIMPL_ENDPOINT + ".response";
 
     // attributes for NS__RESTIMPL_IDENTITY capability
     AttributeType<String> ATTR__RESTIMPL_FRAMEWORK = new SimpleAttributeType<>("framework", String.class);

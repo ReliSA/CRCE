@@ -49,8 +49,12 @@ public class CompatibilityCheckResult implements Compatibility {
      */
     private List<Diff> diffDetails;
 
+    /**
+     * Initializes this object with empty diffDetails and NON difference.
+     */
     public CompatibilityCheckResult() {
         diffDetails = new ArrayList<>();
+        difference = Difference.NON;
     }
 
     @Override
@@ -88,10 +92,18 @@ public class CompatibilityCheckResult implements Compatibility {
         return difference;
     }
 
+    public void setDifference(Difference difference) {
+        this.difference = difference;
+    }
+
     @Nullable
     @Override
     public List<Diff> getDiffDetails() {
         return diffDetails;
+    }
+
+    public void setDiffDetails(List<Diff> diffDetails) {
+        this.diffDetails = diffDetails;
     }
 
     @Nonnull

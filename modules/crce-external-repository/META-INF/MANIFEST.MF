@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1558293776462
-Build-Jdk: 11.0.2
+Bnd-LastModified: 1572373545992
+Build-Jdk: 11.0.5
 Built-By: zdenda
 Bundle-Activator: cz.zcu.kiv.crce.crce_external_repository.internal.Acti
  vator
@@ -22,7 +22,7 @@ Bundle-ClassPath: .,lib/aether-api-1.13.1.jar,lib/aether-util-1.13.1.jar
  4333789.jar,lib/lucene-core-3.6.2.jar,lib/lucene-queries-3.6.2.jar,lib/
  lucene-memory-3.6.2.jar,lib/lucene-highlighter-3.6.2.jar,lib/javax.anno
  tation-api-1.2.jar,lib/javax.ws.rs-api-2.0.jar,lib/jersey-container-ser
- vlet-core-2.9.1.jar,lib/jersey-media-multipart-2.9.1.jar
+ vlet-core-2.29.jar,lib/jersey-media-multipart-2.29.jar
 Bundle-Description: Component Repository supporting Compatibility Evalua
  tion
 Bundle-DocURL: http://www.kiv.zcu.cz
@@ -83,10 +83,10 @@ Embedded-Artifacts: lib/aether-api-1.13.1.jar;g="org.sonatype.aether";a=
  ="org.apache.lucene";a="lucene-highlighter";v="3.6.2",lib/javax.annotat
  ion-api-1.2.jar;g="javax.annotation";a="javax.annotation-api";v="1.2",l
  ib/javax.ws.rs-api-2.0.jar;g="javax.ws.rs";a="javax.ws.rs-api";v="2.0",
- lib/jersey-container-servlet-core-2.9.1.jar;g="org.glassfish.jersey.con
- tainers";a="jersey-container-servlet-core";v="2.9.1",lib/jersey-media-m
- ultipart-2.9.1.jar;g="org.glassfish.jersey.media";a="jersey-media-multi
- part";v="2.9.1"
+ lib/jersey-container-servlet-core-2.29.jar;g="org.glassfish.jersey.cont
+ ainers";a="jersey-container-servlet-core";v="2.29",lib/jersey-media-mul
+ tipart-2.29.jar;g="org.glassfish.jersey.media";a="jersey-media-multipar
+ t";v="2.29"
 Export-Package: cz.zcu.kiv.crce.crce_external_repository.api;uses:="org.
  apache.maven.index";version="1.0.0",org.apache.maven.index;uses:="org.a
  pache.maven.index.artifact,org.apache.maven.index.context,org.apache.ma

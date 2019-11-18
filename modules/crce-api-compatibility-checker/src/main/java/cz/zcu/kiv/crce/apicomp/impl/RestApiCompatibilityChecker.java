@@ -7,9 +7,9 @@ import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
 import cz.zcu.kiv.crce.metadata.Attribute;
-import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  */
 public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
 
-    private static final String IDENTITY_CAPABILITY_NAMESPACE = "restimpl.identity";
 
     @Override
     public boolean isApiSupported(Set<Capability> apiMetadata) {
@@ -29,12 +28,11 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         return apiMetadata != null &&
                 apiMetadata
                 .stream()
-                .anyMatch(capability -> IDENTITY_CAPABILITY_NAMESPACE.equals(capability.getNamespace()));
+                .anyMatch(capability -> RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE.equals(capability.getNamespace()));
     }
 
     @Override
     public CompatibilityCheckResult compareApis(Set<Capability> api1, Set<Capability> api2) {
-        boolean apiCompatible = false;
         CompatibilityCheckResult checkResult = new CompatibilityCheckResult();
         List<Diff> diffs = new ArrayList<>();
 
@@ -54,13 +52,14 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         // of children - capability which describes the endpoint
         // so it can be assumed all children are endpoints
         Capability api1Root = api1.iterator().next();
-        Capability api2Root = api1.iterator().next();
+        Capability api2Root = api2.iterator().next();
 
 
         // compare endpoints and their details
         // copy is created because we're going to be removing
         // processed endpoints
-        Iterator<Capability> endpoint1It = new ArrayList<>(api1Root.getChildren()).iterator();
+        List<Capability> api1RootChildren = new ArrayList<>(api1Root.getChildren());
+        Iterator<Capability> endpoint1It = api1RootChildren.iterator();
         List<Capability> otherEndpoints = new ArrayList<>(api2Root.getChildren());
 
         while(endpoint1It.hasNext()) {
@@ -71,54 +70,56 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             Diff endpointDiff = new DefaultDiffImpl();
             checkResult.getDiffDetails().add(endpointDiff);
             endpointDiff.setLevel(DifferenceLevel.OPERATION);
+            endpointDiff.setValue(Difference.NON);
             if (api2MatchingEndpoint == null) {
                 // API 2 does not contain endpoint from API 1
                 // -> deletion
                 endpointDiff.setValue(Difference.DEL);
-            }
-            endpointDiff.setValue(Difference.NON);
+            } else {
+                // matching endpoint found, compare parameters, respones, ...
+                // compare endpoint parameters
+                List<Diff> endpointDiffs = compareEndpointParameters(api1Endpoint, api2MatchingEndpoint);
+                if (!diffs.isEmpty()) {
+                    endpointDiff.addChildren(endpointDiffs);
+                    endpointDiff.setValue(Difference.MUT);
+                }
 
-            // compare endpoint parameters
-            diffs = compareEndpointParameters(api1Endpoint, api2MatchingEndpoint);
-            if (!diffs.isEmpty()) {
-                endpointDiff.addChildren(diffs);
-                endpointDiff.setValue(Difference.MUT);
-                apiCompatible = false;
-            }
-
-            // compare endpoint responses
-            diffs = compareEndpointResponses(api1Endpoint, api2MatchingEndpoint);
-            if (!diffs.isEmpty()) {
-                endpointDiff.addChildren(diffs);
-                endpointDiff.setValue(Difference.MUT);
-                apiCompatible = false;
+                // compare endpoint responses
+                List<Diff> responseDiffs = compareEndpointResponses(api1Endpoint, api2MatchingEndpoint);
+                if (!diffs.isEmpty()) {
+                    endpointDiff.addChildren(responseDiffs);
+                    endpointDiff.setValue(Difference.MUT);
+                }
             }
 
-
-            // difference found ?  -> add diff to result list
+            // difference found ? -> add diff to result list
             if (!endpointDiff.getValue().equals(Difference.NON)) {
                 diffs.add(endpointDiff);
             }
 
             // endpoint processed, remove it
             endpoint1It.remove();
-
         }
 
         // remaining endpoints
-        for (Capability api2Endpoint : api1Root.getChildren()) {
+        for (Capability api2Endpoint : otherEndpoints) {
             Diff diff = new DefaultDiffImpl();
             diff.setLevel(DifferenceLevel.OPERATION);
             // api 1 does not contain endpoint from API 2
             // -> insertion
             diff.setValue(Difference.INS);
-
+            diff.setName(api2Endpoint.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
             diffs.add(diff);
         }
 
 
-        // comparison result
-        return new CompatibilityCheckResult();
+        // comparison result -> any diffs -> not same
+        // todo: resolve how exactly different they are
+        if (!diffs.isEmpty()) {
+            checkResult.setDifference(Difference.UNK);
+            checkResult.setDiffDetails(diffs);
+        }
+        return checkResult;
     }
 
     /**
@@ -129,7 +130,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
      * @param otherEndpoints List of endpoint metadata to search.
      * @return Endpoint metadata or null if not matching endpoint is found.
      */
-    // todo: what if there is more matches?
+    // todo: what if there are more matches?
     private Capability pullMatchingEndpoint(Capability endpointMetadata, List<Capability> otherEndpoints) {
         Capability match = null;
         Iterator<Capability> otherEndpointsIt = otherEndpoints.iterator();
@@ -149,17 +150,41 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
     private boolean endpointMetadataMatch(Capability endpoint1Metadata, Capability endpoint2Metadata) {
 
         // attributes to be compared
-        List<AttributeType> attributeTypes = Arrays.asList(
+        // ale of those are typed to List
+        List<ListAttributeType> attributeTypes = Arrays.asList(
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_METHOD,
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH,
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_CONSUMES,
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PRODUCES
         );
 
-        for (AttributeType at : attributeTypes) {
+        for (ListAttributeType at : attributeTypes) {
             Attribute a1 = endpoint1Metadata.getAttribute(at);
             Attribute a2 = endpoint2Metadata.getAttribute(at);
-            if (!a1.equals(a2)) {
+
+            // values of both attributes
+            List a1V = new ArrayList((List) a1.getValue());
+            List a2V = new ArrayList((List) a2.getValue());
+
+
+            // go through all the values of attribute of endpoint1
+            // try to find the value in the attribute of endpoint2
+            // and remove it from e1 and e2
+            // if all the values are same (regardless of their order)
+            // both a1V and a2V will be empty
+            Iterator a1i = a1V.iterator();
+            while(a1i.hasNext()) {
+                Object obj = a1i.next();
+                if (a2V.contains(obj)) {
+                    a1i.remove();
+                    a2V.remove(obj);
+                }
+            }
+
+            // todo: this is probably too strict
+            // because e.g. endpoint with methods [GET, POST] <: endpoint with methods [POST]
+            // or similarly endpoint with produces [application/xml, application/json] <: [application/json]
+            if (!a1V.isEmpty() || !a2V.isEmpty()) {
                 return false;
             }
         }
@@ -221,8 +246,9 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
      *
      * @param param1
      * @param param2
+     * @return True if the parameters were different and new Diff(s) was added to the diffs list.
      */
-    private void compareParameters(Property param1, Property param2, List<Diff> diffs) {
+    private boolean compareParameters(Property param1, Property param2, List<Diff> diffs) {
         Diff diff = new DefaultDiffImpl();
         diff.setLevel(DifferenceLevel.FIELD);
         diff.setValue(Difference.NON);
@@ -250,6 +276,9 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         // add diff if needed
         if (!diff.getValue().equals(Difference.NON)) {
             diffs.add(diff);
+            return true;
         }
+
+        return false;
     }
 }
