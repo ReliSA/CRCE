@@ -14,11 +14,19 @@ To cite CRCE as a research result, please use the following citation:
 
 On linux, switching JDK version for development/build can be done via `sudo update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
+Mongo DB can either be run locally or in docker using following command, where `~/data` is directory on host machine to be used as a storage by Mongo.
+
+```bash
+sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
+```
+
+Some CRCE plugins use a mathematical solver, for which you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.  Note that on Windows, you do not have to place the libs to `\WINDOWS` or `\WINDOWS\SYSTEM32` as the guide states. Put it wherever you wish and add the directory to your `Path`.
+
 ## Build
 
 Build process consists of two parts. Compiling and building the code itself and building the docker image.
 
-On linux or similar, the `./build.bash` script in project root directory can be used to perform these build steps. See top of script source for parameters tweaking the build.
+On linux or similar, the `./build-code.bash` script in project root directory can be used to perform these build steps. See top of script source for parameters tweaking the build.
 
 1. `crce-parent` in `/pom` directory
 2. `shared-build-settings` in `/build`
@@ -32,8 +40,7 @@ In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttp
 
 ### Build docker image
 
-Docker image is placed in directory `/deploy` but before it can be used, bundles must be collected. 
-Bundles can be collected by running the following commands in `/deploy` directory:
+Docker image is placed in directory `/deploy` but before it can be used, bundles must be collected by running the following commands in `/deploy` directory:
 
 ```bash
 mvn clean pax:directory
@@ -43,11 +50,13 @@ mvn clean pax:directory
 
 The `prepare-bundles.sh` script is needed due to the issues further described in the Issues section.
 
-To finally build the image itself, execute the following commnad in `/deploy` directory:
+To finally build the image itself, execute the following command in `/deploy` directory:
 
 ```bash
 docker build . -t ${image-tag}
 ```
+
+
 ## Start up
 
 To start on local machine, make sure the `/deploy/conf` folder exists and contains all important configuration (especially the `cz.zcu.kiv.crce.repository.filebased-store.cfg`. After that, you run CRCE using Maven plugin for pax in `crce-modules-reactor` module (i.e. `/deploy` directory):
@@ -97,32 +106,16 @@ At the moment, a bunch of errors will probably come up:
 
 The cause of the latter is a badly loaded binary of mathematical solver which does not affect common application run. Any other error/exception (typically OSGi complaining about a thing) is a problem that needs to be examined as such. However, it should not happen with this version.
 
-## Accessing the Running CRCE
+## Accessing the running CRCE
 
 Started up, the application is accessible at:
 
 - web UI: http://localhost:8080/crce-webui
 - REST web services: http://localhost:8080/rest/v2/
 
-Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).
+Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).  Basic endpoints: `metadata/<id>` (XML), `resources` (list all), `resources/<id>` (download one).
 
-### MongoDB
-
-Mongo DB can either be run locally or in docker using following command:
-
-```bash
-sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
-```
-
-Where `~/data` is directory on host machine to be used as a storage by Mongo.
-
-### lpsolve installation
-
-To solve the issue with mathematical solver, you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.
-
-> Note that on Windows, you do not have to place the libs to `\WINDOWS` or `\WINDOWS\SYSTEM32` as the guide states. Put it wherever you wish and add the directory to your `Path`.
-
-## Debugging
+### Debugging
 
 Remote debugging is possible when running CRCE in Docker. To enable remote debug, application needs to be started with following flags:
 
@@ -134,11 +127,11 @@ And expose the port 5005 by adding `-p 5005:5005` to the `docker run` command.
 
 Check the `deploy/Dockerfile` to see the difference between running the app in normal and debug mode.
 
-## Code updates
+### Code updates
 
 After modifying a part of code, only the parental module needs to be rebuilt (no need to rebuild all). After that, the pax process must be restarted.
 
-## Configuration
+### Configuration
 
 Configuration is done via OSGI service called [Configuration Admin](https://osgi.org/specification/osgi.cmpn/7.0.0/service.cm.html). 
 Details on how it's implemented in Felix can be found in  [Apache Felix Configuration Admin Service](https://felix.apache.org/documentation/subprojects/apache-felix-config-admin.html).
@@ -155,4 +148,6 @@ Some bundles (mostly those from the third parties) either require a particular v
 To remove them, it is necessary to edit manifest (`META-INF/MANIFEST.MF`) of such bundle and remove lines containing:
 `Require-Capability: osgi.ee;` or `Bundle-RequiredExecutionEnvironment: J2SE-`. This is done in the `deploy/prepare-bundles.sh` script.
 
-An ideal solution would be to either found newer version of such bundles or replace them with different bundles with same functionality. This however may introduce compatibility issues (as some other bundles may depend on the current versions) or may not even be possible (replacement bundle does not exist). 
+An ideal solution would be to either find newer versions of such bundles or replace them with different bundles with same functionality. This however may introduce compatibility issues (as some other bundles may depend on the current versions) or may not even be possible (replacement bundle does not exist). 
+
+An interim fix is to use `/deploy/prepare-bundles.sh` as described above which strips the requirements from the manifest files.
