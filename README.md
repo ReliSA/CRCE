@@ -68,11 +68,15 @@ docker run -it \
 
 The `--add-host ...` and `-v ...` parameters allow docker to connect to MongoDB (so use the correct IP address instead of the 172.17... above) and to install new bundles (from the provided directory).  If MongoDB is running locally on 127.0.0.1, add `--network="host"` to make localhost accessible.
 
-
 The `-p` parameter maps the port of docker virual machine to the real port on the computer. 
 The `--add-host` allows docker to connect to the Mongo database running locally (Docker *usually* uses 172.17.0.1 ip to access localhost from the container). The app expects the database to be listening on port 27017 by default.
 The `-v` parameter maps directory in container to the real directory in the host machine so that it can be used to install new bundles via CLI. 
 
+For the simple case of starting the (above) freshly built image on localhost, use
+
+```
+docker run -it --network="host" --add-host mongoserver:127.0.0.1 <image-tag>
+```
 
 If everything works, the output log should write up some info about dependencies terminated by lines similar to the following:
 
@@ -92,6 +96,8 @@ At the moment, a bunch of errors will probably come up:
 ```
 
 The cause of the latter is a badly loaded binary of mathematical solver which does not affect common application run. Any other error/exception (typically OSGi complaining about a thing) is a problem that needs to be examined as such. However, it should not happen with this version.
+
+## Accessing the Running CRCE
 
 Started up, the application is accessible at:
 
