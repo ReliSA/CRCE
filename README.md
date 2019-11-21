@@ -14,11 +14,7 @@ To cite CRCE as a research result, please use the following citation:
 
 On linux, switching JDK version for development/build can be done via `sudo update-java-alternatives` (or, less ideal as it does not set all aspects of the environment, `sudo update-alternatives --config java`).
 
-Mongo DB can either be run locally or in docker using following command, where `~/data` is directory on host machine to be used as a storage by Mongo.
-
-```bash
-sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
-```
+Mongo DB can either be run locally or in docker using `sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo`, where `~/data` is directory on host machine to be used as a storage by Mongo.
 
 Some CRCE plugins use a mathematical solver, for which you need to install [lpsolve library](https://sourceforge.net/projects/lpsolve/) to your computer. To do that, follow [their guide](http://lpsolve.sourceforge.net/5.5/Java/README.html#install) step by step.  Note that on Windows, you do not have to place the libs to `\WINDOWS` or `\WINDOWS\SYSTEM32` as the guide states. Put it wherever you wish and add the directory to your `Path`.
 
