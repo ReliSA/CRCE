@@ -34,7 +34,6 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
     @Override
     public CompatibilityCheckResult compareApis(Set<Capability> api1, Set<Capability> api2) {
         CompatibilityCheckResult checkResult = new CompatibilityCheckResult();
-        List<Diff> diffs = new ArrayList<>();
 
         // given the structure of metadata created in crce-restimpl-indexer, both
         // capability sets should contain exactly 1 capability
@@ -66,36 +65,8 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             Capability api1Endpoint = endpoint1It.next();
 
             // find endpoint from other api with same metadata
-            Capability api2MatchingEndpoint = pullMatchingEndpoint(api1Endpoint, otherEndpoints);
-            Diff endpointDiff = new DefaultDiffImpl();
+            Diff endpointDiff = compareEndpoints(api1Endpoint, otherEndpoints);
             checkResult.getDiffDetails().add(endpointDiff);
-            endpointDiff.setLevel(DifferenceLevel.OPERATION);
-            endpointDiff.setValue(Difference.NON);
-            if (api2MatchingEndpoint == null) {
-                // API 2 does not contain endpoint from API 1
-                // -> deletion
-                endpointDiff.setValue(Difference.DEL);
-            } else {
-                // matching endpoint found, compare parameters, respones, ...
-                // compare endpoint parameters
-                List<Diff> endpointDiffs = compareEndpointParameters(api1Endpoint, api2MatchingEndpoint);
-                if (!diffs.isEmpty()) {
-                    endpointDiff.addChildren(endpointDiffs);
-                    endpointDiff.setValue(Difference.MUT);
-                }
-
-                // compare endpoint responses
-                List<Diff> responseDiffs = compareEndpointResponses(api1Endpoint, api2MatchingEndpoint);
-                if (!diffs.isEmpty()) {
-                    endpointDiff.addChildren(responseDiffs);
-                    endpointDiff.setValue(Difference.MUT);
-                }
-            }
-
-            // difference found ? -> add diff to result list
-            if (!endpointDiff.getValue().equals(Difference.NON)) {
-                diffs.add(endpointDiff);
-            }
 
             // endpoint processed, remove it
             endpoint1It.remove();
@@ -109,17 +80,82 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             // -> insertion
             diff.setValue(Difference.INS);
             diff.setName(api2Endpoint.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
-            diffs.add(diff);
+            checkResult.getDiffDetails().add(diff);
         }
 
-
-        // comparison result -> any diffs -> not same
-        // todo: resolve how exactly different they are
-        if (!diffs.isEmpty()) {
-            checkResult.setDifference(Difference.UNK);
-            checkResult.setDiffDetails(diffs);
-        }
         return checkResult;
+    }
+
+    /**
+     * Contains whole logic of comparing 1 endpoint from one API to endpoint from other set.
+     * Tries to find a one endpoint in otherEndpoints that would be suitable for comparison. If
+     * such endpoint is found, it is removed from otherEndpoints and diff structure is constructed.
+     * Otherwise diff with value DEL is used.
+     *
+     * Returned structure:
+     *
+     * endpointDiff
+     *  - value: final verdict about compatibility of two endpoints
+     *  - children:
+     *      - metadata diff
+     *      - parameter diff
+     *      - response diff
+     *
+     * @param endpoint1
+     * @param otherEndpoints
+     * @return
+     */
+    private Diff compareEndpoints(Capability endpoint1, List<Capability> otherEndpoints) {
+        Diff endpointDiff = new DefaultDiffImpl();
+        endpointDiff.setLevel(DifferenceLevel.OPERATION);
+        endpointDiff.setValue(Difference.NON);
+        endpointDiff.setName(endpoint1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
+
+        // try to find endpoint for comparision and
+        // resolve metadata differences
+        List<Diff> metadataDiffs = new ArrayList<>();
+        Capability api2MatchingEndpoint = pullMatchingEndpoint(endpoint1, otherEndpoints, metadataDiffs);
+
+        if (api2MatchingEndpoint == null) {
+            // nothing found, endpoint1 is defined in API 1 but not in API 2
+            endpointDiff.setValue(Difference.DEL);
+        } else {
+            // possible match found
+            DifferenceAggregation differenceAggregation = new DifferenceAggregation();
+
+            // construct metadata, parameter and response diff
+            Diff metadataDiff = new DefaultDiffImpl();
+            metadataDiff.addChildren(metadataDiffs);
+            metadataDiff.setLevel(DifferenceLevel.FIELD);
+            metadataDiffs.forEach(d -> differenceAggregation.addDifference(d.getValue()));
+            metadataDiff.setValue(differenceAggregation.getResultDifference());
+            differenceAggregation.clear();
+
+            // parameter diffs
+            Diff parameterDiff = new DefaultDiffImpl();
+            parameterDiff.setLevel(DifferenceLevel.FIELD);
+            parameterDiff.addChildren(compareEndpointParameters(endpoint1, api2MatchingEndpoint));
+            parameterDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
+            parameterDiff.setValue(differenceAggregation.getResultDifference());
+            differenceAggregation.clear();
+
+            // response diffs
+            Diff responseDiff = new DefaultDiffImpl();
+            responseDiff.setLevel(DifferenceLevel.FIELD);
+            responseDiff.addChildren(compareEndpointResponses(endpoint1, api2MatchingEndpoint));
+            responseDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
+            responseDiff.setValue(differenceAggregation.getResultDifference());
+            differenceAggregation.clear();
+
+            // total diff
+            endpointDiff.addChild(metadataDiff);
+            endpointDiff.addChild(parameterDiff);
+            endpointDiff.addChild(responseDiff);
+            endpointDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
+            endpointDiff.setValue(differenceAggregation.getResultDifference());
+        }
+
+        return endpointDiff;
     }
 
     /**
@@ -128,18 +164,27 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
      *
      * @param endpointMetadata Metadata of endpoint to be found in otherEndpoints.
      * @param otherEndpoints List of endpoint metadata to search.
+     * @param metadataDiffs List to store details about metadata differences in case matching endpoint is found.
      * @return Endpoint metadata or null if not matching endpoint is found.
      */
     // todo: what if there are more matches?
-    private Capability pullMatchingEndpoint(Capability endpointMetadata, List<Capability> otherEndpoints) {
+    private Capability pullMatchingEndpoint(Capability endpointMetadata, List<Capability> otherEndpoints, List<Diff> metadataDiffs) {
         Capability match = null;
         Iterator<Capability> otherEndpointsIt = otherEndpoints.iterator();
 
         while(otherEndpointsIt.hasNext()) {
             Capability otherE = otherEndpointsIt.next();
-            if (endpointMetadataMatch(endpointMetadata, otherE)) {
+            List<Diff> diffs = compareEndpointMetadata(endpointMetadata, otherE);
+
+            // diff is valid only in case of no DEL and MUT diffs
+            boolean validDiff = !diffs.isEmpty() && diffs.stream()
+                    .noneMatch(d -> d.getValue().equals(Difference.DEL)
+                            || d.getValue().equals(Difference.MUT));
+
+            if (validDiff) {
                 match = otherE;
                 otherEndpointsIt.remove();
+                metadataDiffs.addAll(diffs);
                 break;
             }
         }
@@ -147,8 +192,20 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         return match;
     }
 
-    private boolean endpointMetadataMatch(Capability endpoint1Metadata, Capability endpoint2Metadata) {
-
+    /**
+     * Compares metadata of two endpoints.
+     * Compared metadata: METHOD, PATH, CONSUMES, PRODUCES.
+     * Produces following diffs:
+     *  NON - no difference.
+     *  INS - possible match
+     *  DEL - no match (because endpoint2 doesn't containt everything from endpoint1)
+     *  MUT - no match, because MUT is combination of INS and DEL
+     *
+     * @param endpoint1 Endpoint 1.
+     * @param endpoint2 Endpoint 2.
+     * @return List of diffs. All diffs are NON in case of a total match.
+     */
+    private List<Diff> compareEndpointMetadata(Capability endpoint1, Capability endpoint2) {
         // attributes to be compared
         // ale of those are typed to List
         List<ListAttributeType> attributeTypes = Arrays.asList(
@@ -157,10 +214,11 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_CONSUMES,
                 RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PRODUCES
         );
+        List<Diff> result = new ArrayList<>();
 
         for (ListAttributeType at : attributeTypes) {
-            Attribute a1 = endpoint1Metadata.getAttribute(at);
-            Attribute a2 = endpoint2Metadata.getAttribute(at);
+            Attribute a1 = endpoint1.getAttribute(at);
+            Attribute a2 = endpoint2.getAttribute(at);
 
             // values of both attributes
             List a1V = new ArrayList((List) a1.getValue());
@@ -181,15 +239,29 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
                 }
             }
 
-            // todo: this is probably too strict
+            // if a1V is not empty, some values are missing and it is not true that e1 <: e2
             // because e.g. endpoint with methods [GET, POST] <: endpoint with methods [POST]
             // or similarly endpoint with produces [application/xml, application/json] <: [application/json]
-            if (!a1V.isEmpty() || !a2V.isEmpty()) {
-                return false;
+            Diff d = new DefaultDiffImpl();
+            d.setName(at.getName());
+            d.setLevel(DifferenceLevel.FIELD);
+            if (a1V.isEmpty() && a2V.isEmpty()) {
+                // ok
+                continue;
+            } else if (a1V.isEmpty() && !a2V.isEmpty()) {
+                // endpoint 2 has something endpoint 1 doesn't have
+                d.setValue(Difference.INS);
+            } else if (!a1V.isEmpty() && a2V.isEmpty()) {
+                // endpoint 1 has something endpoint 2 doesn't have
+                d.setValue(Difference.DEL);
+            } else {
+                // combination of INS and DEL -> MUT
+                d.setValue(Difference.MUT);
             }
+            result.add(d);
         }
 
-        return true;
+        return result;
     }
 
     /**
@@ -211,12 +283,11 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
                 .filter(p -> RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER.equals(p.getNamespace()))
                 .collect(Collectors.toList());
 
-        List<Diff> parameterDiffs = new ArrayList<>();
-
+        List<Diff> diffs = new ArrayList<>();
         Iterator<Property> p1i = endpoint1Params.iterator();
         Iterator<Property> p2i = endpoint2Params.iterator();
         while(p1i.hasNext() && p2i.hasNext()) {
-            compareParameters(p1i.next(), p2i.next(), parameterDiffs);
+            compareParameters(p1i.next(), p2i.next(), diffs);
             p1i.remove();
             p2i.remove();
         }
@@ -224,7 +295,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         // add INS and DEL parameters to diff
         // todo:
 
-        return parameterDiffs;
+        return diffs;
     }
 
     /**
@@ -242,13 +313,17 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
     }
 
     /**
-     * Compares two parameters and adds diff to diffs if they are not same.
+     * Creates a diff of two parameters.
+     *
+     * Parameter names must be equal: ?param1=5 vs. ?param1_2=5
+     * Category must be equal: query vs path parameters
+     * Type should be equal but may be just GEN/SPE
      *
      * @param param1
      * @param param2
-     * @return True if the parameters were different and new Diff(s) was added to the diffs list.
+     * @param parameterDiffs List of parameters to add diff to.
      */
-    private boolean compareParameters(Property param1, Property param2, List<Diff> diffs) {
+    private void compareParameters(Property param1, Property param2, List<Diff> parameterDiffs) {
         Diff diff = new DefaultDiffImpl();
         diff.setLevel(DifferenceLevel.FIELD);
         diff.setValue(Difference.NON);
@@ -267,18 +342,22 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         // todo: does it matter that the name is different?
         // todo: handle cases such as short <: long, float <: double ...
         if (!name1.equals(name2)
-            || !dt1.equals(dt2)
             || !cat1.equals(cat2)) {
             diff.setValue(Difference.UNK);
             diff.setNamespace(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER);
+        } else if (!dt1.equals(dt2)) {
+            // data types are not same
+            // try to instantiate those and compare them
+            try {
+                Class<?> c1 = Class.forName(dt1.getStringValue());
+                Class<?> c2 = Class.forName(dt1.getStringValue());
+
+                // todo:
+            } catch (ClassNotFoundException e) {
+                // todo: print error
+            }
         }
 
-        // add diff if needed
-        if (!diff.getValue().equals(Difference.NON)) {
-            diffs.add(diff);
-            return true;
-        }
-
-        return false;
+        parameterDiffs.add(diff);
     }
 }

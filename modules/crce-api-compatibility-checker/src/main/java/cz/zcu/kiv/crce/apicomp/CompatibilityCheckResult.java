@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.apicomp;
 
+import cz.zcu.kiv.crce.apicomp.impl.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -40,11 +41,6 @@ public class CompatibilityCheckResult implements Compatibility {
     private Version baseResourceVersion;
 
     /**
-     * Final verdict regarding the difference of two APIs.
-     */
-    private Difference difference;
-
-    /**
      * Details on differences between APIs.
      */
     private List<Diff> diffDetails;
@@ -54,7 +50,6 @@ public class CompatibilityCheckResult implements Compatibility {
      */
     public CompatibilityCheckResult() {
         diffDetails = new ArrayList<>();
-        difference = Difference.NON;
     }
 
     @Override
@@ -86,14 +81,20 @@ public class CompatibilityCheckResult implements Compatibility {
         return baseResourceVersion;
     }
 
+    /**
+     * Final verdict regarding the difference of two APIs.
+     */
     @Nonnull
     @Override
     public Difference getDiffValue() {
-        return difference;
-    }
+        DifferenceAggregation aggregation = new DifferenceAggregation();
 
-    public void setDifference(Difference difference) {
-        this.difference = difference;
+        // expects that the first level children have their values
+        // set properly
+        getDiffDetails().forEach(d -> aggregation.addDifference(d.getValue()));
+
+        return aggregation.getResultDifference();
+
     }
 
     @Nullable
