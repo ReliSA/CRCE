@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.apicomp;
 
 import cz.zcu.kiv.crce.apicomp.impl.RestApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.RestimplIndexerConstants;
+import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;

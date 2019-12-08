@@ -1,7 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
@@ -293,7 +294,23 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         }
 
         // add INS and DEL parameters to diff
-        // todo:
+        while(p1i.hasNext()) {
+            Property param = p1i.next();
+            Diff d = new DefaultDiffImpl();
+            d.setValue(Difference.DEL);
+            d.setLevel(DifferenceLevel.FIELD);
+            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
+            diffs.add(d);
+        }
+
+        while(p2i.hasNext()) {
+            Property param = p2i.next();
+            Diff d = new DefaultDiffImpl();
+            d.setValue(Difference.INS);
+            d.setLevel(DifferenceLevel.FIELD);
+            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
+            diffs.add(d);
+        }
 
         return diffs;
     }
@@ -339,7 +356,6 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         Attribute cat2 = param2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
 
         // todo: check nulls
-        // todo: does it matter that the name is different?
         // todo: handle cases such as short <: long, float <: double ...
         if (!name1.equals(name2)
             || !cat1.equals(cat2)) {
@@ -348,16 +364,51 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         } else if (!dt1.equals(dt2)) {
             // data types are not same
             // try to instantiate those and compare them
-            try {
-                Class<?> c1 = Class.forName(dt1.getStringValue());
-                Class<?> c2 = Class.forName(dt1.getStringValue());
-
-                // todo:
-            } catch (ClassNotFoundException e) {
-                // todo: print error
-            }
+            diff.setValue(compareTypesByNames(dt1.getStringValue(), dt2.getStringValue()));
         }
 
         parameterDiffs.add(diff);
+    }
+
+    /**
+     * Compares non-equal types by their names.
+     *
+     * This may be a bit tricky because e.g. long <: short and long <: int
+     * but in java Long, Short, Integer are subclasses of Number and can't be
+     * compared between each other (not assignable, not instance of).
+     *
+     * For unknown types (those outside java.lang) UNK is returned.
+     *
+     * @param c1Name Name of the first type.
+     * @param c2Name Name of the second type.
+     * @return
+     */
+    private Difference compareTypesByNames(String c1Name, String c2Name) {
+        if (c1Name == null || c1Name.isEmpty() || c2Name == null || c2Name.isEmpty()) {
+            return Difference.UNK;
+        }
+
+        if (!c1Name.startsWith("java.lang") || !c2Name.startsWith("java.lang")) {
+            return Difference.UNK;
+        }
+
+        try {
+            Class<?> c1 = Class.forName(c1Name);
+            Class<?> c2 = Class.forName(c2Name);
+
+            if (c1.isAssignableFrom(c2)) {
+                // c2 <: c1
+                return Difference.SPE;
+            } else if (c2.isAssignableFrom(c1)) {
+                // c1 <: c2
+                return Difference.INS;
+            }
+        } catch (ClassNotFoundException e) {
+            // since this method only works with "java.lang", this
+            // exception should not be thrown
+            // todo: log exception
+            e.printStackTrace();
+            return Difference.UNK;
+        }
     }
 }

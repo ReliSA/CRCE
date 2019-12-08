@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.apicomp;
 
+import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.metadata.Capability;
 
 import java.util.Set;

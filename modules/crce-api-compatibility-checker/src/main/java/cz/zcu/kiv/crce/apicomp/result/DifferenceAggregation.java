@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.apicomp.impl;
+package cz.zcu.kiv.crce.apicomp.result;
 
 import cz.zcu.kiv.crce.compatibility.Difference;
 

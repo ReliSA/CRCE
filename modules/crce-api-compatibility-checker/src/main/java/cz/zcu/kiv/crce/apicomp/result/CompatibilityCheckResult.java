@@ -1,6 +1,5 @@
-package cz.zcu.kiv.crce.apicomp;
+package cz.zcu.kiv.crce.apicomp.result;
 
-import cz.zcu.kiv.crce.apicomp.impl.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
