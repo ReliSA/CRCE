@@ -9,11 +9,9 @@ import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Compatibility checker for REST API. Expects metadata structure created by
@@ -133,17 +131,24 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             differenceAggregation.clear();
 
             // parameter diffs
+            EndpointParameterComparator parameterComparator = new EndpointParameterComparator(
+                    endpoint1,
+                    api2MatchingEndpoint
+            );
             Diff parameterDiff = new DefaultDiffImpl();
             parameterDiff.setLevel(DifferenceLevel.FIELD);
-            parameterDiff.addChildren(compareEndpointParameters(endpoint1, api2MatchingEndpoint));
+            parameterDiff.addChildren(parameterComparator.compareEndpointParameters());
             parameterDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
             parameterDiff.setValue(differenceAggregation.getResultDifference());
             differenceAggregation.clear();
 
             // response diffs
+            EndpointResponseComparator responseComparator = new EndpointResponseComparator(
+                    endpoint1,
+                    api2MatchingEndpoint);
             Diff responseDiff = new DefaultDiffImpl();
             responseDiff.setLevel(DifferenceLevel.FIELD);
-            responseDiff.addChildren(compareEndpointResponses(endpoint1, api2MatchingEndpoint));
+            responseDiff.addChildren(responseComparator.compareEndpointResponses());
             responseDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
             responseDiff.setValue(differenceAggregation.getResultDifference());
             differenceAggregation.clear();
@@ -263,152 +268,5 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         }
 
         return result;
-    }
-
-    /**
-     * Compares parameters of two endpoints. Positive result is returned only if
-     * all parameters of both endpoints have same order and same type. That is
-     * parameters1[i].type == parameters2[i].type.
-     *
-     * @param endpoint1 Capability containing metadata of the first endpoint.
-     * @param endpoint2 Capability containing metadata of the second endpoint.
-     * @return Diffs between endpoint parameters. Empty collection if the endpoints have same parameters
-     */
-    private List<Diff> compareEndpointParameters(Capability endpoint1, Capability endpoint2) {
-        List<Property> endpoint1Params = endpoint1.getProperties().stream()
-                .filter(p -> RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER.equals(p.getNamespace()))
-                .collect(Collectors.toList());
-
-
-        List<Property> endpoint2Params = endpoint2.getProperties().stream()
-                .filter(p -> RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER.equals(p.getNamespace()))
-                .collect(Collectors.toList());
-
-        List<Diff> diffs = new ArrayList<>();
-        Iterator<Property> p1i = endpoint1Params.iterator();
-        Iterator<Property> p2i = endpoint2Params.iterator();
-        while(p1i.hasNext() && p2i.hasNext()) {
-            compareParameters(p1i.next(), p2i.next(), diffs);
-            p1i.remove();
-            p2i.remove();
-        }
-
-        // add INS and DEL parameters to diff
-        while(p1i.hasNext()) {
-            Property param = p1i.next();
-            Diff d = new DefaultDiffImpl();
-            d.setValue(Difference.DEL);
-            d.setLevel(DifferenceLevel.FIELD);
-            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
-            diffs.add(d);
-        }
-
-        while(p2i.hasNext()) {
-            Property param = p2i.next();
-            Diff d = new DefaultDiffImpl();
-            d.setValue(Difference.INS);
-            d.setLevel(DifferenceLevel.FIELD);
-            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
-            diffs.add(d);
-        }
-
-        return diffs;
-    }
-
-    /**
-     * Compares responses of two endpoints. Positive result is returned only if for every
-     * response defined for endpoint 1 exists one response defined for endpoint 2 with
-     * same status and data type.
-     *
-     * @param endpoint1 Capability containing metadata of the first endpoint.
-     * @param endpoint2 Capability containing metadata of the second endpoint.
-     * @return Diffs between endpoint responses. Empty collection if the endpoints have same responses.
-     */
-    private List<Diff> compareEndpointResponses(Capability endpoint1, Capability endpoint2) {
-        // todo:
-        return Collections.emptyList();
-    }
-
-    /**
-     * Creates a diff of two parameters.
-     *
-     * Parameter names must be equal: ?param1=5 vs. ?param1_2=5
-     * Category must be equal: query vs path parameters
-     * Type should be equal but may be just GEN/SPE
-     *
-     * @param param1
-     * @param param2
-     * @param parameterDiffs List of parameters to add diff to.
-     */
-    private void compareParameters(Property param1, Property param2, List<Diff> parameterDiffs) {
-        Diff diff = new DefaultDiffImpl();
-        diff.setLevel(DifferenceLevel.FIELD);
-        diff.setValue(Difference.NON);
-
-        // attributes to compare
-        Attribute name1 = param1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
-        Attribute name2 = param2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
-
-        Attribute dt1 = param1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DATETYPE);
-        Attribute dt2 = param2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DATETYPE);
-
-        Attribute cat1 = param1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
-        Attribute cat2 = param2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
-
-        // todo: check nulls
-        // todo: handle cases such as short <: long, float <: double ...
-        if (!name1.equals(name2)
-            || !cat1.equals(cat2)) {
-            diff.setValue(Difference.UNK);
-            diff.setNamespace(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER);
-        } else if (!dt1.equals(dt2)) {
-            // data types are not same
-            // try to instantiate those and compare them
-            diff.setValue(compareTypesByNames(dt1.getStringValue(), dt2.getStringValue()));
-        }
-
-        parameterDiffs.add(diff);
-    }
-
-    /**
-     * Compares non-equal types by their names.
-     *
-     * This may be a bit tricky because e.g. long <: short and long <: int
-     * but in java Long, Short, Integer are subclasses of Number and can't be
-     * compared between each other (not assignable, not instance of).
-     *
-     * For unknown types (those outside java.lang) UNK is returned.
-     *
-     * @param c1Name Name of the first type.
-     * @param c2Name Name of the second type.
-     * @return
-     */
-    private Difference compareTypesByNames(String c1Name, String c2Name) {
-        if (c1Name == null || c1Name.isEmpty() || c2Name == null || c2Name.isEmpty()) {
-            return Difference.UNK;
-        }
-
-        if (!c1Name.startsWith("java.lang") || !c2Name.startsWith("java.lang")) {
-            return Difference.UNK;
-        }
-
-        try {
-            Class<?> c1 = Class.forName(c1Name);
-            Class<?> c2 = Class.forName(c2Name);
-
-            if (c1.isAssignableFrom(c2)) {
-                // c2 <: c1
-                return Difference.SPE;
-            } else if (c2.isAssignableFrom(c1)) {
-                // c1 <: c2
-                return Difference.INS;
-            }
-        } catch (ClassNotFoundException e) {
-            // since this method only works with "java.lang", this
-            // exception should not be thrown
-            // todo: log exception
-            e.printStackTrace();
-            return Difference.UNK;
-        }
     }
 }
