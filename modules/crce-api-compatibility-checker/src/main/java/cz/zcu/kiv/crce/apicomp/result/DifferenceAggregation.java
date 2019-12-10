@@ -1,6 +1,9 @@
 package cz.zcu.kiv.crce.apicomp.result;
 
+import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
+
+import java.util.List;
 
 /**
  * Helper class for difference aggregation. You can use it for grouping of
@@ -9,6 +12,12 @@ import cz.zcu.kiv.crce.compatibility.Difference;
  * @author Jaroslav Bauml
  */
 public class DifferenceAggregation {
+
+    public static Difference calculateFinalDifferenceFor(List<Diff> diffList) {
+        DifferenceAggregation aggregation = new DifferenceAggregation();
+        diffList.forEach(diff -> aggregation.addDifference(diff.getValue()));
+        return aggregation.getResultDifference();
+    }
 
     private int nonCounter;
     private int insCounter;

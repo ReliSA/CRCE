@@ -24,13 +24,8 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
 
     private List<Property> endpoint2Params = new ArrayList<>();
 
-    private Capability endpoint1;
-
-    private Capability endpoint2;
-
     public EndpointParameterComparator(Capability endpoint1, Capability endpoint2) {
-        this.endpoint1 = endpoint1;
-        this.endpoint2 = endpoint2;
+        super(endpoint1, endpoint2);
 
         endpoint1Params.addAll(endpoint1.getProperties(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER));
         endpoint2Params.addAll(endpoint2.getProperties(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER));

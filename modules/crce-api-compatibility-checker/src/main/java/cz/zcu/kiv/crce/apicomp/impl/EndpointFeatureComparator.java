@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.apicomp.impl;
 
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 
 /**
@@ -9,6 +10,15 @@ import cz.zcu.kiv.crce.metadata.Property;
  *
  */
 public abstract class EndpointFeatureComparator {
+
+    protected Capability endpoint1;
+
+    protected Capability endpoint2;
+
+    public EndpointFeatureComparator(Capability endpoint1, Capability endpoint2) {
+        this.endpoint1 = endpoint1;
+        this.endpoint2 = endpoint2;
+    }
 
     /**
      * Compares ATTR__RESTIMPL_DATETYPE of two properties.

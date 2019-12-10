@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl;
 
+import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
+import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * New instance should be created for every comparison.
  */
-public class EndpointResponseComparator {
+public class EndpointResponseComparator extends EndpointFeatureComparator {
 
     /**
      * Copy of the list of properties containing metadata of
@@ -34,13 +36,8 @@ public class EndpointResponseComparator {
      */
     private List<Property> endpoint2Responses = new ArrayList<>();
 
-    private Capability endpoint1;
-
-    private Capability endpoint2;
-
     public EndpointResponseComparator(Capability endpoint1, Capability endpoint2) {
-        this.endpoint1 = endpoint1;
-        this.endpoint2 = endpoint2;
+        super(endpoint1, endpoint2);
 
         endpoint1Responses.addAll(endpoint1.getProperties(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE));
         endpoint2Responses.addAll(endpoint2.getProperties(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE));
@@ -65,27 +62,8 @@ public class EndpointResponseComparator {
         while(e1Pi.hasNext()) {
             // first response
             Property resp1 = e1Pi.next();
-            List<Property> resp1Parameters = findPropertiesById(resp1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID),
-                    RestimplIndexerConstants.NS_RESTIMPL_RESPONSEPARAMETER,
-                    endpoint1);
 
-            // other response
-            Property resp2 = pullMatchingResponse(resp1, endpoint2Responses);
-            List<Property> resp2Parameters = new ArrayList<>();
-            if (resp2 != null) {
-                // matching response found
-                resp2Parameters.addAll(findPropertiesById(resp2.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID),
-                        RestimplIndexerConstants.NS_RESTIMPL_RESPONSEPARAMETER,
-                        endpoint2));
-                responseDiffs.add(compareResponses(resp1, resp1Parameters, resp2, resp2Parameters));
-            } else {
-                // no matching response in endpoint 2 found
-                Diff d = new DefaultDiffImpl();
-                d.setLevel(DifferenceLevel.FIELD);
-                d.setName(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE + ":" +resp1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID));
-                d.setValue(Difference.DEL);
-                responseDiffs.add(d);
-            }
+            pullAndCompareMatchingResponse(resp1, endpoint2Responses, responseDiffs);
         }
 
         // remaining responses of the second endpoint
@@ -107,51 +85,98 @@ public class EndpointResponseComparator {
      * Searches the otherProperties list and tries to find a property such
      * that its metadata match the one of response1.
      *
-     * If a matching property is found, it is removed from otherProperties.
+     * If a matching property is found, it is removed from otherProperties
+     * and further comparison is done. Otherwise Diff with DEL value is added
+     * to the result list.
+     *
+     * All results are added into responseDiffs list.
      *
      * @param response1 Property containing response metadata.
      * @param otherResponses List of other responses to search through.
-     * @return Found property or null if no is found.
+     * @param responseDiffs List to store results in.
      */
-    private Property pullMatchingResponse(Property response1, List<Property> otherResponses) {
+    private void pullAndCompareMatchingResponse(Property response1, List<Property> otherResponses, List<Diff> responseDiffs) {
         Iterator<Property> opi = otherResponses.iterator();
+        Diff d = new DefaultDiffImpl();
+        d.setLevel(DifferenceLevel.FIELD);
+        d.setName(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE + ":" +response1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID));
 
+        Property otherResponse = null;
+
+        // try to find matching response to compare response1 with
         while (opi.hasNext()) {
-            Property otherResponse = opi.next();
+            Property nextR = opi.next();
+            Diff metadataDiff = compareResponseMetadata(response1, nextR);
 
-            if (isResponseMetadataMatch(response1, otherResponse)) {
+            if (!metadataDiff.getValue().equals(Difference.UNK)) {
+                // not UNK -> suitable for further comparison
                 opi.remove();
-                return otherResponse;
+                otherResponse = nextR;
+                d.addChild(metadataDiff);
+                break;
             }
         }
 
-        return null;
+
+        // compare response parameters
+        if (otherResponse != null) {
+            List<Property> resp1Parameters = findPropertiesById(response1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID),
+                    RestimplIndexerConstants.NS_RESTIMPL_RESPONSEPARAMETER,
+                    endpoint1);
+
+            List<Property> resp2Parameters = new ArrayList<>();
+            resp2Parameters.addAll(findPropertiesById(otherResponse.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID),
+                    RestimplIndexerConstants.NS_RESTIMPL_RESPONSEPARAMETER,
+                    endpoint2));
+
+            d.addChild(compareResponseParameters(resp1Parameters, resp2Parameters));
+
+        }
+
+        // calculate final value for response diff
+        if (otherResponse != null) {
+            d.setValue(DifferenceAggregation.calculateFinalDifferenceFor(d.getChildren()));
+        } else {
+            d.setValue(Difference.DEL);
+        }
+
+        responseDiffs.add(d);
     }
 
     /**
-     * Checks attributes of both responses and returns true if they're suitable for
-     * further comparison.
+     * Compares metadata of two responses and returns diff describing the difference between response metadata.
      *
-     * status, datetype and isArray attributes of both responses must match.
+     * Possible values:
+     * NON: all attributes are equal
+     * GEN/SPEC: all attributes are equal except for data type attribute (which is generalization/specialization)
+     * UNK: some attributes are not equal
+     *
+     * Diff with value NON, GEN/SPEC means responses are suitable for further comparison.
      *
      * @param response1
      * @param response2
      * @return
      */
-    private boolean isResponseMetadataMatch(Property response1, Property response2) {
+    private Diff compareResponseMetadata(Property response1, Property response2) {
         Attribute r1Status = response1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS);
         Attribute r2Status = response2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS);
 
         Attribute r1IsArray = response1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
         Attribute r2IsArray = response2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
 
-        // todo: use compareDateTypesAttribute() method instead of this
-        Attribute r1DateType = response1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DATETYPE);
-        Attribute r2DateType = response2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DATETYPE);
+        Diff d = new DefaultDiffImpl();
+        d.setName(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE);
 
-        return r1Status != null && r1Status.equals(r2Status)
-            && r1IsArray != null && r1IsArray.equals(r2IsArray)
-            && r1DateType != null && r1DateType.equals(r2DateType);
+        if (r1Status != null && r1Status.equals(r2Status)
+                && r1IsArray != null && r1IsArray.equals(r2IsArray)) {
+            // status and isArray are equal, compare data types
+            d.setValue(compareDateTypeAttributes(response1, response2));
+
+        } else {
+            d.setValue(Difference.UNK);
+        }
+
+        return d;
     }
 
 
@@ -172,16 +197,87 @@ public class EndpointResponseComparator {
     }
 
     /**
-     * Compares two responses.
+     * Compares parameters of two responses.
      *
-     * @param resp1 Metadata of the first response.
-     * @param resp1Parameters Parameters of the first response. May be empty.
-     * @param resp2 Metadata of the second response.
-     * @param resp2Parameters Parameters of the second response. May be empty.
-     * @return Diff describing the differencies between two responses.
+     * Parameter order has to be the same and for each parameter:
+     *
+     *  - name must be the same
+     *  - category must be the same
+     *  - isArray must be the same
+     *  - dataType must be either same or SPEC/GEN
+     *
+     *
+     * @param resp1Parameters Parameters of the first response.
+     * @param resp2Parameters Parameters of the second response.
+     * @return Diff with details (one child diff for each parameter)
      */
-    private Diff compareResponses(Property resp1, List<Property> resp1Parameters, Property resp2, List<Property> resp2Parameters) {
-        // todo:
-        return null;
+    private Diff compareResponseParameters(List<Property> resp1Parameters, List<Property> resp2Parameters) {
+        Diff parameterDiff = new DefaultDiffImpl();
+        parameterDiff.setLevel(DifferenceLevel.FIELD);
+
+        Iterator<Property> r1Pi = resp1Parameters.iterator();
+        Iterator<Property> r2Pi = resp2Parameters.iterator();
+
+        while(r1Pi.hasNext() && r2Pi.hasNext()) {
+            parameterDiff.addChild(compareTwoResponseParameters(r1Pi.next(), r2Pi.next()));
+        }
+
+        // remaining parameters in response1 or response 2
+        while(r1Pi.hasNext()) {
+            Property param = r1Pi.next();
+            parameterDiff.addChild(DiffUtils.createDELDiff(
+                    param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME),
+                    DifferenceLevel.FIELD
+            ));
+        }
+
+        while (r2Pi.hasNext()) {
+            Property param = r1Pi.next();
+            parameterDiff.addChild(DiffUtils.createINSDiff(
+                    param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME),
+                    DifferenceLevel.FIELD
+            ));
+        }
+
+
+        parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
+        return parameterDiff;
+    }
+
+    /**
+     * Compares two response parameters.
+     * - name must be the same
+     * - category must be the same
+     * - isArray must be the same
+     * - dataType must be either same or SPEC/GEN
+     *
+     * @param parameter1
+     * @param parameter2
+     * @return Either NON, SPEC/GEN or UNK diff.
+     */
+    private Diff compareTwoResponseParameters(Property parameter1, Property parameter2) {
+        Diff paramDiff = new DefaultDiffImpl();
+        paramDiff.setLevel(DifferenceLevel.FIELD);
+
+        Attribute p1Name = parameter1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
+        Attribute p2Name = parameter2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
+
+        Attribute p1Category = parameter1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
+        Attribute p2Category = parameter2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
+
+        Attribute p1IsArray = parameter1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
+        Attribute p2IsArray = parameter2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
+
+        if (p1Name != null && p1Name.equals(p2Name)
+                && p1Category != null && p1Category.equals(p2Category)
+                && p1IsArray != null && p1IsArray.equals(p2IsArray)
+        ) {
+            // compare data types
+            paramDiff.setValue(compareDateTypeAttributes(parameter1, parameter2));
+        } else {
+            paramDiff.setValue(Difference.UNK);
+        }
+
+        return paramDiff;
     }
 }
