@@ -120,15 +120,12 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             endpointDiff.setValue(Difference.DEL);
         } else {
             // possible match found
-            DifferenceAggregation differenceAggregation = new DifferenceAggregation();
 
             // construct metadata, parameter and response diff
             Diff metadataDiff = new DefaultDiffImpl();
             metadataDiff.addChildren(metadataDiffs);
             metadataDiff.setLevel(DifferenceLevel.FIELD);
-            metadataDiffs.forEach(d -> differenceAggregation.addDifference(d.getValue()));
-            metadataDiff.setValue(differenceAggregation.getResultDifference());
-            differenceAggregation.clear();
+            metadataDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(metadataDiffs));
 
             // parameter diffs
             EndpointParameterComparator parameterComparator = new EndpointParameterComparator(
@@ -138,9 +135,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             Diff parameterDiff = new DefaultDiffImpl();
             parameterDiff.setLevel(DifferenceLevel.FIELD);
             parameterDiff.addChildren(parameterComparator.compareEndpointParameters());
-            parameterDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
-            parameterDiff.setValue(differenceAggregation.getResultDifference());
-            differenceAggregation.clear();
+            parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
 
             // response diffs
             EndpointResponseComparator responseComparator = new EndpointResponseComparator(
@@ -149,16 +144,13 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             Diff responseDiff = new DefaultDiffImpl();
             responseDiff.setLevel(DifferenceLevel.FIELD);
             responseDiff.addChildren(responseComparator.compareEndpointResponses());
-            responseDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
-            responseDiff.setValue(differenceAggregation.getResultDifference());
-            differenceAggregation.clear();
+            responseDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(responseDiff.getChildren()));
 
             // total diff
             endpointDiff.addChild(metadataDiff);
             endpointDiff.addChild(parameterDiff);
             endpointDiff.addChild(responseDiff);
-            endpointDiff.getChildren().forEach(d -> differenceAggregation.addDifference(d.getValue()));
-            endpointDiff.setValue(differenceAggregation.getResultDifference());
+            endpointDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointDiff.getChildren()));
         }
 
         return endpointDiff;

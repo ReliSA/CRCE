@@ -68,11 +68,10 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
 
         // remaining responses of the second endpoint
         for (Property response2 : endpoint2Responses) {
-            Diff d = new DefaultDiffImpl();
-            d.setLevel(DifferenceLevel.FIELD);
-            d.setName(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE + ":" +response2.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID));
-            d.setValue(Difference.INS);
-            responseDiffs.add(d);
+            responseDiffs.add(DiffUtils.createINSDiff(
+                    RestimplIndexerConstants.NS_RESTIMPL_RESPONSE + ":" +response2.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID),
+                    DifferenceLevel.FIELD
+            ));
         }
 
 

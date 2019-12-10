@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.apicomp.impl;
 
+import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
@@ -51,20 +52,18 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         // add INS and DEL parameters to diff
         while(p1i.hasNext()) {
             Property param = p1i.next();
-            Diff d = new DefaultDiffImpl();
-            d.setValue(Difference.DEL);
-            d.setLevel(DifferenceLevel.FIELD);
-            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
-            diffs.add(d);
+            diffs.add(DiffUtils.createDELDiff(
+                    param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME),
+                    DifferenceLevel.FIELD
+            ));
         }
 
         while(p2i.hasNext()) {
             Property param = p2i.next();
-            Diff d = new DefaultDiffImpl();
-            d.setValue(Difference.INS);
-            d.setLevel(DifferenceLevel.FIELD);
-            d.setName(param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
-            diffs.add(d);
+            diffs.add(DiffUtils.createINSDiff(
+                    param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME),
+                    DifferenceLevel.FIELD
+            ));
         }
 
         return diffs;
@@ -93,15 +92,13 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         Attribute cat1 = param1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
         Attribute cat2 = param2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY);
 
-        // todo: check nulls
-        // todo: handle cases such as short <: long, float <: double ...
-        if (!name1.equals(name2)
-                || !cat1.equals(cat2)) {
-            diff.setValue(Difference.UNK);
-            diff.setNamespace(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER);
-        } else {
+        if (name1 != null && name1.equals(name2)
+            && cat1 != null && cat1.equals(cat2)) {
             // name and category are the same, compare data types
             diff.setValue(compareDateTypeAttributes(param1, param2));
+        } else {
+            diff.setValue(Difference.UNK);
+            diff.setNamespace(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER);
         }
 
         parameterDiffs.add(diff);
