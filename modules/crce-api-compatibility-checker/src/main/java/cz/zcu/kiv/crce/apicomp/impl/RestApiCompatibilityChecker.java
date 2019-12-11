@@ -134,7 +134,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             );
             Diff parameterDiff = new DefaultDiffImpl();
             parameterDiff.setLevel(DifferenceLevel.FIELD);
-            parameterDiff.addChildren(parameterComparator.compareEndpointParameters());
+            parameterDiff.addChildren(parameterComparator.compare());
             parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
 
             // response diffs
@@ -143,7 +143,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
                     api2MatchingEndpoint);
             Diff responseDiff = new DefaultDiffImpl();
             responseDiff.setLevel(DifferenceLevel.FIELD);
-            responseDiff.addChildren(responseComparator.compareEndpointResponses());
+            responseDiff.addChildren(responseComparator.compare());
             responseDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(responseDiff.getChildren()));
 
             // total diff
@@ -245,7 +245,7 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
             d.setLevel(DifferenceLevel.FIELD);
             if (a1V.isEmpty() && a2V.isEmpty()) {
                 // ok
-                continue;
+                d.setValue(Difference.NON);
             } else if (a1V.isEmpty() && !a2V.isEmpty()) {
                 // endpoint 2 has something endpoint 1 doesn't have
                 d.setValue(Difference.INS);

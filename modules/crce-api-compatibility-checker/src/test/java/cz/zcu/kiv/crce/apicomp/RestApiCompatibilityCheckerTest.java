@@ -68,7 +68,7 @@ public class RestApiCompatibilityCheckerTest {
         Set<Capability> api2 = Collections.singleton(createMockApi2());
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
-        assertEquals("APIs should not be same!", Difference.UNK, result.getDiffValue());
+        assertEquals("APIs should not be same!", Difference.MUT, result.getDiffValue());
     }
 
     /**

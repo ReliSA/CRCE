@@ -39,7 +39,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
      *
      * @return Diffs between endpoint parameters. Empty collection if the endpoints have same parameters
      */
-    public List<Diff> compareEndpointParameters() {
+    public List<Diff> compare() {
         List<Diff> diffs = new ArrayList<>();
         Iterator<Property> p1i = endpoint1Params.iterator();
         Iterator<Property> p2i = endpoint2Params.iterator();

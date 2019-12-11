@@ -1,9 +1,12 @@
 package cz.zcu.kiv.crce.apicomp.impl;
 
+import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+
+import java.util.List;
 
 /**
  * Base class for comparing endpoint features - parameters, responses, ...
@@ -19,6 +22,14 @@ public abstract class EndpointFeatureComparator {
         this.endpoint1 = endpoint1;
         this.endpoint2 = endpoint2;
     }
+
+    /**
+     * Compares given features of both endpoints and returns list of diffs
+     * describing the differences.
+     *
+     * Typically, you want one Diff per feature (one diff per one response, one diff per one parameter, ...).
+     */
+    public abstract List<Diff> compare();
 
     /**
      * Compares ATTR__RESTIMPL_DATETYPE of two properties.
@@ -61,7 +72,7 @@ public abstract class EndpointFeatureComparator {
                 return Difference.SPE;
             } else if (c2.isAssignableFrom(c1)) {
                 // c1 <: c2
-                return Difference.INS;
+                return Difference.GEN;
             }
         } catch (ClassNotFoundException e) {
             // since this method only works with "java.lang", this

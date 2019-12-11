@@ -50,7 +50,7 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
      *
      * @return Diffs between endpoint responses. Empty collection if the endpoints have same responses.
      */
-    public List<Diff> compareEndpointResponses() {
+    public List<Diff> compare() {
         List<Diff> responseDiffs = new ArrayList<>();
 
         // response consists of metadata (property) and parameters (property)
@@ -231,7 +231,7 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
         }
 
         while (r2Pi.hasNext()) {
-            Property param = r1Pi.next();
+            Property param = r2Pi.next();
             parameterDiff.addChild(DiffUtils.createINSDiff(
                     param.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME),
                     DifferenceLevel.FIELD

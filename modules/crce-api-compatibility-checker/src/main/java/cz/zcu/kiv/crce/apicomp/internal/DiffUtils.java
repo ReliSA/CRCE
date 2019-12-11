@@ -26,6 +26,6 @@ public class DiffUtils {
     }
 
     public static Diff createINSDiff(String name, DifferenceLevel level) {
-        return createDiff(name, level, Difference.DEL);
+        return createDiff(name, level, Difference.INS);
     }
 }
