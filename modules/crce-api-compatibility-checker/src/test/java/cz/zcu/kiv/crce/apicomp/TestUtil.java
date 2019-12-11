@@ -27,4 +27,16 @@ public class TestUtil {
 
         endpointCapability.addProperty(parameter);
     }
+
+    public static void addEndpointParameter(Capability endpointCapability, String name, String dataType, String category, Long isArray, String defaultValue, Long isOptional) {
+        Property parameter = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER, name);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME, name);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DATETYPE, dataType);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_PARAMETER_CATEGEORY, category);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY, isArray);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_DEFAULT_VALUE, defaultValue);
+        parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_OPTIONAL, isOptional);
+
+        endpointCapability.addProperty(parameter);
+    }
 }
