@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.apicomp;
 
-import cz.zcu.kiv.crce.apicomp.impl.EndpointFeatureComparator;
-import cz.zcu.kiv.crce.apicomp.impl.EndpointResponseComparator;
-import cz.zcu.kiv.crce.apicomp.impl.RestimplIndexerConstants;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.EndpointFeatureComparator;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.EndpointResponseComparator;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestimplIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;

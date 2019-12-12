@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.apicomp.impl;
+package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;

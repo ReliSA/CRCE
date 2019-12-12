@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.apicomp;
 
-import cz.zcu.kiv.crce.apicomp.impl.RestApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.RestimplIndexerConstants;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestimplIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -17,6 +17,8 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
+
+// todo: tests based on real data (examples are in test-data folder)
 public class RestApiCompatibilityCheckerTest {
 
     @Test

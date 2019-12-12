@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.apicomp;
 
-import cz.zcu.kiv.crce.apicomp.impl.RestimplIndexerConstants;
+import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestimplIndexerConstants;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;

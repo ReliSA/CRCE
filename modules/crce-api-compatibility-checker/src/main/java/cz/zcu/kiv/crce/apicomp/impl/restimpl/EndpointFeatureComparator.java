@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.apicomp.impl;
+package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
@@ -59,6 +59,8 @@ public abstract class EndpointFeatureComparator {
             return Difference.NON;
         }
 
+        // todo: probably not necessary
+        // todo: org/package/subpackage/Class format is used in real data
         if (!c1Name.startsWith("java.lang") || !c2Name.startsWith("java.lang")) {
             return Difference.UNK;
         }

@@ -4,6 +4,8 @@ import cz.zcu.kiv.crce.metadata.Capability;
 
 /**
  * Test case for parameter comparison.
+ *
+ * todo: matrix of endpoints and respective test results
  */
 public class EndpointParameterComparatorTest {
 

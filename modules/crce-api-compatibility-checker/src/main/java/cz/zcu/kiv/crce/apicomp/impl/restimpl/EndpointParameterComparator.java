@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.apicomp.impl;
+package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.compatibility.Diff;

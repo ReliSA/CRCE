@@ -86,14 +86,8 @@ public class CompatibilityCheckResult implements Compatibility {
     @Nonnull
     @Override
     public Difference getDiffValue() {
-        DifferenceAggregation aggregation = new DifferenceAggregation();
-
-        // expects that the first level children have their values
-        // set properly
-        getDiffDetails().forEach(d -> aggregation.addDifference(d.getValue()));
-
-        return aggregation.getResultDifference();
-
+        // all children should have their values set properly by compatibility checker
+        return DifferenceAggregation.calculateFinalDifferenceFor(getDiffDetails());
     }
 
     @Nullable
