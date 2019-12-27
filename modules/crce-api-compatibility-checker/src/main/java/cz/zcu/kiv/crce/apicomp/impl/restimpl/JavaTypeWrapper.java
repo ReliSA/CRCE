@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
 
 /**
  * Class that wraps box or primitive type.
@@ -29,8 +29,22 @@ public class JavaTypeWrapper {
 
     private final String typeName;
 
-    public JavaTypeWrapper(String typeName) {
+    /**
+     * Index into the type arrays. Used to compare types between each other.
+     * -1 if type is not in any array.
+     */
+    private int typeIndex;
+
+    public JavaTypeWrapper(@NotNull String typeName) {
         this.typeName = typeName;
+
+        typeIndex = -1;
+        for (int i = 0; i < primitiveTypeNames.length; i++) {
+            if (primitiveTypeNames[i].equals(typeName) || boxTypeNames[i].equals(typeName)) {
+                typeIndex = i;
+                break;
+            }
+        }
     }
 
     /**
@@ -40,11 +54,29 @@ public class JavaTypeWrapper {
      * int fits into long
      * float fits into double
      *
-     * @param otherType Other type.
+     * @param otherType Other type. Must not be null.
      * @return True if this type fits into the other one.
      */
-    public boolean fitsInto(JavaTypeWrapper otherType) {
-        // todo
+    public boolean fitsInto(@NotNull JavaTypeWrapper otherType) {
+        if (!isComparableType() || !otherType.isComparableType()) {
+            return false;
+        }
+
+        // same types fits into each other
+        if (typeIndex == otherType.typeIndex) {
+            return true;
+        }
+
+        // both types are byte, short, int or long
+        // or both types are float, double
+        // then type fits if its index is < than the other
+        if ((typeIndex >= 1 && otherType.typeIndex <= 4 )
+                || (typeIndex >= 5 && otherType.typeIndex <= 6)
+        ) {
+            return typeIndex < otherType.typeIndex;
+        }
+
+        // any other case
         return false;
     }
 
@@ -54,13 +86,7 @@ public class JavaTypeWrapper {
      * @return True if the type is comparable.
      */
     public boolean isComparableType() {
-        for (int i = 0; i < primitiveTypeNames.length; i++) {
-            if (primitiveTypeNames[i].equals(typeName) || boxTypeNames[i].equals(typeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return typeIndex != -1;
     }
 
     @Override
@@ -68,15 +94,11 @@ public class JavaTypeWrapper {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        // todo
-
-        JavaTypeWrapper that = (JavaTypeWrapper) o;
-        return Objects.equals(typeName, that.typeName);
+        return typeIndex == ((JavaTypeWrapper)o).typeIndex;
     }
 
     @Override
     public int hashCode() {
-        // todo
-        return Objects.hash(typeName);
+        return typeIndex;
     }
 }
