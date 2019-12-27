@@ -59,10 +59,14 @@ public abstract class EndpointFeatureComparator {
             return Difference.NON;
         }
 
-        // todo: probably not necessary
-        // todo: org/package/subpackage/Class format is used in real data
-        if (!c1Name.startsWith("java.lang") || !c2Name.startsWith("java.lang")) {
-            return Difference.UNK;
+        JavaTypeWrapper type1 = new JavaTypeWrapper(c1Name);
+        JavaTypeWrapper type2 = new JavaTypeWrapper(c2Name);
+
+        if (type1.equals(type2)
+                || type1.fitsInto(type2)
+                || type2.fitsInto(type1)
+        ) {
+            return Difference.NON;
         }
 
         try {
