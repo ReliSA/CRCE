@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.v2.internal;
 
+import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
 import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
@@ -38,6 +39,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile MappingService mappingService;
     private volatile CostFunctionRepository costFunctionRepository;
     private volatile ResultOptimizerRepository resultOptimizerRepository;
+    private volatile ApiCompatibilityCheckerService apiCompatibilityCheckerService;
 
     public static Activator instance() {
         return instance;
@@ -69,6 +71,10 @@ public final class Activator extends DependencyActivatorBase {
 
     public ResultOptimizerRepository getResultOptimizerRepository() {
         return resultOptimizerRepository;
+    }
+
+    public ApiCompatibilityCheckerService getApiCompatibilityCheckerService() {
+        return apiCompatibilityCheckerService;
     }
 
     @Nullable
@@ -112,6 +118,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(CostFunctionRepository.class).setRequired(true))
                 .add(createServiceDependency().setService(ResultOptimizerRepository.class).setRequired(true))
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false))
+                .add(createServiceDependency().setService(ApiCompatibilityCheckerService.class).setRequired(true))
         );
 
         logger.debug("Finished initializing Rest-V2 Activator!");
