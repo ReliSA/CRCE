@@ -122,6 +122,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-api-compatibility-checker</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- 3rd party dependencies -->
 
         <dependency>
