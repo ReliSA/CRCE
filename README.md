@@ -30,7 +30,7 @@ On linux or similar, the `./build-code.bash` script in project root directory ca
 4. `crce-core-reactor` in `/core`
 5. `crce-modules-reactor` in `/modules`
 6. `provision-reactor` in `/deploy`
-7. generate aggregated javadoc using maven command `mvn javadoc:aggregate` in `/`
+7. generate aggregated javadoc in `/`
 
 In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.  Forbidden hack to speed up build: `-Dmaven.test.skip=true`.
 
