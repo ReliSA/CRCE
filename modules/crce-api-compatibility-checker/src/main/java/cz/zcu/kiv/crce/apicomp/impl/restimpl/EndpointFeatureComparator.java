@@ -67,6 +67,10 @@ public abstract class EndpointFeatureComparator {
                 || type2.fitsInto(type1)
         ) {
             return Difference.NON;
+        } else if (type1.isExtendedBy(type2)) {
+            return Difference.SPE;
+        } else if (type2.isExtendedBy(type1)){
+            return Difference.GEN;
         }
 
         try {

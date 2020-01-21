@@ -145,9 +145,9 @@ public class EndpointResponseComparatorTest {
      * @return
      */
     private void addResponse1(Capability endpoint) {
-        TestUtil.addResponseMetadata(endpoint, "r1", 0L, "java.lang.Integer", 200L);
-        TestUtil.addResponseParameter(endpoint, "r1", "param1", "java.lang.Integer", "FORM", 0L);
-        TestUtil.addResponseParameter(endpoint, "r1", "param2", "java.lang.String", "FORM", 0L);
+        TestUtil.addResponseMetadata(endpoint, "r1", 0L, "java/lang/Integer", 200L);
+        TestUtil.addResponseParameter(endpoint, "r1", "param1", "java/lang/Integer", "FORM", 0L);
+        TestUtil.addResponseParameter(endpoint, "r1", "param2", "java/lang/String", "FORM", 0L);
     }
 
     /**
@@ -172,9 +172,9 @@ public class EndpointResponseComparatorTest {
      * @param endpoint
      */
     private void addResponse3(Capability endpoint) {
-        TestUtil.addResponseMetadata(endpoint, "r3", 0L, "java.lang.Number", 200L);
-        TestUtil.addResponseParameter(endpoint, "r3", "param1", "java.lang.Number", "FORM", 0L);
-        TestUtil.addResponseParameter(endpoint, "r3", "param2", "java.lang.String", "FORM", 0L);
+        TestUtil.addResponseMetadata(endpoint, "r3", 0L, "java/lang/Number", 200L);
+        TestUtil.addResponseParameter(endpoint, "r3", "param1", "java/lang/Number", "FORM", 0L);
+        TestUtil.addResponseParameter(endpoint, "r3", "param2", "java/lang/String", "FORM", 0L);
     }
 
     /**
@@ -185,6 +185,6 @@ public class EndpointResponseComparatorTest {
      * @param endpoint
      */
     private void addResponse4(Capability endpoint) {
-        TestUtil.addResponseMetadata(endpoint, "r4", 0L, "java.lang.Integer", 200L);
+        TestUtil.addResponseMetadata(endpoint, "r4", 0L, "java/lang/Integer", 200L);
     }
 }

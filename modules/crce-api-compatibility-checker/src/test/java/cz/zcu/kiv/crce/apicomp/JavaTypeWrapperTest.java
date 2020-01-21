@@ -50,4 +50,13 @@ public class JavaTypeWrapperTest {
         other = new JavaTypeWrapper("other");
         assertFalse("Other should not fit into double!", other.fitsInto(doubleType));
     }
+
+    @Test
+    public void testNumber() {
+        JavaTypeWrapper numberWrapper = new JavaTypeWrapper("java/lang/Number");
+        JavaTypeWrapper integerWrapper = new JavaTypeWrapper("java/lang/Integer");
+
+        assertTrue("Integer should extend number!", numberWrapper.isExtendedBy(integerWrapper));
+        assertFalse("Number should not extend integer!", integerWrapper.isExtendedBy(numberWrapper));
+    }
 }

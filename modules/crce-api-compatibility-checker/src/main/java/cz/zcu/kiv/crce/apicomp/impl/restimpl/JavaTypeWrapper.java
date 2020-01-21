@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
  *  - float: F
  *  - double: D
  *
+ *  Also handles java/lang/Number.
  */
-// todo: test
 public class JavaTypeWrapper {
 
     private final static String[] primitiveTypeNames = new String[]{
@@ -29,6 +29,9 @@ public class JavaTypeWrapper {
 
     private final String typeName;
 
+    // is java/lang/Number
+    private final boolean isLangNumber;
+
     /**
      * Index into the type arrays. Used to compare types between each other.
      * -1 if type is not in any array.
@@ -37,6 +40,8 @@ public class JavaTypeWrapper {
 
     public JavaTypeWrapper(@NotNull String typeName) {
         this.typeName = typeName;
+
+        isLangNumber = typeName.equals("java/lang/Number");
 
         typeIndex = -1;
         for (int i = 0; i < primitiveTypeNames.length; i++) {
@@ -63,7 +68,8 @@ public class JavaTypeWrapper {
         }
 
         // same types fits into each other
-        if (typeIndex == otherType.typeIndex) {
+        // if langNumber => both will have same typeIndex
+        if (typeIndex != -1 && typeIndex == otherType.typeIndex) {
             return true;
         }
 
@@ -81,12 +87,28 @@ public class JavaTypeWrapper {
     }
 
     /**
+     * Checks whether otherType extends this type.
+     *
+     * Currently works only for java lang number extensions.
+     *
+     * @param otherType Other type. Must not be null.
+     * @return True if this type extends other type.
+     */
+    public boolean isExtendedBy(@NotNull JavaTypeWrapper otherType) {
+        if (!isComparableType() || !otherType.isComparableType()) {
+            return false;
+        }
+
+        return isLangNumber && otherType.typeIndex >= 1;
+    }
+
+    /**
      * Checks if this type is comparable = either primitive or java-lang.*type.
      *
      * @return True if the type is comparable.
      */
     public boolean isComparableType() {
-        return typeIndex != -1;
+        return typeIndex != -1 || isLangNumber;
     }
 
     @Override
