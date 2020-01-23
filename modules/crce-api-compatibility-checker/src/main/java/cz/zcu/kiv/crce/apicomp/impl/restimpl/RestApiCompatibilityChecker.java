@@ -110,7 +110,7 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
         Diff endpointDiff = new DefaultDiffImpl();
         endpointDiff.setLevel(DifferenceLevel.OPERATION);
         endpointDiff.setValue(Difference.NON);
-        endpointDiff.setName(endpoint1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
+        endpointDiff.setName(endpoint1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH));
 
         // try to find endpoint for comparision and
         // resolve metadata differences
