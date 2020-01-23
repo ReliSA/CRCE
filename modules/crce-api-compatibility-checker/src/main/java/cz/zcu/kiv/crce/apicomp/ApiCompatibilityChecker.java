@@ -6,14 +6,14 @@ import cz.zcu.kiv.crce.metadata.Resource;
 /**
  * Interface for compatibility checkers.
  */
-public interface ApiCompatibilityChecker {
+public abstract class ApiCompatibilityChecker {
 
     /**
      * Namespace of the root capability that is expected to hold all metadata relevant to this checker.
      *
      * @return Capability namespace.
      */
-    String getRootCapabilityNamespace();
+    public abstract  String getRootCapabilityNamespace();
 
     /**
      * Verifies that the provided API is supported by this compatibility checker.
@@ -23,7 +23,10 @@ public interface ApiCompatibilityChecker {
      * @param resource Resource that contains API metadata.
      * @return True if the given API is supported.
      */
-    boolean isApiSupported(Resource resource);
+    public boolean isApiSupported(Resource resource) {
+        return resource != null &&
+                !resource.getRootCapabilities(getRootCapabilityNamespace()).isEmpty();
+    };
 
     /**
      * Compares two APIs using metadata stored in CRCE and returns result in form of
@@ -37,5 +40,5 @@ public interface ApiCompatibilityChecker {
      *             capabilities with child capabilities with attributes and/or properties.
      * @return Result.
      */
-    CompatibilityCheckResult compareApis(Resource api1, Resource api2);
+    public abstract CompatibilityCheckResult compareApis(Resource api1, Resource api2);
 }

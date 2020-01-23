@@ -21,7 +21,7 @@ import java.util.List;
  * Compatibility checker for REST API. Expects metadata structure created by
  * 'crce-restimpl-indexer' module.
  */
-public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
+public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
 
 
     public RestApiCompatibilityChecker() {
@@ -30,14 +30,6 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
     @Override
     public String getRootCapabilityNamespace() {
         return RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE;
-    }
-
-    @Override
-    public boolean isApiSupported(Resource resource) {
-        // API is supported if it contains capability with namespace 'restimpl.identity'
-        // related constants are in internal package of crce-restimpl-indexer module
-        return resource != null &&
-                !resource.getRootCapabilities(getRootCapabilityNamespace()).isEmpty();
     }
 
     @Override
