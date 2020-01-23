@@ -1,9 +1,7 @@
 package cz.zcu.kiv.crce.apicomp;
 
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
-import cz.zcu.kiv.crce.metadata.Capability;
-
-import java.util.Set;
+import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Interface for compatibility checkers.
@@ -11,26 +9,33 @@ import java.util.Set;
 public interface ApiCompatibilityChecker {
 
     /**
-     * Verifies that the provided API is supported by this compatibility checker.
-     * Verification is based on presence of identity capability and it's correct
-     * namespace and value.
+     * Namespace of the root capability that is expected to hold all metadata relevant to this checker.
      *
-     * @param apiMetadata Set of capabilities which describes the API.
+     * @return Capability namespace.
+     */
+    String getRootCapabilityNamespace();
+
+    /**
+     * Verifies that the provided API is supported by this compatibility checker.
+     * Verification is based on presence of root capability with namespace equal to
+     * {@link #getRootCapabilityNamespace()}.
+     *
+     * @param resource Resource that contains API metadata.
      * @return True if the given API is supported.
      */
-    boolean isApiSupported(Set<Capability> apiMetadata);
+    boolean isApiSupported(Resource resource);
 
     /**
      * Compares two APIs using metadata stored in CRCE and returns result in form of
      * a CompatibilityCheckResult object.
      *
-     * @param api1 Set of capabilities containing the metadata for the first API. This might be either single root
+     * @param api1 Resource with capabilities containing the metadata for the first API. This might be either single root
      *             capability which contains child capabilities with attributes and/or properties with metadata or set of root
      *             capabilities with child capabilities with attributes and/or properties.
-     * @param api2 Set of capabilities containing the metadata for the second API. This might be either single root
+     * @param api2 Resource with capabilities containing the metadata for the second API. This might be either single root
      *             capability which contains child capabilities with attributes and/or properties with metadata or set of root
      *             capabilities with child capabilities with attributes and/or properties.
      * @return Result.
      */
-    CompatibilityCheckResult compareApis(Set<Capability> api1, Set<Capability> api2);
+    CompatibilityCheckResult compareApis(Resource api1, Resource api2);
 }

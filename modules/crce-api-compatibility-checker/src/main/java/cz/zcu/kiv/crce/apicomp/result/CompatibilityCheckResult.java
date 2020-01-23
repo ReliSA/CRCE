@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.type.Version;
 
 import javax.annotation.Nonnull;
@@ -49,6 +50,18 @@ public class CompatibilityCheckResult implements Compatibility {
      */
     public CompatibilityCheckResult() {
         diffDetails = new ArrayList<>();
+    }
+
+    /**
+     * Diff object of two resources.
+     *
+     * @param baseResource Base resource.
+     * @param resource Resource that is being compared to the base one.
+     */
+    public CompatibilityCheckResult(Resource baseResource, Resource resource) {
+        this();
+        baseResourceName = baseResource.getId();
+        resourceName = resource.getId();
     }
 
     @Override

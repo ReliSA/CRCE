@@ -1,10 +1,7 @@
 package cz.zcu.kiv.crce.apicomp;
 
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
-import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
-
-import java.util.Set;
 
 /**
  * A service responsible for calling correct compatibility comparator for
@@ -28,12 +25,4 @@ public interface ApiCompatibilityCheckerService {
      * @return Checker able to compare this resource.
      */
     ApiCompatibilityChecker pickChecker(Resource resource);
-
-    /**
-     * Returns checker compatible for given set of metadata representing API.
-     *
-     * @param apiMetadata API metadata.
-     * @return Checker able to compare this resource.
-     */
-    ApiCompatibilityChecker pickChecker(Set<Capability> apiMetadata);
 }

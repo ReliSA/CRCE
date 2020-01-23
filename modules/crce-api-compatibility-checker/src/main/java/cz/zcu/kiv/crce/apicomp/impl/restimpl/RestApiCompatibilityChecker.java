@@ -9,9 +9,13 @@ import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Compatibility checker for REST API. Expects metadata structure created by
@@ -20,28 +24,34 @@ import java.util.*;
 public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
 
 
-    @Override
-    public boolean isApiSupported(Set<Capability> apiMetadata) {
-        // API is supported if it contains capability with namespace 'restimpl.identity'
-        // related constants are in internal package of crce-restimpl-indexer module
-        return apiMetadata != null &&
-                apiMetadata
-                .stream()
-                .anyMatch(capability -> RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE.equals(capability.getNamespace()));
+    public RestApiCompatibilityChecker() {
     }
 
     @Override
-    public CompatibilityCheckResult compareApis(Set<Capability> api1, Set<Capability> api2) {
-        CompatibilityCheckResult checkResult = new CompatibilityCheckResult();
+    public String getRootCapabilityNamespace() {
+        return RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE;
+    }
+
+    @Override
+    public boolean isApiSupported(Resource resource) {
+        // API is supported if it contains capability with namespace 'restimpl.identity'
+        // related constants are in internal package of crce-restimpl-indexer module
+        return resource != null &&
+                !resource.getRootCapabilities(getRootCapabilityNamespace()).isEmpty();
+    }
+
+    @Override
+    public CompatibilityCheckResult compareApis(Resource api1, Resource api2) {
+        CompatibilityCheckResult checkResult = new CompatibilityCheckResult(api1, api2);
 
         // given the structure of metadata created in crce-restimpl-indexer, both
         // capability sets should contain exactly 1 capability
-        if (api1.size() != 1 || !isApiSupported(api1)) {
+        if (!isApiSupported(api1)) {
             // todo: log error
             throw new RuntimeException("API 1 is not supported by this checker!");
         }
 
-        if (api2.size() != 1 || !isApiSupported(api2)) {
+        if (!isApiSupported(api2)) {
             // todo: log error
             throw new RuntimeException("API 2 is not supported by this checker!");
         }
@@ -49,8 +59,8 @@ public class RestApiCompatibilityChecker implements ApiCompatibilityChecker {
         // root capabilities are expected to have only one type
         // of children - capability which describes the endpoint
         // so it can be assumed all children are endpoints
-        Capability api1Root = api1.iterator().next();
-        Capability api2Root = api2.iterator().next();
+        Capability api1Root = api1.getRootCapabilities(getRootCapabilityNamespace()).iterator().next();
+        Capability api2Root = api2.getRootCapabilities(getRootCapabilityNamespace()).iterator().next();
 
 
         // compare endpoints and their details

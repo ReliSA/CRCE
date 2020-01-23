@@ -12,6 +12,7 @@
 
     <artifactId>crce-api-compatibility-checker</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>bundle</packaging>
 
     <name>
         Apicomp - API compatibility checker
@@ -27,6 +28,7 @@
     <properties>
         <bundle.symbolicName>${namespace}.apicomp</bundle.symbolicName>
         <bundle.namespace>${namespace}.apicomp</bundle.namespace>
+        <bundle.activator>${bundle.namespace}.internal.Activator</bundle.activator>
     </properties>
 
     <dependencies>

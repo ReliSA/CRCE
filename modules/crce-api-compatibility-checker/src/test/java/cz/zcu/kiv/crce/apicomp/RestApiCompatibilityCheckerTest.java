@@ -6,14 +6,14 @@ import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;
+import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -25,28 +25,31 @@ public class RestApiCompatibilityCheckerTest {
     public void testIsApiSupported() {
         RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
 
-        Capability supportedCapability = new CapabilityImpl("restimpl.identity", "");
-        Capability notSupportedCapability = new CapabilityImpl("not.supported", "");
+        Resource supportedResource = new ResourceImpl("api");
+        supportedResource.addRootCapability(new CapabilityImpl("restimpl.identity", ""));
 
-        assertFalse("Empty set should not be supported!",checker.isApiSupported(Collections.emptySet()));
+        Resource notSupportedResource = new ResourceImpl("api");
+        notSupportedResource.addRootCapability(new CapabilityImpl("not.supported", ""));
+
+        assertFalse("Empty set should not be supported!",checker.isApiSupported(new ResourceImpl("")));
         assertFalse("Null set should not be supported!",checker.isApiSupported(null));
-        assertFalse("Compatibility set with wrong namespace should not be supported", checker.isApiSupported(Collections.singleton(notSupportedCapability)));
-        assertTrue("Compatibility set with wrong namespace should be supported", checker.isApiSupported(Collections.singleton(supportedCapability)));
+        assertFalse("Compatibility set with wrong namespace should not be supported", checker.isApiSupported(notSupportedResource));
+        assertTrue("Compatibility set with wrong namespace should be supported", checker.isApiSupported(supportedResource));
     }
 
     @Test(expected = RuntimeException.class)
     public void testCompareApis_api1notSupported() {
-        Set<Capability> api1 = new HashSet<>();
-        api1.add(new CapabilityImpl("namespace", "id"));
-        api1.add(new CapabilityImpl("namespace2", "id2"));
+        Resource r1 = new ResourceImpl("api1");
+        r1.addRootCapability(new CapabilityImpl("namespace", "id"));
+        r1.addRootCapability(new CapabilityImpl("namespace2", "id2"));
 
-        Set<Capability> api2 = new HashSet<>();
-        api1.add(new CapabilityImpl("namespace", "id"));
-        api1.add(new CapabilityImpl("namespace2", "id2"));
+        Resource r2 = new ResourceImpl("api2");
+        r2.addRootCapability(new CapabilityImpl("namespace", "id"));
+        r2.addRootCapability(new CapabilityImpl("namespace2", "id2"));
 
         RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
 
-        checker.compareApis(api1, api2);
+        checker.compareApis(r1, r2);
         fail("Not supported exception expected!");
     }
 
@@ -56,8 +59,8 @@ public class RestApiCompatibilityCheckerTest {
     @Test
     public void testCompareApis_sameApi() {
         RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
-        Set<Capability> api1 = Collections.singleton(createMockApi1());
-        Set<Capability> api2 = Collections.singleton(createMockApi1());
+        Resource api1 = createMockApi1();
+        Resource api2 = createMockApi1();
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
         assertEquals("APIs should be same!", Difference.NON, result.getDiffValue());
@@ -66,8 +69,8 @@ public class RestApiCompatibilityCheckerTest {
     @Test
     public void testCompareApis_differentApi() {
         RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
-        Set<Capability> api1 = Collections.singleton(createMockApi1());
-        Set<Capability> api2 = Collections.singleton(createMockApi2());
+        Resource api1 = createMockApi1();
+        Resource api2 = createMockApi2();
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
         assertEquals("APIs should not be same!", Difference.MUT, result.getDiffValue());
@@ -80,8 +83,8 @@ public class RestApiCompatibilityCheckerTest {
     @Test
     public void testCompareApis_shuffled() {
         RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
-        Set<Capability> api1 = Collections.singleton(createMockApi2());
-        Set<Capability> api2 = Collections.singleton(createMockApi2_shuffled());
+        Resource api1 = createMockApi2();
+        Resource api2 = createMockApi2_shuffled();
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
         assertEquals("APIs should be same!", Difference.NON, result.getDiffValue());
@@ -92,7 +95,7 @@ public class RestApiCompatibilityCheckerTest {
      *
      * @return
      */
-    private Capability createMockApi1() {
+    private Resource createMockApi1() {
         // root capability
         Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
 
@@ -112,8 +115,9 @@ public class RestApiCompatibilityCheckerTest {
         responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID, "cz/kiv/zcu/server/Server.testEndpoint0");
         responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
 
-
-        return apiRoot;
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
     }
 
     /**
@@ -121,7 +125,7 @@ public class RestApiCompatibilityCheckerTest {
      *
      * @return
      */
-    private Capability createMockApi2() {
+    private Resource createMockApi2() {
         // root capability
         Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
 
@@ -142,7 +146,9 @@ public class RestApiCompatibilityCheckerTest {
         responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
 
 
-        return apiRoot;
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
     }
 
     /**
@@ -150,7 +156,7 @@ public class RestApiCompatibilityCheckerTest {
      *
      * @return
      */
-    private Capability createMockApi2_shuffled() {
+    private Resource createMockApi2_shuffled() {
         // root capability
         Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
 
@@ -171,6 +177,8 @@ public class RestApiCompatibilityCheckerTest {
         responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
 
 
-        return apiRoot;
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
     }
 }

@@ -2,9 +2,7 @@ package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
-import cz.zcu.kiv.crce.metadata.Capability;
-
-import java.util.Set;
+import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Checker for crce-webservices-indexer
@@ -13,12 +11,17 @@ import java.util.Set;
 public class WebservicesCompatibilityChecker implements ApiCompatibilityChecker {
 
     @Override
-    public boolean isApiSupported(Set<Capability> apiMetadata) {
+    public String getRootCapabilityNamespace() {
+        return null;
+    }
+
+    @Override
+    public boolean isApiSupported(Resource resource) {
         return false;
     }
 
     @Override
-    public CompatibilityCheckResult compareApis(Set<Capability> api1, Set<Capability> api2) {
+    public CompatibilityCheckResult compareApis(Resource api1, Resource api2) {
         return null;
     }
 }
