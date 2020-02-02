@@ -2,13 +2,15 @@ package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.compatibility.Diff;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
  * Checker for crce-webservices-indexer
  *
  */
-public class WebservicesCompatibilityChecker extends ApiCompatibilityChecker {
+public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityChecker {
 
     @Override
     public String getRootCapabilityNamespace() {
@@ -37,4 +39,12 @@ public class WebservicesCompatibilityChecker extends ApiCompatibilityChecker {
 
         return checkResult;
     }
+
+    /**
+     * TODO: work in progress, may change
+     * @param root1
+     * @param root2
+     * @return
+     */
+    protected abstract Diff compare(Capability root1, Capability root2);
 }

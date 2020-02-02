@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -124,29 +125,32 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
             // possible match found
 
             // construct metadata, parameter and response diff
-            Diff metadataDiff = new DefaultDiffImpl();
-            metadataDiff.addChildren(metadataDiffs);
-            metadataDiff.setLevel(DifferenceLevel.FIELD);
-            metadataDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(metadataDiffs));
+            Diff metadataDiff = DiffUtils.createDiff(
+                    "metadata",
+                    DifferenceLevel.FIELD,
+                    metadataDiffs
+            );
 
             // parameter diffs
             EndpointParameterComparator parameterComparator = new EndpointParameterComparator(
                     endpoint1,
                     api2MatchingEndpoint
             );
-            Diff parameterDiff = new DefaultDiffImpl();
-            parameterDiff.setLevel(DifferenceLevel.FIELD);
-            parameterDiff.addChildren(parameterComparator.compare());
-            parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
+            Diff parameterDiff = DiffUtils.createDiff(
+                    "parameters",
+                    DifferenceLevel.FIELD,
+                    parameterComparator.compare()
+            );
 
             // response diffs
             EndpointResponseComparator responseComparator = new EndpointResponseComparator(
                     endpoint1,
                     api2MatchingEndpoint);
-            Diff responseDiff = new DefaultDiffImpl();
-            responseDiff.setLevel(DifferenceLevel.FIELD);
-            responseDiff.addChildren(responseComparator.compare());
-            responseDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(responseDiff.getChildren()));
+            Diff responseDiff = DiffUtils.createDiff(
+                    "response",
+                    DifferenceLevel.FIELD,
+                    responseComparator.compare()
+            );
 
             // total diff
             endpointDiff.addChild(metadataDiff);

@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Class used to compare parameters of two endpoint. Also better for testability.
+ * Class used to compare parameters of two endpoints. Also better for testability.
  *
  * New instance should be created for every comparison.
  *
