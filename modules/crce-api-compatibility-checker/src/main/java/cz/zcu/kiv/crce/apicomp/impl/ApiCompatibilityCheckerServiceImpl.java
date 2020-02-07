@@ -3,8 +3,10 @@ package cz.zcu.kiv.crce.apicomp.impl;
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
 import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.webservice.WebservicesCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.JsonWspCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.internal.Activator;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
     public ApiCompatibilityCheckerServiceImpl() {
         availableCheckers = new ArrayList<>();
         availableCheckers.add(new RestApiCompatibilityChecker());
-        availableCheckers.add(new WebservicesCompatibilityChecker());
+        availableCheckers.add(new JsonWspCompatibilityChecker());
     }
 
     @Override
@@ -40,6 +42,17 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
         }
 
         return c1.compareApis(api1, api2);
+    }
+
+    @Override
+    public Compatibility findExistingCompatibility(Resource api1, Resource api2) {
+        List<Compatibility> compatibilities = Activator.instance().getCompatibilityDao().findCompatibility(api1, api2);
+        return compatibilities.isEmpty() ? null : compatibilities.get(0);
+    }
+
+    @Override
+    public Compatibility saveCompatibility(Compatibility compatibilityCheckResult) {
+        return Activator.instance().getCompatibilityDao().saveCompatibility(compatibilityCheckResult);
     }
 
     @Override
