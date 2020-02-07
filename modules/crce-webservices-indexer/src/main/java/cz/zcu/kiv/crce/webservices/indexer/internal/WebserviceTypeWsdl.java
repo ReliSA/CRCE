@@ -68,8 +68,8 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     private static final String WSDL_MESSAGE = "message";
     private static final String WSDL_SERVICE_INTERFACE_V_1_1 = "portType";
     private static final String WSDL_SERVICE_INTERFACE_V_2_0 = "interface";
-    private static final String WSDL_BINDING = "binding";
-    private static final String WSDL_SERVICE = "service";
+    static final String WSDL_BINDING = "binding";
+    static final String WSDL_SERVICE = "service";
     static final String WSDL_SERVICE_ENDPOINT_V_1_1 = "port";
     static final String WSDL_SERVICE_ENDPOINT_V_2_0 = "endpoint";
     static final String WSDL_ADDRESS = "address";
@@ -198,83 +198,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
         NodeList services = root.getElementsByTagName(WSDL_SERVICE);
         for (int i = 0; i < services.getLength(); i++) {
             Node service = services.item(i);
-            NamedNodeMap serviceAttributes = service.getAttributes();
-            String serviceName = returnNodeValue(serviceAttributes, "name");
-            String serviceIdlVersion = null;
-            
-            // get info about service endpoints
-            List<WebserviceEndpoint> processedEndpoints = new ArrayList<>();
-            NodeList endpoints = service.getChildNodes();
-            for(int j = 0; j < endpoints.getLength(); j++) {
-                Node endpoint = endpoints.item(j);
-                String endpointUrl;
-
-                if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_1_1)) {
-                    // detected as WSDL 1.1
-                    serviceIdlVersion = WSDL_V_1_1;
-                    endpointUrl = getWsdl11EndpointUrl(endpoint);
-                } else if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_2_0)) {
-                    // detected as WSDL 2.0
-                    serviceIdlVersion = WSDL_V_2_0;
-                    endpointUrl = getWsdl2EndpointUrl(endpoint);
-                } else {
-                    logger.warn("Unrecognizable element \"{}\" in WSDL \"{}\" element", endpoint.getNodeName(), WSDL_SERVICE);
-                    continue;
-                }
-                
-                NamedNodeMap endpointAttributes = endpoint.getAttributes();
-                String endpointBinding = returnNodeValue(endpointAttributes, "binding");
-                
-                // get all operations implemented by this endpoint via its's binding object and list of operations defined in corresponding interface
-                WebserviceTypeWsdlBinding binding = getBindingByName(processedBindings, endpointBinding);
-                List<WebserviceTypeWsdlBindedOperation> bindedOperations = binding.getBindedOperations();
-                List<WebserviceTypeWsdlOperation> interfaceOperations = getInterfaceByName(processedInterfaces, binding.getInterface_()).getOperations();
-                
-                // process all operation defined in binding
-                for (WebserviceTypeWsdlBindedOperation bindedOperation : bindedOperations) {
-                    // Note: This single binded operation represent endpoint in CRCE semantics. One WSDL port / endpoint can bind multiple particular operations
-                    // each with their parameters, datatypes, return value etc. That is why CRCE Webservice Endpoint corresponds to WSDL Operation.
-                    
-                    WebserviceTypeWsdlOperation operation = getOperationByName(interfaceOperations, bindedOperation.getName());
-                    
-                    // proces all input parts defined in this operation as endpoint parameters
-                    List<WebserviceEndpointParameter> processedParameters = new ArrayList<>();
-                    if (operation.getInputMessage() != null) {
-                        List<WebserviceTypeWsdlPart> parts = getMessageByName(processedMessges, operation.getInputMessage()).getParts();
-                        for (int k = 0; k < parts.size(); k++) {
-                            WebserviceTypeWsdlPart part = parts.get(k);
-                            String endpointParameterType = part.getType() != null ? part.getType() : part.getElement();
-                            processedParameters.add(new WebserviceEndpointParameter(part.getName(), endpointParameterType, (long)k + 1, null, null));
-                        }
-                    } else if (operation.getInputElement() != null) {
-                        processedParameters.add(new WebserviceEndpointParameter(operation.getName(), operation.getInputElement(), null, null, null));
-                    } else {
-                        logger.warn("WSDL \"input\" element of operation \"{}\" does not have \"message\" or \"element\" attributes.");
-                    }
-                    
-                    // proces all output parts defined in this operation as endpoint response
-                    // TODO In document (i.e. messaging) communication style, output message can generally contain multiple parts - now we just grab a first one.
-                    String endpointResponseType = null;
-                    if (operation.getOutputMessage() != null) {
-                        List<WebserviceTypeWsdlPart> parts = getMessageByName(processedMessges, operation.getOutputMessage()).getParts();
-                        if (parts.size() > 0) {
-                            endpointResponseType = parts.get(0).getType() != null ? parts.get(0).getType() : parts.get(0).getElement();
-                        }
-                    } else if (operation.getOutputElement() != null) {
-                        endpointResponseType = operation.getOutputElement();
-                    } else {
-                        logger.warn("WSDL \"output\" element of operation \"{}\" does not have \"message\" or \"element\" attributes.");
-                    }
-                    WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(endpointResponseType, null);
-                    
-                    // add info about new endpoint
-                    // if the bindedOperation contains URL use it, otherwise use the one parsed from endpoint attributes
-                    endpointUrl = bindedOperation.hasSoapAction() ? bindedOperation.getSoapAction() : endpointUrl;
-                    processedEndpoints.add(new WebserviceEndpoint(operation.getName(), endpointUrl, processedParameters, processedResponse));
-                }
-            }
-            
-            processedWebservices.add(new Webservice(serviceName, null, serviceIdlVersion, getSpecificWebserviceType(), processedEndpoints));
+            processWebservice(service, processedWebservices, processedInterfaces, processedBindings, processedMessges);
         }
         
         ////////////////////////////////////////////////////////////////////////////
@@ -323,6 +247,7 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             for (int i = 0; i < processedEndpoints.size(); i++) {
                 endpoint_capability = metadataFactory.createCapability(NAMESPACE__WEBSERVICE_ENDPOINT);
                 setIfSet(endpoint_capability, ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME, processedEndpoints.get(i).getName());
+                setIfSet(endpoint_capability, ATTRIBUTE__WEBSERVICE_ENDPOINT__URL, processedEndpoints.get(i).getUrl());
 
                 // Properties - Webservice Enpoint Parameter
                 List<WebserviceEndpointParameter> processedParams = processedEndpoints.get(i).getParameters();
@@ -351,14 +276,106 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     }
 
     /**
+     * Processes one <service> node and adds it to processedWebservices list.
+     *
+     * Package-private because of tests.
+     *
+     * @param service Node to process.
+     * @param processedWebservices List to add processed webservice to.
+     * @param processedInterfaces
+     * @param processedBindings
+     * @param processedMessges
+     */
+    void processWebservice(Node service, List<Webservice> processedWebservices, List<WebserviceTypeWsdlInterface> processedInterfaces, List<WebserviceTypeWsdlBinding> processedBindings, List<WebserviceTypeWsdlMessage> processedMessges) {
+        NamedNodeMap serviceAttributes = service.getAttributes();
+        String serviceName = returnNodeValue(serviceAttributes, "name");
+        String serviceIdlVersion = null;
+
+        // get info about service endpoints
+        List<WebserviceEndpoint> processedEndpoints = new ArrayList<>();
+        NodeList endpoints = service.getChildNodes();
+        for(int j = 0; j < endpoints.getLength(); j++) {
+            Node endpoint = endpoints.item(j);
+            String endpointUrl;
+
+            if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_1_1)) {
+                // detected as WSDL 1.1
+                serviceIdlVersion = WSDL_V_1_1;
+                endpointUrl = getWsdl11EndpointUrl(endpoint);
+            } else if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_2_0)) {
+                // detected as WSDL 2.0
+                serviceIdlVersion = WSDL_V_2_0;
+                endpointUrl = getWsdl2EndpointUrl(endpoint);
+            } else {
+                logger.warn("Unrecognizable element \"{}\" in WSDL \"{}\" element", endpoint.getNodeName(), WSDL_SERVICE);
+                continue;
+            }
+
+            NamedNodeMap endpointAttributes = endpoint.getAttributes();
+            String endpointBinding = returnNodeValue(endpointAttributes, "binding");
+
+            // get all operations implemented by this endpoint via its's binding object and list of operations defined in corresponding interface
+            WebserviceTypeWsdlBinding binding = getBindingByName(processedBindings, endpointBinding);
+            List<WebserviceTypeWsdlBindedOperation> bindedOperations = binding.getBindedOperations();
+            List<WebserviceTypeWsdlOperation> interfaceOperations = getInterfaceByName(processedInterfaces, binding.getInterface_()).getOperations();
+
+            // process all operation defined in binding
+            for (WebserviceTypeWsdlBindedOperation bindedOperation : bindedOperations) {
+                // Note: This single binded operation represent endpoint in CRCE semantics. One WSDL port / endpoint can bind multiple particular operations
+                // each with their parameters, datatypes, return value etc. That is why CRCE Webservice Endpoint corresponds to WSDL Operation.
+
+                WebserviceTypeWsdlOperation operation = getOperationByName(interfaceOperations, bindedOperation.getName());
+
+                // proces all input parts defined in this operation as endpoint parameters
+                List<WebserviceEndpointParameter> processedParameters = new ArrayList<>();
+                if (operation.getInputMessage() != null) {
+                    List<WebserviceTypeWsdlPart> parts = getMessageByName(processedMessges, operation.getInputMessage()).getParts();
+                    for (int k = 0; k < parts.size(); k++) {
+                        WebserviceTypeWsdlPart part = parts.get(k);
+                        String endpointParameterType = part.getType() != null ? part.getType() : part.getElement();
+                        processedParameters.add(new WebserviceEndpointParameter(part.getName(), endpointParameterType, (long)k + 1, null, null));
+                    }
+                } else if (operation.getInputElement() != null) {
+                    processedParameters.add(new WebserviceEndpointParameter(operation.getName(), operation.getInputElement(), null, null, null));
+                } else {
+                    logger.warn("WSDL \"input\" element of operation \"{}\" does not have \"message\" or \"element\" attributes.");
+                }
+
+                // proces all output parts defined in this operation as endpoint response
+                // TODO In document (i.e. messaging) communication style, output message can generally contain multiple parts - now we just grab a first one.
+                String endpointResponseType = null;
+                if (operation.getOutputMessage() != null) {
+                    List<WebserviceTypeWsdlPart> parts = getMessageByName(processedMessges, operation.getOutputMessage()).getParts();
+                    if (parts.size() > 0) {
+                        endpointResponseType = parts.get(0).getType() != null ? parts.get(0).getType() : parts.get(0).getElement();
+                    }
+                } else if (operation.getOutputElement() != null) {
+                    endpointResponseType = operation.getOutputElement();
+                } else {
+                    logger.warn("WSDL \"output\" element of operation \"{}\" does not have \"message\" or \"element\" attributes.");
+                }
+                WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(endpointResponseType, null);
+
+                // add info about new endpoint
+                // if the bindedOperation contains URL use it, otherwise use the one parsed from endpoint attributes
+                endpointUrl = bindedOperation.hasSoapAction() ? bindedOperation.getSoapAction() : endpointUrl;
+                processedEndpoints.add(new WebserviceEndpoint(operation.getName(), endpointUrl, processedParameters, processedResponse));
+            }
+        }
+
+        processedWebservices.add(new Webservice(serviceName, null, serviceIdlVersion, getSpecificWebserviceType(), processedEndpoints));
+    }
+
+    /**
      * If the WSDL v 2 endpoint (element <endpoint>) contains attribute named 'address'
      * this method returns the value of said attribute.
+     *
+     * Package-private because of tests.
      *
      * @param endpoint
      * @return URL for WSDL endpoint or null if no is found.
      */
-    // todo: test
-    public String getWsdl2EndpointUrl(Node endpoint) {
+    String getWsdl2EndpointUrl(Node endpoint) {
         NamedNodeMap attributes = endpoint.getAttributes();
         Node addressAttribute = attributes.getNamedItem(WSDL_ADDRESS);
         if (addressAttribute != null) {
@@ -371,11 +388,12 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
      * If the WSDL v 1.1 endpoint (element <port>) has child element named <address> with
      * attribute 'location' this method returns the value of the location attribute.
      *
+     * Package-private because of tests.
+     *
      * @param endpoint
      * @return URL for WSDL endpoint or null if no is found.
      */
-    // todo: test
-    public String getWsdl11EndpointUrl(Node endpoint) {
+    String getWsdl11EndpointUrl(Node endpoint) {
         NodeList children = endpoint.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
