@@ -1,24 +1,5 @@
 package cz.zcu.kiv.crce.webservices.indexer.internal;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.Property;
@@ -28,12 +9,20 @@ import cz.zcu.kiv.crce.webservices.indexer.structures.Webservice;
 import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpoint;
 import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointParameter;
 import cz.zcu.kiv.crce.webservices.indexer.structures.WebserviceEndpointResponse;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlBindedOperation;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlBinding;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlInterface;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlMessage;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlOperation;
-import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.WebserviceTypeWsdlPart;
+import cz.zcu.kiv.crce.webservices.indexer.structures.wsdl.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>This class can recognize and parse remote IDL documents representing WSDL (Web Services Description Language)
@@ -81,9 +70,11 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
     private static final String WSDL_SERVICE_INTERFACE_V_2_0 = "interface";
     private static final String WSDL_BINDING = "binding";
     private static final String WSDL_SERVICE = "service";
-    private static final String WSDL_SERVICE_ENDPOINT_V_1_1 = "port";
-    private static final String WSDL_SERVICE_ENDPOINT_V_2_0 = "endpoint";
-    
+    static final String WSDL_SERVICE_ENDPOINT_V_1_1 = "port";
+    static final String WSDL_SERVICE_ENDPOINT_V_2_0 = "endpoint";
+    static final String WSDL_ADDRESS = "address";
+    static final String WSDL_V_1_1_LOCATION = "location";
+
     /**
      * Constructor
      *
@@ -216,13 +207,16 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
             NodeList endpoints = service.getChildNodes();
             for(int j = 0; j < endpoints.getLength(); j++) {
                 Node endpoint = endpoints.item(j);
-                
+                String endpointUrl;
+
                 if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_1_1)) {
                     // detected as WSDL 1.1
                     serviceIdlVersion = WSDL_V_1_1;
+                    endpointUrl = getWsdl11EndpointUrl(endpoint);
                 } else if (endpoint.getNodeName().equalsIgnoreCase(WSDL_SERVICE_ENDPOINT_V_2_0)) {
                     // detected as WSDL 2.0
                     serviceIdlVersion = WSDL_V_2_0;
+                    endpointUrl = getWsdl2EndpointUrl(endpoint);
                 } else {
                     logger.warn("Unrecognizable element \"{}\" in WSDL \"{}\" element", endpoint.getNodeName(), WSDL_SERVICE);
                     continue;
@@ -274,7 +268,9 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
                     WebserviceEndpointResponse processedResponse = new WebserviceEndpointResponse(endpointResponseType, null);
                     
                     // add info about new endpoint
-                    processedEndpoints.add(new WebserviceEndpoint(operation.getName(), bindedOperation.getSoapAction(), processedParameters, processedResponse));
+                    // if the bindedOperation contains URL use it, otherwise use the one parsed from endpoint attributes
+                    endpointUrl = bindedOperation.hasSoapAction() ? bindedOperation.getSoapAction() : endpointUrl;
+                    processedEndpoints.add(new WebserviceEndpoint(operation.getName(), endpointUrl, processedParameters, processedResponse));
                 }
             }
             
@@ -353,7 +349,49 @@ public class WebserviceTypeWsdl extends WebserviceTypeBase implements Webservice
 
         return processedWebservices.size();
     }
-    
+
+    /**
+     * If the WSDL v 2 endpoint (element <endpoint>) contains attribute named 'address'
+     * this method returns the value of said attribute.
+     *
+     * @param endpoint
+     * @return URL for WSDL endpoint or null if no is found.
+     */
+    // todo: test
+    public String getWsdl2EndpointUrl(Node endpoint) {
+        NamedNodeMap attributes = endpoint.getAttributes();
+        Node addressAttribute = attributes.getNamedItem(WSDL_ADDRESS);
+        if (addressAttribute != null) {
+            return addressAttribute.getNodeValue();
+        }
+        return null;
+    }
+
+    /**
+     * If the WSDL v 1.1 endpoint (element <port>) has child element named <address> with
+     * attribute 'location' this method returns the value of the location attribute.
+     *
+     * @param endpoint
+     * @return URL for WSDL endpoint or null if no is found.
+     */
+    // todo: test
+    public String getWsdl11EndpointUrl(Node endpoint) {
+        NodeList children = endpoint.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if (!child.getNodeName().equals(WSDL_ADDRESS)) {
+                continue;
+            }
+
+            NamedNodeMap attributes = children.item(i).getAttributes();
+            Node addressAttribute = attributes.getNamedItem(WSDL_V_1_1_LOCATION);
+            if (addressAttribute != null) {
+                return addressAttribute.getNodeValue();
+            }
+        }
+        return null;
+    }
+
     /**
      * Processes all portTypes (WSDL 1.1) / interfaces (WSDL 2.0) defined in WSDL IDL document.
      * 

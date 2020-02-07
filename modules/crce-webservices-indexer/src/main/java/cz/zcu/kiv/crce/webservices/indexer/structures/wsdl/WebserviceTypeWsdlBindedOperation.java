@@ -72,4 +72,8 @@ public class WebserviceTypeWsdlBindedOperation {
     public void setSoapStyle(String soapStyle) {
         this.soapStyle = soapStyle;
     }
+
+    public boolean hasSoapAction() {
+        return soapAction != null && !soapAction.isEmpty();
+    }
 }
