@@ -28,14 +28,43 @@
     <properties>
         <bundle.symbolicName>${namespace}.apicomp</bundle.symbolicName>
         <bundle.namespace>${namespace}.apicomp</bundle.namespace>
-        <bundle.activator>${bundle.namespace}.internal.Activator</bundle.activator>
+        <!--<bundle.activator>${bundle.namespace}.internal.Activator</bundle.activator>-->
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-core</artifactId>
             <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
         </dependency>
     </dependencies>
 

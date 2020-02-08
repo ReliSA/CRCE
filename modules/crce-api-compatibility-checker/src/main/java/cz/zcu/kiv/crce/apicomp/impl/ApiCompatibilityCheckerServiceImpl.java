@@ -4,25 +4,41 @@ import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
 import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.JsonWspCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.internal.Activator;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
+import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.metadata.Resource;
+import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.ServiceDependency;
+import org.osgi.framework.Constants;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 
 /**
  * A service responsible for fetching resources' metadata and passing them to
  * the correct compatibility checker.
  */
-public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheckerService {
+@Component(provides = {ApiCompatibilityCheckerService.class, ManagedService.class}, properties = {
+        @org.apache.felix.dm.annotation.api.Property(name = Constants.SERVICE_PID, value = ApiCompatibilityCheckerServiceImpl.PID)
+})
+public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheckerService, ManagedService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiCompatibilityCheckerServiceImpl.class);
 
+    public static final String CFG_PROPERTY__REST_IGNORE_PATH_VERSION = "rest.path.version.ignore";
+
+    public static final String PID = "cz.zcu.kiv.crce.apicomp";
+
     private List<ApiCompatibilityChecker> availableCheckers;
+
+    @ServiceDependency
+    private volatile CompatibilityDao compatibilityDao;
 
     public ApiCompatibilityCheckerServiceImpl() {
         availableCheckers = new ArrayList<>();
@@ -46,13 +62,21 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
 
     @Override
     public Compatibility findExistingCompatibility(Resource api1, Resource api2) {
-        List<Compatibility> compatibilities = Activator.instance().getCompatibilityDao().findCompatibility(api1, api2);
+        if (compatibilityDao == null) {
+            System.out.println("Compatibility dao not set.");
+            return null;
+        }
+        List<Compatibility> compatibilities = compatibilityDao.findCompatibility(api1, api2);
         return compatibilities.isEmpty() ? null : compatibilities.get(0);
     }
 
     @Override
     public Compatibility saveCompatibility(Compatibility compatibilityCheckResult) {
-        return Activator.instance().getCompatibilityDao().saveCompatibility(compatibilityCheckResult);
+        if (compatibilityDao == null) {
+            System.out.println("Compatibility dao not set.");
+            return compatibilityCheckResult;
+        }
+        return compatibilityDao.saveCompatibility(compatibilityCheckResult);
     }
 
     @Override
@@ -61,5 +85,29 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
                 .filter(checker -> checker.isApiSupported(resource))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        System.out.println("Updated "+PID);
+        logger.debug("Updated: {}.", PID);
+
+        if (properties == null || properties.isEmpty()) {
+            System.out.println("Configuration is empty.");
+            logger.warn("Configuration is empty.");
+            return;
+        }
+
+        Object val = properties.get(CFG_PROPERTY__REST_IGNORE_PATH_VERSION);
+        if (val != null) {
+            boolean ignoreRestVersion = Boolean.parseBoolean((String)val);
+            logger.debug("Setting {}={}.", CFG_PROPERTY__REST_IGNORE_PATH_VERSION, ignoreRestVersion);
+            System.out.println("Setting "+CFG_PROPERTY__REST_IGNORE_PATH_VERSION+"="+ignoreRestVersion);
+            availableCheckers.forEach(checker -> {
+                if (checker instanceof RestApiCompatibilityChecker) {
+                    ((RestApiCompatibilityChecker)checker).setIgnoreVersionInPath(ignoreRestVersion);
+                }
+            });
+        }
     }
 }

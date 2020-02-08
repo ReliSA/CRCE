@@ -29,10 +29,17 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
      * If set, this checker tries to detect version in path to API and ignore it when picking
      * endpoint suitable for comparison.
      */
-    // todo: set this from property file
     private boolean ignoreVersionInPath = false;
 
     public RestApiCompatibilityChecker() {
+    }
+
+    public boolean isIgnoreVersionInPath() {
+        return ignoreVersionInPath;
+    }
+
+    public void setIgnoreVersionInPath(boolean ignoreVersionInPath) {
+        this.ignoreVersionInPath = ignoreVersionInPath;
     }
 
     @Override

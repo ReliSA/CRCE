@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp;
 
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 /**
@@ -17,6 +18,26 @@ public interface ApiCompatibilityCheckerService {
      * @return Comparison result.
      */
     CompatibilityCheckResult compareApis(Resource api1, Resource api2);
+
+    /**
+     * Tries to find compatibility object for two given resources.
+     *
+     * Note: the fact that compatibility obj doesn't exist for [api1,api2]
+     * combination does not mean it doesn't exist for [api2,api1].
+     *
+     * @param api1 First resource.
+     * @param api2 Second resource.
+     * @return Found compatibility result or null if no is found.
+     */
+    Compatibility findExistingCompatibility(Resource api1, Resource api2);
+
+    /**
+     * Saves compatibility object.
+     *
+     * @param compatibilityCheckResult Object to be saved.
+     * @return Saved object.
+     */
+    Compatibility saveCompatibility(Compatibility compatibilityCheckResult);
 
     /**
      * Returns checker compatible for given resource.

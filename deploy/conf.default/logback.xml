@@ -40,11 +40,14 @@
   
   <!-- Loggers -->
   
-  <logger name="cz.zcu.kiv.crce" level="TRACE"/>
+  <logger name="cz.zcu.kiv.crce" level="TRACE">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
   <!-- <logger name="cz.zcu.kiv.crce.something" level="DEBUG"/> -->
 
   <root level="INFO">
-    <!-- <appender-ref ref="STDOUT"/> -->
+     <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILE-DEBUG"/>
     <appender-ref ref="FILE-INFO"/>
     <appender-ref ref="FILE-ERROR"/>
