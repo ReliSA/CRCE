@@ -14,9 +14,9 @@ import java.util.List;
  */
 public abstract class EndpointFeatureComparator {
 
-    protected Capability endpoint1;
+    Capability endpoint1;
 
-    protected Capability endpoint2;
+    Capability endpoint2;
 
     public EndpointFeatureComparator(Capability endpoint1, Capability endpoint2) {
         this.endpoint1 = endpoint1;
@@ -28,6 +28,8 @@ public abstract class EndpointFeatureComparator {
      * describing the differences.
      *
      * Typically, you want one Diff per feature (one diff per one response, one diff per one parameter, ...).
+     *
+     * The list should be non-empty.
      */
     public abstract List<Diff> compare();
 

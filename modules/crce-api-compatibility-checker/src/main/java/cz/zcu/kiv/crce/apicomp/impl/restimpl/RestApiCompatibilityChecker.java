@@ -25,6 +25,13 @@ import java.util.List;
 public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
 
 
+    /**
+     * If set, this checker tries to detect version in path to API and ignore it when picking
+     * endpoint suitable for comparison.
+     */
+    // todo: set this from property file
+    private boolean ignoreVersionInPath = false;
+
     public RestApiCompatibilityChecker() {
     }
 
@@ -202,7 +209,7 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
      * Produces following diffs:
      *  NON - no difference.
      *  INS - possible match
-     *  DEL - no match (because endpoint2 doesn't containt everything from endpoint1)
+     *  DEL - no match (because endpoint2 doesn't contain everything from endpoint1)
      *  MUT - no match, because MUT is combination of INS and DEL
      *
      * @param endpoint1 Endpoint 1.
@@ -221,50 +228,69 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
         List<Diff> result = new ArrayList<>();
 
         for (ListAttributeType at : attributeTypes) {
-            Attribute a1 = endpoint1.getAttribute(at);
-            Attribute a2 = endpoint2.getAttribute(at);
 
-            // values of both attributes
-            List a1V = new ArrayList((List) a1.getValue());
-            List a2V = new ArrayList((List) a2.getValue());
-
-
-            // go through all the values of attribute of endpoint1
-            // try to find the value in the attribute of endpoint2
-            // and remove it from e1 and e2
-            // if all the values are same (regardless of their order)
-            // both a1V and a2V will be empty
-            Iterator a1i = a1V.iterator();
-            while(a1i.hasNext()) {
-                Object obj = a1i.next();
-                if (a2V.contains(obj)) {
-                    a1i.remove();
-                    a2V.remove(obj);
-                }
-            }
-
-            // if a1V is not empty, some values are missing and it is not true that e1 <: e2
-            // because e.g. endpoint with methods [GET, POST] <: endpoint with methods [POST]
-            // or similarly endpoint with produces [application/xml, application/json] <: [application/json]
-            Diff d = new DefaultDiffImpl();
-            d.setName(at.getName());
-            d.setLevel(DifferenceLevel.FIELD);
-            if (a1V.isEmpty() && a2V.isEmpty()) {
-                // ok
-                d.setValue(Difference.NON);
-            } else if (a1V.isEmpty() && !a2V.isEmpty()) {
-                // endpoint 2 has something endpoint 1 doesn't have
-                d.setValue(Difference.INS);
-            } else if (!a1V.isEmpty() && a2V.isEmpty()) {
-                // endpoint 1 has something endpoint 2 doesn't have
-                d.setValue(Difference.DEL);
+            // use smart comparator for endpoint paths
+            if (at.equals(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH)) {
+                EndpointPathComparator pathComparator = new EndpointPathComparator(endpoint1, endpoint2, this.ignoreVersionInPath);
+                result.add(pathComparator.compare().get(0));
             } else {
-                // combination of INS and DEL -> MUT
-                d.setValue(Difference.MUT);
+                result.add(compareListAttributes(endpoint1, endpoint2, at));
             }
-            result.add(d);
         }
 
         return result;
+    }
+
+    /**
+     * Compares one list attribute of two endpoints.
+     *
+     * @param endpoint1
+     * @param endpoint2
+     * @param attributeType
+     */
+    private Diff compareListAttributes(Capability endpoint1, Capability endpoint2, ListAttributeType attributeType) {
+        Attribute a1 = endpoint1.getAttribute(attributeType);
+        Attribute a2 = endpoint2.getAttribute(attributeType);
+
+        // values of both attributes
+        List a1V = new ArrayList((List) a1.getValue());
+        List a2V = new ArrayList((List) a2.getValue());
+
+
+        // go through all the values of attribute of endpoint1
+        // try to find the value in the attribute of endpoint2
+        // and remove it from e1 and e2
+        // if all the values are same (regardless of their order)
+        // both a1V and a2V will be empty
+        Iterator a1i = a1V.iterator();
+        while(a1i.hasNext()) {
+            Object obj = a1i.next();
+            if (a2V.contains(obj)) {
+                a1i.remove();
+                a2V.remove(obj);
+            }
+        }
+
+        // if a1V is not empty, some values are missing and it is not true that e1 <: e2
+        // because e.g. endpoint with methods [GET, POST] <: endpoint with methods [POST]
+        // or similarly endpoint with produces [application/xml, application/json] <: [application/json]
+        Diff d = new DefaultDiffImpl();
+        d.setName(attributeType.getName());
+        d.setLevel(DifferenceLevel.FIELD);
+        if (a1V.isEmpty() && a2V.isEmpty()) {
+            // ok
+            d.setValue(Difference.NON);
+        } else if (a1V.isEmpty() && !a2V.isEmpty()) {
+            // endpoint 2 has something endpoint 1 doesn't have
+            d.setValue(Difference.INS);
+        } else if (!a1V.isEmpty() && a2V.isEmpty()) {
+            // endpoint 1 has something endpoint 2 doesn't have
+            d.setValue(Difference.DEL);
+        } else {
+            // combination of INS and DEL -> MUT
+            d.setValue(Difference.MUT);
+        }
+
+        return d;
     }
 }
