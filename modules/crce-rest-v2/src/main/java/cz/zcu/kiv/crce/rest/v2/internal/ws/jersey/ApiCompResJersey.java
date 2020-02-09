@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.rest.v2.internal.ws.jersey;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
-import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.rest.v2.internal.Activator;
@@ -34,14 +34,24 @@ public class ApiCompResJersey implements ApiCompRes {
 
             logger.debug("Calling compatibility checker service.");
             ApiCompatibilityCheckerService compatibilityCheckerService = Activator.instance().getApiCompatibilityCheckerService();
-            CompatibilityCheckResult result = compatibilityCheckerService.compareApis(api1, api2);
+            Compatibility c = compatibilityCheckerService.findExistingCompatibility(api1, api2);
+
+            if (c == null) {
+                logger.debug("No existing compatibility found for resource pair {};{}. Calculating new.", api1.getId(), api2.getId());
+                c = compatibilityCheckerService.compareApis(api1, api2);
+
+                if (c != null) {
+                    logger.debug("Saving new compatibility data.");
+                    compatibilityCheckerService.saveCompatibility(c);
+                }
+            }
 
             logger.debug("Done.");
-            if (result == null) {
+            if (c == null) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
 
-            return Response.ok(result).build();
+            return Response.ok(c).build();
         } catch (Exception ex) {
             logger.error("Unexpected error occurred.", ex);
             return Response.serverError().build();

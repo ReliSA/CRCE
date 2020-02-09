@@ -9,7 +9,6 @@ import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.metadata.Resource;
 import org.apache.felix.dm.annotation.api.Component;
-import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -37,13 +36,14 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
 
     private List<ApiCompatibilityChecker> availableCheckers;
 
-    @ServiceDependency
+//    @ServiceDependency
     private volatile CompatibilityDao compatibilityDao;
 
     public ApiCompatibilityCheckerServiceImpl() {
         availableCheckers = new ArrayList<>();
         availableCheckers.add(new RestApiCompatibilityChecker());
         availableCheckers.add(new JsonWspCompatibilityChecker());
+        logger.debug("New instance of {} created.", getClass().getSimpleName());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
     @Override
     public Compatibility findExistingCompatibility(Resource api1, Resource api2) {
         if (compatibilityDao == null) {
-            System.out.println("Compatibility dao not set.");
+            logger.warn("Compatibility dao not set.");
             return null;
         }
         List<Compatibility> compatibilities = compatibilityDao.findCompatibility(api1, api2);
@@ -73,7 +73,7 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
     @Override
     public Compatibility saveCompatibility(Compatibility compatibilityCheckResult) {
         if (compatibilityDao == null) {
-            System.out.println("Compatibility dao not set.");
+            logger.warn("Compatibility dao not set.");
             return compatibilityCheckResult;
         }
         return compatibilityDao.saveCompatibility(compatibilityCheckResult);
@@ -89,11 +89,9 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
 
     @Override
     public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-        System.out.println("Updated "+PID);
         logger.debug("Updated: {}.", PID);
 
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Configuration is empty.");
             logger.warn("Configuration is empty.");
             return;
         }
@@ -102,7 +100,6 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
         if (val != null) {
             boolean ignoreRestVersion = Boolean.parseBoolean((String)val);
             logger.debug("Setting {}={}.", CFG_PROPERTY__REST_IGNORE_PATH_VERSION, ignoreRestVersion);
-            System.out.println("Setting "+CFG_PROPERTY__REST_IGNORE_PATH_VERSION+"="+ignoreRestVersion);
             availableCheckers.forEach(checker -> {
                 if (checker instanceof RestApiCompatibilityChecker) {
                     ((RestApiCompatibilityChecker)checker).setIgnoreVersionInPath(ignoreRestVersion);
