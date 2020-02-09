@@ -2,12 +2,14 @@ package cz.zcu.kiv.crce.compatibility.impl;
 
 import cz.zcu.kiv.crce.compatibility.*;
 import cz.zcu.kiv.crce.metadata.type.Version;
+import org.apache.felix.dm.annotation.api.Component;
 
 import java.util.List;
 
 /**
  * Factory which creates default implementations of Compatibility interfaces.
  */
+@Component(provides = {CompatibilityFactory.class})
 public class DefaultCompatibilityFactoryImpl implements CompatibilityFactory {
 
     @Override

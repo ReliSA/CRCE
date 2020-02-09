@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.compatibility.dao.internal;
 
+import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
@@ -37,9 +38,9 @@ public class Activator extends DependencyActivatorBase {
                 .setInterface(s, compatibilityProps)
                 .setFactory(new CompatibilityDaoMongoFactory(), "get")
                 //requires CompatibilityFactory for proper mapping
-//                .add(createServiceDependency().setRequired(false)
-//                        .setService(CompatibilityFactory.class)
-//                )
+                .add(createServiceDependency().setRequired(true)
+                        .setService(CompatibilityFactory.class)
+                )
         );
     }
 
