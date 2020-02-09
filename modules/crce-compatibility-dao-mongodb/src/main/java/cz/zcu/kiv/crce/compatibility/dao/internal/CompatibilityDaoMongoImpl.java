@@ -6,6 +6,7 @@ import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.compatibility.dao.internal.mapping.MongoCompatibilityMapper;
+import cz.zcu.kiv.crce.compatibility.impl.DefaultCompatibilityFactoryImpl;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.mongodb.BaseMongoDao;
 import cz.zcu.kiv.crce.metadata.type.Version;
@@ -42,6 +43,9 @@ public class CompatibilityDaoMongoImpl extends BaseMongoDao implements Compatibi
     public CompatibilityDaoMongoImpl(MongoClient client) {
         super(client);
         this.col = getCollection("compatibility");
+
+        // todo: service or just like this? probably should be service
+        factory = new DefaultCompatibilityFactoryImpl();
     }
 
     @Override

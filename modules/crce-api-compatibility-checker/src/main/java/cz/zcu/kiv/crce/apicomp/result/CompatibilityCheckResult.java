@@ -62,6 +62,9 @@ public class CompatibilityCheckResult implements Compatibility {
         this();
         baseResourceName = baseResource.getId();
         resourceName = resource.getId();
+
+        baseResourceVersion = new Version(0,0,0);
+        resourceVersion = new Version(0,0,0);
     }
 
     @Override
@@ -116,6 +119,6 @@ public class CompatibilityCheckResult implements Compatibility {
     @Nonnull
     @Override
     public Contract getContract() {
-        return null;
+        return Contract.INTERACTION;
     }
 }

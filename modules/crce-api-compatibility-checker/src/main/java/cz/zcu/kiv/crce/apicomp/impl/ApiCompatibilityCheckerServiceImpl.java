@@ -9,6 +9,7 @@ import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.metadata.Resource;
 import org.apache.felix.dm.annotation.api.Component;
+import org.apache.felix.dm.annotation.api.ServiceDependency;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -36,7 +37,8 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
 
     private List<ApiCompatibilityChecker> availableCheckers;
 
-//    @ServiceDependency
+    // todo: find out why this doesn't work
+    @ServiceDependency(required = false)
     private volatile CompatibilityDao compatibilityDao;
 
     public ApiCompatibilityCheckerServiceImpl() {
@@ -63,7 +65,7 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
     @Override
     public Compatibility findExistingCompatibility(Resource api1, Resource api2) {
         if (compatibilityDao == null) {
-            logger.warn("Compatibility dao not set.");
+            logger.warn("Compatibility dao not available, can't find existing compatibility object.");
             return null;
         }
         List<Compatibility> compatibilities = compatibilityDao.findCompatibility(api1, api2);
@@ -73,9 +75,10 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
     @Override
     public Compatibility saveCompatibility(Compatibility compatibilityCheckResult) {
         if (compatibilityDao == null) {
-            logger.warn("Compatibility dao not set.");
+            logger.warn("Compatibility dao not available, can't save compatibility object.");
             return compatibilityCheckResult;
         }
+
         return compatibilityDao.saveCompatibility(compatibilityCheckResult);
     }
 
