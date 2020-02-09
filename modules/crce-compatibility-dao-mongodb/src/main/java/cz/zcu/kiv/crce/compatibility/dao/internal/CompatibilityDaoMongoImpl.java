@@ -1,27 +1,20 @@
 package cz.zcu.kiv.crce.compatibility.dao.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.QueryBuilder;
-
+import com.mongodb.*;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import cz.zcu.kiv.crce.compatibility.dao.internal.mapping.MongoCompatibilityMapper;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.dao.mongodb.BaseMongoDao;
 import cz.zcu.kiv.crce.metadata.type.Version;
+import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of CompatibilityDao for MongoDB.
@@ -115,6 +108,19 @@ public class CompatibilityDaoMongoImpl extends BaseMongoDao implements Compatibi
     @Override
     public List<Compatibility> findLower(String resourceName, Version resourceVersion, List<Difference> difference) {
         return findByVersion(V_LOWER, resourceName, resourceVersion, difference);
+    }
+
+    @Override
+    public List<Compatibility> findCompatibility(Resource baseResource, Resource resource) {
+        DBObject query = BasicDBObjectBuilder.start(MongoCompatibilityMapper.C_BASE_NAME, baseResource.getId())
+                .add(MongoCompatibilityMapper.C_RESOURCE_NAME, resource.getId()).get();
+
+        DBCursor cursor = col.find(query);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Compatibilities found for {};{} pair: {}.", baseResource.getId(), resource.getId(), cursor.size());
+        }
+
+        return parseCursor(cursor);
     }
 
     /**
