@@ -10,7 +10,9 @@ import cz.zcu.kiv.crce.metadata.type.Version;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Object describing the differences between compared APIs.
@@ -46,10 +48,16 @@ public class CompatibilityCheckResult implements Compatibility {
     private List<Diff> diffDetails;
 
     /**
+     * Additional info map used to store MOV flag.
+     */
+    private Map<String, Object> additionalInfo;
+
+    /**
      * Initializes this object with empty diffDetails and NON difference.
      */
     public CompatibilityCheckResult() {
         diffDetails = new ArrayList<>();
+        additionalInfo = new HashMap<>();
     }
 
     /**
@@ -63,8 +71,10 @@ public class CompatibilityCheckResult implements Compatibility {
         baseResourceName = baseResource.getId();
         resourceName = resource.getId();
 
-        baseResourceVersion = new Version(0,0,0);
-        resourceVersion = new Version(0,0,0);
+        // we have no means of getting resource version at this point
+        // and in the context of comparing APIs, this version is irrelevant
+        baseResourceVersion = Version.emptyVersion;
+        resourceVersion = Version.emptyVersion;
     }
 
     @Override
@@ -120,5 +130,21 @@ public class CompatibilityCheckResult implements Compatibility {
     @Override
     public Contract getContract() {
         return Contract.INTERACTION;
+    }
+
+    @Nonnull
+    @Override
+    public Map<String, Object> getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    /**
+     * Sets the move flag for this compatibility object.
+     *
+     * @param description Machine-readable description of why the MOV flag was set.
+     */
+    public void setMoveFlag(String description) {
+        // todo: key as interface
+        additionalInfo.put("MOV", description);
     }
 }

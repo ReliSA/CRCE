@@ -1,11 +1,12 @@
 package cz.zcu.kiv.crce.compatibility;
 
-import java.util.List;
+import cz.zcu.kiv.crce.metadata.type.Version;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import cz.zcu.kiv.crce.metadata.type.Version;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface representing Compability metadata for a pair of bundles.
@@ -81,5 +82,18 @@ public interface Compatibility {
      */
     @Nonnull
     Contract getContract();
+
+
+    /**
+     * Key-value map that can contain additional info. Keys as well
+     * as values denepnd on particular implementation. If no additional
+     * info is used by implementing class, empty map is to be returned.
+     *
+     * @return Map containing additional info about compatibility.
+     */
+    @Nonnull
+    default Map<String, Object> getAdditionalInfo() {
+        return Collections.emptyMap();
+    };
 
 }
