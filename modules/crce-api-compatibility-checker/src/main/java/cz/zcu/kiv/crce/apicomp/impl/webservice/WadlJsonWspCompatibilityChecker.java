@@ -17,11 +17,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-// todo: logging
 // todo: document used diff levels
-// todo: tests
-// todo: should be usable for both WADL and JsonWSP
-public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker {
+// todo: tests for JsonWSP data
+
+/**
+ * Supports WADL and Json-WSP.
+ *
+ */
+public class WadlJsonWspCompatibilityChecker extends WebservicesCompatibilityChecker {
 
     @Override
     protected Capability getOneRootCapability(Resource resource) {
@@ -35,6 +38,8 @@ public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker
 
     @Override
     protected void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2) {
+
+        logger.info("Comparing WADL and/or Json-WSP APIs.");
 
         Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
         checkResult.getDiffDetails().add(communicationPatternDiff);
