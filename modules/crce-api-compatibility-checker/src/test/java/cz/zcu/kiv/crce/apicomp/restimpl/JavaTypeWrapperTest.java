@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.apicomp;
+package cz.zcu.kiv.crce.apicomp.restimpl;
 
 import cz.zcu.kiv.crce.apicomp.impl.restimpl.JavaTypeWrapper;
 import org.junit.Test;

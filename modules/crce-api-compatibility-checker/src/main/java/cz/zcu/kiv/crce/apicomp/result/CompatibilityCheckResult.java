@@ -53,11 +53,17 @@ public class CompatibilityCheckResult implements Compatibility {
     private Map<String, Object> additionalInfo;
 
     /**
+     * Final difference between comapred resources.
+     */
+    private Difference finalDifference;
+
+    /**
      * Initializes this object with empty diffDetails and NON difference.
      */
     public CompatibilityCheckResult() {
         diffDetails = new ArrayList<>();
         additionalInfo = new HashMap<>();
+        finalDifference = Difference.UNK;
     }
 
     /**
@@ -106,14 +112,24 @@ public class CompatibilityCheckResult implements Compatibility {
         return baseResourceVersion;
     }
 
+    public void setFinalDifference(Difference finalDifference) {
+        this.finalDifference = finalDifference;
+    }
+
     /**
      * Final verdict regarding the difference of two APIs.
      */
     @Nonnull
     @Override
     public Difference getDiffValue() {
-        // all children should have their values set properly by compatibility checker
-        return DifferenceAggregation.calculateFinalDifferenceFor(getDiffDetails());
+        return finalDifference;
+    }
+
+    /**
+     * Recalculates final difference from child diffs.
+     */
+    public void recalculateFinalDifference() {
+        finalDifference = DifferenceAggregation.calculateFinalDifferenceFor(getDiffDetails());
     }
 
     @Nullable

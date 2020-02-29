@@ -1,32 +1,46 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
+import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 // todo: logging
 // todo: document used diff levels
 // todo: tests
+// todo: should be usable for both WADL and JsonWSP
 public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker {
 
     @Override
-    protected Diff compare(Capability root1, Capability root2) {
+    protected Capability getOneRootCapability(Resource resource) {
+        List<Capability> capabilities = resource.getRootCapabilities(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE);
+        if (capabilities.isEmpty()) {
+            return null;
+        }
 
-        Diff result = new DefaultDiffImpl();
+        return capabilities.get(0);
+    }
 
+    @Override
+    protected void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2) {
+
+        Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
+        checkResult.getDiffDetails().add(communicationPatternDiff);
         // communication pattern must be same
-        if (!compareCommunicationPatterns(root1, root2)) {
-            result.setValue(Difference.MUT);
-            result.setLevel(DifferenceLevel.TYPE);
-            return result;
+        if (!communicationPatternDiff.getValue().equals(Difference.NON)) {
+            return;
         }
 
         // start comparing methods in WS
@@ -41,7 +55,7 @@ public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker
 
             // find method from other service with same metadata and compare it
             Diff methodDiff = compareMethods(api1Method, api2Methods);
-            result.addChild(methodDiff);
+            checkResult.getDiffDetails().add(methodDiff);
 
             // method processed, remove it
             it1.remove();
@@ -54,17 +68,22 @@ public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker
                     api2Method.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
                     DifferenceLevel.OPERATION,
                     Difference.INS);
-            result.addChild(diff);
+            checkResult.getDiffDetails().add(diff);
         }
 
-        return result;
+        return;
     }
 
-    private boolean compareCommunicationPatterns(Capability root1, Capability root2) {
+    private Diff compareCommunicationPatterns(Capability root1, Capability root2) {
         String type1 = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
         String type2 = root2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
 
-        return type1 != null && type1.equals(type2);
+        Diff commDiff = new DefaultDiffImpl();
+        commDiff.setName("communication pattern");
+        commDiff.setLevel(DifferenceLevel.TYPE);
+        commDiff.setValue(type1 != null && type1.equals(type2) ? Difference.NON : Difference.MUT);
+
+        return commDiff;
     }
 
     /**
@@ -142,6 +161,58 @@ public class JsonWspCompatibilityChecker extends WebservicesCompatibilityChecker
     }
 
     private Capability pullMatchingMethod(Capability api1Method, List<Capability> api2Methods, List<Diff> metadataDiffs) {
-        return null;
+        Capability match = null;
+        Iterator<Capability> otherMethodsIt = api2Methods.iterator();
+
+        while(otherMethodsIt.hasNext()) {
+            Capability otherE = otherMethodsIt.next();
+            List<Diff> diffs = compareEndpointMetadata(api1Method, otherE);
+
+            // diff is valid only in case of no DEL and MUT diffs
+            boolean validDiff = !diffs.isEmpty() && diffs.stream()
+                    .noneMatch(d -> d.getValue().equals(Difference.UNK));
+
+            if (validDiff) {
+                match = otherE;
+                otherMethodsIt.remove();
+                metadataDiffs.addAll(diffs);
+                break;
+            }
+        }
+
+        return match;
+    }
+
+    /**
+     * Compares metadata (type, url) of two endpoints and returns list
+     * of diffs with each diff describing the difference between metadata.
+     *
+     * So, one diff for type and one diff for url.
+     *
+     * TODO: MOV
+     *
+     * @param api1Method
+     * @param otherE
+     * @return
+     */
+    private List<Diff> compareEndpointMetadata(Capability api1Method, Capability otherE) {
+        List<AttributeType> attributeTypes = Arrays.asList(
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
+        );
+
+        List<Diff> metadataDiffs = new ArrayList<>();
+        for (AttributeType at : attributeTypes) {
+            Attribute a1 = api1Method.getAttribute(at);
+            Attribute a2 = otherE.getAttribute(at);
+
+            if (a1 != null && a1.equals(a2)) {
+                metadataDiffs.add(DiffUtils.createDiff(at.getName(), DifferenceLevel.FIELD, Difference.NON));
+            } else {
+                metadataDiffs.add(DiffUtils.createDiff(at.getName(), DifferenceLevel.FIELD, Difference.UNK));
+            }
+        }
+
+        return metadataDiffs;
     }
 }

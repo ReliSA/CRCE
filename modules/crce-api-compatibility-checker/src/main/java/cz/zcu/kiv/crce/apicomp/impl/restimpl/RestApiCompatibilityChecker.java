@@ -99,6 +99,8 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
             checkResult.getDiffDetails().add(diff);
         }
 
+        checkResult.recalculateFinalDifference();
+
         return checkResult;
     }
 
