@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.webservice.xsd.XsdTypeComparator;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
+import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
@@ -75,7 +77,7 @@ public class MethodParameterComparator extends MethodFeatureComparator {
      * Following attributes must be equal:
      *
      *  - name
-     *  - type
+     *  - type (GEN/SPE allowed for some types)
      *  - order
      *  - isArray
      *  - optional (although if p1 is not optional and p2 is, then it's ok)
@@ -85,15 +87,14 @@ public class MethodParameterComparator extends MethodFeatureComparator {
      * @param diffs
      */
     private void compareParameters(Property param1, Property param2, List<Diff> diffs) {
-        Diff diff = new DefaultDiffImpl();
-        diff.setName(param1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME));
-        diff.setLevel(DifferenceLevel.FIELD);
-        diffs.add(diff);
+        Diff parameterDiff = new DefaultDiffImpl();
+        parameterDiff.setName(param1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME));
+        parameterDiff.setLevel(DifferenceLevel.FIELD);
+        diffs.add(parameterDiff);
 
         // list of attribute types that are ought to be equal
         List<AttributeType> equalAttributesTypes = Arrays.asList(
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE,
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER,
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY
         );
@@ -101,30 +102,63 @@ public class MethodParameterComparator extends MethodFeatureComparator {
         for (AttributeType at : equalAttributesTypes) {
             equalAttributes &= areAttributesEqual(param1, param2, at);
         }
-
         if (!equalAttributes) {
             // some of the attributes that are to be equal are not -> UNK
-            diff.setValue(Difference.UNK);
+            parameterDiff.addChild(DiffUtils.createDiff("metadata", DifferenceLevel.FIELD, Difference.UNK));
         } else {
+            // compare types
+            parameterDiff.addChild(compareTypes(param1, param2));
+
             // compare optional attributes
             Attribute<Long> optional1 = param1.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
             Attribute<Long> optional2 = param2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
 
+            Diff optionalDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL.getName(), DifferenceLevel.FIELD, Difference.NON);
             if (optional1 == null || optional2 == null) {
                 // should happen, optional should be set
                 // todo: log
-                diff.setValue(Difference.UNK);
+                optionalDiff.setValue(Difference.UNK);
             } else if (optional1.equals(optional2)) {
-                diff.setValue(Difference.NON);
+                optionalDiff.setValue(Difference.NON);
             } else if (optional1.getValue().equals(0L) && optional2.getValue().equals(1L)) {
                 // the client is expecting parameter to be non-optional
                 // but it's optional in the new version
                 // that is ok as client can still use such API transparently
-                diff.setValue(Difference.GEN);
+                optionalDiff.setValue(Difference.GEN);
             } else {
                 // anything else is bad
-                diff.setValue(Difference.UNK);
+                optionalDiff.setValue(Difference.UNK);
+            }
+
+            parameterDiff.addChild(optionalDiff);
+        }
+
+        parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
+    }
+
+    private Diff compareTypes(Property param1, Property param2) {
+        String type1 = param1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE);
+        String type2 = param2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE);
+
+        Diff typeDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE.getName(), DifferenceLevel.FIELD, Difference.NON);
+
+        if (type1 == null || type2 == null) {
+            typeDiff.setValue(Difference.UNK);
+        } else {
+            // use Xsd comparator for detecting GEN/SPEC
+            if (XsdTypeComparator.isXsdDataType(type1) && XsdTypeComparator.isXsdDataType(type2)) {
+                Difference d = XsdTypeComparator.compareTypes(type1, type2);
+                if (typeDiff != null) {
+                    typeDiff.setValue(d);
+                } else {
+                    typeDiff.setValue(Difference.UNK);
+                }
+            } else {
+                // unkown types, equality is required
+                typeDiff.setValue(type1.equals(type2) ? Difference.NON : Difference.UNK);
             }
         }
+
+        return typeDiff;
     }
 }

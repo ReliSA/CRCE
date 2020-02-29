@@ -81,6 +81,39 @@ public class JsonWspCompatibilityCheckerTest {
     }
 
     /**
+     * Compare API with its generalized version.
+     */
+    @Test
+    public void testCompare_differenceGEN() {
+        Resource api1 = createWS1(),
+                api2 = createWS1_GEN();
+
+        ApiCompatibilityChecker compatibilityChecker = new JsonWspCompatibilityChecker();
+
+        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+
+        assertNotNull("Null result returned!", res);
+        assertEquals("Wrong difference!", Difference.GEN, res.getDiffValue());
+    }
+
+    /**
+     * Compare API with its specialized version.
+     */
+    @Test
+    public void testCompare_differenceSPE() {
+        Resource api1 = createWS1_GEN(),
+                api2 = createWS1();
+
+        ApiCompatibilityChecker compatibilityChecker = new JsonWspCompatibilityChecker();
+
+        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+
+        assertNotNull("Null result returned!", res);
+        assertEquals("Wrong difference!", Difference.SPE, res.getDiffValue());
+    }
+
+
+    /**
      * Based on Fuel Economy WADL.
      * @return
      */
@@ -89,7 +122,7 @@ public class JsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
-        TestUtil.addMethodParameter(e1, "year", "xs:string", null, null, null);
+        TestUtil.addMethodParameter(e1, "year", "xsd:int", null, null, null);
         TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
         TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
 
@@ -116,7 +149,7 @@ public class JsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
-        TestUtil.addMethodParameter(e1, "year", "xs:string", null, null, null);
+        TestUtil.addMethodParameter(e1, "year", "xsd:int", null, null, null);
         TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
         TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
 
@@ -129,6 +162,33 @@ public class JsonWspCompatibilityCheckerTest {
         Capability e4 = TestUtil.createEndpointCapability("getVehicleMenuModelNoEv (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/menu/modelNoEv", ws);
         TestUtil.addMethodParameter(e4, "make", "xs:string", null, null, null);
         TestUtil.addMethodParameter(e4, "year", "xs:string", null, null, null);
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(ws);
+        r.addRootCapability(new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "ws1-identity"));
+
+        return r;
+    }
+
+    /**
+     * WS1 with some parameters generalized.
+     * @return
+     */
+    private Resource createWS1_GEN() {
+        String wsId = "ws1-gen";
+        Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, wsId);
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
+
+        Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
+        TestUtil.addMethodParameter(e1, "year", "xsd:long", null, null, null);
+        TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
+
+
+        Capability e2 = TestUtil.createEndpointCapability("exportAll (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/export/all", ws);
+
+        Capability e3 = TestUtil.createEndpointCapability("record (GET)", "https://www.fueleconomy.gov/ws/rest//ftr", ws);
+        TestUtil.addMethodParameter(e3, "app", "xs:string", null, null, null);
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(ws);
