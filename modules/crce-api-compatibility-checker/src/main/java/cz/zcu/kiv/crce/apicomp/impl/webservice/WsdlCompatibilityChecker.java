@@ -2,10 +2,12 @@ package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
-import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
@@ -13,64 +15,155 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-// todo: implementation
+/**
+ * Possible differences:
+ *
+ * NON: APIs are the same
+ * GEN/SPE: The second API has data types that are GEN/SPE of the same types in the first API (e.g. endpoint parameter, response data type, ...)
+ * INS/DEL: The second api has/has not ws or endpoint that is defined in the first API.
+ * MUT: Combination of GEN/SPE, INS/DEL.
+ * UNK: Endpoints with same signature have different response, or some more specific metadata (parameter order, parameter data type) do not match.
+ */
 public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
     @Override
+    public String getRootCapabilityNamespace() {
+        return WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY;
+    }
+
+    @Override
     protected Capability getOneRootCapability(Resource resource) {
-        return null;
+        // wsdls have identity->ws capability
+        List<Capability> wsIdentityCapabilities = resource.getRootCapabilities(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY);
+        if (wsIdentityCapabilities.isEmpty()) {
+            return null;
+        }
+
+        return wsIdentityCapabilities.get(0);
+    }
+
+    @Override
+    protected AttributeType getCommunicationPatternAttributeName() {
+        return WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION;
+    }
+
+    @Override
+    protected MethodFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new WsdlEndpointResponseComparator(endpoint1, endpoint2);
     }
 
     @Override
     protected void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2) {
-        Diff result = new DefaultDiffImpl();
-
+        Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
+        checkResult.getDiffDetails().add(communicationPatternDiff);
         // communication pattern must be same
-        if (!compareCommunicationPatterns(root1, root2)) {
-            result.setValue(Difference.MUT);
-            result.setLevel(DifferenceLevel.TYPE);
-            return ;
+        if (!communicationPatternDiff.getValue().equals(Difference.NON)) {
+            return;
         }
 
-        // start comparing methods in WS
+        // start comparing web services defined in WSDL
         // new lists are created so that it's safe to remove items
-        List<Capability> api1Methods = new ArrayList<>(root1.getChildren());
-        Iterator<Capability> it1 = api1Methods.iterator();
-        List<Capability> api2Methods = new ArrayList<>(root2.getChildren());
+        List<Capability> api1WebServices = new ArrayList<>(root1.getChildren());
+        Iterator<Capability> it1 = api1WebServices.iterator();
+        List<Capability> api2WebServices = new ArrayList<>(root2.getChildren());
 
 
+        // diff for collecting differences from all webservices this API may contain
+        Diff webServicesDiff = DiffUtils.createDiff("webservices", DifferenceLevel.PACKAGE, Difference.NON);
         while(it1.hasNext()) {
             Capability api1Method = it1.next();
 
-            // find method from other service with same metadata and compare it
-            Diff methodDiff = compareMethods(api1Method, api2Methods);
-            result.addChild(methodDiff);
+            // find webservice from other api with same metadata and compare it
+            Diff webServiceDiff = compareWebServices(api1Method, api2WebServices);
+            webServicesDiff.addChild(webServiceDiff);
 
-            // method processed, remove it
+            // webservice processed, remove it
             it1.remove();
         }
 
-        // remaining methods
-        for (Capability api2Method : api2Methods) {
-            // api 1 does not contain method defined in api 2 -> INS
+        // remaining webservices
+        for (Capability api2Method : api2WebServices) {
+            // api 1 does not contain webservice defined in api 2 -> INS
             Diff diff = DiffUtils.createDiff(
-                    api2Method.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
-                    DifferenceLevel.OPERATION,
+                    api2Method.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
+                    DifferenceLevel.PACKAGE,
                     Difference.INS);
-            result.addChild(diff);
+            webServicesDiff.addChild(diff);
         }
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(webServicesDiff);
+
+        checkResult.getDiffDetails().add(webServicesDiff);
 
         return;
     }
 
-    private boolean compareCommunicationPatterns(Capability root1, Capability root2) {
-        String type1 = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
-        String type2 = root2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
+    private Diff compareWebServices(Capability api1Ws, List<Capability> api2WebServices) {
+        Diff webserviceDiff = DiffUtils.createDiff(
+                api1Ws.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
+                DifferenceLevel.PACKAGE,
+                Difference.NON);
 
-        return type1 != null && type1.equals(type2);
+        Diff wsMetadataDiff = DiffUtils.createDiff("metadata", DifferenceLevel.FIELD, Difference.NON);
+        Capability otherWs = pullComparableWs(api1Ws, api2WebServices, wsMetadataDiff);
+
+        if (otherWs != null) {
+            // comparable WS found
+            webserviceDiff.addChild(wsMetadataDiff);
+
+            // start comparing endpoints of two web services
+            Diff endpointsDiff = DiffUtils.createDiff("endpoints", DifferenceLevel.PACKAGE, Difference.NON);
+            compareEndpointsFromRoot(api1Ws, otherWs, endpointsDiff);
+            webserviceDiff.addChild(endpointsDiff);
+
+            DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(webserviceDiff);
+
+        } else {
+            // no matching WS found
+            webserviceDiff.setValue(Difference.DEL);
+        }
+        return webserviceDiff;
     }
 
-    private Diff compareMethods(Capability api1Method, List<Capability> api2Methods) {
+    /**
+     * Tries to find capability representing a WSDL webservice in api2WebServices
+     * that is comparable with api1Ws. Also sets metadata diffs and diff value in wsMetadataDiff
+     *
+     * If a comparable WS is found, it is removed from api2WebServices.
+     *
+     * @param api1Ws WS from the first API.
+     * @param api2WebServices Collection of WS from the second API.
+     * @param wsMetadataDiff Metadata diff details.
+     * @return Found WS or null if nothing is found. If null is returned, wsMetadataDiff should not be used.
+     */
+    private Capability pullComparableWs(Capability api1Ws, List<Capability> api2WebServices, Diff wsMetadataDiff) {
+
+        Iterator<Capability> ws2It = api2WebServices.iterator();
+        Attribute type1 = api1Ws.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
+        Attribute name1 = api1Ws.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME);
+
+        if (type1 == null) {
+            logger.error("Malformed webservice metadata, missing attribute: '{}'", WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE.getName());
+            throw new IllegalArgumentException("Malformed webservice metadata, missing attribute: "+WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE.getName());
+        }
+
+        if (name1 == null) {
+            logger.error("Malformed webservice metadata, missing attribute: '{}'", WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME.getName());
+            throw new IllegalArgumentException("Malformed webservice metadata, missing attribute: "+WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME.getName());
+        }
+
+        while (ws2It.hasNext()) {
+            Capability ws2 = ws2It.next();
+
+            // todo: mov?
+            // type and name must be equal
+            Attribute type2 = ws2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
+            Attribute name2 = ws2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME);
+
+            if (type1.equals(type2) && name1.equals(name2)) {
+                ws2It.remove();
+                return ws2;
+            }
+        }
         return null;
     }
 }

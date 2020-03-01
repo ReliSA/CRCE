@@ -122,15 +122,15 @@ public class WadlJsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
-        TestUtil.addMethodParameter(e1, "year", "xsd:int", null, null, null);
-        TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "year", "xsd:int", null, null, null);
+        TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
 
 
         Capability e2 = TestUtil.createEndpointCapability("exportAll (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/export/all", ws);
 
         Capability e3 = TestUtil.createEndpointCapability("record (GET)", "https://www.fueleconomy.gov/ws/rest//ftr", ws);
-        TestUtil.addMethodParameter(e3, "app", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e3, "app", "xs:string", null, null, null);
 
         Resource r = new ResourceImpl("ws1");
         r.addRootCapability(ws);
@@ -149,19 +149,19 @@ public class WadlJsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
-        TestUtil.addMethodParameter(e1, "year", "xsd:int", null, null, null);
-        TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "year", "xsd:int", null, null, null);
+        TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
 
 
         Capability e2 = TestUtil.createEndpointCapability("exportAll (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/export/all", ws);
 
         Capability e3 = TestUtil.createEndpointCapability("record (GET)", "https://www.fueleconomy.gov/ws/rest//ftr", ws);
-        TestUtil.addMethodParameter(e3, "app", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e3, "app", "xs:string", null, null, null);
 
         Capability e4 = TestUtil.createEndpointCapability("getVehicleMenuModelNoEv (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/menu/modelNoEv", ws);
-        TestUtil.addMethodParameter(e4, "make", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e4, "year", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e4, "make", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e4, "year", "xs:string", null, null, null);
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(ws);
@@ -180,15 +180,15 @@ public class WadlJsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
-        TestUtil.addMethodParameter(e1, "year", "xsd:long", null, null, null);
-        TestUtil.addMethodParameter(e1, "state", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e1, "id", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "year", "xsd:long", null, null, null);
+        TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
 
 
         Capability e2 = TestUtil.createEndpointCapability("exportAll (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/export/all", ws);
 
         Capability e3 = TestUtil.createEndpointCapability("record (GET)", "https://www.fueleconomy.gov/ws/rest//ftr", ws);
-        TestUtil.addMethodParameter(e3, "app", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e3, "app", "xs:string", null, null, null);
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(ws);
@@ -207,16 +207,16 @@ public class WadlJsonWspCompatibilityCheckerTest {
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
 
         Capability e1 = TestUtil.createEndpointCapability("getVehicleMenuOptions (GET)", "https://www.fueleconomy.gov/ws/rest//menu/options", ws);
-        TestUtil.addMethodParameter(e1, "year", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e1, "make", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e1, "model", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "year", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "make", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "model", "xs:string", null, null, null);
 
 
         Capability e2 = TestUtil.createEndpointCapability("getFuelPrices (GET)", "https://www.fueleconomy.gov/ws/rest//fuelprices", ws);
 
         Capability e3 = TestUtil.createEndpointCapability("getVehicleMenuModelNoEv (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/menu/modelNoEv", ws);
-        TestUtil.addMethodParameter(e3, "make", "xs:string", null, null, null);
-        TestUtil.addMethodParameter(e3, "year", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e3, "make", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e3, "year", "xs:string", null, null, null);
 
         Resource r = new ResourceImpl("ws2");
         r.addRootCapability(ws);

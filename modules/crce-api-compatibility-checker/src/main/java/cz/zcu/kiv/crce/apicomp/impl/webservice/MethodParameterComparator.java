@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
-import cz.zcu.kiv.crce.apicomp.impl.webservice.xsd.XsdTypeComparator;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -141,23 +140,7 @@ public class MethodParameterComparator extends MethodFeatureComparator {
         String type2 = param2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE);
 
         Diff typeDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE.getName(), DifferenceLevel.FIELD, Difference.NON);
-
-        if (type1 == null || type2 == null) {
-            typeDiff.setValue(Difference.UNK);
-        } else {
-            // use Xsd comparator for detecting GEN/SPEC
-            if (XsdTypeComparator.isXsdDataType(type1) && XsdTypeComparator.isXsdDataType(type2)) {
-                Difference d = XsdTypeComparator.compareTypes(type1, type2);
-                if (typeDiff != null) {
-                    typeDiff.setValue(d);
-                } else {
-                    typeDiff.setValue(Difference.UNK);
-                }
-            } else {
-                // unkown types, equality is required
-                typeDiff.setValue(type1.equals(type2) ? Difference.NON : Difference.UNK);
-            }
-        }
+        compareDataTypes(type1, type2, typeDiff);
 
         return typeDiff;
     }

@@ -69,27 +69,27 @@ public class MethodParameterComparatorTest {
 
     private Capability createMethod1() {
         Capability method = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICE_ENDPOINT, "m1");
-        TestUtil.addMethodParameter(method, "param1", "string", 0L, 0L, 0L);
-        TestUtil.addMethodParameter(method, "param2", "integer", 1L, 0L, 0L);
-        TestUtil.addMethodParameter(method, "param3", "boolean", 2L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "param1", "string", 0L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "param2", "integer", 1L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "param3", "boolean", 2L, 0L, 0L);
 
         return method;
     }
 
     private Capability createMethod1_GEN() {
         Capability method = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICE_ENDPOINT, "m1");
-        TestUtil.addMethodParameter(method, "param1", "string", 0L, 0L, 1L);
-        TestUtil.addMethodParameter(method, "param2", "integer", 1L, 0L, 1L);
-        TestUtil.addMethodParameter(method, "param3", "boolean", 2L, 0L, 1L);
+        TestUtil.addEndpointParameter(method, "param1", "string", 0L, 0L, 1L);
+        TestUtil.addEndpointParameter(method, "param2", "integer", 1L, 0L, 1L);
+        TestUtil.addEndpointParameter(method, "param3", "boolean", 2L, 0L, 1L);
 
         return method;
     }
 
     private Capability createMethod2() {
         Capability method = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICE_ENDPOINT, "m2");
-        TestUtil.addMethodParameter(method, "parameter-1", "float", 0L, 0L, 0L);
-        TestUtil.addMethodParameter(method, "parameter-2", "char", 1L, 0L, 0L);
-        TestUtil.addMethodParameter(method, "parameter-3", "bool", 2L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "parameter-1", "float", 0L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "parameter-2", "char", 1L, 0L, 0L);
+        TestUtil.addEndpointParameter(method, "parameter-3", "bool", 2L, 0L, 0L);
 
         return method;
     }

@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.webservice.xsd.XsdTypeComparator;
 import cz.zcu.kiv.crce.compatibility.Diff;
+import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
@@ -51,5 +53,32 @@ public abstract class MethodFeatureComparator {
         Attribute a2 = param2.getAttribute(parameterAttributeType);
 
         return a1 != null && a1.equals(a2);
+    }
+
+    /**
+     * Compares two data types. Supports GEN/SPEC for xsd typed, otherwise strict equality is required.
+     *
+     * @param type1
+     * @param type2
+     * @param typeDiff This method will set value of this diff.
+     * @return
+     */
+    protected void compareDataTypes(String type1, String type2, Diff typeDiff) {
+        if (type1 == null || type2 == null) {
+            typeDiff.setValue(Difference.UNK);
+        } else {
+            // use Xsd comparator for detecting GEN/SPEC
+            if (XsdTypeComparator.isXsdDataType(type1) && XsdTypeComparator.isXsdDataType(type2)) {
+                Difference d = XsdTypeComparator.compareTypes(type1, type2);
+                if (typeDiff != null) {
+                    typeDiff.setValue(d);
+                } else {
+                    typeDiff.setValue(Difference.UNK);
+                }
+            } else {
+                // unkown types, equality is required
+                typeDiff.setValue(type1.equals(type2) ? Difference.NON : Difference.UNK);
+            }
+        }
     }
 }

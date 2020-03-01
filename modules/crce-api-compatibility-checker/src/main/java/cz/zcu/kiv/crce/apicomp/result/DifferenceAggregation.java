@@ -19,6 +19,20 @@ public class DifferenceAggregation {
         return aggregation.getResultDifference();
     }
 
+    /**
+     * Calculates diff value from child diffs and sets it in diff.
+     *
+     * @param diff Diff. If it has no children, no value will be set.
+     */
+    public static void calculateAndSetFinalDifferenceValueFor(Diff diff) {
+        if (diff.getChildren().isEmpty()) {
+            return;
+        }
+
+        Difference d = calculateFinalDifferenceFor(diff.getChildren());
+        diff.setValue(d);
+    }
+
     private int nonCounter;
     private int insCounter;
     private int delCounter;
