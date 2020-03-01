@@ -23,7 +23,7 @@ public class ApiCompResJersey implements ApiCompRes {
     @Path("/compare")
     @GET
     @Override
-    public Response compareApis(@QueryParam("id1") String id1, @QueryParam("id2") String id2) {
+    public Response compareApis(@QueryParam("id1") String id1, @QueryParam("id2") String id2, @DefaultValue("false") @QueryParam("force") boolean force) {
         logger.info("Comparing APIS with ids: '{}' and '{}'.", id1, id2);
 
         try {
@@ -34,7 +34,13 @@ public class ApiCompResJersey implements ApiCompRes {
 
             logger.debug("Calling compatibility checker service.");
             ApiCompatibilityCheckerService compatibilityCheckerService = Activator.instance().getApiCompatibilityCheckerService();
-            Compatibility c = compatibilityCheckerService.findExistingCompatibility(api1, api2);
+
+            Compatibility c = null;
+            if (force) {
+                logger.info("Force flag is set, skipping DB lookup.");
+            } else {
+                c = compatibilityCheckerService.findExistingCompatibility(api1, api2);
+            }
 
             if (c == null) {
                 logger.debug("No existing compatibility found for resource pair {};{}. Calculating new.", api1.getId(), api2.getId());
