@@ -92,50 +92,64 @@ public class MethodParameterComparator extends MethodFeatureComparator {
         diffs.add(parameterDiff);
 
         // list of attribute types that are ought to be equal
-        List<AttributeType> equalAttributesTypes = Arrays.asList(
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY
-        );
-        boolean equalAttributes = true;
+        List<AttributeType> equalAttributesTypes = getEqualAttributeTypes();
         for (AttributeType at : equalAttributesTypes) {
-            equalAttributes &= areAttributesEqual(param1, param2, at);
+            // add diff for each compared attribute
+            boolean areEqual = areAttributesEqual(param1, param2, at);
+            parameterDiff.addChild(DiffUtils.createDiff(
+                    at.getName(),
+                    DifferenceLevel.FIELD,
+                    areEqual ? Difference.NON : Difference.UNK
+            ));
         }
-        if (!equalAttributes) {
-            // some of the attributes that are to be equal are not -> UNK
-            parameterDiff.addChild(DiffUtils.createDiff("metadata", DifferenceLevel.FIELD, Difference.UNK));
-        } else {
-            // compare types
-            parameterDiff.addChild(compareTypes(param1, param2));
 
-            // compare optional attributes
-            Attribute<Long> optional1 = param1.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
-            Attribute<Long> optional2 = param2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
+        // compare parameter data types
+        parameterDiff.addChild(compareTypes(param1, param2));
 
-            Diff optionalDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL.getName(), DifferenceLevel.FIELD, Difference.NON);
-            if (optional1 == null || optional2 == null) {
-                // should happen, optional should be set
-                // todo: log
-                optionalDiff.setValue(Difference.UNK);
-            } else if (optional1.equals(optional2)) {
-                optionalDiff.setValue(Difference.NON);
-            } else if (optional1.getValue().equals(0L) && optional2.getValue().equals(1L)) {
-                // the client is expecting parameter to be non-optional
-                // but it's optional in the new version
-                // that is ok as client can still use such API transparently
-                optionalDiff.setValue(Difference.GEN);
-            } else {
-                // anything else is bad
-                optionalDiff.setValue(Difference.UNK);
-            }
-
-            parameterDiff.addChild(optionalDiff);
-        }
+        // compare optional attributes
+        compareOptionalParameter(param1, param2, parameterDiff);
 
         parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
     }
 
-    private Diff compareTypes(Property param1, Property param2) {
+    protected void compareOptionalParameter(Property param1, Property param2, Diff parameterDiff) {
+        // compare optional attributes
+        Attribute<Long> optional1 = param1.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
+        Attribute<Long> optional2 = param2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
+
+        Diff optionalDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL.getName(), DifferenceLevel.FIELD, Difference.NON);
+        if (optional1 == null || optional2 == null) {
+            // should happen, optional should be set
+            // todo: log?
+            optionalDiff.setValue(Difference.UNK);
+        } else if (optional1.equals(optional2)) {
+            optionalDiff.setValue(Difference.NON);
+        } else if (optional1.getValue().equals(0L) && optional2.getValue().equals(1L)) {
+            // the client is expecting parameter to be non-optional
+            // but it's optional in the new version
+            // that is ok as client can still use such API transparently
+            optionalDiff.setValue(Difference.GEN);
+        } else {
+            // anything else is bad
+            optionalDiff.setValue(Difference.UNK);
+        }
+
+        parameterDiff.addChild(optionalDiff);
+    }
+
+    /**
+     * Returns list of types where strict equality is required.
+     * @return
+     */
+    protected List<AttributeType> getEqualAttributeTypes() {
+        return Arrays.asList(
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME,
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER,
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY
+        );
+    }
+
+    protected Diff compareTypes(Property param1, Property param2) {
         String type1 = param1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE);
         String type2 = param2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__TYPE);
 

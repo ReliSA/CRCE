@@ -30,7 +30,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
     @Override
     public String getRootCapabilityNamespace() {
-        return WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY;
+        return WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE;
     }
 
     @Override
@@ -100,6 +100,16 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      */
     protected MethodFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
         return new MethodResponseComparator(endpoint1, endpoint2);
+    }
+
+    /**
+     * Override if you need custom logic for comparing endpoint parameters (usually because of different format).
+     * @param endpoint1
+     * @param endpoint2
+     * @return
+     */
+    protected MethodFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new MethodParameterComparator(endpoint1, endpoint2);
     }
 
     /**
@@ -185,7 +195,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             );
 
             // parameter diff
-            MethodParameterComparator parameterComparator = new MethodParameterComparator(
+            MethodFeatureComparator parameterComparator = getEndpointParameterComparatorInstance(
                     api1Endpoint,
                     matchingEndpoint
             );

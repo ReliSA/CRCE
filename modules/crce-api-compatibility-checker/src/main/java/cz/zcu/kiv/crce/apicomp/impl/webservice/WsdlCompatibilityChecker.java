@@ -53,6 +53,11 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
     }
 
     @Override
+    protected MethodFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new WsdlEndpointParameterComparator(endpoint1, endpoint2);
+    }
+
+    @Override
     protected void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2) {
         Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
         checkResult.getDiffDetails().add(communicationPatternDiff);
