@@ -119,9 +119,8 @@ public class MethodParameterComparator extends MethodFeatureComparator {
 
         Diff optionalDiff = DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL.getName(), DifferenceLevel.FIELD, Difference.NON);
         if (optional1 == null || optional2 == null) {
-            // should happen, optional should be set
-            // todo: log?
-            optionalDiff.setValue(Difference.UNK);
+            // optional not set in both parameters, ok
+            optionalDiff.setValue(Difference.NON);
         } else if (optional1.equals(optional2)) {
             optionalDiff.setValue(Difference.NON);
         } else if (optional1.getValue().equals(0L) && optional2.getValue().equals(1L)) {
@@ -145,7 +144,7 @@ public class MethodParameterComparator extends MethodFeatureComparator {
         return Arrays.asList(
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME,
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_RESPONSE__ARRAY
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ARRAY
         );
     }
 

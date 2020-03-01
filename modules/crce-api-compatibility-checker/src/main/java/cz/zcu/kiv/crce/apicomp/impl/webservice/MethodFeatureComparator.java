@@ -43,12 +43,19 @@ public abstract class MethodFeatureComparator {
     /**
      * Returns true if both parameters have equal attribtues.
      *
+     * If attributes are missing from both parameters, still returns true.
+     *
      * @param param1
      * @param param2
      * @param parameterAttributeType
      * @return
      */
     protected boolean areAttributesEqual(Property param1, Property param2, AttributeType parameterAttributeType) {
+
+        if (!param1.getAttributesMap().containsKey(parameterAttributeType) && !param2.getAttributesMap().containsKey(parameterAttributeType)) {
+            return true;
+        }
+
         Attribute a1 = param1.getAttribute(parameterAttributeType);
         Attribute a2 = param2.getAttribute(parameterAttributeType);
 
