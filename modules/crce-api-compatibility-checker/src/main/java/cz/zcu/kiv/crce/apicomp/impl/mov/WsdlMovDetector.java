@@ -1,5 +1,6 @@
-package cz.zcu.kiv.crce.apicomp.impl.webservice;
+package cz.zcu.kiv.crce.apicomp.impl.mov;
 
+import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.metadata.Capability;
 
 import java.util.ArrayList;
@@ -17,17 +18,17 @@ public class WsdlMovDetector {
         this.api2 = api2;
     }
 
-    public void detectMov() {
-        Map<String, Map<String, List<String>>> api1EndpointUrls = collectEndpointUrls(api1);
-        Map<String, Map<String, List<String>>> api2EndpointUrls = collectEndpointUrls(api2);
+    public boolean[] detectMov(ApiDescription a1, ApiDescription a2) {
+        Map<String, Map<String, List<String>>> api1EndpointUrls = a1;
+        Map<String, Map<String, List<String>>> api2EndpointUrls = a2;
 
         boolean hostDiff = false;
         boolean pathDiff = false;
         boolean operationDiff = false;
 
         // determine whether hosts are same in both APIs
-        for (String hostName : api2EndpointUrls.keySet()) {
-            hostDiff |= api2EndpointUrls.containsKey(hostName);
+        for (String hostName : api1EndpointUrls.keySet()) {
+            hostDiff |= !api2EndpointUrls.containsKey(hostName);
         }
 
         // determine if paths to endpoints are same in both APIs
@@ -37,13 +38,7 @@ public class WsdlMovDetector {
         operationDiff = determineOperationDiff(api1EndpointUrls, api2EndpointUrls);
 
 
-
-        // what now?
-        if (hostDiff && pathDiff && operationDiff) {
-            // everything is different -> cannot detect
-        } else if (hostDiff && pathDiff && !operationDiff) {
-
-        }
+        return new boolean[] {hostDiff, pathDiff, operationDiff};
     }
 
     private boolean determinePathDiff(Map<String, Map<String, List<String>>> api1EndpointUrls, Map<String, Map<String, List<String>>> api2EndpointUrls) {
@@ -76,6 +71,7 @@ public class WsdlMovDetector {
                     if (!pathDiffTmp) {
                         // all endpoint paths from host 1 are in host 2
                         samePathSets++;
+                        break;
                     }
                 }
             }
@@ -96,7 +92,42 @@ public class WsdlMovDetector {
      * @return
      */
     private boolean determineOperationDiff(Map<String, Map<String, List<String>>> api1EndpointUrls, Map<String, Map<String, List<String>>> api2EndpointUrls) {
-        return false;
+        int sameOperationSets = 0;
+        int totalOperationSets = 0;
+
+        for (Map<String, List<String>> endpoints1 : api1EndpointUrls.values()) {
+            for (List<String> operations1 : endpoints1.values()) {
+                totalOperationSets++;
+
+                for (Map<String, List<String>> endpoints2 : api2EndpointUrls.values()) {
+                    if (endpoints2.size() == endpoints1.size()) {
+                        // same number of endpoints in host
+                        boolean operationDiff = false;
+
+                        for (List<String> operations2 : endpoints2.values()) {
+                            if (operations1.size() == operations2.size()) {
+                                // same number of operations in endpoints
+                                for (String operation1Name : operations1) {
+                                    if (!operations2.contains(operation1Name)) {
+                                        operationDiff = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!operationDiff) {
+                                    // same operations found
+                                    sameOperationSets++;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return sameOperationSets != totalOperationSets;
     }
 
     // ws -> endpoint -> operations
