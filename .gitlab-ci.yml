@@ -24,11 +24,11 @@ before_script:
 build:
   stage: build
   script:
-    - cd pom && mvn clean install
-    - cd ../build && mvn clean install
-    - cd ../third-party && for d in * ; do cd $d; mvn clean install; cd .. ; done
-    - cd ../core && mvn clean install
-    - cd ../modules && mvn clean install
+    - cd pom && mvn clean install -Dmaven.test.skip=true -Dfindbugs.skip=true -Dpmd.skip=true
+    - cd ../build && mvn clean install  -Dmaven.test.skip=true -Dfindbugs.skip=true -Dpmd.skip=true
+    - cd ../third-party && for d in * ; do cd $d; mvn clean install  -Dmaven.test.skip=true -Dfindbugs.skip=true -Dpmd.skip=true; cd .. ; done
+    - cd ../core && mvn clean install  -Dmaven.test.skip=true -Dfindbugs.skip=true -Dpmd.skip=true
+    - cd ../modules && mvn clean install  -Dmaven.test.skip=true -Dfindbugs.skip=true -Dpmd.skip=true
     - cd ../deploy && mvn clean install && mvn pax:directory && ./prepare-bundles.sh
     - cd ..
   artifacts:
