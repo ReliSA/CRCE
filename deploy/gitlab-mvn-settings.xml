@@ -28,7 +28,7 @@
 		<mirror>
 		  <id>tmatesoft-mirror</id>
 		  <name>tmatesoft mirror</name>
-		  <url>https://repo1.maven.org/maven2/</url>
+		  <url>https://repo.spring.io/plugins-release/</url>
 		  <mirrorOf>tmatesoft</mirrorOf>
 		</mirror>
 		
