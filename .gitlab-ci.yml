@@ -11,6 +11,7 @@ stages:
 # setup scp and maven settings
 # based on: https://medium.com/@hfally/a-gitlab-ci-config-to-deploy-to-your-server-via-ssh-43bf3cf93775
 before_script:
+    - mkdir ~/.m2
     - cp deploy/gitlab-mvn-settings.xml ~/.m2/settings.xml
     - 'which ssh-agent || ( apt-get install -qq openssh-client )'
     - eval $(ssh-agent -s)
