@@ -29,7 +29,9 @@ public class TestUtil {
     }
 
     private static void setAttrIfNotNull(Property parameter, AttributeType attributeType, Object value) {
-        parameter.setAttribute(attributeType, value);
+        if (value != null) {
+            parameter.setAttribute(attributeType, value);
+        }
     }
 
     /**

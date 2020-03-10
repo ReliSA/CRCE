@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.mov;
 
 import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.mov.WsdlMovDetector;
 import org.junit.Test;
 
@@ -17,12 +18,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertFalse("Hosts should be the same!", diffs[0]);
-        assertFalse("Paths to endpoints should be the same!", diffs[1]);
-        assertFalse("Operations should be the same!", diffs[2]);
+        assertFalse("Hosts should be the same!", diffs.hostDiff);
+        assertFalse("Paths to endpoints should be the same!", diffs.pathDiff);
+        assertFalse("Operations should be the same!", diffs.operationDiff);
     }
 
     @Test
@@ -30,12 +31,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1_shuffledOperations();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertFalse("Hosts should be the same!", diffs[0]);
-        assertFalse("Paths to endpoints should be the same!", diffs[1]);
-        assertFalse("Operations should be the same!", diffs[2]);
+        assertFalse("Hosts should be the same!", diffs.hostDiff);
+        assertFalse("Paths to endpoints should be the same!", diffs.pathDiff);
+        assertFalse("Operations should be the same!", diffs.operationDiff);
     }
 
     @Test
@@ -43,12 +44,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1_diffHost();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertTrue("Hosts should not be the same!", diffs[0]);
-        assertFalse("Paths to endpoints should be the same!", diffs[1]);
-        assertFalse("Operations should be the same!", diffs[2]);
+        assertTrue("Hosts should not be the same!", diffs.hostDiff);
+        assertFalse("Paths to endpoints should be the same!", diffs.pathDiff);
+        assertFalse("Operations should be the same!", diffs.operationDiff);
     }
 
     @Test
@@ -56,12 +57,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1_diffEndpoint();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertFalse("Hosts should be the same!", diffs[0]);
-        assertTrue("Paths to endpoints should not be the same!", diffs[1]);
-        assertFalse("Operations should be the same!", diffs[2]);
+        assertFalse("Hosts should be the same!", diffs.hostDiff);
+        assertTrue("Paths to endpoints should not be the same!", diffs.pathDiff);
+        assertFalse("Operations should be the same!", diffs.operationDiff);
     }
 
     @Test
@@ -69,12 +70,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1_diffOperations();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertFalse("Hosts should be the same!", diffs[0]);
-        assertFalse("Paths to endpoints should be the same!", diffs[1]);
-        assertTrue("Operations should not be the same!", diffs[2]);
+        assertFalse("Hosts should be the same!", diffs.hostDiff);
+        assertFalse("Paths to endpoints should be the same!", diffs.pathDiff);
+        assertTrue("Operations should not be the same!", diffs.operationDiff);
     }
 
     @Test
@@ -82,12 +83,12 @@ public class WsdlMovDetectorTest {
         ApiDescription api1 = createApi1(),
                 api2 = createApi1_diffHostAndEndpoints();
 
-        WsdlMovDetector detector = new WsdlMovDetector(null, null);
-        boolean[] diffs = detector.detectMov(api1, api2);
+        WsdlMovDetector detector = new WsdlMovDetector(api1, api2);
+        MovDetectionResult diffs = detector.detectMov();
 
-        assertTrue("Hosts should not be the same!", diffs[0]);
-        assertTrue("Paths to endpoints should not be the same!", diffs[1]);
-        assertFalse("Operations should be the same!", diffs[2]);
+        assertTrue("Hosts should not be the same!", diffs.hostDiff);
+        assertTrue("Paths to endpoints should not be the same!", diffs.pathDiff);
+        assertFalse("Operations should be the same!", diffs.operationDiff);
     }
 
     /**

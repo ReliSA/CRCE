@@ -1,44 +1,37 @@
 package cz.zcu.kiv.crce.apicomp.impl.mov;
 
-import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
-import cz.zcu.kiv.crce.metadata.Capability;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WsdlMovDetector {
 
-    private Capability api1;
-    private Capability api2;
+    private ApiDescription api1;
+    private ApiDescription api2;
 
-    public WsdlMovDetector(Capability api1, Capability api2) {
+    public WsdlMovDetector(ApiDescription api1, ApiDescription api2) {
         this.api1 = api1;
         this.api2 = api2;
     }
 
-    public boolean[] detectMov(ApiDescription a1, ApiDescription a2) {
-        Map<String, Map<String, List<String>>> api1EndpointUrls = a1;
-        Map<String, Map<String, List<String>>> api2EndpointUrls = a2;
+    public MovDetectionResult detectMov() {
 
         boolean hostDiff = false;
         boolean pathDiff = false;
         boolean operationDiff = false;
 
         // determine whether hosts are same in both APIs
-        for (String hostName : api1EndpointUrls.keySet()) {
-            hostDiff |= !api2EndpointUrls.containsKey(hostName);
+        for (String hostName : api1.keySet()) {
+            hostDiff |= !api2.containsKey(hostName);
         }
 
         // determine if paths to endpoints are same in both APIs
-        pathDiff = determinePathDiff(api1EndpointUrls, api2EndpointUrls);
+        pathDiff = determinePathDiff(api1, api2);
 
         // determine if the operation sets of endpoints are same in both APIs
-        operationDiff = determineOperationDiff(api1EndpointUrls, api2EndpointUrls);
+        operationDiff = determineOperationDiff(api1, api2);
 
 
-        return new boolean[] {hostDiff, pathDiff, operationDiff};
+        return new MovDetectionResult(hostDiff, pathDiff, operationDiff);
     }
 
     private boolean determinePathDiff(Map<String, Map<String, List<String>>> api1EndpointUrls, Map<String, Map<String, List<String>>> api2EndpointUrls) {
@@ -128,33 +121,5 @@ public class WsdlMovDetector {
         }
 
         return sameOperationSets != totalOperationSets;
-    }
-
-    // ws -> endpoint -> operations
-    private Map<String, Map<String, List<String>>> collectEndpointUrls(Capability api1) {
-        Map<String, Map<String, List<String>>> urls = new HashMap<>();
-
-        // wsdl has following structure identity -> webservice -> endpoint
-        for (Capability wsCapability : api1.getChildren()) {
-            for (Capability wsEndpoint : wsCapability.getChildren()) {
-                String url = wsEndpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
-                String[] urlSplit = url.split("/", 2);
-                String hostPart = urlSplit[0];
-                String pathPart = urlSplit[1];
-                String operationName = wsEndpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
-
-                if (!urls.containsKey(hostPart)) {
-                    urls.put(hostPart, new HashMap<>());
-                }
-
-                if (!urls.get(hostPart).containsKey(pathPart)) {
-                    urls.get(hostPart).put(pathPart, new ArrayList<>());
-                }
-
-                urls.get(hostPart).get(pathPart).add(operationName);
-            }
-        }
-
-        return urls;
     }
 }

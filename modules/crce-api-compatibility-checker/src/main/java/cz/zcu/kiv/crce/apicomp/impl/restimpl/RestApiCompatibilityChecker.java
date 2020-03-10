@@ -10,6 +10,7 @@ import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;
+import cz.zcu.kiv.crce.metadata.Property;
 import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 
@@ -194,6 +195,13 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
 
         while(otherEndpointsIt.hasNext()) {
             Capability otherE = otherEndpointsIt.next();
+
+            boolean parameterCountMatch = compareEndpointParameterCounts(endpointMetadata, otherE);
+
+            if (!parameterCountMatch) {
+                continue;
+            }
+
             List<Diff> diffs = compareEndpointMetadata(endpointMetadata, otherE);
 
             // diff is valid only in case of no DEL and MUT diffs
@@ -210,6 +218,35 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
         }
 
         return match;
+    }
+
+    /**
+     * Compares counts of required parameters of two endpoints.
+     *
+     * Endpoints should have the same count of required parameters.
+     *
+     * @param endpoint1
+     * @param endpoint2
+     */
+    private boolean compareEndpointParameterCounts(Capability endpoint1, Capability endpoint2) {
+        int requiredParameterCount1 = countRequiredParameters(endpoint1);
+        int requiredParameterCount2 = countRequiredParameters(endpoint2);
+
+        return requiredParameterCount1 == requiredParameterCount2;
+    }
+
+    private int countRequiredParameters(Capability endpoint1) {
+        int count = 0;
+        Long notOptional = 0L;
+
+        for (Property endpointParameter : endpoint1.getProperties(RestimplIndexerConstants.NS_RESTIMPL_REQUESTPARAMETER)) {
+            Attribute<Long> isOptional = endpointParameter.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_OPTIONAL);
+            if (notOptional.equals(isOptional.getValue())) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     /**

@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
+import cz.zcu.kiv.crce.apicomp.impl.mov.WsdlMovDetector;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
@@ -72,6 +75,11 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         Iterator<Capability> it1 = api1WebServices.iterator();
         List<Capability> api2WebServices = new ArrayList<>(root2.getChildren());
 
+        logger.debug("Detecting MOV flag");
+        MovDetectionResult movDetectionResult = detectMov(root1, root2);
+        if (movDetectionResult.isAnyDiff()) {
+            logger.debug("Mov detection result: {}.", movDetectionResult);
+        }
 
         // diff for collecting differences from all webservices this API may contain
         Diff webServicesDiff = DiffUtils.createDiff("webservices", DifferenceLevel.PACKAGE, Difference.NON);
@@ -102,6 +110,18 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         return;
     }
 
+    private MovDetectionResult detectMov(Capability root1, Capability root2) {
+        WsdlMovDetector movDetector = new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
+        return movDetector.detectMov();
+    }
+
+    /**
+     * Compares web services. Comparable WSs are chosen based on their type and name.
+     *
+     * @param api1Ws
+     * @param api2WebServices
+     * @return
+     */
     private Diff compareWebServices(Capability api1Ws, List<Capability> api2WebServices) {
         Diff webserviceDiff = DiffUtils.createDiff(
                 api1Ws.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
@@ -159,7 +179,6 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         while (ws2It.hasNext()) {
             Capability ws2 = ws2It.next();
 
-            // todo: mov?
             // type and name must be equal
             Attribute type2 = ws2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE);
             Attribute name2 = ws2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME);

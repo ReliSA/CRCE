@@ -8,10 +8,7 @@ import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.compatibility.DifferenceLevel;
 import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
-import cz.zcu.kiv.crce.metadata.Attribute;
-import cz.zcu.kiv.crce.metadata.AttributeType;
-import cz.zcu.kiv.crce.metadata.Capability;
-import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,6 +229,14 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
         while(otherMethodsIt.hasNext()) {
             Capability otherE = otherMethodsIt.next();
+
+            boolean parameterCountMatch = compareEndpointParameterCounts(api1Method, otherE);
+
+            if (!parameterCountMatch) {
+                continue;
+            }
+
+            // endpoints with matching parameter count found -> compare their metadata
             List<Diff> diffs = compareEndpointMetadata(api1Method, otherE);
 
             // diff is valid only in case of no DEL and MUT diffs
@@ -250,12 +255,53 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     /**
+     * Compares counts of required parameters of two endpoints.
+     *
+     * Endpoints should have the same count of required parameters.
+     *
+     * @param endpoint1
+     * @param endpoint2
+     */
+    private boolean compareEndpointParameterCounts(Capability endpoint1, Capability endpoint2) {
+        int requiredParameterCount1 = countRequiredParameters(endpoint1);
+        int requiredParameterCount2 = countRequiredParameters(endpoint2);
+
+        return requiredParameterCount1 == requiredParameterCount2;
+    }
+
+    /**
+     * Returns the number of required parameters of given endpoint.
+     *
+     * If the model type does not support optional parameters, parameter count should be returned.
+     *
+     * @param endpoint
+     * @return Number of required parameters.
+     */
+    protected int countRequiredParameters(Capability endpoint) {
+        int count = 0;
+        Long notOptional = 0L;
+        for (Property parameter : endpoint.getProperties(WebserviceIndexerConstants.NAMESPACE__WEBSERVICE_ENDPOINT_PARAMETER)) {
+            if (parameter.getAttributesMap().containsKey(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL.getName())) {
+                Attribute<Long> isOptional = parameter.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__OPTIONAL);
+                if (notOptional.equals(isOptional.getValue())) {
+                    count++;
+                }
+            } else {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+
+    /**
      * Compares metadata (type, url) of two endpoints and returns list
      * of diffs with each diff describing the difference between metadata.
      *
      * So, one diff for type and one diff for url.
      *
-     * TODO: MOV
+     * TODO: MOV endpoint URL and name contains all information regarding the MOV flag
      *
      * @param api1Method
      * @param otherE
