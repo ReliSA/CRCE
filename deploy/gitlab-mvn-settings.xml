@@ -31,6 +31,13 @@
 		  <url>https://repo.maven.apache.org</url>
 		  <mirrorOf>tmatesoft</mirrorOf>
 		</mirror>
+		
+		<mirror>
+		  <id>central-mirror</id>
+		  <name>central mirror</name>
+		  <url>https://repo.maven.apache.org</url>
+		  <mirrorOf>central</mirrorOf>
+		</mirror>
 	</mirrors>
 	
 	<servers>
