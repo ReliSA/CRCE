@@ -2,6 +2,16 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
 					  https://maven.apache.org/xsd/settings-1.0.0.xsd">
+	
+	<mirrors>
+		<mirror>
+		  <id>relisa-global-mirror</id>
+		  <name>Relisa mirror</name>
+		  <url>https://repo.maven.apache.org</url>
+		  <mirrorOf>relisa-global</mirrorOf>
+		</mirror>
+	</mirrors>
+	
 	<servers>
 		<server>
 		  <id>maven.kalwi.eu.releases</id>
