@@ -39,3 +39,5 @@ deploy_myvps:
     stage: deploy
     script:
        - scp -r deploy/target/pax-runner-dir/bundles deploy@69.90.132.97:/opt/deploy
+       - scp -r deploy/conf.default deploy@69.90.132.97:/opt/deploy
+       - scp -r deploy/felix.configuration deploy@69.90.132.97:/opt/deploy
