@@ -1,0 +1,39 @@
+# based on example from: https://docs.gitlab.com/ee/ci/examples/artifactory_and_gitlab/index.html
+# reference: https://docs.gitlab.com/ee/ci/yaml/
+# other article that helped: https://about.gitlab.com/blog/2016/12/14/continuous-delivery-of-a-spring-boot-application-with-gitlab-ci-and-kubernetes/
+image: maven:3.6.2-jdk-11
+
+# stages defined in this pipeline
+stages:
+  - build
+  - deploy  
+
+# setup scp
+# based on: https://medium.com/@hfally/a-gitlab-ci-config-to-deploy-to-your-server-via-ssh-43bf3cf93775
+before_script:
+    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_DEPLOY_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  
+# 1st job - build code
+# make sure to use maven image with jdk 11
+build:
+  stage: build
+  script:
+    - cd pom && mvn clean install
+    - cd ../build && mvn clean install
+    - cd ../third-party && for d in * ; do cd $d; mvn clean install; cd .. ; done
+    - cd ../core && mvn clean install
+    - cd ../modules && mvn clean install
+    - cd ../deploy && mvn clean install && mvn pax:directory && ./prepare-bundles.sh
+    - cd ..
+  artifacts:
+    paths:
+      - deploy/*
+
+deploy_myvps:
+    stage: deploy
+    script:
+       - scp -r deploy/target/pax-runner-dir/bundles deploy@69.90.132.97:/opt/deploy
