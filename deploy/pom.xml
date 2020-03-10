@@ -209,7 +209,7 @@
                         <param>--ee=file:./J2SE-11.Profile</param>
                         <!--<param>&#45;&#45;ee=JavaSE-1.6</param>-->
                         <param>
-                            --repositories=http://uk.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
+                            --repositories=https://repo1.maven.org/maven2/,http://repository.ops4j.org/maven2
                         </param>
                         <!--<param>-Dorg.osgi.framework.system.capabilities=osgi.ee; osgi.ee="JavaSE";version:List="1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8"</param>-->
                         <param>--log=debug</param>
