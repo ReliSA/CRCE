@@ -10,6 +10,27 @@
 		  <url>https://repo.maven.apache.org</url>
 		  <mirrorOf>relisa-global</mirrorOf>
 		</mirror>
+		
+		<mirror>
+		  <id>maven.kalwi.eu.releases-mirror</id>
+		  <name>Kalwi r mirror</name>
+		  <url>https://repo.maven.apache.org</url>
+		  <mirrorOf>maven.kalwi.eu.releases</mirrorOf>
+		</mirror>
+		
+		<mirror>
+		  <id>maven.kalwi.eu.snapshots-mirror</id>
+		  <name>Kalwi s mirror</name>
+		  <url>https://repo.maven.apache.org</url>
+		  <mirrorOf>maven.kalwi.eu.snapshots</mirrorOf>
+		</mirror>
+		
+		<mirror>
+		  <id>tmatesoft-mirror</id>
+		  <name>tmatesoft mirror</name>
+		  <url>https://repo.maven.apache.org</url>
+		  <mirrorOf>tmatesoft</mirrorOf>
+		</mirror>
 	</mirrors>
 	
 	<servers>
