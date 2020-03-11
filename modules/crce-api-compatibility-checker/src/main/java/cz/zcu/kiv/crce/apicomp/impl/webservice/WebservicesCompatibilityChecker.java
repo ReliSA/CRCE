@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
@@ -12,10 +13,7 @@ import cz.zcu.kiv.crce.metadata.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Checker for crce-webservices-indexer
@@ -129,7 +127,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             Capability api1Method = it1.next();
 
             // find method from other service with same metadata and compare it
-            Diff methodDiff = compareEndpoints(api1Method, api2Methods);
+            Diff methodDiff = compareEndpointsPickBest(api1Method, api2Methods);
             endpointsDiff.addChild(methodDiff);
 
             // method processed, remove it
@@ -150,8 +148,9 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     /**
-     * Contains whole logic of finding method in api2 suitable for comparison with method 1
-     * and actual comparison.
+     * Tries to compare as many endpoints as possible (metadata match+MOV flag) and keeps the best result.
+     * Contains whole logic of finding method in api2 suitable for comparison with method 1 and actual comparison.
+     *
      *
      * Structure of returned object:
      *
@@ -163,67 +162,115 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *      - parameter diff
      *      - response diff
      *
-     * @param api1Endpoint Endpoint from api 1.
-     * @param api2Endpoints Set of endpoints from api 2.
-     * @return Diff between method 1 and found method from api 2 or just DEL if no method
-     *      suitable for comparison is found.
+     * @param endpoint1
+     * @param otherEndpoints
+     * @return
      */
-    protected Diff compareEndpoints(Capability api1Endpoint, List<Capability> api2Endpoints) {
-        // using endpoint name for diff name improves result readability
-        Diff endpointDiff = DiffUtils.createDiff(
-                api1Endpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
-                DifferenceLevel.OPERATION,
-                Difference.NON);
+    private Diff compareEndpointsPickBest(Capability endpoint1, List<Capability> otherEndpoints) {
+        // diff -> compared endpoint
+        Map<Diff, Capability> results = new HashMap<>();
+        boolean stopCond = false;
+        Diff endpointDiff = null;
 
-        List<Diff> metadataDiffs = new ArrayList<>();
-        Capability matchingEndpoint = pullMatchingMethod(api1Endpoint, api2Endpoints, metadataDiffs);
+        while(!stopCond) {
+            List<Diff> metadataDiffs = new ArrayList<>();
+            Capability matchingEndpoint = pullMatchingEndpoint(endpoint1, otherEndpoints, metadataDiffs);
 
-        if (matchingEndpoint == null) {
-            // nothing found, method 1 is in api 1 but not in api 2 -> DEL
-            endpointDiff.setValue(Difference.DEL);
-        } else {
-            // possible match found
+            if (matchingEndpoint == null) {
+                // nothing found, method 1 is in api 1 but not in api 2 -> DEL
+                endpointDiff = DiffUtils.createDiff(
+                        endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
+                        DifferenceLevel.OPERATION,
+                        Difference.DEL);
+                stopCond = true;
+            } else {
+                // possible match found
+                Diff metadataDiff = DiffUtils.createDiffMov(
+                        "metadata",
+                        DifferenceLevel.FIELD,
+                        metadataDiffs
+                );
 
-            // metadata diff
-            Diff metadataDiff = DiffUtils.createDiff(
-                    "metadata",
-                    DifferenceLevel.FIELD,
-                    DifferenceAggregation.calculateFinalDifferenceFor(metadataDiffs)
-            );
+                endpointDiff = compareEndpointDetails(endpoint1, matchingEndpoint, metadataDiff);
 
-            // parameter diff
-            MethodFeatureComparator parameterComparator = getEndpointParameterComparatorInstance(
-                    api1Endpoint,
-                    matchingEndpoint
-            );
-            Diff parameterDiff = DiffUtils.createDiff(
-                    "parameters",
-                    DifferenceLevel.FIELD,
-                    parameterComparator.compare()
-            );
+                if (!DiffUtils.isDangerous(endpointDiff)) {
+                    // okish endpoint found
+                    stopCond = true;
+                } else {
+                    if (MovDiff.isMovDiff(endpointDiff)) {
+                        // dangerous endpoint found and MOV is set, add it to the results
+                        // and keep comparing other endpoints
+                        results.put(endpointDiff, matchingEndpoint);
+                    } else {
+                        // dangerous endpoint found but MOV is not set -> incompatibility
+                        stopCond = true;
+                    }
+                }
+            }
 
-            // response diff
-            MethodFeatureComparator responseComparator = getEndpointResponseComparatorInstance(
-                    api1Endpoint,
-                    matchingEndpoint);
-            Diff responseDiff = DiffUtils.createDiff(
-                    "responses",
-                    DifferenceLevel.FIELD,
-                    responseComparator.compare()
-            );
-
-
-            // put it all together
-            endpointDiff.addChild(metadataDiff);
-            endpointDiff.addChild(parameterDiff);
-            endpointDiff.addChild(responseDiff);
-            endpointDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointDiff.getChildren()));
+            if (!stopCond && otherEndpoints.isEmpty()) {
+                // no more endpoints to search and only dangerous
+                // ones were found, pick one
+                // the results map cannot be empty at this point
+                stopCond = true;
+                endpointDiff = results.keySet().iterator().next();
+                results.remove(endpointDiff);
+            }
         }
+
+        // return remaining endpoint to the otherEndpoints list
+        otherEndpoints.addAll(results.values());
 
         return endpointDiff;
     }
 
-    private Capability pullMatchingMethod(Capability api1Method, List<Capability> api2Methods, List<Diff> metadataDiffs) {
+    /**
+     * Compares details of two endpoints that were already deemed comparable.
+     *
+     * @param endpoint1
+     * @param endpoint2
+     * @param metadataDiff Result of pullMatchingEndpoint(), may be MovDiff.
+     * @return
+     */
+    private Diff compareEndpointDetails(Capability endpoint1, Capability endpoint2, Diff metadataDiff) {
+        Diff endpointDiff = DiffUtils.createDiff(
+                endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
+                DifferenceLevel.OPERATION,
+                Difference.NON);
+
+
+        // parameter diff
+        MethodFeatureComparator parameterComparator = getEndpointParameterComparatorInstance(
+                endpoint1,
+                endpoint2
+        );
+        Diff parameterDiff = DiffUtils.createDiff(
+                "parameters",
+                DifferenceLevel.FIELD,
+                parameterComparator.compare()
+        );
+
+        // response diff
+        MethodFeatureComparator responseComparator = getEndpointResponseComparatorInstance(
+                endpoint1,
+                endpoint2);
+        Diff responseDiff = DiffUtils.createDiff(
+                "responses",
+                DifferenceLevel.FIELD,
+                responseComparator.compare()
+        );
+
+
+        // put it all together
+        endpointDiff.addChild(metadataDiff);
+        endpointDiff.addChild(parameterDiff);
+        endpointDiff.addChild(responseDiff);
+        endpointDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointDiff.getChildren()));
+
+        return endpointDiff;
+    }
+
+    private Capability pullMatchingEndpoint(Capability api1Method, List<Capability> api2Methods, List<Diff> metadataDiffs) {
         Capability match = null;
         Iterator<Capability> otherMethodsIt = api2Methods.iterator();
 
