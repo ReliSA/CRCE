@@ -101,6 +101,17 @@ public class RestApiCompatibilityCheckerTest {
         assertEquals("APIs should not be same!", Difference.MUT, result.getDiffValue());
     }
 
+    @Test
+    public void testCompareApis_diffParamType() {
+        RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
+        Resource api1 = createMockApi1_diffParameterCount();
+        Resource api2 = createMockApi1_paramType();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+        assertEquals("APIs should not be same!", Difference.UNK, result.getDiffValue());
+    }
+
     /**
      * Creates mock metadata of API.
      *
@@ -140,6 +151,19 @@ public class RestApiCompatibilityCheckerTest {
         Capability endpoint = api.getRootCapabilities(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE).get(0).getChildren().get(0);
 
         TestUtil.addEndpointParameter(endpoint, "param1",  "String", "category", 0L, "def", 0L);
+
+        return api;
+    }
+
+    /**
+     * API 1 with parameter but the endpoint parameter type is different.
+     * @return
+     */
+    private Resource createMockApi1_paramType() {
+        Resource api = createMockApi1();
+        Capability endpoint = api.getRootCapabilities(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE).get(0).getChildren().get(0);
+
+        TestUtil.addEndpointParameter(endpoint, "param1",  "Long", "category", 0L, "def", 0L);
 
         return api;
     }

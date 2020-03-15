@@ -80,6 +80,20 @@ public class WsdlCompatibilityCheckerTest {
         assertEquals("Wrong difference!", Difference.INS, result.getDiffValue());
     }
 
+    @Test
+    public void testCompare_differenceEndpointParamType() {
+        Resource api1 = createWS1(),
+                api2 = createWS1_paramType();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.UNK, result.getDiffValue());
+    }
+
 
     /**
      * Creates WS based on STAG's ciselniky WS.
@@ -165,6 +179,33 @@ public class WsdlCompatibilityCheckerTest {
         r.addRootCapability(wsRoot);
         return r;
     }
+
+    /**
+     * WS1 but with different parameter type.
+     * @return
+     */
+    private Resource createWS1_paramType() {
+        String wsId = "ws1";
+        Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
+        wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
+
+        // webservice capability containing the endpoints
+        Capability ws1 = TestUtil.createWebServiceCapability("ws1", "CiselnikyServiceImplService", "rpc/messaging", wsRoot);
+
+        Capability e1 = TestUtil.createEndpointCapability("getSeznamDomen", "https://stag-ws.zcu.cz/ws/services/soap/ciselniky", ws1);
+        TestUtil.addEndpointParameter(e1, "parameters", "tns:getSeznamDomen", 1L, null, null);
+        TestUtil.addEndpointResponse(e1, "tns:getSeznamDomenResponse");
+
+        Capability e2 = TestUtil.createEndpointCapability("insertTitul", "https://stag-ws.zcu.cz/ws/services/soap/ciselniky", ws1);
+        TestUtil.addEndpointParameter(e2, "parameters", "tns:insertTitul2", 1L, null, null);
+        TestUtil.addEndpointResponse(e2, "tns:insertTitulResponse");
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(wsRoot);
+        return r;
+    }
+
+
 
 
 

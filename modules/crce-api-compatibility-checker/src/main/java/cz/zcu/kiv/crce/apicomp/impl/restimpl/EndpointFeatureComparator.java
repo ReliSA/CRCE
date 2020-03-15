@@ -64,15 +64,17 @@ public abstract class EndpointFeatureComparator {
         JavaTypeWrapper type1 = new JavaTypeWrapper(c1Name);
         JavaTypeWrapper type2 = new JavaTypeWrapper(c2Name);
 
-        if (type1.equals(type2)
-                || type1.fitsInto(type2)
-                || type2.fitsInto(type1)
-        ) {
-            return Difference.NON;
-        } else if (type1.isExtendedBy(type2)) {
-            return Difference.SPE;
-        } else if (type2.isExtendedBy(type1)){
-            return Difference.GEN;
+        if (type1.isComparableType() && type2.isComparableType()) {
+            if (type1.equals(type2)
+                    || type1.fitsInto(type2)
+                    || type2.fitsInto(type1)
+            ) {
+                return Difference.NON;
+            } else if (type1.isExtendedBy(type2)) {
+                return Difference.SPE;
+            } else if (type2.isExtendedBy(type1)){
+                return Difference.GEN;
+            }
         }
 
         try {
@@ -87,10 +89,10 @@ public abstract class EndpointFeatureComparator {
                 return Difference.GEN;
             }
         } catch (ClassNotFoundException e) {
-            // since this method only works with "java.lang", this
-            // exception should not be thrown
-            // todo: log exception
-            e.printStackTrace();
+            // exception thrown -> one of the classes
+            // could not be instantiated and class names
+            // are not the same
+            // thus -> UNK
         }
 
         return Difference.UNK;

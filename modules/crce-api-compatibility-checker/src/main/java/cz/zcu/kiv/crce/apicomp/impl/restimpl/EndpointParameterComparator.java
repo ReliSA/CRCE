@@ -82,6 +82,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
      */
     private void compareParameters(Property param1, Property param2, List<Diff> parameterDiffs) {
         Diff diff = new DefaultDiffImpl();
+        diff.setName(param1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_NAME));
         diff.setLevel(DifferenceLevel.FIELD);
         diff.setValue(Difference.NON);
 
