@@ -10,6 +10,7 @@ stages:
 
 # setup scp and maven settings
 # based on: https://medium.com/@hfally/a-gitlab-ci-config-to-deploy-to-your-server-via-ssh-43bf3cf93775
+# also install zip command
 before_script:
     - mkdir ~/.m2
     - cp deploy/gitlab-mvn-settings.xml ~/.m2/settings.xml
@@ -18,7 +19,9 @@ before_script:
     - ssh-add <(echo "$SSH_DEPLOY_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  
+    - apt-get install zip
+
+
 # 1st job - build code
 # make sure to use maven image with jdk 11
 build:
@@ -42,4 +45,4 @@ deploy_myvps:
        - scp -r deploy/target/pax-runner-dir/bundles deploy@${DEV_ENV_IP}:/opt/deploy
        - scp -r deploy/conf.default deploy@${DEV_ENV_IP}:/opt/deploy
        - scp -r deploy/felix-configuration deploy@${DEV_ENV_IP}:/opt/deploy
-       - ssh deploy@${DEV_ENV_IP}:/opt/deploy/deploy.sh
+       - ssh deploy@${DEV_ENV_IP} "/opt/deploy/deploy.sh"
