@@ -19,7 +19,7 @@ before_script:
     - ssh-add <(echo "$SSH_DEPLOY_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - apt-get install zip
+    - add-apt-repository 'deb http://deb.debian.org/debian/ -updates main contrib non-free' && apt-get install zip
 
 
 # 1st job - build code
