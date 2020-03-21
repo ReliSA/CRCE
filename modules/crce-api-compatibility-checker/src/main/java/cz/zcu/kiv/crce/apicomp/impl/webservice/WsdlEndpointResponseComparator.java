@@ -6,8 +6,8 @@ import cz.zcu.kiv.crce.metadata.Property;
 
 public class WsdlEndpointResponseComparator extends EndpointResponseComparator {
 
-    public WsdlEndpointResponseComparator(Capability method1, Capability method2) {
-        super(method1, method2);
+    public WsdlEndpointResponseComparator(Capability endpoint1, Capability endpoint2) {
+        super(endpoint1, endpoint2);
     }
 
     @Override

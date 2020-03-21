@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * Checker for crce-webservices-indexer
+ * Base compatibility  checker for APIs indexed by crce-webservices-indexer.
  *
  */
 public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityChecker {
@@ -124,10 +124,10 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
 
         while(it1.hasNext()) {
-            Capability api1Method = it1.next();
+            Capability api1Endpoint = it1.next();
 
             // find endpoint from other service with same metadata and compare it
-            Diff endpointDiff = compareEndpointsPickBest(api1Method, api2Endpoints);
+            Diff endpointDiff = compareEndpointsPickBest(api1Endpoint, api2Endpoints);
             endpointsDiff.addChild(endpointDiff);
 
             // endpoint processed, remove it
@@ -149,21 +149,22 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
     /**
      * Tries to compare as many endpoints as possible (metadata match+MOV flag) and keeps the best result.
-     * Contains whole logic of finding method in api2 suitable for comparison with method 1 and actual comparison.
+     * Contains whole logic of finding endpoint in api2 suitable for comparison with endpoint 1 and
+     * doing the actual comparison.
      *
      *
      * Structure of returned object:
      *
-     * methodDiff
-     *  - value: final verdict about compatibility of two methods.
+     * endpointDiff
+     *  - value: final verdict about compatibility of two endpoints.
      *  - children:
      *      - metadata diff - now this is *theoretically* not needed but lets keep it here in case of
      *                         future changes
      *      - parameter diff
      *      - response diff
      *
-     * @param endpoint1
-     * @param otherEndpoints
+     * @param endpoint1 Endpoint from API 1.
+     * @param otherEndpoints Collection of endpoints from API 2.
      * @return
      */
     private Diff compareEndpointsPickBest(Capability endpoint1, List<Capability> otherEndpoints) {
@@ -177,7 +178,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             Capability matchingEndpoint = pullMatchingEndpoint(endpoint1, otherEndpoints, metadataDiffs);
 
             if (matchingEndpoint == null) {
-                // nothing found, method 1 is in api 1 but not in api 2 -> DEL
+                // nothing found, endpoint 1 is in api 1 but not in api 2 -> DEL
                 endpointDiff = DiffUtils.createDiff(
                         endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
                         DifferenceLevel.OPERATION,

@@ -29,9 +29,9 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
     }
 
     /**
-     * Compares all responses of two methods. Diff is created for every comparison.
+     * Compares all responses of two endpoints. Diff is created for every comparison.
      *
-     * @return Collection of diffs between responses of two methods.
+     * @return Collection of diffs between responses of two endpoints.
      */
     public List<Diff> compare() {
         List<Diff> responseDiffs = new ArrayList<>();

@@ -8,10 +8,13 @@ import cz.zcu.kiv.crce.metadata.Property;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Class that captures differences in parameters of WSDL-based APIs.
+ */
 public class WsdlEndpointParameterComparator extends EndpointParameterComparator {
 
-    public WsdlEndpointParameterComparator(Capability method1, Capability method2) {
-        super(method1, method2);
+    public WsdlEndpointParameterComparator(Capability endpoint1, Capability endpoint2) {
+        super(endpoint1, endpoint2);
     }
 
     @Override
