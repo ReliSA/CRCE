@@ -4,7 +4,7 @@ import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
 
-public class WsdlEndpointResponseComparator extends MethodResponseComparator {
+public class WsdlEndpointResponseComparator extends EndpointResponseComparator {
 
     public WsdlEndpointResponseComparator(Capability method1, Capability method2) {
         super(method1, method2);

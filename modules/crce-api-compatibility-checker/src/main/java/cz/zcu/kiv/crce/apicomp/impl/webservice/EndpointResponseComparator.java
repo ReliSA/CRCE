@@ -17,10 +17,10 @@ import java.util.List;
  * It is possible to extend this class and override compareResponses() method to provide logic for
  * different response formats.
  */
-public class MethodResponseComparator extends MethodFeatureComparator {
+public class EndpointResponseComparator extends EndpointFeatureComparator {
 
-    public MethodResponseComparator(Capability method1, Capability method2) {
-        super(method1, method2);
+    public EndpointResponseComparator(Capability endpoint1, Capability endpoint2) {
+        super(endpoint1, endpoint2);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class MethodResponseComparator extends MethodFeatureComparator {
     public List<Diff> compare() {
         List<Diff> responseDiffs = new ArrayList<>();
 
-        Iterator<Property> response1It = method1Features.iterator();
-        Iterator<Property> response2It = method2Features.iterator();
+        Iterator<Property> response1It = endpoint1Features.iterator();
+        Iterator<Property> response2It = endpoint2Features.iterator();
 
         while (response1It.hasNext()) {
             Property response1 = response1It.next();

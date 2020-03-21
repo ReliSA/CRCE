@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.Property;
 import java.util.Arrays;
 import java.util.List;
 
-public class WsdlEndpointParameterComparator extends MethodParameterComparator {
+public class WsdlEndpointParameterComparator extends EndpointParameterComparator {
 
     public WsdlEndpointParameterComparator(Capability method1, Capability method2) {
         super(method1, method2);

@@ -51,12 +51,12 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
     }
 
     @Override
-    protected MethodFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
+    protected EndpointFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
         return new WsdlEndpointResponseComparator(endpoint1, endpoint2);
     }
 
     @Override
-    protected MethodFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+    protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
         return new WsdlEndpointParameterComparator(endpoint1, endpoint2);
     }
 

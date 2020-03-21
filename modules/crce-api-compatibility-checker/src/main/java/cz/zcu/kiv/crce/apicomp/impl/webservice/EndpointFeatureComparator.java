@@ -12,19 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract class for method features (parameters, repsonse) comparators.
+ * Abstract class for endpoint features (parameters, repsonse) comparators.
  *
  * It is expected that the particular 'feature' is a property of capability.
  *
  */
-public abstract class MethodFeatureComparator {
+public abstract class EndpointFeatureComparator {
 
-    public List<Property> method1Features = new ArrayList<>();
-    public List<Property> method2Features = new ArrayList<>();
+    List<Property> endpoint1Features = new ArrayList<>();
+    List<Property> endpoint2Features = new ArrayList<>();
 
-    public MethodFeatureComparator(Capability method1, Capability method2) {
-        method1Features.addAll(method1.getProperties(getFeatureNamespace()));
-        method2Features.addAll(method2.getProperties(getFeatureNamespace()));
+    public EndpointFeatureComparator(Capability endpoint1, Capability endpoint2) {
+        endpoint1Features.addAll(endpoint1.getProperties(getFeatureNamespace()));
+        endpoint2Features.addAll(endpoint2.getProperties(getFeatureNamespace()));
     }
 
     /**
@@ -41,13 +41,14 @@ public abstract class MethodFeatureComparator {
     public abstract List<Diff> compare();
 
     /**
-     * Returns true if both parameters have equal attribtues.
+     * Returns true if both parameters have equal attributes. The equality is
+     * evaluated as follows: a1 != null && a1.equals(s2).
      *
      * If attributes are missing from both parameters, still returns true.
      *
-     * @param param1
-     * @param param2
-     * @param parameterAttributeType
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @param parameterAttributeType Type of the attribute to be compared.
      * @return
      */
     protected boolean areAttributesEqual(Property param1, Property param2, AttributeType parameterAttributeType) {

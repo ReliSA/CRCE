@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.apicomp.webservice;
 
-import cz.zcu.kiv.crce.apicomp.impl.webservice.MethodParameterComparator;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.EndpointParameterComparator;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.compatibility.Diff;
 import cz.zcu.kiv.crce.compatibility.Difference;
@@ -23,7 +23,7 @@ public class MethodParameterComparatorTest {
         Capability method1 = createMethod1(),
         method2 = createMethod1();
 
-        MethodParameterComparator comparator = new MethodParameterComparator(method1, method2);
+        EndpointParameterComparator comparator = new EndpointParameterComparator(method1, method2);
 
         List<Diff> diffs = comparator.compare();
         assertFalse("Empty diff list returned!", diffs.isEmpty());
@@ -40,7 +40,7 @@ public class MethodParameterComparatorTest {
         Capability method1 = createMethod1(),
                 method2 = createMethod2();
 
-        MethodParameterComparator comparator = new MethodParameterComparator(method1, method2);
+        EndpointParameterComparator comparator = new EndpointParameterComparator(method1, method2);
 
         List<Diff> diffs = comparator.compare();
         assertFalse("Empty diff list returned!", diffs.isEmpty());
@@ -58,7 +58,7 @@ public class MethodParameterComparatorTest {
         Capability method1 = createMethod1(),
                 method2 = createMethod1_GEN();
 
-        MethodParameterComparator comparator = new MethodParameterComparator(method1, method2);
+        EndpointParameterComparator comparator = new EndpointParameterComparator(method1, method2);
 
         List<Diff> diffs = comparator.compare();
         assertFalse("Empty diff list returned!", diffs.isEmpty());

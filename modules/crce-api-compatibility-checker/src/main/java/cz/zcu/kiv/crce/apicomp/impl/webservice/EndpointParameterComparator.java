@@ -17,15 +17,15 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Class used to compare parameters of two methods.
+ * Class used to compare parameters of two endpoints.
  *
  * New instance should be created for every comparison.
  *
  */
-public class MethodParameterComparator extends MethodFeatureComparator {
+public class EndpointParameterComparator extends EndpointFeatureComparator {
 
-    public MethodParameterComparator(Capability method1, Capability method2) {
-        super(method1, method2);
+    public EndpointParameterComparator(Capability endpoint1, Capability endpoint2) {
+        super(endpoint1, endpoint2);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MethodParameterComparator extends MethodFeatureComparator {
     }
 
     /**
-     * Compares parameters of two methods.
+     * Compares parameters of two endpoints.
      *
      * @return Collection of parameter diffs. New diff is added for every parameter comparison.
      */
@@ -42,8 +42,8 @@ public class MethodParameterComparator extends MethodFeatureComparator {
     public List<Diff> compare() {
         List<Diff> diffs = new ArrayList<>();
 
-        Iterator<Property> p1i = method1Features.iterator();
-        Iterator<Property> p2i = method2Features.iterator();
+        Iterator<Property> p1i = endpoint1Features.iterator();
+        Iterator<Property> p2i = endpoint2Features.iterator();
         while(p1i.hasNext() && p2i.hasNext()) {
             compareParameters(p1i.next(), p2i.next(), diffs);
             p1i.remove();

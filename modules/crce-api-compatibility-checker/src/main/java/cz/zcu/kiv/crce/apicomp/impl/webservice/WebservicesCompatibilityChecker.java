@@ -93,8 +93,8 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * @return Comparator to be used for responses.
      */
-    protected MethodFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
-        return new MethodResponseComparator(endpoint1, endpoint2);
+    protected EndpointFeatureComparator getEndpointResponseComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new EndpointResponseComparator(endpoint1, endpoint2);
     }
 
     /**
@@ -103,8 +103,8 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      * @param endpoint2
      * @return
      */
-    protected MethodFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
-        return new MethodParameterComparator(endpoint1, endpoint2);
+    protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new EndpointParameterComparator(endpoint1, endpoint2);
     }
 
     /**
@@ -240,7 +240,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
 
         // parameter diff
-        MethodFeatureComparator parameterComparator = getEndpointParameterComparatorInstance(
+        EndpointFeatureComparator parameterComparator = getEndpointParameterComparatorInstance(
                 endpoint1,
                 endpoint2
         );
@@ -251,7 +251,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         );
 
         // response diff
-        MethodFeatureComparator responseComparator = getEndpointResponseComparatorInstance(
+        EndpointFeatureComparator responseComparator = getEndpointResponseComparatorInstance(
                 endpoint1,
                 endpoint2);
         Diff responseDiff = DiffUtils.createDiff(
