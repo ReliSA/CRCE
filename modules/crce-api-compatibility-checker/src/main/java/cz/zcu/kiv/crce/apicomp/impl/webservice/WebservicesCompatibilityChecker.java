@@ -118,27 +118,27 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *                      are evaluated.
      */
     protected void compareEndpointsFromRoot(Capability api1, Capability api2, Diff endpointsDiff) {
-        List<Capability> api1Methods = new ArrayList<>(api1.getChildren());
-        Iterator<Capability> it1 = api1Methods.iterator();
-        List<Capability> api2Methods = new ArrayList<>(api2.getChildren());
+        List<Capability> api1Endpoints = new ArrayList<>(api1.getChildren());
+        Iterator<Capability> it1 = api1Endpoints.iterator();
+        List<Capability> api2Endpoints = new ArrayList<>(api2.getChildren());
 
 
         while(it1.hasNext()) {
             Capability api1Method = it1.next();
 
-            // find method from other service with same metadata and compare it
-            Diff methodDiff = compareEndpointsPickBest(api1Method, api2Methods);
-            endpointsDiff.addChild(methodDiff);
+            // find endpoint from other service with same metadata and compare it
+            Diff endpointDiff = compareEndpointsPickBest(api1Method, api2Endpoints);
+            endpointsDiff.addChild(endpointDiff);
 
-            // method processed, remove it
+            // endpoint processed, remove it
             it1.remove();
         }
 
-        // remaining methods
-        for (Capability api2Method : api2Methods) {
-            // api 1 does not contain method defined in api 2 -> INS
+        // remaining endpoints
+        for (Capability api2Endpoint : api2Endpoints) {
+            // api 1 does not contain endpoint defined in api 2 -> INS
             Diff diff = DiffUtils.createDiff(
-                    api2Method.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
+                    api2Endpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
                     DifferenceLevel.OPERATION,
                     Difference.INS);
             endpointsDiff.addChild(diff);
@@ -270,21 +270,21 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         return endpointDiff;
     }
 
-    private Capability pullMatchingEndpoint(Capability api1Method, List<Capability> api2Methods, List<Diff> metadataDiffs) {
+    private Capability pullMatchingEndpoint(Capability api1Endpoint, List<Capability> api2Endpoints, List<Diff> metadataDiffs) {
         Capability match = null;
-        Iterator<Capability> otherMethodsIt = api2Methods.iterator();
+        Iterator<Capability> otherEndpointsIt = api2Endpoints.iterator();
 
-        while(otherMethodsIt.hasNext()) {
-            Capability otherE = otherMethodsIt.next();
+        while(otherEndpointsIt.hasNext()) {
+            Capability otherE = otherEndpointsIt.next();
 
-            boolean parameterCountMatch = compareEndpointParameterCounts(api1Method, otherE);
+            boolean parameterCountMatch = compareEndpointParameterCounts(api1Endpoint, otherE);
 
             if (!parameterCountMatch) {
                 continue;
             }
 
             // endpoints with matching parameter count found -> compare their metadata
-            List<Diff> diffs = compareEndpointMetadata(api1Method, otherE);
+            List<Diff> diffs = compareEndpointMetadata(api1Endpoint, otherE);
 
             // diff is valid only in case of no DEL and MUT diffs
             boolean validDiff = !diffs.isEmpty() && diffs.stream()
@@ -292,7 +292,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
             if (validDiff) {
                 match = otherE;
-                otherMethodsIt.remove();
+                otherEndpointsIt.remove();
                 metadataDiffs.addAll(diffs);
                 break;
             }
@@ -350,11 +350,11 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * TODO: MOV endpoint URL and name contains all information regarding the MOV flag
      *
-     * @param api1Method
-     * @param otherE
+     * @param api1Endpoint
+     * @param otherEndpoint
      * @return
      */
-    private List<Diff> compareEndpointMetadata(Capability api1Method, Capability otherE) {
+    private List<Diff> compareEndpointMetadata(Capability api1Endpoint, Capability otherEndpoint) {
         List<AttributeType> attributeTypes = Arrays.asList(
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
@@ -362,8 +362,8 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
         List<Diff> metadataDiffs = new ArrayList<>();
         for (AttributeType at : attributeTypes) {
-            Attribute a1 = api1Method.getAttribute(at);
-            Attribute a2 = otherE.getAttribute(at);
+            Attribute a1 = api1Endpoint.getAttribute(at);
+            Attribute a2 = otherEndpoint.getAttribute(at);
 
             if (a1 != null && a1.equals(a2)) {
                 metadataDiffs.add(DiffUtils.createDiff(at.getName(), DifferenceLevel.FIELD, Difference.NON));
@@ -375,6 +375,15 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         return metadataDiffs;
     }
 
+    /**
+     * Compares communication patterns of two APIs represented by their root capabilities.
+     *
+     * Returns either NON if communication patterns match or MUT if they do no.
+     *
+     * @param root1
+     * @param root2
+     * @return Diff containing info about communication pattern.
+     */
     protected Diff compareCommunicationPatterns(Capability root1, Capability root2) {
         String type1 = root1.getAttributeStringValue(getCommunicationPatternAttributeName());
         String type2 = root2.getAttributeStringValue(getCommunicationPatternAttributeName());
