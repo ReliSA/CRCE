@@ -21,9 +21,9 @@ import java.util.List;
  * SPE - API 2 is less generic than API 1. Caused by data types in endpoint responses and/or parameters.
  * INS - API 2 contains endpoint that API 1 does not.
  * DEL - API 1 contains endpoint that API 2 does not.
- * MUT - Combination of INS/DEL and/or GEN/SPEC or communication patterns do not match.
+ * MUT - Combination of INS/DEL and/or GEN/SPEC.
  * UNK - Could not determine diff, could be because of uncomparable data types (endpoint parameters/responses)
- *       or
+ *       or communication patterns do not match.
  */
 public class WadlJsonWspCompatibilityChecker extends WebservicesCompatibilityChecker {
 

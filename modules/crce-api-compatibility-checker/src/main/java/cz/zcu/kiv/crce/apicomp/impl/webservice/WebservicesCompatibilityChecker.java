@@ -379,7 +379,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     /**
      * Compares communication patterns of two APIs represented by their root capabilities.
      *
-     * Returns either NON if communication patterns match or MUT if they do no.
+     * Returns either NON if communication patterns match or UNK if they do not.
      *
      * @param root1
      * @param root2
@@ -392,7 +392,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         Diff commDiff = new DefaultDiffImpl();
         commDiff.setName("communication pattern");
         commDiff.setLevel(DifferenceLevel.TYPE);
-        commDiff.setValue(type1 != null && type1.equals(type2) ? Difference.NON : Difference.MUT);
+        commDiff.setValue(type1 != null && type1.equals(type2) ? Difference.NON : Difference.UNK);
 
         return commDiff;
     }

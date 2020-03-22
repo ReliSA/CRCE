@@ -31,7 +31,7 @@ import java.util.List;
  * GEN/SPE -  The second API has data types that are GEN/SPE of the same types in the first API (e.g. endpoint parameter, response data type, ...)
  * INS/DEL -  The second api has/has not ws or endpoint that is defined in the first API.
  * MUT -  Combination of GEN/SPE, INS/DEL.
- * UNK -  Endpoints with same signature have different response, or some more specific metadata (parameter order, parameter data type) do not match.
+ * UNK -  Endpoints with same signature have different response, or some more specific metadata (parameter order, parameter data type, communication patterns) do not match.
  */
 public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
@@ -90,10 +90,10 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         // diff for collecting differences from all webservices this API may contain
         Diff webServicesDiff = DiffUtils.createDiff("webservices", DifferenceLevel.PACKAGE, Difference.NON);
         while(it1.hasNext()) {
-            Capability api1Endpoint = it1.next();
+            Capability api1WebService = it1.next();
 
             // find webservice from other api with same metadata and compare it
-            Diff webServiceDiff = compareWebServices(api1Endpoint, api2WebServices);
+            Diff webServiceDiff = compareWebServices(api1WebService, api2WebServices);
             webServicesDiff.addChild(webServiceDiff);
 
             // webservice processed, remove it
@@ -101,10 +101,10 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         }
 
         // remaining webservices
-        for (Capability api2Endpoint : api2WebServices) {
+        for (Capability api2WebService : api2WebServices) {
             // api 1 does not contain webservice defined in api 2 -> INS
             Diff diff = DiffUtils.createDiff(
-                    api2Endpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
+                    api2WebService.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
                     DifferenceLevel.PACKAGE,
                     Difference.INS);
             webServicesDiff.addChild(diff);

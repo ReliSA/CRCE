@@ -95,6 +95,20 @@ public class WsdlCompatibilityCheckerTest {
     }
 
 
+    @Test
+    public void testCompare_differentCommPaterns() {
+        Resource api1 = createWS1(),
+                api2 = createWS1_diffCommPattern();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.UNK, result.getDiffValue());
+    }
+
     /**
      * Creates WS based on STAG's ciselniky WS.
      * @return
@@ -118,6 +132,17 @@ public class WsdlCompatibilityCheckerTest {
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
         return r;
+    }
+
+    /**
+     * Same as WS1 but communication pattern is different.
+     * @return
+     */
+    private Resource createWS1_diffCommPattern() {
+        Resource ws = createWS1();
+        ws.getRootCapabilities().get(0).setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "different comm");
+
+        return ws;
     }
 
     /**
