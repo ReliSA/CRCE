@@ -163,4 +163,8 @@ public class CompatibilityCheckResult implements Compatibility {
         // todo: key as interface
         additionalInfo.put("MOV", description);
     }
+
+    public boolean isMov() {
+        return additionalInfo != null && additionalInfo.containsKey("MOV");
+    }
 }

@@ -14,6 +14,7 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -82,9 +83,13 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         List<Capability> api2WebServices = new ArrayList<>(root2.getChildren());
 
         logger.debug("Detecting MOV flag");
-        MovDetectionResult movDetectionResult = detectMov(root1, root2);
-        if (movDetectionResult.isAnyDiff()) {
-            logger.debug("Mov detection result: {}.", movDetectionResult);
+        try {
+            MovDetectionResult movDetectionResult = detectMov(root1, root2);
+            if (movDetectionResult.isAnyDiff()) {
+                logger.debug("Mov detection result: {}.", movDetectionResult);
+            }
+        } catch (MalformedURLException ex) {
+            logger.error("Could not parse url to endpoint: {}. Skipping MOV detection.", ex);
         }
 
         // diff for collecting differences from all webservices this API may contain
@@ -116,7 +121,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         return;
     }
 
-    private MovDetectionResult detectMov(Capability root1, Capability root2) {
+    private MovDetectionResult detectMov(Capability root1, Capability root2) throws MalformedURLException {
         WsdlMovDetector movDetector = new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
         return movDetector.detectMov();
     }
