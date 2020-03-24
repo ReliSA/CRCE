@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.apicomp.impl.mov;
 import java.util.List;
 import java.util.Map;
 
-public class WsdlMovDetector {
+public class WsdlMovDetector implements IMovDetector{
 
     private ApiDescription api1;
     private ApiDescription api2;

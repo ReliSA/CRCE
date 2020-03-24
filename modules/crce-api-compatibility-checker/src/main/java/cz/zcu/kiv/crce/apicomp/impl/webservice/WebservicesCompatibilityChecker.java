@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
@@ -13,6 +15,8 @@ import cz.zcu.kiv.crce.metadata.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -87,6 +91,13 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     protected abstract void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2);
 
     /**
+     * Returns MOV detector for given API type.
+     *
+     * @return MOV detector to be used. If null, no MOV detection will be performed.
+     */
+    protected abstract IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
+
+    /**
      * Different WS may have different response formats and thus require different logic for comparing those.
      *
      * For these cases, implementing class should override this method and provide its own response comparator.
@@ -108,16 +119,51 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     /**
+     * Detects MOV in the current API type.
+     *
+     * @param root1 Root capability containing metadata of API 1.
+     * @param root2 Root capability containing metadata of API 2.
+     * @return
+     * @throws MalformedURLException
+     */
+    protected MovDetectionResult detectMov(Capability root1, Capability root2) {
+        logger.debug("Detecting MOV flag");
+        MovDetectionResult movDetectionResult;
+        try {
+            IMovDetector movDetector = getMovDetector(root1, root2);
+
+            if (movDetector == null) {
+                logger.debug("No MOV detector provided, skipping MOV detection.");
+                return MovDetectionResult.noMov();
+            }
+
+
+            movDetectionResult = movDetector.detectMov();
+            if (movDetectionResult.isAnyDiff()) {
+                logger.debug("Mov detection result: {}.", movDetectionResult);
+            }
+        } catch (MalformedURLException ex) {
+            logger.error("Could not parse url to endpoint: {}. Skipping MOV detection.", ex);
+            movDetectionResult = MovDetectionResult.noMov();
+        } catch (Exception ex) {
+            logger.error("Unexpected exception when detecting MOV: {}.", ex);
+            movDetectionResult = MovDetectionResult.noMov();
+        }
+
+
+        return movDetectionResult;
+    }
+
+    /**
      * Compares endpoint sets of api1 and api2. Endpoints are assumed to be all child capabilities of
      * api1 and api2.
-     *
-     * @param api1 Capability that contains endpoints of the first API.
+     *  @param api1 Capability that contains endpoints of the first API.
      * @param api2 Capability that contains endpoints of the second API.
      * @param endpointsDiff Object used to store diffs between endpoints. New diff should be created for every
-     *                      endpoint comparison. Correct Difference value is set by this method after all endpoints
-     *                      are evaluated.
+ *                      endpoint comparison. Correct Difference value is set by this method after all endpoints
+     * @param movDetectionResult
      */
-    protected void compareEndpointsFromRoot(Capability api1, Capability api2, Diff endpointsDiff) {
+    protected void compareEndpointsFromRoot(Capability api1, Capability api2, Diff endpointsDiff, MovDetectionResult movDetectionResult) {
         List<Capability> api1Endpoints = new ArrayList<>(api1.getChildren());
         Iterator<Capability> it1 = api1Endpoints.iterator();
         List<Capability> api2Endpoints = new ArrayList<>(api2.getChildren());
@@ -127,7 +173,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             Capability api1Endpoint = it1.next();
 
             // find endpoint from other service with same metadata and compare it
-            Diff endpointDiff = compareEndpointsPickBest(api1Endpoint, api2Endpoints);
+            Diff endpointDiff = compareEndpointsPickBest(api1Endpoint, api2Endpoints, movDetectionResult);
             endpointsDiff.addChild(endpointDiff);
 
             // endpoint processed, remove it
@@ -165,9 +211,12 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * @param endpoint1 Endpoint from API 1.
      * @param otherEndpoints Collection of endpoints from API 2.
+     * @param movDetectionResult
      * @return
      */
-    private Diff compareEndpointsPickBest(Capability endpoint1, List<Capability> otherEndpoints) {
+    private Diff compareEndpointsPickBest(Capability endpoint1, List<Capability> otherEndpoints, MovDetectionResult movDetectionResult) {
+        logger.debug("Comparing endpoint {} with the best one from other endpoint set.", endpoint1);
+
         // diff -> compared endpoint
         Map<Diff, Capability> results = new HashMap<>();
         boolean stopCond = false;
@@ -175,9 +224,10 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
         while(!stopCond) {
             List<Diff> metadataDiffs = new ArrayList<>();
-            Capability matchingEndpoint = pullMatchingEndpoint(endpoint1, otherEndpoints, metadataDiffs);
+            Capability matchingEndpoint = pullMatchingEndpoint(endpoint1, otherEndpoints, metadataDiffs, movDetectionResult);
 
             if (matchingEndpoint == null) {
+                logger.debug("No suitable match found in other api set.");
                 // nothing found, endpoint 1 is in api 1 but not in api 2 -> DEL
                 endpointDiff = DiffUtils.createDiff(
                         endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
@@ -185,6 +235,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
                         Difference.DEL);
                 stopCond = true;
             } else {
+                logger.debug("Suitable match found: {}.", matchingEndpoint);
                 // possible match found
                 Diff metadataDiff = DiffUtils.createDiffMov(
                         "metadata",
@@ -192,13 +243,14 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
                         metadataDiffs
                 );
 
-                endpointDiff = compareEndpointDetails(endpoint1, matchingEndpoint, metadataDiff);
+                endpointDiff = compareEndpointDetails(endpoint1, matchingEndpoint, metadataDiff, movDetectionResult);
 
                 if (!DiffUtils.isDangerous(endpointDiff)) {
                     // okish endpoint found
                     stopCond = true;
                 } else {
                     if (MovDiff.isMovDiff(endpointDiff)) {
+                        logger.debug("MOV detected for this endpoint pair.");
                         // dangerous endpoint found and MOV is set, add it to the results
                         // and keep comparing other endpoints
                         results.put(endpointDiff, matchingEndpoint);
@@ -231,13 +283,15 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      * @param endpoint1
      * @param endpoint2
      * @param metadataDiff Result of pullMatchingEndpoint(), may be MovDiff.
-     * @return
+     * @param movDetectionResult
+     * @return Returns MOV diff if mov was detected for this endpoint.
      */
-    private Diff compareEndpointDetails(Capability endpoint1, Capability endpoint2, Diff metadataDiff) {
+    private Diff compareEndpointDetails(Capability endpoint1, Capability endpoint2, Diff metadataDiff, MovDetectionResult movDetectionResult) {
         Diff endpointDiff = DiffUtils.createDiff(
                 endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
                 DifferenceLevel.OPERATION,
-                Difference.NON);
+                Difference.NON,
+                movDetectionResult.isAnyDiff());
 
 
         // parameter diff
@@ -271,7 +325,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         return endpointDiff;
     }
 
-    private Capability pullMatchingEndpoint(Capability api1Endpoint, List<Capability> api2Endpoints, List<Diff> metadataDiffs) {
+    private Capability pullMatchingEndpoint(Capability api1Endpoint, List<Capability> api2Endpoints, List<Diff> metadataDiffs, MovDetectionResult movDetectionResult) {
         Capability match = null;
         Iterator<Capability> otherEndpointsIt = api2Endpoints.iterator();
 
@@ -285,9 +339,9 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             }
 
             // endpoints with matching parameter count found -> compare their metadata
-            List<Diff> diffs = compareEndpointMetadata(api1Endpoint, otherE);
+            List<Diff> diffs = compareEndpointMetadata(api1Endpoint, otherE, movDetectionResult);
 
-            // diff is valid only in case of no DEL and MUT diffs
+            // diff is valid only in case of no UNK
             boolean validDiff = !diffs.isEmpty() && diffs.stream()
                     .noneMatch(d -> d.getValue().equals(Difference.UNK));
 
@@ -353,9 +407,71 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * @param api1Endpoint
      * @param otherEndpoint
+     * @param movDetectionResult
+     * @return Returns either NON if the metadata match or UNK if they don't.
+     */
+    private List<Diff> compareEndpointMetadata(Capability api1Endpoint, Capability otherEndpoint, MovDetectionResult movDetectionResult) {
+
+        if (movDetectionResult.isAnyDiff()) {
+            return compareEndpointMetadataMov(api1Endpoint, otherEndpoint, movDetectionResult);
+        } else {
+            return compareEndpointMetadataNoMOV(api1Endpoint, otherEndpoint);
+        }
+    }
+
+    /**
+     * Compares endpoint metadata with MOV flags. This method contains actual logic of using the MOV detection
+     * results in picking which endpoints to compare.
+     *
+     * @param api1Endpoint
+     * @param otherEndpoint
+     * @param movDetectionResult Mov detection result object with at least one diff flag set.
      * @return
      */
-    private List<Diff> compareEndpointMetadata(Capability api1Endpoint, Capability otherEndpoint) {
+    private List<Diff> compareEndpointMetadataMov(Capability api1Endpoint, Capability otherEndpoint, MovDetectionResult movDetectionResult) {
+        if (!movDetectionResult.isPossibleMOV()) {
+            // it is not possible to decide whether the API moved or not, so
+            // fall back to the noMov method which return either NON or UNK
+            return compareEndpointMetadataNoMOV(api1Endpoint, otherEndpoint);
+        } else {
+            // MOV flag possible
+            if (movDetectionResult.hostDiff && !movDetectionResult.pathDiff && !movDetectionResult.operationDiff) {
+                List<Diff> metadataDiff = new ArrayList<>();
+                // compare endpoint metadata without host part of url
+                // todo: something nicer, it could be a good idea to move to a separate class, e.g. EndpointMetadataMovComparator
+                Attribute a1Name = api1Endpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
+                Attribute a2Name = otherEndpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
+
+                if (a1Name != null && a1Name.equals(a2Name)) {
+                    metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME.getName(), DifferenceLevel.FIELD, Difference.NON));
+                    try {
+                        String a1Url = api1Endpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+                        String a2Url = otherEndpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+
+                        URL url1 = new URL(a1Url);
+                        URL url2 = new URL(a2Url);
+
+                        metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL.getName(), DifferenceLevel.FIELD,
+                            url1.getPath().equals(url2.getPath()) ? Difference.NON : Difference.UNK
+                        ));
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL.getName(), DifferenceLevel.FIELD, Difference.UNK));
+                    }
+                } else {
+                    metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME.getName(), DifferenceLevel.FIELD, Difference.UNK));
+                }
+
+                return metadataDiff;
+            } else {
+                // todo: rest of the cases
+                return compareEndpointMetadataNoMOV(api1Endpoint, otherEndpoint);
+            }
+        }
+    }
+
+    private List<Diff> compareEndpointMetadataNoMOV(Capability api1Endpoint, Capability otherEndpoint) {
         List<AttributeType> attributeTypes = Arrays.asList(
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL

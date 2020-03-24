@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
+import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.mov.WsdlMovDetector;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
@@ -82,15 +83,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         Iterator<Capability> it1 = api1WebServices.iterator();
         List<Capability> api2WebServices = new ArrayList<>(root2.getChildren());
 
-        logger.debug("Detecting MOV flag");
-        try {
-            MovDetectionResult movDetectionResult = detectMov(root1, root2);
-            if (movDetectionResult.isAnyDiff()) {
-                logger.debug("Mov detection result: {}.", movDetectionResult);
-            }
-        } catch (MalformedURLException ex) {
-            logger.error("Could not parse url to endpoint: {}. Skipping MOV detection.", ex);
-        }
+        MovDetectionResult movDetectionResult = detectMov(root1, root2);
 
         // diff for collecting differences from all webservices this API may contain
         Diff webServicesDiff = DiffUtils.createDiff("webservices", DifferenceLevel.PACKAGE, Difference.NON);
@@ -98,7 +91,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
             Capability api1WebService = it1.next();
 
             // find webservice from other api with same metadata and compare it
-            Diff webServiceDiff = compareWebServices(api1WebService, api2WebServices);
+            Diff webServiceDiff = compareWebServices(api1WebService, api2WebServices, movDetectionResult);
             webServicesDiff.addChild(webServiceDiff);
 
             // webservice processed, remove it
@@ -117,13 +110,16 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(webServicesDiff);
 
         checkResult.getDiffDetails().add(webServicesDiff);
+        if (movDetectionResult.isPossibleMOV()) {
+            checkResult.setMoveFlag("");
+        }
 
         return;
     }
 
-    private MovDetectionResult detectMov(Capability root1, Capability root2) throws MalformedURLException {
-        WsdlMovDetector movDetector = new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
-        return movDetector.detectMov();
+    @Override
+    protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+        return new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
     }
 
     /**
@@ -131,9 +127,10 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
      *
      * @param api1Ws
      * @param api2WebServices
+     * @param movDetectionResult Object containing the result of previous MOV detection.
      * @return
      */
-    private Diff compareWebServices(Capability api1Ws, List<Capability> api2WebServices) {
+    private Diff compareWebServices(Capability api1Ws, List<Capability> api2WebServices, MovDetectionResult movDetectionResult) {
         Diff webserviceDiff = DiffUtils.createDiff(
                 api1Ws.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME),
                 DifferenceLevel.PACKAGE,
@@ -148,7 +145,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
             // start comparing endpoints of two web services
             Diff endpointsDiff = DiffUtils.createDiff("endpoints", DifferenceLevel.PACKAGE, Difference.NON);
-            compareEndpointsFromRoot(api1Ws, otherWs, endpointsDiff);
+            compareEndpointsFromRoot(api1Ws, otherWs, endpointsDiff, movDetectionResult);
             webserviceDiff.addChild(endpointsDiff);
 
             DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(webserviceDiff);

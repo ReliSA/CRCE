@@ -2,6 +2,14 @@ package cz.zcu.kiv.crce.apicomp.impl.mov;
 
 public class MovDetectionResult {
 
+    /**
+     * Returns object representing no MOV in API.
+     * @return
+     */
+    public static MovDetectionResult noMov() {
+        return new MovDetectionResult(false, false, false);
+    }
+
     public final boolean hostDiff;
     public final boolean pathDiff;
     public final boolean operationDiff;

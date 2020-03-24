@@ -61,7 +61,16 @@ public class DiffUtils {
     }
 
     public static Diff createDiff(String name, DifferenceLevel level, Difference value) {
-        Diff d = new DefaultDiffImpl();
+        return DiffUtils.createDiff(name, level, value, false);
+    }
+
+    public static Diff createDiff(String name, DifferenceLevel level, Difference value, boolean mov) {
+        Diff d;
+        if (mov) {
+            d = new MovDiff();
+        } else {
+            d = new DefaultDiffImpl();
+        }
 
         d.setValue(value);
         d.setName(name);

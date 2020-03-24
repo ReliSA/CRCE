@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -9,6 +11,7 @@ import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -54,9 +57,16 @@ public class WadlJsonWspCompatibilityChecker extends WebservicesCompatibilityChe
             return;
         }
 
+        MovDetectionResult movDetectionResult = detectMov(root1, root2);
+
         // diff used to aggregate differences between all endpoints
         Diff endpointsDiff = DiffUtils.createDiff("endpoints", DifferenceLevel.PACKAGE, Difference.NON);
-        compareEndpointsFromRoot(root1, root2, endpointsDiff);
+        compareEndpointsFromRoot(root1, root2, endpointsDiff, movDetectionResult);
         checkResult.getDiffDetails().add(endpointsDiff);
+    }
+
+    @Override
+    protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+        return null;
     }
 }
