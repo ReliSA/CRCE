@@ -3,7 +3,10 @@ package cz.zcu.kiv.crce.apicomp.restimpl;
 import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestimplIndexerConstants;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;
+
+import java.util.List;
 
 public class TestUtil {
 
@@ -38,5 +41,21 @@ public class TestUtil {
         parameter.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_OPTIONAL, isOptional);
 
         endpointCapability.addProperty(parameter);
+    }
+
+    public static Capability createEndpointFor(Capability rootCapability, String name, List<String> methods, List<String> paths, List<String> produces, List<String> consumes) {
+        Capability endpoint1 = new CapabilityImpl(RestimplIndexerConstants.NS__RESTIMPL_ENDPOINT, "");
+        if (rootCapability != null) {
+            rootCapability.addChild(endpoint1);
+        }
+
+        // endpoint metadata
+        endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME, name);
+        endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_METHOD, methods);
+        endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH, paths);
+        endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PRODUCES, produces);
+        endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_CONSUMES, consumes);
+
+        return endpoint1;
     }
 }

@@ -173,7 +173,7 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
             endpointDiff.addChild(metadataDiff);
             endpointDiff.addChild(parameterDiff);
             endpointDiff.addChild(responseDiff);
-            endpointDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointDiff.getChildren()));
+            DifferenceAggregation.calculateAndSetFinalDifferenceValueForEndpoint(endpointDiff);
         }
 
         return endpointDiff;

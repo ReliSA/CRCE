@@ -190,7 +190,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             endpointsDiff.addChild(diff);
         }
 
-        endpointsDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointsDiff.getChildren()));
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(endpointsDiff);
     }
 
     /**
@@ -320,7 +320,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         endpointDiff.addChild(metadataDiff);
         endpointDiff.addChild(parameterDiff);
         endpointDiff.addChild(responseDiff);
-        endpointDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(endpointDiff.getChildren()));
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueForEndpoint(endpointDiff);
 
         return endpointDiff;
     }

@@ -109,7 +109,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         // compare optional attributes
         compareOptionalParameter(param1, param2, parameterDiff);
 
-        parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(parameterDiff);
     }
 
     protected void compareOptionalParameter(Property param1, Property param2, Diff parameterDiff) {

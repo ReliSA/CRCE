@@ -110,6 +110,41 @@ public class WsdlCompatibilityCheckerTest {
     }
 
     /**
+     * Two APIs differs in endpoint parameters (SPE diff) and
+     * final result should be GEN.
+     */
+    @Test
+    public void testCompare_GENContravariant() {
+        Resource api1 = createWS3(),
+                api2 = createWS3_GENParam();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.SPE, result.getDiffValue());
+    }
+
+    /**
+     * Same as testCompare_GENContravariant but APIs are switched.
+     */
+    @Test
+    public void testCompare_SPEContravariant() {
+        Resource api1 = createWS3_GENParam(),
+                api2 = createWS3();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.GEN, result.getDiffValue());
+    }
+
+    /**
      * Creates WS based on STAG's ciselniky WS.
      * @return
      */
@@ -253,6 +288,40 @@ public class WsdlCompatibilityCheckerTest {
         Capability e2 = TestUtil.createEndpointCapability("getSeznamPracovist", "https://stag-ws.zcu.cz/ws/services/soap/ciselniky", ws1);
         TestUtil.addEndpointParameter(e2, "parameters", "tns:getSeznamPracovist", 1L, null, null);
         TestUtil.addEndpointResponse(e2, "tns:getSeznamPracovistResponse");
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(wsRoot);
+        return r;
+    }
+
+    private Resource createWS3() {
+        String wsId = "ws3";
+        Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
+        wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
+
+        // webservice capability containing the endpoints
+        Capability ws1 = TestUtil.createWebServiceCapability("ws1", "WebService3", "rpc/messaging", wsRoot);
+
+        Capability e1 = TestUtil.createEndpointCapability("getEndpoint", "https://host.cz/ws/services/service3", ws1);
+        TestUtil.addEndpointParameter(e1, "parameters", "xsd:byte", 1L, null, null);
+        TestUtil.addEndpointResponse(e1, "tns:webServiceResponse");
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(wsRoot);
+        return r;
+    }
+
+    private Resource createWS3_GENParam() {
+        String wsId = "ws3";
+        Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
+        wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
+
+        // webservice capability containing the endpoints
+        Capability ws1 = TestUtil.createWebServiceCapability("ws1", "WebService3", "rpc/messaging", wsRoot);
+
+        Capability e1 = TestUtil.createEndpointCapability("getEndpoint", "https://host.cz/ws/services/service3", ws1);
+        TestUtil.addEndpointParameter(e1, "parameters", "xsd:long", 1L, null, null);
+        TestUtil.addEndpointResponse(e1, "tns:webServiceResponse");
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);

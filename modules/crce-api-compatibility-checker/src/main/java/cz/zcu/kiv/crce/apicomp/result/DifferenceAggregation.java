@@ -33,6 +33,20 @@ public class DifferenceAggregation {
         diff.setValue(d);
     }
 
+    /**
+     * Calculates diff value from child diffs sets it in endpointDiff.
+     * This method applies the principle of contravariance, that is if the
+     * final value evaluates to GEN, SPE will be set and vice-versa.
+     *
+     * @param endpointDiff Diff representing difference between two endpoints.
+     */
+    public static void calculateAndSetFinalDifferenceValueForEndpoint(Diff endpointDiff) {
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(endpointDiff);
+        if (endpointDiff.getValue().equals(Difference.GEN) || endpointDiff.getValue().equals(Difference.SPE)) {
+            endpointDiff.setValue(endpointDiff.getValue().flip());
+        }
+    }
+
     private int nonCounter;
     private int insCounter;
     private int delCounter;

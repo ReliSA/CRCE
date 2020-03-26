@@ -92,8 +92,9 @@ public class WadlJsonWspCompatibilityCheckerTest {
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
+        // result should be SPE because of contravariance
         assertNotNull("Null result returned!", res);
-        assertEquals("Wrong difference!", Difference.GEN, res.getDiffValue());
+        assertEquals("Wrong difference!", Difference.SPE, res.getDiffValue());
     }
 
     /**
@@ -108,8 +109,9 @@ public class WadlJsonWspCompatibilityCheckerTest {
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
+        // result should be GEN because of contravariance
         assertNotNull("Null result returned!", res);
-        assertEquals("Wrong difference!", Difference.SPE, res.getDiffValue());
+        assertEquals("Wrong difference!", Difference.GEN, res.getDiffValue());
     }
 
 

@@ -18,7 +18,6 @@ import java.util.Collections;
 import static org.junit.Assert.*;
 
 
-// todo: tests based on real data (examples are in test-data folder)
 public class RestApiCompatibilityCheckerTest {
 
     @Test
@@ -110,6 +109,29 @@ public class RestApiCompatibilityCheckerTest {
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
         assertEquals("APIs should not be same!", Difference.UNK, result.getDiffValue());
+    }
+
+    @Test
+    public void testCompareApis_GENContravariant() {
+        RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
+        Resource api1 = createMockApi3();
+        Resource api2 = createMockApi3_GENparam();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+        assertEquals("APIs should not be same!", Difference.SPE, result.getDiffValue());
+    }
+
+
+    @Test
+    public void testCompareApis_SPEContravariant() {
+        RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
+        Resource api1 = createMockApi3_GENparam();
+        Resource api2 = createMockApi3();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+        assertEquals("APIs should not be same!", Difference.GEN, result.getDiffValue());
     }
 
     /**
@@ -218,6 +240,56 @@ public class RestApiCompatibilityCheckerTest {
         endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH, Collections.singletonList("/object/test"));
         endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PRODUCES, Arrays.asList("application/xml", "application/json"));
         endpoint1.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_CONSUMES, Collections.emptyList());
+
+        // endpoint response
+        Property responseProperty = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE, "");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID, "org/kiv/zcu/server/App.testEndpoint0");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
+
+
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
+    }
+
+    private Resource createMockApi3() {
+        // root capability
+        Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
+
+        // endpoint
+        Capability endpoint1 = TestUtil.createEndpointFor(apiRoot, "org/kiv/zcu/server/App.testEndpoint",
+                Arrays.asList("POST", "GET"),
+                Collections.singletonList("/object/test"),
+                Arrays.asList("application/xml", "application/json"),
+                Collections.emptyList()
+        );
+
+        TestUtil.addEndpointParameter(endpoint1, "param1", "java/lang/Long", "params", 0L, "0", 0L);
+
+        // endpoint response
+        Property responseProperty = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE, "");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID, "org/kiv/zcu/server/App.testEndpoint0");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
+
+
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
+    }
+
+    private Resource createMockApi3_GENparam() {
+        // root capability
+        Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
+
+        // endpoint
+        Capability endpoint1 = TestUtil.createEndpointFor(apiRoot, "org/kiv/zcu/server/App.testEndpoint",
+                Arrays.asList("POST", "GET"),
+                Collections.singletonList("/object/test"),
+                Arrays.asList("application/xml", "application/json"),
+                Collections.emptyList()
+        );
+
+        TestUtil.addEndpointParameter(endpoint1, "param1", "java/lang/Number", "params", 0L, "0", 0L);
 
         // endpoint response
         Property responseProperty = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE, "");

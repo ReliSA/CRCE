@@ -134,7 +134,7 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
 
         // calculate final value for response diff
         if (otherResponse != null) {
-            d.setValue(DifferenceAggregation.calculateFinalDifferenceFor(d.getChildren()));
+            DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(d);
         } else {
             d.setValue(Difference.DEL);
         }
@@ -239,7 +239,7 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
         }
 
 
-        parameterDiff.setValue(DifferenceAggregation.calculateFinalDifferenceFor(parameterDiff.getChildren()));
+        DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(parameterDiff);
         return parameterDiff;
     }
 
