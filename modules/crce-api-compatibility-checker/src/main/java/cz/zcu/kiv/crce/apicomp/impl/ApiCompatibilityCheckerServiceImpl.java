@@ -38,7 +38,6 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
 
     private List<ApiCompatibilityChecker> availableCheckers;
 
-    // todo: find out why this doesn't work
     @ServiceDependency(required = false)
     private volatile CompatibilityDao compatibilityDao;
 
@@ -111,5 +110,10 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
                 }
             });
         }
+    }
+
+    @Override
+    public void removeCompatibility(Compatibility compatibility) {
+        compatibilityDao.deleteCompatibility(compatibility);
     }
 }

@@ -35,21 +35,17 @@ public class ApiCompResJersey implements ApiCompRes {
             logger.debug("Calling compatibility checker service.");
             ApiCompatibilityCheckerService compatibilityCheckerService = Activator.instance().getApiCompatibilityCheckerService();
 
-            Compatibility c = null;
-            if (force) {
-                logger.info("Force flag is set, skipping DB lookup.");
-            } else {
-                c = compatibilityCheckerService.findExistingCompatibility(api1, api2);
-            }
+            Compatibility c = compatibilityCheckerService.findExistingCompatibility(api1, api2);
 
             if (c == null) {
                 logger.debug("No existing compatibility found for resource pair {};{}. Calculating new.", api1.getId(), api2.getId());
-                c = compatibilityCheckerService.compareApis(api1, api2);
-
-                if (c != null) {
-                    logger.debug("Saving new compatibility data.");
-                    compatibilityCheckerService.saveCompatibility(c);
-                }
+                c = calculateNewCompatibility(compatibilityCheckerService, api1, api2);
+            } else if (force) {
+                logger.debug("Existing compatibility with id {} found, but force flag is set. Removing the old one and calculating new.", c.getId());
+                compatibilityCheckerService.removeCompatibility(c);
+                c = calculateNewCompatibility(compatibilityCheckerService, api1, api2);
+            } else {
+                logger.debug("Existing compatibility with id {} found and force flag is not set. Returning it.", c.getId());
             }
 
             logger.debug("Done.");
@@ -62,5 +58,16 @@ public class ApiCompResJersey implements ApiCompRes {
             logger.error("Unexpected error occurred.", ex);
             return Response.serverError().build();
         }
+    }
+
+    private Compatibility calculateNewCompatibility(ApiCompatibilityCheckerService compatibilityCheckerService, Resource api1, Resource api2) {
+        Compatibility c = compatibilityCheckerService.compareApis(api1, api2);
+
+        if (c != null) {
+            logger.debug("Saving new compatibility data.");
+            compatibilityCheckerService.saveCompatibility(c);
+        }
+
+        return c;
     }
 }

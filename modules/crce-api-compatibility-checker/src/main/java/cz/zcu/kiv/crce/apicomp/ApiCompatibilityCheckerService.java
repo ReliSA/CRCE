@@ -46,4 +46,10 @@ public interface ApiCompatibilityCheckerService {
      * @return Checker able to compare this resource.
      */
     ApiCompatibilityChecker pickChecker(Resource resource);
+
+    /**
+     * Removes given compatibility object from DB.
+     * @param compatibility
+     */
+    void removeCompatibility(Compatibility compatibility);
 }

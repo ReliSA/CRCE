@@ -23,6 +23,11 @@ import java.util.Map;
 public class CompatibilityCheckResult implements Compatibility {
 
     /**
+     * Database id.
+     */
+    private String id;
+
+    /**
      * @see Compatibility#getResourceName()
      */
     private String resourceName;
@@ -85,7 +90,11 @@ public class CompatibilityCheckResult implements Compatibility {
 
     @Override
     public String getId() {
-        return null;
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Nonnull
