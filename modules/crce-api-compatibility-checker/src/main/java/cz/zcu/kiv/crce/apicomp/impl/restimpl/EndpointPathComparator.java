@@ -66,13 +66,16 @@ public class EndpointPathComparator extends EndpointFeatureComparator {
                 String path1 = paths1.get(i),
                         path2 = paths2.get(j);
 
+                boolean raiseMovFlag = false;
                 if (ignoreApiVersion) {
+                    // if paths match without version but do not match with version, raise MOV flag
+                    raiseMovFlag = !path1.equals(path2);
                     path1 = detectAndRemoveApiVersion(path1);
                     path2 = detectAndRemoveApiVersion(path2);
                 }
 
                 if (path1.equals(path2)) {
-                    return Collections.singletonList(DiffUtils.createDiff(endpoint1Paths.getName(), DifferenceLevel.OPERATION, Difference.NON));
+                    return Collections.singletonList(DiffUtils.createDiff(endpoint1Paths.getName(), DifferenceLevel.OPERATION, Difference.NON, raiseMovFlag));
                 }
             }
         }

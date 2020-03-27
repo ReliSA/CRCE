@@ -5,6 +5,9 @@ import cz.zcu.kiv.crce.compatibility.impl.DefaultDiffImpl;
 
 /**
  * A diff that is capable of carrying additional MOV information.
+ *
+ * Note that you still need to set the MOV flag. The mere presence of this object
+ * in the result Diff does not imply API has been moved.
  */
 public class MovDiff extends DefaultDiffImpl {
 

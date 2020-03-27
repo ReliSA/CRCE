@@ -134,6 +134,20 @@ public class RestApiCompatibilityCheckerTest {
         assertEquals("APIs should not be same!", Difference.GEN, result.getDiffValue());
     }
 
+    @Test
+    public void testCompareApis_pathVersion() {
+        RestApiCompatibilityChecker checker = new RestApiCompatibilityChecker();
+        checker.setIgnoreVersionInPath(true);
+
+        Resource api1 = createMockApi3();
+        Resource api2 = createMockApi3_pathVersion();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+        assertEquals("APIs should be same!", Difference.NON, result.getDiffValue());
+        assertTrue("MOV flag should be set when path version is different!", result.isMov());
+    }
+
     /**
      * Creates mock metadata of API.
      *
@@ -290,6 +304,35 @@ public class RestApiCompatibilityCheckerTest {
         );
 
         TestUtil.addEndpointParameter(endpoint1, "param1", "java/lang/Number", "params", 0L, "0", 0L);
+
+        // endpoint response
+        Property responseProperty = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE, "");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_ID, "org/kiv/zcu/server/App.testEndpoint0");
+        responseProperty.setAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_RESPONSE_STATUS, 200L);
+
+
+        Resource api = new ResourceImpl("");
+        api.addRootCapability(apiRoot);
+        return api;
+    }
+
+    /**
+     * Same as MockApi3 but contains version in path to endpoint
+     * @return
+     */
+    private Resource createMockApi3_pathVersion() {
+        // root capability
+        Capability apiRoot = new CapabilityImpl(RestimplIndexerConstants.IDENTITY_CAPABILITY_NAMESPACE, "");
+
+        // endpoint
+        Capability endpoint1 = TestUtil.createEndpointFor(apiRoot, "org/kiv/zcu/server/App.testEndpoint",
+                Arrays.asList("POST", "GET"),
+                Collections.singletonList("/object/v1.1/test"),
+                Arrays.asList("application/xml", "application/json"),
+                Collections.emptyList()
+        );
+
+        TestUtil.addEndpointParameter(endpoint1, "param1", "java/lang/Long", "params", 0L, "0", 0L);
 
         // endpoint response
         Property responseProperty = new PropertyImpl(RestimplIndexerConstants.NS_RESTIMPL_RESPONSE, "");

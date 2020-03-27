@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
@@ -78,11 +79,13 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
         Iterator<Capability> endpoint1It = api1RootChildren.iterator();
         List<Capability> otherEndpoints = new ArrayList<>(api2Root.getChildren());
 
+        boolean isMov = false;
         while(endpoint1It.hasNext()) {
             Capability api1Endpoint = endpoint1It.next();
 
             // find endpoint from other api with same metadata
-            Diff endpointDiff = compareEndpoints(api1Endpoint, otherEndpoints);
+            MovDiff endpointDiff = compareEndpoints(api1Endpoint, otherEndpoints);
+            isMov |= endpointDiff.isMov();
             checkResult.getDiffDetails().add(endpointDiff);
 
             // endpoint processed, remove it
@@ -101,6 +104,9 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
         }
 
         checkResult.recalculateFinalDifference();
+        if (isMov) {
+            checkResult.setMoveFlag("mov");
+        }
 
         return checkResult;
     }
@@ -124,8 +130,8 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
      * @param otherEndpoints
      * @return
      */
-    private Diff compareEndpoints(Capability endpoint1, List<Capability> otherEndpoints) {
-        Diff endpointDiff = new DefaultDiffImpl();
+    private MovDiff compareEndpoints(Capability endpoint1, List<Capability> otherEndpoints) {
+        MovDiff endpointDiff = new MovDiff();
         endpointDiff.setLevel(DifferenceLevel.OPERATION);
         endpointDiff.setValue(Difference.NON);
         endpointDiff.setName(endpoint1.getAttributeStringValue(RestimplIndexerConstants.ATTR__RESTIMPL_ENDPOINT_PATH));
@@ -173,6 +179,7 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
             endpointDiff.addChild(metadataDiff);
             endpointDiff.addChild(parameterDiff);
             endpointDiff.addChild(responseDiff);
+            endpointDiff.setMov(metadataDiff.getChildren().stream().anyMatch(d -> (d instanceof MovDiff) && ((MovDiff)d).isMov()));
             DifferenceAggregation.calculateAndSetFinalDifferenceValueForEndpoint(endpointDiff);
         }
 
@@ -182,6 +189,8 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
     /**
      * Tries to find endpoint in otherEndpoints so that its metadata matches
      * the endpointMetadata. If the endpoint is found, it will be removed from otherEndpoints.
+     *
+     * If versionIgnoring is turned on, metadataDiffs may contain MovDiff with MOV flag raised.
      *
      * @param endpointMetadata Metadata of endpoint to be found in otherEndpoints.
      * @param otherEndpoints List of endpoint metadata to search.

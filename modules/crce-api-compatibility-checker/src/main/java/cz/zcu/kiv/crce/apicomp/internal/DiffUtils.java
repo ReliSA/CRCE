@@ -67,7 +67,7 @@ public class DiffUtils {
     public static Diff createDiff(String name, DifferenceLevel level, Difference value, boolean mov) {
         Diff d;
         if (mov) {
-            d = new MovDiff();
+            d = new MovDiff(true);
         } else {
             d = new DefaultDiffImpl();
         }
