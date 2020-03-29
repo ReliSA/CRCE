@@ -12,10 +12,11 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Contains logic for comparing apis described by either WADL or Json-WSP.
+ * Contains logic for comparing apis described by WADL.
  *
  * Possible final diffs:
  * NON - no difference between APIs.
@@ -28,7 +29,7 @@ import java.util.List;
  * UNK - Could not determine diff, could be because of uncomparable data types (endpoint parameters/responses)
  *       or communication patterns do not match.
  */
-public class WadlJsonWspCompatibilityChecker extends WebservicesCompatibilityChecker {
+public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
     @Override
     protected Capability getOneRootCapability(Resource resource) {
@@ -68,5 +69,13 @@ public class WadlJsonWspCompatibilityChecker extends WebservicesCompatibilityChe
     @Override
     protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
         return null;
+    }
+
+    @Override
+    protected List<AttributeType> getEndpointMetadataAttributeTypes() {
+        return Arrays.asList(
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
+                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
+        );
     }
 }

@@ -98,6 +98,16 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     protected abstract IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
 
     /**
+     * Returns a collections of attribute types describing endpoint's metadata
+     * that are to be compared for strict equality.
+     *
+     * Various API types may have different attribute sets for endpoint metadata.
+     *
+     * @return
+     */
+    protected abstract List<AttributeType> getEndpointMetadataAttributeTypes();
+
+    /**
      * Different WS may have different response formats and thus require different logic for comparing those.
      *
      * For these cases, implementing class should override this method and provide its own response comparator.
@@ -472,10 +482,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     private List<Diff> compareEndpointMetadataNoMOV(Capability api1Endpoint, Capability otherEndpoint) {
-        List<AttributeType> attributeTypes = Arrays.asList(
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
-        );
+        List<AttributeType> attributeTypes = getEndpointMetadataAttributeTypes();
 
         List<Diff> metadataDiffs = new ArrayList<>();
         for (AttributeType at : attributeTypes) {

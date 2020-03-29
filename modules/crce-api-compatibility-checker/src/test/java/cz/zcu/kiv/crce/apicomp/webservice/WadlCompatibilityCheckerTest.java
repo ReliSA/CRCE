@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.webservice.WadlJsonWspCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.WadlCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Difference;
@@ -14,7 +14,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class WadlJsonWspCompatibilityCheckerTest {
+public class WadlCompatibilityCheckerTest {
 
     /**
      * Compare same APIs.
@@ -24,7 +24,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1(),
                 api2 = createWS1();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
@@ -40,7 +40,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1(),
                 api2 = createWS2();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
@@ -56,7 +56,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1(),
                 api2 = createWS1_INS();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
@@ -72,7 +72,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1_INS(),
                 api2 = createWS1();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
@@ -88,7 +88,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1(),
                 api2 = createWS1_GEN();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
@@ -105,7 +105,7 @@ public class WadlJsonWspCompatibilityCheckerTest {
         Resource api1 = createWS1_GEN(),
                 api2 = createWS1();
 
-        ApiCompatibilityChecker compatibilityChecker = new WadlJsonWspCompatibilityChecker();
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
 
         CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
 
