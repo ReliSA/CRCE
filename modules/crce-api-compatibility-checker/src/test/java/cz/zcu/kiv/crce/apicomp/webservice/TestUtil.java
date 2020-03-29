@@ -4,8 +4,12 @@ import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.PropertyImpl;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
+
+import java.util.Collections;
 
 public class TestUtil {
 
@@ -64,5 +68,11 @@ public class TestUtil {
         }
 
         return endpointC;
+    }
+
+    public static void addIdentityCapabilityWithCategory(Resource r, String categoryName) {
+        Capability identity = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "identity");
+        identity.setAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES, Collections.singletonList(categoryName));
+        r.addRootCapability(identity);
     }
 }

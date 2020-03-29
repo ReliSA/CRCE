@@ -85,12 +85,10 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_differenceGEN() {
-        Resource api1 = createWS1(),
-                api2 = createWS1_GEN();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1(),
+                createWS1_GEN()
+        );
 
         // result should be SPE because of contravariance
         assertNotNull("Null result returned!", res);
@@ -102,16 +100,32 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_differenceSPE() {
-        Resource api1 = createWS1_GEN(),
-                api2 = createWS1();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1_GEN(),
+                createWS1()
+        );
 
         // result should be GEN because of contravariance
         assertNotNull("Null result returned!", res);
         assertEquals("Wrong difference!", Difference.GEN, res.getDiffValue());
+    }
+
+    @Test
+    public void testCompare_parameterOrder() {
+        CompatibilityCheckResult res = compareApis(
+                createWS1(),
+                createWS1_paramOrder()
+        );
+
+        // result should be GEN because of contravariance
+        assertNotNull("Null result returned!", res);
+        assertEquals("Wrong difference!", Difference.NON, res.getDiffValue());
+    }
+
+    private CompatibilityCheckResult compareApis(Resource api1, Resource api2) {
+        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
+
+        return compatibilityChecker.compareApis(api1, api2);
     }
 
 
@@ -136,7 +150,33 @@ public class WadlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl("ws1");
         r.addRootCapability(ws);
-        r.addRootCapability(new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "ws1-identity"));
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
+
+        return r;
+    }
+
+    /**
+     * WS1 but endpoint has different parameter order.
+     * @return
+     */
+    private Resource createWS1_paramOrder() {
+        Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
+
+        Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
+        TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "year", "xsd:int", null, null, null);
+
+
+        Capability e2 = TestUtil.createEndpointCapability("exportAll (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/export/all", ws);
+
+        Capability e3 = TestUtil.createEndpointCapability("record (GET)", "https://www.fueleconomy.gov/ws/rest//ftr", ws);
+        TestUtil.addEndpointParameter(e3, "app", "xs:string", null, null, null);
+
+        Resource r = new ResourceImpl("ws1");
+        r.addRootCapability(ws);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
 
         return r;
     }
@@ -167,7 +207,7 @@ public class WadlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(ws);
-        r.addRootCapability(new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "ws1-identity"));
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
 
         return r;
     }
@@ -194,7 +234,7 @@ public class WadlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(ws);
-        r.addRootCapability(new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "ws1-identity"));
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
 
         return r;
     }
@@ -222,7 +262,7 @@ public class WadlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl("ws2");
         r.addRootCapability(ws);
-        r.addRootCapability(new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "ws2-identity"));
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
 
         return r;
     }

@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.Capability;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,9 +22,21 @@ import java.util.List;
  */
 public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
 
+    public static final String CATEGORY = "json-wsp";
+
     @Override
     protected List<AttributeType> getEndpointMetadataAttributeTypes() {
         // only name is indexed for JSON-WSP endpoints
         return Collections.singletonList(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
+    }
+
+    @Override
+    protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        return new EndpointParameterComparator(endpoint1, endpoint2);
+    }
+
+    @Override
+    protected String getApiCategory() {
+        return CATEGORY;
     }
 }

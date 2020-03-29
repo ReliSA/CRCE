@@ -3,6 +3,7 @@ package cz.zcu.kiv.crce.apicomp.impl;
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
 import cz.zcu.kiv.crce.apicomp.impl.restimpl.RestApiCompatibilityChecker;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.JsonWspCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WadlCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WsdlCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
@@ -46,6 +47,7 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
         availableCheckers.add(new RestApiCompatibilityChecker());
         availableCheckers.add(new WadlCompatibilityChecker());
         availableCheckers.add(new WsdlCompatibilityChecker());
+        availableCheckers.add(new JsonWspCompatibilityChecker());
         logger.debug("New instance of {} created.", getClass().getSimpleName());
     }
 

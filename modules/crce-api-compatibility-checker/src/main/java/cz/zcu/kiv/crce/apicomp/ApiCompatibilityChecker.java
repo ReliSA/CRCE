@@ -1,7 +1,13 @@
 package cz.zcu.kiv.crce.apicomp;
 
+import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.metadata.Attribute;
+import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
+import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
+
+import java.util.List;
 
 /**
  * Interface for compatibility checkers.
@@ -24,8 +30,40 @@ public abstract class ApiCompatibilityChecker {
      * @return True if the given API is supported.
      */
     public boolean isApiSupported(Resource resource) {
-        return resource != null &&
+        // resource is not null and capability with API metadata exists
+        boolean apiCapability = resource != null &&
                 !resource.getRootCapabilities(getRootCapabilityNamespace()).isEmpty();
+
+        // check also category in the identity capability if necessary
+        String expectedCategory = getApiCategory();
+        if (expectedCategory != null) {
+            Capability identity = resource.getRootCapabilities(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY).get(0);
+            Attribute<List<String>> categoryAttr = identity.getAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES);
+            boolean categoryOk = false;
+            if (categoryAttr != null) {
+                for (String category : categoryAttr.getValue()) {
+                    categoryOk |= expectedCategory.equals(category);
+                    if (categoryOk) {
+                        break;
+                    }
+                }
+            }
+            return apiCapability && categoryOk;
+        } else {
+            // mime type ignored
+            return apiCapability;
+        }
+    }
+
+    /**
+     * Returns the category of supported API. This is compared to the value in identity capability.
+     *
+     * Ignored if null.
+     *
+     * @return
+     */
+    protected String getApiCategory() {
+        return null;
     };
 
     /**

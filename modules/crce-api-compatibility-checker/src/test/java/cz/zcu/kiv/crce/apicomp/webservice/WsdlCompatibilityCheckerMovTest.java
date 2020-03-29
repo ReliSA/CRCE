@@ -51,6 +51,7 @@ public class WsdlCompatibilityCheckerMovTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -72,6 +73,7 @@ public class WsdlCompatibilityCheckerMovTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 

@@ -19,13 +19,24 @@ import java.util.List;
 /**
  * Class used to compare parameters of two endpoints.
  *
- * New instance should be created for every comparison.
+ * Note: Instance of this object is not reusable and
+ * new instance should be thus created for every comparison.
  *
  */
 public class EndpointParameterComparator extends EndpointFeatureComparator {
 
-    public EndpointParameterComparator(Capability endpoint1, Capability endpoint2) {
+    /**
+     * Attribute used to determine whether two endpoint parameters are comparable.
+     */
+    private AttributeType comparableAttributeType;
+
+    public EndpointParameterComparator(Capability endpoint1, Capability endpoint2, AttributeType comparableAttributeType) {
         super(endpoint1, endpoint2);
+        this.comparableAttributeType = comparableAttributeType;
+    }
+
+    public EndpointParameterComparator(Capability endpoint1, Capability endpoint2) {
+        this(endpoint1, endpoint2, WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__ORDER);
     }
 
     @Override
@@ -43,11 +54,17 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         List<Diff> diffs = new ArrayList<>();
 
         Iterator<Property> p1i = endpoint1Features.iterator();
-        Iterator<Property> p2i = endpoint2Features.iterator();
-        while(p1i.hasNext() && p2i.hasNext()) {
-            compareParameters(p1i.next(), p2i.next(), diffs);
-            p1i.remove();
-            p2i.remove();
+
+        while(p1i.hasNext() && !endpoint2Features.isEmpty()) {
+
+            // pick
+            Property param1 = p1i.next();
+            Property param2 = pullComparableParameter(param1, endpoint2Features);
+
+            if (param2 != null) {
+                compareParameters(param1, param2, diffs);
+                p1i.remove();
+            }
         }
 
         // add INS and DEL parameters to diff
@@ -59,6 +76,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
             ));
         }
 
+        Iterator<Property> p2i = endpoint2Features.iterator();
         while(p2i.hasNext()) {
             Property param = p2i.next();
             diffs.add(DiffUtils.createINSDiff(
@@ -68,6 +86,49 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         }
 
         return diffs;
+    }
+
+    /**
+     * Decides whether two parameters are comparable. This is usually done by comparing
+     * their name or order.
+     *
+     * Order attribute is used by default.
+     *
+     * @param param1
+     * @param param2
+     * @return True if the parameters are comparable.
+     */
+    private boolean areParametersComparable(Property param1, Property param2) {
+        Attribute a1 = param1.getAttribute(comparableAttributeType);
+        Attribute a2 = param2.getAttribute(comparableAttributeType);
+
+        return a1 != null && a1.equals(a2);
+    }
+
+    /**
+     * Goes through the otherParams and returns the first parameter
+     * for which {@link EndpointParameterComparator#areParametersComparable(Property, Property)}
+     * returns true.
+     *
+     * If a match is found, parameter is removed from otherParams.
+     *
+     * @param param1 Parameter from the first endpoint.
+     * @param otherParams Parameters of the second endpoint.
+     * @return Parameter from endpoint 2 that is comparable with param1 or null if no is found.
+     */
+    private Property pullComparableParameter(Property param1, List<Property> otherParams) {
+        Property param2 = null;
+        Iterator<Property> otherParamsIt = otherParams.iterator();
+        while (otherParamsIt.hasNext()) {
+            Property p2Tmp = otherParamsIt.next();
+            if (areParametersComparable(param1, p2Tmp)) {
+                param2 = p2Tmp;
+                otherParamsIt.remove();
+                break;
+            }
+        }
+
+        return param2;
     }
 
     /**

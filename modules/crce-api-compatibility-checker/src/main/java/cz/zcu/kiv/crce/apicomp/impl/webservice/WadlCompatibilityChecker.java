@@ -78,4 +78,15 @@ public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
                 WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
         );
     }
+
+    @Override
+    protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
+        // endpoint parameters in WADL have no order and name has to be used
+        return new EndpointParameterComparator(endpoint1, endpoint2, WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME);
+    }
+
+    @Override
+    protected String getApiCategory() {
+        return "wadl";
+    }
 }

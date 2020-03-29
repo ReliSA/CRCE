@@ -150,6 +150,7 @@ public class WsdlCompatibilityCheckerTest {
      */
     private Resource createWS1() {
         String wsId = "ws1";
+
         Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
         wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
 
@@ -166,6 +167,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -207,6 +209,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -237,6 +240,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -262,6 +266,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -291,6 +296,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -308,6 +314,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 
@@ -325,6 +332,7 @@ public class WsdlCompatibilityCheckerTest {
 
         Resource r = new ResourceImpl(wsId);
         r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
         return r;
     }
 }

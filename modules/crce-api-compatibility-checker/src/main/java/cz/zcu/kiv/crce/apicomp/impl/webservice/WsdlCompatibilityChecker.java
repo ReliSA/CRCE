@@ -131,6 +131,11 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         );
     }
 
+    @Override
+    protected String getApiCategory() {
+        return "wsdl";
+    }
+
     /**
      * Compares web services. Comparable WSs are chosen based on their type and name.
      *
