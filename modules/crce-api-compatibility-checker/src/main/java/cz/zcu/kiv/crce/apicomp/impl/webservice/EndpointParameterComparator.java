@@ -117,6 +117,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
      * @return Parameter from endpoint 2 that is comparable with param1 or null if no is found.
      */
     private Property pullComparableParameter(Property param1, List<Property> otherParams) {
+        logger.trace("Pulling comparable parameter for {}.", param1);
         Property param2 = null;
         Iterator<Property> otherParamsIt = otherParams.iterator();
         while (otherParamsIt.hasNext()) {
@@ -124,6 +125,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
             if (areParametersComparable(param1, p2Tmp)) {
                 param2 = p2Tmp;
                 otherParamsIt.remove();
+                logger.trace("Comparable parameter found: {}.", param2);
                 break;
             }
         }
@@ -147,6 +149,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
      * @param diffs
      */
     private void compareParameters(Property param1, Property param2, List<Diff> diffs) {
+        logger.trace("Comparing parameters: {}; {}.", param1, param2);
         Diff parameterDiff = new DefaultDiffImpl();
         parameterDiff.setName(param1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT_PARAMETER__NAME));
         parameterDiff.setLevel(DifferenceLevel.FIELD);
@@ -171,6 +174,7 @@ public class EndpointParameterComparator extends EndpointFeatureComparator {
         compareOptionalParameter(param1, param2, parameterDiff);
 
         DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(parameterDiff);
+        logger.trace("Result: {}.", parameterDiff.getValue());
     }
 
     protected void compareOptionalParameter(Property param1, Property param2, Diff parameterDiff) {

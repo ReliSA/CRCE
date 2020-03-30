@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Base compatibility  checker for APIs indexed by crce-webservices-indexer.
@@ -174,6 +175,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      * @param movDetectionResult
      */
     protected void compareEndpointsFromRoot(Capability api1, Capability api2, Diff endpointsDiff, MovDetectionResult movDetectionResult) {
+        logger.debug("Comparing endpoints from root.");
         List<Capability> api1Endpoints = new ArrayList<>(api1.getChildren());
         Iterator<Capability> it1 = api1Endpoints.iterator();
         List<Capability> api2Endpoints = new ArrayList<>(api2.getChildren());
@@ -201,6 +203,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         }
 
         DifferenceAggregation.calculateAndSetFinalDifferenceValueFor(endpointsDiff);
+        logger.debug("Done: {}.", endpointsDiff.getValue());
     }
 
     /**
@@ -336,6 +339,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     private Capability pullMatchingEndpoint(Capability api1Endpoint, List<Capability> api2Endpoints, List<Diff> metadataDiffs, MovDetectionResult movDetectionResult) {
+        logger.debug("Pulling matching endpoint for {}.", api1Endpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME));
         Capability match = null;
         Iterator<Capability> otherEndpointsIt = api2Endpoints.iterator();
 
@@ -359,6 +363,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
                 match = otherE;
                 otherEndpointsIt.remove();
                 metadataDiffs.addAll(diffs);
+                logger.debug("Match found: {}.", match.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME));
                 break;
             }
         }
@@ -482,6 +487,10 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     }
 
     private List<Diff> compareEndpointMetadataNoMOV(Capability api1Endpoint, Capability otherEndpoint) {
+        logger.debug("Comparing metadata of endpoints '{}', '{}' without MOV.",
+                api1Endpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
+                otherEndpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME)
+        );
         List<AttributeType> attributeTypes = getEndpointMetadataAttributeTypes();
 
         List<Diff> metadataDiffs = new ArrayList<>();
@@ -496,6 +505,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             }
         }
 
+        logger.debug("Result: {}.", metadataDiffs.stream().map(Diff::getValue).collect(Collectors.toList()));
         return metadataDiffs;
     }
 

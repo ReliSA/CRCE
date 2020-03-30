@@ -7,6 +7,8 @@ import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Property;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.List;
  *
  */
 public abstract class EndpointFeatureComparator {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     List<Property> endpoint1Features = new ArrayList<>();
     List<Property> endpoint2Features = new ArrayList<>();
