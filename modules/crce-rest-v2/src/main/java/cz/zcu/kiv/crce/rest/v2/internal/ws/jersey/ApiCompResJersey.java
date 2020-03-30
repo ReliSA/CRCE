@@ -32,6 +32,16 @@ public class ApiCompResJersey implements ApiCompRes {
             Resource api1 = store.getResource(id1, true);
             Resource api2 = store.getResource(id2, true);
 
+            if (api1 == null) {
+                logger.warn("Resource with id {} not found.", id1);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            if (api2 == null) {
+                logger.warn("Resource with id {} not found.", id2);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
             logger.debug("Calling compatibility checker service.");
             ApiCompatibilityCheckerService compatibilityCheckerService = Activator.instance().getApiCompatibilityCheckerService();
 
