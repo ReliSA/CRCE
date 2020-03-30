@@ -26,6 +26,7 @@ ADD ./conf.default/* ${FELIX_PATH}/conf/
 
 # Felix framework configuration override
 COPY ./felix-configuration/config.properties ${FELIX_PATH}/conf/
+COPY ./felix-configuration/system.properties ${FELIX_PATH}/conf/
 
 # Set environmental variable for connection string to mongodb
 ENV mongo_connection mongodb://mongoserver:27017
