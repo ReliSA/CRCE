@@ -211,8 +211,7 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
      * @return Diff with details (one child diff for each parameter)
      */
     private Diff compareResponseParameters(List<Property> resp1Parameters, List<Property> resp2Parameters) {
-        Diff parameterDiff = new DefaultDiffImpl();
-        parameterDiff.setLevel(DifferenceLevel.FIELD);
+        Diff parameterDiff = DiffUtils.createDiff("parameters", DifferenceLevel.FIELD, Difference.NON);
 
         Iterator<Property> r1Pi = resp1Parameters.iterator();
         Iterator<Property> r2Pi = resp2Parameters.iterator();
@@ -255,8 +254,6 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
      * @return Either NON, SPEC/GEN or UNK diff.
      */
     private Diff compareTwoResponseParameters(Property parameter1, Property parameter2) {
-        Diff paramDiff = new DefaultDiffImpl();
-        paramDiff.setLevel(DifferenceLevel.FIELD);
 
         Attribute p1Name = parameter1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
         Attribute p2Name = parameter2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_NAME);
@@ -266,6 +263,11 @@ public class EndpointResponseComparator extends EndpointFeatureComparator {
 
         Attribute p1IsArray = parameter1.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
         Attribute p2IsArray = parameter2.getAttribute(RestimplIndexerConstants.ATTR__RESTIMPL_ARRAY);
+
+        Diff paramDiff = new DefaultDiffImpl();
+        paramDiff.setLevel(DifferenceLevel.FIELD);
+        paramDiff.setValue(Difference.NON);
+        paramDiff.setName(p1Name != null ? p1Name.getStringValue() : "");
 
         if (p1Name != null && p1Name.equals(p2Name)
                 && p1Category != null && p1Category.equals(p2Category)

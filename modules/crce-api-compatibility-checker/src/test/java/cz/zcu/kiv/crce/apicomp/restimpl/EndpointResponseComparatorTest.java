@@ -55,6 +55,18 @@ public class EndpointResponseComparatorTest {
     }
 
     /**
+     * Regression test for #32
+     */
+    @Test
+    public void testCompareParameterlessResponses() {
+        Capability e1 = createEndpoint4();
+        Capability e2 = createEndpoint4();
+
+        Difference res = compareTwoEndpoints(e1, e2);
+        assertEquals("Wrong diff!", Difference.NON, res);
+    }
+
+    /**
      * Wrapper for comparing two response which just returns the result difference.
      *
      * @return
