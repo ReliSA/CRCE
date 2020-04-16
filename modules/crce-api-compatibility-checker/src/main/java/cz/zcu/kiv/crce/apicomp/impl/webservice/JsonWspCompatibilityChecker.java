@@ -1,8 +1,13 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
+import cz.zcu.kiv.crce.apicomp.impl.mov.JsonWspWadlMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.mov.JsonWspEndpointMetadataMovComparator;
 import cz.zcu.kiv.crce.metadata.Capability;
+
+import java.net.MalformedURLException;
 
 /**
  * Contains logic for comparing apis described by Json-WSP.
@@ -45,6 +50,11 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
     @Override
     protected EndpointFeatureComparator getEndpointMetadataComparator(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
         return new JsonWspEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult, api1Url, api2Url);
+    }
+
+    @Override
+    protected AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+        return new JsonWspWadlMovDetector(ApiDescription.fromJsonWsp(root1), ApiDescription.fromJsonWsp(root2));
     }
 
     @Override

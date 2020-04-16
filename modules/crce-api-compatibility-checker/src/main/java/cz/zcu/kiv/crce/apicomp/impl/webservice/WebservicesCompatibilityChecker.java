@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.mov.WsEndpointMetadataMovComparator;
@@ -107,7 +107,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * @return MOV detector to be used. If null, no MOV detection will be performed.
      */
-    protected abstract IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
+    protected abstract AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
 
     /**
      * Returns a comparator capable of comparing metadata of two endpoints.
@@ -153,7 +153,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         logger.debug("Detecting MOV flag");
         MovDetectionResult movDetectionResult;
         try {
-            IMovDetector movDetector = getMovDetector(root1, root2);
+            AbstractMovDetector movDetector = getMovDetector(root1, root2);
 
             if (movDetector == null) {
                 logger.debug("No MOV detector provided, skipping MOV detection.");

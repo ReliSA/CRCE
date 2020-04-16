@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
-import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
+import cz.zcu.kiv.crce.apicomp.impl.mov.JsonWspWadlMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
@@ -66,8 +68,8 @@ public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
     }
 
     @Override
-    protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
-        return null;
+    protected AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+        return new JsonWspWadlMovDetector(ApiDescription.fromWadl(root1), ApiDescription.fromWadl(root2));
     }
 
     @Override

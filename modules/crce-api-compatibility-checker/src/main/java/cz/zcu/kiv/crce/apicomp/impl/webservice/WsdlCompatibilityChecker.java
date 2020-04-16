@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
-import cz.zcu.kiv.crce.apicomp.impl.mov.IMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.mov.WsdlMovDetector;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
@@ -118,7 +118,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
     }
 
     @Override
-    protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+    protected AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
         return new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
     }
 
