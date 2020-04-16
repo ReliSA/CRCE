@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.mov.JsonWspEndpointMetadataMovComparator;
 import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
 
@@ -33,6 +35,11 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
     @Override
     protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
         return new EndpointParameterComparator(endpoint1, endpoint2);
+    }
+
+    @Override
+    protected EndpointFeatureComparator getEndpointMetadataComparator(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
+        return new JsonWspEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult);
     }
 
     @Override

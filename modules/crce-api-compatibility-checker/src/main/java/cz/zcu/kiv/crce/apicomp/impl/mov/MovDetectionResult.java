@@ -1,5 +1,8 @@
 package cz.zcu.kiv.crce.apicomp.impl.mov;
 
+/**
+ * Immutable object that holds info about differences in urls to endpoints between two APIs.
+ */
 public class MovDetectionResult {
 
     /**

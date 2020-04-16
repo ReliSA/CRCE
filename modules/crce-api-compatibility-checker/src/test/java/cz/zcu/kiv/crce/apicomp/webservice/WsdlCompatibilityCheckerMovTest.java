@@ -33,6 +33,21 @@ public class WsdlCompatibilityCheckerMovTest {
         assertTrue("MOV flag should be set!", result.isMov());
     }
 
+    @Test
+    public void testCompareApis_Path() {
+        Resource api1 = createWS1(),
+                api2 = createWS1_changePath();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
+        assertTrue("MOV flag should be set!", result.isMov());
+    }
+
     /**
      * Creates WS based on STAG's ciselniky WS.
      * @return
@@ -68,6 +83,27 @@ public class WsdlCompatibilityCheckerMovTest {
         Capability ws1 = TestUtil.createWebServiceCapability("ws1", "CiselnikyServiceImplService", "rpc/messaging", wsRoot);
 
         Capability e1 = TestUtil.createEndpointCapability("getSeznamDomen", "https://another-host.zcu.cz/ws/services/soap/ciselniky", ws1);
+        TestUtil.addEndpointParameter(e1, "parameters", "tns:getSeznamDomen", 1L, null, null);
+        TestUtil.addEndpointResponse(e1, "tns:getSeznamDomenResponse");
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
+        return r;
+    }
+
+    /**
+     * Same as WS1 but the path to endpoint is different
+     */
+    private Resource createWS1_changePath() {
+        String wsId = "ws1";
+        Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
+        wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
+
+        // webservice capability containing the endpoints
+        Capability ws1 = TestUtil.createWebServiceCapability("ws1", "CiselnikyServiceImplService", "rpc/messaging", wsRoot);
+
+        Capability e1 = TestUtil.createEndpointCapability("getSeznamDomen", "https://stag-ws.zcu.cz/ws/services-changed/soap-moved/ciselniky", ws1);
         TestUtil.addEndpointParameter(e1, "parameters", "tns:getSeznamDomen", 1L, null, null);
         TestUtil.addEndpointResponse(e1, "tns:getSeznamDomenResponse");
 

@@ -23,18 +23,32 @@ public abstract class EndpointFeatureComparator {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected Capability endpoint1, endpoint2;
+
     List<Property> endpoint1Features = new ArrayList<>();
     List<Property> endpoint2Features = new ArrayList<>();
 
     public EndpointFeatureComparator(Capability endpoint1, Capability endpoint2) {
-        endpoint1Features.addAll(endpoint1.getProperties(getFeatureNamespace()));
-        endpoint2Features.addAll(endpoint2.getProperties(getFeatureNamespace()));
+        this.endpoint1 = endpoint1;
+        this.endpoint2 = endpoint2;
+
+        initFeatures();
+    }
+
+    protected void initFeatures() {
+        String featureNamespace = getFeatureNamespace();
+        if (featureNamespace == null) {
+            return;
+        }
+
+        endpoint1Features.addAll(endpoint1.getProperties(featureNamespace));
+        endpoint2Features.addAll(endpoint2.getProperties(featureNamespace));
     }
 
     /**
      * Namespace used to get capability properties representing feature to compare.
      *
-     * @return
+     * @return Namespace or null if no features are to be initialized.
      */
     protected abstract String getFeatureNamespace();
 
