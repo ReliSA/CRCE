@@ -113,8 +113,6 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
         if (movDetectionResult.isPossibleMOV()) {
             checkResult.setMoveFlag("");
         }
-
-        return;
     }
 
     @Override

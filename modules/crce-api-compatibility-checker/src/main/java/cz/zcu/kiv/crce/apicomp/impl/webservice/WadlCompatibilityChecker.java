@@ -65,6 +65,9 @@ public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
         Diff endpointsDiff = DiffUtils.createDiff("endpoints", DifferenceLevel.PACKAGE, Difference.NON);
         compareEndpointsFromRoot(root1, root2, endpointsDiff, movDetectionResult);
         checkResult.getDiffDetails().add(endpointsDiff);
+        if (movDetectionResult.isPossibleMOV()) {
+            checkResult.setMoveFlag("");
+        }
     }
 
     @Override

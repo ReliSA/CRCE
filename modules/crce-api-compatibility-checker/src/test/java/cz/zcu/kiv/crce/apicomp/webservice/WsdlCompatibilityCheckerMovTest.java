@@ -20,12 +20,10 @@ public class WsdlCompatibilityCheckerMovTest {
 
     @Test
     public void testCompareApis_Host() {
-        Resource api1 = createWS1(),
-                api2 = createWS1_changeHost();
-
-        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
-
-        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+        CompatibilityCheckResult result = compareApis(
+                createWS1(),
+                createWS1_changeHost()
+        );
 
 
         assertNotNull("Null compatibility returned!", result);
@@ -35,17 +33,37 @@ public class WsdlCompatibilityCheckerMovTest {
 
     @Test
     public void testCompareApis_Path() {
-        Resource api1 = createWS1(),
-                api2 = createWS1_changePath();
-
-        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
-
-        CompatibilityCheckResult result = checker.compareApis(api1, api2);
-
+        CompatibilityCheckResult result = compareApis(
+                createWS1(),
+                createWS1_changePath()
+        );
 
         assertNotNull("Null compatibility returned!", result);
         assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
         assertTrue("MOV flag should be set!", result.isMov());
+    }
+
+    @Test
+    public void testCompareApis_HostPath() {
+        CompatibilityCheckResult result = compareApis(
+                createWS1(),
+                createWS1_changeHostPath()
+        );
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
+        assertTrue("MOV flag should be set!", result.isMov());
+    }
+
+    /**
+     * Creates compatibility checker and compares two APIs.
+     * @param api1
+     * @param api2
+     * @return
+     */
+    private CompatibilityCheckResult compareApis(Resource api1, Resource api2) {
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+        return checker.compareApis(api1, api2);
     }
 
     /**
@@ -104,6 +122,29 @@ public class WsdlCompatibilityCheckerMovTest {
         Capability ws1 = TestUtil.createWebServiceCapability("ws1", "CiselnikyServiceImplService", "rpc/messaging", wsRoot);
 
         Capability e1 = TestUtil.createEndpointCapability("getSeznamDomen", "https://stag-ws.zcu.cz/ws/services-changed/soap-moved/ciselniky", ws1);
+        TestUtil.addEndpointParameter(e1, "parameters", "tns:getSeznamDomen", 1L, null, null);
+        TestUtil.addEndpointResponse(e1, "tns:getSeznamDomenResponse");
+
+        Resource r = new ResourceImpl(wsId);
+        r.addRootCapability(wsRoot);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wsdl");
+        return r;
+    }
+
+
+    /**
+     * Same as WS1 but the host and path are diffrent.
+     * @return
+     */
+    private Resource createWS1_changeHostPath() {
+        String wsId = "ws1";
+        Capability wsRoot = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_IDENTITY, wsId);
+        wsRoot.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_IDENTITY__IDL_VERSION, "1.1");
+
+        // webservice capability containing the endpoints
+        Capability ws1 = TestUtil.createWebServiceCapability("ws1", "CiselnikyServiceImplService", "rpc/messaging", wsRoot);
+
+        Capability e1 = TestUtil.createEndpointCapability("getSeznamDomen", "https://another-host.zcu.cz/ws/services-changed/soap-moved/ciselniky", ws1);
         TestUtil.addEndpointParameter(e1, "parameters", "tns:getSeznamDomen", 1L, null, null);
         TestUtil.addEndpointResponse(e1, "tns:getSeznamDomenResponse");
 
