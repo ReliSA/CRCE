@@ -61,7 +61,7 @@ public class ApiDescription extends HashMap<String, Map<String, List<String>>> {
         ApiDescription description = new ApiDescription();
 
         // Json-WSP has url in its root
-        String urlStr = jsonWspApiRoot.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+        String urlStr = jsonWspApiRoot.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI);
         URL url = new URL(urlStr);
         String hostPart = url.getHost();
         String pathPart = url.getPath();

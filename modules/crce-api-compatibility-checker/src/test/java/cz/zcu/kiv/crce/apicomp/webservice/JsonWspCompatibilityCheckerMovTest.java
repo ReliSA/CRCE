@@ -72,7 +72,7 @@ public class JsonWspCompatibilityCheckerMovTest {
     private Resource createApi1() {
         Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
-        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL, "http://testladon.org:80/proxy.php?path=UserService/jsonwsp");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI, "http://testladon.org:80/proxy.php?path=UserService/jsonwsp");
 
         Capability e1 = TestUtil.createEndpointCapability("listUsers", null, ws);
         TestUtil.addEndpointParameter(e1, "name_filter", "string", 1L, 0L, 0L);
@@ -91,7 +91,7 @@ public class JsonWspCompatibilityCheckerMovTest {
     private Resource createApi1_changeHost() {
         Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
-        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL, "http://some-other-test.com/proxy.php?path=UserService/jsonwsp");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI, "http://some-other-test.com/proxy.php?path=UserService/jsonwsp");
 
         Capability e1 = TestUtil.createEndpointCapability("listUsers", null, ws);
         TestUtil.addEndpointParameter(e1, "name_filter", "string", 1L, 0L, 0L);
@@ -109,7 +109,7 @@ public class JsonWspCompatibilityCheckerMovTest {
     private Resource createApi1_changePath() {
         Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
-        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL, "http://testladon.org:80/path/to/jsonwsp");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI, "http://testladon.org:80/path/to/jsonwsp");
 
         Capability e1 = TestUtil.createEndpointCapability("listUsers", null, ws);
         TestUtil.addEndpointParameter(e1, "name_filter", "string", 1L, 0L, 0L);
@@ -129,7 +129,7 @@ public class JsonWspCompatibilityCheckerMovTest {
     private Resource createApi1_changeHostPath() {
         Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
         ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
-        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL, "http://some-other-test.com/path/to/jsonwsp");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI, "http://some-other-test.com/path/to/jsonwsp");
 
         Capability e1 = TestUtil.createEndpointCapability("listUsers", null, ws);
         TestUtil.addEndpointParameter(e1, "name_filter", "string", 1L, 0L, 0L);

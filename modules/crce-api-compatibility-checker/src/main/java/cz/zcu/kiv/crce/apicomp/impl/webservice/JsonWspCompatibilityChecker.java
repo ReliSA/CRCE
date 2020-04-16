@@ -39,8 +39,8 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
 
     @Override
     protected void extractAdditionalInfoFromRoots(Capability root1, Capability root2) {
-        api1Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
-        api2Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+        api1Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI);
+        api2Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__URI);
     }
     @Override
     protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
