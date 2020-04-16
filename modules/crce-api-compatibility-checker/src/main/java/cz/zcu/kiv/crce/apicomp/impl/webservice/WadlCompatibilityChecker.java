@@ -12,7 +12,6 @@ import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
 
 import java.net.MalformedURLException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -69,14 +68,6 @@ public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
     @Override
     protected IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
         return null;
-    }
-
-    @Override
-    protected List<AttributeType> getEndpointMetadataAttributeTypes() {
-        return Arrays.asList(
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME,
-                WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL
-        );
     }
 
     @Override

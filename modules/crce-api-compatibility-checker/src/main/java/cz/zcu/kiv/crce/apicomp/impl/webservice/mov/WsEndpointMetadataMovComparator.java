@@ -59,11 +59,7 @@ public class WsEndpointMetadataMovComparator extends EndpointFeatureComparator {
             metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME.getName(), DifferenceLevel.FIELD, Difference.NON));
 
             // urls are affected by the MOV flag
-            if (hasUrl()) {
-                metadataDiff.add(compareUrls());
-            } else {
-                logger.debug("Comparing endpoints without URL attribute.");
-            }
+            metadataDiff.add(compareUrls());
 
         } else {
             logger.trace("Name attributes are not equal.");
@@ -72,14 +68,6 @@ public class WsEndpointMetadataMovComparator extends EndpointFeatureComparator {
 
         logger.debug("Metadata compared.");
         return metadataDiff;
-    }
-
-    /**
-     * Returns true if the compared endpoints are supposed to have URL attribute.
-     * @return
-     */
-    protected boolean hasUrl() {
-        return true;
     }
 
     /**
@@ -93,8 +81,8 @@ public class WsEndpointMetadataMovComparator extends EndpointFeatureComparator {
                 DifferenceLevel.FIELD,
                 Difference.NON);
 
-        String e1Url = endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
-        String e2Url = endpoint2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+        String e1Url = getEndpoint1Url();
+        String e2Url = getEndpoint2Url();
 
         if (e1Url != null && e2Url != null) {
             try {
@@ -125,6 +113,14 @@ public class WsEndpointMetadataMovComparator extends EndpointFeatureComparator {
 
         logger.trace("Result: {}.", urlDiff.getValue());
         return urlDiff;
+    }
+
+    protected String getEndpoint2Url() {
+        return endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+    }
+
+    protected String getEndpoint1Url() {
+        return endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
     }
 
     /**

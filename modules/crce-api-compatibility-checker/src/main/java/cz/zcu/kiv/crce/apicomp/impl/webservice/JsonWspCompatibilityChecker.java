@@ -2,11 +2,7 @@ package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.mov.JsonWspEndpointMetadataMovComparator;
-import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.Capability;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Contains logic for comparing apis described by Json-WSP.
@@ -26,12 +22,21 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
 
     public static final String CATEGORY = "json-wsp";
 
-    @Override
-    protected List<AttributeType> getEndpointMetadataAttributeTypes() {
-        // only name is indexed for JSON-WSP endpoints
-        return Collections.singletonList(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
-    }
+    /**
+     * URL of the first API.
+     */
+    private String api1Url;
 
+    /**
+     * URL of the second API.
+     */
+    private String api2Url;
+
+    @Override
+    protected void extractAdditionalInfoFromRoots(Capability root1, Capability root2) {
+        api1Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+        api2Url = root1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+    }
     @Override
     protected EndpointFeatureComparator getEndpointParameterComparatorInstance(Capability endpoint1, Capability endpoint2) {
         return new EndpointParameterComparator(endpoint1, endpoint2);
@@ -39,7 +44,7 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
 
     @Override
     protected EndpointFeatureComparator getEndpointMetadataComparator(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
-        return new JsonWspEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult);
+        return new JsonWspEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult, api1Url, api2Url);
     }
 
     @Override

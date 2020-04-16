@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Base compatibility  checker for APIs indexed by crce-webservices-indexer.
@@ -60,10 +58,22 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             return checkResult;
         }
 
+        extractAdditionalInfoFromRoots(root1, root2);
+
         compare(checkResult, root1, root2);
         checkResult.recalculateFinalDifference();
 
         return checkResult;
+    }
+
+    /**
+     * Extract additional info from root capabilities before the comparison. What is extracted
+     * depends on the implementing method.
+     *
+     * @param root1 Root capability representing the first API.
+     * @param root2 Root capability representing the second API.
+     */
+    protected void extractAdditionalInfoFromRoots(Capability root1, Capability root2) {
     }
 
     /**
@@ -98,17 +108,6 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      * @return MOV detector to be used. If null, no MOV detection will be performed.
      */
     protected abstract IMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
-
-    /**
-     * Returns a collections of attribute types describing endpoint's metadata
-     * that are to be compared for strict equality.
-     *
-     * Various API types may have different attribute sets for endpoint metadata.
-     *
-     * @return
-     */
-    @Deprecated
-    protected abstract List<AttributeType> getEndpointMetadataAttributeTypes();
 
     /**
      * Returns a comparator capable of comparing metadata of two endpoints.
@@ -431,8 +430,6 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * So, one diff for type and one diff for url.
      *
-     * TODO: MOV endpoint URL and name contains all information regarding the MOV flag
-     *
      * @param api1Endpoint
      * @param otherEndpoint
      * @param movDetectionResult
@@ -441,81 +438,6 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
     private List<Diff> compareEndpointMetadata(Capability api1Endpoint, Capability otherEndpoint, MovDetectionResult movDetectionResult) {
         EndpointFeatureComparator metadataComparator = getEndpointMetadataComparator(api1Endpoint, otherEndpoint, movDetectionResult);
         return metadataComparator.compare();
-    }
-
-    /**
-     * Compares endpoint metadata with MOV flags. This method contains actual logic of using the MOV detection
-     * results in picking which endpoints to compare.
-     *
-     * @param api1Endpoint
-     * @param otherEndpoint
-     * @param movDetectionResult Mov detection result object with at least one diff flag set.
-     * @return
-     */
-    private List<Diff> compareEndpointMetadataMov(Capability api1Endpoint, Capability otherEndpoint, MovDetectionResult movDetectionResult) {
-        if (!movDetectionResult.isPossibleMOV()) {
-            // it is not possible to decide whether the API moved or not, so
-            // fall back to the noMov method which return either NON or UNK
-            return compareEndpointMetadataNoMOV(api1Endpoint, otherEndpoint);
-        } else {
-            // MOV flag possible
-            if (movDetectionResult.hostDiff && !movDetectionResult.pathDiff && !movDetectionResult.operationDiff) {
-                List<Diff> metadataDiff = new ArrayList<>();
-                // compare endpoint metadata without host part of url
-                // todo: something nicer, it could be a good idea to move to a separate class, e.g. EndpointMetadataMovComparator
-                Attribute a1Name = api1Endpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
-                Attribute a2Name = otherEndpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME);
-
-                if (a1Name != null && a1Name.equals(a2Name)) {
-                    metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME.getName(), DifferenceLevel.FIELD, Difference.NON));
-                    try {
-                        String a1Url = api1Endpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
-                        String a2Url = otherEndpoint.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
-
-                        URL url1 = new URL(a1Url);
-                        URL url2 = new URL(a2Url);
-
-                        metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL.getName(), DifferenceLevel.FIELD,
-                            url1.getPath().equals(url2.getPath()) ? Difference.NON : Difference.UNK
-                        ));
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL.getName(), DifferenceLevel.FIELD, Difference.UNK));
-                    }
-                } else {
-                    metadataDiff.add(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME.getName(), DifferenceLevel.FIELD, Difference.UNK));
-                }
-
-                return metadataDiff;
-            } else {
-                // todo: rest of the cases
-                return compareEndpointMetadataNoMOV(api1Endpoint, otherEndpoint);
-            }
-        }
-    }
-
-    private List<Diff> compareEndpointMetadataNoMOV(Capability api1Endpoint, Capability otherEndpoint) {
-        logger.debug("Comparing metadata of endpoints '{}', '{}' without MOV.",
-                api1Endpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME),
-                otherEndpoint.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__NAME)
-        );
-        List<AttributeType> attributeTypes = getEndpointMetadataAttributeTypes();
-
-        List<Diff> metadataDiffs = new ArrayList<>();
-        for (AttributeType at : attributeTypes) {
-            Attribute a1 = api1Endpoint.getAttribute(at);
-            Attribute a2 = otherEndpoint.getAttribute(at);
-
-            if (a1 != null && a1.equals(a2)) {
-                metadataDiffs.add(DiffUtils.createDiff(at.getName(), DifferenceLevel.FIELD, Difference.NON));
-            } else {
-                metadataDiffs.add(DiffUtils.createDiff(at.getName(), DifferenceLevel.FIELD, Difference.UNK));
-            }
-        }
-
-        logger.debug("Result: {}.", metadataDiffs.stream().map(Diff::getValue).collect(Collectors.toList()));
-        return metadataDiffs;
     }
 
     /**
