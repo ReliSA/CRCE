@@ -35,15 +35,14 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_different() {
-        Resource api1 = createWS1(),
-                api2 = createWS2();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1(),
+                createWS2()
+        );
 
         assertNotNull("Null result returned!", res);
         assertEquals("Wrong difference!", Difference.MUT, res.getDiffValue());
+        assertFalse("MOV flag should not be set!", res.movFlagSet());
     }
 
     /**
@@ -51,15 +50,14 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_differenceINS() {
-        Resource api1 = createWS1(),
-                api2 = createWS1_INS();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1(),
+                createWS1_INS()
+        );
 
         assertNotNull("Null result returned!", res);
         assertEquals("Wrong difference!", Difference.INS, res.getDiffValue());
+        assertFalse("MOV flag should not be set!", res.movFlagSet());
     }
 
     /**
@@ -67,15 +65,14 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_differenceDEL() {
-        Resource api1 = createWS1_INS(),
-                api2 = createWS1();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1_INS(),
+                createWS1()
+        );
 
         assertNotNull("Null result returned!", res);
         assertEquals("Wrong difference!", Difference.DEL, res.getDiffValue());
+        assertFalse("MOV flag should not be set!", res.movFlagSet());
     }
 
     /**
