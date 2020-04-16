@@ -27,6 +27,8 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    protected MovDetectionResult movDetectionResult;
+
     @Override
     public String getRootCapabilityNamespace() {
         return WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE;
@@ -58,10 +60,20 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
             return checkResult;
         }
 
+        Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
+        checkResult.getDiffDetails().add(communicationPatternDiff);
+        // communication pattern must be same
+        if (!communicationPatternDiff.getValue().equals(Difference.NON)) {
+            return checkResult;
+        }
+
         extractAdditionalInfoFromRoots(root1, root2);
+
+        movDetectionResult = detectMov(root1, root2);
 
         compare(checkResult, root1, root2);
         checkResult.recalculateFinalDifference();
+        checkResult.trySetMovIfSafeDiffrence(movDetectionResult, "");
 
         return checkResult;
     }

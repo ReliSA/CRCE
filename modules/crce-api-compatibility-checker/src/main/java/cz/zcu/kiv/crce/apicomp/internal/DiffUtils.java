@@ -23,6 +23,22 @@ public class DiffUtils {
             Difference.UNK
     );
 
+    public static final List<Difference> safeMovDifferences = Arrays.asList(
+            Difference.NON,
+            Difference.SPE,
+            Difference.GEN
+    );
+
+    /**
+     * Checks if the given difference value is compatible with MOV flag.
+     *
+     * @param diff
+     * @return
+     */
+    public static boolean isDiffSafeForMov(Difference diff) {
+        return safeMovDifferences.contains(diff);
+    }
+
     public static boolean isDangerous(Diff diff) {
         return dangerousDifferences.contains(diff.getValue());
     }

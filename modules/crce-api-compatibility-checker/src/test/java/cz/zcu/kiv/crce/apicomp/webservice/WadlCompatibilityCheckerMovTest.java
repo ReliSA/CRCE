@@ -56,6 +56,21 @@ public class WadlCompatibilityCheckerMovTest {
     }
 
     /**
+     * Two APIs with DEL difference and
+     */
+    @Test
+    public void testCompareApis_DELNoMov() {
+        CompatibilityCheckResult result = compareApis(
+                createApi1_INS(),
+                createApi1()
+        );
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.DEL, result.getDiffValue());
+        assertFalse("MOV flag should be set!", result.movFlagSet());
+    }
+
+    /**
      * Creates compatibility checker and compares two APIs.
      * @param api1
      * @param api2
@@ -138,6 +153,28 @@ public class WadlCompatibilityCheckerMovTest {
         TestUtil.addEndpointParameter(e1, "year", "xsd:int", null, null, null);
         TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
         TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
+
+        Resource r = new ResourceImpl("ws1");
+        r.addRootCapability(ws);
+        TestUtil.addIdentityCapabilityWithCategory(r, "wadl");
+
+        return r;
+    }
+
+    /**
+     * Api 1 with one additional endpoint with same operation name as the first one.
+     * @return
+     */
+    private Resource createApi1_INS() {
+        Capability ws = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__WEBSERVICESCHEMA_WEBSERVICE, "ws1");
+        ws.setAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE, "rest");
+
+        Capability e1 = TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/newemissions", ws);
+        TestUtil.addEndpointParameter(e1, "year", "xsd:int", null, null, null);
+        TestUtil.addEndpointParameter(e1, "state", "xs:string", null, null, null);
+        TestUtil.addEndpointParameter(e1, "id", "xs:string", null, null, null);
+
+        TestUtil.createEndpointCapability("getEmissionsInfo (GET)", "https://www.fueleconomy.gov/ws/rest//vehicle/oldemissions", ws);
 
         Resource r = new ResourceImpl("ws1");
         r.addRootCapability(ws);

@@ -70,20 +70,11 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
     @Override
     protected void compare(CompatibilityCheckResult checkResult, Capability root1, Capability root2) {
-        Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
-        checkResult.getDiffDetails().add(communicationPatternDiff);
-        // communication pattern must be same
-        if (!communicationPatternDiff.getValue().equals(Difference.NON)) {
-            return;
-        }
-
         // start comparing web services defined in WSDL
         // new lists are created so that it's safe to remove items
         List<Capability> api1WebServices = new ArrayList<>(root1.getChildren());
         Iterator<Capability> it1 = api1WebServices.iterator();
         List<Capability> api2WebServices = new ArrayList<>(root2.getChildren());
-
-        MovDetectionResult movDetectionResult = detectMov(root1, root2);
 
         // diff for collecting differences from all webservices this API may contain
         Diff webServicesDiff = DiffUtils.createDiff("webservices", DifferenceLevel.PACKAGE, Difference.NON);

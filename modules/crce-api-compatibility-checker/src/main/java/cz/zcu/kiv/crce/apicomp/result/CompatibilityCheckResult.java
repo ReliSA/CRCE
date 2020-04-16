@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.result;
 
+import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
+import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Contract;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -86,6 +88,22 @@ public class CompatibilityCheckResult implements Compatibility {
         // and in the context of comparing APIs, this version is irrelevant
         baseResourceVersion = Version.emptyVersion;
         resourceVersion = Version.emptyVersion;
+    }
+
+    /**
+     * Checks if this compatibility's difference level is compatible with MOV flag
+     * and if the MOV flag itself can be set and sets it.
+     *
+     * Using this method, the MOV flag is set only with difference levels that make sense (NON, SPE, GEN).
+     * Any other difference indicates bigger change in API and MOV can no longer be assumed.
+     *
+     * @param movDetectionResult Object carrying info about detected MOV.
+     * @param description Description ot be added to MOV flag.
+     */
+    public void trySetMovIfSafeDiffrence(MovDetectionResult movDetectionResult, String description) {
+        if (DiffUtils.isDiffSafeForMov(getDiffValue()) && movDetectionResult.isPossibleMOV()) {
+            setMoveFlag(description);
+        }
     }
 
     @Override

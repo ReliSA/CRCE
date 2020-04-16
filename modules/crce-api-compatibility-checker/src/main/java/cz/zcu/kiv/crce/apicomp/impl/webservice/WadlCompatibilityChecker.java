@@ -3,7 +3,6 @@ package cz.zcu.kiv.crce.apicomp.impl.webservice;
 import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
 import cz.zcu.kiv.crce.apicomp.impl.mov.ApiDescription;
 import cz.zcu.kiv.crce.apicomp.impl.mov.JsonWspWadlMovDetector;
-import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.compatibility.Diff;
@@ -52,22 +51,10 @@ public class WadlCompatibilityChecker extends WebservicesCompatibilityChecker {
 
         logger.info("Comparing WADL and/or Json-WSP APIs.");
 
-        Diff communicationPatternDiff = compareCommunicationPatterns(root1, root2);
-        checkResult.getDiffDetails().add(communicationPatternDiff);
-        // communication pattern must be same
-        if (!communicationPatternDiff.getValue().equals(Difference.NON)) {
-            return;
-        }
-
-        MovDetectionResult movDetectionResult = detectMov(root1, root2);
-
         // diff used to aggregate differences between all endpoints
         Diff endpointsDiff = DiffUtils.createDiff("endpoints", DifferenceLevel.PACKAGE, Difference.NON);
         compareEndpointsFromRoot(root1, root2, endpointsDiff, movDetectionResult);
         checkResult.getDiffDetails().add(endpointsDiff);
-        if (movDetectionResult.isPossibleMOV()) {
-            checkResult.setMoveFlag("");
-        }
     }
 
     @Override
