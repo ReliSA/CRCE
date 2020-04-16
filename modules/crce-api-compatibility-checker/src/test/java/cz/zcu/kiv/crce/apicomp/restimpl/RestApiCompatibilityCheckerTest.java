@@ -145,7 +145,7 @@ public class RestApiCompatibilityCheckerTest {
         CompatibilityCheckResult result = checker.compareApis(api1, api2);
 
         assertEquals("APIs should be same!", Difference.NON, result.getDiffValue());
-        assertTrue("MOV flag should be set when path version is different!", result.isMov());
+        assertTrue("MOV flag should be set when path version is different!", result.movFlagSet());
     }
 
     /**

@@ -28,7 +28,7 @@ public class WsdlCompatibilityCheckerMovTest {
 
         assertNotNull("Null compatibility returned!", result);
         assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
-        assertTrue("MOV flag should be set!", result.isMov());
+        assertTrue("MOV flag should be set!", result.movFlagSet());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class WsdlCompatibilityCheckerMovTest {
 
         assertNotNull("Null compatibility returned!", result);
         assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
-        assertTrue("MOV flag should be set!", result.isMov());
+        assertTrue("MOV flag should be set!", result.movFlagSet());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class WsdlCompatibilityCheckerMovTest {
 
         assertNotNull("Null compatibility returned!", result);
         assertEquals("Wrong difference!", Difference.NON, result.getDiffValue());
-        assertTrue("MOV flag should be set!", result.isMov());
+        assertTrue("MOV flag should be set!", result.movFlagSet());
     }
 
     /**

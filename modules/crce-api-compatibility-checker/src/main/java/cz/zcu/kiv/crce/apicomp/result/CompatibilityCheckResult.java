@@ -172,7 +172,7 @@ public class CompatibilityCheckResult implements Compatibility {
         additionalInfo.put(AdditionalInfoKeys.MOV_FLAG, description);
     }
 
-    public boolean isMov() {
+    public boolean movFlagSet() {
         return additionalInfo != null && additionalInfo.containsKey(AdditionalInfoKeys.MOV_FLAG);
     }
 }
