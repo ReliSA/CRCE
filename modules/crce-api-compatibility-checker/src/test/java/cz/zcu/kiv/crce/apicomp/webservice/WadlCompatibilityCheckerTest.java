@@ -11,8 +11,7 @@ import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class WadlCompatibilityCheckerTest {
 
@@ -21,15 +20,14 @@ public class WadlCompatibilityCheckerTest {
      */
     @Test
     public void testCompare_same() {
-        Resource api1 = createWS1(),
-                api2 = createWS1();
-
-        ApiCompatibilityChecker compatibilityChecker = new WadlCompatibilityChecker();
-
-        CompatibilityCheckResult res = compatibilityChecker.compareApis(api1, api2);
+        CompatibilityCheckResult res = compareApis(
+                createWS1(),
+                createWS1()
+        );
 
         assertNotNull("Null result returned!", res);
         assertEquals("Wrong difference!", Difference.NON, res.getDiffValue());
+        assertFalse("MOV flag should not be set!", res.movFlagSet());
     }
 
     /**

@@ -34,12 +34,14 @@ public class MovDetectionResult {
     /**
      * Returns true whether the result of MOV detection is possible MOV flag.
      *
-     * MOV is possible whenever there's no difference in operations.
+     * MOV is possible whenever there's no difference in operations and there is
+     * difference in host, path or both.
      *
      * @return
      */
     public boolean isPossibleMOV() {
-       return !operationDiff;
+       return !operationDiff &&
+               (hostDiff || pathDiff);
     }
 
     @Override
