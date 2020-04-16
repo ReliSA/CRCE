@@ -169,11 +169,10 @@ public class CompatibilityCheckResult implements Compatibility {
      * @param description Machine-readable description of why the MOV flag was set.
      */
     public void setMoveFlag(String description) {
-        // todo: key as interface
-        additionalInfo.put("MOV", description);
+        additionalInfo.put(AdditionalInfoKeys.MOV_FLAG, description);
     }
 
     public boolean isMov() {
-        return additionalInfo != null && additionalInfo.containsKey("MOV");
+        return additionalInfo != null && additionalInfo.containsKey(AdditionalInfoKeys.MOV_FLAG);
     }
 }
