@@ -4,7 +4,7 @@ import cz.zcu.kiv.crce.compatibility.Difference;
 
 public class XsdTypeComparator {
 
-    public static final String XSD_PREFIX = "xsd:";
+    public static final String XSD_PREFIX = "xs:";
 
     private static XsdDataType[] intLikeTypes;
 
