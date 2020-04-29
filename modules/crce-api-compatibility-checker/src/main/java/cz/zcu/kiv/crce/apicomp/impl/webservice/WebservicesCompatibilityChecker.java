@@ -291,6 +291,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
                         // dangerous endpoint found and MOV is set, add it to the results
                         // and keep comparing other endpoints
                         results.put(endpointDiff, matchingEndpoint);
+                        stopCond = DiffUtils.isDiffSafeForMov(endpointDiff.getValue());
                     } else {
                         // dangerous endpoint found but MOV is not set -> incompatibility
                         stopCond = true;

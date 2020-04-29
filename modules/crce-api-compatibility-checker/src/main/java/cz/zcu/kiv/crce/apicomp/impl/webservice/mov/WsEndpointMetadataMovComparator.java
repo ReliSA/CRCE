@@ -116,7 +116,7 @@ public class WsEndpointMetadataMovComparator extends EndpointFeatureComparator {
     }
 
     protected String getEndpoint2Url() {
-        return endpoint1.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
+        return endpoint2.getAttributeStringValue(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICE_ENDPOINT__URL);
     }
 
     protected String getEndpoint1Url() {
