@@ -1,0 +1,91 @@
+{
+	"info": {
+		"_postman_id": "bf4ce4c6-080f-4644-a841-efa03eff5bae",
+		"name": "CRCE-API tests",
+		"description": "Contains tests to be used with csv data files in Collection Runner.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Test copmare APIs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9b1279c0-5f73-4460-b6f2-2dda9161cbb1",
+						"exec": [
+							"pm.test(\"Test diff value\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.diffValue).to.eql(pm.variables.get(\"res-diff\"));",
+							"});",
+							"",
+							"pm.test(\"Test MOV flag\", function(){",
+							"    var jsonData = pm.response.json();",
+							"    if (pm.variables.get(\"mov-flag\") === 1) {",
+							"        pm.expect(jsonData.additionalInfo).to.have.any.keys(\"MOV\");",
+							"    } else {",
+							"        pm.expect(jsonData.additionalInfo).to.not.have.any.keys(\"MOV\");",
+							"    }",
+							"}) ;"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}/{{api_prefix}}/apicomp/compare?id1={{id1}}&id2={{id2}}&force=true",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"{{api_prefix}}",
+						"apicomp",
+						"compare"
+					],
+					"query": [
+						{
+							"key": "id1",
+							"value": "{{id1}}"
+						},
+						{
+							"key": "id2",
+							"value": "{{id2}}"
+						},
+						{
+							"key": "force",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "aa3b4e1b-0bc9-494d-8736-1f2d9695de76",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "17d8597b-ee59-475e-b917-d9c625e5f468",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
