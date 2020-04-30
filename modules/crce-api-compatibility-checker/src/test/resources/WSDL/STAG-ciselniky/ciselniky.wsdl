@@ -1,0 +1,655 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://stag-ws.zcu.cz/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  name="CiselnikyServiceImplService" targetNamespace="http://stag-ws.zcu.cz/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://stag-ws.zcu.cz/" elementFormDefault="unqualified" targetNamespace="http://stag-ws.zcu.cz/" version="1.0">
+
+  <xs:element name="casovaRada" type="tns:casovaRadaType"/>
+
+  <xs:element name="ciselnik" type="tns:ciselnikType"/>
+
+  <xs:element name="ciselnikNew" type="tns:ciselnikNewType"/>
+
+  <xs:element name="deletePracoviste" type="tns:deletePracoviste"/>
+
+  <xs:element name="deletePracovisteResponse" type="tns:deletePracovisteResponse"/>
+
+  <xs:element name="getCasovaRada" type="tns:getCasovaRada"/>
+
+  <xs:element name="getCasovaRadaResponse" type="tns:getCasovaRadaResponse"/>
+
+  <xs:element name="getCiselnik" type="tns:getCiselnik"/>
+
+  <xs:element name="getCiselnikNewDomains" type="tns:getCiselnikNewDomains"/>
+
+  <xs:element name="getCiselnikNewDomainsResponse" type="tns:getCiselnikNewDomainsResponse"/>
+
+  <xs:element name="getCiselnikNewItems" type="tns:getCiselnikNewItems"/>
+
+  <xs:element name="getCiselnikNewItemsResponse" type="tns:getCiselnikNewItemsResponse"/>
+
+  <xs:element name="getCiselnikResponse" type="tns:getCiselnikResponse"/>
+
+  <xs:element name="getHierarchiePracovist" type="tns:getHierarchiePracovist"/>
+
+  <xs:element name="getHierarchiePracovistResponse" type="tns:getHierarchiePracovistResponse"/>
+
+  <xs:element name="getSeznamDomen" type="tns:getSeznamDomen"/>
+
+  <xs:element name="getSeznamDomenResponse" type="tns:getSeznamDomenResponse"/>
+
+  <xs:element name="getSeznamPracovist" type="tns:getSeznamPracovist"/>
+
+  <xs:element name="getSeznamPracovistResponse" type="tns:getSeznamPracovistResponse"/>
+
+  <xs:element name="insertPracoviste" type="tns:insertPracoviste"/>
+
+  <xs:element name="insertPracovisteResponse" type="tns:insertPracovisteResponse"/>
+
+  <xs:element name="insertTitul" type="tns:insertTitul"/>
+
+  <xs:element name="insertTitulResponse" type="tns:insertTitulResponse"/>
+
+  <xs:element name="pracoviste" type="tns:pracovisteType"/>
+
+  <xs:element name="pracovisteForEdit" type="tns:pracovisteForEditType"/>
+
+  <xs:element name="pracovisteListBean" type="tns:pracovisteListType"/>
+
+  <xs:element name="stringList" type="tns:stringListType"/>
+
+  <xs:element name="updatePracoviste" type="tns:updatePracoviste"/>
+
+  <xs:element name="updatePracovisteResponse" type="tns:updatePracovisteResponse"/>
+
+  <xs:element name="updateTitul" type="tns:updateTitul"/>
+
+  <xs:element name="updateTitulResponse" type="tns:updateTitulResponse"/>
+
+  <xs:element name="wsCiselnikItemForEdit" type="tns:wsCiselnikItemForEditType"/>
+
+  <xs:complexType name="getHierarchiePracovist">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getHierarchiePracovistResponse">
+    <xs:sequence>
+      <xs:element name="pracovisteList" type="tns:pracovisteListType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pracovisteListType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="pracoviste" nillable="true" type="tns:pracovisteType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pracovisteType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="level" type="xs:string"/>
+      <xs:element name="cisloPracoviste" type="xs:string"/>
+      <xs:element name="zkratka" type="xs:string"/>
+      <xs:element minOccurs="0" name="nazev" type="xs:string"/>
+      <xs:element minOccurs="0" name="anNazev" type="xs:string"/>
+      <xs:element minOccurs="0" name="nadrazenePracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="typPracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="typPracovisteTxt" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloPracovisteInterni" type="xs:string"/>
+      <xs:element minOccurs="0" name="identifikator" type="xs:string"/>
+      <xs:element minOccurs="0" name="platnostOd" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="platnostDo" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="typVedouciho" type="xs:string"/>
+      <xs:element minOccurs="0" name="typVedoucihoTxt" type="xs:string"/>
+      <xs:element minOccurs="0" name="vedouciUcitIdno" type="xs:long"/>
+      <xs:element minOccurs="0" name="vedouciJmeno" type="xs:string"/>
+      <xs:element minOccurs="0" name="vedouciPrijmeni" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="xmlDateType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="getCiselnik">
+    <xs:sequence>
+      <xs:element name="domena" type="xs:string"/>
+      <xs:element minOccurs="0" name="lang" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCiselnikResponse">
+    <xs:sequence>
+      <xs:element name="ciselnik" type="tns:ciselnikType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciselnikType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="ciselnikItem" nillable="true" type="tns:ciselnikItemType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciselnikItemType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="domena" type="xs:string"/>
+      <xs:element name="zkratka" type="xs:string"/>
+      <xs:element name="nazev" type="xs:string"/>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element minOccurs="0" name="poradi" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCasovaRada">
+    <xs:sequence>
+      <xs:element name="kod" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCasovaRadaResponse">
+    <xs:sequence>
+      <xs:element name="casovaRada" type="tns:casovaRadaType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="casovaRadaType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="casovaRadaItem" nillable="true" type="tns:casovaRadaItemType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="casovaRadaItemType">
+    <xs:sequence>
+      <xs:element name="hodina" type="xs:int"/>
+      <xs:element name="hodSkutOd" type="tns:xmlDateType"/>
+      <xs:element name="hodSkutDo" type="tns:xmlDateType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updatePracoviste">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="stagUser" nillable="true" type="xs:string"/>
+      <xs:element name="pracoviste" type="tns:pracovisteForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pracovisteForEditType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cisloPracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloPracovisteInterni" type="xs:string"/>
+      <xs:element name="zkratka" type="xs:string"/>
+      <xs:element minOccurs="0" name="nazev" type="xs:string"/>
+      <xs:element minOccurs="0" name="nazev2Pad" type="xs:string"/>
+      <xs:element minOccurs="0" name="nazev3Pad" type="xs:string"/>
+      <xs:element minOccurs="0" name="anNazev" type="xs:string"/>
+      <xs:element minOccurs="0" name="nadrazenePracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="typPracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="platnostOd" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="platnostDo" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="typVedouciho" type="xs:string"/>
+      <xs:element minOccurs="0" name="vedouciUcitIdno" type="xs:long"/>
+      <xs:element minOccurs="0" name="url" type="xs:string"/>
+      <xs:element minOccurs="0" name="identifikator" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updatePracovisteResponse">
+    <xs:sequence>
+      <xs:element name="ciselnikItem" type="tns:pracovisteForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCiselnikNewDomains">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getCiselnikNewDomainsResponse">
+    <xs:sequence>
+      <xs:element name="ciselnikNewSeznamDomen" type="tns:stringListType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stringListType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertTitul">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="stagUser" nillable="true" type="xs:string"/>
+      <xs:element name="ciselnikItem" type="tns:wsCiselnikItemForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="wsCiselnikItemForEditType">
+    <xs:sequence>
+      <xs:element name="domena" type="xs:string"/>
+      <xs:element minOccurs="0" name="key" type="xs:string"/>
+      <xs:element name="valueCs" type="xs:string"/>
+      <xs:element minOccurs="0" name="zkratka" type="xs:string"/>
+      <xs:element minOccurs="0" name="valueEn" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertTitulResponse">
+    <xs:sequence>
+      <xs:element name="wsCiselnikItemForEdit" type="tns:wsCiselnikItemForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deletePracoviste">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="stagUser" nillable="true" type="xs:string"/>
+      <xs:element name="pracovisteForDelete" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deletePracovisteResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getSeznamPracovist">
+    <xs:sequence>
+      <xs:element name="zkratka" type="xs:string"/>
+      <xs:element minOccurs="0" name="nadrazenePracoviste" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="typPracoviste" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSeznamPracovistResponse">
+    <xs:sequence>
+      <xs:element name="pracovisteList" type="tns:pracovisteListType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getSeznamDomen">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getSeznamDomenResponse">
+    <xs:sequence>
+      <xs:element name="seznamDomen" type="tns:stringListType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateTitul">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="stagUser" nillable="true" type="xs:string"/>
+      <xs:element name="ciselnikItem" type="tns:wsCiselnikItemForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="updateTitulResponse">
+    <xs:sequence>
+      <xs:element name="wsCiselnikItemForEdit" type="tns:wsCiselnikItemForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCiselnikNewItems">
+    <xs:sequence>
+      <xs:element name="domena" type="xs:string"/>
+      <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="resultsStartAt" nillable="true" type="xs:int"/>
+      <xs:element minOccurs="0" name="resultsEndAt" nillable="true" type="xs:int"/>
+      <xs:element minOccurs="0" name="onlyValidItems" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="sortItems" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="lang" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getCiselnikNewItemsResponse">
+    <xs:sequence>
+      <xs:element name="ciselnikNew" type="tns:ciselnikNewType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciselnikNewType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:ciselnikItemNewType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciselnikItemNewType">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element name="valueCs" nillable="true" type="xs:string"/>
+      <xs:element name="valueEn" nillable="true" type="xs:string"/>
+      <xs:element name="valid" type="xs:boolean"/>
+      <xs:element name="poradi" type="xs:int"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="attributes" type="tns:ciselnikItemNewAttributeType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ciselnikItemNewAttributeType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="value" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertPracoviste">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="stagUser" nillable="true" type="xs:string"/>
+      <xs:element name="pracoviste" type="tns:pracovisteForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="insertPracovisteResponse">
+    <xs:sequence>
+      <xs:element name="ciselnikItem" type="tns:pracovisteForEditType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="deletePracovisteResponse">
+    <wsdl:part element="tns:deletePracovisteResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getHierarchiePracovist">
+    <wsdl:part element="tns:getHierarchiePracovist" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnik">
+    <wsdl:part element="tns:getCiselnik" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCasovaRada">
+    <wsdl:part element="tns:getCasovaRada" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertTitulResponse">
+    <wsdl:part element="tns:insertTitulResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertPracovisteResponse">
+    <wsdl:part element="tns:insertPracovisteResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updatePracoviste">
+    <wsdl:part element="tns:updatePracoviste" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCasovaRadaResponse">
+    <wsdl:part element="tns:getCasovaRadaResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnikNewDomainsResponse">
+    <wsdl:part element="tns:getCiselnikNewDomainsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnikNewDomains">
+    <wsdl:part element="tns:getCiselnikNewDomains" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSeznamDomenResponse">
+    <wsdl:part element="tns:getSeznamDomenResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnikResponse">
+    <wsdl:part element="tns:getCiselnikResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertTitul">
+    <wsdl:part element="tns:insertTitul" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deletePracoviste">
+    <wsdl:part element="tns:deletePracoviste" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSeznamPracovist">
+    <wsdl:part element="tns:getSeznamPracovist" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSeznamDomen">
+    <wsdl:part element="tns:getSeznamDomen" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getHierarchiePracovistResponse">
+    <wsdl:part element="tns:getHierarchiePracovistResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateTitul">
+    <wsdl:part element="tns:updateTitul" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSeznamPracovistResponse">
+    <wsdl:part element="tns:getSeznamPracovistResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnikNewItemsResponse">
+    <wsdl:part element="tns:getCiselnikNewItemsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCiselnikNewItems">
+    <wsdl:part element="tns:getCiselnikNewItems" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="insertPracoviste">
+    <wsdl:part element="tns:insertPracoviste" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updatePracovisteResponse">
+    <wsdl:part element="tns:updatePracovisteResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateTitulResponse">
+    <wsdl:part element="tns:updateTitulResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOperation">
+    <wsdl:part element="xs:int" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOperationResponse">
+    <wsdl:part element="xs:int" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CiselnikyService">
+    <wsdl:operation name="getHierarchiePracovist">
+      <wsdl:input message="tns:getHierarchiePracovist" name="getHierarchiePracovist">
+    </wsdl:input>
+      <wsdl:output message="tns:getHierarchiePracovistResponse" name="getHierarchiePracovistResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnik">
+      <wsdl:input message="tns:getCiselnik" name="getCiselnik">
+    </wsdl:input>
+      <wsdl:output message="tns:getCiselnikResponse" name="getCiselnikResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCasovaRada">
+      <wsdl:input message="tns:getCasovaRada" name="getCasovaRada">
+    </wsdl:input>
+      <wsdl:output message="tns:getCasovaRadaResponse" name="getCasovaRadaResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updatePracoviste">
+      <wsdl:input message="tns:updatePracoviste" name="updatePracoviste">
+    </wsdl:input>
+      <wsdl:output message="tns:updatePracovisteResponse" name="updatePracovisteResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnikNewDomains">
+      <wsdl:input message="tns:getCiselnikNewDomains" name="getCiselnikNewDomains">
+    </wsdl:input>
+      <wsdl:output message="tns:getCiselnikNewDomainsResponse" name="getCiselnikNewDomainsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertTitul">
+      <wsdl:input message="tns:insertTitul" name="insertTitul">
+    </wsdl:input>
+      <wsdl:output message="tns:insertTitulResponse" name="insertTitulResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deletePracoviste">
+      <wsdl:input message="tns:deletePracoviste" name="deletePracoviste">
+    </wsdl:input>
+      <wsdl:output message="tns:deletePracovisteResponse" name="deletePracovisteResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeznamPracovist">
+      <wsdl:input message="tns:getSeznamPracovist" name="getSeznamPracovist">
+    </wsdl:input>
+      <wsdl:output message="tns:getSeznamPracovistResponse" name="getSeznamPracovistResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeznamDomen">
+      <wsdl:input message="tns:getSeznamDomen" name="getSeznamDomen">
+    </wsdl:input>
+      <wsdl:output message="tns:getSeznamDomenResponse" name="getSeznamDomenResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateTitul">
+      <wsdl:input message="tns:updateTitul" name="updateTitul">
+    </wsdl:input>
+      <wsdl:output message="tns:updateTitulResponse" name="updateTitulResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnikNewItems">
+      <wsdl:input message="tns:getCiselnikNewItems" name="getCiselnikNewItems">
+    </wsdl:input>
+      <wsdl:output message="tns:getCiselnikNewItemsResponse" name="getCiselnikNewItemsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertPracoviste">
+      <wsdl:input message="tns:insertPracoviste" name="insertPracoviste">
+    </wsdl:input>
+      <wsdl:output message="tns:insertPracovisteResponse" name="insertPracovisteResponse">
+    </wsdl:output>
+    </wsdl:operation>
+	<wsdl:operation name="testOperation">
+      <wsdl:input message="tns:testOperation" name="testOperation">
+    </wsdl:input>
+      <wsdl:output message="tns:testOperationResponse" name="testOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CiselnikyServiceImplServiceSoapBinding" type="tns:CiselnikyService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getHierarchiePracovist">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getHierarchiePracovist">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getHierarchiePracovistResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCasovaRada">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCasovaRada">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCasovaRadaResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnik">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCiselnik">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCiselnikResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updatePracoviste">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updatePracoviste">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updatePracovisteResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnikNewDomains">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCiselnikNewDomains">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCiselnikNewDomainsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertTitul">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="insertTitul">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="insertTitulResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deletePracoviste">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deletePracoviste">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deletePracovisteResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeznamPracovist">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSeznamPracovist">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSeznamPracovistResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSeznamDomen">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSeznamDomen">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSeznamDomenResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateTitul">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updateTitul">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updateTitulResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCiselnikNewItems">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCiselnikNewItems">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCiselnikNewItemsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="insertPracoviste">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="insertPracoviste">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="insertPracovisteResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+	<wsdl:operation name="testOperation">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="testOperation">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="testOperationResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CiselnikyServiceImplService">
+    <wsdl:port binding="tns:CiselnikyServiceImplServiceSoapBinding" name="CiselnikyServiceImplPort">
+      <soap:address location="https://stag-ws.zcu.cz/ws/services/soap/ciselniky"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

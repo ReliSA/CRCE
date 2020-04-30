@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://stag-ws.zcu.cz/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  name="MistnostServiceImplService" targetNamespace="http://stag-ws.zcu.cz/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://stag-ws.zcu.cz/" elementFormDefault="unqualified" targetNamespace="http://stag-ws.zcu.cz/" version="1.0">
+
+  <xs:element name="getMistnostiInfo" type="tns:getMistnostiInfo"/>
+
+  <xs:element name="getMistnostiInfoResponse" type="tns:getMistnostiInfoResponse"/>
+
+  <xs:element name="getVytizeniMistnostiFakultami" type="tns:getVytizeniMistnostiFakultami"/>
+
+  <xs:element name="getVytizeniMistnostiFakultamiResponse" type="tns:getVytizeniMistnostiFakultamiResponse"/>
+
+  <xs:element name="getVytizeniMistnostiPracovisti" type="tns:getVytizeniMistnostiPracovisti"/>
+
+  <xs:element name="getVytizeniMistnostiPracovistiResponse" type="tns:getVytizeniMistnostiPracovistiResponse"/>
+
+  <xs:element name="mistnosti" type="tns:mistnostiType"/>
+
+  <xs:element name="mistnostiVytizeni" type="tns:mistnostiVytizeniType"/>
+
+  <xs:complexType name="getVytizeniMistnostiPracovisti">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="zkrBudovy" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloMistnosti" nillable="true" type="xs:string"/>
+      <xs:element name="datumOd" type="xs:dateTime"/>
+      <xs:element name="datumDo" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="pracoviste" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="jenPracovniDny" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="jenSoboty" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="zapocitatNevyuzitouDobu" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="pocitatPrezKomb" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="dobuPocitatTydne" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="rozepsatOstatni" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="provozOd" nillable="true" type="xs:double"/>
+      <xs:element minOccurs="0" name="provozDo" nillable="true" type="xs:double"/>
+      <xs:element minOccurs="0" name="typyUdalosti" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVytizeniMistnostiPracovistiResponse">
+    <xs:sequence>
+      <xs:element name="mistnostiVytizeni" type="tns:mistnostiVytizeniType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mistnostiVytizeniType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="mistnostVytizeni" nillable="true" type="tns:mistnostVytizeniType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mistnostVytizeniType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="zkrBudovy" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloMistnosti" type="xs:string"/>
+      <xs:element minOccurs="0" name="fakulta" type="xs:string"/>
+      <xs:element minOccurs="0" name="fakultaCp" type="xs:string"/>
+      <xs:element minOccurs="0" name="pracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="pracovisteCp" type="xs:string"/>
+      <xs:element minOccurs="0" name="forma" type="xs:string"/>
+      <xs:element minOccurs="0" name="nazev" type="xs:string"/>
+      <xs:element minOccurs="0" name="pocetHodin" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVytizeniMistnostiFakultami">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="zkrBudovy" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloMistnosti" nillable="true" type="xs:string"/>
+      <xs:element name="datumOd" type="xs:dateTime"/>
+      <xs:element name="datumDo" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="fakulta" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="jenPracovniDny" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="jenSoboty" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="zapocitatNevyuzitouDobu" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="pocitatPrezKomb" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="dobuPocitatTydne" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="rozepsatOstatni" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="provozOd" nillable="true" type="xs:double"/>
+      <xs:element minOccurs="0" name="provozDo" nillable="true" type="xs:double"/>
+      <xs:element minOccurs="0" name="typyUdalosti" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getVytizeniMistnostiFakultamiResponse">
+    <xs:sequence>
+      <xs:element name="mistnostiVytizeni" type="tns:mistnostiVytizeniType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getMistnostiInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="zkrBudovy" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloMistnosti" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="pracoviste" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="kapacitaOd" nillable="true" type="xs:int"/>
+      <xs:element minOccurs="0" name="kapacitaDo" nillable="true" type="xs:int"/>
+      <xs:element minOccurs="0" name="typ" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="spolFond" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="jenPlatne" nillable="true" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="identifikator" nillable="true" type="xs:string"/>
+      <xs:element minOccurs="0" name="lang" nillable="true" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getMistnostiInfoResponse">
+    <xs:sequence>
+      <xs:element name="mistnostiInfo" type="tns:mistnostiType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mistnostiType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="mistnostInfo" nillable="true" type="tns:mistnostInfoType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="mistnostInfoType">
+    <xs:sequence>
+      <xs:element name="zkrBudovy" type="xs:string"/>
+      <xs:element name="cisloMistnosti" type="xs:string"/>
+      <xs:element minOccurs="0" name="katedra" type="xs:string"/>
+      <xs:element minOccurs="0" name="pracoviste" type="xs:string"/>
+      <xs:element minOccurs="0" name="typCiselne" type="xs:string"/>
+      <xs:element minOccurs="0" name="typ" type="xs:string"/>
+      <xs:element minOccurs="0" name="kapacita" type="xs:int"/>
+      <xs:element minOccurs="0" name="spolecnyFond" type="xs:string"/>
+      <xs:element minOccurs="0" name="provozOd" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="provozDo" type="tns:xmlDateType"/>
+      <xs:element minOccurs="0" name="poznamka" type="xs:string"/>
+      <xs:element minOccurs="0" name="plocha" type="xs:double"/>
+      <xs:element minOccurs="0" name="vyskaMistnosti" type="xs:double"/>
+      <xs:element minOccurs="0" name="dvereCislo" type="xs:string"/>
+      <xs:element minOccurs="0" name="podlazi" type="xs:string"/>
+      <xs:element minOccurs="0" name="obec" type="xs:string"/>
+      <xs:element minOccurs="0" name="ulice" type="xs:string"/>
+      <xs:element minOccurs="0" name="cisloPopisne" type="xs:string"/>
+      <xs:element minOccurs="0" name="adresaBudovy" type="xs:string"/>
+      <xs:element minOccurs="0" name="serial" type="xs:double"/>
+      <xs:element minOccurs="0" name="urlMistnost" type="xs:string"/>
+      <xs:element minOccurs="0" name="urlBudova" type="xs:string"/>
+      <xs:element minOccurs="0" name="identifikatorMistnost" type="xs:string"/>
+      <xs:element minOccurs="0" name="identifikatorBudova" type="xs:string"/>
+      <xs:element minOccurs="0" name="budovaGPSX" type="xs:double"/>
+      <xs:element minOccurs="0" name="budovaGPSY" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="xmlDateType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getVytizeniMistnostiPracovisti">
+    <wsdl:part element="tns:getVytizeniMistnostiPracovisti" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getVytizeniMistnostiPracovistiResponse">
+    <wsdl:part element="tns:getVytizeniMistnostiPracovistiResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMistnostiInfoResponse">
+    <wsdl:part element="tns:getMistnostiInfoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getVytizeniMistnostiFakultami">
+    <wsdl:part element="tns:getVytizeniMistnostiFakultami" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMistnostiInfo">
+    <wsdl:part element="tns:getMistnostiInfo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getVytizeniMistnostiFakultamiResponse">
+    <wsdl:part element="tns:getVytizeniMistnostiFakultamiResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="MistnostService">
+    <wsdl:operation name="getVytizeniMistnostiPracovisti">
+      <wsdl:input message="tns:getVytizeniMistnostiPracovisti" name="getVytizeniMistnostiPracovisti">
+    </wsdl:input>
+      <wsdl:output message="tns:getVytizeniMistnostiPracovistiResponse" name="getVytizeniMistnostiPracovistiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getVytizeniMistnostiFakultami">
+      <wsdl:input message="tns:getVytizeniMistnostiFakultami" name="getVytizeniMistnostiFakultami">
+    </wsdl:input>
+      <wsdl:output message="tns:getVytizeniMistnostiFakultamiResponse" name="getVytizeniMistnostiFakultamiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMistnostiInfo">
+      <wsdl:input message="tns:getMistnostiInfo" name="getMistnostiInfo">
+    </wsdl:input>
+      <wsdl:output message="tns:getMistnostiInfoResponse" name="getMistnostiInfoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MistnostServiceImplServiceSoapBinding" type="tns:MistnostService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getVytizeniMistnostiPracovisti">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getVytizeniMistnostiPracovisti">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getVytizeniMistnostiPracovistiResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getVytizeniMistnostiFakultami">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getVytizeniMistnostiFakultami">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getVytizeniMistnostiFakultamiResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMistnostiInfo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMistnostiInfo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMistnostiInfoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MistnostServiceImplService">
+    <wsdl:port binding="tns:MistnostServiceImplServiceSoapBinding" name="MistnostServiceImplPort">
+      <soap:address location="https://stag-ws.zcu.cz/ws/services/soap/mistnost"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
