@@ -4,6 +4,7 @@ import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.impl.webservice.WsdlCompatibilityChecker;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
+import cz.zcu.kiv.crce.apicomp.webservice.data.StagCiselnikyTestData;
 import cz.zcu.kiv.crce.compatibility.Difference;
 import cz.zcu.kiv.crce.metadata.Capability;
 import cz.zcu.kiv.crce.metadata.Resource;
@@ -11,8 +12,7 @@ import cz.zcu.kiv.crce.metadata.internal.CapabilityImpl;
 import cz.zcu.kiv.crce.metadata.internal.ResourceImpl;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class WsdlCompatibilityCheckerTest {
 
@@ -142,6 +142,23 @@ public class WsdlCompatibilityCheckerTest {
 
         assertNotNull("Null compatibility returned!", result);
         assertEquals("Wrong difference!", Difference.GEN, result.getDiffValue());
+    }
+
+    /**
+     * Compares V2 and V5 from test resources.
+     */
+    @Test
+    public void testCompare_v2v5() {
+        Resource api1 = StagCiselnikyTestData.v2(),
+                api2 = StagCiselnikyTestData.v5();
+
+        ApiCompatibilityChecker checker = new WsdlCompatibilityChecker();
+
+        CompatibilityCheckResult result = checker.compareApis(api1, api2);
+
+        assertNotNull("Null compatibility returned!", result);
+        assertEquals("Wrong difference!", Difference.SPE, result.getDiffValue());
+        assertTrue("MOV flag should be set!", result.movFlagSet());
     }
 
     /**

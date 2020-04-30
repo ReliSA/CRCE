@@ -75,4 +75,12 @@ public class TestUtil {
         identity.setAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES, Collections.singletonList(categoryName));
         r.addRootCapability(identity);
     }
+
+    public static void addIdentityCapabilityWithCategories(Resource r, String... categoryNames) {
+        Capability identity = new CapabilityImpl(WebserviceIndexerConstants.NAMESPACE__CRCE_IDENTITY, "identity");
+        for(String categoryName : categoryNames) {
+            identity.setAttribute(NsCrceIdentity.ATTRIBUTE__CATEGORIES, Collections.singletonList(categoryName));
+        }
+        r.addRootCapability(identity);
+    }
 }
