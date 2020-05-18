@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.apicomp;
 
-import cz.zcu.kiv.crce.apicomp.impl.webservice.WebserviceIndexerConstants;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.common.WebserviceIndexerConstants;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.metadata.Attribute;
 import cz.zcu.kiv.crce.metadata.Capability;

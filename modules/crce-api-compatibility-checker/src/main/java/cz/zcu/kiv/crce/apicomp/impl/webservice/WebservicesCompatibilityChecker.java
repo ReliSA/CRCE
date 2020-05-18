@@ -1,10 +1,10 @@
 package cz.zcu.kiv.crce.apicomp.impl.webservice;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.mov.AbstractMovDetector;
-import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
-import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
-import cz.zcu.kiv.crce.apicomp.impl.webservice.mov.WsEndpointMetadataMovComparator;
+import cz.zcu.kiv.crce.apicomp.impl.mov.common.AbstractMovDetector;
+import cz.zcu.kiv.crce.apicomp.impl.mov.common.MovDetectionResult;
+import cz.zcu.kiv.crce.apicomp.impl.mov.common.MovDiff;
+import cz.zcu.kiv.crce.apicomp.impl.webservice.common.*;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;

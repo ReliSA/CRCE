@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.apicomp.result;
 
-import cz.zcu.kiv.crce.apicomp.impl.mov.MovDetectionResult;
+import cz.zcu.kiv.crce.apicomp.impl.mov.common.MovDetectionResult;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Contract;

@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.apicomp.impl.restimpl;
 
 import cz.zcu.kiv.crce.apicomp.ApiCompatibilityChecker;
-import cz.zcu.kiv.crce.apicomp.impl.mov.MovDiff;
+import cz.zcu.kiv.crce.apicomp.impl.mov.common.MovDiff;
 import cz.zcu.kiv.crce.apicomp.internal.DiffUtils;
 import cz.zcu.kiv.crce.apicomp.result.CompatibilityCheckResult;
 import cz.zcu.kiv.crce.apicomp.result.DifferenceAggregation;
