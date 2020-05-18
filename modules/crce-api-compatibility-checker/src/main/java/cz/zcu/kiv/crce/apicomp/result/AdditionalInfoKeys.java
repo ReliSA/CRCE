@@ -5,5 +5,5 @@ package cz.zcu.kiv.crce.apicomp.result;
  */
 public interface AdditionalInfoKeys {
 
-    static final String MOV_FLAG = "MOV";
+    String MOV_FLAG = "MOV";
 }

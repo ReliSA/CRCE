@@ -27,8 +27,6 @@ public class JavaTypeWrapper {
             "java/lang/Character", "java/lang/Byte", "java/lang/Short", "java/lang/Integer", "java/lang/Long", "java/lang/Float", "java/lang/Double"
     };
 
-    private final String typeName;
-
     // is java/lang/Number
     private final boolean isLangNumber;
 
@@ -39,8 +37,6 @@ public class JavaTypeWrapper {
     private int typeIndex;
 
     public JavaTypeWrapper(@NotNull String typeName) {
-        this.typeName = typeName;
-
         isLangNumber = typeName.equals("java/lang/Number");
 
         typeIndex = -1;
@@ -76,8 +72,8 @@ public class JavaTypeWrapper {
         // both types are byte, short, int or long
         // or both types are float, double
         // then type fits if its index is < than the other
-        if ((typeIndex >= 1 && otherType.typeIndex <= 4 )
-                || (typeIndex >= 5 && otherType.typeIndex <= 6)
+        if (typeIndex >= 1 && otherType.typeIndex <= 4
+                || typeIndex >= 5 && otherType.typeIndex <= 6
         ) {
             return typeIndex < otherType.typeIndex;
         }

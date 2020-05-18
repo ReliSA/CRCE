@@ -87,14 +87,15 @@ public abstract class EndpointFeatureComparator {
             } else if (c2.isAssignableFrom(c1)) {
                 // c1 <: c2
                 return Difference.GEN;
+            } else {
+                return Difference.UNK;
             }
         } catch (ClassNotFoundException e) {
             // exception thrown -> one of the classes
             // could not be instantiated and class names
             // are not the same
             // thus -> UNK
+            return Difference.UNK;
         }
-
-        return Difference.UNK;
     }
 }

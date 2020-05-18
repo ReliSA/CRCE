@@ -179,7 +179,7 @@ public class RestApiCompatibilityChecker extends ApiCompatibilityChecker {
             endpointDiff.addChild(metadataDiff);
             endpointDiff.addChild(parameterDiff);
             endpointDiff.addChild(responseDiff);
-            endpointDiff.setMov(metadataDiff.getChildren().stream().anyMatch(d -> (d instanceof MovDiff) && ((MovDiff)d).isMov()));
+            endpointDiff.setMov(metadataDiff.getChildren().stream().anyMatch(d -> d instanceof MovDiff && ((MovDiff)d).isMov()));
             DifferenceAggregation.calculateAndSetFinalDifferenceValueForEndpoint(endpointDiff);
         }
 

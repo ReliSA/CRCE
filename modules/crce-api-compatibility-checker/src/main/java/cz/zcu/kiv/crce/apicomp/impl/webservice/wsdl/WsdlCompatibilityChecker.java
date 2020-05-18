@@ -189,6 +189,8 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
             Attribute name2 = ws2.getAttribute(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME);
 
             if (type1.equals(type2) && name1.equals(name2)) {
+                wsMetadataDiff.addChild(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__TYPE.getName(), DifferenceLevel.FIELD, Difference.NON));
+                wsMetadataDiff.addChild(DiffUtils.createDiff(WebserviceIndexerConstants.ATTRIBUTE__WEBSERVICESCHEMA_WEBSERVICE__NAME.getName(), DifferenceLevel.FIELD, Difference.NON));
                 ws2It.remove();
                 return ws2;
             }
