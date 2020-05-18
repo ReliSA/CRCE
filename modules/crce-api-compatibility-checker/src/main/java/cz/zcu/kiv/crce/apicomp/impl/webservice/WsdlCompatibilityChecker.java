@@ -107,7 +107,7 @@ public class WsdlCompatibilityChecker extends WebservicesCompatibilityChecker {
     }
 
     @Override
-    protected AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException {
+    protected AbstractMovDetector getMovDetectorInstance(Capability root1, Capability root2) throws MalformedURLException {
         return new WsdlMovDetector(ApiDescription.fromWsdl(root1), ApiDescription.fromWsdl(root2));
     }
 

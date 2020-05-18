@@ -48,7 +48,7 @@ public class JsonWspCompatibilityChecker extends WadlCompatibilityChecker {
     }
 
     @Override
-    protected EndpointFeatureComparator getEndpointMetadataComparator(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
+    protected EndpointFeatureComparator getEndpointMetadataComparatorInstance(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
         return new JsonWspEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult, api1Url, api2Url);
     }
 

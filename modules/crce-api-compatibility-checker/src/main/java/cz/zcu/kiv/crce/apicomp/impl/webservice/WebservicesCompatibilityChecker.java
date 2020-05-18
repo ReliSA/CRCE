@@ -119,7 +119,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *
      * @return MOV detector to be used. If null, no MOV detection will be performed.
      */
-    protected abstract AbstractMovDetector getMovDetector(Capability root1, Capability root2) throws MalformedURLException;
+    protected abstract AbstractMovDetector getMovDetectorInstance(Capability root1, Capability root2) throws MalformedURLException;
 
     /**
      * Returns a comparator capable of comparing metadata of two endpoints.
@@ -128,7 +128,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      *                           metadata comparator.
      * @return Instance of metadata comparator.
      */
-    protected EndpointFeatureComparator getEndpointMetadataComparator(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
+    protected EndpointFeatureComparator getEndpointMetadataComparatorInstance(Capability endpoint1, Capability endpoint2, MovDetectionResult movDetectionResult) {
         return new WsEndpointMetadataMovComparator(endpoint1, endpoint2, movDetectionResult);
     }
 
@@ -165,7 +165,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
         logger.debug("Detecting MOV flag");
         MovDetectionResult movDetectionResult;
         try {
-            AbstractMovDetector movDetector = getMovDetector(root1, root2);
+            AbstractMovDetector movDetector = getMovDetectorInstance(root1, root2);
 
             if (movDetector == null) {
                 logger.debug("No MOV detector provided, skipping MOV detection.");
@@ -452,7 +452,7 @@ public abstract class WebservicesCompatibilityChecker extends ApiCompatibilityCh
      * @return Returns either NON if the metadata match or UNK if they don't.
      */
     private List<Diff> compareEndpointMetadata(Capability api1Endpoint, Capability otherEndpoint, MovDetectionResult movDetectionResult) {
-        EndpointFeatureComparator metadataComparator = getEndpointMetadataComparator(api1Endpoint, otherEndpoint, movDetectionResult);
+        EndpointFeatureComparator metadataComparator = getEndpointMetadataComparatorInstance(api1Endpoint, otherEndpoint, movDetectionResult);
         return metadataComparator.compare();
     }
 
