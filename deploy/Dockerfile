@@ -1,5 +1,6 @@
-# Use java 11 jdk
-FROM openjdk:11.0.3-jdk-stretch
+FROM builder:1.0
+# builder:<version> is <root_project>/build/Dockerfile
+# WARNING: Make sure you prebuild the builder first, see:<root_project>/build-code-docker.sh
 
 # Prepare environment
 RUN mkdir /felix
@@ -27,9 +28,6 @@ ADD ./conf.default/* ${FELIX_PATH}/conf/
 # Felix framework configuration override
 COPY ./felix-configuration/config.properties ${FELIX_PATH}/conf/
 COPY ./felix-configuration/system.properties ${FELIX_PATH}/conf/
-
-# Set environmental variable for connection string to mongodb
-ENV mongo_connection mongodb://mongoserver:27017
 
 # Run Felix (with debug enabled)
 CMD cd ${FELIX_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar

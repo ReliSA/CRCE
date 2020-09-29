@@ -93,14 +93,14 @@
         <!-- Central repository - must be listed first as a default repo for downloading artifacts -->
         <repository>
             <id>central</id>
-            <url>http://uk.maven.org/maven2/</url>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository>
 
-        <repository>
+<!--         <repository>
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

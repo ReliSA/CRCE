@@ -107,7 +107,7 @@
                         </param>
                         <param>--platform=felix</param>
                         <param>
-                            --repositories=http://uk.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
+                            --repositories=https://repo1.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
                         </param>
                         <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
                         <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
@@ -159,11 +159,11 @@
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
     <repositories>
-        <repository>
+<!--         <repository>
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

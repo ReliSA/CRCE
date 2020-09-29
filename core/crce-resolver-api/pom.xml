@@ -59,11 +59,11 @@
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
     <repositories>
-        <repository>
+<!--         <repository>
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

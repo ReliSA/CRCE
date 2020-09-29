@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1558293785414
-Build-Jdk: 11.0.2
-Built-By: zdenda
+Bnd-LastModified: 1601484853872
+Build-Jdk: 11.0.8
+Built-By: root
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
  ivator
 Bundle-Description: Component Repository supporting Compatibility Evalua
