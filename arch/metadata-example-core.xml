@@ -1,0 +1,146 @@
+<repository name='CRCE Repository' increment='13582741'
+	xmlns="TBD-CRCE-METADATA-XSD-URI">
+	<!-- $Id: metadata-example.xml,v 1.3 2013/02/21 21:56:01 brada Exp $ -->
+	<!-- ===== General rules ===== -->
+	<!-- 1. Each resource, capability, requirement, property shall have an 'id' attributewhich contains an internal, CRCE-instance specific unique identifier.2. For <attribute name="NNN" [value="VVV" [type="TTT"]] > the following rules hold:* for NNN 'name' is used instead of OSGi R5 repetition of namespace 'type' denotes the language type name, e.g. Java class name; is used by resolver to interpret the cap/req data, only primitive types + typed collections are allowed for capabilities/reqts (as in OSGi) 'version' denotes a semantic version as per OSGi Semantic Versioning spec or semver.org 'name' and 'type' names are "well known" = they should be used in the above meaning in any context (cap/req/otherwise)* for TTT, only the following values are valid (subset of XSD primitive datatypes): string (default), int, float, boolean, time, date, list* for VVV, the content shall be parsed and interpreted according to the 'type' attribute (the type="list" means a comma separated list of strings)-->
+	<resource crce:id='obcc-parking-example.gate-2.0.0' id="334232" >
+		<!-- ===== Primary identification of the resource in CRCE ===== -->
+		<capability namespace='crce.identity' 
+			
+			uuid='550e8400-e29b-41d4-a716-446655440000'>
+			<attribute name="name" value="obcc-parking-example.gate-2.0.0" />
+			<attribute name="crce.type" value="osgi,jar" type="list" />
+			<!-- defines the namespace prefix(es) for cap/req elements -->
+			<attribute name="provider" value="cz.zcu.kiv" />
+			<attribute name="version.original" type="Version" value="2.0.0" />
+			<!-- CRCE classification put here as they can be resolved-against -->
+			<attribute name="crce.categories" value="initial-version,versioned,osgi" type="list" />
+			<attribute name="crce.status" value="stored" />
+			<!-- buffer / stored / removed (or similar, according to lifecycle) -->
+		</capability>
+		<!-- ===== Component type-dependent information ===== -->
+		<!-- The "crce.type" attribute of "crce.identity" capability define which identification capabilities shall be provided -->
+		<capability namespace='osgi.identity' uuid="... (will be omitted from now on)">
+			<attribute name="name" value="obcc.parking.gate" />
+			<attribute name="version" type="Version" value="2.0.0.build-3622" />
+		</capability>
+		<capability namespace='jar.identity'>
+			<!-- a case of empty component type-dependent information -->
+		</capability>
+		<!-- ===== General file capabilities ===== -->
+		<capability namespace='crce.content'>
+			<attribute name="hash" value="-the-SHA-256-hex-encoded-digest-for-this-resource-" />
+			<!-- name='osgi.content' for OBR -->
+			<attribute name="url" value="http://crce.kiv.zcu.cz/cz/zcu/kiv/obcc/parking/gate/2.0.0" />
+			<attribute name="size" type="Long" value="12345" />
+			<!-- in bytes -->
+			<attribute name="mime" value="application/vnd.osgi.bundle" />
+			<!-- mime for unknown: application/octet-stream -->
+			<attribute name="crce.original-file-name" value="obcc-parking-example.gate.jar" />
+		</capability>
+		<!-- ===== OSGi capabilities ===== -->
+		<capability namespace='osgi.wiring.package'>
+			<attribute name='name' value='cz.zcu.kiv.obcc.parking.gate.stats' />
+			<attribute name='version' type='Version' value='2.0.0' />
+			<directive name='uses' value='cz.zcu.kiv.obcc.parking.gate.base' />
+		</capability>
+		<!-- ===== Other component models' capabilities ===== -->
+		<!-- how named capabilities, e.g. properties in CoSi component model, are declared: -->
+		<capability namespace='cosi.property'>
+			<attribute name='name' value='maxCapacity' />
+			<attribute name='type' value='java.lang.Integer' />
+			<attribute name='cosi.property.default-value' value='50' type='java.lang.Integer' />
+		</capability>
+		<!-- how component-wide extra functional properties according to EFFCC schema are declared needs to be thought through; here is a first cut: -->
+		<capability namespace='effcc.efp'>
+			<attribute name='name' value='GR.memory.allocation' />
+			<attribute name='value' value='LR.desktop.low' type="cz.zcu.kiv.effcc.types.Long" />
+		</capability>
+		<!-- recursive capability declaration for hierarchical structures. TODO should the namespaces be hierarchical, like below, or should the outer scopes be inferred from the element containment? -->
+		<capability namespace='ab.component'>
+			<attribute name='name' value='someComponent' />
+			<capability namespace='ab.component.bean'>
+				<attribute name='name' value='com.ab-software.example.BeanClass' />
+				<capability namespace='ab.component.bean.interface'>
+					<attribute name='name' value='svc1' />
+					<attribute name='type' value='com.ab-software.example.SvcInterface' />
+				</capability>
+			</capability>
+		</capability>
+		<!-- use for element-bound EFPs -->
+		<capability namespace='osgi.runtime.service'>
+			<attribute name='name' value='baseStatsSvc' />
+			<attribute name='type' value='cz.zcu.kiv.obcc.parking.gate.stats.BaseStatistics' />
+			<capability namespace='effcc.efp' >
+				<attribute name='name' value='GR.throughput.cars' />
+				<attribute name='value' value="1.carpark.high" type="cz.zcu.kiv.effcc.types.Int" />
+			</capability>
+			<capability namespace='effcc.efp' >
+				<attribute name='name' value="GR.throughput.trucks" />
+				<attribute name='value' value="LR.carpark.low" type="cz.zcu.kiv.effcc.types.Int" />
+			</capability>
+		</capability>
+		<!-- ===== Dependencies (requirements) ===== -->
+		<requirement namespace='osgi.wiring.bundle' >
+			<attribute name="name" value='cz.zcu.kiv.obcc.parking.gate'/>
+			<attribute name='bundle-version' type='Version' value='2.2.0'/>
+		</requirement>
+		<requirement namespace='osgi.wiring.package'>
+			<attribute name='name' value='cz.zcu.kiv.obcc.example.carpark.arrivals' />
+			<!-- + attributes are AND-ed unless crce:filter is used -->
+			<attribute name='version' value='1.0.0' op='greater-than' />
+			<!-- ^ 'op's are: equal (default), not-equal, greater-than, less-than, greater-equal, less-equal -->
+			<!-- the OSGi representation of the above via LDAP filter, as direct resolver directive -->
+			<directive name='filter' value='(&(osgi.wiring.package=cz.zcu.kiv.obcc.example.carpark.arrivals)(version>=1.0.0))'/>
+		</requirement>
+		<!-- referencing hierarchical structures, declared by recursive capability elements -->
+		<requirement namespace='xyz.service'>
+			<attribute name='xyz.service' value='bundleA::cz.zcu....stats::svc1' />
+			<!-- unambiguous -->
+			<attribute name='xyz.service' value='svcXyz' />
+			<!-- ambiguous, more candidates -->
+			<!-- override of default 'and'-ing of attributes in the requirement -->
+			<directive name='operator' value='or' />
+		</requirement>
+		<!-- TODO will the simple "either AND or OR between attributes" suffice for requirements? -->
+		<!-- requirements with attribute filters (keeping attributes as first-class citizens) -->
+		<requirement namespace='osgi.wiring.package'>
+			<attribute name='name' value="cz.zcu.kiv.obcc.example.carpark.arrivals" />
+			<crce:filter op='or'>
+				<!-- this filter says "version in <1.0.0, 2.0.0) or equal to 0.2.1" -->
+				<crce:filter op='and'>
+					<attribute name='version' value='1.0.0' crce:op='greater-equal'/>
+					<attribute name='version' value='2.0.0' crce:op='less-than'/>
+				</crce:filter>
+				<attribute name='version' value='0.2.1' />
+			</crce:filter>
+		</requirement>
+		<!-- nested requirements, i.e. we want a given component which has 1.2.13 version and contains a given bean -->
+		<requirement namespace='ab.component'>
+			<attribute name='name' value="daoComponent" />
+			<crce:filter>
+				<!-- op='and' by default -->
+				<attribute name='version' value='1.2.13.build1299' />
+				<requirement namespace='ab.component.bean'>
+					<attribute name='name' value='CorePosDao' />
+				</requirement>
+			</crce:filter>
+		</requirement>
+		<!-- ===== Descriptive properties ===== -->
+		<property namespace='crce.description'>
+			<attribute name="crce.description" value="An example bundle from the Parking Place app." />
+		</property>
+		<!-- results modeled as crce properties referencing the related capabilities/requirements, which corresponds to the Results meta-model -->
+		<property namespace='crce.result'>
+			<attribute name="name" value="obcc-parking--2.0.0--loadtest" />
+			<!-- refers to crce.identity -->
+			<attribute name="uri" value="http://crce.kiv.zcu.cz/rest/obcc-parking--2.0.0--loadtest.log" type="java.net.Url" />
+			<!-- CRCE properties allow structured types, unlike caps/reqts -->
+			<attribute name="creator" value="cz.zcu.kiv.crce.plugin.simco.runner" />
+			<attribute name="creator-version" value="1.5.0" />
+			<link rel="reason" type="capability" name="1.memory.allocation" />
+			<link rel="reason" type="capability" name="base-stats-1::GR.throughput.cars" />
+			<!-- references sub-capability -->
+		</property>
+	</resource>
+</repository>
