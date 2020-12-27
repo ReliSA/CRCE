@@ -13,6 +13,7 @@
     <name>CRCE - Build - Compiled bundle instructions</name>
 
     <packaging>pom</packaging>
+    <groupId>cz.zcu.kiv.crce</groupId>
 
     <build>
         <resources>

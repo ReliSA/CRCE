@@ -53,11 +53,11 @@
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>2.0</version>
             </dependency>
-            <dependency>
+<!--             <dependency>
                 <groupId>org.glassfish.jersey.containers</groupId>
                 <artifactId>jersey-container-servlet-core</artifactId>
                 <version>${version.glassfish.jersey}</version>
-            </dependency>
+            </dependency> -->
             <dependency>
                 <groupId>org.glassfish.jersey.media</groupId>
                 <artifactId>jersey-media-multipart</artifactId>
@@ -68,22 +68,22 @@
                 <artifactId>jersey-media-json-jackson</artifactId>
                 <version>${version.glassfish.jersey}</version>
             </dependency>
-            <dependency>
+<!--             <dependency>
                 <groupId>org.glassfish.jersey.inject</groupId>
                 <artifactId>jersey-hk2</artifactId>
                 <version>${version.glassfish.jersey}</version>
-            </dependency>
+            </dependency> -->
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
                 <version>${version.com.fasterxml.jackson}</version>
             </dependency>
-            <dependency>
+<!--             <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
                 <version>${version.com.fasterxml.jackson}</version>
             </dependency>
-
+ -->
         </dependencies>
     </dependencyManagement>
 

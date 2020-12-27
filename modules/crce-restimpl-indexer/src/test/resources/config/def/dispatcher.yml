@@ -1,9 +1,0 @@
-dispatchers:
-  jersey_sun:
-    dispatcher: org.glassfish.jersey.servlet.ServletContainer
-    providers: jersey.config.server.provider.packages
-  jersey_glassfish:
-    dispatcher: com.sun.jersey.spi.container.servlet.ServletContainer
-    providers: com.sun.jersey.config.property.packages
-  resteasy:
-    dispatcher: org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
