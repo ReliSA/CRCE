@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <parent>
+        <artifactId>crce-modules-parent</artifactId>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <version>2.1.1-SNAPSHOT</version>
+        <relativePath>../shared-third-party-dependencies</relativePath>
+    </parent>
+
+    <artifactId>crce-vo</artifactId>
+    <packaging>bundle</packaging>
+    
+    <name>CRCE - Value Objects</name>
+    
+    <properties>
+        <bundle.symbolicName>${namespace}.vo</bundle.symbolicName>
+        <bundle.namespace>${namespace}.vo</bundle.namespace>
+        <crce.metadata.api.version>3.0.1-SNAPSHOT</crce.metadata.api.version>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
+        </dependency>
+
+        <!-- 3rd party deps -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer-osgi</artifactId>
+            <version>5.5.1</version>
+        </dependency>
+        <!-- Dozer dependencies -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>${crce.metadata.api.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+</project>

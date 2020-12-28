@@ -1,30 +1,5 @@
 version: "3.2"
 services:
-       app:
-                build: ./deploy
-                tty: true
-                depends_on:
-                        - database
-                ports: 
-                        - "8080:8080"
-                networks:
-                        - crce
-                volumes:
-                        - felix:/felix
-                        - ./build:/src/build
-                        - ./core:/src/core
-                        - ./deploy:/src/deploy
-                        - ./modules:/src/modules
-                        - ./pom:/src/pom
-                        - ./third-party:/src/third-party
-                        - ./pom.xml:/src/pom.xml
-                        - ./build-code.sh:/src/build-code.sh
-
-                container_name: "crce_app"
-                environment: 
-                        # Set environmental variable for connection string to mongodb
-                        mongo_connection: mongodb://172.17.0.1:27017
-
        database:
                image: 'mongo'
                container_name: "crce_mongodb"
@@ -32,14 +7,30 @@ services:
                networks:
                        - crce
                ports:
-                       - '27017-27019:27017-27019'
-
+                       - '27017:27017'
                volumes:
-                       - data-db:/data/db
+                       - /mongodb:/data/db
+                       - ./dev-dump:/dev-dump
+
+       metadata:
+                depends_on: 
+                          - database
+                container_name: "crce_metadata"
+                networks: 
+                        - crce
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
+                ports:
+                     - "8080:8080"
+                volumes:
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
 
 networks:
        crce:
-                        
-volumes:
-    felix:
-    data-db:
+
+volumes: 
+        shared-modules:
+                      external: true

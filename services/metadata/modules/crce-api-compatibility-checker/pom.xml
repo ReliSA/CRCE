@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <relativePath>../shared-third-party-dependencies</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>crce-api-compatibility-checker</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <name>
+        Apicomp - API compatibility checker
+    </name>
+
+    <description>
+        Module which is able to compare web APIs by metadata stored in CRCE and evaluate their compatibility.
+
+        Output of bundles 'crce-webservices-indexer' and 'crce-restimpl-indexer' is used as input for the
+        compatibility check.
+    </description>
+
+    <properties>
+        <bundle.symbolicName>${namespace}.apicomp</bundle.symbolicName>
+        <bundle.namespace>${namespace}.apicomp</bundle.namespace>
+        <!--<bundle.activator>${bundle.namespace}.internal.Activator</bundle.activator>-->
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.dependencymanager.annotation</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-core</artifactId>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+
+        <!-- needed for logging to work properly in unit tests -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

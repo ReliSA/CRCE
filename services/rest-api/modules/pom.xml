@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-core-reactor</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Core - Reactor</name>
+
+    <modules>
+        <module>crce-rest-v2</module>
+        <module>aggregation</module>
+    </modules>
+
+    <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
+    <repositories>
+<!--         <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository> -->
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+    </repositories>
+
+</project>

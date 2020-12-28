@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
+        <relativePath />
+    </parent>
+
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-modules-parent</artifactId>
+    <version>2.1.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE - Modules Parent</name>
+
+    <description>Component Repository supporting Compatibility Evaluation</description>
+
+    <properties>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- CRCE core dependencies -->
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>crce-core</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
+                <type>pom</type>
+            </dependency>
+
+            <!-- 3rd party dependencies -->
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0</version>
+            </dependency>
+<!--             <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet-core</artifactId>
+                <version>${version.glassfish.jersey}</version>
+            </dependency> -->
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>${version.glassfish.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-json-jackson</artifactId>
+                <version>${version.glassfish.jersey}</version>
+            </dependency>
+<!--             <dependency>
+                <groupId>org.glassfish.jersey.inject</groupId>
+                <artifactId>jersey-hk2</artifactId>
+                <version>${version.glassfish.jersey}</version>
+            </dependency> -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+<!--             <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${version.com.fasterxml.jackson}</version>
+            </dependency>
+ -->
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Define repositories also there to allow to download paren POM even if it is not checked out -->
+
+    <repositories>
+        <!-- Central repository - must be listed first as a default repo for downloading artifacts -->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+
+<!--         <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public/</url>
+        </repository> -->
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+    </repositories>
+</project>

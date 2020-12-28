@@ -13,9 +13,9 @@ elif [ "$CFG" == "fast" ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building parent pom in ./pom"
+echo "Building parent pom in ./parent-aggregation"
 echo "#==============================================================\n\n\n"
-cd pom
+cd parent-aggregation
 mvn $BUILD $PARAMS
 retVal=$?
 cd ..
@@ -25,7 +25,19 @@ if [ $retVal -ne 0 ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building modules crce service"
+echo "Building shared-build-settings in ./build"
+echo "#==============================================================\n\n\n"
+cd build
+mvn $BUILD $PARAMS
+retVal=$?
+cd ..
+if [ $retVal -ne 0 ]; then
+    echo "Error";
+	exit $retVal;
+fi
+
+echo $'\n\n\n'; echo "=============================================================="
+echo "Building modules for crce service"
 echo "#==============================================================\n\n\n"
 cd modules
 mvn $BUILD $PARAMS
@@ -40,8 +52,6 @@ echo $'\n\n\n'; echo "==========================================================
 echo "Done building"
 echo "#==============================================================\n\n\n"
 
-#==============================================================
-
 echo $'\n\n\n'; echo "=============================================================="
 echo "Building third party libraries in ./third-party"
 echo "#==============================================================\n\n\n"
@@ -53,3 +63,6 @@ if [ $retVal -ne 0 ]; then
     echo "Error";
 	exit $retVal;
 fi
+echo $'\n\n\n'; echo "=============================================================="
+echo "Done building"
+echo "#==============================================================\n\n\n"

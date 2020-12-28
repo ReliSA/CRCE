@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cz.zcu.kiv.crce</groupId>
+    <artifactId>crce-parent</artifactId>
+    <version>2.1.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>CRCE Service - Web service indexers</name>
+
+    <description>Service for indexing web services like REST api, SOAP etc. (communication with internal REST services)</description>
+
+    <url>https://www.assembla.com/spaces/crce</url>
+
+    <organization>
+        <name>ZČU KIV</name>
+        <url>http://www.kiv.zcu.cz</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>kalwi</id>
+            <name>Jiří Kučera</name>
+        </developer>
+    </developers>
+
+    <prerequisites>
+        <!-- Note: Jenkins build uses the latest available stable Maven version -->
+        <maven>3.0.4</maven>
+    </prerequisites>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <scm>
+        <url>https://github.com/ReliSA/crce/tree/master/pom</url>
+        <connection>https://github.com/ReliSA/crce.git</connection>
+        <developerConnection>scm:git:git@github.com:ReliSA/crce.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <extensions>
+            <!-- For upload to fallback DAV repository -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-webdav</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <!-- https://jira.codehaus.org/browse/MRELEASE-812 -->
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <distributionManagement>
+<!--         <repository>
+            <id>relisa-release</id>
+            <name>ReliSA Internal Releases</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/releases</url>
+        </repository> -->
+<!--         <snapshotRepository>
+            <id>relisa-snapshots</id>
+            <name>ReliSA Internal Snapshots</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository> -->
+    </distributionManagement>
+
+    <repositories>
+        <!-- Central repository - must be listed first as a default repo for downloading of artifacts -->
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+
+<!--         <repository>
+            <id>relisa-global</id>
+            <name>ReliSA Global Proxy repository</name>
+            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository> -->
+
+        <!-- Fallback repositories -->
+        <repository>
+            <id>maven.kalwi.eu.snapshots</id>
+            <name>kalwi.eu snapshots repository</name>
+            <url>http://maven.kalwi.eu/repo/snapshots</url>
+        </repository>
+
+        <repository>
+            <id>maven.kalwi.eu.releases</id>
+            <name>kalwi.eu releases repository</name>
+            <url>http://maven.kalwi.eu/repo/releases</url>
+        </repository>
+    </repositories>
+
+</project>
