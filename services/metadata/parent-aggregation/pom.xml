@@ -74,6 +74,11 @@
     </distributionManagement>
 
     <repositories>
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
         <!-- Central repository - must be listed first as a default repo for downloading of artifacts -->
         <repository>
             <id>central</id>
@@ -97,12 +102,6 @@
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>
             <url>http://maven.kalwi.eu/repo/releases</url>
-        </repository>
-        
-        <repository>
-            <id>crce-plugin-api</id>
-            <name>CRCE plugin API with plugin manager</name>
-            <url>file://${project.basedir}/shared-modules</url>
         </repository>
     </repositories>
 

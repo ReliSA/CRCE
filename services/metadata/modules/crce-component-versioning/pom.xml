@@ -77,4 +77,11 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
+    </repositories>
 </project>

@@ -1,8 +1,9 @@
 CFG=$1
-BUILD="clean install"
+BUILD="clean install -U"
 PARAMS=
 echo "CRCE build type: ${CFG:-(plain)}"
-
+ls *;
+ls ./shared-modules;
 if [ "$CFG" == "notest" ]; then
     PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true";
 elif [ "$CFG" == "onlyclean" ]; then

@@ -16,6 +16,14 @@ for filename in ./*.jar; do
         new_path=./${module_name}/${version};
         mkdir -p ${new_path};
         mv ${jar_filename} ${new_path};
+
+        echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+            <project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>${GROUP_ID}</groupId>
+                <artifactId>${module_name}</artifactId>
+                <version>${version}</version>
+            </project>" > ${new_path}/${module_name}-${version}.pom;
     fi
 done
 rm -f ${VOLUME_CONTAINING_JARS}/*.jar

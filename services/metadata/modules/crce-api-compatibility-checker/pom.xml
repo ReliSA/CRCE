@@ -49,12 +49,12 @@
     </build>
 
     <dependencies>
-        <dependency>
+<!--         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-core</artifactId>
+            <artifactId>aggregation</artifactId>
             <type>pom</type>
         </dependency>
-
+ -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-api</artifactId>
@@ -75,5 +75,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
+    </repositories>
 
 </project>

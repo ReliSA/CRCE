@@ -92,6 +92,11 @@
     <repositories>
         <!-- Central repository - must be listed first as a default repo for downloading artifacts -->
         <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
+        <repository>
             <id>central</id>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
