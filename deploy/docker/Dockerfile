@@ -55,48 +55,43 @@ COPY ${PREPARE_BUNDLE_PATH} .
 
 COPY ${FELIX_EXEC_ENV_PROFILE_PATH} .
 
-# Run building script
-CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME}
+#FELIX OSGi START
+# Prepare environment
+RUN mkdir -p ${FELIX_V_PATH}
+WORKDIR ${FELIX_PATH}
 
-# Run prepare-bundles script
-#RUN bash ${PREPARE_BUNDLE_NAME}
-#
-##FELIX OSGi START
-## Prepare environment
-#RUN mkdir ${FELIX_PATH}
-#WORKDIR ${FELIX_PATH}
-#
-## Download and unpack Felix (6.0.3 is the latest version)
-#ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-6.0.3.tar.gz ./apache-felix.tar.gz
-#RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
-#
-## Remove duplicate gogo runtime
-#RUN rm ${FELIX_V_PATH}/bundle/org.apache.felix.gogo.runtime*
-#
-## Add CRCE modules to Felix autodeploy dir
+# Download and unpack Felix (6.0.3 is the latest version)
+ADD https://archive.apache.org/dist/felix/org.apache.felix.main.distribution-6.0.3.tar.gz ./apache-felix.tar.gz
+RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
+
+# Remove duplicate gogo runtime
+RUN rm ${FELIX_V_PATH}/bundle/org.apache.felix.gogo.runtime*
+
+# Add CRCE modules to Felix autodeploy dir
 #RUN cp ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/
-#
-## Create directory for installing new bundles
-#RUN mkdir ${FELIX_V_PATH}/dist
-#
-## Copy configuration for Configuration Admin service
-## 'conf' is the directory to watch (configured by 'felix.fileinstall.dir')
-##RUN mkdir ${FELIX_V_PATH}/load
-#ADD ./conf.default/* ${FELIX_V_PATH}/conf/
-#
-## Felix framework configuration override
-#COPY ./felix-configuration/config.properties ${FELIX_V_PATH}/conf/
-#COPY ./felix-configuration/system.properties ${FELIX_V_PATH}/conf/
-#
-## Run Felix (with debug enabled)
-##CMD cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
-#
-## Run Felix (with debug disabled)
-## CMD cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
-#
-##FELIX OSGi END
-#
+
+# Create directory for installing new bundles
+RUN mkdir ${FELIX_V_PATH}/dist
+
+# Copy configuration for Configuration Admin service
+# 'conf' is the directory to watch (configured by 'felix.fileinstall.dir')
+#RUN mkdir ${FELIX_V_PATH}/load
+ADD ./deploy/conf.default/* ${FELIX_V_PATH}/conf/
+
+# Felix framework configuration override
+COPY ./deploy/felix-configuration/config.properties ${FELIX_V_PATH}/conf/
+COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
+
+# Run Felix (with debug enabled)
+#CMD cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+
+# Run Felix (with debug disabled)
+# CMD cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
+
+#FELIX OSGi END
+
 #RUN addgroup -S spring && adduser -S spring -G spring
 #USER spring:spring
-#
-#CMD java -jar ./bin/felix.jar
+WORKDIR ${PROJECT_PATH}
+
+CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ${FELIX_V_PATH}/bin/felix.jar

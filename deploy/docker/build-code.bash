@@ -78,3 +78,4 @@ echo "Done building"
 echo "#=============================================================="
 
 mvn clean pax:directory;
+cp ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/;
