@@ -74,11 +74,11 @@
     </distributionManagement>
 
     <repositories>
-        <repository>
+<!--         <repository>
             <id>crce-shared-modules</id>
             <name>CRCE plugin API with plugin manager</name>
             <url>file:///home/crce/shared-modules</url>
-        </repository>
+        </repository> -->
         <!-- Central repository - must be listed first as a default repo for downloading of artifacts -->
         <repository>
             <id>central</id>

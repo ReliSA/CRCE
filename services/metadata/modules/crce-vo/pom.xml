@@ -73,10 +73,29 @@
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-metadata-impl</artifactId>
-            <version>${crce.metadata.api.version}</version>
+            <version>3.0.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-resolver-api</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-resolver-impl</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

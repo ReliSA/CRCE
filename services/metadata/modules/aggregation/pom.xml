@@ -44,12 +44,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-api</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
+            <version>2.1.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-mongodb</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
+            <version>2.1.2-SNAPSHOT</version>
         </dependency>
 		<dependency>
             <groupId>${project.groupId}</groupId>
@@ -61,11 +61,11 @@
             <artifactId>crce-component-versioning</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
+<!--         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-api-compatibility-checker</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
@@ -135,6 +135,11 @@
             <name>ReliSA Global Proxy repository</name>
            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository> -->
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <relativePath>./shared-third-party-dependencies</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.1-SNAPSHOT</version>
+    </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-core-reactor</artifactId>
@@ -20,7 +25,7 @@
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
         <module>crce-metadata-dao-api</module>
-        <module>crce-api-compatibility-checker</module>
+        <!-- <module>crce-api-compatibility-checker</module> -->
 
         
         <module>crce-component-versioning</module>
@@ -37,6 +42,67 @@
         <module>aggregation</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.ops4j</groupId>
+                <artifactId>maven-pax-plugin</artifactId>
+                <configuration>
+                    <provision>
+                        <param>--vmOptions=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=65505
+                        </param>
+                        <param>--platform=felix</param>
+                        <param>
+                            --repositories=https://repo1.maven.org/maven2,http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public,http://repository.ops4j.org/maven2
+                        </param>
+                        <!-- Provision of logging artifacts - needs to be here to allow to set startlevel -->
+                        <param>mvn:org.slf4j/slf4j-api/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/osgi-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/log4j-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jcl-over-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:org.slf4j/jul-to-slf4j/${version.org.slf4j}@1</param>
+                        <param>mvn:ch.qos.logback/logback-core/${version.logback}@1</param>
+                        <param>mvn:ch.qos.logback/logback-classic/${version.logback}@1</param>
+                    </provision>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>conf</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>conf.default</directory>
+                                </resource>
+                            </resources>
+                            <overwrite>false</overwrite>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
     <repositories>
 <!--         <repository>
@@ -44,11 +110,6 @@
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository> -->
-        <repository>
-            <id>crce-shared-modules</id>
-            <name>CRCE plugin API with plugin manager</name>
-            <url>file:///home/crce/shared-modules</url>
-        </repository>
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>
