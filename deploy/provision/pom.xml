@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-         <groupId>cz.zcu.kiv.crce</groupId>
+        <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>provision-reactor</artifactId>
         <version>2.1.2-SNAPSHOT</version>
     </parent>
@@ -185,11 +185,6 @@
         </dependency>
 		
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-        </dependency>
-		
-        <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>
         </dependency>
@@ -241,15 +236,16 @@
 
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-core</artifactId>
+            <artifactId>crce-modules-parent</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
 		
-		<dependency>
+<!-- 		<dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-default-modules</artifactId>
             <type>pom</type>
-        </dependency>
+        </dependency> -->
 
         <!-- vaadin -->
         <dependency>

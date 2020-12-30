@@ -3,7 +3,8 @@ FROM alpine:latest
 #OPENJDK11 START
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm/"
 RUN apk add openjdk11;\
-    apk add bash;
+    apk add bash;\
+    apk add zip;
 ENV PATH=$PATH:${JAVA_HOME}/bin
 #OPENJDK11 END
 
@@ -12,10 +13,15 @@ ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
 ENV PREPARE_BUNDLE_PATH="./deploy/${PREPARE_BUNDLE_NAME}"
 ENV BUILD_CODE_NAME="build-code.bash"
 ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
+ENV DEPLOY_POM_PATH="./deploy/pom.xml"
+ENV PROVISION_POM_PATH="./deploy/provision"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
 ENV FELIX_PATH="/felix"
 ENV FELIX_V_PATH="/felix/felix-framework-6.0.3"
+ENV TARGET_DIR="target/pax-runner-dir/bundles"
+ENV FELIX_EXEC_ENV_PROFILE_PATH="./deploy/J2SE-11.Profile"
+ENV BUNDLE_TMP_PATH="${TARGET_DIR}/bundle-tmp"
 ARG SERVICE_PATH_PREFIX
 
 #COPY PROJECT INTO DOCKER
@@ -31,11 +37,15 @@ COPY ${SERVICE_PATH_PREFIX}/modules ./modules
 RUN echo ${SERVICE_PATH_PREFIX} 
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
+COPY ${DEPLOY_POM_PATH} .
+COPY ${PROVISION_POM_PATH} ./provision
 #END
 
 # Alias on mvn wrapper 
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
+
+RUN mkdir -p ${TARGET_DIR};
 
 # Copy building script
 COPY ${BUILD_CODE_PATH} .
@@ -43,8 +53,10 @@ COPY ${BUILD_CODE_PATH} .
 # Copy prepare-bundles script
 COPY ${PREPARE_BUNDLE_PATH} .
 
+COPY ${FELIX_EXEC_ENV_PROFILE_PATH} .
+
 # Run building script
-CMD bash ${BUILD_CODE_NAME}
+CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME}
 
 # Run prepare-bundles script
 #RUN bash ${PREPARE_BUNDLE_NAME}
