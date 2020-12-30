@@ -71,8 +71,9 @@ public class ApiCompatibilityCheckerServiceImpl implements ApiCompatibilityCheck
             logger.warn("Compatibility dao not available, can't find existing compatibility object.");
             return null;
         }
-        List<Compatibility> compatibilities = compatibilityDao.findCompatibility(api1, api2);
-        return compatibilities.isEmpty() ? null : compatibilities.get(0);
+        return null;
+/*         List<Compatibility> compatibilities = compatibilityDao.findCompatibility(api1, api2);
+        return compatibilities.isEmpty() ? null : compatibilities.get(0); */
     }
 
     @Override

@@ -2,12 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
+<!--     <parent>
         <relativePath>../shared-third-party-dependencies</relativePath>
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>crce-modules-parent</artifactId>
         <version>2.1.1-SNAPSHOT</version>
+    </parent> -->
+    <parent>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>compiled-bundle-settings</artifactId>
+        <version>2.1.2-SNAPSHOT</version>
+        <relativePath />
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>crce-api-compatibility-checker</artifactId>
@@ -56,11 +63,31 @@
         </dependency>
  -->
         <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-compatibility-dao-api</artifactId>
             <version>2.1.2-SNAPSHOT</version>
         </dependency>
-
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-mongodb</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -76,12 +103,12 @@
         </dependency>
     </dependencies>
 
-<!--     <repositories>
+    <repositories>
         <repository>
             <id>crce-shared-modules</id>
             <name>CRCE plugin API with plugin manager</name>
             <url>file:///home/crce/shared-modules</url>
         </repository>
-    </repositories> -->
+    </repositories>
 
 </project>

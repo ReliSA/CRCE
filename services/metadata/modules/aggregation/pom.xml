@@ -61,11 +61,11 @@
             <artifactId>crce-component-versioning</artifactId>
             <version>1.0</version>
         </dependency>
-<!--         <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-api-compatibility-checker</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-api</artifactId>
