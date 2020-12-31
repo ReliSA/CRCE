@@ -1,0 +1,13 @@
+crce-compatibility-api
+crce-compatibility-dao-api
+crce-metadata-dao-api
+crce-metadata-indexer-api
+crce-metadata-indexer-impl
+crce-metadata-osgi-bundle
+crce-metadata-service-api
+crce-metadata-service-impl
+crce-resolver-api
+crce-resolver-impl
+crce-repository-api
+crce-repository-impl
+crce-vo

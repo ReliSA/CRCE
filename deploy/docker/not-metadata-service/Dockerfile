@@ -12,7 +12,6 @@ ENV PROJECT_PATH="/home/crce"
 ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
 ENV PREPARE_BUNDLE_PATH="./deploy/${PREPARE_BUNDLE_NAME}"
 ENV BUILD_CODE_NAME="build-code.bash"
-ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
 ENV DEPLOY_POM_PATH="./deploy/pom.xml"
 ENV PROVISION_POM_PATH="./deploy/provision"
 ENV MVN_DIR_PATH="/.mvn"
@@ -24,15 +23,28 @@ ENV FELIX_EXEC_ENV_PROFILE_PATH="./deploy/J2SE-11.Profile"
 ENV BUNDLE_TMP_PATH="${TARGET_DIR}/bundle-tmp"
 ARG SERVICE_PATH_PREFIX
 
+#NEW ENVs
+
+ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
+ENV BASE_BUILD_SCRIPT_NAME="base_build-code.sh"
+ENV BASE_BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
+ENV BUILD_CODE_PATH="./deploy/docker/not-metadata-service/${BUILD_CODE_NAME}"
+ENV CONFIG_METADATA_MODULES="metadata-modules.txt"
+
+#
+
+
 #COPY PROJECT INTO DOCKER
 WORKDIR ${PROJECT_PATH}
+
+
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
 
 RUN echo ${SERVICE_PATH_PREFIX}
 
 COPY ${SERVICE_PATH_PREFIX}/build ./build
-COPY ${SERVICE_PATH_PREFIX}/modules ./modules_tmp
+COPY ${SERVICE_PATH_PREFIX}/modules ./modules
 #COPY ${SERVICE_PATH_PREFIX}/pom.xml .
 RUN echo ${SERVICE_PATH_PREFIX} 
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
@@ -47,8 +59,14 @@ RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
 
 RUN mkdir -p ${TARGET_DIR};
 
-# Copy building script
-COPY ${BUILD_CODE_PATH} .
+# NEW Copy base building script
+COPY ${BASE_BUILD_CODE_PATH} ${BASE_BUILD_SCRIPT_NAME}
+
+# NEW Copy building script
+COPY ${BUILD_CODE_PATH} ${BUILD_CODE_NAME}
+
+# NEW Copy configuration (list of metadata modules)
+COPY ${SERVICE_PATH_PREFIX}/${CONFIG_METADATA_MODULES} .
 
 # Copy prepare-bundles script
 COPY ${PREPARE_BUNDLE_PATH} .
@@ -94,4 +112,4 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ${FELIX_V_PATH}/bin/felix.jar
+CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ${FELIX_V_PATH}/bin/felix.jar

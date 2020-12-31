@@ -3,8 +3,6 @@ BUILD="clean install -U"
 #PARAMS=
 #echo "CRCE build type: ${CFG:-(plain)}"
 PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true -Dpmd.skip=true";
-ls *;
-ls ./shared-modules;
 if [ "$CFG" == "notest" ]; then
     PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true";
 elif [ "$CFG" == "onlyclean" ]; then
@@ -15,9 +13,9 @@ elif [ "$CFG" == "fast" ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building parent pom in ./parent-aggregation"
+echo "Building shared-build-settings in ./build"
 echo "#=============================================================="
-cd parent-aggregation
+cd build
 mvn $BUILD $PARAMS
 retVal=$?
 cd ..
@@ -27,9 +25,9 @@ if [ $retVal -ne 0 ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building shared-build-settings in ./build"
+echo "Building parent pom in ./parent-aggregation"
 echo "#=============================================================="
-cd build
+cd parent-aggregation
 mvn $BUILD $PARAMS
 retVal=$?
 cd ..
