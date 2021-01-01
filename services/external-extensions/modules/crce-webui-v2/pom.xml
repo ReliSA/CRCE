@@ -9,7 +9,7 @@
 		<artifactId>crce-modules-parent</artifactId>
 		<version>2.1.1-SNAPSHOT</version>
 	</parent>
-	<!-- <groupId>cz.zcu.kiv.crce</groupId> -->
+	<groupId>cz.zcu.kiv.crce</groupId>
 	<artifactId>crce-webui-v2</artifactId>
 	<packaging>war</packaging>
 	<version>1.7</version>
@@ -19,7 +19,7 @@
 
 	<properties>
 		<bundle.symbolicName>CRCE - Web UI</bundle.symbolicName>
-		<bundle.namespace>${namespace}.crce_webui_v2</bundle.namespace>
+		<bundle.namespace>cz.zcu.kiv.crce.crce_webui_v2</bundle.namespace>
 		<vaadin.version>7.7.10</vaadin.version>
 		<vaadin.plugin.version>7.7.10</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>

@@ -60,4 +60,4 @@ function main {
 # Script body
 #
 main
-
+cp -r ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/;

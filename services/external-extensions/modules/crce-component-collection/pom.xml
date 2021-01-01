@@ -8,6 +8,7 @@
         <groupId>cz.zcu.kiv.crce</groupId>
         <version>2.1.0-SNAPSHOT</version>
     </parent>
+    <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-component-collection</artifactId>
     <version>1.0</version>
     <name>CRCE - Support versification collection of components</name>
@@ -16,7 +17,7 @@
 
     <properties>
         <bundle.symbolicName>CRCE  - Support versification collection of components</bundle.symbolicName>
-        <bundle.namespace>${namespace}.crce_component_collection</bundle.namespace>
+        <bundle.namespace>cz.zcu.kiv.crce.crce_component_collection</bundle.namespace>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.jdk>10</version.jdk>
     </properties>

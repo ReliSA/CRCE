@@ -72,7 +72,7 @@
 			
 			<dependency>
                 <groupId>cz.zcu.kiv.crce</groupId>
-                <artifactId>crce-modules-parent</artifactId>
+                <artifactId>crce-default-modules</artifactId>
                 <version>2.1.1-SNAPSHOT</version>
                 <type>pom</type>
             </dependency>

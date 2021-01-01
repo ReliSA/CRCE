@@ -1,5 +1,6 @@
 CFG=$1
-BUILD="clean install -U"
+BUILD="clean install -U --no-transfer-progress"
+PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true";
 #PARAMS=
 #echo "CRCE build type: ${CFG:-(plain)}"
 PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true -Dpmd.skip=true";
@@ -70,8 +71,6 @@ if [ $retVal -ne 0 ]; then
     echo "Error";
 	exit $retVal;
 fi
-mvn clean pax:directory;
-cp ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/;
 
 echo $'\n\n\n'; echo "=============================================================="
 echo "Done building"

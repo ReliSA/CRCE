@@ -111,4 +111,5 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ${FELIX_V_PATH}/bin/felix.jar
+#CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; ls ./bundle ; echo "BIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN" ; ls ;ls ./bin ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+CMD bash ${BUILD_CODE_NAME} ; mvn clean pax:directory ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ;  echo $'BIIIIIIIIIIIIIIIII\nIIIIIIIIIIIIIII\nIN' ; ls ./bundle ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
