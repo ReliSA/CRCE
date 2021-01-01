@@ -7,7 +7,7 @@
         <artifactId>crce-modules-parent</artifactId>
         <groupId>cz.zcu.kiv.crce</groupId>
         <version>2.1.1-SNAPSHOT</version>
-        <relativePath>../pom</relativePath>
+        <relativePath>../shared-third-party-dependencies</relativePath>
     </parent>
 
     <artifactId>crce-optimizer-functions</artifactId>
@@ -34,25 +34,28 @@
             </plugin>
         </plugins>
     </build>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>cz.zcu.kiv.crce.wrapper</groupId>
+                <artifactId>com.datumbox.lpsolve</artifactId>
+                <version>${crce.lpsolve.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cz.zcu.kiv.crce</groupId>
+                <artifactId>crce-metadata-service-api</artifactId>
+                <version>${crce.metadata.service.api.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>cz.zcu.kiv.crce</groupId>
-            <artifactId>crce-core</artifactId>
-            <type>pom</type>
-        </dependency>
-
         <dependency>
             <groupId>cz.zcu.kiv.crce.wrapper</groupId>
             <artifactId>com.datumbox.lpsolve</artifactId>
-            <version>${crce.lpsolve.version}</version>
         </dependency>
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-metadata-service-api</artifactId>
-            <version>${crce.metadata.service.api.version}</version>
         </dependency>
     </dependencies>
-
-
 </project>

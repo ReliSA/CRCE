@@ -12,8 +12,18 @@
     <name>CRCE - Core - Reactor</name>
 
     <modules>
-        <module>crce-optimizer-functions</module>
+        <module>shared-third-party-dependencies</module>
         <module>aggregation</module>
+        <!-- <module>crce-optimizer-functions</module> -->
+        <module>crce-repository-api</module>
+        <module>crce-repository-impl</module>
+        <module>crce-resolver-api</module>
+        <module>crce-resolver-impl</module>
+        <module>crce-metadata-service-api</module>
+        <module>crce-metadata-service-impl</module>
+        <module>crce-metadata-dao-api</module>
+        <module>crce-metadata-indexer-api</module>
+        <module>crce-metadata-indexer-impl</module>
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
