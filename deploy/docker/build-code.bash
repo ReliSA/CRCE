@@ -13,18 +13,6 @@ elif [ "$CFG" == "fast" ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building shared-build-settings in ./build"
-echo "#=============================================================="
-cd build
-mvn $BUILD $PARAMS
-retVal=$?
-cd ..
-if [ $retVal -ne 0 ]; then
-    echo "Error";
-	exit $retVal;
-fi
-
-echo $'\n\n\n'; echo "=============================================================="
 echo "Building parent pom in ./parent-aggregation"
 echo "#=============================================================="
 cd parent-aggregation
@@ -37,9 +25,9 @@ if [ $retVal -ne 0 ]; then
 fi
 
 echo $'\n\n\n'; echo "=============================================================="
-echo "Building modules for crce service"
+echo "Building shared-build-settings in ./build"
 echo "#=============================================================="
-cd modules
+cd build
 mvn $BUILD $PARAMS
 retVal=$?
 cd ..
@@ -72,8 +60,19 @@ else
 fi
 cd ..
 echo $'\n\n\n'; echo "=============================================================="
-echo "Done building"
+echo "Building modules for crce service"
 echo "#=============================================================="
-
+cd modules
+mvn $BUILD $PARAMS
+retVal=$?
+cd ..
+if [ $retVal -ne 0 ]; then
+    echo "Error";
+	exit $retVal;
+fi
 mvn clean pax:directory;
 cp ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/;
+
+echo $'\n\n\n'; echo "=============================================================="
+echo "Done building"
+echo "#=============================================================="

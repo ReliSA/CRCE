@@ -19,10 +19,10 @@
         <artifactId>crce-modules-parent</artifactId>
         <groupId>cz.zcu.kiv.crce</groupId>
         <version>2.1.1-SNAPSHOT</version>
-        <relativePath>../pom</relativePath>
+        <relativePath>../shared-third-party-dependencies</relativePath>
     </parent>
 
-    <artifactId>aggregation</artifactId>
+    <artifactId>crce-default-modules</artifactId>
     <version>2.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -39,13 +39,89 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-webui-v2</artifactId>
-            <version>1.5</version>
-            <type>war</type>
+            <version>1.7</version>
+			<type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-osgi-bundle</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+<!--         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-dao-api</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
+        </dependency> -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-impl</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-api</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-repository-impl</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-external-repository</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+			<groupId>cz.zcu.kiv.crce</groupId>
+			<artifactId>crce-component-collection</artifactId>
+			<version>1.0</version>
+			<type>bundle</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-plugin-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-indexer-impl</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-indexer-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-resolver-api</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>        
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-resolver-impl</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -56,6 +132,11 @@
             <name>ReliSA Global Proxy repository</name>
            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository> -->
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

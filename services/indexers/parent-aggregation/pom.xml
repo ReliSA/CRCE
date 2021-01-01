@@ -8,9 +8,9 @@
     <version>2.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>CRCE Service - Web service indexers</name>
+    <name>CRCE Service - External extensions</name>
 
-    <description>Service for indexing web services like REST api, SOAP etc. (communication with internal REST services)</description>
+    <description>External extensions which can be ran outside the CRCE project (communication only over REST api service)</description>
 
     <url>https://www.assembla.com/spaces/crce</url>
 

@@ -63,7 +63,7 @@
         <repository>
             <id>crce-shared-modules</id>
             <name>CRCE plugin API with plugin manager</name>
-            <url>file:///home/tomas/projects/sar/CRCE/services/metadata/shared-modules</url>
+            <url>file:///home/crce/shared-modules</url>
         </repository>
         <repository>
             <id>maven.kalwi.eu.releases</id>

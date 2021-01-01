@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<relativePath>../pom</relativePath>
+		<relativePath>../shared-third-party-dependencies</relativePath>
 		<groupId>cz.zcu.kiv.crce</groupId>
 		<artifactId>crce-modules-parent</artifactId>
 		<version>2.1.1-SNAPSHOT</version>
@@ -292,18 +292,6 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-repository-metadata</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
-			<artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
-			<artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
-			<artifactId>org.codehaus.plexus.plexus-utils</artifactId>
 		</dependency>
 
 		<dependency>

@@ -46,7 +46,6 @@ RUN echo ${SERVICE_PATH_PREFIX}
 COPY ${SERVICE_PATH_PREFIX}/build ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules
 #COPY ${SERVICE_PATH_PREFIX}/pom.xml .
-RUN echo ${SERVICE_PATH_PREFIX} 
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
 COPY ${DEPLOY_POM_PATH} .

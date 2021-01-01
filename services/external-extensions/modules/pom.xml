@@ -3,6 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <relativePath>./shared-third-party-dependencies</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.1-SNAPSHOT</version>
+    </parent>
 
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-core-reactor</artifactId>
@@ -12,9 +19,22 @@
     <name>CRCE - Core - Reactor</name>
 
     <modules>
-        <module>crce-external-repository</module>
-        <module>crce-webui-v2</module>
+        <module>shared-third-party-dependencies</module>
         <module>aggregation</module>
+        <module>crce-webui-v2</module>
+        <module>crce-metadata-service-api</module>
+        <module>crce-metadata-service-impl</module>
+        <module>crce-metadata-dao-api</module>
+        <module>crce-compatibility-api</module>
+        <module>crce-repository-api</module>
+        <module>crce-repository-impl</module>
+        <module>crce-resolver-api</module>
+        <module>crce-resolver-impl</module>
+        <module>crce-external-repository</module>
+        <module>crce-metadata-osgi-bundle</module>
+        <module>crce-metadata-indexer-api</module>
+        <module>crce-metadata-indexer-impl</module>
+        <module>crce-component-collection</module>
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
@@ -23,6 +43,11 @@
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository> -->
+<!--         <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
         </repository> -->
         <repository>
             <id>maven.kalwi.eu.releases</id>

@@ -1,0 +1,12 @@
+crce-metadata-service-api
+crce-metadata-service-impl
+crce-metadata-dao-api
+crce-compatibility-api
+crce-repository-api
+crce-repository-impl
+crce-metadata-osgi-bundle
+crce-metadata-indexer-api
+crce-metadata-indexer-impl
+crce-resolver-api
+crce-resolver-impl
+crce-component-collection <- dostupne po rebase vetve dp na dev
