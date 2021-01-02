@@ -9,9 +9,7 @@ mvn package
 find . -name \*.jar -exec cp {} ${VOLUME_CONTAINING_JARS} \;
 
 cd ${VOLUME_CONTAINING_JARS};
-echo "----------------------------------------------------- NAD LS -----------------------------------------------"
-ls
-echo "----------------------------------------------------- POD LS -----------------------------------------------"
+
 for filename in ./*.jar; do
     if [ -z $(echo "${filename}"|sed "/crce/d") ]; then
         filename=`echo "${filename/.\//''}"`;
