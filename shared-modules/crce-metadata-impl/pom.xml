@@ -7,7 +7,7 @@
         <groupId>cz.zcu.kiv.crce</groupId>
         <artifactId>compiled-bundle-settings</artifactId>
         <version>2.1.2-SNAPSHOT</version>
-        <relativePath />
+        <relativePath>../../compiled/</relativePath>
     </parent>
 
     <artifactId>crce-metadata-impl</artifactId>

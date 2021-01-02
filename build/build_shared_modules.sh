@@ -1,11 +1,17 @@
-./mvnw install -DskipTests 
-./mvnw package
-
 rm -fr ${VOLUME_BASE_PATH}/*
 mkdir -p ${VOLUME_CONTAINING_JARS}
+
+cd ${SHARED_MODULES_ABS_PATH}
+
+mvn clean install -U -DskipTests 
+mvn package
+
 find . -name \*.jar -exec cp {} ${VOLUME_CONTAINING_JARS} \;
 
 cd ${VOLUME_CONTAINING_JARS};
+echo "----------------------------------------------------- NAD LS -----------------------------------------------"
+ls
+echo "----------------------------------------------------- POD LS -----------------------------------------------"
 for filename in ./*.jar; do
     if [ -z $(echo "${filename}"|sed "/crce/d") ]; then
         filename=`echo "${filename/.\//''}"`;
