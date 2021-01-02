@@ -98,6 +98,16 @@
             <version>3.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-json-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-json-impl</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-external-repository</artifactId>
             <version>1.0</version>
@@ -142,11 +152,11 @@
             <name>ReliSA Global Proxy repository</name>
            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository> -->
-        <repository>
+<!--         <repository>
             <id>crce-shared-modules</id>
             <name>CRCE plugin API with plugin manager</name>
             <url>file:///home/crce/shared-modules</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>

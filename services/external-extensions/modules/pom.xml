@@ -22,6 +22,11 @@
         <module>shared-third-party-dependencies</module>
         <module>aggregation</module>
         <module>crce-webui-v2</module>
+        <module>crce-metadata-api</module>
+        <module>crce-metadata-impl</module>
+        <module>crce-metadata-json-api</module>
+        <module>crce-metadata-json-impl</module>
+        <module>crce-plugin-api</module>
         <module>crce-metadata-service-api</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-metadata-dao-api</module>
