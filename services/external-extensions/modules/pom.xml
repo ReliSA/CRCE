@@ -25,6 +25,7 @@
         <module>crce-metadata-service-api</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-metadata-dao-api</module>
+        <module>crce-metadata-dao-impl</module>
         <module>crce-compatibility-api</module>
         <module>crce-repository-api</module>
         <module>crce-repository-impl</module>
