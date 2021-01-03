@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.crce_external_repository.api.impl;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,14 +37,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
 
-/**
- * Class methods include indexing the central Maven repository, or verifying the index's timeliness.
- * Verifying the existence of an artifact using the created index.
- * <p/>
- * Date: 02.05.19
- *
- * @author Roman Pesek
- */
 public class MavenIndex {
 	private String centralCachePath = "repository-index/central-cache";
 	private String centralIndexPath = "repository-index/central-index";
@@ -54,7 +46,7 @@ public class MavenIndex {
 		return indexCentralRepository.perform(settings);
 	}
 
-	public List<ArtifactInfo> searchArtefact(SettingsUrl settings, String group, String artifact,
+	public List<ArtifactInfo> searchArtefact(SettingsUrl settings, String group, String artifact, 
 			String version, String packaging, String range) throws Exception {
 		final MavenIndex indexCentralRepository = new MavenIndex();
 		return indexCentralRepository.getArtefact(settings, group, artifact, version, packaging, range);

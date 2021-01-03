@@ -1,3 +1,4 @@
+#!/bin/bash
 CFG=$1
 BUILD="clean install -U --no-transfer-progress"
 PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true";
@@ -41,24 +42,16 @@ echo $'\n\n\n'; echo "==========================================================
 echo "Building third party libraries in ./third-party"
 echo "#=============================================================="
 
-pom_exists=0;
 cd third-party
-for filename in ./*.xml; do
-    if [ -z $(echo "${filename}"|sed "/pom.xml/d") ]; then
-        pom_exists=1;
-    fi
-done
-if [ $pom_exists -eq 1 ]; then
-    for d in * ; do cd $d ; mvn $BUILD $PARAMS; cd .. ; done
-    retVal=$?;
-    if [ $retVal -ne 0 ]; then
+ls
+for d in $(ls) ; do cd $d ; ls ; mvn $BUILD $PARAMS; cd .. ; done
+
+retVal=$?;
+if [ $retVal -ne 0 ]; then
         echo "Error";
-	    exit $retVal;
-    fi
-else
-    echo $'\n';
-    echo '[INFO] No third party modules available';
+        exit $retVal;
 fi
+
 cd ..
 echo $'\n\n\n'; echo "=============================================================="
 echo "Building modules for crce service"

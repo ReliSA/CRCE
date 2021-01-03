@@ -7,7 +7,6 @@
 		<artifactId>crce-modules-parent</artifactId>
 		<version>2.1.1-SNAPSHOT</version>
 	</parent>
-	<groupId>cz.zcu.kiv.crce</groupId>
 	<artifactId>crce-external-repository</artifactId>
 	<version>1.0</version>
 	<name>CRCE - External repository support</name>
@@ -18,7 +17,6 @@
 		<bundle.symbolicName>CRCE - External repository</bundle.symbolicName>
 		<bundle.namespace>${namespace}.crce_external_repository</bundle.namespace>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.jdk>10</version.jdk>
 		<!-- <maven.compiler.source>1.8</maven.compiler.source> -->
 		<!-- <maven.compiler.target>1.8</maven.compiler.target> -->
 		<!-- If there are no local customisations, this can also be "fetch" or 
@@ -73,25 +71,20 @@
 				<version>3.3.9</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.7.22</version>
-			</dependency>
-			<dependency>
 				<groupId>org.jsoup</groupId>
 				<artifactId>jsoup</artifactId>
 				<version>1.10.3</version>
 			</dependency>
-<!-- 			<dependency>
+			<dependency>
 				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
 				<artifactId>org.apache.httpcomponents.httpcore</artifactId>
 				<version>4.3.2</version>
-			</dependency> -->
-<!-- 			<dependency>
+			</dependency>
+			<dependency>
 				<groupId>cz.zcu.kiv.crce.wrapper</groupId>
 				<artifactId>org.apache.httpcomponents.httpclient</artifactId>
 				<version>4.3.5</version>
-			</dependency> -->
+			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
@@ -207,6 +200,11 @@
 				<artifactId>sisu-guice</artifactId>
 				<version>3.2.6</version>
 			</dependency>
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>1.2</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -251,10 +249,6 @@
 			<artifactId>maven-builder-support</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 		</dependency>
@@ -274,14 +268,14 @@
 			<groupId>com.vaadin.external.flute</groupId>
 			<artifactId>flute</artifactId>
 		</dependency>
-<!-- 		<dependency>
+		<dependency>
 			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
 			<artifactId>org.apache.httpcomponents.httpcore</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
 			<artifactId>org.apache.httpcomponents.httpclient</artifactId>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -293,6 +287,18 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-repository-metadata</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-component-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-interpolation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cz.zcu.kiv.crce.wrapper</groupId>
+			<artifactId>org.codehaus.plexus.plexus-utils</artifactId>
 		</dependency>
 
 		<dependency>
@@ -343,6 +349,10 @@
 			<groupId>org.sonatype.sisu</groupId>
 			<artifactId>sisu-guice</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -357,7 +367,7 @@
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Private-Package>cz.zcu.kiv.crce.crce_external_repository.internal.*</Private-Package>
 						<Export-Package>
-							cz.zcu.kiv.crce.crce_external_repository.api.*,
+							cz.zcu.kiv.crce.crce_external_repository.api, 
 							org.apache.maven.index.*, 
 							org.apache.maven.wagon.*, 
 							javax.inject.*

@@ -1,13 +1,5 @@
-package cz.zcu.kiv.crce.crce_external_repository.api.impl;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
-/**
- * A class for setting external, central, and local Maven repository links. It also maintains user preference settings
- * to enable group content listing and editing in the local currency repository..
- * <p/>
- * Date: 02.05.19
- *
- * @author Roman Pesek
- */
 public class SettingsUrl{
 	private String centralMavenUrl = "http://repo.maven.apache.org/maven2/";
 	private String localAetherUrl = "aether-local-repo";

@@ -1,16 +1,7 @@
-package cz.zcu.kiv.crce.crce_external_repository.api.impl;
+package cz.zcu.kiv.crce.crce_external_repository.api;
 
 import java.util.List;
 
-/**
- * The class represents the artifact in the external Maven repository. The goupId, artefactId, package, list,
- * available versions, and location url parameters uniquely identify the object. The return type of interface
- * methods DefinedMavenApi
- * <p/>
- * Date: 02.05.19
- *
- * @author Roman Pesek
- */
 public class ArtifactTree {
 	private String groupId;
 	private String artefactId;

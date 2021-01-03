@@ -18,12 +18,7 @@ ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
 ENV FELIX_PATH="/felix"
 ENV FELIX_V_PATH="/felix/felix-framework-6.0.3"
-ENV TARGET_DIR="target/pax-runner-dir/bundles"
-ENV FELIX_EXEC_ENV_PROFILE_PATH="./deploy/J2SE-11.Profile"
-ENV BUNDLE_TMP_PATH="${TARGET_DIR}/bundle-tmp"
 ARG SERVICE_PATH_PREFIX
-
-#NEW ENVs
 
 ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 ENV BASE_BUILD_SCRIPT_NAME="base_build-code.sh"
@@ -31,7 +26,7 @@ ENV BASE_BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
 ENV BUILD_CODE_PATH="./deploy/docker/not-metadata-service/${BUILD_CODE_NAME}"
 ENV CONFIG_METADATA_MODULES="metadata-modules.txt"
 
-#
+ENV WAIT_FOR_IT_PATH="wait-for-it.sh"
 
 
 #COPY PROJECT INTO DOCKER
@@ -40,8 +35,6 @@ WORKDIR ${PROJECT_PATH}
 COPY ./deploy ./deploy
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
-
-RUN echo ${SERVICE_PATH_PREFIX}
 
 COPY ${SERVICE_PATH_PREFIX}/build ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules
@@ -56,15 +49,24 @@ COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
 
-RUN mkdir -p ${TARGET_DIR};
 
-# NEW Copy base building script
+#Copy wait for other container script
+
+COPY ${WAIT_FOR_IT_PATH} .
+RUN chmod u+x ${WAIT_FOR_IT_PATH}
+RUN pwd
+
+# Copy base building script
 COPY ${BASE_BUILD_CODE_PATH} ${BASE_BUILD_SCRIPT_NAME}
 
-# NEW Copy building script
+# Copy building script
 COPY ${BUILD_CODE_PATH} ${BUILD_CODE_NAME}
 
-# NEW Copy configuration (list of metadata modules)
+RUN chmod u+x ${BUILD_CODE_NAME}
+
+RUN chmod u+x ./deploy/prepare-bundles.sh
+
+# Copy configuration (list of metadata modules)
 COPY ${SERVICE_PATH_PREFIX}/${CONFIG_METADATA_MODULES} .
 
 # Copy prepare-bundles script
@@ -112,4 +114,5 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 WORKDIR ${PROJECT_PATH}
 
 #CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; ls ./bundle ; echo "BIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN" ; ls ;ls ./bin ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
-CMD bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ;  echo $'BIIIIIIIIIIIIIIIII\nIIIIIIIIIIIIIII\nIN' ; ls ./bundle ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+#CMD bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+#CMD bash ${BUILD_CODE_NAME}

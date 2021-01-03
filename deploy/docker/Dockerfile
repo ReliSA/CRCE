@@ -9,51 +9,36 @@ ENV PATH=$PATH:${JAVA_HOME}/bin
 #OPENJDK11 END
 
 ENV PROJECT_PATH="/home/crce"
-ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
-ENV PREPARE_BUNDLE_PATH="./deploy/${PREPARE_BUNDLE_NAME}"
 ENV BUILD_CODE_NAME="build-code.bash"
 ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
-ENV DEPLOY_POM_PATH="./deploy/pom.xml"
-ENV PROVISION_POM_PATH="./deploy/provision"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
 ENV FELIX_PATH="/felix"
-ENV FELIX_V_PATH="/felix/felix-framework-6.0.3"
-ENV TARGET_DIR="target/pax-runner-dir/bundles"
-ENV FELIX_EXEC_ENV_PROFILE_PATH="./deploy/J2SE-11.Profile"
-ENV BUNDLE_TMP_PATH="${TARGET_DIR}/bundle-tmp"
+ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
 ARG SERVICE_PATH_PREFIX
+
+ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 
 #COPY PROJECT INTO DOCKER
 WORKDIR ${PROJECT_PATH}
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
 
-RUN echo ${SERVICE_PATH_PREFIX}
-
 COPY ${SERVICE_PATH_PREFIX}/build ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules_tmp
 #COPY ${SERVICE_PATH_PREFIX}/pom.xml .
-RUN echo ${SERVICE_PATH_PREFIX} 
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
-COPY ${DEPLOY_POM_PATH} .
-COPY ${PROVISION_POM_PATH} ./provision
 #END
 
 # Alias on mvn wrapper 
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
 
-RUN mkdir -p ${TARGET_DIR};
+COPY ./deploy ./deploy
 
 # Copy building script
 COPY ${BUILD_CODE_PATH} .
-
-# Copy prepare-bundles script
-COPY ${PREPARE_BUNDLE_PATH} .
-
-COPY ${FELIX_EXEC_ENV_PROFILE_PATH} .
 
 #FELIX OSGi START
 # Prepare environment
@@ -94,4 +79,5 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ${FELIX_V_PATH}/bin/felix.jar
+CMD cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME}
+# ; cd ./deploy ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar

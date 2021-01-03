@@ -12,22 +12,25 @@ services:
                        - /mongodb:/data/db
                        - ./dev-dump:/dev-dump
 
-#       metadata:
-#                depends_on: 
-#                          - database
-#                container_name: "crce_metadata"
-#                networks: 
-#                        - crce
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
-#                ports:
-#                     - "8081:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+       metadata:
+                depends_on: 
+                          - database
+                container_name: "crce_metadata"
+                tty: true
+                networks: 
+                        - crce
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
+                ports:
+                     - "8081:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+                command: bash -c "cd ./deploy && ./prepare-bundles.sh && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                       #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
 #
 #
 #       restapi:
@@ -51,8 +54,8 @@ services:
        externalextensions:
                 depends_on: 
                           - database
-                          #- metadata
                 container_name: "crce_external-extensions"
+                tty: true
                 networks: 
                         - crce
                 build: 
@@ -65,6 +68,9 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+                command: bash -c "pwd && ls && ./build-code.bash && cd ./deploy && ./prepare-bundles.sh && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
+                
 #       wsindexers:
 #                depends_on: 
 #                          - database
