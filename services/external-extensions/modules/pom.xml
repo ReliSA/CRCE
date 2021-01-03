@@ -22,11 +22,11 @@
         <module>shared-third-party-dependencies</module>
         <module>aggregation</module>
         <module>crce-webui-v2</module>
-        <module>crce-metadata-api</module>
-        <module>crce-metadata-impl</module>
-        <module>crce-metadata-json-api</module>
-        <module>crce-metadata-json-impl</module>
-        <module>crce-plugin-api</module>
+        <!-- <module>crce-metadata-api</module> -->
+        <!-- <module>crce-metadata-impl</module> -->
+        <!-- <module>crce-metadata-json-api</module> -->
+        <!-- <module>crce-metadata-json-impl</module> -->
+        <!-- <module>crce-plugin-api</module> -->
         <module>crce-metadata-service-api</module>
         <module>crce-metadata-service-impl</module>
         <module>crce-metadata-dao-api</module>
@@ -40,7 +40,7 @@
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-metadata-indexer-api</module>
         <module>crce-metadata-indexer-impl</module>
-        <module>crce-component-collection</module>
+        <module>crce-component-versioning</module>
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->

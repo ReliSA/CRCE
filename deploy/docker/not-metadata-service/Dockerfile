@@ -37,7 +37,7 @@ ENV CONFIG_METADATA_MODULES="metadata-modules.txt"
 #COPY PROJECT INTO DOCKER
 WORKDIR ${PROJECT_PATH}
 
-
+COPY ./deploy ./deploy
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
 
@@ -48,8 +48,8 @@ COPY ${SERVICE_PATH_PREFIX}/modules ./modules
 #COPY ${SERVICE_PATH_PREFIX}/pom.xml .
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
-COPY ${DEPLOY_POM_PATH} .
-COPY ${PROVISION_POM_PATH} ./provision
+#COPY ${DEPLOY_POM_PATH} .
+#COPY ${PROVISION_POM_PATH} ./provision
 #END
 
 # Alias on mvn wrapper 
@@ -68,9 +68,9 @@ COPY ${BUILD_CODE_PATH} ${BUILD_CODE_NAME}
 COPY ${SERVICE_PATH_PREFIX}/${CONFIG_METADATA_MODULES} .
 
 # Copy prepare-bundles script
-COPY ${PREPARE_BUNDLE_PATH} .
+#COPY ${PREPARE_BUNDLE_PATH} .
 
-COPY ${FELIX_EXEC_ENV_PROFILE_PATH} .
+#COPY ${FELIX_EXEC_ENV_PROFILE_PATH} .
 
 #FELIX OSGi START
 # Prepare environment
@@ -112,4 +112,4 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 WORKDIR ${PROJECT_PATH}
 
 #CMD bash ${BUILD_CODE_NAME} ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; ls ./bundle ; echo "BIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIN" ; ls ;ls ./bin ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
-CMD bash ${BUILD_CODE_NAME} ; mvn clean pax:directory ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ;  echo $'BIIIIIIIIIIIIIIIII\nIIIIIIIIIIIIIII\nIN' ; ls ./bundle ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+CMD bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ;  echo $'BIIIIIIIIIIIIIIIII\nIIIIIIIIIIIIIII\nIN' ; ls ./bundle ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar

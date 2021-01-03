@@ -9,22 +9,21 @@
 		<artifactId>crce-modules-parent</artifactId>
 		<version>2.1.1-SNAPSHOT</version>
 	</parent>
-	<groupId>cz.zcu.kiv.crce</groupId>
+	<!-- <groupId>cz.zcu.kiv.crce</groupId> -->
 	<artifactId>crce-webui-v2</artifactId>
 	<packaging>war</packaging>
-	<version>1.7</version>
+	<version>1.5</version>
 	<name>CRCE - Web UI</name>
 
 	<!-- <prerequisites> <maven>3</maven> </prerequisites> -->
 
 	<properties>
 		<bundle.symbolicName>CRCE - Web UI</bundle.symbolicName>
-		<bundle.namespace>cz.zcu.kiv.crce.crce_webui_v2</bundle.namespace>
+		<bundle.namespace>${namespace}.crce_webui_v2</bundle.namespace>
 		<vaadin.version>7.7.10</vaadin.version>
 		<vaadin.plugin.version>7.7.10</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version.jdk>10</version.jdk>
 		<!-- <maven.compiler.source>1.8</maven.compiler.source> -->
 		<!-- <maven.compiler.target>1.8</maven.compiler.target> -->
 		<!-- If there are no local customisations, this can also be "fetch" or 
@@ -33,6 +32,11 @@
 	</properties>
 
 	<repositories>
+		<repository>
+			<id>crce-shared-modules</id>
+			<name>CRCE plugin API with plugin manager</name>
+			<url>file:///home/crce/shared-modules</url>
+		</repository>
 		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
@@ -87,29 +91,49 @@
 		</dependency>
 		<dependency>
 			<groupId>cz.zcu.kiv.crce</groupId>
-			<artifactId>crce-component-collection</artifactId>
+			<artifactId>crce-component-versioning</artifactId>
 			<version>1.0</version>
 			<type>bundle</type>
 		</dependency>
 		<dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-dao-api</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+		</dependency>
+				<dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-metadata-dao-impl</artifactId>
+            <version>3.1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-repository-api</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.zcu.kiv.crce</groupId>
+            <artifactId>crce-repository-impl</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-api</artifactId>
+            <artifactId>crce-plugin-api</artifactId>
             <version>2.1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>crce-metadata-indexer-impl</artifactId>
-            <version>2.1.1-SNAPSHOT</version>
-        </dependency>
-		<dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-service-api</artifactId>
             <version>3.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
+		</dependency>
+		<dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-metadata-service-impl</artifactId>
             <version>3.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-compatibility-api</artifactId>
+            <version>2.1.2-SNAPSHOT</version>
         </dependency>
 	</dependencies>
 
@@ -189,10 +213,10 @@
 							*
 						</DynamicImport-Package>
 						<Import-Package>
-                            cz.zcu.kiv.crce.crce_external_repository.api,
-                            cz.zcu.kiv.crce.crce_component_collection.api,
-                            !${bundle.namespace}.internal.*
-                        </Import-Package>
+							cz.zcu.kiv.crce.crce_external_repository.api,
+							cz.zcu.kiv.crce.crce_component_versioning.api,
+							!${bundle.namespace}.internal.*
+						</Import-Package>
 						<Bundle-Activator>${bundle.namespace}.internal.Activator</Bundle-Activator>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-ClassPath>
@@ -248,4 +272,5 @@
 			</pluginRepositories>
 		</profile>
 	</profiles>
+
 </project>

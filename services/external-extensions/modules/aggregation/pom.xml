@@ -49,7 +49,7 @@
         <dependency>
             <groupId>cz.zcu.kiv.crce</groupId>
             <artifactId>crce-webui-v2</artifactId>
-            <version>1.7</version>
+            <version>1.5</version>
 			<type>war</type>
         </dependency>
         <dependency>
@@ -113,12 +113,6 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-			<groupId>cz.zcu.kiv.crce</groupId>
-			<artifactId>crce-component-collection</artifactId>
-			<version>1.0</version>
-			<type>bundle</type>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-plugin-api</artifactId>
             <version>2.1.1-SNAPSHOT</version>
@@ -143,6 +137,11 @@
             <artifactId>crce-resolver-impl</artifactId>
             <version>2.2.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-component-versioning</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->
@@ -152,11 +151,11 @@
             <name>ReliSA Global Proxy repository</name>
            <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
         </repository> -->
-<!--         <repository>
+        <repository>
             <id>crce-shared-modules</id>
             <name>CRCE plugin API with plugin manager</name>
             <url>file:///home/crce/shared-modules</url>
-        </repository> -->
+        </repository>
         <repository>
             <id>maven.kalwi.eu.releases</id>
             <name>kalwi.eu releases repository</name>
