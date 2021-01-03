@@ -8,37 +8,43 @@ RUN apk add openjdk11;\
 ENV PATH=$PATH:${JAVA_HOME}/bin
 #OPENJDK11 END
 
+# Project ENVs
+ENV DEPLOY_PATH="./deploy"
+ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/prepare-bundles.sh"
 ENV PROJECT_PATH="/home/crce"
 ENV BUILD_CODE_NAME="build-code.bash"
 ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
+
+# Felix ENVs
 ENV FELIX_PATH="/felix"
 ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
+
 ARG SERVICE_PATH_PREFIX
 
 ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 
-#COPY PROJECT INTO DOCKER
 WORKDIR ${PROJECT_PATH}
+
+COPY ${DEPLOY_PATH} ./deploy
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
-
 COPY ${SERVICE_PATH_PREFIX}/build ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules_tmp
-#COPY ${SERVICE_PATH_PREFIX}/pom.xml .
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
-#END
+
+# Executable prepare-bundles.sh
+RUN chmod u+x ${PREPARE_BUNDLES_PATH}
 
 # Alias on mvn wrapper 
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
 
-COPY ./deploy ./deploy
-
 # Copy building script
-COPY ${BUILD_CODE_PATH} .
+COPY ${BUILD_CODE_PATH} ${BUILD_CODE_NAME}
+RUN chmod u+x ${BUILD_CODE_NAME}
 
 #FELIX OSGi START
 # Prepare environment
@@ -51,9 +57,6 @@ RUN tar xvfz apache-felix.tar.gz && rm apache-felix.tar.gz
 
 # Remove duplicate gogo runtime
 RUN rm ${FELIX_V_PATH}/bundle/org.apache.felix.gogo.runtime*
-
-# Add CRCE modules to Felix autodeploy dir
-#RUN cp ${PROJECT_PATH}/target/pax-runner-dir/bundles/* ${FELIX_V_PATH}/bundle/
 
 # Create directory for installing new bundles
 RUN mkdir ${FELIX_V_PATH}/dist
@@ -68,10 +71,10 @@ COPY ./deploy/felix-configuration/config.properties ${FELIX_V_PATH}/conf/
 COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 
 # Run Felix (with debug enabled)
-#CMD cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+#cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
 
 # Run Felix (with debug disabled)
-# CMD cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
+#cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
 
 #FELIX OSGi END
 
@@ -80,4 +83,3 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 WORKDIR ${PROJECT_PATH}
 
 CMD cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME}
-# ; cd ./deploy ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar

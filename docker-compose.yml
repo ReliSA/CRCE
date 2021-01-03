@@ -29,7 +29,7 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-                command: bash -c "cd ./deploy && ./prepare-bundles.sh && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                command: bash -c "cd ./deploy && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
                        #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
 #
 #
@@ -68,7 +68,7 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-                command: bash -c "pwd && ls && ./build-code.bash && cd ./deploy && ./prepare-bundles.sh && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                command: bash -c "pwd && ls && bash ${BUILD_CODE_NAME} && cd ./deploy && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
                 #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
                 
 #       wsindexers:
