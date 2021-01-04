@@ -22,7 +22,7 @@
         <relativePath>../shared-third-party-dependencies</relativePath>
     </parent>
 
-    <artifactId>aggregation</artifactId>
+    <artifactId>crce-default-modules</artifactId>
     <version>2.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 

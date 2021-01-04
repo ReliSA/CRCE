@@ -1,16 +1,14 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1601484853872
-Build-Jdk: 11.0.8
-Built-By: root
+Bnd-LastModified: 1609752919772
+Build-Jdk: 11.0.9.1
+Built-By: tomas
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
  ivator
 Bundle-Description: Component Repository supporting Compatibility Evalua
  tion
-Bundle-DocURL: http://www.kiv.zcu.cz
 Bundle-ManifestVersion: 2
 Bundle-Name: CRCE - Support versification composite components
 Bundle-SymbolicName: crce-component-versioning
-Bundle-Vendor: ZČU KIV
 Bundle-Version: 1.0
 Created-By: Apache Maven Bundle Plugin
 DynamicImport-Package: *

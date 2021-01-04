@@ -4,13 +4,15 @@ FROM alpine:latest
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm/"
 RUN apk add openjdk11;\
     apk add bash;\
-    apk add zip;
+    apk add zip;\
+    apk add tree;
 ENV PATH=$PATH:${JAVA_HOME}/bin
 #OPENJDK11 END
 
 # Project ENVs
 ENV DEPLOY_PATH="./deploy"
 ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/prepare-bundles.sh"
+ENV TARGET_PATH="${DEPLOY_PATH}/target"
 ENV PROJECT_PATH="/home/crce"
 ENV BUILD_CODE_NAME="build-code.bash"
 ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
@@ -28,6 +30,7 @@ ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 WORKDIR ${PROJECT_PATH}
 
 COPY ${DEPLOY_PATH} ./deploy
+COPY ${SERVICE_PATH_PREFIX}/modules/aggregation/pom.xml ./deploy/pom/pom.xml
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
 COPY ${SERVICE_PATH_PREFIX}/build ./build
@@ -61,6 +64,7 @@ RUN rm ${FELIX_V_PATH}/bundle/org.apache.felix.gogo.runtime*
 # Create directory for installing new bundles
 RUN mkdir ${FELIX_V_PATH}/dist
 
+
 # Copy configuration for Configuration Admin service
 # 'conf' is the directory to watch (configured by 'felix.fileinstall.dir')
 #RUN mkdir ${FELIX_V_PATH}/load
@@ -82,4 +86,4 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME}
+CMD ls ; cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; cd deploy/ ; mvn clean pax:directory ; bash prepare-bundles.sh

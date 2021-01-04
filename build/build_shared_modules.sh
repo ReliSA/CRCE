@@ -3,7 +3,7 @@ mkdir -p ${VOLUME_CONTAINING_JARS}
 
 cd ${SHARED_MODULES_ABS_PATH}
 
-mvn clean install -U -DskipTests 
+mvn clean install -U -DskipTests --no-transfer-progress
 mvn package
 
 find . -name \*.jar -exec cp {} ${VOLUME_CONTAINING_JARS} \;

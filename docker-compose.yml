@@ -24,12 +24,15 @@ services:
                      context: .
                      args: 
                          - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
+                         - SKIP_BUILD=1
                 ports:
                      - "8081:8080"
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-                command: bash -c "cd ./deploy && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                       - metadata-felix:/felix
+                command: bash -c "cd ${FELIX_V_PATH} && ls bundle && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+                #command: bash -c "find . -name \*.jar -exec echo {} . \; && cd deploy && ls pom/ && cat pom/pom.xml && mvn clean pax:directory -U --no-transfer-progress && ls && ls target && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
                        #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
 #
 #
@@ -50,27 +53,28 @@ services:
 #                volumes:
 #                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
 #                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-
-       externalextensions:
-                depends_on: 
-                          - database
-                container_name: "crce_external-extensions"
-                tty: true
-                networks: 
-                        - crce
-                build: 
-                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
-                     context: .
-                     args: 
-                         - SERVICE_PATH_PREFIX=${EXTERNAL_EXTENSIONS_SERVICE_PATH}
-                ports:
-                     - "8080:8080"
-                volumes:
-                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
-                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-                command: bash -c "pwd && ls && bash ${BUILD_CODE_NAME} && cd ./deploy && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
-                #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
-                
+#
+#       externalextensions:
+#                depends_on: 
+#                          - database
+#                container_name: "crce_external-extensions"
+#                tty: true
+#                networks: 
+#                        - crce
+#                build: 
+#                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
+#                     context: .
+#                     args: 
+#                         - SERVICE_PATH_PREFIX=${EXTERNAL_EXTENSIONS_SERVICE_PATH}
+#                         - BUILD_CODE_NAME=${BUILD_CODE_NAME}
+#                ports:
+#                     - "8080:8080"
+#                volumes:
+#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
+#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+#                command: bash -c "pwd && ls && bash ${BUILD_CODE_NAME} && cd ./deploy && mvn clean pax:directory && bash ${PREPARE_BUNDLE_NAME} && cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+#                #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
+#                
 #       wsindexers:
 #                depends_on: 
 #                          - database
@@ -114,4 +118,7 @@ volumes:
                         external: true
                         
         shared-modules:
+                      external: true
+
+        metadata-felix:
                       external: true
