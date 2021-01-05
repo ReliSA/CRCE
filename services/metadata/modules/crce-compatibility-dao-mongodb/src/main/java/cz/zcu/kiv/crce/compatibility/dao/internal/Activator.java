@@ -1,15 +1,14 @@
 package cz.zcu.kiv.crce.compatibility.dao.internal;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
-
+import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
+import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
 import org.apache.felix.dm.DependencyActivatorBase;
 import org.apache.felix.dm.DependencyManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ManagedService;
 
-import cz.zcu.kiv.crce.compatibility.CompatibilityFactory;
-import cz.zcu.kiv.crce.compatibility.dao.CompatibilityDao;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Date: 17.11.13
@@ -40,7 +39,8 @@ public class Activator extends DependencyActivatorBase {
                 .setFactory(new CompatibilityDaoMongoFactory(), "get")
                 //requires CompatibilityFactory for proper mapping
                 .add(createServiceDependency().setRequired(true)
-                        .setService(CompatibilityFactory.class))
+                        .setService(CompatibilityFactory.class)
+                )
         );
     }
 

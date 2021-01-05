@@ -43,8 +43,7 @@ echo "Building third party libraries in ./third-party"
 echo "#=============================================================="
 
 cd third-party
-ls
-for d in $(ls) ; do cd $d ; ls ; mvn $BUILD $PARAMS; cd .. ; done
+for d in $(ls) ; do cd $d ; mvn $BUILD $PARAMS; cd .. ; done
 
 retVal=$?;
 if [ $retVal -ne 0 ]; then

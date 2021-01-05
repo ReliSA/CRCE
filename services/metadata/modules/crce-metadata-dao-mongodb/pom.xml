@@ -59,6 +59,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
+            <!-- <version>2.13.3</version> -->
         </dependency>
         <dependency>
             <groupId>org.mongojack</groupId>
@@ -79,6 +80,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+<!--         <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.process</artifactId>
+            <version>1.40.0</version>
+        </dependency>    -->     
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
@@ -89,11 +95,11 @@
             <artifactId>jna-osgi</artifactId>
             <version>4.0.0</version>
         </dependency>
-<!--         <dependency>
+        <dependency>
             <groupId>cz.zcu.kiv.crce.wrapper</groupId>
             <artifactId>net.java.dev.jna.jna-platform</artifactId>
             <version>4.0.0</version>
-        </dependency> -->
+        </dependency>
 
 
         <!-- Project dependencies -->
@@ -136,6 +142,10 @@
             <id>relisa-global</id>
             <name>ReliSA Global Proxy repository</name>
             <url>http://relisa-dev.kiv.zcu.cz:8081/nexus/content/groups/public</url>
+        </repository> -->
+<!--         <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
         </repository> -->
         <repository>
             <id>crce-shared-modules</id>

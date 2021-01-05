@@ -1,10 +1,11 @@
 package cz.zcu.kiv.crce.compatibility.dao;
 
-import java.util.List;
-
 import cz.zcu.kiv.crce.compatibility.Compatibility;
 import cz.zcu.kiv.crce.compatibility.Difference;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.metadata.type.Version;
+
+import java.util.List;
 
 /**
  * Interface for Compatibility DAO object.
@@ -84,4 +85,15 @@ public interface CompatibilityDao {
      * @return list of compatibilities or empty list if none found
      */
     List<Compatibility> findLower(String resourceName, Version resourceVersion, List<Difference> differences);
+
+    /**
+     * Returns Compatibility data for baseResource and resource tuple.
+     *
+     * Resource IDs are used to lookup data.
+     *
+     * @param baseResource Base resource (id must match baseResourceName).
+     * @param resource Other resource (id must match resourceName).
+     * @return Found compatibilities.
+     */
+    List<Compatibility> findCompatibility(Resource baseResource, Resource resource);
 }

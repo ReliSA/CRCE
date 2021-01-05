@@ -27,8 +27,10 @@ public class CompatibilityDaoMongoFactory {
      * @return instance of CompatibilityDao MongoDB implementation.
      */
     public CompatibilityDao get() {
+        System.out.println("MONGO GET");
         if(dao == null) {
             try {
+                System.out.println("NEW MONGOIMPL");
                 dao = new CompatibilityDaoMongoImpl(DbContext.getConnection());
             } catch (UnknownHostException e) {
                 logger.error("Unable to open connection to the database!", e);

@@ -11,7 +11,8 @@ ENV PATH=$PATH:${JAVA_HOME}/bin
 
 # Project ENVs
 ENV DEPLOY_PATH="./deploy"
-ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/prepare-bundles.sh"
+ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
+ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/${PREPARE_BUNDLE_NAME}"
 ENV TARGET_PATH="${DEPLOY_PATH}/target"
 ENV PROJECT_PATH="/home/crce"
 ENV BUILD_CODE_NAME="build-code.bash"
@@ -23,14 +24,13 @@ ENV MVN_WRAPPER_PATH="mvnw"
 ENV FELIX_PATH="/felix"
 ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
 
-ARG SERVICE_PATH_PREFIX
-
 ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 
 WORKDIR ${PROJECT_PATH}
 
+ARG SERVICE_PATH_PREFIX
+
 COPY ${DEPLOY_PATH} ./deploy
-COPY ${SERVICE_PATH_PREFIX}/modules/aggregation/pom.xml ./deploy/pom/pom.xml
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
 COPY ${SERVICE_PATH_PREFIX}/build ./build
@@ -86,4 +86,4 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD ls ; cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; cd deploy/ ; mvn clean pax:directory ; bash prepare-bundles.sh
+CMD rm -rf ./modules/* ; cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; cd deploy/ ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME}

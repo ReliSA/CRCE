@@ -10,23 +10,27 @@ ENV PATH=$PATH:${JAVA_HOME}/bin
 
 # Project ENVs
 ENV DEPLOY_PATH="./deploy"
-ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/prepare-bundles.sh"
+ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
+ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/${PREPARE_BUNDLE_NAME}"
 ENV PROJECT_PATH="/home/crce"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
 
 # Felix ENVs
 ENV FELIX_PATH="/felix"
+
 ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
 
 ARG SERVICE_PATH_PREFIX
-ARG BUILD_CODE_NAME
 
+ENV BUILD_CODE_NAME="build-code.bash"
 ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 ENV BASE_BUILD_SCRIPT_NAME="base_build-code.sh"
 ENV BASE_BUILD_CODE_PATH="${DEPLOY_PATH}/docker/${BUILD_CODE_NAME}"
 ENV BUILD_CODE_PATH="${DEPLOY_PATH}/docker/not-metadata-service/${BUILD_CODE_NAME}"
 ENV CONFIG_METADATA_MODULES_PATH="${SERVICE_PATH_PREFIX}/metadata-modules.txt"
+ENV CONFIG_METADATA_MODULES_DOCKER_PATH="${PROJECT_PATH}/metadata-modules.txt"
+ENV mongo_connection mongodb://172.17.0.1:27017
 
 WORKDIR ${PROJECT_PATH}
 
@@ -91,3 +95,5 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #RUN addgroup -S spring && adduser -S spring -G spring
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
+
+CMD bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
