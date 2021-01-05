@@ -44,11 +44,6 @@ public class DbContext {
      * @see MongoClientURI
      * */
     public static MongoClient getConnection() throws UnknownHostException {
-        if (client != null){
-            System.out.println("Client neni null");
-        } else {
-            System.out.println("Client je null");
-        }
         if (client == null) {
             String connectionString = DEFAULT_CONNECTION;
             if(System.getenv().containsKey(ENV_CONNECTION)) {
@@ -56,12 +51,6 @@ public class DbContext {
             }
             MongoClientURI connectionParams = new MongoClientURI(connectionString);
             client = new MongoClient(connectionParams);
-            try {
-                client.getAddress();
-                System.out.println("Mongo is running");
-              } catch (Exception e) {
-                System.out.println("Mongo is down");
-              }
         }
         return client;
     }

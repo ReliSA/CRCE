@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  OSGi Version Generator Service
+
+-->
+
+<component name="cz.zcu.kiv.crce.concurrency" immediate="true">
+    <implementation class="cz.zcu.kiv.crce.concurrency.service.internal.TaskRunnerServiceImpl"/>
+    <service>
+        <provide interface="cz.zcu.kiv.crce.concurrency.service.TaskRunnerService"/>
+    </service>
+</component>
+

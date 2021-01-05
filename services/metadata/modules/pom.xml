@@ -37,6 +37,9 @@
         <module>crce-metadata-osgi-bundle</module>
         <module>crce-repository-impl</module>
         <module>crce-resolver-impl</module>
+        <module>crce-webservices-indexer</module>
+        <module>crce-restimpl-indexer</module>
+        <module>crce-concurrency</module>
         <module>crce-vo</module>
 		
         <module>aggregation</module>

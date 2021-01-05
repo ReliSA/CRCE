@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <parent>
+        <relativePath>../shared-third-party-dependencies</relativePath>
+        <groupId>cz.zcu.kiv.crce</groupId>
+        <artifactId>crce-modules-parent</artifactId>
+        <version>2.1.1-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>crce-webservices-indexer</artifactId>
+    <packaging>bundle</packaging>
+
+    <name>CRCE - Webservices Indexer</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bundle.namespace>${namespace}.webservices.indexer</bundle.namespace>
+        <bundle.symbolicName>${namespace}.webservices.indexer</bundle.symbolicName>
+        <findbugs.skip>true</findbugs.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.dependencymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-concurrency</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-impl</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-indexer-api</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-indexer-impl</artifactId>
+            <version>2.1.1-SNAPSHOT</version>
+        </dependency>
+		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crce-metadata-service-api</artifactId>
+            <version>3.0.1-SNAPSHOT</version>
+        </dependency>
+        <!-- originally taken from apache felix dependencymanager annotations 3.2.0 -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>crce-shared-modules</id>
+            <name>CRCE plugin API with plugin manager</name>
+            <url>file:///home/crce/shared-modules</url>
+        </repository>
+    </repositories>
+</project>

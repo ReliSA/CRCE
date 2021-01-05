@@ -42,6 +42,9 @@
         <module>crce-metadata-indexer-api</module>
         <module>crce-metadata-indexer-impl</module>
         <module>crce-component-versioning</module>
+        <module>crce-webservices-indexer</module>
+        <module>crce-restimpl-indexer</module>
+        <module>crce-concurrency</module>
     </modules>
 
     <!-- Workaround for that Maven 3.1+ doesn't resolve released artifacts from local repository -->

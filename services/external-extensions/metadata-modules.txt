@@ -7,10 +7,11 @@ crce-repository-api
 crce-repository-impl
 crce-metadata-osgi-bundle
 crce-component-versioning
-!crce-restimpl-indexer
-!crce-webservices-indexer
+crce-restimpl-indexer
+crce-webservices-indexer
 crce-metadata-indexer-api
 crce-metadata-indexer-impl
 crce-resolver-api
 crce-resolver-impl
+crce-concurrency
 crce-component-collection <- dostupne po rebase vetve dp na dev
