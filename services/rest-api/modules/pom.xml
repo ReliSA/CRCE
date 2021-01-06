@@ -24,7 +24,10 @@
         <module>aggregation</module>
         <module>crce-compatibility-api</module>
         <module>crce-compatibility-dao-api</module>
+        <module>crce-api-compatibility-checker</module>
+        <module>crce-compatibility-dao-mongodb</module>
         <module>crce-metadata-dao-api</module>
+        <module>crce-metadata-dao-mongodb</module>
         <module>crce-metadata-indexer-api</module>
         <module>crce-metadata-indexer-impl</module>
         <module>crce-metadata-osgi-bundle</module>
@@ -34,6 +37,9 @@
         <module>crce-resolver-impl</module>
         <module>crce-repository-api</module>
         <module>crce-repository-impl</module>
+        <module>crce-webservices-indexer</module>
+        <module>crce-restimpl-indexer</module>
+        <module>crce-concurrency</module>
         <module>crce-vo</module>
     </modules>
 

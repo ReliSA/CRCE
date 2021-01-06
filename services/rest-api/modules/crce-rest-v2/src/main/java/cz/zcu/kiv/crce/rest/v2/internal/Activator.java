@@ -1,14 +1,6 @@
 package cz.zcu.kiv.crce.rest.v2.internal;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.felix.dm.DependencyActivatorBase;
-import org.apache.felix.dm.DependencyManager;
-import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import cz.zcu.kiv.crce.apicomp.ApiCompatibilityCheckerService;
 import cz.zcu.kiv.crce.compatibility.service.CompatibilitySearchService;
 import cz.zcu.kiv.crce.metadata.MetadataFactory;
 import cz.zcu.kiv.crce.metadata.osgi.util.FilterParser;
@@ -19,6 +11,14 @@ import cz.zcu.kiv.crce.repository.Store;
 import cz.zcu.kiv.crce.resolver.optimizer.CostFunctionRepository;
 import cz.zcu.kiv.crce.resolver.optimizer.ResultOptimizerRepository;
 import cz.zcu.kiv.crce.vo.service.MappingService;
+import org.apache.felix.dm.DependencyActivatorBase;
+import org.apache.felix.dm.DependencyManager;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "UWF_UNWRITTEN_FIELD", justification = "Injected by dependency manager.")
 public final class Activator extends DependencyActivatorBase {
@@ -39,6 +39,7 @@ public final class Activator extends DependencyActivatorBase {
     private volatile MappingService mappingService;
     private volatile CostFunctionRepository costFunctionRepository;
     private volatile ResultOptimizerRepository resultOptimizerRepository;
+    private volatile ApiCompatibilityCheckerService apiCompatibilityCheckerService;
 
     public static Activator instance() {
         return instance;
@@ -70,6 +71,10 @@ public final class Activator extends DependencyActivatorBase {
 
     public ResultOptimizerRepository getResultOptimizerRepository() {
         return resultOptimizerRepository;
+    }
+
+    public ApiCompatibilityCheckerService getApiCompatibilityCheckerService() {
+        return apiCompatibilityCheckerService;
     }
 
     @Nullable
@@ -113,6 +118,7 @@ public final class Activator extends DependencyActivatorBase {
                 .add(createServiceDependency().setService(CostFunctionRepository.class).setRequired(true))
                 .add(createServiceDependency().setService(ResultOptimizerRepository.class).setRequired(true))
                 .add(createServiceDependency().setService(CompatibilitySearchService.class).setRequired(false))
+                .add(createServiceDependency().setService(ApiCompatibilityCheckerService.class).setRequired(true))
         );
 
         logger.debug("Finished initializing Rest-V2 Activator!");

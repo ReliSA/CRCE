@@ -1,6 +1,9 @@
 crce-compatibility-api
 crce-compatibility-dao-api
+crce-compatibility-dao-mongodb
+crce-api-compatibility-checker
 crce-metadata-dao-api
+crce-metadata-dao-mongodb
 crce-metadata-indexer-api
 crce-metadata-indexer-impl
 crce-metadata-osgi-bundle
@@ -11,3 +14,6 @@ crce-resolver-impl
 crce-repository-api
 crce-repository-impl
 crce-vo
+crce-restimpl-indexer
+crce-webservices-indexer
+crce-concurrencyq
