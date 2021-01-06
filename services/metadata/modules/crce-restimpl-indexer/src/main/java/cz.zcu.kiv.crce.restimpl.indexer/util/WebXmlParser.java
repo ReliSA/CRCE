@@ -27,20 +27,16 @@ public class WebXmlParser {
     private DispatcherDefinition definition;
 
     public WebXmlParser() throws IOException {
-        System.out.println("Before load definition");
         definition = loadDefinition();
-        System.out.println("Constructed");
     }
 
     private DispatcherDefinition loadDefinition() throws IOException{
         DispatcherDefinition definition = null;
-        System.out.println("Before YAMLFactory");
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        System.out.println("After YAMLFactory");
         URL defFileUrl = getClass().getClassLoader().getResource(DEF_FILE);
-        System.out.println("After URL");
+
         definition = mapper.readValue(defFileUrl, DispatcherDefinition.class);
-        System.out.println("After definition");
+
         return definition;
 
     }

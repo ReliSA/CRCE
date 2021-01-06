@@ -63,23 +63,17 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
         // ARCHIVE PROCESSING
         WebXmlParser.Result webXmlResult = null;
         try {   // borrowed code..  -  parsing input stream and collecting class entry information
-            logger.debug("Parsing ???");
-            System.out.println("Parsing ???");
             ZipInputStream jis = new ZipInputStream(input);
             ClassVisitor classVisitor = new MyClassVisitor(Opcodes.ASM5);
             for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
-                System.out.println("Iteration");
                 if (e.getName().endsWith(".class")) {
                     logger.debug("Parsing class file");
                     parseClass(new ClassReader(getEntryInputStream(jis)), classVisitor);
-                    logger.debug("Parsing class file done");
                 }
                 else if (e.getName().endsWith("web.xml") && webXmlResult == null) {
-                    logger.debug("BLA BLA web.xml");
+                    logger.debug("Parsing web.xml");
                     WebXmlParser webXmlParser = new WebXmlParser();
-                    logger.debug("Before webXmlResult");
                     webXmlResult = webXmlParser.parseWebXml(getEntryInputStream(jis));
-                    logger.debug("Parsing web done.xml");
                 }
             }
         } catch (IOException e) {

@@ -18,6 +18,7 @@ ENV MVN_WRAPPER_PATH="mvnw"
 
 # Felix ENVs
 ENV FELIX_PATH="/felix"
+RUN rm -rf /felix
 
 ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
 
@@ -96,4 +97,4 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 #USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
-CMD bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
+CMD rm -rf ${FELIX_V_PATH}/felix-cache/* ; bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
