@@ -4,7 +4,6 @@ services:
                image: 'mongo'
                container_name: "crce_mongodb"
                restart: always
-               #network_mode: host
                networks: 
                        - crce
                ports:
@@ -13,52 +12,52 @@ services:
                        - /mongodb:/data/db
                        - ./dev-dump:/dev-dump
 
-#       metadata:
-#                depends_on: 
-#                          - database
-#                container_name: "crce_metadata"
-#                tty: true
-#                network_mode: host
-#                extra_hosts: 
-#                           - "mongoserver:127.0.0.1"
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
-#                ports:
-#                     - "8081:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-#                       - metadata-felix:/felix
-#                command: bash -c "cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
-#
-#
-#       restapi:
-#                depends_on: 
-#                          - database
-#                          - metadata
-#                container_name: "crce_rest-api"
-#                networks: 
-#                        - crce
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${REST_API_SERVICE_PATH}
-#                ports:
-#                     - "8081:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-#
+       metadata:
+                depends_on: 
+                          - database
+                container_name: "crce_metadata"
+                tty: true
+                networks: 
+                        - crce
+                environment: 
+                           - "mongo_connection=mongodb://172.17.0.1:27017"
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${METADATA_SERVICE_PATH}
+                ports:
+                     - "8081:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/modules
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+                       - metadata-felix:/felix
+                command: bash -c "cd ${FELIX_V_PATH} && java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar"
+
+
+       restapi:
+                depends_on: 
+                          - database
+                container_name: "crce_rest-api"
+                tty: true
+                networks: 
+                        - crce
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${REST_API_SERVICE_PATH}
+                ports:
+                     - "8082:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+
        externalextensions:
                 depends_on: 
                           - database
                 container_name: "crce_external-extensions"
                 tty: true
-                #network_mode: host
                 networks: 
                         - crce
                 environment: 
@@ -73,44 +72,41 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-
-#                #command: ["cd" , "./deploy" , "bash" , "prepare_bundles.sh","cd","${FELIX_V_PATH}","java","-Xdebug" ,"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","./bin/felix.jar" ]
-#                
-#       wsindexers:
-#                depends_on: 
-#                          - database
-#                          - metadata
-#                container_name: "crce_ws-indexers"
-#                networks: 
-#                        - crce
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${WS_INDEXERS_SERVICE_PATH}
-#                ports:
-#                     - "8083:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-#
-#       internalextensions:
-#                depends_on: 
-#                          - database
-#                          - metadata
-#                container_name: "crce_internal-extensions"
-#                networks: 
-#                        - crce
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${INTERNAL_EXTENSIONS_SERVICE_PATH}
-#                ports:
-#                     - "8084:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+               
+       wsindexers:
+                depends_on: 
+                          - database
+                container_name: "crce_ws-indexers"
+                tty: true
+                networks: 
+                        - crce
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${WS_INDEXERS_SERVICE_PATH}
+                ports:
+                     - "8083:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+       internalextensions:
+                depends_on: 
+                          - database
+                container_name: "crce_internal-extensions"
+                tty: true
+                networks: 
+                        - crce
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${INTERNAL_EXTENSIONS_SERVICE_PATH}
+                ports:
+                     - "8084:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
 
 networks: 
         crce:

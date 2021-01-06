@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Building script for every module
+# ================================
+
 CFG=$1
 BUILD="clean install -U --no-transfer-progress"
 PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true";

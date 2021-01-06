@@ -44,3 +44,6 @@ local.properties
 ### IDEA ###
 .idea/
 *.iml
+
+# Output of crce-artifact-finder-script.py #
+artifact-list.txt

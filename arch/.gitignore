@@ -1,8 +1,0 @@
-#ignore vim
-*.swp
-
-#ignore tex build
-*.aux
-*.gz
-*.log
-

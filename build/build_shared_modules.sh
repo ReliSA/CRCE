@@ -1,3 +1,15 @@
+#!/bin/bash
+
+# Building script for shared modules
+# ================================== 
+# 1. install dependencies with Maven
+# 2. create JARs for each module
+# 3. create directory based on the name of JAR (cz/zcu/kiv/crce/<VERSION>/<MODULE_NAME>-<VERSION>.jar)
+# 4. create pom.xml containing <groupId>, <artifactId>, <version> (cz/zcu/kiv/crce/<VERSION>/<MODULE_NAME>-<VERSION>.pom)
+# 5. cleanup afterwards
+#
+# Source: https://gist.github.com/timmolderez/92bea7cc90201cd3273a07cf21d119eb
+
 rm -fr ${VOLUME_BASE_PATH}/*
 mkdir -p ${VOLUME_CONTAINING_JARS}
 
@@ -30,4 +42,5 @@ for filename in ./*.jar; do
             </project>" > ${new_path}/${module_name}-${version}.pom;
     fi
 done
+
 rm -f ${VOLUME_CONTAINING_JARS}/*.jar

@@ -1,16 +1,19 @@
 FROM alpine:latest
 
-#OPENJDK11 START
+# OPENJDK11 START
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm/"
 RUN apk add openjdk11;\
     apk add bash;\
     apk add zip;\
     apk add tree;
 ENV PATH=$PATH:${JAVA_HOME}/bin
-#OPENJDK11 END
+# OPENJDK11 END
 
-# Project ENVs
+ARG SERVICE_PATH_PREFIX
+
+# PROJECT ENVs
 ENV DEPLOY_PATH="./deploy"
+ENV BUILD_PATH="./build"
 ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
 ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/${PREPARE_BUNDLE_NAME}"
 ENV TARGET_PATH="${DEPLOY_PATH}/target"
@@ -19,29 +22,30 @@ ENV BUILD_CODE_NAME="build-code.bash"
 ENV BUILD_CODE_PATH="./deploy/docker/${BUILD_CODE_NAME}"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
+ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
+# END
 
-# Felix ENVs
+# FELIX ENVs
 ENV FELIX_PATH="/felix"
 ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
-
-ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
+# END
 
 WORKDIR ${PROJECT_PATH}
 
-ARG SERVICE_PATH_PREFIX
-
+# COPY PROJECT INTO DOCKER
 COPY ${DEPLOY_PATH} ./deploy
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
-COPY ${SERVICE_PATH_PREFIX}/build ./build
+COPY ${BUILD_PATH} ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules_tmp
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
+# END
 
 # Executable prepare-bundles.sh
 RUN chmod u+x ${PREPARE_BUNDLES_PATH}
 
-# Alias on mvn wrapper 
+# Alias for Maven wrapper (mvnw -> bash /home/crce/mvnw)
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
 
@@ -49,7 +53,7 @@ RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
 COPY ${BUILD_CODE_PATH} ${BUILD_CODE_NAME}
 RUN chmod u+x ${BUILD_CODE_NAME}
 
-#FELIX OSGi START
+# FELIX OSGi START
 # Prepare environment
 RUN mkdir -p ${FELIX_V_PATH}
 WORKDIR ${FELIX_PATH}
@@ -80,10 +84,8 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 # Run Felix (with debug disabled)
 #cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
 
-#FELIX OSGi END
+# END
 
-#RUN addgroup -S spring && adduser -S spring -G spring
-#USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
 CMD rm -rf ./modules/* ; cp -r modules_tmp/* ./modules ; bash ${BUILD_CODE_NAME} ; cd deploy/ ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME}

@@ -1,29 +1,23 @@
 FROM alpine:latest
 
-#OPENJDK11 START
+# OPENJDK11 START
 ENV JAVA_HOME="/usr/lib/jvm/default-jvm/"
 RUN apk add openjdk11;\
     apk add bash;\
     apk add zip;
 ENV PATH=$PATH:${JAVA_HOME}/bin
-#OPENJDK11 END
+# OPENJDK11 END
 
-# Project ENVs
+ARG SERVICE_PATH_PREFIX
+
+# PROJECT ENVs
 ENV DEPLOY_PATH="./deploy"
+ENV BUILD_PATH="./build"
 ENV PREPARE_BUNDLE_NAME="prepare-bundles.sh"
 ENV PREPARE_BUNDLES_PATH="${DEPLOY_PATH}/${PREPARE_BUNDLE_NAME}"
 ENV PROJECT_PATH="/home/crce"
 ENV MVN_DIR_PATH="/.mvn"
 ENV MVN_WRAPPER_PATH="mvnw"
-
-# Felix ENVs
-ENV FELIX_PATH="/felix"
-RUN rm -rf /felix
-
-ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
-
-ARG SERVICE_PATH_PREFIX
-
 ENV BUILD_CODE_NAME="build-code.bash"
 ENV METADATA_VOLUME_PATH="${PROJECT_PATH}/metadata"
 ENV BASE_BUILD_SCRIPT_NAME="base_build-code.sh"
@@ -31,22 +25,31 @@ ENV BASE_BUILD_CODE_PATH="${DEPLOY_PATH}/docker/${BUILD_CODE_NAME}"
 ENV BUILD_CODE_PATH="${DEPLOY_PATH}/docker/not-metadata-service/${BUILD_CODE_NAME}"
 ENV CONFIG_METADATA_MODULES_PATH="${SERVICE_PATH_PREFIX}/metadata-modules.txt"
 ENV CONFIG_METADATA_MODULES_DOCKER_PATH="${PROJECT_PATH}/metadata-modules.txt"
-#ENV mongo_connection mongodb://172.17.0.1:27017
+# END
+
+# FELIX ENVs
+ENV FELIX_PATH="/felix"
+ENV FELIX_V_PATH="${FELIX_PATH}/felix-framework-6.0.3"
+# END
+
+RUN rm -rf ${FELIX_PATH}
 
 WORKDIR ${PROJECT_PATH}
 
+# COPY PROJECT INTO DOCKER
 COPY ${DEPLOY_PATH} ./deploy
 COPY ${MVN_DIR_PATH} ./.mvn
 COPY ${MVN_WRAPPER_PATH} .
-COPY ${SERVICE_PATH_PREFIX}/build ./build
+COPY ${BUILD_PATH} ./build
 COPY ${SERVICE_PATH_PREFIX}/modules ./modules
 COPY ${SERVICE_PATH_PREFIX}/parent-aggregation ./parent-aggregation
 COPY ${SERVICE_PATH_PREFIX}/third-party ./third-party
+# END
 
 # Executable prepare-bundles.sh
 RUN chmod u+x ${PREPARE_BUNDLES_PATH}
 
-# Alias on mvn wrapper 
+# Alias for Maven wrapper (mvnw -> bash /home/crce/mvnw)
 RUN echo -e '#!/bin/bash\n'"${PROJECT_PATH}/mvnw"' "$@"' > /usr/bin/mvn && \
     chmod +x /usr/bin/mvn
 
@@ -61,7 +64,7 @@ RUN chmod u+x ${BUILD_CODE_NAME}
 # Copy configuration (list of metadata modules)
 COPY ${CONFIG_METADATA_MODULES_PATH} .
 
-# FELIX OSGi START
+# FELIX OSGi
 # Prepare environment
 RUN mkdir -p ${FELIX_V_PATH}
 WORKDIR ${FELIX_PATH}
@@ -91,10 +94,8 @@ COPY ./deploy/felix-configuration/system.properties ${FELIX_V_PATH}/conf/
 # Run Felix (with debug disabled)
 #cd ${FELIX_V_PATH} && java -jar ./bin/felix.jar
 
-#FELIX OSGi END
+# END
 
-#RUN addgroup -S spring && adduser -S spring -G spring
-#USER spring:spring
 WORKDIR ${PROJECT_PATH}
 
 CMD rm -rf ${FELIX_V_PATH}/felix-cache/* ; bash ${BUILD_CODE_NAME} ; cd ./deploy ; mvn clean pax:directory --no-transfer-progress ; bash ${PREPARE_BUNDLE_NAME} ; cd ${FELIX_V_PATH} ; java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar ./bin/felix.jar
