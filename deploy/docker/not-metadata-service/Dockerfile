@@ -31,7 +31,7 @@ ENV BASE_BUILD_CODE_PATH="${DEPLOY_PATH}/docker/${BUILD_CODE_NAME}"
 ENV BUILD_CODE_PATH="${DEPLOY_PATH}/docker/not-metadata-service/${BUILD_CODE_NAME}"
 ENV CONFIG_METADATA_MODULES_PATH="${SERVICE_PATH_PREFIX}/metadata-modules.txt"
 ENV CONFIG_METADATA_MODULES_DOCKER_PATH="${PROJECT_PATH}/metadata-modules.txt"
-ENV mongo_connection mongodb://172.17.0.1:27017
+#ENV mongo_connection mongodb://172.17.0.1:27017
 
 WORKDIR ${PROJECT_PATH}
 

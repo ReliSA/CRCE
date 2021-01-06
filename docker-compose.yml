@@ -4,7 +4,9 @@ services:
                image: 'mongo'
                container_name: "crce_mongodb"
                restart: always
-               network_mode: host
+               #network_mode: host
+               networks: 
+                       - crce
                ports:
                        - '27017-27019:27017-27019'
                volumes:
@@ -56,9 +58,11 @@ services:
                           - database
                 container_name: "crce_external-extensions"
                 tty: true
-                network_mode: host
-                extra_hosts: 
-                           - "mongoserver:127.0.0.1"
+                #network_mode: host
+                networks: 
+                        - crce
+                environment: 
+                           - "mongo_connection=mongodb://172.17.0.1:27017"
                 build: 
                      dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
                      context: .
@@ -107,6 +111,9 @@ services:
 #                volumes:
 #                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
 #                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+
+networks: 
+        crce:
 
 volumes: 
         metadata-modules:

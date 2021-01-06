@@ -34,6 +34,8 @@
         <module>crce-metadata-osgi-bundle</module> -->
         <module>crce-metadata-indexer-api</module>
         <module>crce-metadata-indexer-impl</module>
+        <module>crce-webservices-indexer</module>
+        <module>crce-restimpl-indexer</module>
         <module>crce-concurrency</module>
 <!--         <module>crce-component-collection</module> -->
     </modules>
