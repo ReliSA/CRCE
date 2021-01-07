@@ -116,6 +116,7 @@ services:
 
 networks: 
         crce:
+            name: crce
 
 volumes: 
         metadata-modules:
