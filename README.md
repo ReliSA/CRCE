@@ -4,48 +4,11 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Prerequisities
 
-- **JDK 11** set in `JAVA_HOME` environment variable before starting CRCE, tested on OpenJDK 11.0.4
-- **MongoDB**, tested on v2.6.10, v3.4.10
-- **Maven 3**, tested on 3.5.2
+- **Docker compose**, tested on v1.27.4
+- **Docker**, tested on v20.10.1
 
-On linux, switching to JDK 11 for development/build can be done via `sudo update-alternatives --config java`.
+## Build & Start up
 
-## Build
-
-Build process consists of two parts. Compiling and building the code itself and building the docker image.
-
-### Build CRCE
-
-This process can be done automatically by running the `build-code.bash` script placed in the project root directory.
-
-1. `crce-parent` in `/pom` directory
-2. `shared-build-settings` in `/build`
-3. everything in `/third-party` (bash: `.../third-party$ for d in * ; do cd $d; mvn clean install; cd .. ; done`)
-4. `crce-core-reactor` in `/core`
-5. `crce-modules-reactor` in `/modules`
-6. `provision-reactor` in `/deploy`
-
-On linux, step 3. can be perfomed via `.../third-party$ for d in * ; do cd $d ; mvn clean install ; cd .. ; done`.  In case of maven error "Received fatal alert: protocol_version", use `mvn -Dhttps.protocols=TLSv1.2 ...` after https://stackoverflow.com/a/50924208/261891.
-
-
-### Build docker image
-
-Docker image is placed in directory `/deploy` but before it can be used, bundles must be collected. 
-Bundles can be collected by running the following commands in `/deploy` directory:
-
-```bash
-mvn clean pax:directory
-./prepare-bundles.sh
-
-```
-
-The `prepare-bundles.sh` script is needed due to the issues further described in the Issues section.
-
-To finally build the image itself, execute the following commnad in `/deploy` directory:
-
-```bash
-docker build . -t ${image-tag}
-```
 
 ## Start up
 
