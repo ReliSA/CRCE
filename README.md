@@ -9,7 +9,15 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Build & Start up
 
+You need to build everything (shared-modules, metadata-modules) if you building project for the first time.
 
+<div style="text-align: center;">
+
+```zsh
+user@localhost:~$ ./build.sh all
+```
+
+</div>
 ## Start up
 
 Assuimg the dokcer image is already build, run it by following command:
