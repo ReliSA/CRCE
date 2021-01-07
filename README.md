@@ -7,7 +7,20 @@ CRCE is an experimental repository, designed to support research into component-
 - **Docker compose**, tested on v1.27.4
 - **Docker**, tested on v20.10.1
 
+## Documentation
+See directory: `<projects_root>/doc/sar/2020/`.
+
 ## Build & Start up
+
+Available endpoints:
+
+* webui-v2
+  * http://localhost:8080/crce-webui/
+* rest-v2:
+  * http://localhost:8082/rest/v2/resources
+  * http://localhost:8082/rest/v2/metadata
+  * ... 
+
 
 You need to build everything (shared-modules, metadata-modules) if you **building CRCE** for the first time.
 
