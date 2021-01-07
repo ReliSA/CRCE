@@ -13,7 +13,13 @@ You need to build everything (shared-modules, metadata-modules) if you **buildin
 
 
 ```zsh
-user@localhost:~$ ./build.sh all
+user@localhost:<projects_root>$ ./build.sh all
+```
+
+You can execute build without param **all** if build.sh was executed before.
+
+```zsh
+user@localhost:<projects_root>$ ./build.sh
 ```
 
 Now all containers (crce_mongodb, crce_metadata, crce_rest-api, crce_external-extensions, crce_ws-indexers, crce_internal-extensions). To show all **running containers** execute this:
@@ -25,62 +31,107 @@ user@localhost:~$ docker ps
 You should see something like this:
 
 ```zsh
-bla bla
-```
-
-
-## Start up
-
-Assuimg the dokcer image is already build, run it by following command:
-
-```bash
-docker run -it \
-        -p 8080:8080 \
-        --add-host mongoserver:172.17.0.1 \
-        -v /felix/deploy:/felix/deploy \
-        ${image-tag}
-```
-
-The `-p` parameter maps the port of docker virual machine to the real port on the computer. 
-The `--add-host` allows docker to connect to the Mongo database running locally (Docker *usually* uses 172.17.0.1 ip to access localhost from the container). The app expects the database to be listening on port 27017 by default.
-The `-v` parameter maps directory in container to the real directory in the host machine so that it can be used to install new bundles via CLI. 
-
-
-If everything works, the output log should write up some info about dependencies terminated by lines similar to the following:
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS         PORTS                                  NAMES
+d7c0d0fcda41   crce_externalextensions   "/bin/sh -c 'rm -rf …"   18 minutes ago   Up 6 minutes   0.0.0.0:8080->8080/tcp                 crce_external-extensions
+1e8ba316da50   crce_restapi              "/bin/sh -c 'rm -rf …"   18 minutes ago   Up 6 minutes   0.0.0.0:8082->8080/tcp                 crce_rest-api
+06cd03b77bd5   mongo                     "docker-entrypoint.s…"   41 minutes ago   Up 6 minutes   0.0.0.0:27017-27019->27017-27019/tcp   crce_mongodb
 
 ```
-Listening for transport dt_socket at address: 65505
-____________________________
-Welcome to Apache Felix Gogo
 
-g! X 10, 2017 10:38:47 DOP. org.glassfish.jersey.server.ApplicationHandler initialize
-INFO: Initiating Jersey application, version Jersey: 2.9.1 2014-06-01 23:30:50...
+If you want to skip the building of the metadata service and shared modules you can execute this:
+
+```zsh
+user@localhost:<projects_root>$ ./start.sh
 ```
 
-At the moment, a bunch of errors will probably come up:
+Each script **build.sh** and **start.sh** have options to build services in **detached** mode see this:
 
+```zsh
+user@localhost:<projects_root>$ ./build.sh all -d
+
+user@localhost:<projects_root>$ ./build.sh -d
+
+user@localhost:<projects_root>$ ./start.sh -d
 ```
-[Fatal Error] :1:1: Content is not allowed in prolog.
-```
+Be aware that detached mode does not provide building or any other **informations** while starting up containers.
 
-The cause of the latter is a badly loaded binary of mathematical solver which does not affect common application run. Any other error/exception (typically OSGi complaining about a thing) is a problem that needs to be examined as such. However, it should not happen with this version.
+If you want to shutdown your services execute this:
 
-Started up, the application is accessible at:
-
-- web UI: http://localhost:8080/crce-webui
-- REST web services: http://localhost:8080/rest/v2/
-
-Updated (more or less) REST WS documentation is available at [Apiary](https://crceapi.docs.apiary.io/).
-
-### MongoDB
-
-Mongo DB can either be run locally or in docker using following command:
-
-```bash
-sudo docker run -d -p 27017:27017 -v ~/data:/data/db mongo
+```zsh
+user@localhost:<projects_root>$ docker-compose down
 ```
 
-Where `~/data` is directory on host machine to be used as a storage by Mongo.
+## Services
+
+Each running service can be **entered** with this command:
+
+```zsh
+user@localhost:<projects_root>$ docker-compose exec <name-of-the-service-from-docker-compose.yml> <command (bash)>
+```
+## Volumes
+
+Services use **docker volumes**. Volumes hold shared source code (metadata-modules, shared-modules) and also the cache directory `.m2` which is used for maven caching.
+
+To list docker volumes just execute this:
+
+```zsh
+user@localhost:<projects_root>$ docker volume list
+```
+
+Docker volumes have data stored in a host system. The specific **directory** can be seen with this command:
+
+```zsh
+user@localhost:<projects_root>$ docker inspect <volume-name>
+```
+
+Now you can **enter volume** directly from your fs (usually you need to enter super user mode with `sudo su`)
+
+### Metadata modules
+
+This volume holds all source code of last metadata build.
+
+```
+crce-api-compatibility-checker
+crce-compatibility-api
+...
+pom.xml
+shared-third-party-dependencies
+```
+
+### Shared modules
+
+This volume holds all source code of last shared modules build.
+
+```
+crce-metadata-api
+crce-metadata-impl
+crce-metadata-json-api
+crce-metadata-json-impl
+crce-plugin-api
+```
+
+### Metadata Apache Felix
+
+Cached JARs in `/felix/<felix-version>` directory of metadata container (after `maven clean pax:directory` and `prepare-bundles.sh`).
+
+### Maven cache
+
+Shared maven cache `.m2` for all services in this project.
+
+## Build flow
+
+1. Creating volumes
+2. Creating containers for building metadata and shared modules
+3. Building metadata and shared volumes
+   1. Prefixes for path to each service src is specified inside `docker-compose.yml`
+   2. Inside **Dockerfile** for each kind of service - *metadata* and *not-metadata* (`<project_root>/deploy/docker/Dockerfile` and `<project_root>/deploy/docker/not-metadata-service/Dockerfile`) copying, preparing fs structure and installing all needed libraries (Apache Felix etc.) is performed. For more detail information check Dockerfiles directly.
+4. Starting up all services from `docker-compose.yml`
+   1. Build all modules like `aggregation`, `crce-...`
+   2. Perform `mvn clean pax:directory` inside copied `deploy` directory
+   3. Run `prepare-bundles.sh` which collects all needed information for each JAR and copy them into `target/pax-runner` directory inside container
+   4. Run `felix.jar` **inside the Apache Felix directory**  
+
+<hr>
 
 ### lpsolve installation
 

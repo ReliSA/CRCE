@@ -54,6 +54,7 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+                       - maven-cache:/root/.m2
 
        externalextensions:
                 depends_on: 
@@ -74,6 +75,7 @@ services:
                 volumes:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+                       - maven-cache:/root/.m2
                
 #       wsindexers:
 #                depends_on: 
@@ -92,6 +94,7 @@ services:
 #                volumes:
 #                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
 #                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+#                       - maven-cache:/root/.m2
 #       internalextensions:
 #                depends_on: 
 #                          - database
@@ -109,6 +112,7 @@ services:
 #                volumes:
 #                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
 #                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+#                       - maven-cache:/root/.m2
 
 networks: 
         crce:
@@ -122,3 +126,6 @@ volumes:
 
         metadata-felix:
                       external: true
+                      
+        maven-cache:
+                   external: true
