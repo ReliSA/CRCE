@@ -55,26 +55,26 @@ services:
                        - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
                        - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
 
-#       externalextensions:
-#                depends_on: 
-#                          - database
-#                container_name: "crce_external-extensions"
-#                tty: true
-#                networks: 
-#                        - crce
-#                environment: 
-#                           - "mongo_connection=mongodb://172.17.0.1:27017"
-#                build: 
-#                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
-#                     context: .
-#                     args: 
-#                         - SERVICE_PATH_PREFIX=${EXTERNAL_EXTENSIONS_SERVICE_PATH}
-#                ports:
-#                     - "8080:8080"
-#                volumes:
-#                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
-#                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-#               
+       externalextensions:
+                depends_on: 
+                          - database
+                container_name: "crce_external-extensions"
+                tty: true
+                networks: 
+                        - crce
+                environment: 
+                           - "mongo_connection=mongodb://172.17.0.1:27017"
+                build: 
+                     dockerfile: ${DEPLOY_DOCKERFILE_NOT_METADATA_PATH}
+                     context: .
+                     args: 
+                         - SERVICE_PATH_PREFIX=${EXTERNAL_EXTENSIONS_SERVICE_PATH}
+                ports:
+                     - "8080:8080"
+                volumes:
+                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
+                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
+               
 #       wsindexers:
 #                depends_on: 
 #                          - database
@@ -109,7 +109,7 @@ services:
 #                volumes:
 #                       - ${METADATA_MODULES_VOLUME_NAME}:/home/crce/metadata
 #                       - ${SHARED_MODULES_VOLUME_NAME}:/home/crce/shared-modules:ro
-#
+
 networks: 
         crce:
 

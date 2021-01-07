@@ -9,15 +9,26 @@ CRCE is an experimental repository, designed to support research into component-
 
 ## Build & Start up
 
-You need to build everything (shared-modules, metadata-modules) if you building project for the first time.
+You need to build everything (shared-modules, metadata-modules) if you **building CRCE** for the first time.
 
-<div style="text-align: center;">
 
 ```zsh
 user@localhost:~$ ./build.sh all
 ```
 
-</div>
+Now all containers (crce_mongodb, crce_metadata, crce_rest-api, crce_external-extensions, crce_ws-indexers, crce_internal-extensions). To show all **running containers** execute this:
+
+```zsh
+user@localhost:~$ docker ps
+```
+
+You should see something like this:
+
+```zsh
+bla bla
+```
+
+
 ## Start up
 
 Assuimg the dokcer image is already build, run it by following command:

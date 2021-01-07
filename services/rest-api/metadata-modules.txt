@@ -16,4 +16,4 @@ crce-repository-impl
 crce-vo
 crce-restimpl-indexer
 crce-webservices-indexer
-crce-concurrencyq
+crce-concurrency
