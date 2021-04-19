@@ -44,7 +44,7 @@
 
         <version.org.slf4j>1.7.26</version.org.slf4j>
         <version.logback>1.1.2</version.logback>
-        <vaadin.version>7.7.10</vaadin.version>
+        <vaadin.version>8.12.4</vaadin.version>
     </properties>
 
     <scm>
