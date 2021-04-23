@@ -1,0 +1,279 @@
+endpointDataContainers:
+  - class: javax.ws.rs.client.Entity
+    methods:
+      - name: entity
+        type: GENERIC
+        args:
+          - - SEND
+            - CONTENTTYPE
+  - class: javax.ws.rs.core.Cookie
+    methods:
+      - name: init
+        type: PARAM
+        value: COOKIE
+        args:
+          - - PARAMKEY
+            - PARAMVALUE
+          - - PARAMKEY
+            - PARAMVALUE
+            - SKIP
+            - SKIP
+          - - PARAMKEY
+            - PARAMVALUE
+            - SKIP
+            - SKIP
+            - SKIP
+generics:
+  - javax.ws.rs.core.GenericType
+enums:
+  - class: javax.ws.rs.core.MediaType
+    fields:
+      - name: CHARSET_PARAMETER
+        contentType: charset
+      - name: MEDIA_TYPE_WILDCARD
+        contentType: "*"
+      - name: WILDCARD
+        contentType: "*/*"
+      - name: WILDCARD_TYPE
+        contentType: "*/*"
+      - name: APPLICATION_XML
+        contentType: application/xml
+      - name: APPLICATION_XML_TYPE
+        contentType: application/xml
+      - name: APPLICATION_ATOM_XML
+        contentType: application/atom+xml
+      - name: APPLICATION_ATOM_XML_TYPE
+        contentType: application/atom+xml
+      - name: APPLICATION_XHTML_XML
+        contentType: application/xhtml+xml
+      - name: APPLICATION_XHTML_XML_TYPE
+        contentType: application/xhtml+xml
+      - name: APPLICATION_SVG_XML
+        contentType: application/svg+xml
+      - name: APPLICATION_SVG_XML_TYPE
+        contentType: application/svg+xml
+      - name: APPLICATION_JSON
+        contentType: application/json
+      - name: APPLICATION_JSON_TYPE
+        contentType: application/json
+      - name: APPLICATION_FORM_URLENCODED
+        contentType: application/x-www-form-urlencoded
+      - name: APPLICATION_FORM_URLENCODED_TYPE
+        contentType: application/x-www-form-urlencoded
+      - name: MULTIPART_FORM_DATA
+        contentType: multipart/form-data
+      - name: MULTIPART_FORM_DATA_TYPE
+        contentType: multipart/form-data
+      - name: APPLICATION_OCTET_STREAM
+        contentType: application/octet-stream
+      - name: APPLICATION_OCTET_STREAM_TYPE
+        contentType: application/octet-stream
+      - name: TEXT_PLAIN
+        contentType: text/plain
+      - name: TEXT_PLAIN_TYPE
+        contentType: text/plain
+      - name: TEXT_XML
+        contentType: text/xml
+      - name: TEXT_XML_TYPE
+        contentType: text/xml
+      - name: TEXT_HTML
+        contentType: text/html
+      - name: TEXT_HTML_TYPE
+        contentType: text/html
+      - name: SERVER_SENT_EVENTS
+        contentType: text/event-stream
+      - name: SERVER_SENT_EVENTS_TYPE
+        contentType: text/event-stream
+      - name: APPLICATION_JSON_PATCH_JSON
+        contentType: application/json-patch+json
+  - class: javax.ws.rs.core.HttpHeaders
+    fields:
+      - name: ACCEPT #Req
+        headerType: Accept
+      - name: ACCEPT_CHARSET
+        headerType: Accept-Charset #Req
+      - name: ACCEPT_ENCODING
+        headerType: Accept-Encoding #Req
+      - name: ACCEPT_LANGUAGE
+        headerType: Accept-Language #Req
+      - name: ALLOW
+        headerType: Allow #NEBUDE
+      - name: AUTHORIZATION
+        headerType: Authorization #Req
+      - name: CACHE_CONTROL
+        headerType: Cache-Control #Req
+      - name: CONTENT_DISPOSITION
+        headerType: Content-Disposition #NEBUDE
+      - name: CONTENT_ENCODING
+        headerType: Content-Encoding #Req
+      - name: CONTENT_ID
+        headerType: Content-ID #Req
+      - name: CONTENT_LANGUAGE
+        headerType: Content-Language #NEBUDE
+      - name: CONTENT_LENGTH
+        headerType: Content-Length #Req
+      - name: CONTENT_LOCATION
+        headerType: Content-Location #NEBUDE
+      - name: CONTENT_TYPE
+        headerType: Content-Type #Req
+      - name: DATE
+        headerType: Date #Req
+      - name: ETAG
+        headerType: ETag #NEBUDE
+      - name: EXPIRES
+        headerType: Expires #NEBUDE
+      - name: HOST
+        headerType: Host #Req
+      - name: IF_MATCH
+        headerType: If-Match #Req
+      - name: IF_MODIFIED_SINCE
+        headerType: If-Modified-Since #Req
+      - name: IF_NONE_MATCH
+        headerType: If-None-Match #Req
+      - name: IF_UNMODIFIED_SINCE
+        headerType: If-Unmodified-Since #Req
+      - name: LAST_MODIFIED
+        headerType: Last-Modified #NEBUDE
+      - name: LOCATION
+        headerType: Location #NEBUDE
+      - name: LINK
+        headerType: Link #NEBUDE
+      - name: RETRY_AFTER
+        headerType: Retry-After #NEBUDE
+      - name: USER_AGENT
+        headerType: User-Agent #Req
+      - name: VARY
+        headerType: Vary #NEBUDE
+      - name: WWW_AUTHENTICATE
+        headerType: WWW-Authenticate #NEBUDE
+      - name: COOKIE
+        headerType: Cookie #Req
+      - name: SET_COOKIE
+        headerType: Cookie
+      - name: SET_COOKIE
+        headerType: Set-Cookie #NEBUDE
+apiCall:
+  - class: javax.ws.rs.client.Client
+    methods:
+      - name: target
+        type: GENERIC
+        args:
+          - - BASEURL
+  - class: javax.ws.rs.client.WebTarget
+    methods:
+      - name: matrixParam
+        type: PARAM
+        value: MATRIX
+        args:
+          - - PARAMKEY
+            - PARAMVALUE
+      - name: path
+        type: GENERIC
+        args:
+          - - PATH
+      - name: queryParam
+        type: PARAM
+        value: QUERY
+        args:
+          - - PARAMKEY
+            - PARAMVALUE
+      - name: request
+        type: HEADER
+        value: Accept
+        args:
+          - - HEADERVALUE
+  - class: javax.ws.rs.client.Invocation$Builder
+    methods:
+      - name: accept
+        type: HEADER
+        value: Accept
+        args:
+          - - HEADERVALUE
+      - name: acceptEncoding
+        type: HEADER
+        value: Accept-Encoding
+        args:
+          - - HEADERVALUE
+      - name: acceptLanguage
+        type: HEADER
+        value: Accept-Language
+        args:
+          - - HEADERVALUE
+      - name: build
+        type: GENERIC
+        args:
+          - - SKIP
+            - EDATA
+      - name: buildDelete
+        type: HTTPMETHOD
+        value: DELETE
+      - name: buildGet
+        type: HTTPMETHOD
+        value: GET
+      - name: buildPost
+        type: HTTPMETHOD
+        value: POST
+        args:
+          - - EDATA
+      - name: buildPut
+        type: HTTPMETHOD
+        value: PUT
+        args:
+          - - EDATA
+      - name: cookie
+        type: HEADER
+        value: COOKIE
+        args:
+          - - HEADERTYPE
+            - HEADERVALUE
+      - name: header
+        type: GENERIC
+        args:
+          - - HEADERTYPE
+            - HEADERVALUE
+      - name: delete
+        type: HTTPMETHOD
+        value: DELETE
+        args:
+          - - EXPECT
+      - name: get
+        type: HTTPMETHOD
+        value: GET
+        args:
+          - - EXPECT
+      - name: head
+        type: HTTPMETHOD
+        value: HEAD
+      - name: options
+        type: HTTPMETHOD
+        value: OPTIONS
+        args:
+          - - EXPECT
+      - name: post
+        type: HTTPMETHOD
+        value: POST
+        args:
+          - - SEND
+          - - SEND
+            - EXPECT
+      - name: put
+        type: HTTPMETHOD
+        value: PUT
+        args:
+          - - EDATA
+            - EXPECT
+          - - EDATA
+      - name: trace
+        type: HTTPMETHOD
+        value: TRACE
+        args:
+          - - EXPECT
+      - name: method
+        type: GENERIC
+        args:
+          - - SKIP
+          - - SKIP
+            - EXPECT
+          - - SKIP
+            - SEND
+            - EXPECT

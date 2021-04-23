@@ -1,0 +1,283 @@
+endpointDataContainers:
+  - class: org.springframework.http.HttpHeaders
+    methods:
+      - name: add
+        type: GENERIC
+        args:
+          - - HEADERTYPE
+            - HEADERVALUE
+      - name: init
+        type: GENERIC
+  - class: org.springframework.http.HttpEntity
+    methods:
+      - name: init
+        type: GENERIC
+        args:
+          - - SKIP
+            - EDATA
+generics:
+  - org.springframework.core.ParameterizedTypeReference
+  - org.springframework.web.client.ResponseExtractor
+  - org.springframework.http.RequestEntity
+enums:
+  - class: org.springframework.http.HttpMethod
+    fields:
+      - name: DELETE
+        httpMethod: DELETE
+      - name: GET
+        httpMethod: GET
+      - name: HEAD
+        httpMethod: HEAD
+      - name: OPTIONS
+        httpMethod: OPTIONS
+      - name: PATCH
+        httpMethod: PATCH
+      - name: POST
+        httpMethod: POST
+      - name: PUT
+        httpMethod: PUT
+      - name: TRACE
+        httpMethod: TRACE
+  - class: org.springframework.http.HttpHeaders
+    fields:
+      - name: EMPTY
+        headerType: ""
+      - name: ACCEPT
+        headerType: "Accept"
+      - name: ACCEPT_CHARSET
+        headerType: "Accept-Charset"
+      - name: ACCEPT_ENCODING
+        headerType: "Accept-Encoding"
+      - name: ACCEPT_LANGUAGE
+        headerType: "Accept-Language"
+      - name: ACCEPT_RANGES
+        headerType: "Accept-Ranges"
+      - name: ACCESS_CONTROL_ALLOW_CREDENTIALS
+        headerType: "Access-Control-Allow-Credentials"
+      - name: ACCESS_CONTROL_ALLOW_HEADERS
+        headerType: "Access-Control-Allow-Headers"
+      - name: ACCESS_CONTROL_ALLOW_METHODS
+        headerType: "Access-Control-Allow-Methods"
+      - name: ACCESS_CONTROL_ALLOW_ORIGIN
+        headerType: "Access-Control-Allow-Origin"
+      - name: ACCESS_CONTROL_EXPOSE_HEADERS
+        headerType: "Access-Control-Expose-Headers"
+      - name: ACCESS_CONTROL_MAX_AGE
+        headerType: "Access-Control-Max-Age"
+      - name: ACCESS_CONTROL_REQUEST_HEADERS
+        headerType: "Access-Control-Request-Headers"
+      - name: ACCESS_CONTROL_REQUEST_METHOD
+        headerType: "Access-Control-Request-Method"
+      - name: AGE
+        headerType: "Age"
+      - name: ALLOW
+        headerType: "Allow"
+      - name: AUTHORIZATION
+        headerType: "Authorization"
+      - name: CACHE_CONTROL
+        headerType: "Cache-Control"
+      - name: CONNECTION
+        headerType: "Connection"
+      - name: CONTENT_ENCODING
+        headerType: "Content-Encoding"
+      - name: CONTENT_DISPOSITION
+        headerType: "Content-Disposition"
+      - name: CONTENT_LANGUAGE
+        headerType: "Content-Language"
+      - name: CONTENT_LENGTH
+        headerType: "Content-Length"
+      - name: CONTENT_LOCATION
+        headerType: "Content-Location"
+      - name: CONTENT_RANGE
+        headerType: "Content-Range"
+      - name: CONTENT_TYPE
+        headerType: "Content-Type"
+      - name: COOKIE
+        headerType: "Cookie"
+      - name: DATE
+        headerType: "Date"
+      - name: ETAG
+        headerType: "ETag"
+      - name: EXPECT
+        headerType: "Expect"
+      - name: EXPIRES
+        headerType: "Expires"
+      - name: FROM
+        headerType: "From"
+      - name: HOST
+        headerType: "Host"
+      - name: IF_MATCH
+        headerType: "If-Match"
+      - name: IF_MODIFIED_SINCE
+        headerType: "If-Modified-Since"
+      - name: IF_NONE_MATCH
+        headerType: "If-None-Match"
+      - name: IF_RANGE
+        headerType: "If-Range"
+      - name: IF_UNMODIFIED_SINCE
+        headerType: "If-Unmodified-Since"
+      - name: LAST_MODIFIED
+        headerType: "Last-Modified"
+      - name: LINK
+        headerType: "Link"
+      - name: LOCATION
+        headerType: "Location"
+      - name: MAX_FORWARDS
+        headerType: "Max-Forwards"
+      - name: ORIGIN
+        headerType: "Origin"
+      - name: PRAGMA
+        headerType: "Pragma"
+      - name: PROXY_AUTHENTICATE
+        headerType: "Proxy-Authenticate"
+      - name: PROXY_AUTHORIZATION
+        headerType: "Proxy-Authorization"
+      - name: RANGE
+        headerType: "Range"
+      - name: REFERER
+        headerType: "Referer"
+      - name: RETRY_AFTER
+        headerType: "Retry-After"
+      - name: SERVER
+        headerType: "Server"
+      - name: SET_COOKIE
+        headerType: "Set-Cookie"
+      - name: SET_COOKIE2
+        headerType: "Set-Cookie2"
+      - name: TE
+        headerType: "TE"
+      - name: TRAILER
+        headerType: "Trailer"
+      - name: TRANSFER_ENCODING
+        headerType: "Transfer-Encoding"
+      - name: UPGRADE
+        headerType: "Upgrade"
+      - name: USER_AGENT
+        headerType: "User-Agent"
+      - name: VARY
+        headerType: "Vary"
+      - name: VIA
+        headerType: "Via"
+      - name: WARNING
+        headerType: "Warning"
+      - name: WWW_AUTHENTICATE
+        headerType: "WWW-Authenticate"
+
+apiCall:
+  - class: org.springframework.web.client.RestTemplate
+    methods:
+      - name: delete
+        type: HTTPMETHOD
+        value: DELETE
+        args:
+          - - PATH
+            - PARAM
+          - - PATH
+      - name: doExecute
+        type: GENERIC
+        args:
+          - - PATH
+            - HTTPMETHOD
+            - SKIP
+            - EXPECT
+      - name: exchange
+        type: GENERIC
+        args:
+          - - SEND
+            - EXPECT
+          - - PATH
+            - HTTPMETHOD
+            - EDATA
+            - EXPECT
+            - PARAM
+          - - PATH
+            - HTTPMETHOD
+            - EDATA
+            - EXPECT
+
+      - name: getForEntity
+        type: HTTPMETHOD
+        value: GET
+        args:
+          - - PATH
+            - EXPECT
+            - PARAM
+          - - PATH
+            - EXPECT
+      - name: getForObject
+        type: HTTPMETHOD
+        value: GET
+        args:
+          - - PATH
+            - EXPECT
+            - PARAM
+          - - PATH
+            - EXPECT
+      - name: headersExtractor
+        type: HTTPMETHOD
+        value: HEAD
+      - name: headForHeaders
+        type: HTTPMETHOD
+        value: HEAD
+        args:
+          - - PATH
+            - PARAM
+          - - PATH
+      - name: optionsForAllow
+        type: HTTPMETHOD
+        value: OPTIONS
+        args:
+          - - PATH
+            - PARAM
+          - - PATH
+      - name: patchForObject
+        type: HTTPMETHOD
+        value: PATCH
+        args:
+          - - PATH
+            - SEND
+            - EXPECT
+            - PARAM
+          - - PATH
+            - SEND
+            - EXPECT
+      - name: postForEntity
+        type: HTTPMETHOD
+        value: POST
+        args:
+          - - PATH
+            - SEND
+            - EXPECT
+            - PARAM
+          - - PATH
+            - SEND
+            - EXPECT
+      - name: postForLocation
+        type: HTTPMETHOD
+        value: POST
+        args:
+          - - PATH
+            - SEND
+            - PARAM
+          - - PATH
+            - SEND
+      - name: postForObject
+        type: HTTPMETHOD
+        value: POST
+        args:
+          - - PATH
+            - SEND
+            - EXPECT
+            - PARAM
+          - - PATH
+            - SEND
+            - EXPECT
+      - name: put
+        type: HTTPMETHOD
+        value: PUT
+        args:
+          - - PATH
+            - SEND
+            - EXPECT
+          - - PATH
+            - SEND

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1601484841050
-Build-Jdk: 11.0.8
-Built-By: root
+Bnd-LastModified: 1619216373187
+Build-Jdk: 11.0.10
+Built-By: anonym
 Bundle-Activator: cz.zcu.kiv.crce.crce_external_repository.internal.Acti
  vator
 Bundle-ClassPath: .,lib/aether-api-1.13.1.jar,lib/aether-util-1.13.1.jar

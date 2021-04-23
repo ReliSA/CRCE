@@ -1,0 +1,5 @@
+package cz.zcu.kiv.crce.rest.client.indexer.config;
+
+public enum ApiCallMethodType {
+    POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS, TRACE, EXPECT, PATH, BASEURL, INIT, EXECUTE, SEND, EXCHANGE, GENERIC, CONTENTTYPE, ACCEPT, HEADER, EDATALIST, HEADERTYPE, HTTPMETHOD, PARAM
+}

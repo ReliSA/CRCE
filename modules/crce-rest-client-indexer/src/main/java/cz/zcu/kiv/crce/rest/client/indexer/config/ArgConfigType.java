@@ -1,0 +1,7 @@
+package cz.zcu.kiv.crce.rest.client.indexer.config;
+
+public enum ArgConfigType {
+    POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS, TRACE, PATH, EXPECT, SKIP, PARAM, PARAMKEY,
+
+    PARAMVALUE, BASEURL, SEND, EXCHANGE, HTTPMETHOD, CONTENTTYPE, ACCEPT, HEADERTYPE, HEADERVALUE, EDATA
+}
