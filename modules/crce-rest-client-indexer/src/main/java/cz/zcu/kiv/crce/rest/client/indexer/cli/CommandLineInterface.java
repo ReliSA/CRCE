@@ -1,8 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.cli;
 
 import java.io.File;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.config.Configurator;
 
 public class CommandLineInterface {
         private final static String helpShort = "-h";
@@ -80,9 +78,6 @@ public class CommandLineInterface {
                 if (helpArg) {
                         showHelp();
                         System.exit(0);
-                }
-                if (!debugArg) {
-                        Configurator.setLevel("extractor", Level.OFF);
                 }
         }
 }
