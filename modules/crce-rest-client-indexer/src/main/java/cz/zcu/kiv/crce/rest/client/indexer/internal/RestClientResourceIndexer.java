@@ -6,8 +6,6 @@ import cz.zcu.kiv.crce.metadata.indexer.AbstractResourceIndexer;
 import cz.zcu.kiv.crce.metadata.service.MetadataService;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Processor;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +18,7 @@ import java.util.*;
  *
  * @author Gabriela Hessova
  *
- * Indexer for REST model extraction from input archive.
+ *         Indexer for REST model extraction from input archive.
  */
 public class RestClientResourceIndexer extends AbstractResourceIndexer {
 
@@ -33,10 +31,9 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
     /**
      * Indexer's entry point.
      *
-     * Indexing consists of three steps:
-     * 1. Class model representation is created from the archive.
-     * 2. REST API model is created based on analysis of the class model.
-     * 3. REST model is converted to metadata, which are added to the resource.
+     * Indexing consists of three steps: 1. Class model representation is created from the archive.
+     * 2. REST API model is created based on analysis of the class model. 3. REST model is converted
+     * to metadata, which are added to the resource.
      *
      * @param input archive input stream
      * @param resource CRCE resource the metadata are set to
@@ -45,7 +42,7 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
     @Override
     public List<String> index(InputStream input, Resource resource) {
 
-        logger.info("Indexing resource "+resource.getId());
+        logger.info("Indexing resource " + resource.getId());
         Collection<Endpoint> endpoints = new LinkedList<>();
         try {
             endpoints = Processor.process(input).values();
@@ -56,32 +53,51 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
         if (endpoints.isEmpty()) {
             logger.info("No endpoints found for resource " + resource.getId());
             return Collections.emptyList();
-        }
-        else {
+        } else {
             logger.debug("REST API model (Client) extracted");
             // save endpoints and metadata
-            RestClientMetadataManager metadataManager = new RestClientMetadataManager(metadataFactory);
+            RestClientMetadataManager metadataManager =
+                    new RestClientMetadataManager(metadataFactory);
             metadataManager.setMetadata(resource, endpoints);
             // label the resource with categories and other common attributes
-            metadataService.addCategory(resource, RestClientMetadataConstants.MAIN_CATEGORY); // assign main category tag
+            metadataService.addCategory(resource, RestClientMetadataConstants.MAIN_CATEGORY); // assign
+                                                                                              // main
+                                                                                              // category
+                                                                                              // tag
             logger.debug("Rest client indexer finished");
 
             return Collections.singletonList(RestClientMetadataConstants.MAIN_CATEGORY);
         }
     }
 
+    /**
+     * 
+     * @return Metadata factory
+     */
     public MetadataFactory getMetadataFactory() {
         return metadataFactory;
     }
 
+    /**
+     * 
+     * @param metadataFactory
+     */
     public void setMetadataFactory(MetadataFactory metadataFactory) {
         this.metadataFactory = metadataFactory;
     }
 
+    /**
+     * 
+     * @return Metadata service
+     */
     public MetadataService getMetadataService() {
         return metadataService;
     }
 
+    /**
+     * 
+     * @param metadataService
+     */
     public void setMetadataService(MetadataService metadataService) {
         this.metadataService = metadataService;
     }

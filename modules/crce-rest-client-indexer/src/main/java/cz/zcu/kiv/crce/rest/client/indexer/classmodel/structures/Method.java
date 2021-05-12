@@ -13,6 +13,7 @@ public class Method extends PathPart {
     private String desc;
     private String signature;
     private DataType returnType;
+    private String owner;
     private String[] exceptions;
     private List<Variable> parameters;
     private List<List<String>> responsesLog = new ArrayList<>();
@@ -20,11 +21,12 @@ public class Method extends PathPart {
 
     private String returnValue = "";
 
-    public Method(int access, String name, String desc) {
+    public Method(int access, String name, String desc, String owner) {
         this.access = access;
         this.name = name;
         this.desc = desc;
         BytecodeDescriptorsProcessor.processMethodDescriptor(desc, this);
+        this.owner = owner;
     }
 
     public String getName() {
@@ -85,6 +87,10 @@ public class Method extends PathPart {
 
     public void setExceptions(String[] exceptions) {
         this.exceptions = exceptions;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 
     @Override

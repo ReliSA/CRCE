@@ -23,7 +23,9 @@ public class ConfigTools {
 
     private static final String DEF_DIR_NAME = "definition";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
-    private static final List<String> configs = List.of(DEF_DIR_ABS+"/"+"jax-rs.yml",DEF_DIR_ABS+"/"+"spring_resttemplate.yml", DEF_DIR_ABS+"/"+"spring_webclient.yml");
+    private static final List<String> configs =
+            List.of(DEF_DIR_ABS + "/" + "jax-rs.yml", DEF_DIR_ABS + "/" + "spring_resttemplate.yml",
+                    DEF_DIR_ABS + "/" + "spring_webclient.yml");
     private static final String DEF_DIR_REL = DEF_DIR_NAME + "/";
     private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
@@ -56,7 +58,7 @@ public class ConfigTools {
      * Wrappes loader for configuration file
      * 
      * @param defDirPath Directory of an configuration file
-     * @param file       Filename of an configuration file
+     * @param file Filename of an configuration file
      * @throws Exception
      */
     private static void loadConfigurationFile(String defDirPath, String file) throws Exception {
@@ -127,7 +129,7 @@ public class ConfigTools {
     private static void loadDefinitions() {
         try {
             final URL resource_url = ConfigTools.class.getResource(DEF_DIR_ABS);
-            System.out.println("RESOURCE_URL="+resource_url.toURI().getScheme());
+            // System.out.println("RESOURCE_URL="+resource_url.toURI().getScheme());
             if (resource_url == null) {
                 throw new Exception("Directory not found: " + DEF_DIR_ABS);
             }
@@ -143,8 +145,8 @@ public class ConfigTools {
                 for (final String path : filesInDirectory) {
                     loadConfigurationFile(path);
                 }
-            } else if (resource_url.toURI().getScheme().equals(BUNDLE_URI_SCHEME)){
-                for (final String path: configs){
+            } else if (resource_url.toURI().getScheme().equals(BUNDLE_URI_SCHEME)) {
+                for (final String path : configs) {
                     loadConfigurationFile(path);
                 }
             } else {

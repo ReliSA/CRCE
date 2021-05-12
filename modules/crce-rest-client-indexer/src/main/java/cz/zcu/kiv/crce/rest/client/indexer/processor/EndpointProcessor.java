@@ -1,9 +1,12 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallMethodConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallMethodType;
@@ -28,20 +31,55 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 class EndpointHandler extends MethodProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
+
+    private String lastProcessedClass = "";
+    private String lastMethodName = "";
+    private String classInProgress = "";
+    private Set<String> callingChain = new HashSet<>();
+
+
     private Map<String, Endpoint> endpoints = new HashMap<>();
     private Set<String> typeHolders = ConfigTools.getGenerics();
     private EnumConfigMap ed = ConfigTools.getEnumDefinitions();
     private MethodConfigMap md = ConfigTools.getMethodDefinitions();
     private EDataContainerConfigMap eDataConfig = ConfigTools.getEDataContainerConfigMap();
 
+    private FieldProcessor fProcessor;
+
     public EndpointHandler(ClassMap classes) {
         super(classes);
+        fProcessor = new FieldProcessor(classes);
+    }
+
+    @Override
+    protected MethodWrapper getMethodWrapper(Operation operation) {
+        MethodWrapper mw = super.getMethodWrapper(operation);
+        if (mw == null) {
+            return null;
+        }
+        final String operationOwner = operation.getOwner();
+        if (!mw.isProcessed() && !classInProgress.equals(operationOwner)) {
+            final ClassWrapper cw = this.classes.getOrDefault(operationOwner, null);
+            if (cw == null) {
+                mw.setIsProcessed();
+                logger.info("Missing class=" + operationOwner);
+                return null;
+            }
+            logger.info("Not processed class=" + cw.getClassStruct().getName());
+            process(mw);
+        } else if (!mw.isProcessed()) {
+            logger.info("Not processed method=" + operation.getMethodName() + " class="
+                    + operationOwner);
+            process(mw);
+        }
+        return mw;
     }
 
     @Override
     protected void processINVOKESTATIC(Stack<Variable> values, Operation operation) {
         if (eDataConfig.containsKey(operation.getOwner())) {
-            Variable newEndointData = ArgTools.setEndpointAttrFromContainer(values, operation);
+            Variable newEndointData = ArgTools.getEndpointAttrFromContainer(values, operation);
             values.push(newEndointData);
             return;
         }
@@ -52,7 +90,7 @@ class EndpointHandler extends MethodProcessor {
     protected void processINVOKESPECIAL(Stack<Variable> values, Operation operation) {
         if (eDataConfig.containsKey(operation.getOwner())) {
             // TODO: new
-            Variable newEndointData = ArgTools.setEndpointAttrFromContainer(values, operation);
+            Variable newEndointData = ArgTools.getEndpointAttrFromContainer(values, operation);
             mergeVarEndpointData(values, newEndointData);
             return;
         } else if (MethodTools.getType(operation.getDescription()) == MethodType.INIT) {
@@ -96,7 +134,7 @@ class EndpointHandler extends MethodProcessor {
     protected void processINVOKEVIRTUAL(Stack<Variable> values, Operation operation) {
         if (eDataConfig.containsKey(operation.getOwner())) {
             // TODO: new
-            Variable newEndointData = ArgTools.setEndpointAttrFromContainer(values, operation);
+            Variable newEndointData = ArgTools.getEndpointAttrFromContainer(values, operation);
             mergeVarEndpointData(values, newEndointData);
             return;
         } else {
@@ -147,13 +185,13 @@ class EndpointHandler extends MethodProcessor {
             EDataContainerMethodConfig methodDefinition, Operation operation) {
         ParameterCategory category = ParameterCategory.valueOf(methodDefinition.getValue());
         Variable varEndpoint =
-                ArgTools.setPathParamFromContainer(values, methodDefinition, operation, category);
+                ArgTools.getPathParamFromContainer(values, methodDefinition, operation, category);
         mergeVarEndpointData(values, varEndpoint);
     }
 
     private void processPathParamEDataContainerGENERIC(Stack<Variable> values,
             EDataContainerMethodConfig methodDefinition, Operation operation) {
-        Variable varEndpoint = ArgTools.setEndpointAttrFromContainer(values, operation);
+        Variable varEndpoint = ArgTools.getEndpointAttrFromContainer(values, operation);
         mergeVarEndpointData(values, varEndpoint);
     }
 
@@ -197,8 +235,7 @@ class EndpointHandler extends MethodProcessor {
 
 
         if (md.containsKey(operation.getOwner())) {
-
-
+            logger.info("Endpoint method=" + operation.getMethodName());
             HashMap<String, ApiCallMethodConfig> methodDefinitionMap = md.get(operation.getOwner());
             if (!methodDefinitionMap.containsKey(operation.getMethodName())) {
                 removeMethodArgsFromStack(values, operation);
@@ -255,14 +292,48 @@ class EndpointHandler extends MethodProcessor {
         } else {
             super.processCALL(operation, values);
         }
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void process(MethodWrapper method) {
-        super.process(method);
+    public void process(MethodWrapper mw) {
+        if (mw.isProcessed()) {
+            return;
+        }
+        final String currentClass = mw.getOwner();
+        final String methodName = mw.getMethodStruct().getName();
+        final String chainKey = currentClass + "-" + methodName;
+
+        if (callingChain.contains(chainKey)) {
+            //System.out.println("Recursion=" + chainKey);
+            //System.out.println("CHAIN=" + callingChain);
+            logger.info("Recursion detected method=" + methodName + " class=" + mw.getOwner());
+            //System.out.println("MW.isvisited=" + mw.isProcessed());
+            mw.setIsProcessed();
+            return;
+        }
+        callingChain.add(chainKey);
+        super.process(mw);
+        callingChain = new HashSet<>();
+    }
+
+    public void process(ClassWrapper class_) {
+
+        if (class_.getClassStruct().getName().contains("org/springframework")) {
+            return;
+        }
+
+        classInProgress = class_.getClassStruct().getName();
+        this.fProcessor.process(class_);
+        for (MethodWrapper method : class_.getMethods()) {
+            //calling chain
+            process(method);
+        }
+        callingChain = new HashSet<>();
+        lastProcessedClass = classInProgress;
     }
 
     /**
@@ -278,12 +349,10 @@ class EndpointHandler extends MethodProcessor {
 public class EndpointProcessor {
     private EndpointHandler endpointHandler;
     private Map<String, Endpoint> endpoints = null;
-    private FieldProcessor fieldProcessor;
 
 
     public EndpointProcessor(ClassMap classes) {
         this.endpointHandler = new EndpointHandler(classes);
-        this.fieldProcessor = new FieldProcessor(classes);
     }
 
     /**
@@ -292,10 +361,7 @@ public class EndpointProcessor {
      * @param class_ Class to processing
      */
     public void process(ClassWrapper class_) {
-        this.fieldProcessor.process(class_);
-        for (MethodWrapper method : class_.getMethods()) {
-            endpointHandler.process(method);
-        }
+        this.endpointHandler.process(class_);
         this.endpoints = endpointHandler.getEndpoints();
     }
 

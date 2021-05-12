@@ -26,5 +26,7 @@
         "editor.formatOnType": true,
         "editor.formatOnSave": true,
         "java.codeGeneration.generateComments": true,
+        "better-comments.multilineComments": true,
+        "java.format.comments.enabled": false
     },
 }

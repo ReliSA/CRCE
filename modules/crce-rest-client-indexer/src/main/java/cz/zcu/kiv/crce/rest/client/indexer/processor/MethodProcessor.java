@@ -2,6 +2,8 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.Stack;
 import org.objectweb.asm.Opcodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
@@ -18,12 +20,46 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 public class MethodProcessor extends BasicProcessor {
 
     private Helpers.StringC.OperationType stringOP = null;
+    private static final Logger logger = LoggerFactory.getLogger(MethodProcessor.class);
 
     public MethodProcessor(ClassMap classes) {
         super(classes);
     }
 
+    protected MethodWrapper getMethodWrapper(Operation operation) {
+        final String methodName = operation.getMethodName();
+        final String operationOwner = operation.getOwner();
+        final ClassWrapper classWrapper = this.classes.getOrDefault(operationOwner, null);
+        if (classWrapper == null) {
+            logger.error("Missing class=" + operationOwner);
+            return null;
+        }
+
+        MethodWrapper methodWrapper = classWrapper.getMethod(methodName);
+
+        if (methodWrapper == null) {
+            logger.error("Missing method=" + methodName + " class=" + operationOwner);
+            return null;
+        }
+
+        return methodWrapper;
+    }
+
+    protected void cleanupAfterMCall(Stack<Variable> values, Operation operation) {
+        removeMethodArgsFromStack(values, operation);
+        handleAccessingObject(values, operation);
+    }
+
+    /**
+     * Removes values based on description of method
+     * e.g.:
+     * invokevirtual java/lang/StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder -> one param
+     * pops out one parameter from stacck
+     * @param values
+     * @param operation
+     */
     protected void removeMethodArgsFromStack(Stack<Variable> values, Operation operation) {
+        // TODO: give me those params
         String[] args = MethodTools.getArgsFromSignature(operation.getDescription());
         if (args != null) {
             for (String arg : args) {
@@ -62,8 +98,8 @@ public class MethodProcessor extends BasicProcessor {
     }
 
     protected void processINVOKEVIRTUAL(Stack<Variable> values, Operation operation) {
-        handleAccessingObject(values, operation);
         final String methodName = operation.getMethodName();
+        handleAccessingObject(values, operation);
 
         if (Helpers.StringC.isToString(methodName)) {
             this.stringOP = StringC.OperationType.TOSTRING;
@@ -71,20 +107,18 @@ public class MethodProcessor extends BasicProcessor {
             processAppendString(values);
             this.stringOP = Helpers.StringC.OperationType.APPEND;
         } else {
-            handleAccessingObject(values, operation);
             removeMethodArgsFromStack(values, operation);
             if (!this.classes.containsKey(operation.getOwner())) {
                 return;
             }
-            ClassWrapper cw = this.classes.get(operation.getOwner());
-            MethodWrapper mw = cw.getMethod(operation.getMethodName());
+            final MethodWrapper mw = getMethodWrapper(operation);
             if (mw == null) {
                 return;
             }
             Variable variable = new Variable(mw.getMethodStruct().getReturnValue())
-                    .setType(VariableType.OTHER).setDescription(mw.getDescription());
+                    .setType(VariableType.OTHER).setDescription(mw.getOwner());
 
-            if (ClassTools.isPrimitive(mw.getDescription())) {
+            if (mw.isPrimitive()) {
                 variable.setType(VariableType.SIMPLE);
             }
             values.add(variable);
@@ -92,39 +126,31 @@ public class MethodProcessor extends BasicProcessor {
     }
 
     protected void processINVOKESPECIAL(Stack<Variable> values, Operation operation) {
-        Variable variable = Helpers.StackF.peek(values);
         if (MethodTools.getType(operation.getDescription()) == MethodType.INIT) {
-            variable = new Variable().setType(VariableType.OTHER)
+            Variable variable = new Variable().setType(VariableType.OTHER)
                     .setDescription(operation.getDescription()).setOwner(operation.getOwner());
             values.add(variable);
             return;
         }
+        cleanupAfterMCall(values, operation);
     }
 
     protected void processINVOKEINTERFACE(Stack<Variable> values, Operation operation) {
-        removeMethodArgsFromStack(values, operation);
-        handleAccessingObject(values, operation);
+        cleanupAfterMCall(values, operation);
     }
 
 
     protected void processINVOKESTATIC(Stack<Variable> values, Operation operation) {
-        final String methodName = operation.getMethodName();
-        final String operationOwner = operation.getOwner();
-        final ClassWrapper classWrapper = this.classes.getOrDefault(operationOwner, null);
-
-        if (classWrapper == null) {
+        final MethodWrapper mw = getMethodWrapper(operation);
+        if (mw == null) {
             return;
         }
-        MethodWrapper methodWrapper = classWrapper.getMethod(methodName);
-        final Method method = methodWrapper.getMethodStruct();
-        if (methodWrapper.getDescription().equals("")) {
+        final Method method = getMethodWrapper(operation).getMethodStruct();
+        if (mw.getOwner().equals("")) {
             return;
-        }
-        if (method.getReturnValue() == null) {
-            this.process(methodWrapper);
         }
         Variable newVar = new Variable();
-        if (ClassTools.isPrimitive(methodWrapper.getDescription())) {
+        if (ClassTools.isPrimitive(mw.getReturnType())) {
             newVar.setType(VariableType.SIMPLE);
         } else {
             newVar.setType(VariableType.OTHER);

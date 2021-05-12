@@ -18,7 +18,17 @@ public class BasicProcessor {
 
     protected ClassMap classes;
 
+    /**
+     * Check if on top of the stack is not owner (instance of class) of the method e.q.
+     * com/baeldung/reactive/constants/NonStaticUri (contains getTest) -> is currently on stack
+     * invokevirtual com/baeldung/reactive/constants/NonStaticUri.getTest()Ljava/lang/String 
+     * -> deletes NonStaticUri
+     * 
+     * @param values
+     * @param operation
+     */
     protected void handleAccessingObject(Stack<Variable> values, Operation operation) {
+        // TODO: give me those params
         Variable var = Helpers.StackF.peek(values);
         if (var != null && var.getType() == VariableType.OTHER
                 && var.getOwner().equals(operation.getOwner())) {
@@ -39,10 +49,7 @@ public class BasicProcessor {
             return;
         }
         ConstPool classPool = this.classes.get(operation.getOwner()).getClassPool();
-        // Variable value = Helpers.StackF.peek(values);
-        /*
-         * if (value != null && value.getType() == VariableType.OTHER) { values.pop(); }
-         */
+
         if (!classPool.containsKey(operation.getFieldName())) {
             return;
         }
@@ -50,7 +57,7 @@ public class BasicProcessor {
         if (field == null) {
             return;
         }
-        field.setDescription(ClassTools.descriptionToOwner(operation.getDesc()));
+        field.setDescription(ClassTools.descriptionToClassPath(operation.getDesc()));
         values.add(field);
     }
 
@@ -226,12 +233,6 @@ public class BasicProcessor {
                 processANEWARRAY(operation, values);
                 break;
             case DUP:
-                /*
-                 * Variable last = Helpers.StackF.pop(values); if (!VariableTools.isEmpty(last) &&
-                 * last.getType() == VariableType.ARRAY) {
-                 * 
-                 * }
-                 */
                 break;
             default:;
 

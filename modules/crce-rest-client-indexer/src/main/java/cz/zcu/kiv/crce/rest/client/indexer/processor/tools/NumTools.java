@@ -5,7 +5,13 @@ import java.util.regex.Pattern;
 public class NumTools {
     final private static Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-    // @source:https://www.baeldung.com/java-check-string-number
+    /**
+     * Detects number from string
+     * 
+     * @source:https://www.baeldung.com/java-check-string-number
+     * @param strNum Posible number
+     * @return
+     */
     public static boolean isNumeric(String strNum) {
         if (strNum == null) {
             return false;

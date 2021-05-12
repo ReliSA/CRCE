@@ -8,6 +8,12 @@ public class VariableTools {
         return var == null || var.getValue() == null;
     }
 
+    /**
+     * Detects if variable is number by its description
+     * 
+     * @param var Variable
+     * @return
+     */
     public static boolean isNumberVar(Variable var) {
         return (var.getDescription().equals("I") || var.getDescription().equals("D")
                 || var.getDescription().equals("F") || var.getDescription().equals("L")
@@ -17,6 +23,12 @@ public class VariableTools {
                 || var.getDescription().equals("java/lang/Float"));
     }
 
+    /**
+     * Detects if variable is type of String (or StringBuilder)
+     * 
+     * @param var Variable
+     * @return
+     */
     public static boolean isStringVar(Variable var) {
         return (var.getType() == VariableType.SIMPLE
                 || var.getDescription().equals("java/lang/String")

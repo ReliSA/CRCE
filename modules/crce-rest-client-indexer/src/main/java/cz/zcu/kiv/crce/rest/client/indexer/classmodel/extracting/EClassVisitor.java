@@ -1,10 +1,13 @@
 package cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting;
 
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
+/*
+ * import org.apache.logging.log4j.LogManager; import org.apache.logging.log4j.Logger;
+ */
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.Collector;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.DataType;
@@ -14,8 +17,9 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 public class EClassVisitor extends ClassVisitor {
 
     //static Logger log = LogManager.getLogger("extractor");
-
+    private static final Logger logger = LoggerFactory.getLogger(EClassVisitor.class);
     private State state = State.getInstance();
+    private ClassStruct lastClass = null;
 
     public EClassVisitor(int api, ClassVisitor classVisitor) {
         super(api, classVisitor);
@@ -24,9 +28,10 @@ public class EClassVisitor extends ClassVisitor {
     @Override
     public void visit(int version, int access, String name, String signature, String superName,
             String[] interfaces) {
-/*        log.debug("============Class-Visitor[name=" + name + " extends=" + superName + " signature="
+        /*        log.debug("============Class-Visitor[name=" + name + " extends=" + superName + " signature="
                 + signature + "]===");*/
         ClassStruct class_ = new ClassStruct(name, superName, signature);
+        lastClass = class_;
         state.setClassType(class_);
         super.visit(version, access, name, signature, superName, interfaces);
 
@@ -34,7 +39,7 @@ public class EClassVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-/*        log.debug("==========" + "END-Class-Visitor[" + State.getInstance().getClassType().getName()
+        /*        log.debug("==========" + "END-Class-Visitor[" + State.getInstance().getClassType().getName()
                 + "]" + "==================\n\n\n");*/
         Collector.getInstance().addClass(State.getInstance().getClassType());
         super.visitEnd();
@@ -43,7 +48,7 @@ public class EClassVisitor extends ClassVisitor {
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature,
             Object value) {
-/*        log.debug("    Field-Visitor[access=" + access + ", name=" + name + ", desc=" + desc
+        /*        log.debug("    Field-Visitor[access=" + access + ", name=" + name + ", desc=" + desc
                 + ", signature=" + signature + ", value=" + value + "]");*/
 
         DataType dataType = BytecodeDescriptorsProcessor.processFieldDescriptor(desc);
@@ -60,9 +65,9 @@ public class EClassVisitor extends ClassVisitor {
             String[] exceptions) {
         // @source
         // https://stackoverflow.com/questions/47000699/how-to-extract-access-flags-of-a-field-in-asm-visitfield-method
-/*        log.debug("\n    ==========Method-Visitor[name=" + name + " CLINIT="
-                + (name.equals("<clinit>") ? "TRUE" : "FALSE") + "]===");*/
-        Method newMethod = new Method(access, name, descriptor);
+        /*        log.debug("\n    ==========Method-Visitor[name=" + name + " CLINIT="
+        + (name.equals("<clinit>") ? "TRUE" : "FALSE") + "]===");*/
+        Method newMethod = new Method(access, name, descriptor, lastClass.getName());
         state.getClassType().addMethod(newMethod);
         MethodVisitor mv = new MyMethodVisitor(newMethod);
 

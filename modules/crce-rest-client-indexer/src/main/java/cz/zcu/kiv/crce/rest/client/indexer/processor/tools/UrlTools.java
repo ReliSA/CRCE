@@ -4,7 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class UrlTools {
-    // public static void get
+    /**
+     * Gets query from given path
+     * 
+     * @param path Path to process
+     * @return Query part in path
+     */
     public static String getQuery(String path) {
 
         try {
@@ -15,10 +20,15 @@ public class UrlTools {
             return parsed.getQuery();
         } catch (MalformedURLException e) {
             return null;
-            // TODO Auto-generated catch block
         }
     }
 
+    /**
+     * Matrix query from path
+     * 
+     * @param path Path to process
+     * @return Matrix part in path
+     */
     public static String getMatrixQuery(String path) {
         String matrixQuery;
         try {

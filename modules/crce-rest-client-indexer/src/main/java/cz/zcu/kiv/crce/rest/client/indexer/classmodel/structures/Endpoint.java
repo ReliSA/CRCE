@@ -1,6 +1,8 @@
 package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
@@ -34,15 +36,15 @@ public class Endpoint implements Serializable {
     }
 
     public Endpoint(String baseUrl, String path, Set<HttpMethod> httpMethods,
-                    Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
-                    Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
+            Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
+            Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
         this(path, httpMethods, requestBodies, expectedResponses, parameters, produces, consumes);
         this.baseUrl = baseUrl;
     }
 
     public Endpoint(String path, Set<HttpMethod> httpMethods,
-                    Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
-                    Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
+            Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
+            Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
         this.httpMethods = httpMethods;
         this.requestBodies = requestBodies;
         this.expectedResponses = expectedResponses;
@@ -216,6 +218,17 @@ public class Endpoint implements Serializable {
         if (path != null) {
             if (!path.startsWith("http")) {
                 this.path = path.replace("//", "/");
+            } else {
+                URL url;
+                try {
+                    url = new URL(path);
+                    this.path = url.getFile();
+                    this.baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+                } catch (MalformedURLException e) {
+                    // TODO replace with logger
+                    e.printStackTrace();
+                }
+
             }
             String query = UrlTools.getQuery(path);
             String queryMatrix = UrlTools.getMatrixQuery(path);

@@ -31,6 +31,10 @@ public class ClassWrapper {
         }
     }
 
+    /**
+     * 
+     * @return Fields
+     */
     public Map<String, Field> getFieldsContainer() {
         return this.fieldsContainer;
     }

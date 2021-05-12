@@ -44,7 +44,8 @@ public class MethodTools {
             // cleanup
             int counter = 0;
             for (String arg : args) {
-                args[counter++] = ClassTools.descriptionToOwner(arg);
+                //System.out.println("ARG=" + arg);
+                args[counter++] = ClassTools.descriptionToClassPath(arg);
             }
             return args;
         }
