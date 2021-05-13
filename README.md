@@ -9,6 +9,11 @@ CRCE is an experimental repository, designed to support research into component-
 - **Maven 3**, tested on 3.5.2
 
 On linux, switching to JDK 11 for development/build can be done via `sudo update-alternatives --config java`.
+## New fast way of building entire project!
+With usage of docker and maven, you can run just this script in the `root` of proejct.
+```bash
+./build-code-docker.sh fast
+```
 
 ## Build
 
@@ -41,6 +46,10 @@ mvn clean pax:directory
 
 The `prepare-bundles.sh` script is needed due to the issues further described in the Issues section.
 
+Before executing build in `/deploy` be sure to make docker build of `builder`
+```bash
+docker image build --tag builder:1.0 ./build 
+```
 To finally build the image itself, execute the following commnad in `/deploy` directory:
 
 ```bash
