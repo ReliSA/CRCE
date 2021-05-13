@@ -33,8 +33,6 @@ class EndpointHandler extends MethodProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
 
-    private String lastProcessedClass = "";
-    private String lastMethodName = "";
     private String classInProgress = "";
     private Set<String> callingChain = new HashSet<>();
 
@@ -133,7 +131,6 @@ class EndpointHandler extends MethodProcessor {
     @Override
     protected void processINVOKEVIRTUAL(Stack<Variable> values, Operation operation) {
         if (eDataConfig.containsKey(operation.getOwner())) {
-            // TODO: new
             Variable newEndointData = ArgTools.getEndpointAttrFromContainer(values, operation);
             mergeVarEndpointData(values, newEndointData);
             return;
@@ -235,7 +232,8 @@ class EndpointHandler extends MethodProcessor {
 
 
         if (md.containsKey(operation.getOwner())) {
-            logger.info("Endpoint method=" + operation.getMethodName());
+            logger.info("Endpoint method=" + operation.getMethodName() + " owner="
+                    + operation.getOwner() + " executedFromClass=" + this.classInProgress);
             HashMap<String, ApiCallMethodConfig> methodDefinitionMap = md.get(operation.getOwner());
             if (!methodDefinitionMap.containsKey(operation.getMethodName())) {
                 removeMethodArgsFromStack(values, operation);
@@ -303,37 +301,36 @@ class EndpointHandler extends MethodProcessor {
         if (mw.isProcessed()) {
             return;
         }
+
+        classInProgress = mw.getOwner();
         final String currentClass = mw.getOwner();
         final String methodName = mw.getMethodStruct().getName();
         final String chainKey = currentClass + "-" + methodName;
 
         if (callingChain.contains(chainKey)) {
-            //System.out.println("Recursion=" + chainKey);
-            //System.out.println("CHAIN=" + callingChain);
-            logger.info("Recursion detected method=" + methodName + " class=" + mw.getOwner());
-            //System.out.println("MW.isvisited=" + mw.isProcessed());
+            logger.info("Recursion detected method=" + methodName + " owner=" + mw.getOwner());
             mw.setIsProcessed();
             return;
         }
         callingChain.add(chainKey);
         super.process(mw);
+        mw.setIsProcessed();
         callingChain = new HashSet<>();
     }
 
     public void process(ClassWrapper class_) {
-
-        if (class_.getClassStruct().getName().contains("org/springframework")) {
-            return;
-        }
 
         classInProgress = class_.getClassStruct().getName();
         this.fProcessor.process(class_);
         for (MethodWrapper method : class_.getMethods()) {
             //calling chain
             process(method);
+            if (!method.hasPrimitiveReturnType()) {
+                class_.removeMethod(method.getMethodStruct().getName());
+            }
         }
+
         callingChain = new HashSet<>();
-        lastProcessedClass = classInProgress;
     }
 
     /**

@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
+
 public class Variable {
 
     public enum VariableType {
@@ -29,6 +31,15 @@ public class Variable {
 
     public Variable setType(VariableType vType) {
         this.vType = vType;
+        return this;
+    }
+
+    public Variable setType(String description) {
+        if (ClassTools.isPrimitive(description)) {
+            this.vType = VariableType.SIMPLE;
+        } else {
+            this.vType = VariableType.OTHER;
+        }
         return this;
     }
 

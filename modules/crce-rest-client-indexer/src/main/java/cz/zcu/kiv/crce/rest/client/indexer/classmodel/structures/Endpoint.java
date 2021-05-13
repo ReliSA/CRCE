@@ -5,6 +5,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
@@ -18,6 +20,7 @@ public class Endpoint implements Serializable {
      */
     private static final long serialVersionUID = -5099598028525455821L;
 
+    private static final Logger logger = LoggerFactory.getLogger(Endpoint.class);
 
     protected String path;
     protected String baseUrl;
@@ -39,7 +42,7 @@ public class Endpoint implements Serializable {
             Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
             Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
         this(path, httpMethods, requestBodies, expectedResponses, parameters, produces, consumes);
-        this.baseUrl = baseUrl;
+        this.setBaseUrl(baseUrl);
     }
 
     public Endpoint(String path, Set<HttpMethod> httpMethods,
@@ -120,6 +123,22 @@ public class Endpoint implements Serializable {
      */
     public Endpoint setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+        if (baseUrl != null && baseUrl.length() > 0 && baseUrl.startsWith("http")) {
+            URL url;
+            try {
+                url = new URL(baseUrl);
+                if (this.path == null) {
+                    this.path = url.getFile();
+                }
+                this.baseUrl = url.getProtocol() + "://" + url.getHost()
+                        + (url.getPort() > 0 ? (":" + url.getPort()) : "");
+            } catch (MalformedURLException e) {
+                logger.error("Wrong type of Base URL=" + baseUrl);
+                // TODO replace with logger
+                //e.printStackTrace();
+            }
+
+        }
         return this;
     }
 
@@ -225,8 +244,9 @@ public class Endpoint implements Serializable {
                     this.path = url.getFile();
                     this.baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
                 } catch (MalformedURLException e) {
+                    logger.error("Wrong type of Path =" + path);
                     // TODO replace with logger
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
 
             }

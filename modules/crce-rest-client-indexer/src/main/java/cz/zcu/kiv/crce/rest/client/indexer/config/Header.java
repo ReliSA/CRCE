@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config;
 
 import java.util.Objects;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
 
 public class Header {
@@ -49,6 +50,20 @@ public class Header {
     public Header(String name, String value) {
         this.name = name;
         this.value = value;
+    }
+
+    /**
+    * @param name
+    * @param value
+    */
+    public Header(String name, Variable value) {
+        this.name = name;
+        if (value == null) {
+            this.value = "";
+        } else {
+            this.value =
+                    value.getValue() == null ? value.getDescription() : (String) value.getValue();
+        }
     }
 
     @Override

@@ -51,7 +51,7 @@ public class BasicProcessor {
         ConstPool classPool = this.classes.get(operation.getOwner()).getClassPool();
 
         if (!classPool.containsKey(operation.getFieldName())) {
-            return;
+            classPool.put(operation.getFieldName(), new Variable("").setType(VariableType.SIMPLE));
         }
         Variable field = classPool.get(operation.getFieldName());
         if (field == null) {
@@ -59,6 +59,18 @@ public class BasicProcessor {
         }
         field.setDescription(ClassTools.descriptionToClassPath(operation.getDesc()));
         values.add(field);
+    }
+
+    protected void processPUTFIELD(Stack<Variable> values, Operation operation) {
+        if (!classes.containsKey(operation.getOwner())) {
+            return;
+        }
+        ConstPool classPool = this.classes.get(operation.getOwner()).getClassPool();
+        Variable var = Helpers.StackF.pop(values);
+        if (VariableTools.isEmpty(var)) {
+            return;
+        }
+        classPool.put(operation.getFieldName(), var);
     }
 
     /**
@@ -75,29 +87,20 @@ public class BasicProcessor {
                 processGETSTATICFIELD(values, operation);
                 break;
             case Opcodes.PUTSTATIC:
-            case Opcodes.PUTFIELD: {
-                if (!classes.containsKey(operation.getOwner())) {
-                    return;
-                }
-                ConstPool classPool = this.classes.get(operation.getOwner()).getClassPool();
-                Variable var = Helpers.StackF.pop(values);
-                if (VariableTools.isEmpty(var)) {
-                    break;
-                }
-                classPool.put(operation.getFieldName(), var);
-            }
+            case Opcodes.PUTFIELD:
+                processPUTFIELD(values, operation);
                 break;
         }
 
     }
 
     /**
-     * Processes constants like String, Integer, Float...
+     * Processes constants like Integer, Float...
      * 
      * @param operation Operation create constant
      * @param values String values
      */
-    protected void processCONSTANT(Operation operation, Stack<Variable> values) {
+    protected void processNUMCONSTANT(Operation operation, Stack<Variable> values) {
         String newValue = operation.getValue() != null ? operation.getValue().toString() : null;
         Variable last = Helpers.StackF.peek(values);
         if (newValue != null && NumTools.isNumeric(newValue) && last != null
@@ -106,6 +109,17 @@ public class BasicProcessor {
             array.setPosition(Integer.valueOf(newValue));
             return;
         }
+        values.add(new Variable(newValue).setType(VariableType.SIMPLE));
+    }
+
+    /**
+     * Processes String constant
+     * 
+     * @param operation Operation create constant
+     * @param values String values
+     */
+    protected void processSTRINGCONST(Operation operation, Stack<Variable> values) {
+        String newValue = operation.getValue() != null ? operation.getValue().toString() : null;
         values.add(new Variable(newValue).setType(VariableType.SIMPLE));
     }
 
@@ -144,9 +158,10 @@ public class BasicProcessor {
             return;
         }
         VarArray varArray = (VarArray) array.getValue();
-        varArray.set((VariableTools.isEmpty(arrayItem) || arrayItem.getValue().toString().isEmpty())
-                ? arrayItem.getDescription()
-                : (String) arrayItem.getValue());
+        if (arrayItem.getType() == VariableType.SIMPLE && arrayItem.getValue() != null) {
+            //varArray.set((String) arrayItem.getValue());
+            varArray.set(arrayItem);
+        }
         values.push(array);
     }
 
@@ -218,8 +233,10 @@ public class BasicProcessor {
                 break;
 
             case STRING_CONSTANT:
+                processSTRINGCONST(operation, values);
+                break;
             case INT_CONSTANT:
-                processCONSTANT(operation, values);
+                processNUMCONSTANT(operation, values);
                 break;
 
             case LOAD:

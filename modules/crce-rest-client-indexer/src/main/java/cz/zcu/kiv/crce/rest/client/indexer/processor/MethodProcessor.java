@@ -115,10 +115,11 @@ public class MethodProcessor extends BasicProcessor {
             if (mw == null) {
                 return;
             }
+            //TODO: changes possible broken
             Variable variable = new Variable(mw.getMethodStruct().getReturnValue())
-                    .setType(VariableType.OTHER).setDescription(mw.getOwner());
+                    .setType(VariableType.OTHER).setDescription(mw.getReturnType());
 
-            if (mw.isPrimitive()) {
+            if (mw.hasPrimitiveReturnType()) {
                 variable.setType(VariableType.SIMPLE);
             }
             values.add(variable);

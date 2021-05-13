@@ -54,19 +54,21 @@ public class VariablesContainer {
         vars.add(new Variable("").setType(VariableType.OTHER));
     }
 
-    public VariablesContainer(List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures,
+    public VariablesContainer(
+            List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures,
             String owner) {
         vars = new ArrayList<>();
         if (owner != null) {
             vars.add(new Variable("").setType(VariableType.OTHER).setOwner(owner));
         }
         for (cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable varStruct : varStructures) {
-            vars.add(new Variable().setDescription(varStruct.getDataType().getBasicType())
-                    .setType(VariableType.OTHER));
+            String basicType = varStruct.getDataType().getBasicType();
+            vars.add(new Variable("").setDescription(basicType).setType(basicType));
         }
     }
 
-    public VariablesContainer(List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures) {
+    public VariablesContainer(
+            List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures) {
         this(varStructures, null);
     }
 }

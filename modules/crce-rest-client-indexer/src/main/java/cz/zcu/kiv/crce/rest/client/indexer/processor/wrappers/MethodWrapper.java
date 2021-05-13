@@ -53,7 +53,7 @@ public class MethodWrapper {
         return isProcessed;
     }
 
-    public boolean isPrimitive() {
+    public boolean hasPrimitiveReturnType() {
         return isPrimitive;
     }
 }

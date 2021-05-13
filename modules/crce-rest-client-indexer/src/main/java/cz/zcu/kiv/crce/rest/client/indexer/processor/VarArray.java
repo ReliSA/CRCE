@@ -1,20 +1,20 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 public class VarArray {
-    private String[] value;
+    private Variable[] value;
     private int position;
 
     public VarArray(int size) {
         position = 0;
-        value = new String[size];
+        value = new Variable[size];
     }
 
-    public String[] getInnerArray() {
+    public Variable[] getInnerArray() {
         return value;
     }
 
-    public void set(String val) {
-        value[position] = val;
+    public void set(Variable var) {
+        value[position] = var;
     }
 
     public void setPosition(int pos) {
@@ -26,8 +26,11 @@ public class VarArray {
         // TODO Auto-generated method stub
         String toStringVal = "";
         final String delimeter = ", ";
-        for (String item : value) {
-            toStringVal += item + delimeter;
+        for (Variable item : value) {
+            if (item == null) {
+                continue;
+            }
+            toStringVal += item.getValue() + delimeter;
         }
         int finalSize = toStringVal.length() - delimeter.length();
         if (finalSize <= 0) {

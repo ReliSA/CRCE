@@ -120,10 +120,10 @@ public class ArgTools {
      * @param param Parameter of endpoint
      * @param endpoint Endpoint which will be updated
      */
-    private static void addParamToEndpoint(String param, Endpoint endpoint) {
+    private static void addParamToEndpoint(Variable param, Endpoint endpoint) {
         EndpointParameter newParam = new EndpointParameter();
-        newParam.setArray(BytecodeDescriptorsProcessor.isArrayOrCollection(param));
-        newParam.setDataType(ClassTools.descriptionToClassName(param));
+        newParam.setArray(BytecodeDescriptorsProcessor.isArrayOrCollection(param.getDescription()));
+        newParam.setDataType(ClassTools.descriptionToClassName(param.getDescription()));
         endpoint.addParameter(newParam);
     }
 
@@ -158,11 +158,15 @@ public class ArgTools {
         endpoint.addRequestBody(requestBody);
     }
 
+    //TODO:CHANGES!!
     private static interface HandleEndpointAttrI {
+        public void run(Variable param);
+    }
+    private static interface HandleEndpointAttrIS {
         public void run(String param);
     }
-    private static interface HandleEndpointPairAttrI {
-        public void run(String param1, String param2);
+    private static interface HandleEndpointPairAttrGeneric<T> {
+        public void run(String param1, T param2);
     }
 
     /**
@@ -172,21 +176,22 @@ public class ArgTools {
      * @param param2 Param value or Param values
      * @param method Callback for processing those values
      */
-    private static void handleAttrPair(Object param1, Object param2,
-            HandleEndpointPairAttrI method) {
-        if (param1 instanceof String[] && param2 instanceof String[]) {
+    @SuppressWarnings("unchecked")
+    private static <T> void handleAttrPair(Object param1, Object param2,
+            HandleEndpointPairAttrGeneric<T> method) {
+        if (param1 instanceof String[] && param2.getClass().isArray()) {
             String[] params1 = (String[]) param1;
-            String[] params2 = (String[]) param2;
+            T[] params2 = (T[]) param2;
             if (params1.length != params2.length) {
                 return;
             }
             for (int i = 0; i < params1.length; i++) {
                 method.run(params1[i], params2[i]);
             }
-        } else if (param1 instanceof String && param2 instanceof String) {
-            method.run((String) param1, (String) param2);
-        } else if (param1 instanceof String && param2 instanceof String[]) {
-            String[] params2 = (String[]) param2;
+        } else if (param1 instanceof String && !param2.getClass().isArray()) {
+            method.run((String) param1, (T) param2);
+        } else if (param1 instanceof String && param2.getClass().isArray()) {
+            T[] params2 = (T[]) param2;
             for (int i = 0; i < params2.length; i++) {
                 method.run((String) param1, params2[i]);
             }
@@ -201,6 +206,25 @@ public class ArgTools {
      * @param method
      */
     private static void handleAttr(Object param, HandleEndpointAttrI method) {
+        if (param instanceof Variable[]) {
+            Variable[] params = (Variable[]) param;
+            for (Variable val : params) {
+                method.run(val);
+            }
+        } else {
+            method.run((Variable) param);
+        }
+
+    }
+
+    /**
+     * Helper method for attributes of endpoint
+     * 
+     * @param param Param for endpoint either String or String[]
+     * @param endpoint
+     * @param method
+     */
+    private static void handleAttr(Object param, HandleEndpointAttrIS method) {
         if (param instanceof String[]) {
             String[] params = (String[]) param;
             for (String val : params) {
@@ -324,7 +348,7 @@ public class ArgTools {
         String headerType = methodConfig.getValue();
         Object acceptValue = params.getOrDefault(ArgConfigType.HEADERVALUE.name(), null);
         if (acceptValue != null) {
-            handleAttr(acceptValue, (String value) -> ((Endpoint) var.getValue())
+            handleAttr(acceptValue, (Variable value) -> ((Endpoint) var.getValue())
                     .addHeader(new Header(headerType, value)));
             params.remove(ArgConfigType.ACCEPT.name());
         }
@@ -349,8 +373,8 @@ public class ArgTools {
                     .addParameter(new EndpointParameter(null, p, false, category)));
             params.remove(ArgConfigType.PARAM.name());
         } else if (paramKey != null && paramValue != null) {
-            handleAttrPair(paramKey, paramValue,
-                    (String pKey, String pValue) -> ((Endpoint) var.getValue())
+            handleAttrPair(paramKey, (Variable) paramValue,
+                    (String pKey, Variable pValue) -> ((Endpoint) var.getValue())
                             .addParameter(new EndpointParameter(null,
                                     new Header(pKey, pValue).toString(), false, category)));
             params.remove(ArgConfigType.PARAMKEY.name());
@@ -459,10 +483,11 @@ public class ArgTools {
         if (param != null) {
             if (param instanceof VarEndpointData) {
                 VarEndpointData varEData = (VarEndpointData) param;
+
                 endpoint.merge(varEData);
                 varEData.merge(endpoint);
             } else {
-                handleAttr(param, (String p) -> addParamToEndpoint(p, endpoint));
+                handleAttr(param, (Variable p) -> addParamToEndpoint(p, endpoint));
             }
         }
         if (expect != null) {
@@ -482,8 +507,14 @@ public class ArgTools {
                     (String httpmethod) -> endpoint.addHttpMethod(HttpMethod.valueOf(httpmethod)));
         }
         if (headerType != null && headerValue != null) {
-            handleAttrPair(headerType, headerValue, (String headerName,
-                    String headerVal) -> endpoint.addHeader(new Header(headerName, headerVal)));
+            if (headerValue instanceof String) {
+                handleAttrPair(headerType, headerValue, (String headerName,
+                        String headerVal) -> endpoint.addHeader(new Header(headerName, headerVal)));
+            } else if (headerValue.getClass().isArray()) {
+                handleAttrPair(headerType, headerValue,
+                        (String headerName, Variable headerVal) -> endpoint
+                                .addHeader(new Header(headerName, headerVal)));
+            }
         }
         if (contentType != null) {
             handleAttr(contentType, (String cType) -> endpoint

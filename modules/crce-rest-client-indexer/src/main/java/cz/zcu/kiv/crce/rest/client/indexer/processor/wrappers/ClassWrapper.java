@@ -24,6 +24,7 @@ public class ClassWrapper {
         fieldsContainer = new HashMap<>();
 
         for (Method method : classStruct.getMethods()) {
+
             methods.put(method.getName(), new MethodWrapper(method, classStruct.getName()));
         }
         for (Field field : classStruct.getFields()) {
