@@ -10,6 +10,10 @@ public class MyFieldVisitor extends FieldVisitor {
     private State state = State.getInstance();
     private Field field;
 
+    /**
+     * Init
+     * @param field Field
+     */
     public MyFieldVisitor(Field field) {
         super(Opcodes.ASM7);
         this.field = field;
@@ -22,7 +26,7 @@ public class MyFieldVisitor extends FieldVisitor {
 
     @Override
     public void visitEnd() {
-        state.getClassType().addField(field);
+        state.getClassStruct().addField(field);
         super.visitEnd();
     }
 

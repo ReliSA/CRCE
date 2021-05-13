@@ -9,27 +9,30 @@ public class Field extends Variable {
     private String val;
     private String signature;
 
+    /**
+     * 
+     * @param dataType Type of field
+     */
     public Field(DataType dataType) {
         super(dataType);
     }
 
-    public int getAccess() {
-        return access;
-    }
 
-    public void setAccess(int access) {
-        this.access = access;
-    }
-
+    /**
+     * Sets const value
+     * @param val New const value
+     */
     public void setConstValue(String val) {
         this.val = val;
     }
 
+    /**
+     * 
+     * @return Const value
+     */
     public String getConstValue() {
         return val;
     }
-
-    // public void setDataTypeChain()
 
     @Override
     public String toString() {
@@ -37,14 +40,15 @@ public class Field extends Variable {
     }
 
     /**
-     * @return the signature
+     * @return Signature
      */
     public String getSignature() {
         return signature;
     }
 
     /**
-     * @param signature the signature to set
+     * Sets signature
+     * @param signature Signature
      */
     public void setSignature(String signature) {
         this.signature = signature;

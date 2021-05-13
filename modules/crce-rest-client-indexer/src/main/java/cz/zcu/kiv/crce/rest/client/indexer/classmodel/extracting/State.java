@@ -1,11 +1,9 @@
 package cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting;
 
-
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.PathPart;
 
 /**
- * Created by ghessova on 02.03.2018.
+ * Inspired by ghessova on 02.03.2018.
  */
 public class State {
 
@@ -17,34 +15,38 @@ public class State {
 
     private int parametersProcessed = 0;
 
-    private cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct classType;
+    private cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct currClass;
 
-    private PathPart pathPart;
-
-
-    public ClassStruct getClassType() {
-        return classType;
+    /**
+     * Return current classtructure
+     * @return
+     */
+    public ClassStruct getClassStruct() {
+        return currClass;
     }
 
-    public void setClassType(ClassStruct classType) {
-        this.classType = classType;
-        this.pathPart = classType;
+    /**
+     * Set current scope (Class) for the state
+     * @param classStruct
+     */
+    public void setClassStruct(ClassStruct classStruct) {
+        this.currClass = classStruct;
     }
 
-    public int getParametersProcessed() {
+    /**
+     * Returns number of processed parameters
+     * @return
+     */
+    public int getNumParametersProcessed() {
         return parametersProcessed;
     }
 
-    public void setParametersProcessed(int parametersProcessed) {
+    /**
+     * Sets number of processed parameters
+     * @param parametersProcessed
+     */
+    public void setNumParametersProcessed(int parametersProcessed) {
         this.parametersProcessed = parametersProcessed;
-    }
-
-    public PathPart getPathPart() {
-        return pathPart;
-    }
-
-    public void setPathPart(PathPart pathPart) {
-        this.pathPart = pathPart;
     }
 
 }

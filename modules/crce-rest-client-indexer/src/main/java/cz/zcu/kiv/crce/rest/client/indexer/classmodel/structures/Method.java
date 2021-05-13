@@ -5,16 +5,14 @@ import java.util.List;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 
 /**
- * Created by ghessova on 05.03.2018.
+ * Inspired by ghessova on 05.03.2018.
  */
 public class Method extends PathPart {
 
     private int access;
     private String desc;
-    private String signature;
     private DataType returnType;
     private String owner;
-    private String[] exceptions;
     private List<Variable> parameters;
     private List<List<String>> responsesLog = new ArrayList<>();
     private List<Operation> bodyLog = new ArrayList<>();
@@ -29,64 +27,98 @@ public class Method extends PathPart {
         this.owner = owner;
     }
 
+    /**
+     * @return Name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * 
+     * @return Return Type
+     */
     public DataType getReturnType() {
         return returnType;
     }
 
+    /**
+     * Sets return type
+     * @param returnType Return type
+     */
     public void setReturnType(DataType returnType) {
         this.returnType = returnType;
     }
 
+    /**
+     * @return List of parameters
+     */
     public List<Variable> getParameters() {
         return parameters;
     }
 
+    /**
+     * Sets parameters
+     * @param parameters Parameters
+     */
     public void setParameters(List<Variable> parameters) {
         this.parameters = parameters;
     }
 
+    /**
+     * Logging
+     * @param log
+     */
     public void addLog(List<String> log) {
         responsesLog.add(log);
     }
 
+    /**
+     * Response log
+     * @return
+     */
     public List<List<String>> getResponsesLog() {
         return responsesLog;
     }
 
+    /**
+     *
+     * @return Operations within scope of this method
+     */
     public List<Operation> getOperations() {
         return bodyLog;
     }
 
+    /**
+     * Adds operation into bodyLog 
+     * @param operation New operation
+     */
     public void addOperation(Operation operation) {
         bodyLog.add(operation);
     }
 
+    /**
+     * Sets method access
+     * @param access Acccess
+     */
     public void setAccess(int access) {
         this.access = access;
     }
 
+    /**
+     * 
+     * @return Method access
+     */
     public int getAccess() {
         return access;
     }
 
+    /**
+     * 
+     * @return Description of method e.g. Is it array (Ljava/lang/String;)V
+     */
     public String getDesc() {
         return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public String[] getExceptions() {
-        return exceptions;
-    }
-
-    public void setExceptions(String[] exceptions) {
-        this.exceptions = exceptions;
     }
 
     public String getOwner() {
@@ -111,19 +143,5 @@ public class Method extends PathPart {
      */
     public void setReturnValue(String returnValue) {
         this.returnValue = returnValue;
-    }
-
-    /**
-     * @return the signature
-     */
-    public String getSignature() {
-        return signature;
-    }
-
-    /**
-     * @param signature the signature to set
-     */
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 }

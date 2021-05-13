@@ -12,7 +12,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class Loader {
@@ -24,6 +23,7 @@ public class Loader {
         jar.close();
         // return classes;
     }
+
     public static void loadClasses(ZipInputStream jis) throws IOException {
         for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
             if (e.getName().endsWith(".class")) {
@@ -31,11 +31,13 @@ public class Loader {
             }
         }
     }
+
     public static void processJARInputStream(InputStream jis) throws IOException {
-        EClassVisitor classVisitor = new EClassVisitor(Opcodes.ASM7, null);
+        MyClassVisitor classVisitor = new MyClassVisitor(Opcodes.ASM7, null);
         ClassReader classReader = new ClassReader(getEntryInputStream(jis));
         classReader.accept(classVisitor, ClassReader.SKIP_DEBUG);
     }
+
     static void readJar(JarFile jar, JarEntry entry) {
         String name = entry.getName();
         try (InputStream jis = jar.getInputStream(entry)) {

@@ -9,17 +9,18 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 public class ClassTools {
-    private static int counter = 0;
     private static final String descrToClassPathRegexp = "^((\\((\\w|\\/|;)*\\)\\[?)?[A-Z])";
     private static final String descrToClassPathRegexpEnd = "((\\$|\\.).*)";
     private static final String descrClassNameRegexpEnd = "((\\.).*)";
-    private static final String methodSetGetPrefixRegExp = "^(set)";
+    private static final String methodSetGetPrefixRegExp = "^(get)";
     private static final String baseTypeRegex = "[BCDFIJSZ]";
     private static final Pattern baseTypePattern = Pattern.compile(baseTypeRegex);
     private static final String objectTypeRegex = "^L[^;<>]+(<.*>)*;";
@@ -31,6 +32,8 @@ public class ClassTools {
     private static Set<String> primitiveClassNames = Set.of("java/lang/String", "java/lang/Integer",
             "java/lang/Float", "java/lang/Double", "java/lang/Long", "java/lang/Short",
             "java/lang/Character", "java/lang/Byte", "java/lang/Boolean");
+
+    private static final Logger logger = LoggerFactory.getLogger(ClassTools.class);
 
     /**
      * Checks if classname is one of the primitive classes like java/lang/String, java/lang/Integer
@@ -70,7 +73,6 @@ public class ClassTools {
             Matcher matcherEnd = descrToClassPathEndPattern.matcher(matcherStart.replaceFirst(""));
 
             String output = matcherEnd.replaceAll("").replace(";", "");
-            counter++;
             return output;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -104,6 +106,17 @@ public class ClassTools {
         processTypes(signature, typesStack);
         List<Object> types = new LinkedList<>(typesStack);
         Collections.reverse(types);
+        return types;
+    }
+
+    /**
+     * Processes signature and gains types from that
+     * 
+     * @param signature
+     */
+    public static Stack<Object> processTypes(String signature) {
+        Stack<Object> types = new Stack<>();
+        processTypes(signature, types);
         return types;
     }
 
@@ -146,15 +159,13 @@ public class ClassTools {
         }
     }
 
-
     /**
      * Converts fields of class into map structure like "field_name: field_type"
      * 
      * @param class_ Input class
      * @return Map of fields
      */
-    public static Map<String, Object> fieldsToMap(Object logger, ClassMap classes,
-            ClassWrapper class_) {
+    public static Map<String, Object> fieldsToMap(ClassMap classes, ClassWrapper class_) {
         Map<String, Object> map = new HashMap<>();
         final List<MethodWrapper> methods = class_.getMethods();
         final Map<String, Field> fields = class_.getFieldsContainer();
@@ -171,12 +182,11 @@ public class ClassTools {
                     map.put(fieldName, field.getDataType().getBasicType());
                 } else if (classes.containsKey(fieldType)) {
                     ClassWrapper classWrapper = classes.get(fieldType);
-                    map.put(fieldName, fieldsToMap(logger, classes, classWrapper));
+                    map.put(fieldName, fieldsToMap(classes, classWrapper));
                 } else {
-                    /*
-                     * logger.error( "Could not find type/class=" + fieldType + "of this field=" +
-                     * field);
-                     */
+                    logger.error(
+                            "Could not find type/class=" + fieldType + "of this field=" + field);
+
                 }
 
             }

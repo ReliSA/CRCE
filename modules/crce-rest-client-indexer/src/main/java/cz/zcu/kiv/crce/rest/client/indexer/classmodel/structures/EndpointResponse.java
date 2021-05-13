@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ghessova on 10.03.2018.
+ * Inspired by ghessova on 10.03.2018.
  *
- * - name - responseid - stejný význam jako name u webservice.endpoint - status - type - MIME type -
- * structure - grammar - XSD, JSON-schema... - isOptional - isArray
  */
 public class EndpointResponse implements Serializable {
 
@@ -21,35 +19,50 @@ public class EndpointResponse implements Serializable {
     private boolean isArray;
     private List<EndpointParameter> parameters = new ArrayList<>();
 
-    public int getStatus() {
-        return status;
-    }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-
+    /**
+     * 
+     * @return Structure
+     */
     public String getStructure() {
         return structure;
     }
 
+    /**
+     * Sets structure of response
+     * @param structure Structure
+     */
     public void setStructure(String structure) {
         this.structure = structure;
     }
 
+    /**
+     * @return Is it array
+     */
     public boolean isArray() {
         return isArray;
     }
 
-    public void setArray(boolean array) {
+    /**
+     * Sets wheter its array
+     * @param array Is it array
+     */
+    public void setIsArray(boolean array) {
         isArray = array;
     }
 
+    /**
+     * Adds parameter to this response
+     * @param parameter EndpointParameter
+     */
     public void addParameter(EndpointParameter parameter) {
         parameters.add(parameter);
     }
 
+    /**
+     * 
+     * @return List of Endpoint parameters
+     */
     public List<EndpointParameter> getParameters() {
         return parameters;
     }

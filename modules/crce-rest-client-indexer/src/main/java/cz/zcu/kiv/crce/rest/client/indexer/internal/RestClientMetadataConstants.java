@@ -6,7 +6,7 @@ import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 
 /**
- * Created by ghessova on 18.04.2018.
+ * Inspired by ghessova on 18.04.2018.
  *
  * Constants for rest implementation representation in CRCE metada (namespaces, attributes).
  *

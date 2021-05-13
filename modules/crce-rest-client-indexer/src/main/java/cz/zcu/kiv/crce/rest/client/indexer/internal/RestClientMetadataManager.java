@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * Created by ghessova on 18.04.2018.
+ * Inspired by ghessova on 18.04.2018.
  */
 public class RestClientMetadataManager {
 

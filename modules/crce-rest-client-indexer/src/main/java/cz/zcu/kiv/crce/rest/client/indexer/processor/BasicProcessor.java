@@ -9,6 +9,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.Opera
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.NumTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
@@ -28,22 +29,35 @@ public class BasicProcessor {
      * @param operation
      */
     protected void handleAccessingObject(Stack<Variable> values, Operation operation) {
-        // TODO: give me those params
-        Variable var = Helpers.StackF.peek(values);
+        Variable var = SafeStack.peek(values);
         if (var != null && var.getType() == VariableType.OTHER
                 && var.getOwner().equals(operation.getOwner())) {
             values.pop();
         }
     }
 
+    /**
+     * 
+     * @param classes All classes available
+     */
     public BasicProcessor(ClassMap classes) {
         this.classes = classes;
     }
 
+    /**
+     * Process get field from instance
+     * @param values Stack
+     * @param operation GETFIELD operation
+     */
     protected void processGETFIELD(Stack<Variable> values, Operation operation) {
         handleAccessingObject(values, operation);
     }
 
+    /**
+     * Process (static) get field from class
+     * @param values Stack
+     * @param operation GETSTATICFIELD operation
+     */
     protected void processGETSTATICFIELD(Stack<Variable> values, Operation operation) {
         if (!classes.containsKey(operation.getOwner())) {
             return;
@@ -61,12 +75,17 @@ public class BasicProcessor {
         values.add(field);
     }
 
+    /**
+     * Process static and classic putfield 
+     * @param values Stack
+     * @param operation PUTFIELD operation
+     */
     protected void processPUTFIELD(Stack<Variable> values, Operation operation) {
         if (!classes.containsKey(operation.getOwner())) {
             return;
         }
         ConstPool classPool = this.classes.get(operation.getOwner()).getClassPool();
-        Variable var = Helpers.StackF.pop(values);
+        Variable var = SafeStack.pop(values);
         if (VariableTools.isEmpty(var)) {
             return;
         }
@@ -102,7 +121,7 @@ public class BasicProcessor {
      */
     protected void processNUMCONSTANT(Operation operation, Stack<Variable> values) {
         String newValue = operation.getValue() != null ? operation.getValue().toString() : null;
-        Variable last = Helpers.StackF.peek(values);
+        Variable last = SafeStack.peek(values);
         if (newValue != null && NumTools.isNumeric(newValue) && last != null
                 && last.getType() == VariableType.ARRAY && last.getValue() instanceof VarArray) {
             VarArray array = (VarArray) last.getValue();
@@ -115,7 +134,7 @@ public class BasicProcessor {
     /**
      * Processes String constant
      * 
-     * @param operation Operation create constant
+     * @param operation Operation create (String) constant
      * @param values String values
      */
     protected void processSTRINGCONST(Operation operation, Stack<Variable> values) {
@@ -126,8 +145,8 @@ public class BasicProcessor {
     /**
      * Stores values into local variables aka const pool
      * 
-     * @param method Method which includes concrete const pool
-     * @param operation Operation for storing into variable
+     * @param method Method which includes set of variables to which data will be stored
+     * @param operation STORE operation
      * @param values String values
      */
     protected void processSTORE(MethodWrapper method, Operation operation, Stack<Variable> values) {
@@ -140,7 +159,7 @@ public class BasicProcessor {
 
         VariablesContainer variables = method.getVariables();
 
-        Variable var = Helpers.StackF.pop(values);
+        Variable var = SafeStack.pop(values);
         if (VariableTools.isEmpty(var)) {
             return;
         }
@@ -148,10 +167,16 @@ public class BasicProcessor {
         variables.set(operation.getIndex(), var);
     }
 
+    /**
+     * Process saving data into array
+     * @param method Input method
+     * @param operation AASTORE operation
+     * @param values STACK
+     */
     protected void processAASTORE(MethodWrapper method, Operation operation,
             Stack<Variable> values) {
-        Variable arrayItem = Helpers.StackF.pop(values);
-        Variable array = Helpers.StackF.pop(values);
+        Variable arrayItem = SafeStack.pop(values);
+        Variable array = SafeStack.pop(values);
         if (arrayItem == null || VariableTools.isEmpty(array)
                 || array.getType() != VariableType.ARRAY || !(array.getValue() instanceof VarArray)
                 || (arrayItem.getValue() instanceof VarArray)) {
@@ -169,7 +194,7 @@ public class BasicProcessor {
      * Loads value from constant pool into values stack
      * 
      * @param method Method where is Load performed
-     * @param operation Loading operation
+     * @param operation LOAD operation
      * @param values String values
      */
     protected void processLOAD(MethodWrapper method, Operation operation, Stack<Variable> values) {
@@ -199,22 +224,19 @@ public class BasicProcessor {
         }
     }
 
+    /**
+     * Processing new array initiation
+     * @param operation ANEWARRAY operation
+     * @param values Stack
+     */
     protected void processANEWARRAY(Operation operation, Stack<Variable> values) {
-        Variable possibleNum = Helpers.StackF.pop(values);
-        Variable arr =
-                new Variable().setType(VariableType.ARRAY).setDescription(operation.getDesc());
+        Variable possibleNum = SafeStack.pop(values);
+        Variable arr = new Variable().setType(VariableType.ARRAY);
         if (!VariableTools.isEmpty(possibleNum)
                 && NumTools.isNumeric(possibleNum.getValue().toString())) {
             arr.setValue(new VarArray(Integer.valueOf(possibleNum.getValue().toString())));
         }
         values.push(arr);
-    }
-
-    protected void processDUP(Stack<Variable> values) {
-        Variable last = Helpers.StackF.pop(values);
-        if (!VariableTools.isEmpty(last) && last.getType() == VariableType.ARRAY) {
-
-        }
     }
 
     /**

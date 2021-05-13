@@ -9,7 +9,11 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
 public class VariablesContainer {
     private ArrayList<Variable> vars;
 
-
+    /**
+     * Get variable fron container
+     * @param index
+     * @return
+     */
     public Variable get(int index) {
         if (vars.size() <= index) {
             return null;
@@ -17,6 +21,11 @@ public class VariablesContainer {
         return vars.get(index);
     }
 
+    /**
+     * Initialize container and its variables
+     * @param index How large should be the container
+     * @return Variable stored at given index
+     */
     public Variable init(int index) {
         if (index >= vars.size()) {
             Variable last = null;
@@ -30,6 +39,11 @@ public class VariablesContainer {
         return vars.get(index);
     }
 
+    /**
+     * Storing Variable inside container
+     * @param index Where to put Variable
+     * @param var Variable which will be stored
+     */
     public void set(int index, Variable var) {
         if (index == vars.size()) {
             vars.add(var);
@@ -47,13 +61,18 @@ public class VariablesContainer {
     }
 
     /**
-     * @param vars
+     * Init container
      */
     public VariablesContainer() {
         vars = new ArrayList<>();
         vars.add(new Variable("").setType(VariableType.OTHER));
     }
 
+    /**
+     * Builds container form Variable structures
+     * @param varStructures Variable structure
+     * @param owner Owner (class) of method
+     */
     public VariablesContainer(
             List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures,
             String owner) {
@@ -67,6 +86,10 @@ public class VariablesContainer {
         }
     }
 
+    /**
+     * Init wihout owner but with varStructures
+     * @param varStructures Variable structures
+     */
     public VariablesContainer(
             List<cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable> varStructures) {
         this(varStructures, null);

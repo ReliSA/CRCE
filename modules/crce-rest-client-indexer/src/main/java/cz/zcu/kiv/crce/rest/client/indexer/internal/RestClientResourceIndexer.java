@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
- * Created by ghessova on 23.03.2018.
+ * Inspired by ghessova on 23.03.2018.
  *
  * @author Gabriela Hessova
  *

@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.config;
+package cz.zcu.kiv.crce.rest.client.indexer.config.tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,16 @@ import java.util.jar.JarFile;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.osgi.framework.Bundle;
+import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallMethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.Config;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerConfigMap;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerMethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EnumConfigItem;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EnumConfigMap;
+import cz.zcu.kiv.crce.rest.client.indexer.config.EnumFieldOrMethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.MethodConfigMap;
 
 public class ConfigTools {
 
@@ -18,7 +27,7 @@ public class ConfigTools {
     private static final String BUNDLE_URI_SCHEME = "bundle";
     private static Set<String> httpTypeEnums = null;
     private static EnumConfigMap enumDefinitionsMap = null;
-    private static MethodConfigMap methodDefinitionsMap = null;
+    private static MethodConfigMap methodConfigsMap = null;
     private static EDataContainerConfigMap eDataContainerConfigMap = null;
 
     private static final String DEF_DIR_NAME = "definition";
@@ -86,11 +95,11 @@ public class ConfigTools {
         if (methodsConfig != null) {
             for (ApiCallConfig one : methodsConfig) {
                 final String methodDefKey = one.getClassName();
-                if (!methodDefinitionsMap.containsKey(methodDefKey)) {
-                    methodDefinitionsMap.put(methodDefKey, new HashMap<>());
+                if (!methodConfigsMap.containsKey(methodDefKey)) {
+                    methodConfigsMap.put(methodDefKey, new HashMap<>());
                 }
-                for (ApiCallMethodConfig md : one.getMethods()) {
-                    methodDefinitionsMap.get(methodDefKey).put(md.getName(), md);
+                for (ApiCallMethodConfig mc : one.getMethods()) {
+                    methodConfigsMap.get(methodDefKey).put(mc.getName(), mc);
                 }
             }
         }
@@ -136,7 +145,7 @@ public class ConfigTools {
 
             File directory = null;
             List<String> filesInDirectory = null;
-            methodDefinitionsMap = new MethodConfigMap();
+            methodConfigsMap = new MethodConfigMap();
             String fullPath = resource_url.getFile();
 
             if (resource_url.toURI().getScheme().equals(JAR_URI_SCHEME)) { // inside JAR
@@ -163,7 +172,7 @@ public class ConfigTools {
 
     private static void initStructures() {
         httpTypeEnums = new HashSet<>();
-        methodDefinitionsMap = new MethodConfigMap();
+        methodConfigsMap = new MethodConfigMap();
         enumDefinitionsMap = new EnumConfigMap();
         eDataContainerConfigMap = new EDataContainerConfigMap();
     }
@@ -172,12 +181,12 @@ public class ConfigTools {
      * 
      * @return Definition of methods
      */
-    public static MethodConfigMap getMethodDefinitions() {
-        if (methodDefinitionsMap == null) {
+    public static MethodConfigMap getMethodConfigs() {
+        if (methodConfigsMap == null) {
             initStructures();
             loadDefinitions();
         }
-        return methodDefinitionsMap;
+        return methodConfigsMap;
     }
 
     /**

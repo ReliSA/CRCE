@@ -2,16 +2,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting;
 
 import java.util.ArrayList;
 import java.util.List;
-/*import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;*/
-/*
- * package cz.zcu.kiv.crce.restimpl.indexer.classmodel.extracting;
- * 
- * import cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Annotation; import
- * cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Method; import
- * cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Operation; import
- * cz.zcu.kiv.crce.restimpl.indexer.classmodel.structures.Variable;
- */
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -22,7 +13,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
 
 /**
- * Created by ghessova on 22.01.2018.
+ * Inspired by ghessova on 22.01.2018.
  *
  * Method visitor.
  *
@@ -38,25 +29,12 @@ public class MyMethodVisitor extends MethodVisitor {
     private State state = State.getInstance();
     private Method method;
     private List<String> log = new ArrayList<>();
-    //private static Logger logger = LogManager.getLogger("extractor");
-
-
-    // private static final Logger logger = LoggerFactory.getLogger(MyMethodVisitor.class);
-
-
 
     MyMethodVisitor(Method method) {
 
         super(Opcodes.ASM5);
         this.method = method;
     }
-
-    /*
-     * @Override public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-     * 
-     * desc = BytecodeDescriptorsProcessor.getFullClassName(desc); state.setAnnotation(new
-     * Annotation(desc)); return new MyAnnotationVisitor(Opcodes.ASM5, method); }
-     */
 
     /*
      * Visits a local variable declaration.
@@ -79,39 +57,30 @@ public class MyMethodVisitor extends MethodVisitor {
     @Override
     public void visitLocalVariable(String name, String desc, String signature, Label start,
             Label end, int index) {
-        // method parameters are first local variables (except for this) - the names can be get here
-/*        logger.debug("        Local-Variable[" + "name=" + name + ", desc=" + desc + ", signature=+"
-                + signature + "]");*/
         if ("this".equals(name)) {
-            state.setParametersProcessed(0);
+            state.setNumParametersProcessed(0);
             return;
         }
         List<Variable> parameters = method.getParameters();
 
         if (parameters != null) {
-            int paramIndex = state.getParametersProcessed();
+            int paramIndex = state.getNumParametersProcessed();
             if (paramIndex < parameters.size()) {
                 parameters.get(paramIndex).setName(name);
-                state.setParametersProcessed(paramIndex + 1);
+                state.setNumParametersProcessed(paramIndex + 1);
             } else if (paramIndex == parameters.size()) {
-                // parameter processing is finished // log.add(name + "-" + dataType + "-" + s2 +
-                // "-" +
-                // label + "-" + label1 + "-" + i);
-                state.setParametersProcessed(0);
+                state.setNumParametersProcessed(0);
             }
 
             super.visitLocalVariable(name, desc, signature, start, end, index);
         }
     }
 
-
-    @Override
-    public void visitLineNumber(int i, Label label) {
-        super.visitLineNumber(i, label);
-    }
-
-    // 178 (0xB2) - getstatic
-    // 180 (0xB4) - getfield
+    /**
+     * {@inheritDoc}
+     * 178 (0xB2) - getstatic
+     * 180 (0xB4) - getfield
+     */
     @Override // status value
     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 
@@ -122,8 +91,7 @@ public class MyMethodVisitor extends MethodVisitor {
         operation.setOpcode(opcode);
         method.addOperation(operation);
 
-/*        logger.debug("        Field-Instruction[" + "opcode=" + opcode + ", name=" + name + "owner="
-                + owner + ", desc=" + desc + "]");*/
+
         super.visitFieldInsn(opcode, owner, name, desc);
     }
 
@@ -145,18 +113,6 @@ public class MyMethodVisitor extends MethodVisitor {
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
 
-        /*
-         * log.add(owner + "." + name + "-" + desc + "-" + itf); Operation operation = new
-         * Operation(opcode, Operation.OperationType.CALL); operation.setOwner(owner);
-         * operation.setName(name); operation.setDesc(desc);
-         */
-        /*
-         * if (opcode == Opcodes.INVOKESTATIC) { }
-         */
-        /*
-         * method.addOperation(operation); operation.setDescription(owner + "." + name + "-" + desc
-         * + "-" + itf);
-         */
 
         Operation operation = new Operation(opcode, Operation.OperationType.CALL);
         operation.setOwner(owner);
@@ -165,25 +121,6 @@ public class MyMethodVisitor extends MethodVisitor {
 
         method.addOperation(operation);
         operation.setDescription(owner + "." + name + "-" + desc + "-" + itf);
-
-
-        String opcodeTransl = "" + opcode;
-        if (opcode == Opcodes.INVOKESTATIC) {
-            opcodeTransl = "INVOKESTATIC";
-        } else if (opcode == Opcodes.INVOKEDYNAMIC) {
-            opcodeTransl = "INVOKEDYNAMIC";
-        } else if (opcode == Opcodes.INVOKESPECIAL) {
-            opcodeTransl = "INVOKESPECIAL";
-        } else if (opcode == Opcodes.INVOKEVIRTUAL) {
-            opcodeTransl = "INVOKEVIRTUAL";
-        } else if (opcode == Opcodes.INVOKEINTERFACE) {
-            opcodeTransl = "INVOKEINTERFACE";
-        }
-
-
-
-/*        logger.debug("        Method-Instruction[" + "opcode=" + opcodeTransl + ", owner=" + owner
-                + ", name=" + name + ", desc=" + desc + "]");*/
         super.visitMethodInsn(opcode, owner, name, desc, itf);
     }
 
@@ -208,14 +145,11 @@ public class MyMethodVisitor extends MethodVisitor {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AnnotationVisitor visitParameterAnnotation(int paramIndex, String desc, boolean b) {
-        /*
-         * List<Variable> parameters = method.getParameters(); desc =
-         * BytecodeDescriptorsProcessor.getFullClassName(desc); state.setAnnotation(new
-         * Annotation(desc)); return new MyAnnotationVisitor(Opcodes.ASM5,
-         * parameters.get(paramIndex));
-         */
         return super.visitParameterAnnotation(paramIndex, desc, b);
     }
 
@@ -227,19 +161,11 @@ public class MyMethodVisitor extends MethodVisitor {
      */
     @Override
     public void visitLdcInsn(Object o) {
-        /*
-         * log.add("constant from pool: " + String.valueOf(o)); Operation operation = new
-         * Operation(Operation.OperationType.STRING_CONSTANT); operation.setValue("" + o);
-         * operation.setDescription("constant from pool: " + String.valueOf(o));
-         * method.addOperation(operation);
-         */
-
         Operation operation = new Operation(Operation.OperationType.STRING_CONSTANT);
         operation.setValue("" + o);
         operation.setDescription("constant from pool: " + String.valueOf(o));
         method.addOperation(operation);
 
-/*        logger.debug("        Constant-From-Pool[" + String.valueOf(o) + "]");*/
         super.visitLdcInsn(o);
     }
 
@@ -256,19 +182,11 @@ public class MyMethodVisitor extends MethodVisitor {
      */
     @Override
     public void visitIntInsn(int opcode, int operand) {
-        /*
-         * log.add("int: " + String.valueOf(operand)); Operation operation = new Operation(opcode,
-         * Operation.OperationType.INT_CONSTANT); operation.setDataType("I"); operation.setValue(""
-         * + operand); operation.setDescription("int: " + String.valueOf(operand));
-         * method.addOperation(operation);
-         */
         Operation operation = new Operation(opcode, Operation.OperationType.INT_CONSTANT);
         operation.setDataType("I");
         operation.setValue("" + operand);
         operation.setDescription("int: " + String.valueOf(operand));
         method.addOperation(operation);
-/*        logger.debug(
-                "        Visit-Int-Instruction[operand=" + operand + ", opcode=" + opcode + "]");*/
         super.visitIntInsn(opcode, operand);
     }
 
@@ -289,32 +207,25 @@ public class MyMethodVisitor extends MethodVisitor {
      */
     @Override
     public void visitVarInsn(int opcode, int var) {
-        String type = "unknown";
         Operation operation;
         if (opcode >= Opcodes.ILOAD && opcode <= Opcodes.SALOAD) { // load
-            type = "load";
             log.add("load(" + opcode + "): " + var);
             operation = new Operation(opcode, Operation.OperationType.LOAD);
             operation.setDescription("load(" + opcode + "): " + var);
 
             operation.setIndex(var);
         } else if (Opcodes.ISTORE >= 54 && opcode <= Opcodes.SASTORE) { // store
-            type = "store";
             operation = new Operation(opcode, Operation.OperationType.STORE);
             operation.setIndex(var);
             operation.setDescription("store(" + opcode + "): " + var);
 
             log.add("store(" + opcode + "): " + var);
         } else {
-            type = "unknown";
             operation = new Operation(opcode, Operation.OperationType.OTHER);
             operation.setIndex(var);
             operation.setDescription("operation(" + opcode + "): " + var);
             log.add("operation(" + opcode + "): " + var);
         }
-/*        logger.debug(
-                "        Local-Variable-Instruction[" + type + "=" + opcode + ", var=" + var + "]");*/
-
         method.addOperation(operation);
     }
 
@@ -323,7 +234,7 @@ public class MyMethodVisitor extends MethodVisitor {
         // log.add("jump(" + opcode + "): " + label);
 
 
-/*        logger.debug(
+        /*        logger.debug(
                 "        Jump-Instruction[" + "opcode=" + opcode + ", " + "label=" + label + "]");*/
 
         method.addOperation(new Operation(opcode, Operation.OperationType.JUMP));
@@ -390,13 +301,10 @@ public class MyMethodVisitor extends MethodVisitor {
             method.addOperation(op);
         }
         super.visitInsn(opcode);
-/*        logger.debug("        Instruction[" + type + "=" + opcode + "]");*/
     }
 
     @Override
     public void visitEnd() {
-/*        logger.debug("    ==========END-Method-Visitor[name=" + this.method.getName() + " CLINIT="
-                + (this.method.getName().equals("<clinit>") ? "TRUE" : "FALSE") + "]===\n");*/
         super.visitEnd();
     }
 

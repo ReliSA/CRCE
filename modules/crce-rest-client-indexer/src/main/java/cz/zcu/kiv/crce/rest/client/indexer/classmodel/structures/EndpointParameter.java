@@ -22,6 +22,13 @@ public class EndpointParameter implements Serializable {
 
     private ParameterCategory category;
 
+    /**
+     * Init
+     * @param name Name
+     * @param dataType Data type 
+     * @param isArray Is it array
+     * @param category Category specification
+     */
     public EndpointParameter(String name, Header dataType, boolean isArray,
             ParameterCategory category) {
         this(name, null, isArray);
@@ -29,12 +36,25 @@ public class EndpointParameter implements Serializable {
         this.dataTypeH = dataType;
     }
 
+    /**
+     * Init
+     * @param name Name
+     * @param dataType Data type 
+     * @param isArray Is it array
+     * @param category Category specification
+     */
     public EndpointParameter(String name, String datatype, boolean isArray,
             ParameterCategory category) {
         this(name, datatype, isArray);
         this.category = category;
     }
 
+    /**
+     * Init
+     * @param name Name
+     * @param dataType Data type 
+     * @param isArray Is it array
+     */
     public EndpointParameter(String name, String datatype, boolean isArray) {
         this.name = name != null ? name : "";
         this.dataType = datatype;
@@ -59,34 +79,66 @@ public class EndpointParameter implements Serializable {
 
     }
 
+    /**
+     * 
+     * @return ParameterCategory
+     */
     public ParameterCategory getCategory() {
         return category;
     }
 
+    /**
+     * Sets new categery
+     * @param category ParameterCategory
+     */
     public void setCategory(ParameterCategory category) {
         this.category = category;
     }
 
+    /**
+     * Returns name
+     * @return Name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets name 
+     * @param name Name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * 
+     * @return DateType
+     */
     public String getDataType() {
         return dataType;
     }
 
+    /**
+     * Sets new DateType
+     * @param dataType New DateType
+     */
     public void setDataType(String dataType) {
         this.dataType = dataType;
     }
 
+    /**
+     * 
+     * @return Is it array
+     */
     public boolean isArray() {
         return isArray;
     }
 
+    /**
+     * Sets info about if datatype is array
+     * @param array isItArray
+     */
     public void setArray(boolean array) {
         isArray = array;
     }
@@ -112,10 +164,14 @@ public class EndpointParameter implements Serializable {
         return false;
     }
 
-    public String getDataTypeS(){
+    /**
+     * 
+     * @return Data type
+     */
+    public String getDataTypeS() {
         if (dataType == null || dataTypeH == null) {
             if (dataType != null && !dataType.isEmpty()) {
-                return  dataType;
+                return dataType;
             } else if (dataTypeH != null) {
                 return dataTypeH.toString();
             } else {
@@ -124,8 +180,8 @@ public class EndpointParameter implements Serializable {
         }
         return dataType;
     }
-
-    public String dataTypeToString(){
+    
+    public String dataTypeToString() {
         String dataTypeObj = ", \"dataType\": ";
         if (dataType == null || dataTypeH == null) {
             if (dataType != null && !dataType.isEmpty()) {
@@ -136,7 +192,7 @@ public class EndpointParameter implements Serializable {
                 dataTypeObj = "";
             }
         }
-        return  dataTypeObj;
+        return dataTypeObj;
     }
 
     @Override

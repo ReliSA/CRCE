@@ -10,6 +10,7 @@ import java.util.zip.ZipInputStream;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.Collector;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.Loader;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 
@@ -51,8 +52,10 @@ public class Processor {
         EndpointProcessor endpointProcessor = new EndpointProcessor(classes);
         for (ClassWrapper class_ : classes.values()) {
             endpointProcessor.process(class_);
-            Helpers.EndpointF.merge(endpoints, endpointProcessor.getEndpoints());
+            EndpointTools.merge(endpoints, endpointProcessor.getEndpoints());
         }
+        BeanProcessor beanProcessor = new BeanProcessor(classes, endpoints.values());
+        beanProcessor.process();
         return endpoints;
     }
 }

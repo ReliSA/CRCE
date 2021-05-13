@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.config.tools;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,25 +9,21 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescrip
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallMethodConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config.ArgConfigType;
-import cz.zcu.kiv.crce.rest.client.indexer.config.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerConfigMap;
 import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerMethodConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.config.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointRequestBody;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Helpers;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.VarArray;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.VarEndpointData;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint.HttpMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
 
-public class ArgTools {
+public class EndpointDataMiningTools {
 
     private static EDataContainerConfigMap eDataConfig = ConfigTools.getEDataContainerConfigMap();
 
@@ -135,9 +131,10 @@ public class ArgTools {
      */
     private static void addExpectedResponseToEndpoint(String response, Endpoint endpoint) {
         EndpointRequestBody responseBody = new EndpointRequestBody();
-        responseBody.setArray(BytecodeDescriptorsProcessor.isArrayOrCollection(response));
+        responseBody.setIsArray(BytecodeDescriptorsProcessor.isArrayOrCollection(response));
         response = ClassTools.descriptionToClassName(response);
         responseBody.setStructure(response);
+
         endpoint.addExpectedResponse(responseBody);
     }
 
@@ -152,13 +149,12 @@ public class ArgTools {
             return;
         }
         EndpointRequestBody requestBody = new EndpointRequestBody();
-        requestBody.setArray(BytecodeDescriptorsProcessor.isArrayOrCollection(rBody));
+        requestBody.setIsArray(BytecodeDescriptorsProcessor.isArrayOrCollection(rBody));
         rBody = ClassTools.descriptionToClassName(rBody);
         requestBody.setStructure(rBody);
         endpoint.addRequestBody(requestBody);
     }
 
-    //TODO:CHANGES!!
     private static interface HandleEndpointAttrI {
         public void run(Variable param);
     }
@@ -276,7 +272,8 @@ public class ArgTools {
         Stack<Variable> args = methodArgsFromValues(values, operation);
         EDataContainerMethodConfig methodConfig = eDataConfig.get(operation.getOwner())
                 .get(MethodTools.getMethodNameFromSignature(operation.getDescription()));
-        Map<String, Object> params = ArgTools.getParams(args, methodConfig.getArgs());
+        Map<String, Object> params =
+                EndpointDataMiningTools.getParams(args, methodConfig.getArgs());
         VarEndpointData varEndpointData = new VarEndpointData();
         Variable newEndpointData = new Variable(varEndpointData).setType(VariableType.ENDPOINTDATA)
                 .setOwner(operation.getOwner());
@@ -430,7 +427,7 @@ public class ArgTools {
             Set<ArrayList<ArgConfigType>> argDefs, Operation operation, HandlePathParam callback) {
         Stack<Variable> args = methodArgsFromValues(values, operation);
 
-        Variable varEndpoint = Helpers.StackF.peekEndpoint(values);
+        Variable varEndpoint = SafeStack.peekEndpoint(values);
         if (varEndpoint == null) {
             Endpoint endpoint = new Endpoint();
             varEndpoint = new Variable(endpoint).setType(VariableType.ENDPOINT);

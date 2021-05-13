@@ -12,15 +12,15 @@ import org.osgi.framework.BundleContext;
 
 
 /**
- * Created by ghessova on 23.03.2018.
+ * Inspired by ghessova on 23.03.2018.
  */
 public class Activator extends DependencyActivatorBase {
 
 
     @Override
-    public void init(BundleContext bundleContext, DependencyManager dependencyManager) throws Exception {
-        dependencyManager.add(createComponent()
-                .setInterface(Plugin.class.getName(), null)
+    public void init(BundleContext bundleContext, DependencyManager dependencyManager)
+            throws Exception {
+        dependencyManager.add(createComponent().setInterface(Plugin.class.getName(), null)
                 .setImplementation(RestClientResourceIndexer.class)
                 .add(createServiceDependency().setRequired(true).setService(MetadataFactory.class))
                 .add(createServiceDependency().setRequired(true).setService(MetadataService.class))

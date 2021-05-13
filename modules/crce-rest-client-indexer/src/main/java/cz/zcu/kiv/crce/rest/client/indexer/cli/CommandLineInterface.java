@@ -30,6 +30,9 @@ public class CommandLineInterface {
                 return new File(filename);
         }
 
+        /**
+         * Shows title into console
+         */
         private static void showTitle() {
                 System.out.println(
                                 " _______ ______  _                                                                    _               ");
@@ -48,11 +51,17 @@ public class CommandLineInterface {
 
         }
 
+        /**
+         * Shows error
+         */
         private static void showError() {
                 showHelp();
                 System.err.println("Missing the " + fileShort + " or " + fileLong + " param");
         }
 
+        /**
+         * Shows help
+         */
         private static void showHelp() {
                 showTitle();
                 System.out.println("Relative or absolute path to JAR which will be processed: "
@@ -63,6 +72,10 @@ public class CommandLineInterface {
 
         }
 
+        /**
+         * Processes given arguments
+         * @param args
+         */
         private static void processArgs(String[] args) {
                 boolean debugArg = false;
                 boolean helpArg = false;

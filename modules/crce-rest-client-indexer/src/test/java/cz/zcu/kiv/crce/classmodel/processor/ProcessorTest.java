@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -29,26 +33,28 @@ public class ProcessorTest {
 
         private static ClassLoader classLoader;
 
-        public static void initWebClient() {
-                final Endpoint endpoint1 = new Endpoint("/123", Set.of(HttpMethod.GET),
-                                new HashSet<>(),
-                                Set.of(new EndpointRequestBody(
-                                                "com/baeldung/reactive/model/Employee", false)),
-                                Set.of(new EndpointParameter(null, "java/lang/Integer", false,
-                                                null)),
-                                new HashSet<>(), new HashSet<>());
+        public static void initWebClient() throws JsonParseException, JsonMappingException,
+                        JsonProcessingException, IOException {
+                /*                 final String employee = mapper.writeValueAsString(Map.of("lastName",
+                                "java/lang/String", "firstName", "java/lang/String", "employeeId",
+                                "java/lang/Integer", "age", "java/lang/Integer")); */
+                String employee =
+                                "{\"lastName\":\"java/lang/String\",\"firstName\":\"java/lang/String\",\"employeeId\":\"java/lang/Integer\",\"age\":\"java/lang/Integer\"}";
+                final Endpoint endpoint1 =
+                                new Endpoint("/123", Set.of(HttpMethod.GET), new HashSet<>(),
+                                                Set.of(new EndpointRequestBody(employee, false)),
+                                                Set.of(new EndpointParameter(null,
+                                                                "java/lang/Integer", false, null)),
+                                                new HashSet<>(), new HashSet<>());
                 Endpoint endpoint2 = new Endpoint("/prvni/uri/trida", Set.of(HttpMethod.PUT),
                                 new HashSet<>(),
                                 Set.of(new EndpointRequestBody("java/lang/String", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 Endpoint endpoint3 = new Endpoint("/employee/{id}/prvni/uri/tridaNONSTATICtest",
                                 Set.of(HttpMethod.PUT, HttpMethod.DELETE),
-                                Set.of(new EndpointRequestBody(
-                                                "com/baeldung/reactive/model/Employee", false)),
+                                Set.of(new EndpointRequestBody(employee, false)),
                                 Set.of(new EndpointRequestBody("java/lang/String", false),
-                                                new EndpointRequestBody(
-                                                                "com/baeldung/reactive/model/Employee",
-                                                                false)),
+                                                new EndpointRequestBody(employee, false)),
                                 new HashSet<>(Set.of(new EndpointParameter(null,
                                                 "java/lang/Integer", false, null))),
                                 new HashSet<>(), new HashSet<>());
@@ -63,11 +69,9 @@ public class ProcessorTest {
                                 Set.of(new EndpointRequestBody("java/lang/String", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint7 = new Endpoint("/employee", Set.of(HttpMethod.POST),
-                                Set.of(new EndpointRequestBody(
-                                                "com/baeldung/reactive/model/Employee", false)),
-                                Set.of(new EndpointRequestBody(
-                                                "com/baeldung/reactive/model/Employee", false)),
-                                new HashSet<>(), new HashSet<>(), new HashSet<>());
+                                Set.of(new EndpointRequestBody(employee, false)),
+                                Set.of(new EndpointRequestBody(employee, false)), new HashSet<>(),
+                                new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint8 = new Endpoint("/nejaka/uri/s/argumentem/{id}",
                                 Set.of(HttpMethod.POST), new HashSet<>(),
                                 Set.of(new EndpointRequestBody("java/lang/String", false)),
@@ -163,7 +167,8 @@ public class ProcessorTest {
         }
 
         @BeforeClass
-        public static void init() {
+        public static void init() throws JsonParseException, JsonMappingException,
+                        JsonProcessingException, IOException {
                 classLoader = ProcessorTest.class.getClassLoader();
                 initWebClient();
                 initResttemplate();
@@ -186,6 +191,7 @@ public class ProcessorTest {
                         }
                         Endpoint found = springWebClientEndpoints.get(endpoint.getPath());
                         if (!found.equals(endpoint)) {
+
                                 fail("Expected " + endpoint + " but got " + found);
                         }
                 }

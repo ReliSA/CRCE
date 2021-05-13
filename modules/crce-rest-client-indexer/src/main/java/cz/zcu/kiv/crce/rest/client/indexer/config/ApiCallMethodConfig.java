@@ -81,7 +81,7 @@ public class ApiCallMethodConfig {
 
     @Override
     public String toString() {
-        return "MethodDefinition{" + "name='" + name + '\'' + ", types='" + this.type.toString()
-                + '\'' + ", args=" + this.args.toString() + '}';
+        return "MethodConfig{" + "name='" + name + '\'' + ", types='" + this.type.toString() + '\''
+                + ", args=" + this.args.toString() + '}';
     }
 }

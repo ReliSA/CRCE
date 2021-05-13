@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 
 public class ToStringTools {
     private static ObjectMapper mapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(ToStringTools.class);
 
     /**
      * Converts endpoints into list of json objects
@@ -28,11 +31,9 @@ public class ToStringTools {
             return mapper.writerWithDefaultPrettyPrinter()
                     .writeValueAsString(mapper.readValue(notIndentedJSON, Object.class));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Failed to convert " + notIndentedJSON + " to json");
+            return notIndentedJSON;
         }
-
-        return "";
     }
 
     /**
@@ -70,7 +71,7 @@ public class ToStringTools {
             return null;
         }
         if (obj instanceof String && ((String) obj).startsWith("{")) {
-            return (String) obj;
+            return ((String) obj).replace(" ", "");
         }
         return "\"" + obj + "\"";
     }

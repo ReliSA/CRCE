@@ -13,6 +13,9 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.UrlTools;
 
+/**
+ * @author Tomáš Ballák
+ */
 public class Endpoint implements Serializable {
 
     /**
@@ -31,13 +34,28 @@ public class Endpoint implements Serializable {
     protected Set<Header> produces;
     protected Set<Header> consumes;
 
-
+    /**
+     * 
+     * @param path Path
+     * @param httpMethods Set of http methods
+     */
     public Endpoint(String path, Set<HttpMethod> httpMethods) {
         this();
         this.setPath(path);
         this.httpMethods = httpMethods;
     }
 
+    /**
+     * 
+     * @param baseUrl http://www.zcu.cz
+     * @param path /some/path
+     * @param httpMethod GET | POST ...
+     * @param requestBodies Body of request (POST method)
+     * @param expectedResponses Expected response from service
+     * @param parameters Parameters for request
+     * @param produces Producing JSON | XML etc. (header params)
+     * @param consumes Consuming JSON | XML etx. (header params)
+    */
     public Endpoint(String baseUrl, String path, Set<HttpMethod> httpMethods,
             Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
             Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
@@ -45,6 +63,16 @@ public class Endpoint implements Serializable {
         this.setBaseUrl(baseUrl);
     }
 
+    /**
+     * 
+     * @param path /some/path
+     * @param httpMethod GET | POST ...
+     * @param requestBodies Body of request (POST method)
+     * @param expectedResponses Expected response from service
+     * @param parameters Parameters for request
+     * @param produces Producing JSON | XML etc. (header params)
+     * @param consumes Consuming JSON | XML etx. (header params)
+     */
     public Endpoint(String path, Set<HttpMethod> httpMethods,
             Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
             Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
@@ -57,10 +85,15 @@ public class Endpoint implements Serializable {
         this.setPath(path);
     }
 
-    public Endpoint(String path, HttpMethod type) {
+    /**
+     * 
+     * @param path /some/path
+     * @param httpMethod GET | POST ...
+     */
+    public Endpoint(String path, HttpMethod httpMethod) {
         this();
         this.setPath(path);
-        httpMethods.add(type);
+        httpMethods.add(httpMethod);
     }
 
     public Endpoint() {
@@ -76,19 +109,37 @@ public class Endpoint implements Serializable {
         POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS, TRACE;
     }
 
+    /**
+     * 
+     * @return Get all http methods
+     */
     public Set<HttpMethod> getHttpMethods() {
         return this.httpMethods;
     }
 
+    /**
+     * 
+     * @return Get all request bodies
+     */
     public Set<EndpointRequestBody> getRequestBodies() {
         return this.requestBodies;
     }
 
-    public Endpoint addHttpMethod(HttpMethod type) {
-        this.httpMethods.add(type);
+    /**
+     * Adds new http method
+     * @param httpMethod New http method
+     * @return this
+     */
+    public Endpoint addHttpMethod(HttpMethod httpMethod) {
+        this.httpMethods.add(httpMethod);
         return this;
     }
 
+    /**
+     * Adds parameter to endpoint
+     * @param param Endpoint parameter
+     * @return this
+     */
     public Endpoint addParameter(EndpointParameter param) {
         if (param.getCategory() == ParameterCategory.BODY) {
             addRequestBody(new EndpointRequestBody(param.getDataType(),
@@ -99,27 +150,46 @@ public class Endpoint implements Serializable {
         return this;
     }
 
+    /**
+     * 
+     * @return Parameters
+     */
     public Set<EndpointParameter> getParameters() {
         return this.parameters;
     }
 
+    /**
+     * 
+     * @param body Adds request body
+     * @return this
+     */
     public Endpoint addRequestBody(EndpointRequestBody body) {
         this.requestBodies.add(body);
         return this;
     }
 
+    /**
+     * 
+     * @param response Adds new response
+     * @return this
+     */
     public Endpoint addExpectedResponse(EndpointRequestBody response) {
         this.expectedResponses.add(response);
         return this;
     }
 
+    /**
+     * 
+     * @return Endpoint request bodies
+     */
     public Set<EndpointRequestBody> getExpectedResponses() {
         return this.expectedResponses;
     }
 
     /**
-     * 
-     * @param baseUrl
+     * Sets new baseurl and tries to retrieve path and params from it
+     * @param baseUrl Base url
+     * @return this
      */
     public Endpoint setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -132,16 +202,28 @@ public class Endpoint implements Serializable {
                 }
                 this.baseUrl = url.getProtocol() + "://" + url.getHost()
                         + (url.getPort() > 0 ? (":" + url.getPort()) : "");
+                String query = UrlTools.getQuery(path);
+                String queryMatrix = UrlTools.getMatrixQuery(path);
+                if (query != null) {
+                    parameters.add(
+                            new EndpointParameter(null, query, false, ParameterCategory.QUERY));
+                }
+                if (queryMatrix != null) {
+                    parameters.add(new EndpointParameter(null, queryMatrix, false,
+                            ParameterCategory.MATRIX));
+                }
             } catch (MalformedURLException e) {
                 logger.error("Wrong type of Base URL=" + baseUrl);
-                // TODO replace with logger
-                //e.printStackTrace();
             }
 
         }
         return this;
     }
 
+    /**
+     * Adds new header to endpoint
+     * @param header New header
+     */
     public void addHeader(Header header) {
         if (HeaderTools.isConsumingType(header.getName())) {
             this.addConsumes(header);
@@ -153,6 +235,10 @@ public class Endpoint implements Serializable {
         }
     }
 
+    /**
+     * 
+     * @param endpoint Merges incoming endpoint into this
+     */
     public void merge(Endpoint endpoint) {
         String newPath = endpoint.getPath() != null ? endpoint.getPath() : this.path;
         String newBaseUrl = endpoint.getBaseUrl() != null ? endpoint.getBaseUrl() : this.baseUrl;
@@ -166,25 +252,33 @@ public class Endpoint implements Serializable {
         this.parameters.addAll(endpoint.getParameters());
     }
 
+    /**
+     * Compares endpoints if they are equlas
+     * @param endpoint Endpoit for comparison
+     * @return same or not
+     */
     public boolean sEquals(Endpoint endpoint) {
         return super.equals(endpoint);
     }
 
-
+    /**
+     * Compares endpoints if they are equlas
+     * @param endpoint Endpoit for comparison
+     * @return same or not
+     */
     public boolean equals(Endpoint endpoint) {
         final boolean httpMethodEq = httpMethods.equals(endpoint.getHttpMethods());
-        final boolean reqBodiesEq = requestBodies.containsAll(endpoint.getRequestBodies());
-        final boolean expectedResponsesEq =
+        /*         final boolean reqBodiesEq = requestBodies.containsAll(endpoint.getRequestBodies()); */
+        /*         final boolean expectedResponsesEq =
                 expectedResponses.containsAll(endpoint.getExpectedResponses())
-                        && endpoint.getExpectedResponses().containsAll(expectedResponses);
+                        && endpoint.getExpectedResponses().containsAll(expectedResponses); */
         final boolean parametersEq = parameters.containsAll(endpoint.getParameters())
                 && endpoint.getParameters().containsAll(parameters);
         final boolean consumesEq = consumes.containsAll(endpoint.getConsumes())
                 && endpoint.getConsumes().containsAll(consumes);
         final boolean producesEq = produces.containsAll(endpoint.getProduces())
                 && endpoint.getProduces().containsAll(produces);
-        return httpMethodEq && reqBodiesEq && expectedResponsesEq && parametersEq && consumesEq
-                && producesEq;
+        return httpMethodEq && parametersEq && consumesEq && producesEq;
     }
 
 
@@ -203,16 +297,24 @@ public class Endpoint implements Serializable {
 
 
     /**
-     * @return the path
+     * @return Path
      */
     public String getPath() {
         return path;
     }
 
+    /**
+     * 
+     * @return Base url
+     */
     public String getBaseUrl() {
         return baseUrl;
     }
 
+    /**
+     * 
+     * @return Full url
+     */
     public String getUrl() {
         if (path == null && baseUrl == null) {
             return null;
@@ -245,8 +347,6 @@ public class Endpoint implements Serializable {
                     this.baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
                 } catch (MalformedURLException e) {
                     logger.error("Wrong type of Path =" + path);
-                    // TODO replace with logger
-                    //e.printStackTrace();
                 }
 
             }
@@ -265,14 +365,15 @@ public class Endpoint implements Serializable {
     }
 
     /**
-     * @return the produces
+     * @return Produces (content-type: json...)
      */
     public Set<Header> getProduces() {
         return produces;
     }
 
     /**
-     * @param produces the produces to set
+     * Sets new produce types
+     * @param produces Produces (content-type: json...)
      */
     public Endpoint addProduces(Header produces) {
         this.produces.add(produces);
@@ -280,14 +381,16 @@ public class Endpoint implements Serializable {
     }
 
     /**
-     * @return the consumes
+     * Gets what client is able to consume
+     * @return (content-type: json...)
      */
     public Set<Header> getConsumes() {
         return consumes;
     }
 
     /**
-     * @param consumes the consumes to set
+     * Sets headers which endpoint is able to consume
+     * @param consumes Headers which will be consumed
      */
     public Endpoint setConsumes(Set<Header> consumes) {
         this.consumes = consumes;
@@ -295,7 +398,8 @@ public class Endpoint implements Serializable {
     }
 
     /**
-     * @param consumes the consumes to set
+     * Sets header which is client able to consume
+     * @param consumes Consumint types
      */
     public Endpoint addConsumes(Header consumes) {
         this.consumes.add(consumes);

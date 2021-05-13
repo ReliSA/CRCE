@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Helpers.StringC;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
@@ -19,13 +20,22 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 public class MethodProcessor extends BasicProcessor {
 
-    private Helpers.StringC.OperationType stringOP = null;
+    private StringTools.OperationType stringOP = null;
     private static final Logger logger = LoggerFactory.getLogger(MethodProcessor.class);
 
+    /**
+     * 
+     * @param classes All classes available
+     */
     public MethodProcessor(ClassMap classes) {
         super(classes);
     }
 
+    /**
+     * Safe retrieving of method (if not processed than process it)
+     * @param operation Operation of method execution
+     * @return Method wrapper
+     */
     protected MethodWrapper getMethodWrapper(Operation operation) {
         final String methodName = operation.getMethodName();
         final String operationOwner = operation.getOwner();
@@ -45,6 +55,11 @@ public class MethodProcessor extends BasicProcessor {
         return methodWrapper;
     }
 
+    /**
+     * Cleans leftovers from Stack
+     * @param values Stack
+     * @param operation Operation of method call
+     */
     protected void cleanupAfterMCall(Stack<Variable> values, Operation operation) {
         removeMethodArgsFromStack(values, operation);
         handleAccessingObject(values, operation);
@@ -59,11 +74,10 @@ public class MethodProcessor extends BasicProcessor {
      * @param operation
      */
     protected void removeMethodArgsFromStack(Stack<Variable> values, Operation operation) {
-        // TODO: give me those params
         String[] args = MethodTools.getArgsFromSignature(operation.getDescription());
         if (args != null) {
             for (String arg : args) {
-                Helpers.StackF.pop(values);
+                SafeStack.pop(values);
             }
         }
     }
@@ -78,12 +92,16 @@ public class MethodProcessor extends BasicProcessor {
         this.processInner(method, values);
     }
 
+    /**
+     * Process appending Strings and pushes merged string back to the Stack
+     * @param values Stack
+     */
     private void processAppendString(Stack<Variable> values) {
-        if (this.stringOP == Helpers.StringC.OperationType.APPEND) {
+        if (this.stringOP == StringTools.OperationType.APPEND) {
             Variable merged = new Variable().setType(VariableType.SIMPLE);
             String mergedS = "";
-            while (Helpers.StackF.peek(values) != null) {
-                Variable last = Helpers.StackF.peek(values);
+            while (SafeStack.peek(values) != null) {
+                Variable last = SafeStack.peek(values);
                 if (!VariableTools.isStringVar(last) && !VariableTools.isNumberVar(last)) {
                     break;
                 }
@@ -97,15 +115,20 @@ public class MethodProcessor extends BasicProcessor {
 
     }
 
+    /**
+     * Process invoked virtual methods
+     * @param values Stack
+     * @param operation INVOKEVIRTUAL operation
+     */
     protected void processINVOKEVIRTUAL(Stack<Variable> values, Operation operation) {
         final String methodName = operation.getMethodName();
         handleAccessingObject(values, operation);
 
-        if (Helpers.StringC.isToString(methodName)) {
-            this.stringOP = StringC.OperationType.TOSTRING;
-        } else if (Helpers.StringC.isAppend(methodName)) {
+        if (StringTools.isToString(methodName)) {
+            this.stringOP = StringTools.OperationType.TOSTRING;
+        } else if (StringTools.isAppend(methodName)) {
             processAppendString(values);
-            this.stringOP = Helpers.StringC.OperationType.APPEND;
+            this.stringOP = StringTools.OperationType.APPEND;
         } else {
             removeMethodArgsFromStack(values, operation);
             if (!this.classes.containsKey(operation.getOwner())) {
@@ -115,7 +138,6 @@ public class MethodProcessor extends BasicProcessor {
             if (mw == null) {
                 return;
             }
-            //TODO: changes possible broken
             Variable variable = new Variable(mw.getMethodStruct().getReturnValue())
                     .setType(VariableType.OTHER).setDescription(mw.getReturnType());
 
@@ -126,6 +148,11 @@ public class MethodProcessor extends BasicProcessor {
         }
     }
 
+    /**
+     * Processes invoked special methods e.g. <init>
+     * @param values Stack
+     * @param operation INVOKESPECIAL operation
+     */
     protected void processINVOKESPECIAL(Stack<Variable> values, Operation operation) {
         if (MethodTools.getType(operation.getDescription()) == MethodType.INIT) {
             Variable variable = new Variable().setType(VariableType.OTHER)
@@ -136,11 +163,20 @@ public class MethodProcessor extends BasicProcessor {
         cleanupAfterMCall(values, operation);
     }
 
+    /**
+     * Processes invoked interface method (only cleanup)
+     * @param values
+     * @param operation
+     */
     protected void processINVOKEINTERFACE(Stack<Variable> values, Operation operation) {
         cleanupAfterMCall(values, operation);
     }
 
-
+    /**
+     * Processes static invocation of methods
+     * @param values Stack
+     * @param operation INVOKESTATIC operation
+     */
     protected void processINVOKESTATIC(Stack<Variable> values, Operation operation) {
         final MethodWrapper mw = getMethodWrapper(operation);
         if (mw == null) {
