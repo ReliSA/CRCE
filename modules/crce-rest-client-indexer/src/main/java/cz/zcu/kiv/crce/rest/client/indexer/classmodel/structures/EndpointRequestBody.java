@@ -14,6 +14,7 @@ public class EndpointRequestBody implements Serializable {
     private String structure;
     private boolean isArray;
 
+
     /**
      * 
      * @param structure Stringified sutucture of body
@@ -73,8 +74,6 @@ public class EndpointRequestBody implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof EndpointRequestBody) {
             EndpointRequestBody eReqBody = (EndpointRequestBody) obj;
-            System.out.println(
-                    StringUtils.difference(structure, eReqBody.getStructure()).length() == 0);
             boolean structureEq = structure.compareTo(eReqBody.getStructure()) == 0;
             boolean isArrayEq = isArray == eReqBody.isArray();
             return structureEq && isArrayEq;

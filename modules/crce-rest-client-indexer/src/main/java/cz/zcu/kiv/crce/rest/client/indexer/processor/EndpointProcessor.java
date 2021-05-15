@@ -419,8 +419,8 @@ class EndpointHandler extends MethodProcessor {
             return;
         }
         callingChain.add(chainKey);
-        super.process(mw);
         mw.setIsProcessed();
+        super.process(mw);
         callingChain = new HashSet<>();
     }
 

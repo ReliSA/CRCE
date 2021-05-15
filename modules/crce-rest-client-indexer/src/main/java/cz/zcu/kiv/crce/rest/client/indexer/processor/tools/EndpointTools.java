@@ -15,32 +15,16 @@ public class EndpointTools {
             return;
         }
 
-        Endpoint updatedEndpoint = null;
 
         if (endpoints.containsKey(endpoint.getUrl())) {
-            final Endpoint oldEndpoint = endpoints.remove(endpoint.getUrl());
-            updatedEndpoint = oldEndpoint;
-
-        } else if (endpoints.containsKey(endpoint.getPath())) {
-            final Endpoint oldEndpoint = endpoints.remove(endpoint.getPath());
-            updatedEndpoint = oldEndpoint;
-
-        } else if (endpoints.containsKey(endpoint.getBaseUrl())) {
-            final Endpoint oldEndpoint = endpoints.remove(endpoint.getBaseUrl());
-            updatedEndpoint = oldEndpoint;
-
+            final Endpoint oldEndpoint = endpoints.get(endpoint.getUrl());
+            oldEndpoint.merge(endpoint);
         } else {
-            endpoints.put(endpoint.getUrl(), endpoint);
+            endpoints.put(endpoint.getUrl(), new Endpoint(endpoint));
             return;
         }
 
-        if (updatedEndpoint.sEquals(endpoint)) {
-            // same instance, data are already changed
-        } else {
-            updatedEndpoint.merge(endpoint);
-        }
 
-        endpoints.put(updatedEndpoint.getUrl(), updatedEndpoint);
     }
 
     /**
@@ -49,8 +33,7 @@ public class EndpointTools {
      * @param endpoints    Current endpoints
      * @param newEndpoints New endpoints
      */
-    public static void merge(Map<String, Endpoint> endpoints,
-            Map<String, Endpoint> newEndpoints) {
+    public static void merge(Map<String, Endpoint> endpoints, Map<String, Endpoint> newEndpoints) {
         for (final String key : newEndpoints.keySet()) {
             final Endpoint endpoint = newEndpoints.get(key);
             if (endpoints.containsKey(key)) {

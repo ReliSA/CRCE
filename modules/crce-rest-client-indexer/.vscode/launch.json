@@ -20,7 +20,7 @@
             "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.Main",
             "projectName": "crce-rest-client-indexer",
             "args": [
-                "-f=/home/anonym/projects/CRCE/modules/crce-rest-client-indexer/src/test/resources/spring_webclient_v2.jar"
+                "-f=/home/anonym/Dokumenty/TEST/jersey-client_jaxrs-ri-2.31.jar"
             ]
         }
     ]

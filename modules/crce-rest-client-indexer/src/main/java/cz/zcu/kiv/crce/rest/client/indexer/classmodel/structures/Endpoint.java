@@ -34,6 +34,53 @@ public class Endpoint implements Serializable {
     protected Set<Header> produces;
     protected Set<Header> consumes;
 
+
+    public Endpoint(Endpoint endpoint) {
+        this();
+        this.setBaseUrl(endpoint.getBaseUrl());
+        this.setPath(endpoint.getPath());
+        this.httpMethods.addAll(endpoint.getHttpMethods());
+        this.requestBodies = copyEndpointReqBodySet(endpoint.getRequestBodies());
+        this.expectedResponses = copyEndpointReqBodySet(endpoint.getExpectedResponses());
+        this.produces = copyHeaders(endpoint.getProduces());
+        this.consumes = copyHeaders(endpoint.getConsumes());
+        this.parameters = copyEndpointParameters(endpoint.getParameters());
+    }
+
+    private Set<EndpointParameter> copyEndpointParameters(
+            Set<EndpointParameter> endpointParameters) {
+        Set<EndpointParameter> copy = new HashSet<>();
+
+        for (final EndpointParameter item : endpointParameters) {
+            EndpointParameter copyEndpointParameter = new EndpointParameter();
+            copyEndpointParameter.setArray(item.isArray());
+            copyEndpointParameter.setCategory(item.getCategory());
+            copyEndpointParameter.setDataType(item.getDataType());
+            copyEndpointParameter.setDataTypeH(item.getDataTypeH());
+            copyEndpointParameter.setName(item.getName());
+            copy.add(copyEndpointParameter);
+        }
+        return copy;
+    }
+
+    private Set<EndpointRequestBody> copyEndpointReqBodySet(Set<EndpointRequestBody> setEbody) {
+        Set<EndpointRequestBody> copy = new HashSet<>();
+
+        for (final EndpointRequestBody body : setEbody) {
+            copy.add(new EndpointRequestBody(body.getStructure(), body.isArray()));
+        }
+        return copy;
+    }
+
+    private Set<Header> copyHeaders(Set<Header> headers) {
+        Set<Header> copy = new HashSet<>();
+
+        for (final Header body : headers) {
+            copy.add(new Header(body.getName(), body.getValue()));
+        }
+        return copy;
+    }
+
     /**
      * 
      * @param path Path
@@ -245,11 +292,11 @@ public class Endpoint implements Serializable {
         this.setPath(newPath);
         this.setBaseUrl(newBaseUrl);
         this.httpMethods.addAll(endpoint.getHttpMethods());
-        this.requestBodies.addAll(endpoint.getRequestBodies());
-        this.expectedResponses.addAll(endpoint.getExpectedResponses());
-        this.produces.addAll(endpoint.getProduces());
-        this.consumes.addAll(endpoint.getConsumes());
-        this.parameters.addAll(endpoint.getParameters());
+        this.requestBodies.addAll(copyEndpointReqBodySet(endpoint.getRequestBodies()));
+        this.expectedResponses.addAll(copyEndpointReqBodySet(endpoint.getExpectedResponses()));
+        this.produces.addAll(copyHeaders(endpoint.getProduces()));
+        this.consumes.addAll(copyHeaders(endpoint.getConsumes()));
+        this.parameters.addAll(copyEndpointParameters(endpoint.getParameters()));
     }
 
     /**
@@ -335,7 +382,6 @@ public class Endpoint implements Serializable {
      * @param path the path to set
      */
     public Endpoint setPath(String path) {
-
         if (path != null) {
             if (!path.startsWith("http")) {
                 this.path = path.replace("//", "/");
@@ -344,6 +390,7 @@ public class Endpoint implements Serializable {
                 try {
                     url = new URL(path);
                     this.path = url.getFile();
+
                     this.baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
                 } catch (MalformedURLException e) {
                     logger.error("Wrong type of Path =" + path);
@@ -360,7 +407,6 @@ public class Endpoint implements Serializable {
                         new EndpointParameter(null, queryMatrix, false, ParameterCategory.MATRIX));
             }
         }
-
         return this;
     }
 
@@ -405,5 +451,4 @@ public class Endpoint implements Serializable {
         this.consumes.add(consumes);
         return this;
     }
-
 }

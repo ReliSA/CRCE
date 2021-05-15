@@ -22,6 +22,7 @@ public class EndpointParameter implements Serializable {
 
     private ParameterCategory category;
 
+
     /**
      * Init
      * @param name Name
@@ -180,7 +181,7 @@ public class EndpointParameter implements Serializable {
         }
         return dataType;
     }
-    
+
     public String dataTypeToString() {
         String dataTypeObj = ", \"dataType\": ";
         if (dataType == null || dataTypeH == null) {
