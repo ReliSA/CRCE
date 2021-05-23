@@ -6,11 +6,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}",
             "args": [
-                "-f=/home/anonym/projects/crce-ws-parser-dp/crce-client-webservices-indexer/src/test/resources/spring_webclient.jar"
+                "-f=/home/anonym/Dokumenty/diplomka_test_data/rest.war"
             ]
         },
         {
@@ -20,7 +27,7 @@
             "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.Main",
             "projectName": "crce-rest-client-indexer",
             "args": [
-                "-f=/home/anonym/Dokumenty/TEST/jersey-client_jaxrs-ri-2.31.jar"
+                "-f=/home/anonym/Dokumenty/diplomka_test_data/rest.war"
             ]
         }
     ]

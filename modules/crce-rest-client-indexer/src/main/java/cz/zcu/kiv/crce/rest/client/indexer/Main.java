@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting;
+package cz.zcu.kiv.crce.rest.client.indexer;
 
 import java.io.File;
 import java.util.Collection;

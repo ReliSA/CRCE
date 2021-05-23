@@ -39,11 +39,14 @@ public class BeanProcessor {
             return cache.get(className);
         }
         if (classes.containsKey(className)) {
-            Map<String, Object> fields = ClassTools.fieldsToMap(classes, classes.get(className));
+            Map<String, Object> fields = ClassTools.fieldsToTypes(classes, classes.get(className));
             try {
-                final String jsonifiedClass = mapperObj.writeValueAsString(fields);
-                cache.put(className, jsonifiedClass);
-                return jsonifiedClass;
+                String stringified = "java/lang/Object";
+                if (fields != null) {
+                    stringified = mapperObj.writeValueAsString(fields);
+                }
+                cache.put(className, stringified);
+                return stringified;
             } catch (JsonProcessingException e) {
                 logger.error("Unsuported MAP of objects");
                 return body.getStructure();

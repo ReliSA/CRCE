@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,10 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
@@ -43,20 +46,28 @@ public class ClassTools {
      * @return Is class primitive
      */
     public static boolean isPrimitive(String className) {
-        return primitiveClassNames.contains(className);
+        Matcher matcher = baseTypePattern.matcher(className);
+        return primitiveClassNames.contains(className) || matcher.matches();
     }
 
     /**
-     * Converts methods like setX, getX into X
-     * 
-     * @param methodName Method name
-     * @return X
+     * Is className Enum
+     * @param className ClassName
+     * @return
      */
-    private static String methodNameIntoFieldName(String methodName) {
-        String newMethodName = methodName.replaceFirst(methodSetGetPrefixRegExp, "");
-        return newMethodName.replaceFirst(newMethodName.charAt(0) + "",
-                Character.toLowerCase(newMethodName.charAt(0)) + "");
+    public static boolean isEnum(String className) {
+        return className.contains("java/lang/Enum");
     }
+
+    /**
+    * Is className Map
+    * @param className ClassName
+    * @return
+    */
+    public static boolean isMap(String className) {
+        return className.contains("java/util/Map");
+    }
+
 
     /**
      * Converting description to owner like style (java/lang/String etc.)
@@ -159,38 +170,114 @@ public class ClassTools {
         }
     }
 
+    private static Object signatureToType(String signature, ClassMap classes,
+            Set<String> recDetection) {
+        List<Object> types = ClassTools.getTypes(signature);
+        return signatureToType(types, classes, recDetection);
+    }
+
+    private static Object signatureToType(List<Object> signature, ClassMap classes,
+            Set<String> recDetection) {
+        if (signature.size() == 0) {
+            return null;
+        }
+        Object type = signature.remove(0);
+
+        if (type instanceof String) {
+            String typeS = (String) type;
+
+            if (BytecodeDescriptorsProcessor.isArrayOrCollection(typeS)) {
+                return List.of(signatureToType(signature, classes, recDetection));
+            } else if (isMap(typeS)) {
+                /*                 if (!((signature.get(0)) instanceof String[])) {
+                    logger.error("Unspecified Map type");
+                    return "java/lang/Map";
+                } else if (!((List) signature.get(0)).get(0).equals("java/lang/String")) {
+                    logger.error("Key is type of " + signature.get(0));
+                    return "java/lang/Map";
+                }
+                Object types = signatureToType(signature, classes);
+                if (types instanceof List) {
+                    List typesList = (List) types;
+                    if (typesList.size() < 2) {
+                        logger.error("nspecified Map type");
+                        return "java/lang/Map";
+                    }
+                    signature.add(0, typesList.get(1));
+                    return Map.of((String) typesList.get(0), signatureToType(signature, classes));
+                } */
+                return "java/util/Map";
+            } else if (isPrimitive(typeS)) {
+                return typeS;
+            } else if (!recDetection.contains(typeS)) {
+                ClassWrapper classWrapper = classes.get(typeS);
+                return fieldsToTypes(classes, classWrapper, recDetection);
+            } else {
+                return typeS;
+            }
+        }
+
+        return null;
+    }
+
+    public static Map<String, Object> fieldsToTypes(ClassMap classes, ClassWrapper class_) {
+        Set<String> recDetection = new HashSet<>();
+        return fieldsToTypes(classes, class_, recDetection);
+    }
+
     /**
      * Converts fields of class into map structure like "field_name: field_type"
      * 
      * @param class_ Input class
      * @return Map of fields
      */
-    public static Map<String, Object> fieldsToMap(ClassMap classes, ClassWrapper class_) {
+    public static Map<String, Object> fieldsToTypes(ClassMap classes, ClassWrapper class_,
+            Set<String> recDetection) {
+        recDetection.add(class_.getClassStruct().getName());
         Map<String, Object> map = new HashMap<>();
-        final List<MethodWrapper> methods = class_.getMethods();
+        if (class_ == null) {
+            return null;
+        }
         final Map<String, Field> fields = class_.getFieldsContainer();
 
-        for (final MethodWrapper method : methods) {
-            final String expFieldName = methodNameIntoFieldName(method.getMethodStruct().getName());
-            if (fields.containsKey(expFieldName)) {
-                // checks the field has getter and setter function
-                final Field field = fields.get(expFieldName);
-                final String fieldName = field.getName();
-                final String fieldType = field.getDataType().getBasicType();
+        for (Field field : fields.values()) {
+            final String fieldName = field.getName();
+            final String fieldType = field.getDataType().getBasicType();
 
-                if (ClassTools.isPrimitive(fieldType)) {
-                    map.put(fieldName, field.getDataType().getBasicType());
-                } else if (classes.containsKey(fieldType)) {
-                    ClassWrapper classWrapper = classes.get(fieldType);
-                    map.put(fieldName, fieldsToMap(classes, classWrapper));
-                } else {
-                    logger.error(
-                            "Could not find type/class=" + fieldType + "of this field=" + field);
-
+            if (BytecodeDescriptorsProcessor.isArrayOrCollection(fieldType)) {
+                if (field.getDataType().getInnerType() == null) {
+                    if (field.getSignature() != null) {
+                        map.put(fieldName,
+                                signatureToType(field.getSignature(), classes, recDetection));
+                        continue;
+                    }
                 }
+                ClassWrapper classWrapper =
+                        classes.get(field.getDataType().getInnerType().getBasicType());
+                if (recDetection.contains(class_.getClassStruct().getName())) {
+                    map.put(fieldName, List.of(class_.getClassStruct().getName()));
+                    continue;
+                }
+                map.put(fieldName, List.of(fieldsToTypes(classes, classWrapper)));
+            } else if (ClassTools.isPrimitive(fieldType)) {
+                map.put(fieldName, field.getDataType().getBasicType());
+            } else if (classes.containsKey(fieldType)) {
+                ClassWrapper classWrapper = classes.get(fieldType);
+                if (isEnum(classWrapper.getClassStruct().getParent())) {
 
+                    map.put(fieldName,
+                            classWrapper.getFieldNames().stream()
+                                    .filter((String val) -> !val.equals("$VALUES"))
+                                    .collect(Collectors.toList()));
+                    continue;
+                }
+                map.put(fieldName, fieldsToTypes(classes, classWrapper));
+            } else {
+                logger.error("Not serializable type/class= '" + fieldType + "' of this field= '"
+                        + fieldName + "'");
+                map.put(fieldName, fieldType);
             }
         }
-        return map;
+        return Map.of("type", class_.getClassStruct().getName(), "data", map);
     }
 }
