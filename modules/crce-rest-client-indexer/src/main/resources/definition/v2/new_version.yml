@@ -2,218 +2,79 @@ package: org.springframework
 enums:
   - class: org.springframework.http.HttpMethod
     fields:
-      - name: DELETE
-        type: HTTP_METHOD
-        value: DELETE
-      - name: GET
-        type: HTTP_METHOD
-        value: GET
-      - name: HEAD
-        type: HTTP_METHOD
-        value: HEAD
-      - name: HEAD
-        type: HTTP_METHOD
-        value: HEAD
-      - name: OPTIONS
-        type: HTTP_METHOD
-        value: OPTIONS
-      - name: PATCH
-        type: HTTP_METHOD
-        value: PATCH
-      - name: POST
-        type: HTTP_METHOD
-        value: POST
-      - name: PUT
-        type: HTTP_METHOD
-        value: PUT
-      - name: TRACE
-        type: HTTP_METHOD
-        value: TRACE
+      HTTP_METHOD:
+        DELETE: DELETE
+        GET: GET
+        HEAD: HEAD
+        OPTIONS: OPTIONS
+        PATCH: PATCH
+        POST: POST
+        PUT: PUT
+        TRACE: TRACE
   - class: org.springframework.http.HttpHeaders
     fields:
-      - name: EMPTY
-        type: HEADER_TYPE
-        value: ""
-      - name: ACCEPT
-        type: HEADER_TYPE
-        value: Accept
-      - name: ACCEPT_CHARSET
-        type: HEADER_TYPE
-        value: "Accept-Charset"
-      - name: ACCEPT_ENCODING
-        type: HEADER_TYPE
-        value: "Accept-Encoding"
-      - name: ACCEPT_LANGUAGE
-        type: HEADER_TYPE
-        value: "Accept-Language"
-      - name: ACCEPT_RANGES
-        type: HEADER_TYPE
-        value: "Accept-Ranges"
-      - name: ACCESS_CONTROL_ALLOW_CREDENTIALS
-        type: HEADER_TYPE
-        value: "Access-Control-Allow-Credentials"
-      - name: ACCESS_CONTROL_ALLOW_HEADERS
-        type: HEADER_TYPE
-        value: "Access-Control-Allow-Headers"
-      - name: ACCESS_CONTROL_ALLOW_METHODS
-        type: HEADER_TYPE
-        value: "Access-Control-Allow-Methods"
-      - name: ACCESS_CONTROL_ALLOW_ORIGIN
-        type: HEADER_TYPE
-        value: "Access-Control-Allow-Origin"
-      - name: ACCESS_CONTROL_EXPOSE_HEADERS
-        type: HEADER_TYPE
-        value: "Access-Control-Expose-Headers"
-      - name: ACCESS_CONTROL_MAX_AGE
-        type: HEADER_TYPE
-        value: "Access-Control-Max-Age"
-      - name: ACCESS_CONTROL_REQUEST_HEADERS
-        type: HEADER_TYPE
-        value: "Access-Control-Request-Headers"
-      - name: ACCESS_CONTROL_REQUEST_METHOD
-        type: HEADER_TYPE
-        value: "Access-Control-Request-Method"
-      - name: AGE
-        type: HEADER_TYPE
-        value: "Age"
-      - name: ALLOW
-        type: HEADER_TYPE
-        value: "Allow"
-      - name: AUTHORIZATION
-        type: HEADER_TYPE
-        value: "Authorization"
-      - name: CACHE_CONTROL
-        type: HEADER_TYPE
-        value: "Cache-Control"
-      - name: CONNECTION
-        type: HEADER_TYPE
-        value: "Connection"
-      - name: CONTENT_ENCODING
-        type: HEADER_TYPE
-        value: "Content-Encoding"
-      - name: CONTENT_DISPOSITION
-        type: HEADER_TYPE
-        value: "Content-Disposition"
-      - name: CONTENT_LANGUAGE
-        type: HEADER_TYPE
-        value: "Content-Language"
-      - name: CONTENT_LENGTH
-        type: HEADER_TYPE
-        value: "Content-Length"
-      - name: CONTENT_LOCATION
-        type: HEADER_TYPE
-        value: "Content-Location"
-      - name: CONTENT_RANGE
-        type: HEADER_TYPE
-        value: "Content-Range"
-      - name: CONTENT_TYPE
-        type: HEADER_TYPE
-        value: "Content-Type"
-      - name: COOKIE
-        type: HEADER_TYPE
-        value: "Cookie"
-      - name: DATE
-        type: HEADER_TYPE
-        value: "Date"
-      - name: ETAG
-        type: HEADER_TYPE
-        value: "ETag"
-      - name: EXPECT
-        type: HEADER_TYPE
-        value: "Expect"
-      - name: EXPIRES
-        type: HEADER_TYPE
-        value: "Expires"
-      - name: FROM
-        type: HEADER_TYPE
-        value: "From"
-      - name: HOST
-        type: HEADER_TYPE
-        value: "Host"
-      - name: IF_MATCH
-        type: HEADER_TYPE
-        value: "If-Match"
-      - name: IF_MODIFIED_SINCE
-        type: HEADER_TYPE
-        value: "If-Modified-Since"
-      - name: IF_NONE_MATCH
-        type: HEADER_TYPE
-        value: "If-None-Match"
-      - name: IF_RANGE
-        type: HEADER_TYPE
-        value: "If-Range"
-      - name: IF_UNMODIFIED_SINCE
-        type: HEADER_TYPE
-        value: "If-Unmodified-Since"
-      - name: LAST_MODIFIED
-        type: HEADER_TYPE
-        value: "Last-Modified"
-      - name: LINK
-        type: HEADER_TYPE
-        value: "Link"
-      - name: LOCATION
-        type: HEADER_TYPE
-        value: "Location"
-      - name: MAX_FORWARDS
-        type: HEADER_TYPE
-        value: "Max-Forwards"
-      - name: ORIGIN
-        type: HEADER_TYPE
-        value: "Origin"
-      - name: PRAGMA
-        type: HEADER_TYPE
-        value: "Pragma"
-      - name: PROXY_AUTHENTICATE
-        type: HEADER_TYPE
-        value: "Proxy-Authenticate"
-      - name: PROXY_AUTHORIZATION
-        type: HEADER_TYPE
-        value: "Proxy-Authorization"
-      - name: RANGE
-        type: HEADER_TYPE
-        value: "Range"
-      - name: REFERER
-        type: HEADER_TYPE
-        value: "Referer"
-      - name: RETRY_AFTER
-        type: HEADER_TYPE
-        value: "Retry-After"
-      - name: SERVER
-        type: HEADER_TYPE
-        value: "Server"
-      - name: SET_COOKIE
-        type: HEADER_TYPE
-        value: "Set-Cookie"
-      - name: SET_COOKIE2
-        type: HEADER_TYPE
-        value: "Set-Cookie2"
-      - name: TE
-        type: HEADER_TYPE
-        value: "TE"
-      - name: TRAILER
-        type: HEADER_TYPE
-        value: "Trailer"
-      - name: TRANSFER_ENCODING
-        type: HEADER_TYPE
-        value: "Transfer-Encoding"
-      - name: UPGRADE
-        type: HEADER_TYPE
-        value: "Upgrade"
-      - name: USER_AGENT
-        type: HEADER_TYPE
-        value: "User-Agent"
-      - name: VARY
-        type: HEADER_TYPE
-        value: "Vary"
-      - name: VIA
-        type: HEADER_TYPE
-        value: "Via"
-      - name: WARNING
-        type: HEADER_TYPE
-        value: "Warning"
-      - name: WWW_AUTHENTICATE
-        type: HEADER_TYPE
-        value: "WWW-Authenticate"
+      HEADER_TYPE:
+        EMPTY: ""
+        ACCEPT: Accept
+        ACCEPT_CHARSET: "Accept-Charset"
+        ACCEPT_ENCODING: "Accept-Encoding"
+        ACCEPT_LANGUAGE: "Accept-Language"
+        ACCEPT_RANGES: "Accept-Ranges"
+        ACCESS_CONTROL_ALLOW_CREDENTIALS: "Access-Control-Allow-Credentials"
+        ACCESS_CONTROL_ALLOW_HEADERS: "Access-Control-Allow-Headers"
+        ACCESS_CONTROL_ALLOW_METHODS: "Access-Control-Allow-Methods"
+        ACCESS_CONTROL_ALLOW_ORIGIN: "Access-Control-Allow-Origin"
+        ACCESS_CONTROL_EXPOSE_HEADERS: "Access-Control-Expose-Headers"
+        ACCESS_CONTROL_MAX_AGE: "Access-Control-Max-Age"
+        ACCESS_CONTROL_REQUEST_HEADERS: "Access-Control-Request-Headers"
+        ACCESS_CONTROL_REQUEST_METHOD: "Access-Control-Request-Method"
+        AGE: "Age"
+        ALLOW: "Allow"
+        AUTHORIZATION: "Authorization"
+        CACHE_CONTROL: "Cache-Control"
+        CONNECTION: "Connection"
+        CONTENT_ENCODING: "Content-Encoding"
+        CONTENT_DISPOSITION: "Content-Disposition"
+        CONTENT_LANGUAGE: "Content-Language"
+        CONTENT_LENGTH: "Content-Length"
+        CONTENT_LOCATION: "Content-Location"
+        CONTENT_RANGE: "Content-Range"
+        CONTENT_TYPE: "Content-Type"
+        COOKIE: "Cookie"
+        DATE: "Date"
+        ETAG: "ETag"
+        EXPECT: "Expect"
+        EXPIRES: "Expires"
+        FROM: "From"
+        HOST: "Host"
+        IF_MATCH: "If-Match"
+        IF_MODIFIED_SINCE: "If-Modified-Since"
+        IF_NONE_MATCH: "If-None-Match"
+        IF_RANGE: "If-Range"
+        IF_UNMODIFIED_SINCE: "If-Unmodified-Since"
+        LAST_MODIFIED: "Last-Modified"
+        LINK: "Link"
+        LOCATION: "Location"
+        MAX_FORWARDS: "Max-Forwards"
+        ORIGIN: "Origin"
+        PRAGMA: "Pragma"
+        PROXY_AUTHENTICATE: "Proxy-Authenticate"
+        PROXY_AUTHORIZATION: "Proxy-Authorization"
+        RANGE: "Range"
+        REFERER: "Referer"
+        RETRY_AFTER: "Retry-After"
+        SERVER: "Server"
+        SET_COOKIE: "Set-Cookie"
+        SET_COOKIE2: "Set-Cookie2"
+        TE: "TE"
+        TRAILER: "Trailer"
+        TRANSFER_ENCODING: "Transfer-Encoding"
+        UPGRADE: "Upgrade"
+        USER_AGENT: "User-Agent"
+        VARY: "Vary"
+        VIA: "Via"
+        WARNING: "Warning"
+        WWW_AUTHENTICATE: "WWW-Authenticate"
 argDefinitions:
   stringURL:
     type: URL
@@ -245,7 +106,7 @@ argDefinitions:
     classes:
       - org.springframework.http.HttpEntity
   requestObjectAny:
-    type: REQUEST
+    type: REQUEST_BODY
   headersParam:
     type: HEADER
     interfaces:

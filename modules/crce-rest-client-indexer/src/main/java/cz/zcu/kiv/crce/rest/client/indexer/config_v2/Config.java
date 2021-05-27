@@ -9,10 +9,10 @@ public class Config {
     private String name;
 
     @JsonProperty("wsClient")
-    private Set<WebClientConfig> wsClients;
+    private Set<WSClientConfig> wsClients;
 
     @JsonProperty("wsClientData")
-    private Set<WebClientConfig> wsClientDataHolders;
+    private Set<WSClientConfig> wsClientDataHolders;
 
     @JsonProperty("argDefinitions")
     private Map<String, ArgConfig> argDefinitions;
@@ -51,28 +51,28 @@ public class Config {
     /**
      * @return the wsClients
      */
-    public Set<WebClientConfig> getWsClients() {
+    public Set<WSClientConfig> getWsClients() {
         return wsClients;
     }
 
     /**
      * @param wsClients the wsClients to set
      */
-    public void setWsClients(Set<WebClientConfig> wsClients) {
+    public void setWsClients(Set<WSClientConfig> wsClients) {
         this.wsClients = wsClients;
     }
 
     /**
      * @return the wsClientDataHolders
      */
-    public Set<WebClientConfig> getWsClientDataHolders() {
+    public Set<WSClientConfig> getWsClientDataHolders() {
         return wsClientDataHolders;
     }
 
     /**
      * @param wsClientDataHolders the wsClientDataHolders to set
      */
-    public void setWsClientDataHolders(Set<WebClientConfig> wsClientDataHolders) {
+    public void setWsClientDataHolders(Set<WSClientConfig> wsClientDataHolders) {
         this.wsClientDataHolders = wsClientDataHolders;
     }
 

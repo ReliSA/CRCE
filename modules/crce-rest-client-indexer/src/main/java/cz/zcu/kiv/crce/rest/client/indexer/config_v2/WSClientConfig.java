@@ -1,15 +1,16 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2;
 
 import java.util.Map;
+import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import cz.zcu.kiv.crce.rest.client.indexer.config.DefinitionValuesProcessor;
 
-public class WebClientConfig {
+public class WSClientConfig {
     @JsonProperty("class")
     private String className;
 
     @JsonProperty("methods")
-    private Map<MethodType, MethodConfig> methods;
+    private Map<MethodType, Set<WSClientMethodConfig>> methods;
 
     /**
      * @return the className
@@ -27,18 +28,18 @@ public class WebClientConfig {
     }
 
     /**
-     * @return the constructors
+     * @return the methods
      */
-    public Map<MethodType, MethodConfig> getMethods() {
+    public Map<MethodType, Set<WSClientMethodConfig>> getMethods() {
         return methods;
     }
 
     /**
-     * @param constructors the constructors to set
+     * @param methods the methods to set
      */
-    public void setMethods(Map<MethodType, MethodConfig> methods) {
+    public void setMethods(Map<MethodType, Set<WSClientMethodConfig>> methods) {
         this.methods = methods;
     }
 
-
+    
 }

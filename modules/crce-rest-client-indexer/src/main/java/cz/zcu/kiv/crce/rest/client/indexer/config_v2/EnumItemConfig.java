@@ -6,7 +6,7 @@ public class EnumItemConfig {
     @JsonProperty("name")
     private String name;
     @JsonProperty("type")
-    private ArgConfig type;
+    private MethodArgType type;
     @JsonProperty("value")
     private String value;
 
@@ -27,14 +27,14 @@ public class EnumItemConfig {
     /**
      * @return the type
      */
-    public ArgConfig getType() {
+    public MethodArgType getType() {
         return type;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(ArgConfig type) {
+    public void setType(MethodArgType type) {
         this.type = type;
     }
 

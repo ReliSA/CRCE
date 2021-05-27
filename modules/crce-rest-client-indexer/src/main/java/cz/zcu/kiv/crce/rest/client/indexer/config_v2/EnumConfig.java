@@ -1,13 +1,13 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2;
 
-import java.util.Set;
+import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EnumConfig {
     @JsonProperty("class")
     private String className;
     @JsonProperty("fields")
-    private Set<EnumItemConfig> fields;
+    private Map<MethodArgType, Map<String, String>> fields;
 
     /**
      * @return the className
@@ -26,16 +26,14 @@ public class EnumConfig {
     /**
      * @return the fields
      */
-    public Set<EnumItemConfig> getFields() {
+    public Map<MethodArgType, Map<String, String>> getFields() {
         return fields;
     }
 
     /**
      * @param fields the fields to set
      */
-    public void setFields(Set<EnumItemConfig> fields) {
+    public void setFields(Map<MethodArgType, Map<String, String>> fields) {
         this.fields = fields;
     }
-
-
 }

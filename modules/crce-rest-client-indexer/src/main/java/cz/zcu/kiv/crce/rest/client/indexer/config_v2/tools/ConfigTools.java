@@ -13,8 +13,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.Config;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.EnumConfig;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodConfig;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WebClientConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientMethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.EnumItem;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClient;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodType;
 
 
@@ -22,10 +25,9 @@ public class ConfigTools {
 
     private static final String JAR_URI_SCHEME = "jar";
     private static final String BUNDLE_URI_SCHEME = "bundle";
-    private static Set<String> httpTypeEnums = null;
-    private static Map<String, EnumConfig> enumDefinitionsMap = null;
-    private static Map<String, Map<String, MethodConfig>> methodConfigsMap = null;
-    private static Map<String, MethodConfig> endpointDataMap = null;
+    private static Map<String, EnumItem> enums = null;
+    private static Map<String, Map<String, WSClient>> wsClients = null;
+    private static Map<String, Map<String, WSClient>> wsClientData = null;
 
     private static final String DEF_DIR_NAME = "definition" + "/v2";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
@@ -71,6 +73,70 @@ public class ConfigTools {
     }
 
     /**
+     * Processes ws client configurations
+     * @param wsClientConfigs ws client configurations
+     * @param argDefinitions definitions of arguments for client methods
+     * @throws Exception
+     */
+    private static void processWSClientConfigurations(Set<WSClientConfig> wsClientConfigs,
+            Map<String, ArgConfig> argDefinitions, Map<String, Map<String, WSClient>> wsData)
+            throws Exception {
+        if (wsClientConfigs != null) {
+            for (WSClientConfig item : wsClientConfigs) {
+                String methodOwner = item.getClassName();
+                if (!wsData.containsKey(methodOwner)) {
+                    wsData.put(methodOwner, new HashMap<>());
+                }
+                for (MethodType httpMethodType : item.getMethods().keySet()) {
+                    for (WSClientMethodConfig currentMethod : item.getMethods()
+                            .get(httpMethodType)) {
+                        Set<Set<ArgConfig>> argConfig = new HashSet<>();
+                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+
+                            Set<ArgConfig> args = new HashSet<>();
+                            argConfig.add(args);
+                            for (final String argReference : argReferences) {
+                                if (argDefinitions.containsKey(argReference)) {
+                                    args.add(argDefinitions.get(argReference));
+                                } else {
+                                    throw new Exception(
+                                            "Arg reference of " + argReference + " not found");
+                                }
+                            }
+                        }
+                        for (final String name : currentMethod.getNames()) {
+                            final WSClient client = new WSClient(methodOwner, name,
+                                    EnumTools.methodTypeToHttpMethod(httpMethodType), argConfig);
+                            wsData.get(client.getOwner()).put(client.getName(), client);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Processes enum configurations (header types, http types etc.)
+     * @param enumConfigs Enum configurations
+     */
+    private static void processEnumConfigurations(Set<EnumConfig> enumConfigs) {
+        if (enumConfigs != null) {
+            for (EnumConfig one : enumConfigs) {
+                final String enumDefKey = one.getClassName();
+                if (!enums.containsKey(enumDefKey)) {
+                    for (MethodArgType enumType : one.getFields().keySet()) {
+                        final Map<String, String> fields = one.getFields().get(enumType);
+                        for (String key : fields.keySet()) {
+                            EnumItem newEnumItem = new EnumItem(enumType, fields.get(key));
+                            enums.put(key, newEnumItem);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Loads configuration into private static field
      * 
      * @param path Path to configuration file
@@ -78,66 +144,25 @@ public class ConfigTools {
      */
     private static void loadConfigurationFile(String path) throws Exception {
         final InputStream inputStream = ConfigTools.class.getResourceAsStream(path);
-        if (inputStream == null)
+
+        if (inputStream == null) {
             throw new Exception("Resource not found: " + path);
+        }
+
         Config config =
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                         .readValue(inputStream, Config.class);
+
         Map<String, ArgConfig> argDefinitions = config.getArgDefinitions();
-        Set<WebClientConfig> methodsConfig = config.getWsClients();
+        Set<WSClientConfig> wsClientConfigs = config.getWsClients();
         Set<EnumConfig> enumConfigs = config.getEnums();
-        //Set<String> httpTypeContainer = config.getGenerics();
-        Set<WebClientConfig> eDataConfig = config.getWsClientDataHolders();
-        if (methodsConfig != null) {
-            for (WebClientConfig item : methodsConfig) {
-                String methodOwner = item.getClassName();
-                if (!methodConfigsMap.containsKey(methodOwner)) {
-                    methodConfigsMap.put(methodOwner, new HashMap<>());
-                }
-                for (MethodType methodType : item.getMethods().keySet()) {
-                    final MethodConfig currentMethod = item.getMethods().get(methodType);
-                    for (final String name : currentMethod.getNames()) {
-                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
-                            for (final String argReference : argReferences) {
-                                if (argDefinitions.containsKey(argReference)) {
-                                    currentMethod.addArg(argDefinitions.get(argReference));
-                                } else {
-                                    throw new Exception(
-                                            "Arg reference of " + argReference + " not found");
-                                }
-                            }
-                        }
-                        //methodConfigsMap.get(methodOwner).put(name, mc);
-                    }
-                    //methodConfigsMap.get(methodOwner).put(mc.getName(), mc);
-                }
-            }
-        }
-        /*         if (enumConfigs != null) {
-            for (EnumConfig one : enumConfigs) {
-                final String enumDefKey = one.getClassName();
-                if (!enumDefinitionsMap.containsKey(enumDefKey)) {
-                    enumDefinitionsMap.put(enumDefKey, new HashMap<>());
-                }
-                for (EnumFieldOrMethodConfig field : one.getFields()) {
-                    enumDefinitionsMap.get(enumDefKey).put(field.getName(), field);
-                }
-            }
-        }
-        if (httpTypeContainer != null) {
-            httpTypeEnums.addAll(httpTypeContainer);
-        }
-        if (eDataConfig != null) {
-            for (EDataContainerConfig one : eDataConfig) {
-                final String key = one.getClassName();
-                if (!eDataContainerConfigMap.containsKey(key)) {
-                    eDataContainerConfigMap.put(key, new HashMap<>());
-                }
-                for (EDataContainerMethodConfig method : one.getMethods()) {
-                    eDataContainerConfigMap.get(key).put(method.getName(), method);
-                }
-            }
-        } */
+        Set<WSClientConfig> wsDataConfigs = config.getWsClientDataHolders();
+
+
+        processWSClientConfigurations(wsClientConfigs, argDefinitions, wsClients);
+        processWSClientConfigurations(wsDataConfigs, argDefinitions, wsClientData);
+        processEnumConfigurations(enumConfigs);
+
     }
 
     /**
@@ -154,7 +179,6 @@ public class ConfigTools {
 
             File directory = null;
             List<String> filesInDirectory = null;
-            methodConfigsMap = new HashMap<>();
             String fullPath = resource_url.getFile();
 
             if (resource_url.toURI().getScheme().equals(JAR_URI_SCHEME)) { // inside JAR
@@ -180,60 +204,50 @@ public class ConfigTools {
     }
 
     private static void initStructures() {
-        httpTypeEnums = new HashSet<>();
-        methodConfigsMap = new HashMap<>();
-        enumDefinitionsMap = new HashMap<>();
-        endpointDataMap = new HashMap<>();
+        wsClients = new HashMap<>();
+        enums = new HashMap<>();
+        wsClientData = new HashMap<>();
     }
 
     /**
      * 
-     * @return Definition of methods
+     * @return WS clients
      */
-    public static MethodConfigMap getMethodConfigs() {
-        if (methodConfigsMap == null) {
+    public static Map<String, Map<String, WSClient>> getWSClientConfigs() {
+        if (wsClients == null) {
             initStructures();
             loadDefinitions();
         }
-        return methodConfigsMap;
+        return wsClients;
+    }
+
+    /**
+     * 
+     * @return Data containers for WS clients
+     */
+    public static Map<String, Map<String, WSClient>> wsClientData() {
+        if (wsClientData == null) {
+            initStructures();
+            loadDefinitions();
+        }
+        return wsClientData;
     }
 
     /**
      * 
      * @return Definition of enums
      */
-    public static EnumConfigMap getEnumDefinitions() {
-        if (enumDefinitionsMap == null) {
+    public static Map<String, EnumItem> getEnumConfigs() {
+        if (enums == null) {
             initStructures();
             loadDefinitions();
         }
-        return enumDefinitionsMap;
+        return enums;
     }
 
-    /**
-     * @return the typeHolders
-     */
-    public static Set<String> getGenerics() {
-        if (httpTypeEnums == null) {
-            initStructures();
-            loadDefinitions();
-        }
-        return httpTypeEnums;
-    }
-
-    /**
-     * @return the eDataContainerConfigMap
-     */
-    public static EDataContainerConfigMap getEDataContainerConfigMap() {
-        if (eDataContainerConfigMap == null) {
-            initStructures();
-            loadDefinitions();
-        }
-        return eDataContainerConfigMap;
-    }
 
     public static void main(String[] args) {
-        System.err.println("TEST");
+        getWSClientConfigs();
     }
 
 }
