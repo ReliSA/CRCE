@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch ConfigTools",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.config_v2.tools.ConfigTools",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
             "name": "Launch Main",
             "request": "launch",
             "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
@@ -24,7 +31,7 @@
             "type": "java",
             "name": "Launch Main",
             "request": "launch",
-            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.Main",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
             "projectName": "crce-rest-client-indexer",
             "args": [
                 "-f=/home/anonym/Dokumenty/diplomka_test_data/rest.war"

@@ -1,0 +1,239 @@
+package cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.Config;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.EnumConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WebClientConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodType;
+
+
+public class ConfigTools {
+
+    private static final String JAR_URI_SCHEME = "jar";
+    private static final String BUNDLE_URI_SCHEME = "bundle";
+    private static Set<String> httpTypeEnums = null;
+    private static Map<String, EnumConfig> enumDefinitionsMap = null;
+    private static Map<String, Map<String, MethodConfig>> methodConfigsMap = null;
+    private static Map<String, MethodConfig> endpointDataMap = null;
+
+    private static final String DEF_DIR_NAME = "definition" + "/v2";
+    private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
+    private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "new_version.yml");
+    private static final String DEF_DIR_REL = DEF_DIR_NAME + "/";
+    private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
+
+    /**
+     * Preloads all filenames into list (JAR version)
+     * 
+     * @param path Path to resource file
+     * @throws IOException
+     */
+    private static List<String> loadFilesFromJar(String path) throws IOException {
+        final String jarPath = path.replaceFirst("[.]jar[!].*", ".jar").replaceFirst("file:", "");
+        JarFile jarFile = new JarFile(jarPath);
+        Enumeration<JarEntry> entries = jarFile.entries();
+        List<String> filesInDirectory = new LinkedList<String>();
+
+        while (entries.hasMoreElements()) {
+            final JarEntry entry = entries.nextElement();
+            final String entryName = entry.getName();
+
+            if (entryName.startsWith(DEF_DIR_REL) && !entryName.equals(DEF_DIR_REL)) {
+                filesInDirectory.add("/" + entryName);
+            }
+        }
+
+        jarFile.close();
+        return filesInDirectory;
+    }
+
+    /**
+     * Wrappes loader for configuration file
+     * 
+     * @param defDirPath Directory of an configuration file
+     * @param file Filename of an configuration file
+     * @throws Exception
+     */
+    private static void loadConfigurationFile(String defDirPath, String file) throws Exception {
+        final String path = defDirPath + "/" + file;
+        loadConfigurationFile(path);
+    }
+
+    /**
+     * Loads configuration into private static field
+     * 
+     * @param path Path to configuration file
+     * @throws Exception
+     */
+    private static void loadConfigurationFile(String path) throws Exception {
+        final InputStream inputStream = ConfigTools.class.getResourceAsStream(path);
+        if (inputStream == null)
+            throw new Exception("Resource not found: " + path);
+        Config config =
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                        .readValue(inputStream, Config.class);
+        Map<String, ArgConfig> argDefinitions = config.getArgDefinitions();
+        Set<WebClientConfig> methodsConfig = config.getWsClients();
+        Set<EnumConfig> enumConfigs = config.getEnums();
+        //Set<String> httpTypeContainer = config.getGenerics();
+        Set<WebClientConfig> eDataConfig = config.getWsClientDataHolders();
+        if (methodsConfig != null) {
+            for (WebClientConfig item : methodsConfig) {
+                String methodOwner = item.getClassName();
+                if (!methodConfigsMap.containsKey(methodOwner)) {
+                    methodConfigsMap.put(methodOwner, new HashMap<>());
+                }
+                for (MethodType methodType : item.getMethods().keySet()) {
+                    final MethodConfig currentMethod = item.getMethods().get(methodType);
+                    for (final String name : currentMethod.getNames()) {
+                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+                            for (final String argReference : argReferences) {
+                                if (argDefinitions.containsKey(argReference)) {
+                                    currentMethod.addArg(argDefinitions.get(argReference));
+                                } else {
+                                    throw new Exception(
+                                            "Arg reference of " + argReference + " not found");
+                                }
+                            }
+                        }
+                        //methodConfigsMap.get(methodOwner).put(name, mc);
+                    }
+                    //methodConfigsMap.get(methodOwner).put(mc.getName(), mc);
+                }
+            }
+        }
+        /*         if (enumConfigs != null) {
+            for (EnumConfig one : enumConfigs) {
+                final String enumDefKey = one.getClassName();
+                if (!enumDefinitionsMap.containsKey(enumDefKey)) {
+                    enumDefinitionsMap.put(enumDefKey, new HashMap<>());
+                }
+                for (EnumFieldOrMethodConfig field : one.getFields()) {
+                    enumDefinitionsMap.get(enumDefKey).put(field.getName(), field);
+                }
+            }
+        }
+        if (httpTypeContainer != null) {
+            httpTypeEnums.addAll(httpTypeContainer);
+        }
+        if (eDataConfig != null) {
+            for (EDataContainerConfig one : eDataConfig) {
+                final String key = one.getClassName();
+                if (!eDataContainerConfigMap.containsKey(key)) {
+                    eDataContainerConfigMap.put(key, new HashMap<>());
+                }
+                for (EDataContainerMethodConfig method : one.getMethods()) {
+                    eDataContainerConfigMap.get(key).put(method.getName(), method);
+                }
+            }
+        } */
+    }
+
+    /**
+     * Loads configuration file into definition map
+     * 
+     * @throws Exception
+     */
+    private static void loadDefinitions() {
+        try {
+            final URL resource_url = ConfigTools.class.getResource(DEF_DIR_ABS);
+            if (resource_url == null) {
+                throw new Exception("Directory not found: " + DEF_DIR_ABS);
+            }
+
+            File directory = null;
+            List<String> filesInDirectory = null;
+            methodConfigsMap = new HashMap<>();
+            String fullPath = resource_url.getFile();
+
+            if (resource_url.toURI().getScheme().equals(JAR_URI_SCHEME)) { // inside JAR
+
+                filesInDirectory = loadFilesFromJar(fullPath);
+                for (final String path : filesInDirectory) {
+                    loadConfigurationFile(path);
+                }
+            } else if (resource_url.toURI().getScheme().equals(BUNDLE_URI_SCHEME)) {
+                for (final String path : configs) {
+                    loadConfigurationFile(path);
+                }
+            } else {
+                directory = new File(resource_url.toURI());
+                filesInDirectory = Arrays.asList(directory.list());
+                for (final String file : filesInDirectory) {
+                    loadConfigurationFile(DEF_DIR_ABS, file);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void initStructures() {
+        httpTypeEnums = new HashSet<>();
+        methodConfigsMap = new HashMap<>();
+        enumDefinitionsMap = new HashMap<>();
+        endpointDataMap = new HashMap<>();
+    }
+
+    /**
+     * 
+     * @return Definition of methods
+     */
+    public static MethodConfigMap getMethodConfigs() {
+        if (methodConfigsMap == null) {
+            initStructures();
+            loadDefinitions();
+        }
+        return methodConfigsMap;
+    }
+
+    /**
+     * 
+     * @return Definition of enums
+     */
+    public static EnumConfigMap getEnumDefinitions() {
+        if (enumDefinitionsMap == null) {
+            initStructures();
+            loadDefinitions();
+        }
+        return enumDefinitionsMap;
+    }
+
+    /**
+     * @return the typeHolders
+     */
+    public static Set<String> getGenerics() {
+        if (httpTypeEnums == null) {
+            initStructures();
+            loadDefinitions();
+        }
+        return httpTypeEnums;
+    }
+
+    /**
+     * @return the eDataContainerConfigMap
+     */
+    public static EDataContainerConfigMap getEDataContainerConfigMap() {
+        if (eDataContainerConfigMap == null) {
+            initStructures();
+            loadDefinitions();
+        }
+        return eDataContainerConfigMap;
+    }
+
+    public static void main(String[] args) {
+        System.err.println("TEST");
+    }
+
+}
