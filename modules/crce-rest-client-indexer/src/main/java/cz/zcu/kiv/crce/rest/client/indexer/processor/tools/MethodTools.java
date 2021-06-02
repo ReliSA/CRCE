@@ -1,7 +1,18 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.VarArray;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.VarEndpointData;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
 
 public class MethodTools {
     public enum MethodType {
@@ -65,5 +76,48 @@ public class MethodTools {
             return found;
         }
         return null;
+    }
+
+    /**
+     * Stringifies variable
+     * 
+     * @param var Variable
+     * @return Stringified variable
+     */
+    private static String getStringValueVar(Variable var) {
+        String val = var.getValue() != null ? var.getValue().toString() : null;
+        if (val == null || val.length() == 0) {
+            return var.getDescription();
+        }
+        return val;
+    }
+
+    //TODO: zpracovat interfaces, classes atd z nastavení args??
+    public static Map<String, Object> parseArgs(Stack<Variable> values, Set<Set<ArgConfig>> args) {
+        Map<String, Object> output = new HashMap<>();
+        if (args == null || values.isEmpty()) {
+            return output;
+        }
+        for (final Set<ArgConfig> versionOfArgs : args) {
+            if (versionOfArgs.size() == values.size()) {
+                for (ArgConfig arg : versionOfArgs) {
+                    final Variable var = values.pop();
+                    final Object val = var.getValue();
+                    if (arg.getType() == MethodArgType.UNKNOWN) {
+                        continue;
+                    }
+                    if (val instanceof VarArray) {
+                        VarArray arrayCasted = (VarArray) val;
+                        output.put(arg.getType().name(), arrayCasted.getInnerArray());
+                    } else if (val instanceof VarEndpointData || val instanceof Endpoint) {
+                        output.put(arg.getType().name(), val);
+                    } else {
+                        output.put(arg.getType().name(), getStringValueVar(var));
+                    }
+
+                }
+            }
+        }
+        return output;
     }
 }

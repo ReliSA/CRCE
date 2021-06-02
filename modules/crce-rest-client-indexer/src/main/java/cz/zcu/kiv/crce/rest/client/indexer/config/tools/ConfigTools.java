@@ -162,6 +162,9 @@ public class ConfigTools {
                 directory = new File(resource_url.toURI());
                 filesInDirectory = Arrays.asList(directory.list());
                 for (final String file : filesInDirectory) {
+                    if (file.equals("v2")) {
+                        continue;
+                    }
                     loadConfigurationFile(DEF_DIR_ABS, file);
                 }
             }

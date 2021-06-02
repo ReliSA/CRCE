@@ -41,11 +41,11 @@ public class ConfigTools {
      * @param path Path to resource file
      * @throws IOException
      */
-    private static List<String> loadFilesFromJar(String path) throws IOException {
+    private static List<String> loadFilesFromJar(final String path) throws IOException {
         final String jarPath = path.replaceFirst("[.]jar[!].*", ".jar").replaceFirst("file:", "");
-        JarFile jarFile = new JarFile(jarPath);
-        Enumeration<JarEntry> entries = jarFile.entries();
-        List<String> filesInDirectory = new LinkedList<String>();
+        final JarFile jarFile = new JarFile(jarPath);
+        final Enumeration<JarEntry> entries = jarFile.entries();
+        final List<String> filesInDirectory = new LinkedList<String>();
 
         while (entries.hasMoreElements()) {
             final JarEntry entry = entries.nextElement();
@@ -67,7 +67,8 @@ public class ConfigTools {
      * @param file Filename of an configuration file
      * @throws Exception
      */
-    private static void loadConfigurationFile(String defDirPath, String file) throws Exception {
+    private static void loadConfigurationFile(final String defDirPath, final String file)
+            throws Exception {
         final String path = defDirPath + "/" + file;
         loadConfigurationFile(path);
     }
@@ -78,22 +79,22 @@ public class ConfigTools {
      * @param argDefinitions definitions of arguments for client methods
      * @throws Exception
      */
-    private static void processWSClientConfigurations(Set<WSClientConfig> wsClientConfigs,
-            Map<String, ArgConfig> argDefinitions, Map<String, Map<String, WSClient>> wsData)
-            throws Exception {
+    private static void processWSClientConfigurations(final Set<WSClientConfig> wsClientConfigs,
+            final Map<String, ArgConfig> argDefinitions,
+            final Map<String, Map<String, WSClient>> wsData) throws Exception {
         if (wsClientConfigs != null) {
-            for (WSClientConfig item : wsClientConfigs) {
-                String methodOwner = item.getClassName();
+            for (final WSClientConfig item : wsClientConfigs) {
+                final String methodOwner = item.getClassName();
                 if (!wsData.containsKey(methodOwner)) {
                     wsData.put(methodOwner, new HashMap<>());
                 }
-                for (MethodType httpMethodType : item.getMethods().keySet()) {
-                    for (WSClientMethodConfig currentMethod : item.getMethods()
+                for (final MethodType httpMethodType : item.getMethods().keySet()) {
+                    for (final WSClientMethodConfig currentMethod : item.getMethods()
                             .get(httpMethodType)) {
-                        Set<Set<ArgConfig>> argConfig = new HashSet<>();
+                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
                         for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
 
-                            Set<ArgConfig> args = new HashSet<>();
+                            final Set<ArgConfig> args = new HashSet<>();
                             argConfig.add(args);
                             for (final String argReference : argReferences) {
                                 if (argDefinitions.containsKey(argReference)) {
@@ -119,15 +120,15 @@ public class ConfigTools {
      * Processes enum configurations (header types, http types etc.)
      * @param enumConfigs Enum configurations
      */
-    private static void processEnumConfigurations(Set<EnumConfig> enumConfigs) {
+    private static void processEnumConfigurations(final Set<EnumConfig> enumConfigs) {
         if (enumConfigs != null) {
-            for (EnumConfig one : enumConfigs) {
+            for (final EnumConfig one : enumConfigs) {
                 final String enumDefKey = one.getClassName();
                 if (!enums.containsKey(enumDefKey)) {
-                    for (MethodArgType enumType : one.getFields().keySet()) {
+                    for (final MethodArgType enumType : one.getFields().keySet()) {
                         final Map<String, String> fields = one.getFields().get(enumType);
-                        for (String key : fields.keySet()) {
-                            EnumItem newEnumItem = new EnumItem(enumType, fields.get(key));
+                        for (final String key : fields.keySet()) {
+                            final EnumItem newEnumItem = new EnumItem(enumType, fields.get(key));
                             enums.put(key, newEnumItem);
                         }
                     }
@@ -142,21 +143,21 @@ public class ConfigTools {
      * @param path Path to configuration file
      * @throws Exception
      */
-    private static void loadConfigurationFile(String path) throws Exception {
+    private static void loadConfigurationFile(final String path) throws Exception {
         final InputStream inputStream = ConfigTools.class.getResourceAsStream(path);
 
         if (inputStream == null) {
             throw new Exception("Resource not found: " + path);
         }
 
-        Config config =
+        final Config config =
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                         .readValue(inputStream, Config.class);
 
-        Map<String, ArgConfig> argDefinitions = config.getArgDefinitions();
-        Set<WSClientConfig> wsClientConfigs = config.getWsClients();
-        Set<EnumConfig> enumConfigs = config.getEnums();
-        Set<WSClientConfig> wsDataConfigs = config.getWsClientDataHolders();
+        final Map<String, ArgConfig> argDefinitions = config.getArgDefinitions();
+        final Set<WSClientConfig> wsClientConfigs = config.getWsClients();
+        final Set<EnumConfig> enumConfigs = config.getEnums();
+        final Set<WSClientConfig> wsDataConfigs = config.getWsClientDataHolders();
 
 
         processWSClientConfigurations(wsClientConfigs, argDefinitions, wsClients);
@@ -179,7 +180,7 @@ public class ConfigTools {
 
             File directory = null;
             List<String> filesInDirectory = null;
-            String fullPath = resource_url.getFile();
+            final String fullPath = resource_url.getFile();
 
             if (resource_url.toURI().getScheme().equals(JAR_URI_SCHEME)) { // inside JAR
 
@@ -198,11 +199,14 @@ public class ConfigTools {
                     loadConfigurationFile(DEF_DIR_ABS, file);
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Initialize needed structures
+     */
     private static void initStructures() {
         wsClients = new HashMap<>();
         enums = new HashMap<>();
@@ -246,7 +250,7 @@ public class ConfigTools {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         getWSClientConfigs();
     }
 

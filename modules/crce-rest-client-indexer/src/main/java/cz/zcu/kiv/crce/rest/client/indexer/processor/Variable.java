@@ -1,29 +1,18 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
-import java.util.HashMap;
-import java.util.Map;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 
 public class Variable {
 
     public enum VariableType {
-        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINTDATA
+        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINTDATA, WS_CLIENT_DATA
     }
 
-    private Map<String, Object> data = new HashMap<>();
     private Object value = "";
     private String owner = "";
     private String description = "";
     private VariableType vType = null;
 
-
-    public void putData(String key, Object data) {
-        this.data.put(key, data);
-    }
-
-    public Object getData(String key) {
-        return data.get(key);
-    }
 
     /**
      * @return the value

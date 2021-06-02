@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch VariableFactory",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.processor.VariableFactory",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
             "name": "Launch ConfigTools",
             "request": "launch",
             "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools",
