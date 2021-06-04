@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
@@ -270,7 +271,6 @@ public class MethodProcessor extends BasicProcessor {
             case CALL:
                 processCALL(operation, values);
                 break;
-
             default:;
         }
     }

@@ -12,41 +12,14 @@ public class Config {
     private Set<WSClientConfig> wsClients;
 
     @JsonProperty("wsClientData")
-    private Set<WSClientConfig> wsClientDataHolders;
+    private Set<WSClientDataConfig> wsClientDataHolders;
 
     @JsonProperty("argDefinitions")
     private Map<String, ArgConfig> argDefinitions;
 
-    @JsonProperty("enums")
-    private Set<EnumConfig> enums;
+    @JsonProperty("requestParams")
+    private Set<RequestParamConfig> requestParams;
 
-    /**
-     * @return the enums
-     */
-    public Set<EnumConfig> getEnums() {
-        return enums;
-    }
-
-    /**
-     * @param enums the enums to set
-     */
-    public void setEnums(Set<EnumConfig> enums) {
-        this.enums = enums;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
      * @return the wsClients
@@ -63,16 +36,46 @@ public class Config {
     }
 
     /**
+     * @return the requestParams
+     */
+    public Set<RequestParamConfig> getRequestParams() {
+        return requestParams;
+    }
+
+    /**
+     * @param requestParams the requestParams to set
+     */
+    public void setRequestParams(Set<RequestParamConfig> requestParams) {
+        this.requestParams = requestParams;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+
+    /**
      * @return the wsClientDataHolders
      */
-    public Set<WSClientConfig> getWsClientDataHolders() {
+    public Set<WSClientDataConfig> getWsClientDataHolders() {
         return wsClientDataHolders;
     }
 
     /**
      * @param wsClientDataHolders the wsClientDataHolders to set
      */
-    public void setWsClientDataHolders(Set<WSClientConfig> wsClientDataHolders) {
+    public void setWsClientDataHolders(Set<WSClientDataConfig> wsClientDataHolders) {
         this.wsClientDataHolders = wsClientDataHolders;
     }
 

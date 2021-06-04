@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointRequestBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 
@@ -33,7 +33,7 @@ public class BeanProcessor {
      * @param body Body
      * @return String
      */
-    private String convertBodyToJson(EndpointRequestBody body) {
+    private String convertBodyToJson(EndpointBody body) {
         final String className = body.getStructure();
         if (cache.containsKey(className)) {
             return cache.get(className);
@@ -62,10 +62,10 @@ public class BeanProcessor {
     public Collection<Endpoint> process() {
 
         for (Endpoint endpoint : endpoints) {
-            for (EndpointRequestBody body : endpoint.getRequestBodies()) {
+            for (EndpointBody body : endpoint.getRequestBodies()) {
                 body.setStructure(convertBodyToJson(body));
             }
-            for (EndpointRequestBody body : endpoint.getExpectedResponses()) {
+            for (EndpointBody body : endpoint.getExpectedResponses()) {
                 body.setStructure(convertBodyToJson(body));
             }
         }

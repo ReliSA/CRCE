@@ -8,10 +8,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
-import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.UrlTools;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 /**
  * @author Tomáš Ballák
@@ -29,8 +29,8 @@ public class Endpoint implements Serializable {
     protected String baseUrl;
     protected Set<HttpMethod> httpMethods;
     protected Set<EndpointParameter> parameters;
-    protected Set<EndpointRequestBody> requestBodies;
-    protected Set<EndpointRequestBody> expectedResponses;
+    protected Set<EndpointBody> requestBodies;
+    protected Set<EndpointBody> expectedResponses;
     protected Set<Header> produces;
     protected Set<Header> consumes;
 
@@ -63,11 +63,11 @@ public class Endpoint implements Serializable {
         return copy;
     }
 
-    private Set<EndpointRequestBody> copyEndpointReqBodySet(Set<EndpointRequestBody> setEbody) {
-        Set<EndpointRequestBody> copy = new HashSet<>();
+    private Set<EndpointBody> copyEndpointReqBodySet(Set<EndpointBody> setEbody) {
+        Set<EndpointBody> copy = new HashSet<>();
 
-        for (final EndpointRequestBody body : setEbody) {
-            copy.add(new EndpointRequestBody(body.getStructure(), body.isArray()));
+        for (final EndpointBody body : setEbody) {
+            copy.add(new EndpointBody(body.getStructure(), body.isArray()));
         }
         return copy;
     }
@@ -76,7 +76,7 @@ public class Endpoint implements Serializable {
         Set<Header> copy = new HashSet<>();
 
         for (final Header body : headers) {
-            copy.add(new Header(body.getName(), body.getValue()));
+            copy.add(new Header(body.getType(), body.getValue()));
         }
         return copy;
     }
@@ -104,7 +104,7 @@ public class Endpoint implements Serializable {
      * @param consumes Consuming JSON | XML etx. (header params)
     */
     public Endpoint(String baseUrl, String path, Set<HttpMethod> httpMethods,
-            Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
+            Set<EndpointBody> requestBodies, Set<EndpointBody> expectedResponses,
             Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
         this(path, httpMethods, requestBodies, expectedResponses, parameters, produces, consumes);
         this.setBaseUrl(baseUrl);
@@ -120,9 +120,9 @@ public class Endpoint implements Serializable {
      * @param produces Producing JSON | XML etc. (header params)
      * @param consumes Consuming JSON | XML etx. (header params)
      */
-    public Endpoint(String path, Set<HttpMethod> httpMethods,
-            Set<EndpointRequestBody> requestBodies, Set<EndpointRequestBody> expectedResponses,
-            Set<EndpointParameter> parameters, Set<Header> produces, Set<Header> consumes) {
+    public Endpoint(String path, Set<HttpMethod> httpMethods, Set<EndpointBody> requestBodies,
+            Set<EndpointBody> expectedResponses, Set<EndpointParameter> parameters,
+            Set<Header> produces, Set<Header> consumes) {
         this.httpMethods = httpMethods;
         this.requestBodies = requestBodies;
         this.expectedResponses = expectedResponses;
@@ -152,10 +152,6 @@ public class Endpoint implements Serializable {
         this.consumes = new HashSet<>();
     }
 
-    public enum HttpMethod {
-        POST, GET, PUT, PATCH, DELETE, HEAD, OPTIONS, TRACE;
-    }
-
     /**
      * 
      * @return Get all http methods
@@ -168,7 +164,7 @@ public class Endpoint implements Serializable {
      * 
      * @return Get all request bodies
      */
-    public Set<EndpointRequestBody> getRequestBodies() {
+    public Set<EndpointBody> getRequestBodies() {
         return this.requestBodies;
     }
 
@@ -189,7 +185,7 @@ public class Endpoint implements Serializable {
      */
     public Endpoint addParameter(EndpointParameter param) {
         if (param.getCategory() == ParameterCategory.BODY) {
-            addRequestBody(new EndpointRequestBody(param.getDataType(),
+            addRequestBody(new EndpointBody(param.getDataType(),
                     BytecodeDescriptorsProcessor.isArrayOrCollection(param.getDataType())));
         } else {
             parameters.add(param);
@@ -210,7 +206,7 @@ public class Endpoint implements Serializable {
      * @param body Adds request body
      * @return this
      */
-    public Endpoint addRequestBody(EndpointRequestBody body) {
+    public Endpoint addRequestBody(EndpointBody body) {
         this.requestBodies.add(body);
         return this;
     }
@@ -220,7 +216,7 @@ public class Endpoint implements Serializable {
      * @param response Adds new response
      * @return this
      */
-    public Endpoint addExpectedResponse(EndpointRequestBody response) {
+    public Endpoint addExpectedResponse(EndpointBody response) {
         this.expectedResponses.add(response);
         return this;
     }
@@ -229,7 +225,7 @@ public class Endpoint implements Serializable {
      * 
      * @return Endpoint request bodies
      */
-    public Set<EndpointRequestBody> getExpectedResponses() {
+    public Set<EndpointBody> getExpectedResponses() {
         return this.expectedResponses;
     }
 
@@ -272,9 +268,9 @@ public class Endpoint implements Serializable {
      * @param header New header
      */
     public void addHeader(Header header) {
-        if (HeaderTools.isConsumingType(header.getName())) {
+        if (HeaderTools.isConsumingType(header.getType())) {
             this.addConsumes(header);
-        } else if (HeaderTools.isProducingType(header.getName())) {
+        } else if (HeaderTools.isProducingType(header.getType())) {
             this.addProduces(header);
         } else {
             // some other header attrs
@@ -331,14 +327,14 @@ public class Endpoint implements Serializable {
 
     @Override
     public String toString() {
-        return "{ \"baseUrl\": " + ToStringTools.stringToString(baseUrl) + ", \"path\": "
-                + ToStringTools.stringToString(path) + ", \"httpMethods\": "
-                + ToStringTools.setToString(httpMethods) + ", \"requestBodies\": "
-                + ToStringTools.setToString(requestBodies) + ", \"responses\": "
-                + ToStringTools.setToString(expectedResponses) + ", \"parameters\": "
-                + ToStringTools.setToString(parameters) + ", \"produces\": "
-                + ToStringTools.setToString(produces) + ", \"consumes\": "
-                + ToStringTools.setToString(consumes) + " }";
+        return "{ \"baseUrl\": " + ToJSONTools.convertString(baseUrl) + ", \"path\": "
+                + ToJSONTools.convertString(path) + ", \"httpMethods\": "
+                + ToJSONTools.convertSet(httpMethods) + ", \"requestBodies\": "
+                + ToJSONTools.convertSet(requestBodies) + ", \"responses\": "
+                + ToJSONTools.convertSet(expectedResponses) + ", \"parameters\": "
+                + ToJSONTools.convertSet(parameters) + ", \"produces\": "
+                + ToJSONTools.convertSet(produces) + ", \"consumes\": "
+                + ToJSONTools.convertSet(consumes) + " }";
     }
 
 

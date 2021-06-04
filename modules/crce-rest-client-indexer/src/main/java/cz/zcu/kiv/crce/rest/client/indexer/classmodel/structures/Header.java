@@ -1,11 +1,11 @@
-package cz.zcu.kiv.crce.rest.client.indexer.config;
+package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 
 import java.util.Objects;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 
 public class Header {
-    private String name;
+    private String type;
     private String value;
 
 
@@ -13,15 +13,15 @@ public class Header {
     /**
      * @return the name
      */
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String name) {
+        this.type = name;
     }
 
     /**
@@ -40,25 +40,25 @@ public class Header {
 
     @Override
     public String toString() {
-        return "{ \"name\": " + ToStringTools.stringToString(name) + ", \"value\": "
-                + ToStringTools.stringToString(value) + " }";
+        return "{ \"name\": " + ToJSONTools.convertString(type) + ", \"value\": "
+                + ToJSONTools.convertString(value) + " }";
     }
 
     /**
-     * @param name
+     * @param type
      * @param value
      */
-    public Header(String name, String value) {
-        this.name = name;
+    public Header(String type, String value) {
+        this.type = type;
         this.value = value;
     }
 
     /**
-    * @param name
+    * @param type
     * @param value
     */
-    public Header(String name, Variable value) {
-        this.name = name;
+    public Header(String type, Variable value) {
+        this.type = type;
         if (value == null) {
             this.value = "";
         } else {
@@ -71,7 +71,7 @@ public class Header {
     public boolean equals(Object obj) {
         if (obj instanceof Header) {
             Header header = (Header) obj;
-            return header.getName().equals(header.getName())
+            return header.getType().equals(header.getType())
                     && header.getValue().equals(header.getValue());
         }
         return super.equals(obj);
@@ -80,7 +80,7 @@ public class Header {
     @Override
     public int hashCode() {
         // TODO Auto-generated method stub
-        return Objects.hash(name, value);
+        return Objects.hash(type, value);
     }
 
 }

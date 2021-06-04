@@ -4,8 +4,9 @@ import cz.zcu.kiv.crce.metadata.*;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointRequestBody;
-import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,9 +105,9 @@ public class RestClientMetadataManager {
      * @param bodies Request bodies
      * @return Set of strings
      */
-    private Set<String> convertRequestBodiesToStringSet(Set<EndpointRequestBody> bodies) {
+    private Set<String> convertRequestBodiesToStringSet(Set<EndpointBody> bodies) {
         Set<String> stringSet = new HashSet<>();
-        for (final EndpointRequestBody body : bodies) {
+        for (final EndpointBody body : bodies) {
             stringSet.add(body.getStructure());
         }
         return stringSet;
@@ -118,9 +119,9 @@ public class RestClientMetadataManager {
      * @param enums Http methods
      * @return Stringified http methods
      */
-    private Set<String> convertHTTPEnumsToStrings(Set<Endpoint.HttpMethod> enums) {
+    private Set<String> convertHTTPEnumsToStrings(Set<HttpMethod> enums) {
         Set<String> stringSet = new HashSet<>();
-        for (Endpoint.HttpMethod enum_ : enums) {
+        for (HttpMethod enum_ : enums) {
             stringSet.add(enum_.name());
         }
         return stringSet;

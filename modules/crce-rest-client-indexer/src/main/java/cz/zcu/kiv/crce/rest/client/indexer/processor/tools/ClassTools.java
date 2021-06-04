@@ -14,21 +14,22 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 public class ClassTools {
     private static final String descrToClassPathRegexp = "^((\\((\\w|\\/|;)*\\)\\[?)?[A-Z])";
     private static final String descrToClassPathRegexpEnd = "((\\$|\\.).*)";
     private static final String descrClassNameRegexpEnd = "((\\.).*)";
-    private static final String methodSetGetPrefixRegExp = "^(get)";
+    private static final String genericClasss = "<>";
     private static final String baseTypeRegex = "[BCDFIJSZ]";
     private static final Pattern baseTypePattern = Pattern.compile(baseTypeRegex);
     private static final String objectTypeRegex = "^L[^;<>]+(<.*>)*;";
     private static final Pattern objectTypePattern = Pattern.compile(objectTypeRegex);
     private static final Pattern descrToClassPathPattern = Pattern.compile(descrToClassPathRegexp);
+    private static final Pattern genericClassPatern = Pattern.compile(genericClasss);
     private static final Pattern descrToClassPathEndPattern =
             Pattern.compile(descrToClassPathRegexpEnd);
 
@@ -68,6 +69,34 @@ public class ClassTools {
         return className.contains("java/util/Map");
     }
 
+    /**
+    * Returns true if data type is array or collection.
+    * 
+    * @param type data type as string
+    * @return true if data type is array or collection
+    * @source G. Hessova
+    */
+    @SuppressWarnings("rawtypes")
+    public static boolean isArrayOrCollection(String type) {
+        if ("[".equals(type)) { // array
+            return true;
+        }
+        type = type.replaceAll("/", "\\.");
+        if ("java.util.Collection".equals(type))
+            return true;
+        try {
+            Class c = Class.forName(type);
+            Class[] interfaces = c.getInterfaces();
+            for (Class anInterface : interfaces) {
+                if ("java.util.Collection".equals(anInterface.getName())) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return false;
+    }
 
     /**
      * Converting description to owner like style (java/lang/String etc.)
@@ -279,5 +308,14 @@ public class ClassTools {
             }
         }
         return Map.of("type", class_.getClassStruct().getName(), "data", map);
+    }
+
+    public static boolean isGenericClass(ClassWrapper cWrapper) {
+        if (cWrapper == null) {
+            return false;
+        }
+        ClassStruct class_ = cWrapper.getClassStruct();
+        return class_ != null && class_.getSignature() != null
+                && genericClassPatern.matcher(class_.getSignature()).find();
     }
 }

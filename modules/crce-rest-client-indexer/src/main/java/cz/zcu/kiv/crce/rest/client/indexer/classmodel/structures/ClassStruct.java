@@ -20,8 +20,7 @@ public class ClassStruct extends PathPart {
     private String[] interfaces;
     private Method clnitMethod;
 
-    public ClassStruct() {
-    }
+    public ClassStruct() {}
 
     /**
      * @return the cinitMethod
@@ -37,9 +36,10 @@ public class ClassStruct extends PathPart {
         this.clnitMethod = cinitMethod;
     }
 
-    public ClassStruct(String name, String parent, String signature) {
+    public ClassStruct(String name, String parent, String signature, String[] interfaces) {
         this(name, parent);
         this.signature = signature;
+        this.interfaces = interfaces;
     }
 
     public ClassStruct(String name, String parent) {

@@ -3,9 +3,9 @@ package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 import java.io.Serializable;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 
-public class EndpointRequestBody implements Serializable {
+public class EndpointBody implements Serializable {
     /**
      *
      */
@@ -20,12 +20,12 @@ public class EndpointRequestBody implements Serializable {
      * @param structure Stringified sutucture of body
      * @param isArray Is it array
      */
-    public EndpointRequestBody(String structure, boolean isArray) {
+    public EndpointBody(String structure, boolean isArray) {
         this.structure = structure;
         this.isArray = isArray;
     }
 
-    public EndpointRequestBody() {}
+    public EndpointBody() {}
 
     /**
      * 
@@ -60,7 +60,7 @@ public class EndpointRequestBody implements Serializable {
 
     @Override
     public String toString() {
-        return "{ \"structure\": " + ToStringTools.objToString(structure) + ", \"isArray\" : "
+        return "{ \"structure\": " + ToJSONTools.convertObject(structure) + ", \"isArray\" : "
                 + isArray + " }";
 
     }
@@ -72,8 +72,8 @@ public class EndpointRequestBody implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof EndpointRequestBody) {
-            EndpointRequestBody eReqBody = (EndpointRequestBody) obj;
+        if (obj instanceof EndpointBody) {
+            EndpointBody eReqBody = (EndpointBody) obj;
             boolean structureEq = structure.compareTo(eReqBody.getStructure()) == 0;
             boolean isArrayEq = isArray == eReqBody.isArray();
             return structureEq && isArrayEq;

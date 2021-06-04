@@ -1,8 +1,8 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import java.util.Stack;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 
 public class SafeStack {
     /**

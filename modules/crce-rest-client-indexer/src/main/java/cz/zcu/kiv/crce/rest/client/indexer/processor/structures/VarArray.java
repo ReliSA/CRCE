@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 public class VarArray {
     private Variable[] value;

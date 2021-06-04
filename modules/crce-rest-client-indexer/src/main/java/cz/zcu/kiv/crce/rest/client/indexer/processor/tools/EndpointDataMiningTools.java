@@ -11,17 +11,17 @@ import cz.zcu.kiv.crce.rest.client.indexer.config.ApiCallMethodConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config.ArgConfigType;
 import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerConfigMap;
 import cz.zcu.kiv.crce.rest.client.indexer.config.EDataContainerMethodConfig;
-import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.config.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointRequestBody;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.VarArray;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.VarEndpointData;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint.HttpMethod;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VarArray;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 public class EndpointDataMiningTools {
 
@@ -96,7 +96,7 @@ public class EndpointDataMiningTools {
                     } else if (val instanceof VarArray) {
                         VarArray arrayCasted = (VarArray) val;
                         output.put(definition.name(), arrayCasted.getInnerArray());
-                    } else if (val instanceof VarEndpointData) {
+                    } else if (val instanceof EndpointData) {
                         output.put(definition.name(), val);
                     } else if (val instanceof Endpoint) {
                         output.put(definition.name(), val);
@@ -130,7 +130,7 @@ public class EndpointDataMiningTools {
      * @param endpoint Endpoint which will be updated
      */
     private static void addExpectedResponseToEndpoint(String response, Endpoint endpoint) {
-        EndpointRequestBody responseBody = new EndpointRequestBody();
+        EndpointBody responseBody = new EndpointBody();
         responseBody.setIsArray(BytecodeDescriptorsProcessor.isArrayOrCollection(response));
         response = ClassTools.descriptionToClassName(response);
         responseBody.setStructure(response);
@@ -148,7 +148,7 @@ public class EndpointDataMiningTools {
         if (rBody == null || rBody.length() == 0) {
             return;
         }
-        EndpointRequestBody requestBody = new EndpointRequestBody();
+        EndpointBody requestBody = new EndpointBody();
         requestBody.setIsArray(BytecodeDescriptorsProcessor.isArrayOrCollection(rBody));
         rBody = ClassTools.descriptionToClassName(rBody);
         requestBody.setStructure(rBody);
@@ -274,8 +274,8 @@ public class EndpointDataMiningTools {
                 .get(MethodTools.getMethodNameFromSignature(operation.getDescription()));
         Map<String, Object> params =
                 EndpointDataMiningTools.getParams(args, methodConfig.getArgs());
-        VarEndpointData varEndpointData = new VarEndpointData();
-        Variable newEndpointData = new Variable(varEndpointData).setType(VariableType.ENDPOINTDATA)
+        EndpointData varEndpointData = new EndpointData();
+        Variable newEndpointData = new Variable(varEndpointData).setType(VariableType.ENDPOINT_DATA)
                 .setOwner(operation.getOwner());
         callback.run(params, newEndpointData, args);
         return newEndpointData;
@@ -462,7 +462,7 @@ public class EndpointDataMiningTools {
         Object eData = params.getOrDefault(ArgConfigType.EDATA.name(), null);
 
         if (path != null) {
-            if (path instanceof Endpoint || path instanceof VarEndpointData) {
+            if (path instanceof Endpoint || path instanceof EndpointData) {
                 Endpoint pathData = (Endpoint) path;
                 endpoint.setBaseUrl(pathData.getBaseUrl());
             } else if (path instanceof String) {
@@ -470,7 +470,7 @@ public class EndpointDataMiningTools {
             }
         }
         if (baseURL != null) {
-            if (baseURL instanceof Endpoint || baseURL instanceof VarEndpointData) {
+            if (baseURL instanceof Endpoint || baseURL instanceof EndpointData) {
                 Endpoint baseURLData = (Endpoint) baseURL;
                 endpoint.setBaseUrl(baseURLData.getBaseUrl());
             } else if (baseURL instanceof String) {
@@ -478,8 +478,8 @@ public class EndpointDataMiningTools {
             }
         }
         if (param != null) {
-            if (param instanceof VarEndpointData) {
-                VarEndpointData varEData = (VarEndpointData) param;
+            if (param instanceof EndpointData) {
+                EndpointData varEData = (EndpointData) param;
 
                 endpoint.merge(varEData);
                 varEData.merge(endpoint);
@@ -491,7 +491,7 @@ public class EndpointDataMiningTools {
             handleAttr(expect, (String p) -> addExpectedResponseToEndpoint(p, endpoint));
         }
         if (send != null) {
-            if (send instanceof VarEndpointData) {
+            if (send instanceof EndpointData) {
                 Endpoint varEData = (Endpoint) send;
                 endpoint.merge(varEData);
                 varEData.merge(endpoint);
@@ -514,16 +514,15 @@ public class EndpointDataMiningTools {
             }
         }
         if (contentType != null) {
-            handleAttr(contentType, (String cType) -> endpoint
-                    .addProduces(new Header(HeaderTools.CONTENTTYPE, cType)));
+            handleAttr(contentType,
+                    (String cType) -> endpoint.addProduces(new Header("Content-Type", cType)));
         }
         if (accept != null) {
-            handleAttr(accept, (String aType) -> endpoint
-                    .addConsumes(new Header(HeaderTools.CONTENTTYPE, aType)));
+            handleAttr(accept, (String aType) -> endpoint.addConsumes(new Header("Accept", aType)));
         }
         if (eData != null) {
-            if (eData instanceof VarEndpointData) {
-                VarEndpointData varEData = (VarEndpointData) eData;
+            if (eData instanceof EndpointData) {
+                EndpointData varEData = (EndpointData) eData;
                 endpoint.merge(varEData);
                 varEData.merge(endpoint);
             }

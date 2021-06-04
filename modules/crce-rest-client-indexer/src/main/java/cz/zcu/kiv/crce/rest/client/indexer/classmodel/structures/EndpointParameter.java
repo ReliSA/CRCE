@@ -2,8 +2,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 
 import java.io.Serializable;
 import java.util.Objects;
-import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 
 /**
  * Created by ghessova on 10.03.2018.
@@ -186,7 +185,7 @@ public class EndpointParameter implements Serializable {
         String dataTypeObj = ", \"dataType\": ";
         if (dataType == null || dataTypeH == null) {
             if (dataType != null && !dataType.isEmpty()) {
-                dataTypeObj += ToStringTools.objToString(dataType);
+                dataTypeObj += ToJSONTools.convertObject(dataType);
             } else if (dataTypeH != null) {
                 dataTypeObj += dataTypeH;
             } else {
@@ -199,8 +198,8 @@ public class EndpointParameter implements Serializable {
     @Override
     public String toString() {
         String dateTypeObj = dataTypeToString();
-        return "{" + "\"name\": " + ToStringTools.objToString(getName()) + ", \"category\": "
-                + ToStringTools.objToString(getCategory()) + dateTypeObj + ", \"isArray\": "
+        return "{" + "\"name\": " + ToJSONTools.convertObject(getName()) + ", \"category\": "
+                + ToJSONTools.convertObject(getCategory()) + dateTypeObj + ", \"isArray\": "
                 + isArray() + "}";
     }
 }

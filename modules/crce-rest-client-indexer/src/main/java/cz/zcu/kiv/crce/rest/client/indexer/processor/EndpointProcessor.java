@@ -18,8 +18,9 @@ import cz.zcu.kiv.crce.rest.client.indexer.config.MethodConfigMap;
 import cz.zcu.kiv.crce.rest.client.indexer.config.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint.HttpMethod;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable.VariableType;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointDataMiningTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
@@ -30,6 +31,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodTyp
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 class EndpointHandler extends MethodProcessor {
 
@@ -95,9 +97,9 @@ class EndpointHandler extends MethodProcessor {
      */
     private void mergeVarEndpointData(Stack<Variable> values, Variable var) {
         Variable lastVar = SafeStack.peek(values);
-        if (!VariableTools.isEmpty(lastVar) && lastVar.getValue() instanceof VarEndpointData) {
-            VarEndpointData lastVarEData = (VarEndpointData) lastVar.getValue();
-            VarEndpointData varEData = (VarEndpointData) var.getValue();
+        if (!VariableTools.isEmpty(lastVar) && lastVar.getValue() instanceof EndpointData) {
+            EndpointData lastVarEData = (EndpointData) lastVar.getValue();
+            EndpointData varEData = (EndpointData) var.getValue();
 
             lastVarEData.merge(varEData);
         } else {
@@ -168,8 +170,7 @@ class EndpointHandler extends MethodProcessor {
         } else if (isInitMethod(operation)) {
             removeMethodArgsFromStack(values, operation);
             ClassWrapper class_ = this.classes.getOrDefault(operation.getOwner(), null);
-            if (class_ != null && typeHolders.contains(class_.getClassStruct().getParent())
-                    && class_.getClassStruct().getSignature() != null) {
+            if (ClassTools.isGenericClass(class_)) {
                 Stack<Object> types =
                         ClassTools.processTypes(class_.getClassStruct().getSignature());
                 types.pop(); // Throw away generic wrapper

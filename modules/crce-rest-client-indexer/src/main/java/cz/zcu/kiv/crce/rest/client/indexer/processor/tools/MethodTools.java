@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,14 +8,21 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
+import cz.zcu.kiv.crce.rest.client.indexer.config.ArgConfigType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.VarArray;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.VarEndpointData;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VarArray;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 
 public class MethodTools {
+
+
+
     public enum MethodType {
         OTHER, INIT
     }
@@ -78,46 +86,49 @@ public class MethodTools {
         return null;
     }
 
-    /**
-     * Stringifies variable
-     * 
-     * @param var Variable
-     * @return Stringified variable
-     */
-    private static String getStringValueVar(Variable var) {
-        String val = var.getValue() != null ? var.getValue().toString() : null;
-        if (val == null || val.length() == 0) {
-            return var.getDescription();
-        }
-        return val;
-    }
 
-    //TODO: zpracovat interfaces, classes atd z nastavení args??
-    public static Map<String, Object> parseArgs(Stack<Variable> values, Set<Set<ArgConfig>> args) {
+
+
+
+    /**
+     * Retrieves parameters from stack based on definition of method arguments
+     * 
+     * @param values Stack
+     * @param args Definition of arguments definition
+     * @return Endpoint parameters
+     
+    public static Map<String, Object> getParams(Stack<Variable> values,
+            Set<ArrayList<ArgConfigType>> args) {
         Map<String, Object> output = new HashMap<>();
         if (args == null || values.isEmpty()) {
             return output;
         }
-        for (final Set<ArgConfig> versionOfArgs : args) {
+        for (final ArrayList<ArgConfigType> versionOfArgs : args) {
             if (versionOfArgs.size() == values.size()) {
-                for (ArgConfig arg : versionOfArgs) {
+                for (ArgConfigType definition : versionOfArgs) {
                     final Variable var = values.pop();
                     final Object val = var.getValue();
-                    if (arg.getType() == MethodArgType.UNKNOWN) {
+                    if (definition == ArgConfigType.SKIP) {
                         continue;
                     }
-                    if (val instanceof VarArray) {
+                    if (output.containsKey(definition.name())) {
+                        output.put(definition.name(),
+                                output.get(definition.name()) + getStringValueVar(var));
+                    } else if (val instanceof VarArray) {
                         VarArray arrayCasted = (VarArray) val;
-                        output.put(arg.getType().name(), arrayCasted.getInnerArray());
-                    } else if (val instanceof VarEndpointData || val instanceof Endpoint) {
-                        output.put(arg.getType().name(), val);
+                        output.put(definition.name(), arrayCasted.getInnerArray());
+                    } else if (val instanceof VarEndpointData) {
+                        output.put(definition.name(), val);
+                    } else if (val instanceof Endpoint) {
+                        output.put(definition.name(), val);
                     } else {
-                        output.put(arg.getType().name(), getStringValueVar(var));
+                        output.put(definition.name(), getStringValueVar(var));
                     }
-
+    
                 }
             }
         }
         return output;
     }
+    */
 }

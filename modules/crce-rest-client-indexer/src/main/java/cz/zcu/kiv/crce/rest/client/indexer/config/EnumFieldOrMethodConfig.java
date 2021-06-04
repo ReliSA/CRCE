@@ -1,7 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint.HttpMethod;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 public class EnumFieldOrMethodConfig {
     @JsonProperty("name")

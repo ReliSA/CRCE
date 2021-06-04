@@ -1,14 +1,13 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+
 public class HeaderTools {
     private static final String ACCEPT = "Accept";
-    private static String CONTENTBASE = "Content";
-    public static final String CONTENTTYPE = CONTENTBASE + "-Type";
 
-    //TODO: more to dect request/response data
     /**
-     * Detects if header is consuming type
-     * 
+     * Detects if header describes accepting 
+     * @source https://datatracker.ietf.org/doc/html/rfc7231#section-5
      * @param headerType
      * @return
      */
@@ -16,13 +15,18 @@ public class HeaderTools {
         return headerType.startsWith(ACCEPT);
     }
 
+    public static boolean isConsumingType(Header header) {
+        return header.getType().startsWith(ACCEPT);
+    }
+
     /**
-     * Detects if header is producing type
+     * Detects if header describes sent content
+     * @source https://datatracker.ietf.org/doc/html/rfc7231#section-3
      * 
      * @param headerType
      * @return
      */
     public static boolean isProducingType(String headerType) {
-        return headerType.startsWith(CONTENTTYPE);
+        return !headerType.startsWith(ACCEPT);
     }
 }

@@ -3,7 +3,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures;
 import java.util.HashSet;
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
-import cz.zcu.kiv.crce.rest.client.indexer.general.HttpMethod;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 public class WSClient {
     String owner;

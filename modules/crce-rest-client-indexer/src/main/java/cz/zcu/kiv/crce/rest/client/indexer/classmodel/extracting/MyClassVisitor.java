@@ -27,7 +27,7 @@ public class MyClassVisitor extends ClassVisitor {
     @Override
     public void visit(int version, int access, String name, String signature, String superName,
             String[] interfaces) {
-        ClassStruct class_ = new ClassStruct(name, superName, signature);
+        ClassStruct class_ = new ClassStruct(name, superName, signature, interfaces);
         lastClass = class_;
         state.setClassStruct(class_);
         super.visit(version, access, name, signature, superName, interfaces);

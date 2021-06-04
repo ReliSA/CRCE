@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 
-public class ToStringTools {
+public class ToJSONTools {
     private static ObjectMapper mapper = new ObjectMapper();
-    private static final Logger logger = LoggerFactory.getLogger(ToStringTools.class);
+    private static final Logger logger = LoggerFactory.getLogger(ToJSONTools.class);
 
     /**
      * Converts endpoints into list of json objects
@@ -18,7 +18,7 @@ public class ToStringTools {
      * @param collection
      * @return
      */
-    public static String endpointsToJSON(Collection<Endpoint> collection) {
+    public static String convertEndpoints(Collection<Endpoint> collection) {
         if (collection.size() == 0) {
             return null;
         }
@@ -43,12 +43,12 @@ public class ToStringTools {
      * @param set Input set
      * @return Converted set
      */
-    public static <T> String setToString(Set<T> set) {
+    public static <T> String convertSet(Set<T> set) {
 
         String stringified = "[";
         for (T item : set) {
             if (item instanceof String || item instanceof Enum) {
-                stringified += objToString(item) + ",";
+                stringified += convertObject(item) + ",";
             } else {
                 stringified += item.toString() + ",";
             }
@@ -66,7 +66,7 @@ public class ToStringTools {
      * @param obj Any object
      * @return Object converted to JSON string
      */
-    public static String objToString(Object obj) {
+    public static String convertObject(Object obj) {
         if (obj == null) {
             return null;
         }
@@ -82,7 +82,7 @@ public class ToStringTools {
      * @param str String to conversion
      * @return Converted string
      */
-    public static String stringToString(String str) {
+    public static String convertString(String str) {
         if (str == null) {
             return null;
         }

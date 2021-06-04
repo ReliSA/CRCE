@@ -6,7 +6,7 @@ import org.apache.log4j.BasicConfigurator;
 import cz.zcu.kiv.crce.rest.client.indexer.cli.CommandLineInterface;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Processor;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToStringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 
 public class Main {
 
@@ -19,6 +19,6 @@ public class Main {
         }
 
         Collection<Endpoint> endpoints = Processor.process(jarFile).values();
-        System.out.println(ToStringTools.endpointsToJSON(endpoints));
+        System.out.println(ToJSONTools.convertEndpoints(endpoints));
     }
 }

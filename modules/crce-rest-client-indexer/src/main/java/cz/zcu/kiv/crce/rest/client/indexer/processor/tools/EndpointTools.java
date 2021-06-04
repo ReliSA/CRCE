@@ -4,6 +4,7 @@ import java.util.Map;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 
 public class EndpointTools {
+
     /**
      * Merges new endpoints into existing map of endpoints
      * 
@@ -43,4 +44,6 @@ public class EndpointTools {
             }
         }
     }
+
+
 }

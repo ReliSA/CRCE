@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointRequestBody;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint.HttpMethod;
-import cz.zcu.kiv.crce.rest.client.indexer.config.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Processor;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 public class ProcessorTest {
 
@@ -42,51 +42,49 @@ public class ProcessorTest {
                                 "{\"lastName\":\"java/lang/String\",\"firstName\":\"java/lang/String\",\"employeeId\":\"java/lang/Integer\",\"age\":\"java/lang/Integer\"}";
                 final Endpoint endpoint1 =
                                 new Endpoint("/123", Set.of(HttpMethod.GET), new HashSet<>(),
-                                                Set.of(new EndpointRequestBody(employee, false)),
+                                                Set.of(new EndpointBody(employee, false)),
                                                 Set.of(new EndpointParameter(null,
                                                                 "java/lang/Integer", false, null)),
                                                 new HashSet<>(), new HashSet<>());
                 Endpoint endpoint2 = new Endpoint("/prvni/uri/trida", Set.of(HttpMethod.PUT),
                                 new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/lang/String", false)),
+                                Set.of(new EndpointBody("java/lang/String", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 Endpoint endpoint3 = new Endpoint("/employee/{id}/prvni/uri/tridaNONSTATICtest",
                                 Set.of(HttpMethod.PUT, HttpMethod.DELETE),
-                                Set.of(new EndpointRequestBody(employee, false)),
-                                Set.of(new EndpointRequestBody("java/lang/String", false),
-                                                new EndpointRequestBody(employee, false)),
+                                Set.of(new EndpointBody(employee, false)),
+                                Set.of(new EndpointBody("java/lang/String", false),
+                                                new EndpointBody(employee, false)),
                                 new HashSet<>(Set.of(new EndpointParameter(null,
                                                 "java/lang/Integer", false, null))),
                                 new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint4 = new Endpoint("/bla/uri/s/argumentem/{id}",
                                 Set.of(HttpMethod.PUT), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/lang/String", false)),
+                                Set.of(new EndpointBody("java/lang/String", false)),
                                 new HashSet<>(Set.of(new EndpointParameter(null,
                                                 "java/lang/Integer", false, null))),
                                 new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint5 = new Endpoint("/prvni/uri/tridaNONSTATICtest",
                                 Set.of(HttpMethod.PUT), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/lang/String", false)),
+                                Set.of(new EndpointBody("java/lang/String", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint7 = new Endpoint("/employee", Set.of(HttpMethod.POST),
-                                Set.of(new EndpointRequestBody(employee, false)),
-                                Set.of(new EndpointRequestBody(employee, false)), new HashSet<>(),
+                                Set.of(new EndpointBody(employee, false)),
+                                Set.of(new EndpointBody(employee, false)), new HashSet<>(),
                                 new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint8 = new Endpoint("/nejaka/uri/s/argumentem/{id}",
                                 Set.of(HttpMethod.POST), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/lang/String", false)),
+                                Set.of(new EndpointBody("java/lang/String", false)),
                                 new HashSet<>(Set.of(new EndpointParameter(null,
                                                 "java/lang/Integer", false, null))),
                                 new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint9 = new Endpoint("/test", HttpMethod.PUT)
-                                .addExpectedResponse(
-                                                new EndpointRequestBody("java/lang/String", false))
+                                .addExpectedResponse(new EndpointBody("java/lang/String", false))
                                 .addConsumes(new Header("Accept", "application/json"));
                 final Endpoint endpoint10 = new Endpoint("/accept", HttpMethod.PUT)
                                 .setConsumes(Set.of(new Header("Accept", "application/json")))
                                 .addProduces(new Header("Content-Type", "application/json"))
-                                .addExpectedResponse(
-                                                new EndpointRequestBody("java/lang/String", false));
+                                .addExpectedResponse(new EndpointBody("java/lang/String", false));
 
                 springWebClientExpectedEndpoints = Map.of(endpoint1.getUrl(), endpoint1,
                                 endpoint2.getUrl(), endpoint2, endpoint3.getUrl(), endpoint3,
@@ -100,19 +98,18 @@ public class ProcessorTest {
         public static void initResttemplate() {
                 Endpoint endpoint1 = new Endpoint("http://localhost:8090", "/api/user/users",
                                 Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/util/List", true)),
-                                new HashSet<>(),
+                                Set.of(new EndpointBody("java/util/List", true)), new HashSet<>(),
                                 Set.of(new Header("Content-Type", "application/json")),
                                 Set.of(new Header("Accept", "application/json")));
                 Endpoint endpoint2 = new Endpoint("http://localhost:8090", "/api/user/addUser",
                                 Set.of(HttpMethod.POST),
-                                Set.of(new EndpointRequestBody("com/app/demo/model/User", false)),
-                                Set.of(new EndpointRequestBody("com/app/demo/model/User", false)),
+                                Set.of(new EndpointBody("com/app/demo/model/User", false)),
+                                Set.of(new EndpointBody("com/app/demo/model/User", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 Endpoint endpoint3 = new Endpoint("http://localhost:8090", "/api/user/patchUser/",
                                 Set.of(HttpMethod.PATCH),
-                                Set.of(new EndpointRequestBody("com/app/demo/model/User", false)),
-                                Set.of(new EndpointRequestBody("com/app/demo/model/User", false)),
+                                Set.of(new EndpointBody("com/app/demo/model/User", false)),
+                                Set.of(new EndpointBody("com/app/demo/model/User", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 Endpoint endpoint4 = new Endpoint("http://localhost:8090", "/api/user/deleteUser/",
                                 Set.of(HttpMethod.DELETE), new HashSet<>(), new HashSet<>(),
@@ -127,37 +124,36 @@ public class ProcessorTest {
         public static void initJaxRs() {
                 final String baseUrl = "http://localhost:8080/hrmanagerapi/webapi";
                 final Endpoint endpoint1 = new Endpoint(baseUrl, "/emp", Set.of(HttpMethod.GET),
-                                new HashSet<>(),
-                                Set.of(new EndpointRequestBody("java/util/List", true)),
+                                new HashSet<>(), Set.of(new EndpointBody("java/util/List", true)),
                                 new HashSet<>(),
                                 Set.of(new Header("Content-Type", "application/json")),
                                 Set.of(new Header("Accept", "application/json")));
                 final Endpoint endpoint2 = new Endpoint(baseUrl, "/emp/addemp",
                                 Set.of(HttpMethod.POST),
-                                Set.of(new EndpointRequestBody(
-                                                "com/nagarro/hrmanager/model/Employee", false)),
+                                Set.of(new EndpointBody("com/nagarro/hrmanager/model/Employee",
+                                                false)),
                                 new HashSet<>(), new HashSet<>(),
                                 Set.of(new Header("Content-Type", "application/json")),
                                 new HashSet<>());
 
                 final Endpoint endpoint3 = new Endpoint(baseUrl, "/emp/update",
                                 Set.of(HttpMethod.PUT),
-                                Set.of(new EndpointRequestBody(
-                                                "com/nagarro/hrmanager/model/Employee", false)),
+                                Set.of(new EndpointBody("com/nagarro/hrmanager/model/Employee",
+                                                false)),
                                 new HashSet<>(), new HashSet<>(),
                                 Set.of(new Header("Content-Type", "application/json")),
                                 new HashSet<>());
                 final Endpoint endpoint4 = new Endpoint(baseUrl, "/emp/delete/",
                                 Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("javax/ws/rs/core/Response", false)),
+                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint5 = new Endpoint(baseUrl, "/emp/getemp/",
                                 Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("javax/ws/rs/core/Response", false)),
+                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
                 final Endpoint endpoint6 = new Endpoint(baseUrl, "/user/getUser/",
                                 Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointRequestBody("javax/ws/rs/core/Response", false)),
+                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
                                 new HashSet<>(), new HashSet<>(), new HashSet<>());
 
                 jaxRsExpectedEndpoints = Map.of(endpoint1.getUrl(), endpoint1, endpoint2.getUrl(),
