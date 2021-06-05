@@ -19,6 +19,18 @@ argDefinitions:
     type: URI_VARIABLE
     interfaces:
       - java.util.Map
+  uriVariableKey:
+    type: URI_VARIABLE_KEY
+    classes:
+      - java.lang.String
+  uriVariableValue:
+    type: URI_VARIABLE_VALUE
+    classes:
+      - java.lang.String
+  uriVariableSkip:
+    type: UNKNOWN
+    classes:
+      - java.util.function
   uriVariableVarArg:
     type: URI_VARIABLE
     classes:
@@ -45,6 +57,30 @@ argDefinitions:
     type: CONTENT_TYPE
     classes:
       - org.springframework.http.MediaType
+  acceptCharset:
+    type: ACCEPT
+    classes:
+      - java.nio.charset.Charset
+  cookieName:
+    type: KEY
+    classes:
+      - java.lang.String
+  cookieValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  headerKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  headerValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  ifNonMatch:
+    type: IF_NONE_MATCH
+    classes:
+      - java.lang.String
   
 
 wsClient:
@@ -119,12 +155,38 @@ wsClient:
       
   - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
     settings:
-      - names:
-          - accept
-        varArgs:
-          - - contentType
-      - names:
-          - acceptCharset
+      GENERIC:
+        - names:
+            - accept
+          varArgs:
+            - - contentType
+        - names:
+            - acceptCharset
+          varArgs:
+            - - acceptCharset
+        - names:
+            - attribute
+          args:
+            - - uriVariableKey
+              - uriVariableValue 
+            - - uriVariableSkip
+        - names:
+            - ifNoneMatch
+          varArgs:
+            - ifNonMatch
+            - - 
+      COOKIE:
+        - names:
+            - cookie
+          args:
+            - - cookieName
+              - cookieValue
+      HEADER:
+        - names: 
+            - header
+          varArgs:
+            - - headerKey
+              - headerValue  
         
   - class: org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
     request:

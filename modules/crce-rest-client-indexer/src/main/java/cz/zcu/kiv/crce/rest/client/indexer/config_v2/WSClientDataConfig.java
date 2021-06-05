@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cz.zcu.kiv.crce.rest.client.indexer.config.DefinitionValuesProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HeaderType;
 
