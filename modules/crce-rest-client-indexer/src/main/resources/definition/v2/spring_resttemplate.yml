@@ -65,7 +65,7 @@ wsClientData:
 wsClient:
   - classes:
       - org.springframework.web.client.RestTemplate
-    makeRequest:
+    request:
       GET:
         - names:
             - getForEntity

@@ -12,9 +12,23 @@ public class WSClientConfig {
     @JsonProperty("classes")
     private Set<String> classNames;
 
-    @JsonProperty("makeRequest")
-    private Map<HttpMethodExt, Set<WSClientMethodConfig>> makeRequest;
+    @JsonProperty("request")
+    private Map<HttpMethodExt, Set<WSClientMethodConfig>> request;
 
+
+    /**
+     * @return the request
+     */
+    public Map<HttpMethodExt, Set<WSClientMethodConfig>> getRequest() {
+        return request;
+    }
+
+    /**
+     * @param request the request to set
+     */
+    public void setRequest(Map<HttpMethodExt, Set<WSClientMethodConfig>> request) {
+        this.request = request;
+    }
 
     /**
      * @return the classNames
@@ -34,19 +48,6 @@ public class WSClientConfig {
         }
     }
 
-    /**
-     * @return the makeRequest
-     */
-    public Map<HttpMethodExt, Set<WSClientMethodConfig>> getMakeRequest() {
-        return makeRequest;
-    }
-
-    /**
-     * @param makeRequest the makeRequest to set
-     */
-    public void setMakeRequest(Map<HttpMethodExt, Set<WSClientMethodConfig>> makeRequest) {
-        this.makeRequest = makeRequest;
-    }
 
     @JsonProperty("headers")
     private Map<HeaderType, Set<WSClientMethodConfig>> headers;

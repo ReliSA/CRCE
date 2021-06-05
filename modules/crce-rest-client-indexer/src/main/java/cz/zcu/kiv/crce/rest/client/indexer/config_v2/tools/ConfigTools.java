@@ -27,7 +27,7 @@ public class ConfigTools {
 
     private static final String JAR_URI_SCHEME = "jar";
     private static final String BUNDLE_URI_SCHEME = "bundle";
-    private static Map<String, RequestParam> endpointDataParameter = null;
+    private static Map<String, Map<String, RequestParam>> requestParams = null;
     private static Map<String, Map<String, WSClient>> wsClients = null;
     private static Map<String, Map<String, WSClient>> wsClientData = null;
 
@@ -97,28 +97,30 @@ public class ConfigTools {
                     if (!wsClients.containsKey(methodOwner)) {
                         wsClients.put(methodOwner, new HashMap<>());
                     }
-                    for (final HttpMethodExt httpMethodType : item.getMakeRequest().keySet()) {
-                        for (final WSClientMethodConfig currentMethod : item.getMakeRequest()
-                                .get(httpMethodType)) {
-                            final Set<Set<ArgConfig>> argConfig = new HashSet<>();
-                            for (final Set<String> argReferences : currentMethod
-                                    .getArgsReferences()) {
+                }
 
-                                final Set<ArgConfig> args = new HashSet<>();
-                                argConfig.add(args);
-                                for (final String argReference : argReferences) {
-                                    if (argDefinitions.containsKey(argReference)) {
-                                        args.add(argDefinitions.get(argReference));
-                                    } else {
-                                        throw new Exception(
-                                                "Arg reference of " + argReference + " not found");
-                                    }
+                for (final HttpMethodExt httpMethodType : item.getRequest().keySet()) {
+                    for (final WSClientMethodConfig currentMethod : item.getRequest()
+                            .get(httpMethodType)) {
+                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
+                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+
+                            final Set<ArgConfig> args = new HashSet<>();
+                            argConfig.add(args);
+                            for (final String argReference : argReferences) {
+                                if (argDefinitions.containsKey(argReference)) {
+                                    args.add(argDefinitions.get(argReference));
+                                } else {
+                                    throw new Exception(
+                                            "Arg reference of " + argReference + " not found");
                                 }
                             }
-                            for (final String name : currentMethod.getNames()) {
-                                final WSClient client = new WSClient(methodOwner, name,
-                                        httpMethodExtToHttpMethod(httpMethodType), argConfig);
-                                wsClients.get(client.getOwner()).put(client.getName(), client);
+                        }
+                        for (final String name : currentMethod.getNames()) {
+                            final WSClient client = new WSClient(name,
+                                    httpMethodExtToHttpMethod(httpMethodType), argConfig);
+                            for (final String methodOwner : methodOwners) {
+                                wsClients.get(methodOwner).put(client.getName(), client);
                             }
                         }
                     }
@@ -144,25 +146,26 @@ public class ConfigTools {
                     if (!wsClientData.containsKey(methodOwner)) {
                         wsClientData.put(methodOwner, new HashMap<>());
                     }
-                    for (final WSClientMethodConfig currentMethod : item.getMethods()) {
-                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
-                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+                }
+                for (final WSClientMethodConfig currentMethod : item.getMethods()) {
+                    final Set<Set<ArgConfig>> argConfig = new HashSet<>();
+                    for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
 
-                            final Set<ArgConfig> args = new HashSet<>();
-                            argConfig.add(args);
-                            for (final String argReference : argReferences) {
-                                if (argDefinitions.containsKey(argReference)) {
-                                    args.add(argDefinitions.get(argReference));
-                                } else {
-                                    throw new Exception(
-                                            "Arg reference of " + argReference + " not found");
-                                }
+                        final Set<ArgConfig> args = new HashSet<>();
+                        argConfig.add(args);
+                        for (final String argReference : argReferences) {
+                            if (argDefinitions.containsKey(argReference)) {
+                                args.add(argDefinitions.get(argReference));
+                            } else {
+                                throw new Exception(
+                                        "Arg reference of " + argReference + " not found");
                             }
                         }
-                        for (final String name : currentMethod.getNames()) {
-                            final WSClient client =
-                                    new WSClient(methodOwner, name, null, argConfig);
-                            wsClientData.get(client.getOwner()).put(client.getName(), client);
+                    }
+                    for (final String name : currentMethod.getNames()) {
+                        final WSClient client = new WSClient(name, null, argConfig);
+                        for (final String methodOwner : methodOwners) {
+                            wsClientData.get(methodOwner).put(name, client);
                         }
                     }
                 }
@@ -173,22 +176,24 @@ public class ConfigTools {
 
     /**
      * Processes class which contains prameters in its fields for requests (header types, http types etc.)
-     * @param enumConfigs Enum configurations
+     * @param requestParamsConfigs Enum configurations
      */
     private static void processRequestParamConfiguration(
-            final Set<RequestParamConfig> enumConfigs) {
-        if (enumConfigs != null) {
-            //TODO: pracovat pouze s referencemi!!! nekopirovat to pro kazdou tridu zvlast
-            for (final RequestParamConfig one : enumConfigs) {
-                for (final String enumDefKey : one.getClassNames()) {
-                    if (!endpointDataParameter.containsKey(enumDefKey)) {
-                        for (final RequestParamFieldType enumType : one.getFields().keySet()) {
-                            final Map<String, String> fields = one.getFields().get(enumType);
-                            for (final String key : fields.keySet()) {
-                                final RequestParam newEnumItem =
-                                        new RequestParam(enumType, fields.get(key));
-                                endpointDataParameter.put(key, newEnumItem);
-                            }
+            final Set<RequestParamConfig> requestParamsConfigs) {
+        if (requestParamsConfigs != null) {
+            for (final RequestParamConfig one : requestParamsConfigs) {
+                for (final String className : one.getClassNames()) {
+                    if (!requestParams.containsKey(className)) {
+                        requestParams.put(className, new HashMap<>());
+                    }
+                }
+                for (final RequestParamFieldType enumType : one.getFields().keySet()) {
+                    final Map<String, String> fields = one.getFields().get(enumType);
+                    for (final String key : fields.keySet()) {
+                        final RequestParam newEnumItem =
+                                new RequestParam(enumType, fields.get(key));
+                        for (final String className : one.getClassNames()) {
+                            requestParams.get(className).put(key, newEnumItem);
                         }
                     }
                 }
@@ -268,7 +273,7 @@ public class ConfigTools {
      */
     private static void initStructures() {
         wsClients = new HashMap<>();
-        endpointDataParameter = new HashMap<>();
+        requestParams = new HashMap<>();
         wsClientData = new HashMap<>();
     }
 
@@ -300,12 +305,12 @@ public class ConfigTools {
      * 
      * @return Definition of enums
      */
-    public static Map<String, RequestParam> getEnumConfigs() {
-        if (endpointDataParameter == null) {
+    public static Map<String, Map<String, RequestParam>> getEnumConfigs() {
+        if (requestParams == null) {
             initStructures();
             loadDefinitions();
         }
-        return endpointDataParameter;
+        return requestParams;
     }
 
 
