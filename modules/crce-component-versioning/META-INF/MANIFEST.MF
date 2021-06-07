@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1623051739945
+Bnd-LastModified: 1623056050636
 Build-Jdk: 11.0.11
 Built-By: anonym
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
