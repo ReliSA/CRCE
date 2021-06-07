@@ -1,4 +1,4 @@
-requestParams:
+requestParameters:
   - classes:
       - org.springframework.http.HttpMethod
     fields:
@@ -14,7 +14,7 @@ requestParams:
   - classes:
       - org.springframework.http.HttpHeaders
     fields:
-      HEADER_TYPE:
+      GENERIC:
         EMPTY: ""
         ACCEPT: Accept
         ACCEPT_CHARSET: "Accept-Charset"
@@ -79,7 +79,7 @@ requestParams:
   - classes:
       - org.springframework.http.MediaType
     fields:
-      CONTENT_TYPE:
+      GENERIC:
         ALL: "all"
         APPLICATION_ATOM_XML: "application/atom+xml"
         APPLICATION_ATOM_XML_VALUE: "application/atom+xml"

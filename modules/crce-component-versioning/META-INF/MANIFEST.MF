@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1621784139656
+Bnd-LastModified: 1623051739945
 Build-Jdk: 11.0.11
-Built-By: tomas
+Built-By: anonym
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
  ivator
 Bundle-Description: Component Repository supporting Compatibility Evalua

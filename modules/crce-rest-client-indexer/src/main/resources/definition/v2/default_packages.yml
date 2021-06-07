@@ -1,0 +1,3 @@
+core:
+  - java.net.URI
+  - java.util.Locale

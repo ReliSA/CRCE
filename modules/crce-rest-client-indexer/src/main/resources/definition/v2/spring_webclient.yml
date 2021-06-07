@@ -15,6 +15,10 @@ argDefinitions:
     type: URL
     classes:
       - java.lang.String
+  baseURL:
+    type: BASE_URL
+    classes:
+      - java.lang.String
   uriVariable:
     type: URI_VARIABLE
     interfaces:
@@ -81,10 +85,15 @@ argDefinitions:
     type: IF_NONE_MATCH
     classes:
       - java.lang.String
-  
+  responseTypeClass:
+    type: RESPONSE
+    classes:
+      - java.lang.Class
+      - org.springframework.core.ParameterizedTypeReference
 
 wsClient:
-  - class: org.springframework.web.reactive.function.client.WebClient
+  - classes:
+      - org.springframework.web.reactive.function.client.WebClient
     request:
       GET:
         - names:
@@ -120,39 +129,39 @@ wsClient:
     request:
       GENERIC:
         - names:
-           - uri
+            - uri
           args:
             - - URI
             - - stringURI
               - uriVariable
             - - stringURI
-              - uriFunction 
+              - uriFunction
             - - uriFunction
           varArgs:
             - - uriFunction
               - uriVariableVarArg
   - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
     settings:
-        - names:
-            - bodyValue
-            - syncBody
-          args:
-            - - body
-        - names:
-            - body
-          args:
-            - - bodyInserted
-            - - skipArg
-              - requestObject
-        - names:
-            - contentLength
-          args:
-            - - contentLength
-        - names:
-            - contentType
-          args:
-            - - contentType
-      
+      - names:
+          - bodyValue
+          - syncBody
+        args:
+          - - body
+      - names:
+          - body
+        args:
+          - - bodyInserted
+          - - skipArg
+            - requestObject
+      - names:
+          - contentLength
+        args:
+          - - contentLength
+      - names:
+          - contentType
+        args:
+          - - contentType
+
   - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
     settings:
       GENERIC:
@@ -168,13 +177,12 @@ wsClient:
             - attribute
           args:
             - - uriVariableKey
-              - uriVariableValue 
+              - uriVariableValue
             - - uriVariableSkip
         - names:
             - ifNoneMatch
           varArgs:
-            - ifNonMatch
-            - - 
+            - - ifNonMatch
       COOKIE:
         - names:
             - cookie
@@ -182,286 +190,57 @@ wsClient:
             - - cookieName
               - cookieValue
       HEADER:
-        - names: 
+        - names:
             - header
           varArgs:
             - - headerKey
-              - headerValue  
-        
-  - class: org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-    request:
-      GENERIC:
-        - names:
-            - uri
-          args:
-            - - URI
-            - - 
-      - name: uri
-        type: GENERIC
-        value: PATH
-        args:
-          - - PATH
-            - PARAM
-          - - PATH
-      - name: accept
-        type: HEADER
-        value: Accept
-        args:
-          - - HEADERVALUE
-      - name: acceptCharset
-        type: ACCEPT
-        value: Accept-Charset
-        args:
-          - - HEADERVALUE
-      - name: attribute
-        type: PARAM
-        value: QUERY
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: attributes #SKIP
-        type: GENERIC
-      - name: context #SKIP
-        type: GENERIC
-      - name: cookie
-        type: PARAM
-        value: COOKIE
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: cookies
-        type: GENERIC #SKIP
-      - name: exchange
-        type: GENERIC #SKIP
-      - name: exchangeToFlux
-        type: GENERIC #SKIP
-      - name: exchangeToMono
-        type: GENERIC #SKIP
-      - name: header
-        type: GENERIC
-        args:
-          - - HEADERTYPE
-            - HEADERVALUE
-      - name: headers #SKIP
-        type: GENERIC
-      - name: httpRequest #SKIP
-        type: GENERIC
-      - name: ifModifiedSince #SKIP
-        type: GENERIC
-      - name: ifNoneMatch
-        type: HEADER
-        value: If-None-Match
-        args:
-          - - HEADERVALUE
+              - headerValue
 
-  - class: org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
-    methods:
-      - name: body
-        type: PARAM
-        value: BODY
-        args:
-          - - SKIP
-            - PARAM
-      - name: bodyValue
-        type: PARAM
-        value: BODY
-        args:
-          - - PARAM
-      - name: contentLength
-        type: HEADER
-        value: Content-Length
-        args:
-          - - HEADERVALUE
-      - name: contentType
-        type: HEADER
-        value: Content-Type
-        args:
-          - - HEADERVALUE
-      - name: syncBody
-        type: PARAM
-        value: BODY
-        args:
-          - - PARAM
-      - name: accept #COPY OF org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-        type: HEADER
-        value: Accept
-        args:
-          - - HEADERVALUE
-      - name: acceptCharset
-        type: ACCEPT
-        value: Accept-Charset
-        args:
-          - - HEADERVALUE
-      - name: attribute
-        type: PARAM
-        value: QUERY
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: attributes #SKIP
-        type: GENERIC
-      - name: context #SKIP
-        type: GENERIC
-      - name: cookie
-        type: PARAM
-        value: COOKIE
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: cookies
-        type: GENERIC #SKIP
-      - name: exchange
-        type: GENERIC #SKIP
-      - name: exchangeToFlux
-        type: GENERIC #SKIP
-      - name: exchangeToMono
-        type: GENERIC #SKIP
-      - name: header
-        type: GENERIC
-        args:
-          - - HEADERTYPE
-            - HEADERVALUE
-      - name: headers #SKIP
-        type: GENERIC
-      - name: httpRequest #SKIP
-        type: GENERIC
-      - name: ifModifiedSince #SKIP
-        type: GENERIC
-      - name: ifNoneMatch
-        type: HEADER
-        value: If-None-Match
-        args:
-          - - HEADERVALUE
-  - class: org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
-    methods:
-      - name: uri
-        type: GENERIC
-        args:
-          - - PATH
-            - PARAM
-          - - PATH
-      - name: accept #COPY OF org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-        type: HEADER
-        value: Accept
-        args:
-          - - HEADERVALUE
-      - name: acceptCharset
-        type: ACCEPT
-        value: Accept-Charset
-        args:
-          - - HEADERVALUE
-      - name: attribute
-        type: PARAM
-        value: QUERY
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: attributes #SKIP
-        type: GENERIC
-      - name: context #SKIP
-        type: GENERIC
-      - name: cookie
-        type: PARAM
-        value: COOKIE
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: cookies
-        type: GENERIC #SKIP
-      - name: exchange
-        type: GENERIC #SKIP
-      - name: exchangeToFlux
-        type: GENERIC #SKIP
-      - name: exchangeToMono
-        type: GENERIC #SKIP
-      - name: header
-        type: GENERIC
-        args:
-          - - HEADERTYPE
-            - HEADERVALUE
-      - name: headers #SKIP
-        type: GENERIC
-      - name: httpRequest #SKIP
-        type: GENERIC
-      - name: ifModifiedSince #SKIP
-        type: GENERIC
-      - name: ifNoneMatch
-        type: HEADER
-        value: If-None-Match
-        args:
-          - - HEADERVALUE
-  - class: org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
-    methods:
-      - name: accept #COPY OF org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-        type: HEADER
-        value: Accept
-        args:
-          - - HEADERVALUE
-      - name: acceptCharset
-        type: ACCEPT
-        value: Accept-Charset
-        args:
-          - - HEADERVALUE
-      - name: attribute
-        type: PARAM
-        value: QUERY
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: attributes #SKIP
-        type: GENERIC
-      - name: context #SKIP
-        type: GENERIC
-      - name: cookie
-        type: PARAM
-        value: COOKIE
-        args:
-          - - PARAMKEY
-            - PARAMVALUE
-      - name: cookies
-        type: GENERIC #SKIP
-      - name: exchange
-        type: GENERIC #SKIP
-      - name: exchangeToFlux
-        type: GENERIC #SKIP
-      - name: exchangeToMono
-        type: GENERIC #SKIP
-      - name: header
-        type: GENERIC
-        args:
-          - - HEADERTYPE
-            - HEADERVALUE
-      - name: headers #SKIP
-        type: GENERIC
-      - name: httpRequest #SKIP
-        type: GENERIC
-      - name: ifModifiedSince #SKIP
-        type: GENERIC
-      - name: ifNoneMatch
-        type: HEADER
-        value: If-None-Match
-        args:
-          - - HEADERVALUE
+  - interface: org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+
+  - interface: org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
 
   - class: org.springframework.web.reactive.function.client.WebClient$ResponseSpec
-    methods:
-      - name: bodyToFlux
-        type: GENERIC
-        args:
-          - - EXPECT
-      - name: bodyToMono
-        type: GENERIC
-        args:
-          - - EXPECT
-      - name: toEntity
-        type: GENERIC
-        args:
-          - - EXPECT
-      - name: toEntityFlux
-        type: GENERIC
-        args:
-          - - EXPECT
-      - name: toEntityList #TODO: make param for list to detect array like structure
-        type: GENERIC
-        args:
-          - - EXPECT
+    settings:
+      GENERIC:
+        - names:
+            - bodyToFlux
+            - bodyToMono
+            - toEntity
+            - toEntityFlux
+          args:
+            - - responseTypeClass
+        - names:
+            - toEntityList
+          args:
+            - - responseTypeClass
+          expectArray: true
+  - interface: org.springframework.web.reactive.function.client.WebClient$Builder
+    settings:
+      GENERIC:
+        - names:
+            - baseUrl
+          args:
+            - - baseURL
+        - names:
+            - defaultHeader
+          varArgs:
+            - - headerKey
+              - headerValue
+        - names:
+            - defaultUriVariables
+          args:
+            - - uriVariable
+      COOKIE:
+        - names:
+            - defaultCookie
+          varArgs:
+            - - cookieName
+              - cookieValue

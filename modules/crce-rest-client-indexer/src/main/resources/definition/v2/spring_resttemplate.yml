@@ -31,6 +31,7 @@ argDefinitions:
       - org.springframework.http.HttpEntity
   requestObjectAny:
     type: REQUEST_BODY
+    classes: java.lang.String
   headersParam:
     type: HEADER
     interfaces:
@@ -51,20 +52,24 @@ argDefinitions:
 wsClientData:
   - classes:
       - org.springframework.http.HttpEntity
-    methods:
-      - names:
-          - init
-        args:
-          - - requestObjectAny
-            - headersParam
-          - - headersParam
-          - - requestParamBody
-        methods:
-          - getBody: REQUEST_BODY
-          - getHeaders: HEADER
+    settings:
+      GENERIC:
+        - names:
+            - init
+          args:
+            - - requestObjectAny
+              - headersParam
+            - - headersParam
+            - - requestParamBody
+        - names:
+            - getBody
+          returns: requestObjectAny
+        - names:
+            - getHeaders
+          returns: headersParam
 wsClient:
-  - classes:
-      - org.springframework.web.client.RestTemplate
+  - interfaces:
+      - org.springframework.web.client.RestOperations
     request:
       GET:
         - names:
