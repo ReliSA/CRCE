@@ -3,7 +3,7 @@ argDefinitions:
     type: REQUEST_BODY
     classes:
       - java.lang.Object
-  bodyInserted: #dodělat wsClientData
+  bodyInserted:
     type: ENDPOINT_DATA
     interfaces:
       - org.springframework.web.reactive.function.BodyInserter
@@ -142,25 +142,26 @@ wsClient:
               - uriVariableVarArg
   - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
     settings:
-      - names:
-          - bodyValue
-          - syncBody
-        args:
-          - - body
-      - names:
-          - body
-        args:
-          - - bodyInserted
-          - - skipArg
-            - requestObject
-      - names:
-          - contentLength
-        args:
-          - - contentLength
-      - names:
-          - contentType
-        args:
-          - - contentType
+      GENERIC:
+        - names:
+            - bodyValue
+            - syncBody
+          args:
+            - - body
+        - names:
+            - body
+          args:
+            - - bodyInserted
+            - - skipArg
+              - requestObject
+        - names:
+            - contentLength
+          args:
+            - - contentLength
+        - names:
+            - contentType
+          args:
+            - - contentType
 
   - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
     settings:

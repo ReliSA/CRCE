@@ -4,17 +4,39 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ClassTools;
-import cz.zcu.kiv.crce.rest.client.indexer.shared.HeaderType;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
 
 public class WSClientConfig {
+
     @JsonProperty("classes")
     private Set<String> classNames;
+
+    @JsonProperty("interfaces")
+    private Set<String> interfaces;
+
+    @JsonProperty("settings")
+    private Map<SettingsType, Set<WSClientMethodConfig>> settings;
 
     @JsonProperty("request")
     private Map<HttpMethodExt, Set<WSClientMethodConfig>> request;
 
+    
+
+    /**
+     * @return the settings
+     */
+    public Map<SettingsType, Set<WSClientMethodConfig>> getSettings() {
+        return settings;
+    }
+
+    /**
+     * @param settings the settings to set
+     */
+    public void setSettings(final Map<SettingsType, Set<WSClientMethodConfig>> settings) {
+        this.settings = settings;
+    }
 
     /**
      * @return the request
@@ -26,7 +48,7 @@ public class WSClientConfig {
     /**
      * @param request the request to set
      */
-    public void setRequest(Map<HttpMethodExt, Set<WSClientMethodConfig>> request) {
+    public void setRequest(final Map<HttpMethodExt, Set<WSClientMethodConfig>> request) {
         this.request = request;
     }
 
@@ -40,30 +62,30 @@ public class WSClientConfig {
     /**
      * @param classNames the classNames to set
      */
-    public void setClassNames(Set<String> classNames) {
+    public void setClassNames(final Set<String> classNames) {
         this.classNames = new HashSet<>();
-        for (String className : classNames) {
+        for (final String className : classNames) {
             final String processed = ClassTools.processClassName(className);
             this.classNames.add(processed);
         }
     }
 
-
-    @JsonProperty("headers")
-    private Map<HeaderType, Set<WSClientMethodConfig>> headers;
-
     /**
-     * @return the headers
+     * @return the interfaces
      */
-    public Map<HeaderType, Set<WSClientMethodConfig>> getHeaders() {
-        return headers;
+    public Set<String> getInterfaces() {
+        return interfaces;
     }
 
     /**
-     * @param headers the headers to set
+     * @param interfaces the interfaces to set
      */
-    public void setHeaders(Map<HeaderType, Set<WSClientMethodConfig>> headers) {
-        this.headers = headers;
+    public void setInterfaces(final Set<String> interfaces) {
+        this.interfaces = new HashSet<>();
+        for (final String interf : interfaces) {
+            final String processed = ClassTools.processClassName(interf);
+            this.interfaces.add(processed);
+        }
     }
 
 }

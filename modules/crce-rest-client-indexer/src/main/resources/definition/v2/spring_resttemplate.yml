@@ -48,6 +48,22 @@ argDefinitions:
     type: HTTP_METHOD
     classes:
       - org.springframework.http.HttpMethod
+  mValuedMap:
+    type: VALUE
+    classes:
+      - org.springframework.util.MultiValueMap
+  mValuedMapKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  mValuedMapValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  mValuedMapValueList:
+    type: VALUE
+    classes:
+      - java.lang.List
 
 wsClientData:
   - classes:
@@ -67,6 +83,23 @@ wsClientData:
         - names:
             - getHeaders
           returns: headersParam
+  - classes:
+      - org.springframework.util.MultiValueMap
+    inherits:
+      - java.lang.Map
+    settings:
+      GENERIC:
+        - names:
+            - add
+          args:
+            - - mValuedMapKey
+              - mValuedMapValue
+        - names:
+            - addAll
+          args:
+            - - mValuedMapKey
+              - mValuedMapValueList
+            - - mValuedMap
 wsClient:
   - interfaces:
       - org.springframework.web.client.RestOperations

@@ -4,47 +4,73 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HeaderType;
 
 public class WSClientDataConfig {
     @JsonProperty("classes")
-    private Set<String> classNames;
+    private Set<String> classes;
 
-    @JsonProperty("methods")
-    private Set<WSClientMethodConfig> methods;
+    @JsonProperty("interfaces")
+    private Set<String> interfaces;
 
+    @JsonProperty("settings")
+    private Map<SettingsType, Set<WSClientMethodConfig>> settings;
 
     /**
-     * @return the methods
+     * @return the settings
      */
-    public Set<WSClientMethodConfig> getMethods() {
-        return methods;
+    public Map<SettingsType, Set<WSClientMethodConfig>> getSettings() {
+        return settings;
     }
 
-    /**
-     * @param methods the methods to set
-     */
-    public void setMethods(Set<WSClientMethodConfig> methods) {
-        this.methods = methods;
-    }
+
 
     /**
-     * @return the classNames
+     * @return the classes
      */
-    public Set<String> getClassNames() {
-        return classNames;
+    public Set<String> getClasses() {
+        return classes;
     }
 
+
+
     /**
-     * @param classNames the classNames to set
+     * @param settings the settings to set
      */
-    public void setClassNames(Set<String> classNames) {
-        this.classNames = new HashSet<>();
-        for (String className : classNames) {
-            //TODO: replace
+    public void setSettings(Map<SettingsType, Set<WSClientMethodConfig>> settings) {
+        this.settings = settings;
+    }
+
+
+
+    /**
+     * @param classes the classes to set
+     */
+    public void setClasses(Set<String> classes) {
+        this.classes = new HashSet<>();
+        for (String className : classes) {
             final String processed = ClassTools.processClassName(className);
-            this.classNames.add(processed);
+            this.classes.add(processed);
+        }
+    }
+
+    /**
+     * @return the interfaces
+     */
+    public Set<String> getInterfaces() {
+        return interfaces;
+    }
+
+    /**
+     * @param interfaces the interfaces to set
+     */
+    public void setInterfaces(Set<String> interfaces) {
+        this.interfaces = new HashSet<>();
+        for (String className : interfaces) {
+            final String processed = ClassTools.processClassName(className);
+            this.interfaces.add(processed);
         }
     }
 

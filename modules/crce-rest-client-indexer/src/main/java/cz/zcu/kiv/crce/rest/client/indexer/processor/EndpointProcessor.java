@@ -38,11 +38,11 @@ class EndpointHandler extends MethodProcessor {
     private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
 
     private String classInProgress = "";
+    private String currentMethod = "";
     private Set<String> callingChain = new HashSet<>();
 
 
     private Map<String, Endpoint> endpoints = new HashMap<>();
-    private Set<String> typeHolders = ConfigTools.getGenerics();
     private EnumConfigMap ecMAp = ConfigTools.getEnumDefinitions();
     private MethodConfigMap mcMap = ConfigTools.getMethodConfigs();
     private EDataContainerConfigMap eDataConfigMap = ConfigTools.getEDataContainerConfigMap();
@@ -339,6 +339,7 @@ class EndpointHandler extends MethodProcessor {
 
 
         if (isEndpointMethod(operation)) {
+            System.out.println("currentMethod:" + currentMethod);
             logger.info("Endpoint method=" + operation.getMethodName() + " owner="
                     + operation.getOwner() + " executedFromClass=" + this.classInProgress);
             HashMap<String, ApiCallMethodConfig> methodConfigMap = mcMap.get(operation.getOwner());
@@ -412,7 +413,8 @@ class EndpointHandler extends MethodProcessor {
         classInProgress = mw.getOwner();
         final String currentClass = mw.getOwner();
         final String methodName = mw.getMethodStruct().getName();
-        final String chainKey = currentClass + "-" + methodName;
+        final String chainKey = currentClass + "." + methodName + mw.getMethodStruct().getDesc();
+        this.currentMethod = chainKey;
 
         if (callingChain.contains(chainKey)) {
             logger.info("Recursion detected method=" + methodName + " owner=" + mw.getOwner());

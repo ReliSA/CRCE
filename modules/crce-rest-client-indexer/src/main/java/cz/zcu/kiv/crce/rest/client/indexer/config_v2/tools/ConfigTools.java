@@ -16,7 +16,10 @@ import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamFieldType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientMethodConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestParam;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsMethod;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
@@ -28,8 +31,8 @@ public class ConfigTools {
     private static final String JAR_URI_SCHEME = "jar";
     private static final String BUNDLE_URI_SCHEME = "bundle";
     private static Map<String, Map<String, RequestParam>> requestParams = null;
-    private static Map<String, Map<String, WSClient>> wsClients = null;
-    private static Map<String, Map<String, WSClient>> wsClientData = null;
+    private static Map<String, Map<String, IWSClient>> wsClients = null;
+    private static Map<String, Map<String, IWSClient>> wsClientData = null;
 
     private static final String DEF_DIR_NAME = "definition" + "/v2";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
@@ -98,7 +101,12 @@ public class ConfigTools {
                         wsClients.put(methodOwner, new HashMap<>());
                     }
                 }
-
+                methodOwners = item.getInterfaces();
+                for (final String methodOwner : methodOwners) {
+                    if (!wsClients.containsKey(methodOwner)) {
+                        wsClients.put(methodOwner, new HashMap<>());
+                    }
+                }
                 for (final HttpMethodExt httpMethodType : item.getRequest().keySet()) {
                     for (final WSClientMethodConfig currentMethod : item.getRequest()
                             .get(httpMethodType)) {
@@ -141,35 +149,46 @@ public class ConfigTools {
             final Map<String, ArgConfig> argDefinitions) throws Exception {
         if (wsClientDataConfigs != null) {
             for (final WSClientDataConfig item : wsClientDataConfigs) {
-                final Set<String> methodOwners = item.getClassNames();
+                //load all classes
+                Set<String> methodOwners = item.getClasses();
                 for (final String methodOwner : methodOwners) {
                     if (!wsClientData.containsKey(methodOwner)) {
                         wsClientData.put(methodOwner, new HashMap<>());
                     }
                 }
-                for (final WSClientMethodConfig currentMethod : item.getMethods()) {
-                    final Set<Set<ArgConfig>> argConfig = new HashSet<>();
-                    for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+                //load all interfaces
+                methodOwners = item.getInterfaces();
+                for (final String methodOwner : methodOwners) {
+                    if (!wsClientData.containsKey(methodOwner)) {
+                        wsClientData.put(methodOwner, new HashMap<>());
+                    }
+                }
+                final Map<SettingsType, Set<WSClientMethodConfig>> settings = item.getSettings();
+                for (final SettingsType settingsKey : settings.keySet()) {
+                    final Set<WSClientMethodConfig> settingsScope = settings.get(settingsKey);
+                    for (final WSClientMethodConfig methodConfig : settingsScope) {
+                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
+                        for (final Set<String> argReferences : methodConfig.getArgsReferences()) {
 
-                        final Set<ArgConfig> args = new HashSet<>();
-                        argConfig.add(args);
-                        for (final String argReference : argReferences) {
-                            if (argDefinitions.containsKey(argReference)) {
-                                args.add(argDefinitions.get(argReference));
-                            } else {
-                                throw new Exception(
-                                        "Arg reference of " + argReference + " not found");
+                            final Set<ArgConfig> args = new HashSet<>();
+                            argConfig.add(args);
+                            for (final String argReference : argReferences) {
+                                if (argDefinitions.containsKey(argReference)) {
+                                    args.add(argDefinitions.get(argReference));
+                                } else {
+                                    throw new Exception(
+                                            "Arg reference of " + argReference + " not found");
+                                }
+                            }
+                        }
+                        SettingsMethod settingsMethod = new SettingsMethod(settingsKey, argConfig);
+                        for (final String methodName : methodConfig.getNames()) {
+                            for (final String methodOwner : methodOwners) {
+                                wsClientData.get(methodOwner).put(methodName, settingsMethod);
                             }
                         }
                     }
-                    for (final String name : currentMethod.getNames()) {
-                        final WSClient client = new WSClient(name, null, argConfig);
-                        for (final String methodOwner : methodOwners) {
-                            wsClientData.get(methodOwner).put(name, client);
-                        }
-                    }
                 }
-
             }
         }
     }
@@ -281,7 +300,7 @@ public class ConfigTools {
      * 
      * @return WS clients
      */
-    public static Map<String, Map<String, WSClient>> getWSClientConfigs() {
+    public static Map<String, Map<String, IWSClient>> getWSClients() {
         if (wsClients == null) {
             initStructures();
             loadDefinitions();
@@ -293,7 +312,7 @@ public class ConfigTools {
      * 
      * @return Data containers for WS clients
      */
-    public static Map<String, Map<String, WSClient>> wsClientData() {
+    public static Map<String, Map<String, IWSClient>> getWSClientDataContainers() {
         if (wsClientData == null) {
             initStructures();
             loadDefinitions();
@@ -305,7 +324,7 @@ public class ConfigTools {
      * 
      * @return Definition of enums
      */
-    public static Map<String, Map<String, RequestParam>> getEnumConfigs() {
+    public static Map<String, Map<String, RequestParam>> getRequestParams() {
         if (requestParams == null) {
             initStructures();
             loadDefinitions();
@@ -315,7 +334,7 @@ public class ConfigTools {
 
 
     public static void main(final String[] args) {
-        getWSClientConfigs();
+        getWSClients();
         System.out.println("TEST");
     }
 

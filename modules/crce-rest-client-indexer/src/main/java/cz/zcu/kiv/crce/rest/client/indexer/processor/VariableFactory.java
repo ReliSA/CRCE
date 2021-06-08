@@ -223,7 +223,7 @@ public class VariableFactory {
     } */
 
     private static final Map<String, Map<String, WSClient>> wsClientData =
-            ConfigTools.wsClientData();
+            ConfigTools.getWSClientDataContainers();
 
     private static WSClient getWSClientMethod(String methodOwner, String methodName) {
         return wsClientData.get(methodOwner).get(methodName);
