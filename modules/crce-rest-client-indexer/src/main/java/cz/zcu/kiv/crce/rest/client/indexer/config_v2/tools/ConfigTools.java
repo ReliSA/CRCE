@@ -17,6 +17,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamFieldType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientMethodConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestParam;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsType;
@@ -95,7 +96,7 @@ public class ConfigTools {
             final Map<String, ArgConfig> argDefinitions) throws Exception {
         if (wsClientConfigs != null) {
             for (final WSClientConfig item : wsClientConfigs) {
-                final Set<String> methodOwners = item.getClassNames();
+                Set<String> methodOwners = item.getClassNames();
                 for (final String methodOwner : methodOwners) {
                     if (!wsClients.containsKey(methodOwner)) {
                         wsClients.put(methodOwner, new HashMap<>());
@@ -107,23 +108,18 @@ public class ConfigTools {
                         wsClients.put(methodOwner, new HashMap<>());
                     }
                 }
+                final Map<SettingsType, Set<WSClientMethodConfig>> settings = item.getSettings();
+                setSettingsMethod(settings, argDefinitions, methodOwners, wsClientData);
                 for (final HttpMethodExt httpMethodType : item.getRequest().keySet()) {
                     for (final WSClientMethodConfig currentMethod : item.getRequest()
                             .get(httpMethodType)) {
-                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
-                        for (final Set<String> argReferences : currentMethod.getArgsReferences()) {
+                        final Set<Set<ArgConfig>> argConfig =
+                                loadArgs(currentMethod.getArgsReferences(), argDefinitions);
+                        final Set<Set<ArgConfig>> varArgConfig =
+                                loadArgs(currentMethod.getVarArgsReferences(), argDefinitions);
+                        RequestMethod settingsMethod = new RequestMethod(currentMethod.getReturns(),
+                                httpMethodType, argConfig, varArgConfig);
 
-                            final Set<ArgConfig> args = new HashSet<>();
-                            argConfig.add(args);
-                            for (final String argReference : argReferences) {
-                                if (argDefinitions.containsKey(argReference)) {
-                                    args.add(argDefinitions.get(argReference));
-                                } else {
-                                    throw new Exception(
-                                            "Arg reference of " + argReference + " not found");
-                                }
-                            }
-                        }
                         for (final String name : currentMethod.getNames()) {
                             final WSClient client = new WSClient(name,
                                     httpMethodExtToHttpMethod(httpMethodType), argConfig);
@@ -137,6 +133,47 @@ public class ConfigTools {
         }
     }
 
+
+    private static void setSettingsMethod(Map<SettingsType, Set<WSClientMethodConfig>> settings,
+            final Map<String, ArgConfig> argDefinitions, Set<String> methodOwners,
+            Map<String, Map<String, IWSClient>> data) throws Exception {
+        for (final SettingsType settingsKey : settings.keySet()) {
+            final Set<WSClientMethodConfig> settingsScope = settings.get(settingsKey);
+            for (final WSClientMethodConfig methodConfig : settingsScope) {
+                final Set<Set<ArgConfig>> argConfig =
+                        loadArgs(methodConfig.getArgsReferences(), argDefinitions);
+
+                final Set<Set<ArgConfig>> varArgConfig =
+                        loadArgs(methodConfig.getVarArgsReferences(), argDefinitions);
+                SettingsMethod settingsMethod = new SettingsMethod(methodConfig.getReturns(),
+                        settingsKey, argConfig, varArgConfig);
+                for (final String methodName : methodConfig.getNames()) {
+                    for (final String methodOwner : methodOwners) {
+                        data.get(methodOwner).put(methodName, settingsMethod);
+                    }
+                }
+            }
+        }
+    }
+
+    private static Set<Set<ArgConfig>> loadArgs(Set<Set<String>> argsReferences,
+            Map<String, ArgConfig> argDefinitions) throws Exception {
+
+        Set<Set<ArgConfig>> output = new HashSet<>();
+        for (final Set<String> argReferences : argsReferences) {
+
+            final Set<ArgConfig> args = new HashSet<>();
+            output.add(args);
+            for (final String argReference : argReferences) {
+                if (argDefinitions.containsKey(argReference)) {
+                    args.add(argDefinitions.get(argReference));
+                } else {
+                    throw new Exception("Arg reference of " + argReference + " not found");
+                }
+            }
+        }
+        return output;
+    }
 
     /**
      * Processes ws client configurations
@@ -164,31 +201,7 @@ public class ConfigTools {
                     }
                 }
                 final Map<SettingsType, Set<WSClientMethodConfig>> settings = item.getSettings();
-                for (final SettingsType settingsKey : settings.keySet()) {
-                    final Set<WSClientMethodConfig> settingsScope = settings.get(settingsKey);
-                    for (final WSClientMethodConfig methodConfig : settingsScope) {
-                        final Set<Set<ArgConfig>> argConfig = new HashSet<>();
-                        for (final Set<String> argReferences : methodConfig.getArgsReferences()) {
-
-                            final Set<ArgConfig> args = new HashSet<>();
-                            argConfig.add(args);
-                            for (final String argReference : argReferences) {
-                                if (argDefinitions.containsKey(argReference)) {
-                                    args.add(argDefinitions.get(argReference));
-                                } else {
-                                    throw new Exception(
-                                            "Arg reference of " + argReference + " not found");
-                                }
-                            }
-                        }
-                        SettingsMethod settingsMethod = new SettingsMethod(settingsKey, argConfig);
-                        for (final String methodName : methodConfig.getNames()) {
-                            for (final String methodOwner : methodOwners) {
-                                wsClientData.get(methodOwner).put(methodName, settingsMethod);
-                            }
-                        }
-                    }
-                }
+                setSettingsMethod(settings, argDefinitions, methodOwners, wsClientData);
             }
         }
     }

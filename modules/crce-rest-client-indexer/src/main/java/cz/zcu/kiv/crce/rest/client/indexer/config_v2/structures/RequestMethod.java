@@ -11,6 +11,22 @@ public class RequestMethod implements IWSClient {
     private Set<Set<ArgConfig>> args;
     private Set<Set<ArgConfig>> varArgs;
 
+
+    
+    /**
+     * @param returns
+     * @param innerType
+     * @param args
+     * @param varArgs
+     */
+    public RequestMethod(String returns, HttpMethodExt innerType, Set<Set<ArgConfig>> args,
+            Set<Set<ArgConfig>> varArgs) {
+        this.returns = returns;
+        this.innerType = innerType;
+        this.args = args;
+        this.varArgs = varArgs;
+    }
+
     /**
      * @return the innerType
      */

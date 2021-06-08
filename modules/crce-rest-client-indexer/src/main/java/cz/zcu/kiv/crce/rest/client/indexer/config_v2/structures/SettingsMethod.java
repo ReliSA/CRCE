@@ -10,12 +10,20 @@ public class SettingsMethod implements IWSClient {
     private Set<Set<ArgConfig>> varArgs;
     private String returns;
 
+
+
     /**
      * @param innerType
+     * @param args
+     * @param varArgs
+     * @param returns
      */
-    public SettingsMethod(SettingsType innerType, Set<Set<ArgConfig>> args) {
+    public SettingsMethod(String returns, SettingsType innerType, Set<Set<ArgConfig>> args,
+            Set<Set<ArgConfig>> varArgs) {
         this.innerType = innerType;
         this.args = args;
+        this.varArgs = varArgs;
+        this.returns = returns;
     }
 
     @Override

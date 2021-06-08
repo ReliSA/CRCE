@@ -10,8 +10,42 @@ public class WSClientMethodConfig {
     @JsonProperty("args")
     private Set<Set<String>> argsReferences;
 
+    @JsonProperty("varArgs")
+    private Set<Set<String>> varArgsReferences;
+
+    @JsonProperty("returns")
+    private String returns;
+
+    /**
+     * @return the returns
+     */
+    public String getReturns() {
+        return returns;
+    }
+
+    /**
+     * @param returns the returns to set
+     */
+    public void setReturns(String returns) {
+        this.returns = returns;
+    }
+
     public void setArgs(Set<Set<String>> argsReferences) {
         this.argsReferences = argsReferences;
+    }
+
+    /**
+     * @return the varArgsReferences
+     */
+    public Set<Set<String>> getVarArgsReferences() {
+        return varArgsReferences;
+    }
+
+    /**
+     * @param varArgsReferences the varArgsReferences to set
+     */
+    public void setVarArgs(Set<Set<String>> varArgsReferences) {
+        this.varArgsReferences = varArgsReferences;
     }
 
     /**
