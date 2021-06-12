@@ -5,10 +5,24 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 
 public class Header {
+
+    private HeaderGroup headerGroup;
     private String type;
     private String value;
 
+    /**
+     * @return the headerGroup
+     */
+    public HeaderGroup getHeaderGroup() {
+        return headerGroup;
+    }
 
+    /**
+     * @param headerGroup the headerGroup to set
+     */
+    public void setHeaderGroup(HeaderGroup headerGroup) {
+        this.headerGroup = headerGroup;
+    }
 
     /**
      * @return the name

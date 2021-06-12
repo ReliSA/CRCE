@@ -34,25 +34,125 @@ public class Endpoint implements Serializable {
     protected Set<Header> produces;
     protected Set<Header> consumes;
 
-    protected Set<Header> requestHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-5
-    protected Set<Header> responseHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-7
-    protected Set<Header> representationHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-3
-    protected Set<Header> payloadHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-3.3
 
-    
+    protected Set<Header> responseHeaders = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-7
+    protected Set<Header> controlsHeaders = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.1
+    protected Set<Header> conditionals = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.2
+    protected Set<Header> contentNegotiation = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.3
+    protected Set<Header> authenticationCredentials = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.4
+    protected Set<Header> requestContext = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.5
+
+
 
     /**
-     * @return the requestHeaders
+     * @return the controlsHeaders
      */
-    public Set<Header> getRequestHeaders() {
-        return requestHeaders;
+    public Set<Header> getControlsHeaders() {
+        return controlsHeaders;
     }
 
     /**
-     * @param requestHeaders the requestHeaders to set
+     * @param controlsHeaders the controlsHeaders to set
      */
-    public void setRequestHeaders(Set<Header> requestHeaders) {
-        this.requestHeaders = requestHeaders;
+    public void setControlsHeaders(Set<Header> controlsHeaders) {
+        this.controlsHeaders = controlsHeaders;
+    }
+
+    /**
+     * 
+     * @param header new control header
+     */
+    public void addControlsHeaders(Header header) {
+        this.controlsHeaders.add(header);
+    }
+
+
+    /**
+     * @return the conditionals
+     */
+    public Set<Header> getConditionals() {
+        return conditionals;
+    }
+
+    /**
+     * 
+     * @param header new conditional header
+     */
+    public void addConditionals(Header header) {
+        this.conditionals.add(header);
+    }
+
+    /**
+     * @param conditionals the conditionals to set
+     */
+    public void setConditionals(Set<Header> conditionals) {
+        this.conditionals = conditionals;
+    }
+
+    /**
+     * @return the contentNegotiation
+     */
+    public Set<Header> getContentNegotiation() {
+        return contentNegotiation;
+    }
+
+    /**
+     * 
+     * @param header new content negotiation
+     */
+    public void addContentNegotiation(Header header) {
+        this.contentNegotiation.add(header);
+    }
+
+    /**
+     * @param contentNegotiation the contentNegotiation to set
+     */
+    public void setContentNegotiation(Set<Header> contentNegotiation) {
+        this.contentNegotiation = contentNegotiation;
+    }
+
+    /**
+     * @return the authenticationCredentials
+     */
+    public Set<Header> getAuthenticationCredentials() {
+        return authenticationCredentials;
+    }
+
+    /**
+     * 
+     * @param header new authentication credentials
+     */
+    public void addAuthenticationCredentials(Header header) {
+        this.authenticationCredentials.add(header);
+    }
+
+    /**
+     * @param authenticationCredentials the authenticationCredentials to set
+     */
+    public void setAuthenticationCredentials(Set<Header> authenticationCredentials) {
+        this.authenticationCredentials = authenticationCredentials;
+    }
+
+    /**
+     * @return the requestContext
+     */
+    public Set<Header> getRequestContext() {
+        return requestContext;
+    }
+
+    /**
+     * @param requestContext the requestContext to set
+     */
+    public void setRequestContext(Set<Header> requestContext) {
+        this.requestContext = requestContext;
+    }
+
+    /**
+     * 
+     * @param header new request context header
+     */
+    public void addRequestContext(Header header) {
+        this.requestContext.add(header);
     }
 
     /**
@@ -67,34 +167,6 @@ public class Endpoint implements Serializable {
      */
     public void setResponseHeaders(Set<Header> responseHeaders) {
         this.responseHeaders = responseHeaders;
-    }
-
-    /**
-     * @return the representationHeaders
-     */
-    public Set<Header> getRepresentationHeaders() {
-        return representationHeaders;
-    }
-
-    /**
-     * @param representationHeaders the representationHeaders to set
-     */
-    public void setRepresentationHeaders(Set<Header> representationHeaders) {
-        this.representationHeaders = representationHeaders;
-    }
-
-    /**
-     * @return the payloadHeaders
-     */
-    public Set<Header> getPayloadHeaders() {
-        return payloadHeaders;
-    }
-
-    /**
-     * @param payloadHeaders the payloadHeaders to set
-     */
-    public void setPayloadHeaders(Set<Header> payloadHeaders) {
-        this.payloadHeaders = payloadHeaders;
     }
 
     public Endpoint(Endpoint endpoint) {

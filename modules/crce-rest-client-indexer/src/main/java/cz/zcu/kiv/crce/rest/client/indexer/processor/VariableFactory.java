@@ -15,12 +15,12 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.HeaderGroup;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClientType;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.MethodArg;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VarArray;
@@ -179,6 +179,7 @@ public class VariableFactory {
             Endpoint endpointData) {
         if (argType.ordinal() <= MethodArgType.ACCEPT_RANGES.ordinal()) {
             Header header = new Header(argType.name(), argValue);
+            HeaderType.valueOf(arg0)
             endpointData.addConsumes(header);
 
         } else if (argType.ordinal() >= MethodArgType.CONTENT_ENCODING.ordinal()
@@ -262,7 +263,6 @@ public class VariableFactory {
             }
                 break;
             case SET_COOKIE:
-            case SET_COOKIE2:
             case COOKIE: {
                 endpointData.addParameter(new EndpointParameter(
                         key, data.getVar().getDescription(), BytecodeDescriptorsProcessor
@@ -320,10 +320,23 @@ public class VariableFactory {
         }
         //add processed headers to endpointData
         for (final Header header : headers) {
-            if (HeaderTools.isConsumingType(header)) {
-                endpointData.addConsumes(header);
-            } else {
-                endpointData.addProduces(header);
+            switch (header.getHeaderGroup()) {
+                case CONTROL:
+                    endpointData.addControlsHeaders(header);
+                    break;
+                case AUTHENTICATION_CREDENTIALS:
+                    endpointData.addAuthenticationCredentials(header);
+                    break;
+                case CONDITIONAL:
+                    endpointData.addConditionals(header);
+                    break;
+                case CONTENT_NEGOTIATION:
+                    endpointData.addContentNegotiation(header);
+                    break;
+                case REQUEST_CONTEXT:
+                    endpointData.addRequestContext(header);
+                    break;
+                default:;
             }
         }
 

@@ -22,54 +22,43 @@ public enum MethodArgType {
                         "Access-Control-Request-Method"), ACCESS_CONTROL_REQUEST_HEADERS(
                                         "Access-Control-Request-Headers"), AUTHORIZATION(
                                                         "Authorization"), //
-        , COOKIE("Cookie"), EXPECT("Expect"), //
+        COOKIE("Cookie"), EXPECT("Expect"), //
         FORWARDED("Forwarded"), FROM("From"), HOST("Host"), //
         IF_MATCH("If-Match"), IF_MODIFIED_SINCE("If-Modified-Since"), IF_NONE_MATCH(
                         "If-None-Match"), //
         IF_RANGE("If-Range"), IF_UNMODIFIED_SINCE("If-Unmodified-Since"), MAX_FORWARDS(
                         "Max-Forwards"), //
-        ORIGIN("Origin"), PRAGMA("Pragma"), PROXY_AUTHORIZATION("Proxy-Authorization"), //
+        ORIGIN("Origin"), PROXY_AUTHORIZATION("Proxy-Authorization"), //
         RANGE("Range"), REFERER("Referer"), TE("TE"), USER_AGENT("User-Agent"), //
-        UPGRADE("Upgrade"), VIA("Via"),
+        CONNECTION("Connection"), CONTENT_LENGTH("Content-Length"), CONTENT_TYPE(
+                        "Content-Type"), DATE("Date"), PRAGMA("Pragma"), UPGRADE(
+                                        "Upgrade"), VIA("Via"), CACHE_CONTROL("Cache-Control"),
 
         //RESPONSE HEADERS
-        ACCEPT_PATCH("Accept-Patch"),
-        ACCEPT_RANGES("Accept-Ranges"),
-        AGE("Age"),
-        ALLOW("Allow"),
-        ALT_SVC("Alt-Svc"),
-        CACHE_CONTROL("Cache-Control"),
-        CONTENT_DISPOSITION("Content-Disposition"),
-        CONTENT_ENCODING("Content-Encoding"),
-        CONTENT_LANGUAGE("Content-Language"),
-        CONTENT_LOCATION("Content-Location"),
-        CONTENT_RANGE("Content-Range"),
-        DELTA_BASE("Delta-Base"),
-        ETAG("ETag"),
-        EXPIRES("Expires"),
-        IM("IM"),
-        LAST_MODIFIED("Last-Modified"),
-        LINK("Link"),
-        LOCATION("Location"),
-        PRAGMA("Pragma"),
-        PROXY_AUTHENTICATE("Proxy-Authenticate"),
-        PUBLIC_KEY_PINS("Public-Key-Pins"),
-        RETRY_AFTER("Retry-After"),
-        SERVER("Server"),
-        SET_COOKIE("Set-Cookie"),
-        STRICT_TRANSPORT_SECURITY("Strict-Transport-Security"),
-        TRAILER("Trailer"),
-        TRANSFER_ENCODING("Transfer-Encoding"),
-        TK("Tk"),
-        UPGRADE("Upgrade"),
-        VARY("Vary"),
-        VIA("Via"),
-        WARNING("Warning"),
-        WWW_AUTHENTICATE("WWW-Authenticate"),
-
-        //REQUEST OR RESPONSE -> generic ()
-        CONNECTION("Connection"), CONTENT_LENGTH("Content-Length"), CONTENT_TYPE(
-                        "Content-Type"),DATE("Date");
+        ACCEPT_PATCH("Accept-Patch"), ACCEPT_RANGES("Accept-Ranges"), AGE("Age"), ALLOW(
+                        "Allow"), ALT_SVC("Alt-Svc"), CONTENT_DISPOSITION(
+                                        "Content-Disposition"), CONTENT_ENCODING(
+                                                        "Content-Encoding"), CONTENT_LANGUAGE(
+                                                                        "Content-Language"), CONTENT_LOCATION(
+                                                                                        "Content-Location"), CONTENT_RANGE(
+                                                                                                        "Content-Range"), DELTA_BASE(
+                                                                                                                        "Delta-Base"), ETAG(
+                                                                                                                                        "ETag"), EXPIRES(
+                                                                                                                                                        "Expires"), IM("IM"), LAST_MODIFIED(
+                                                                                                                                                                        "Last-Modified"), LINK(
+                                                                                                                                                                                        "Link"), LOCATION(
+                                                                                                                                                                                                        "Location"), PROXY_AUTHENTICATE(
+                                                                                                                                                                                                                        "Proxy-Authenticate"), PUBLIC_KEY_PINS(
+                                                                                                                                                                                                                                        "Public-Key-Pins"), RETRY_AFTER(
+                                                                                                                                                                                                                                                        "Retry-After"), SERVER(
+                                                                                                                                                                                                                                                                        "Server"), SET_COOKIE(
+                                                                                                                                                                                                                                                                                        "Set-Cookie"), STRICT_TRANSPORT_SECURITY(
+                                                                                                                                                                                                                                                                                                        "Strict-Transport-Security"), TRAILER(
+                                                                                                                                                                                                                                                                                                                        "Trailer"), TRANSFER_ENCODING(
+                                                                                                                                                                                                                                                                                                                                        "Transfer-Encoding"), TK(
+                                                                                                                                                                                                                                                                                                                                                        "Tk"), VARY("Vary"), WARNING(
+                                                                                                                                                                                                                                                                                                                                                                        "Warning"), WWW_AUTHENTICATE(
+                                                                                                                                                                                                                                                                                                                                                                                        "WWW-Authenticate");
 
         private String methodArgType;
 
