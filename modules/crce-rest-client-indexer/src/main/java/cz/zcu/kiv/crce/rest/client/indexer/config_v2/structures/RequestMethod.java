@@ -6,20 +6,20 @@ import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
 
 public class RequestMethod implements IWSClient {
 
-    private String returns;
+    private ArgConfig returns;
     private HttpMethodExt innerType;
     private Set<Set<ArgConfig>> args;
     private Set<Set<ArgConfig>> varArgs;
 
 
-    
+
     /**
      * @param returns
      * @param innerType
      * @param args
      * @param varArgs
      */
-    public RequestMethod(String returns, HttpMethodExt innerType, Set<Set<ArgConfig>> args,
+    public RequestMethod(ArgConfig returns, HttpMethodExt innerType, Set<Set<ArgConfig>> args,
             Set<Set<ArgConfig>> varArgs) {
         this.returns = returns;
         this.innerType = innerType;
@@ -50,7 +50,7 @@ public class RequestMethod implements IWSClient {
     }
 
     @Override
-    public String getReturns() {
+    public ArgConfig getReturns() {
         return returns;
     }
 

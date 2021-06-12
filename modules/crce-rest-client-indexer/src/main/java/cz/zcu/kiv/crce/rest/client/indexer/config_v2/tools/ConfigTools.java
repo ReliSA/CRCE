@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.Config;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.WSClientConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamFieldType;
@@ -20,7 +21,6 @@ import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestParam;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsMethod;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.SettingsType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
@@ -37,11 +37,11 @@ public class ConfigTools {
 
     private static final String DEF_DIR_NAME = "definition" + "/v2";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
-    private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "new_version.yml");
     private static final String DEF_DIR_REL = DEF_DIR_NAME + "/";
+    private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "new_version.yml");
     private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
-    private static HttpMethod httpMethodExtToHttpMethod(HttpMethodExt httpMethodExt) {
+    private static HttpMethod httpMethodExtToHttpMethod(final HttpMethodExt httpMethodExt) {
         if (httpMethodExt.ordinal() > (HttpMethod.values().length - 1)) {
             return null;
         }
@@ -96,48 +96,71 @@ public class ConfigTools {
             final Map<String, ArgConfig> argDefinitions) throws Exception {
         if (wsClientConfigs != null) {
             for (final WSClientConfig item : wsClientConfigs) {
-                Set<String> methodOwners = item.getClassNames();
-                for (final String methodOwner : methodOwners) {
-                    if (!wsClients.containsKey(methodOwner)) {
-                        wsClients.put(methodOwner, new HashMap<>());
-                    }
-                }
-                methodOwners = item.getInterfaces();
-                for (final String methodOwner : methodOwners) {
-                    if (!wsClients.containsKey(methodOwner)) {
-                        wsClients.put(methodOwner, new HashMap<>());
-                    }
-                }
-                final Map<SettingsType, Set<WSClientMethodConfig>> settings = item.getSettings();
-                setSettingsMethod(settings, argDefinitions, methodOwners, wsClientData);
-                for (final HttpMethodExt httpMethodType : item.getRequest().keySet()) {
-                    for (final WSClientMethodConfig currentMethod : item.getRequest()
-                            .get(httpMethodType)) {
-                        final Set<Set<ArgConfig>> argConfig =
-                                loadArgs(currentMethod.getArgsReferences(), argDefinitions);
-                        final Set<Set<ArgConfig>> varArgConfig =
-                                loadArgs(currentMethod.getVarArgsReferences(), argDefinitions);
-                        RequestMethod settingsMethod = new RequestMethod(currentMethod.getReturns(),
-                                httpMethodType, argConfig, varArgConfig);
-
-                        for (final String name : currentMethod.getNames()) {
-                            final WSClient client = new WSClient(name,
-                                    httpMethodExtToHttpMethod(httpMethodType), argConfig);
-                            for (final String methodOwner : methodOwners) {
-                                wsClients.get(methodOwner).put(client.getName(), client);
-                            }
-                        }
-                    }
-                }
+                Set<String> methodOwners = loadClasses(item.getClassNames(), item.getInterfaces(),
+                        item.getInherits(), wsClients);
+                setSettingsMethod(item.getSettings(), argDefinitions, methodOwners, wsClients);
+                setRequestMethod(item.getRequest(), argDefinitions, methodOwners, wsClients);
             }
         }
     }
 
+    /**
+    * Processes ws client configurations
+    * @param wsClientConfigs ws client data configurations
+    * @param argDefinitions definitions of arguments for client methods
+    * @throws Exception
+    */
+    private static void processWSClientDataConfigurations(
+            final Set<WSClientDataConfig> wsClientDataConfigs,
+            final Map<String, ArgConfig> argDefinitions) throws Exception {
+        if (wsClientDataConfigs != null) {
+            for (final WSClientDataConfig item : wsClientDataConfigs) {
+                //load all classes
+                Set<String> methodOwners = loadClasses(item.getClasses(), item.getInterfaces(),
+                        item.getInherits(), wsClientData);
 
-    private static void setSettingsMethod(Map<SettingsType, Set<WSClientMethodConfig>> settings,
-            final Map<String, ArgConfig> argDefinitions, Set<String> methodOwners,
-            Map<String, Map<String, IWSClient>> data) throws Exception {
-        for (final SettingsType settingsKey : settings.keySet()) {
+                setSettingsMethod(item.getSettings(), argDefinitions, methodOwners, wsClientData);
+            }
+        }
+    }
+
+    /**
+     * Takes classnames and interfaces for creation of record in data variable.
+     * Inherits methods and arg definitions from classnames and interfaces  
+     * @param classes Class names
+     * @param interfaces Interfaces
+     * @param inherits Classes or interfaces from which records inherits
+     * @param data Map of configuration methods and classes or interfaces
+     * @return Merged classes and interfaces
+     * @throws Exception
+     */
+    private static Set<String> loadClasses(Set<String> classes, Set<String> interfaces,
+            Set<String> inherits, Map<String, Map<String, IWSClient>> data) throws Exception {
+        Set<String> methodOwners = classes;
+        methodOwners.addAll(interfaces);
+
+        for (final String methodOwner : methodOwners) {
+            if (!data.containsKey(methodOwner)) {
+                data.put(methodOwner, new HashMap<>());
+            }
+            inherit(methodOwner, inherits, data);
+        }
+        return methodOwners;
+    }
+
+    /**
+     * Takes settings methods from WSClient or WSClientData
+     * @param settings Settings classes
+     * @param argDefinitions Arg definitions (type, classes or interfaces)
+     * @param methodOwners Owners(classes or interfaces) of method
+     * @param data Map which will hold the settings method
+     * @throws Exception
+     */
+    private static void setSettingsMethod(
+            final Map<MethodArgType, Set<WSClientMethodConfig>> settings,
+            final Map<String, ArgConfig> argDefinitions, final Set<String> methodOwners,
+            final Map<String, Map<String, IWSClient>> data) throws Exception {
+        for (final MethodArgType settingsKey : settings.keySet()) {
             final Set<WSClientMethodConfig> settingsScope = settings.get(settingsKey);
             for (final WSClientMethodConfig methodConfig : settingsScope) {
                 final Set<Set<ArgConfig>> argConfig =
@@ -145,21 +168,95 @@ public class ConfigTools {
 
                 final Set<Set<ArgConfig>> varArgConfig =
                         loadArgs(methodConfig.getVarArgsReferences(), argDefinitions);
-                SettingsMethod settingsMethod = new SettingsMethod(methodConfig.getReturns(),
-                        settingsKey, argConfig, varArgConfig);
+                final SettingsMethod settingsMethod =
+                        new SettingsMethod(argDefinitions.get(methodConfig.getReturns()),
+                                settingsKey, argConfig, varArgConfig);
+
                 for (final String methodName : methodConfig.getNames()) {
                     for (final String methodOwner : methodOwners) {
                         data.get(methodOwner).put(methodName, settingsMethod);
                     }
                 }
+
             }
         }
     }
 
-    private static Set<Set<ArgConfig>> loadArgs(Set<Set<String>> argsReferences,
-            Map<String, ArgConfig> argDefinitions) throws Exception {
+    /**
+     * 
+     * @param request
+     * @param argDefinitions
+     * @param methodOwners
+     * @param data
+     * @throws Exception
+     */
+    private static void setRequestMethod(
+            final Map<HttpMethodExt, Set<WSClientMethodConfig>> request,
+            final Map<String, ArgConfig> argDefinitions, final Set<String> methodOwners,
+            final Map<String, Map<String, IWSClient>> data) throws Exception {
+        for (final HttpMethodExt httpMethodType : request.keySet()) {
+            for (final WSClientMethodConfig currentMethod : request.get(httpMethodType)) {
+                final Set<Set<ArgConfig>> argConfig =
+                        loadArgs(currentMethod.getArgsReferences(), argDefinitions);
+                final Set<Set<ArgConfig>> varArgConfig =
+                        loadArgs(currentMethod.getVarArgsReferences(), argDefinitions);
+                final RequestMethod settingsMethod =
+                        new RequestMethod(argDefinitions.get(currentMethod.getReturns()),
+                                httpMethodType, argConfig, varArgConfig);
 
-        Set<Set<ArgConfig>> output = new HashSet<>();
+                for (final String name : currentMethod.getNames()) {
+                    final WSClient client = new WSClient(name,
+                            httpMethodExtToHttpMethod(httpMethodType), argConfig);
+
+                    for (final String methodOwner : methodOwners) {
+                        wsClients.get(methodOwner).put(client.getName(), settingsMethod);
+                    }
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Takes data from records defined by var inheritsFrom and put it to record based on classOrInterfName
+     * @param classOrInterfName Base class or interface
+     * @param inheritsFrom From which base inherits configurations
+     * @param data Map for storage of configurations
+     * @throws Exception
+     */
+    private static void inherit(String classOrInterfName, Set<String> inheritsFrom,
+            Map<String, Map<String, IWSClient>> data) throws Exception {
+        Map<String, IWSClient> classOrInterf = data.get(classOrInterfName);
+        if (classOrInterf == null) {
+            throw new Exception("Class or interface " + classOrInterfName + " not found");
+        }
+        for (final String item : inheritsFrom) {
+            if (!data.containsKey(item)) {
+                throw new Exception("Cannot inherit from class/interface " + item
+                        + " not found inside conf file");
+            }
+            final Map<String, IWSClient> foundClass = data.get(item);
+            for (final String methodName : foundClass.keySet()) {
+                classOrInterf.putIfAbsent(methodName, foundClass.get(methodName));
+            }
+        }
+
+    }
+
+    /**
+     * Links argument references with their definitions
+     * @param argsReferences Argument references
+     * @param argDefinitions Argument definitions
+     * @return
+     * @throws Exception
+     */
+    private static Set<Set<ArgConfig>> loadArgs(final Set<Set<String>> argsReferences,
+            final Map<String, ArgConfig> argDefinitions) throws Exception {
+
+        final Set<Set<ArgConfig>> output = new HashSet<>();
+        if (argsReferences == null) {
+            return output;
+        }
         for (final Set<String> argReferences : argsReferences) {
 
             final Set<ArgConfig> args = new HashSet<>();
@@ -175,36 +272,6 @@ public class ConfigTools {
         return output;
     }
 
-    /**
-     * Processes ws client configurations
-     * @param wsClientConfigs ws client data configurations
-     * @param argDefinitions definitions of arguments for client methods
-     * @throws Exception
-     */
-    private static void processWSClientDataConfigurations(
-            final Set<WSClientDataConfig> wsClientDataConfigs,
-            final Map<String, ArgConfig> argDefinitions) throws Exception {
-        if (wsClientDataConfigs != null) {
-            for (final WSClientDataConfig item : wsClientDataConfigs) {
-                //load all classes
-                Set<String> methodOwners = item.getClasses();
-                for (final String methodOwner : methodOwners) {
-                    if (!wsClientData.containsKey(methodOwner)) {
-                        wsClientData.put(methodOwner, new HashMap<>());
-                    }
-                }
-                //load all interfaces
-                methodOwners = item.getInterfaces();
-                for (final String methodOwner : methodOwners) {
-                    if (!wsClientData.containsKey(methodOwner)) {
-                        wsClientData.put(methodOwner, new HashMap<>());
-                    }
-                }
-                final Map<SettingsType, Set<WSClientMethodConfig>> settings = item.getSettings();
-                setSettingsMethod(settings, argDefinitions, methodOwners, wsClientData);
-            }
-        }
-    }
 
     /**
      * Processes class which contains prameters in its fields for requests (header types, http types etc.)
@@ -348,7 +415,6 @@ public class ConfigTools {
 
     public static void main(final String[] args) {
         getWSClients();
-        System.out.println("TEST");
     }
 
 }

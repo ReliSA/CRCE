@@ -31,7 +31,8 @@ argDefinitions:
       - org.springframework.http.HttpEntity
   requestObjectAny:
     type: REQUEST_BODY
-    classes: java.lang.String
+    classes:
+      - java.lang.String
   headersParam:
     type: HEADER
     interfaces:
@@ -85,8 +86,6 @@ wsClientData:
           returns: headersParam
   - classes:
       - org.springframework.util.MultiValueMap
-    inherits:
-      - java.lang.Map
     settings:
       GENERIC:
         - names:

@@ -24,11 +24,11 @@ argDefinitions:
     interfaces:
       - java.util.Map
   uriVariableKey:
-    type: URI_VARIABLE_KEY
+    type: KEY
     classes:
       - java.lang.String
   uriVariableValue:
-    type: URI_VARIABLE_VALUE
+    type: VALUE
     classes:
       - java.lang.String
   uriVariableSkip:
@@ -125,7 +125,8 @@ wsClient:
             - method
           args:
             - - httpMethod
-  - interfaces: org.springframework.web.reactive.function.client.WebClient$UriSpec
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
     request:
       GENERIC:
         - names:
@@ -140,7 +141,8 @@ wsClient:
           varArgs:
             - - uriFunction
               - uriVariableVarArg
-  - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
     settings:
       GENERIC:
         - names:
@@ -163,7 +165,8 @@ wsClient:
           args:
             - - contentType
 
-  - interfaces: org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
     settings:
       GENERIC:
         - names:
@@ -174,12 +177,6 @@ wsClient:
             - acceptCharset
           varArgs:
             - - acceptCharset
-        - names:
-            - attribute
-          args:
-            - - uriVariableKey
-              - uriVariableValue
-            - - uriVariableSkip
         - names:
             - ifNoneMatch
           varArgs:
@@ -196,19 +193,16 @@ wsClient:
           varArgs:
             - - headerKey
               - headerValue
+      URI_VARIABLE:
+        - names:
+            - attribute
+          args:
+            - - uriVariableKey
+              - uriVariableValue
+            - - uriVariableSkip
 
-  - interface: org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-    inherits:
-      - org.springframework.web.reactive.function.client.WebClient$UriSpec
-      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
-      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
-
-  - interface: org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
-    inherits:
-      - org.springframework.web.reactive.function.client.WebClient$UriSpec
-      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
-
-  - class: org.springframework.web.reactive.function.client.WebClient$ResponseSpec
+  - classes:
+      - org.springframework.web.reactive.function.client.WebClient$ResponseSpec
     settings:
       GENERIC:
         - names:
@@ -223,7 +217,8 @@ wsClient:
           args:
             - - responseTypeClass
           expectArray: true
-  - interface: org.springframework.web.reactive.function.client.WebClient$Builder
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$Builder
     settings:
       GENERIC:
         - names:
@@ -245,3 +240,16 @@ wsClient:
           varArgs:
             - - cookieName
               - cookieValue
+
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec

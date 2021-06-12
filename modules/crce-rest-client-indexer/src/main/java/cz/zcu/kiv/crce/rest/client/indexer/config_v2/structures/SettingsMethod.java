@@ -2,13 +2,14 @@ package cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures;
 
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 
 public class SettingsMethod implements IWSClient {
 
-    private SettingsType innerType;
+    private MethodArgType innerType;
     private Set<Set<ArgConfig>> args;
     private Set<Set<ArgConfig>> varArgs;
-    private String returns;
+    private ArgConfig returns;
 
 
 
@@ -18,7 +19,7 @@ public class SettingsMethod implements IWSClient {
      * @param varArgs
      * @param returns
      */
-    public SettingsMethod(String returns, SettingsType innerType, Set<Set<ArgConfig>> args,
+    public SettingsMethod(ArgConfig returns, MethodArgType innerType, Set<Set<ArgConfig>> args,
             Set<Set<ArgConfig>> varArgs) {
         this.innerType = innerType;
         this.args = args;
@@ -32,7 +33,7 @@ public class SettingsMethod implements IWSClient {
     }
 
     @Override
-    public SettingsType getInnerType() {
+    public MethodArgType getInnerType() {
         return innerType;
     }
 
@@ -47,7 +48,7 @@ public class SettingsMethod implements IWSClient {
     }
 
     @Override
-    public String getReturns() {
+    public ArgConfig getReturns() {
         return returns;
     }
 

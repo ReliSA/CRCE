@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 public class Variable {
 
     public enum VariableType {
-        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINT_DATA, WS_CLIENT_DATA
+        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINT_DATA, WS_CLIENT_DATA, MAP
     }
 
     private Object value = "";
@@ -132,5 +132,4 @@ public class Variable {
     public void add(Variable var) {
         this.value = value.toString() + var.toString();
     }
-
 }

@@ -12,5 +12,5 @@ public interface IWSClient {
 
     Set<Set<ArgConfig>> getVarArgs();
 
-    String getReturns();
+    ArgConfig getReturns();
 }

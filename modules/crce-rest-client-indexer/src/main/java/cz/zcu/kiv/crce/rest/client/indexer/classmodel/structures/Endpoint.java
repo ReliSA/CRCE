@@ -34,6 +34,68 @@ public class Endpoint implements Serializable {
     protected Set<Header> produces;
     protected Set<Header> consumes;
 
+    protected Set<Header> requestHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-5
+    protected Set<Header> responseHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-7
+    protected Set<Header> representationHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-3
+    protected Set<Header> payloadHeaders; //https://datatracker.ietf.org/doc/html/rfc7231#section-3.3
+
+    
+
+    /**
+     * @return the requestHeaders
+     */
+    public Set<Header> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    /**
+     * @param requestHeaders the requestHeaders to set
+     */
+    public void setRequestHeaders(Set<Header> requestHeaders) {
+        this.requestHeaders = requestHeaders;
+    }
+
+    /**
+     * @return the responseHeaders
+     */
+    public Set<Header> getResponseHeaders() {
+        return responseHeaders;
+    }
+
+    /**
+     * @param responseHeaders the responseHeaders to set
+     */
+    public void setResponseHeaders(Set<Header> responseHeaders) {
+        this.responseHeaders = responseHeaders;
+    }
+
+    /**
+     * @return the representationHeaders
+     */
+    public Set<Header> getRepresentationHeaders() {
+        return representationHeaders;
+    }
+
+    /**
+     * @param representationHeaders the representationHeaders to set
+     */
+    public void setRepresentationHeaders(Set<Header> representationHeaders) {
+        this.representationHeaders = representationHeaders;
+    }
+
+    /**
+     * @return the payloadHeaders
+     */
+    public Set<Header> getPayloadHeaders() {
+        return payloadHeaders;
+    }
+
+    /**
+     * @param payloadHeaders the payloadHeaders to set
+     */
+    public void setPayloadHeaders(Set<Header> payloadHeaders) {
+        this.payloadHeaders = payloadHeaders;
+    }
 
     public Endpoint(Endpoint endpoint) {
         this();
@@ -386,7 +448,6 @@ public class Endpoint implements Serializable {
                 try {
                     url = new URL(path);
                     this.path = url.getFile();
-
                     this.baseUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
                 } catch (MalformedURLException e) {
                     logger.error("Wrong type of Path =" + path);

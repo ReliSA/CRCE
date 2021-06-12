@@ -3,14 +3,31 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 
 public class MethodArg extends ArgConfig {
-    private Object value;
+    private Variable var;
+    private boolean isarray;
 
-    public void setValue(Object val) {
-        this.value = val;
+
+
+    /**
+     * @return the var
+     */
+    public Variable getVar() {
+        return var;
     }
 
-    public Object getValue() {
-        return this.value;
+    /**
+     * @param var the var to set
+     */
+    public void setVar(Variable var) {
+        this.var = var;
+    }
+
+    public boolean isArray() {
+        return isarray;
+    }
+
+    public void setIsArray(boolean isarray) {
+        this.isarray = isarray;
     }
 
     public void setDataFromArgConfig(ArgConfig argConfig) {

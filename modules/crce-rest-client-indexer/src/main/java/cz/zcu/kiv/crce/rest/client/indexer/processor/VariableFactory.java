@@ -1,19 +1,25 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClient;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.WSClientType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.MethodArg;
@@ -22,58 +28,46 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodType;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 
 public class VariableFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(VariableFactory.class);
 
     /**
-    * Stringifies variable
-    * 
-    * @param var Variable
-    * @return Stringified variable
-    */
-    private static String getStringValueVar(Variable var) {
-        String val = var.getValue() != null ? var.getValue().toString() : null;
-        if (val == null || val.length() == 0) {
-            return var.getDescription();
+     * Converts varArray into String list
+     * @param varArray
+     * @return
+     */
+    private static List<String> varArrayToStringList(VarArray varArray) {
+        List<String> output = new LinkedList<>();
+        for (final Variable variable : varArray.getInnerArray()) {
+            output.add((String) variable.getValue());
         }
-        return val;
+        return output;
     }
 
-    //TODO: zpracovat interfaces, classes atd z nastavení args??
+    /**
+     * Process helping stack and retrieves arguments bases on method configuration
+     * @param values Helping stack
+     * @param method Configuration of method
+     * @return Extracted args from stack
+     */
     private static Map<MethodArgType, MethodArg> getArgsFromStack(Stack<Variable> values,
-            Set<Set<ArgConfig>> args) {
+            IWSClient method) {
         Map<MethodArgType, MethodArg> output = new HashMap<>();
-        if (args == null || values.isEmpty()) {
+        if (method.getArgs() == null && method.getVarArgs() == null || values.isEmpty()) {
             return output;
         }
-        for (final Set<ArgConfig> versionOfArgs : args) {
+        for (final Set<ArgConfig> versionOfArgs : method.getArgs()) {
             if (versionOfArgs.size() == values.size()) {
                 for (ArgConfig arg : versionOfArgs) {
                     final Variable var = values.pop();
-                    final Object val = var.getValue();
                     MethodArg mArg = new MethodArg();
                     if (arg.getType() == MethodArgType.UNKNOWN) {
                         continue;
                     }
-                    if (val instanceof VarArray) {
-                        VarArray arrayCasted = (VarArray) val;
-                        mArg.setValue(arrayCasted);
-                        output.put(arg.getType(), mArg);
-                    } else if (val instanceof EndpointData || val instanceof Endpoint) {
-                        mArg.setValue(val);
-                        output.put(arg.getType(), mArg);
-                    } else {
-                        mArg.setValue(getStringValueVar(var));
-                        output.put(arg.getType(), mArg);
-                    }
-
+                    mArg.setVar(var);
                 }
             }
         }
@@ -81,101 +75,247 @@ public class VariableFactory {
     }
 
     /**
-    * Checking variable for its existence and type with logging errors
-    * @param var Variable for checking
-    * @param type expected VariableType
-    * @return
-    */
-    private static boolean checkVariable(Variable var, VariableType type) {
-        if (VariableTools.isEmpty(var)) {
-            logger.error("No Variable on top of the Stack");
-            return false;
+     * Processes settings methods for request 
+     * @param argValue Argument provided to method
+     * @param headers 
+     * @param endpointData
+     */
+    private static void processSettingsArg(MethodArg argValue, Stack<Header> headers,
+            Endpoint endpointData) {
+        if (argValue.getVar().getValue() instanceof VarArray) {
+            VarArray varArray = (VarArray) argValue.getVar().getValue();
+            MethodArg methodArg = new MethodArg();
+            for (final Variable variable : varArray.getInnerArray()) {
+                methodArg.setVar(variable);
+                processSettingsArg(variable, argValue.getType(), headers, endpointData);
+            }
+        } else {
+            processSettingsArg(argValue.getVar(), argValue.getType(), headers, endpointData);
         }
-        if (var.getType() != type) {
-            logger.error("Expected " + type.name() + " but got " + var.getType().name());
-            return false;
-        }
-        return true;
     }
 
-    public static Endpoint getEndpointData(Stack<Variable> values, Set<Set<ArgConfig>> wsClientArgsConfigs) {
-        Map<MethodArgType, MethodArg> argValues = getArgsFromStack(values, wsClientArgsConfigs);
+    /**
+     * Processes method argument 
+     * @param argValue Method argument
+     * @param argType Method argument type
+     * @param headers Headers for filling up
+     * @param endpointData Object which holds information about endpoint
+     */
+    private static void processSettingsArg(Variable argValue, MethodArgType argType,
+            Stack<Header> headers, Endpoint endpointData) {
+        switch (argType) {
+            case ENDPOINT_DATA:
+                //SKIP -> wrapped in EndpointData
+                break;
+            case HEADER:
+                //SKIP -> wrapped in EndpointData
+                break;
+            case HTTP_METHOD: {
+                final HttpMethod httpMethod = (HttpMethod) argValue.getValue();
+                endpointData.addHttpMethod(httpMethod);
+            }
+                break;
+            case REQUEST_BODY: {
+                endpointData.addParameter(new EndpointParameter(null, argValue.getDescription(),
+                        ClassTools.isArrayOrCollection(argValue.getDescription())));
+            }
+                break;
+            case REQUEST_CALLBACK:
+                //what to do with REQUEST CALLBACK???
+                break;
+            case URI_VARIABLE: {
+                processURIVariable(argValue, endpointData);
+            }
+                break;
+            case RESPONSE: {
+                endpointData.addExpectedResponse(new EndpointBody(argValue.getDescription(),
+                        ClassTools.isArrayOrCollection(argValue.getDescription())));
+            }
+                break;
+            case UNKNOWN:
+                break;
+            case BASE_URL:
+            case URL: {
+                final String url = (String) argValue.getValue();
+                endpointData.setBaseUrl(url);
+            }
+                break;
+            case PATH: {
+                final String path = (String) argValue.getValue();
+                endpointData.setPath(path);
+            }
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    /**
+     * Processes arguments of request
+     * @param methodArg Method argument
+     * @param endpointData Object which holds information about endpoint
+     */
+    private static void processHeaderArg(MethodArg methodArg, Endpoint endpointData) {
+        List<String> values;
+        if (methodArg.getVar().getType() == VariableType.ARRAY
+                && methodArg.getVar().getValue() instanceof VarArray) {
+            values = varArrayToStringList((VarArray) (methodArg.getVar().getValue()));
+        } else {
+            values = List.of((String) methodArg.getVar().getValue());
+        }
+        for (final String value : values) {
+            processHeaderArg(value, methodArg.getType(), endpointData);
+        }
+    }
+
+    /**
+     * Processes arguments of request
+     * @param methodArg Method argument
+     * @param argType Type of the argument
+     * @param endpointData Object which holds information about endpoint
+     */
+    private static void processHeaderArg(String argValue, MethodArgType argType,
+            Endpoint endpointData) {
+        if (argType.ordinal() <= MethodArgType.ACCEPT_RANGES.ordinal()) {
+            Header header = new Header(argType.name(), argValue);
+            endpointData.addConsumes(header);
+
+        } else if (argType.ordinal() >= MethodArgType.CONTENT_ENCODING.ordinal()
+                && argType.ordinal() <= MethodArgType.CONTENT_TYPE.ordinal()) {
+            Header header = new Header(argType.name(), argValue);
+            endpointData.addProduces(header);
+        }
+    }
+
+    /**
+     * Processes generic arguments
+     * @param key Key value of the argument
+     * @param dataHolderRecord One record
+     * @param methodArgType Type of the method argument
+     * @param endpointData Object which holds information about endpoint
+     */
+    private static void processGenericArgs(String key, List<MethodArg> dataHolderRecord,
+            MethodArgType methodArgType, Endpoint endpointData) {
+        for (final MethodArg item : dataHolderRecord) {
+            processGenericArgs(key, item, methodArgType, endpointData);
+        }
+    }
+
+    /**
+     * Processes URI variables
+     * @param data Variable which holds information about URI
+     * @param endpointData Object which holds information about endpoint
+     */
+    @SuppressWarnings("unchecked")
+    private static void processURIVariable(Variable data, Endpoint endpointData) {
+        if (data.getType() == VariableType.MAP && data.getValue() instanceof Map) {
+            //java/lang/Map structure given as URI variable
+            Map<String, Variable> map = (Map<String, Variable>) data.getValue();
+            for (final String key : map.keySet()) {
+                final Variable variable = map.get(key);
+                if (variable.getType() == VariableType.ARRAY
+                        && variable.getValue() instanceof VarArray) {
+                    VarArray varArray = (VarArray) variable.getValue();
+                    for (Variable varArrayItem : varArray.getInnerArray()) {
+                        endpointData.addParameter(new EndpointParameter(key,
+                                varArrayItem.getDescription(), BytecodeDescriptorsProcessor
+                                        .isArrayOrCollection(varArrayItem.getDescription()),
+                                ParameterCategory.QUERY));
+                    }
+                } else {
+                    endpointData.addParameter(new EndpointParameter(
+                            key, variable.getDescription(), BytecodeDescriptorsProcessor
+                                    .isArrayOrCollection(variable.getDescription()),
+                            ParameterCategory.QUERY));
+                }
+            }
+        } else {
+            endpointData.addParameter(new EndpointParameter(null, data.getDescription(),
+                    BytecodeDescriptorsProcessor.isArrayOrCollection(data.getDescription()),
+                    ParameterCategory.QUERY));
+        }
+    }
+
+    /**
+     * Processes argumens and 
+     * @param key Key under which data are stored 
+     * @param data Argument of method holding important information
+     * @param methodArgType Type of the method argument
+     * @param endpointData Object which holds information about endpoint
+     */
+    private static void processGenericArgs(String key, MethodArg data, MethodArgType methodArgType,
+            Endpoint endpointData) {
+        switch (methodArgType) {
+            case HEADER: {
+                endpointData.addHeader(new Header(key, data.getVar().getValue().toString()));
+            }
+                break;
+            case URI_VARIABLE: {
+                processURIVariable(data.getVar(), endpointData);
+            }
+                break;
+            case MATRIX: {
+                endpointData
+                        .addParameter(new EndpointParameter(null, (String) data.getVar().getValue(),
+                                data.isArray(), ParameterCategory.MATRIX));
+            }
+                break;
+            case SET_COOKIE:
+            case SET_COOKIE2:
+            case COOKIE: {
+                endpointData.addParameter(new EndpointParameter(
+                        key, data.getVar().getDescription(), BytecodeDescriptorsProcessor
+                                .isArrayOrCollection(data.getVar().getDescription()),
+                        ParameterCategory.COOKIE));
+            }
+            default:;
+        }
+    }
+
+    /**
+     * Processes KEY and VALUE type of arguments (generic arguments - context given by method type)
+     * @param argValue  Argument of method
+     * @param dataHolder Storage of all KEY and VALUE information for given method
+     */
+    private static void processKeyOrValue(MethodArg argValue,
+            LinkedHashMap<String, List<MethodArg>> dataHolder) {
+        if (argValue.getType() == MethodArgType.KEY) {
+            dataHolder.put((String) argValue.getVar().getValue(), new LinkedList<>());
+        } else if (argValue.getType() == MethodArgType.VALUE) {
+            ArrayList<String> keys = new ArrayList<>(dataHolder.keySet());
+            final String lastKey = keys.get(keys.size() - 1);
+            dataHolder.get(lastKey).add(argValue);
+        }
+    }
+
+    /**
+     * Retrieves data about endpoint from helping Stack and method configuration
+     * @param values Stack
+     * @param method Method configuration
+     * @return Object which contains informations about endpoint
+     */
+    public static Endpoint getEndpointData(Stack<Variable> values, IWSClient method) {
+        Map<MethodArgType, MethodArg> argValues = getArgsFromStack(values, method);
         Endpoint endpointData = new Endpoint();
         Stack<Header> headers = new Stack<>();
+        LinkedHashMap<String, List<MethodArg>> dataHolder = new LinkedHashMap<>();
+
         for (final MethodArg arg : argValues.values()) {
-            Object argValue = arg.getValue();
+            Object argValue = arg.getVar().getValue();
             //arg contains endpoint data or endpoint itself (does not matter what arg type it is) => merge it
             if (argValue instanceof Endpoint || argValue instanceof EndpointData) {
                 Endpoint valCast = (Endpoint) argValue;
                 endpointData.merge(valCast);
                 continue;
             }
-            switch (arg.getType()) {
-                case ENDPOINT_DATA:
-                    //SKIP -> wrapped in EndpointData
-                    break;
-                case HEADER:
-                    //SKIP -> wrapped in EndpointData
-                    break;
-                case HTTP_METHOD: {
-                    final HttpMethod httpMethod = (HttpMethod) argValue;
-                    endpointData.addHttpMethod(httpMethod);
-                }
-                    break;
-                case REQUEST_BODY: {
-                    final String objectDescription = (String) argValue;
-                    endpointData.addRequestBody(new EndpointBody(objectDescription,
-                            ClassTools.isArrayOrCollection(objectDescription)));
-                }
-                    break;
-                case REQUEST_CALLBACK:
-                    //what to do with REQUEST CALLBACK???
-                    break;
-                case HEADER_TYPE: {
-                    final String headerType = (String) argValue;
-                    final Header lastHeader = SafeStack.peek(headers);
-                    // no header on stack or last header does not have headerType set
-                    if (lastHeader == null || lastHeader.getType() != null) {
-                        Header newHeader = new Header(headerType, (String) null);
-                        headers.push(newHeader);
-                    } else {
-                        lastHeader.setType(headerType);
-                    }
-                }
-                    break;
-                case HEADER_VALUE: {
-                    final String headerValue = (String) argValue;
-                    final Header lastHeader = SafeStack.peek(headers);
-                    if (lastHeader == null || lastHeader.getValue() != null) {
-                        Header newHeader = new Header(null, headerValue);
-                        headers.push(newHeader);
-                    } else {
-                        lastHeader.setValue(headerValue);
-                    }
-                }
-                    break;
-                case URI_VARIABLE:
-                    break;
-                case RESPONSE:
-                    final String objectDescription = (String) argValue;
-                    endpointData.addExpectedResponse(new EndpointBody(objectDescription,
-                            ClassTools.isArrayOrCollection(objectDescription)));
-                    break;
-                case UNKNOWN:
-                    break;
-                case BASE_URL:
-                case URL: {
-                    final String url = (String) argValue;
-                    endpointData.setBaseUrl(url);
-                }
-                    break;
-                case PATH: {
-                    final String path = (String) argValue;
-                    endpointData.setPath(path);
-                }
-                    break;
-                default:
-                    break;
+            if (arg.getType() == MethodArgType.KEY || arg.getType() == MethodArgType.VALUE
+                    && method.getType() == WSClientType.SETTINGS) {
+                processKeyOrValue(arg, dataHolder);
+            } else if (arg.getType().ordinal() < MethodArgType.EMPTY.ordinal()) {
+                processSettingsArg(arg, headers, endpointData);
+            } else if (arg.getType().ordinal() > MethodArgType.EMPTY.ordinal()) {
+                processHeaderArg(arg, endpointData);
             }
         }
         //add processed headers to endpointData
@@ -186,84 +326,13 @@ public class VariableFactory {
                 endpointData.addProduces(header);
             }
         }
-        //LOAD DATA FROM ARGS
-        //return lastVal.setValue(value);
-        return null;
-    }
 
-    public static Variable getData(Stack<Variable> values, Set<Set<ArgConfig>> args) {
-        Map<MethodArgType, MethodArg> argValues = getArgsFromStack(values, args);
-        Endpoint endpointData = new Endpoint();
-        MethodArg mArg = new MethodArg();
-        Map<String, String> data = null;
-        for (final MethodArgType key : argValues.keySet()) {
-            switch (key) {
-                case KEY:
-                    //TODO: set data into MAP
-                    break;
-                case VALUE:
-                    //mArg.setValue();
-                    break;
-                default:
-                    break;
-            }
-        }
-        return null;
-    }
-
-    /*     public static Endpoint getEndpointData(Stack<Variable> values, Set<Set<ArgConfig>> args) {
-        Map<MethodArgType, Object> argValues = getArgsFromStack(values, args);
-        Variable lastVal = SafeStack.pop(values);
-        if (checkVariable(lastVal, VariableType.ENDPOINT_DATA)) {
-            return null;
-        }
-        //LOAD DATA FROM ARGS
-        //return lastVal.setValue(value);
-        return null;
-    } */
-
-    private static final Map<String, Map<String, WSClient>> wsClientData =
-            ConfigTools.getWSClientDataContainers();
-
-    private static WSClient getWSClientMethod(String methodOwner, String methodName) {
-        return wsClientData.get(methodOwner).get(methodName);
-    }
-
-    private static boolean isWSClientData(Operation operation) {
-        final String owner = operation.getOwner();
-        final String methodName = operation.getMethodName();
-
-        if (methodName == null || owner == null) {
-            return false;
+        for (final String key : dataHolder.keySet()) {
+            List<MethodArg> mapValue = dataHolder.get(key);
+            processGenericArgs(key, mapValue, (MethodArgType) method.getInnerType(), endpointData);
         }
 
-        return wsClientData.containsKey(owner) && wsClientData.get(owner).containsKey(methodName);
-    }
-
-
-
-    private static Variable getWSClientData(Stack<Variable> stack, Operation operation) {
-        final String methodName = operation.getMethodName();
-        final String methodOwner = operation.getOwner();
-        final String[] args = MethodTools.getArgsFromSignature(operation.getDescription());
-        Variable variable = new Variable();
-
-        variable.setType(VariableType.WS_CLIENT_DATA);
-        WSClient wsClientMethod = getWSClientMethod(methodOwner, methodName);
-
-        return null;
-
-    }
-
-    public static Variable getVariable(Stack<Variable> stack, Operation operation) {
-
-        if (operation.getType() == OperationType.CALL
-                && MethodTools.getType(operation.getDescription()) == MethodType.INIT) {
-
-        }
-
-        return null;
-
+        return endpointData;
     }
 
     public static void main(String[] args) {

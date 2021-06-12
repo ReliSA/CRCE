@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,10 +10,10 @@ public class Config {
     private String name;
 
     @JsonProperty("wsClient")
-    private Set<WSClientConfig> wsClients;
+    private LinkedHashSet<WSClientConfig> wsClients;
 
     @JsonProperty("wsClientData")
-    private Set<WSClientDataConfig> wsClientDataHolders;
+    private LinkedHashSet<WSClientDataConfig> wsClientDataHolders;
 
     @JsonProperty("argDefinitions")
     private Map<String, ArgConfig> argDefinitions;
@@ -31,7 +32,7 @@ public class Config {
     /**
      * @param wsClients the wsClients to set
      */
-    public void setWsClients(Set<WSClientConfig> wsClients) {
+    public void setWsClients(LinkedHashSet<WSClientConfig> wsClients) {
         this.wsClients = wsClients;
     }
 
@@ -75,7 +76,7 @@ public class Config {
     /**
      * @param wsClientDataHolders the wsClientDataHolders to set
      */
-    public void setWsClientDataHolders(Set<WSClientDataConfig> wsClientDataHolders) {
+    public void setWsClientDataHolders(LinkedHashSet<WSClientDataConfig> wsClientDataHolders) {
         this.wsClientDataHolders = wsClientDataHolders;
     }
 

@@ -215,11 +215,11 @@ argDefinitions:
     classes:
       - java.lang.String
   formArgKey:
-    type: URI_VARIABLE_KEY
+    type: KEY
     classes:
       - java.lang.String
   formArgValue:
-    type: URI_VARIABLE_VALUE
+    type: VALUE
     classes:
       - java.lang.String
   formArgValueMap:
@@ -305,8 +305,6 @@ wsClientData:
           returns: uri
   - classes:
       - javax.ws.rs.core.MultivaluedMap
-    inherits:
-      - java.lang.Map
     settings:
       GENERIC:
         - names:
@@ -360,7 +358,7 @@ wsClientData:
   - classes:
       - javax.ws.rs.core.Form
     settings:
-      GENERIC:
+      URI_VARIABLE:
         - names:
             - param
           args:
@@ -423,15 +421,17 @@ wsClient:
   - interfaces:
       - javax.ws.rs.client.Client
     settings:
-      - names:
-          - target
-        args:
-          - - target
-      - names:
-          - invocation
-        args:
-          - - invocationLink
-  - interfaces: javax.ws.rs.client.WebTarget
+      GENERIC:
+        - names:
+            - target
+          args:
+            - - target
+        - names:
+            - invocation
+          args:
+            - - invocationLink
+  - interfaces:
+      - javax.ws.rs.client.WebTarget
     settings:
       MATRIX:
         - names:
