@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.HeaderGroup;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 
 public class HeaderTools {
     private static final String ACCEPT = "Accept";
@@ -20,7 +21,7 @@ public class HeaderTools {
         return header.getType().startsWith(ACCEPT);
     }
 
-    public static boolean isControlType(HeaderGroup headerType) {
+    public static boolean isControlType(MethodArgType headerType) {
         switch (headerType) {
             case CACHE_CONTROL:
             case EXPECT:
@@ -34,7 +35,7 @@ public class HeaderTools {
         return false;
     }
 
-    public static boolean isConditionalType(HeaderGroup headerType) {
+    public static boolean isConditionalType(MethodArgType headerType) {
         switch (headerType) {
             case IF_MATCH:
             case IF_NONE_MATCH:
@@ -47,7 +48,7 @@ public class HeaderTools {
         return false;
     }
 
-    public static boolean isContentNegotiation(HeaderGroup headerType) {
+    public static boolean isContentNegotiation(MethodArgType headerType) {
         switch (headerType) {
             case ACCEPT:
             case ACCEPT_CHARSET:
@@ -59,7 +60,7 @@ public class HeaderTools {
         return false;
     }
 
-    public static boolean isAuthenticationCredentials(HeaderGroup headerType) {
+    public static boolean isAuthenticationCredentials(MethodArgType headerType) {
         switch (headerType) {
             case AUTHORIZATION:
             case PROXY_AUTHORIZATION:
@@ -69,7 +70,7 @@ public class HeaderTools {
         return false;
     }
 
-    public static boolean isRequestContext(HeaderGroup headerType) {
+    public static boolean isRequestContext(MethodArgType headerType) {
         switch (headerType) {
             case FROM:
             case REFERER:
@@ -78,6 +79,12 @@ public class HeaderTools {
             default:;
         }
         return false;
+    }
+
+    public static MethodArgType getHeaderType(String headerType) {
+        MethodArgType mArgType = MethodArgType.valueOf(headerType);
+        
+        return null;
     }
 
     /**

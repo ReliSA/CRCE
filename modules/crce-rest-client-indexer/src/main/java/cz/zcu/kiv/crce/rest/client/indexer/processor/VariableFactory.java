@@ -177,15 +177,27 @@ public class VariableFactory {
      */
     private static void processHeaderArg(String argValue, MethodArgType argType,
             Endpoint endpointData) {
-        if (argType.ordinal() <= MethodArgType.ACCEPT_RANGES.ordinal()) {
-            Header header = new Header(argType.name(), argValue);
-            HeaderType.valueOf(arg0)
-            endpointData.addConsumes(header);
 
-        } else if (argType.ordinal() >= MethodArgType.CONTENT_ENCODING.ordinal()
-                && argType.ordinal() <= MethodArgType.CONTENT_TYPE.ordinal()) {
-            Header header = new Header(argType.name(), argValue);
-            endpointData.addProduces(header);
+        Header newHeader = new Header(null, argValue);
+        if (HeaderTools.isControlType(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.CONTROL);
+            endpointData.addControlsHeaders(newHeader);
+        } else if (HeaderTools.isConditionalType(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.CONDITIONAL);
+            endpointData.addConditionals(newHeader);
+        } else if (HeaderTools.isContentNegotiation(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.CONTENT_NEGOTIATION);
+            endpointData.addContentNegotiation(newHeader);
+        } else if (HeaderTools.isAuthenticationCredentials(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.AUTHENTICATION_CREDENTIALS);
+            endpointData.addAuthenticationCredentials(newHeader);
+        } else if (HeaderTools.isRequestContext(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.REQUEST_CONTEXT);
+            endpointData.addRequestContext(newHeader);
+        }
+
+        if (newHeader.getHeaderGroup() == null) {
+            endpointData.addProduces(newHeader);
         }
     }
 
@@ -249,7 +261,8 @@ public class VariableFactory {
             Endpoint endpointData) {
         switch (methodArgType) {
             case HEADER: {
-                endpointData.addHeader(new Header(key, data.getVar().getValue().toString()));
+                MethodArgType headerType = MethodArgType.ofValue(key);
+                processHeaderArg(data.getVar().getValue().toString(), headerType, endpointData);
             }
                 break;
             case URI_VARIABLE: {
