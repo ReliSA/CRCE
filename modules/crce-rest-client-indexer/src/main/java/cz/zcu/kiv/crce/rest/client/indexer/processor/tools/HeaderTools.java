@@ -81,9 +81,19 @@ public class HeaderTools {
         return false;
     }
 
+    public static boolean isRepresentation(MethodArgType headerType) {
+        switch (headerType) {
+            case CONTENT_TYPE:
+            case CONTENT_LENGTH:
+                return true;
+            default:;
+        }
+        return false;
+    }
+
     public static MethodArgType getHeaderType(String headerType) {
         MethodArgType mArgType = MethodArgType.valueOf(headerType);
-        
+
         return null;
     }
 

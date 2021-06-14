@@ -9,7 +9,6 @@ import java.util.Set;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
@@ -17,6 +16,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ParameterCategory;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.Processor;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
@@ -123,38 +123,31 @@ public class ProcessorTest {
 
         public static void initJaxRs() {
                 final String baseUrl = "http://localhost:8080/hrmanagerapi/webapi";
-                final Endpoint endpoint1 = new Endpoint(baseUrl, "/emp", Set.of(HttpMethod.GET),
-                                new HashSet<>(), Set.of(new EndpointBody("java/util/List", true)),
-                                new HashSet<>(),
-                                Set.of(new Header("Content-Type", "application/json")),
-                                Set.of(new Header("Accept", "application/json")));
-                final Endpoint endpoint2 = new Endpoint(baseUrl, "/emp/addemp",
-                                Set.of(HttpMethod.POST),
-                                Set.of(new EndpointBody("com/nagarro/hrmanager/model/Employee",
-                                                false)),
-                                new HashSet<>(), new HashSet<>(),
-                                Set.of(new Header("Content-Type", "application/json")),
-                                new HashSet<>());
-
-                final Endpoint endpoint3 = new Endpoint(baseUrl, "/emp/update",
-                                Set.of(HttpMethod.PUT),
-                                Set.of(new EndpointBody("com/nagarro/hrmanager/model/Employee",
-                                                false)),
-                                new HashSet<>(), new HashSet<>(),
-                                Set.of(new Header("Content-Type", "application/json")),
-                                new HashSet<>());
-                final Endpoint endpoint4 = new Endpoint(baseUrl, "/emp/delete/",
-                                Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
-                                new HashSet<>(), new HashSet<>(), new HashSet<>());
-                final Endpoint endpoint5 = new Endpoint(baseUrl, "/emp/getemp/",
-                                Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
-                                new HashSet<>(), new HashSet<>(), new HashSet<>());
-                final Endpoint endpoint6 = new Endpoint(baseUrl, "/user/getUser/",
-                                Set.of(HttpMethod.GET), new HashSet<>(),
-                                Set.of(new EndpointBody("javax/ws/rs/core/Response", false)),
-                                new HashSet<>(), new HashSet<>(), new HashSet<>());
+                Set<Header> test = new HashSet<>();
+                test.add(new Header("Content-Type", "application/json"));
+                test.add(new Header("Accept", "application/json"));
+                Endpoint endpoint1 = new Endpoint(baseUrl, "/emp", Set.of(HttpMethod.GET), Set.of(),
+                                test);
+                endpoint1.addExpectedResponse(new EndpointBody("java/util/List", true));
+                Endpoint endpoint2 = new Endpoint(baseUrl, "/emp/addemp", Set.of(HttpMethod.POST),
+                                Set.of(new EndpointParameter(null,
+                                                "com/nagarro/hrmanager/model/Employee", false,
+                                                ParameterCategory.BODY)),
+                                Set.of(new Header("Content-Type", "application/json")));
+                Endpoint endpoint3 = new Endpoint(baseUrl, "/emp/update", Set.of(HttpMethod.PUT),
+                                Set.of(new EndpointParameter(null,
+                                                "com/nagarro/hrmanager/model/Employee", false,
+                                                ParameterCategory.BODY)),
+                                Set.of(new Header("Content-Type", "application/json")));
+                Endpoint endpoint4 = new Endpoint(baseUrl, "/emp/delete/", Set.of(HttpMethod.GET),
+                                Set.of(), Set.of());
+                endpoint4.addExpectedResponse(new EndpointBody("javax/ws/rs/core/Response", false));
+                Endpoint endpoint5 = new Endpoint(baseUrl, "/emp/getemp/", Set.of(HttpMethod.GET),
+                                Set.of(), Set.of());
+                endpoint5.addExpectedResponse(new EndpointBody("javax/ws/rs/core/Response", false));
+                Endpoint endpoint6 = new Endpoint(baseUrl, "/user/getUser/", Set.of(HttpMethod.GET),
+                                Set.of(), Set.of());
+                endpoint6.addExpectedResponse(new EndpointBody("javax/ws/rs/core/Response", false));
 
                 jaxRsExpectedEndpoints = Map.of(endpoint1.getUrl(), endpoint1, endpoint2.getUrl(),
                                 endpoint2, endpoint3.getUrl(), endpoint3, endpoint4.getUrl(),
@@ -223,6 +216,11 @@ public class ProcessorTest {
                 } catch (IOException e) {
                         fail(e.getMessage());
                 }
+                System.out.println("[");
+                for (Endpoint endpoint : jaxRsEndpoints.values()) {
+                        System.out.println(endpoint);
+                }
+                System.out.println("]");
                 for (Endpoint endpoint : jaxRsExpectedEndpoints.values()) {
                         if (!jaxRsEndpoints.containsKey(endpoint.getUrl())) {
                                 fail("Missing endpoint " + endpoint);

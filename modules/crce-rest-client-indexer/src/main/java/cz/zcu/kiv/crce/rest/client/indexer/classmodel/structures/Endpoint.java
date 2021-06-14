@@ -8,6 +8,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.UrlTools;
@@ -27,12 +28,14 @@ public class Endpoint implements Serializable {
 
     protected String path;
     protected String baseUrl;
-    protected Set<HttpMethod> httpMethods;
-    protected Set<EndpointParameter> parameters;
-    protected Set<EndpointBody> requestBodies;
-    protected Set<EndpointBody> expectedResponses;
-    protected Set<Header> produces;
-    protected Set<Header> consumes;
+    protected Set<HttpMethod> httpMethods = new HashSet<>();
+    protected Set<EndpointParameter> parameters = new HashSet<>();
+    protected Set<EndpointParameter> genericParameters = new HashSet<>();
+    protected Set<EndpointBody> requestBodies = new HashSet<>();
+    protected Set<String> objects = new HashSet<>(); //either response or request object
+    protected Set<EndpointBody> expectedResponses = new HashSet<>();
+    protected Set<Header> produces = new HashSet<>();
+    protected Set<Header> consumes = new HashSet<>();
 
 
     protected Set<Header> responseHeaders = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-7
@@ -41,7 +44,49 @@ public class Endpoint implements Serializable {
     protected Set<Header> contentNegotiation = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.3
     protected Set<Header> authenticationCredentials = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.4
     protected Set<Header> requestContext = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.5
+    protected Set<Header> representation = new HashSet<>();
 
+
+
+    /**
+     * @return the objects
+     */
+    public Set<String> getObjects() {
+        return objects;
+    }
+
+    /**
+     * @param objects the objects to set
+     */
+    public void setObjects(Set<String> objects) {
+        this.objects = objects;
+    }
+
+    /**
+     * 
+     * @param object Classname of object
+     */
+    public void addObject(String object) {
+        this.objects.add(object);
+    }
+
+    /**
+     * @param representation the representation to set
+     */
+    public void setRepresentation(Set<Header> representation) {
+        this.representation = representation;
+    }
+
+    /**
+     * @return the representation
+     */
+    public Set<Header> getRepresentation() {
+        return representation;
+    }
+
+    public void addRepresentationHeader(Header header) {
+        this.representation.add(header);
+    }
 
 
     /**
@@ -169,6 +214,10 @@ public class Endpoint implements Serializable {
         this.responseHeaders = responseHeaders;
     }
 
+    public void addResponseHeader(Header responseHeader) {
+        this.responseHeaders.add(responseHeader);
+    }
+
     public Endpoint(Endpoint endpoint) {
         this();
         this.setBaseUrl(endpoint.getBaseUrl());
@@ -224,6 +273,43 @@ public class Endpoint implements Serializable {
         this();
         this.setPath(path);
         this.httpMethods = httpMethods;
+    }
+
+    public Endpoint(String baseURL, String path, Set<HttpMethod> httpMethods,
+            Set<EndpointParameter> endpointParameters, Set<Header> headers) {
+        this.setBaseUrl(baseURL);
+        this.setPath(path);
+        this.httpMethods = httpMethods;
+        this.parameters = endpointParameters;
+
+        Set<Header> mutableSet = new HashSet<>(headers);
+
+        for (Header header : mutableSet) {
+            MethodArgType headerType = MethodArgType.ofValue(header.getType());
+            if (HeaderTools.isControlType(headerType)) {
+                header.setHeaderGroup(HeaderGroup.CONTROL);
+                this.addControlsHeaders(header);
+            } else if (HeaderTools.isConditionalType(headerType)) {
+                header.setHeaderGroup(HeaderGroup.CONDITIONAL);
+                this.addConditionals(header);
+            } else if (HeaderTools.isContentNegotiation(headerType)) {
+                header.setHeaderGroup(HeaderGroup.CONTENT_NEGOTIATION);
+                this.addContentNegotiation(header);
+            } else if (HeaderTools.isAuthenticationCredentials(headerType)) {
+                header.setHeaderGroup(HeaderGroup.AUTHENTICATION_CREDENTIALS);
+                this.addAuthenticationCredentials(header);
+            } else if (HeaderTools.isRequestContext(headerType)) {
+                header.setHeaderGroup(HeaderGroup.REQUEST_CONTEXT);
+                this.addRequestContext(header);
+            } else if (HeaderTools.isRepresentation(headerType)) {
+                header.setHeaderGroup(HeaderGroup.REPRESENTATION);
+                this.addRepresentationHeader(header);
+            }
+
+            if (header.getHeaderGroup() == null) {
+                this.addResponseHeader(header);
+            }
+        }
     }
 
     /**
@@ -318,12 +404,7 @@ public class Endpoint implements Serializable {
      * @return this
      */
     public Endpoint addParameter(EndpointParameter param) {
-        if (param.getCategory() == ParameterCategory.BODY) {
-            addRequestBody(new EndpointBody(param.getDataType(),
-                    BytecodeDescriptorsProcessor.isArrayOrCollection(param.getDataType())));
-        } else {
-            parameters.add(param);
-        }
+        parameters.add(param);
         return this;
     }
 
@@ -370,7 +451,7 @@ public class Endpoint implements Serializable {
      */
     public Endpoint setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-        if (baseUrl != null && baseUrl.length() > 0 && baseUrl.startsWith("http")) {
+        /*         if (baseUrl != null && baseUrl.length() > 0 && baseUrl.startsWith("http")) {
             URL url;
             try {
                 url = new URL(baseUrl);
@@ -392,8 +473,8 @@ public class Endpoint implements Serializable {
             } catch (MalformedURLException e) {
                 logger.error("Wrong type of Base URL=" + baseUrl);
             }
-
-        }
+        
+        } */
         return this;
     }
 
@@ -426,7 +507,15 @@ public class Endpoint implements Serializable {
         this.expectedResponses.addAll(copyEndpointReqBodySet(endpoint.getExpectedResponses()));
         this.produces.addAll(copyHeaders(endpoint.getProduces()));
         this.consumes.addAll(copyHeaders(endpoint.getConsumes()));
+        this.responseHeaders.addAll(copyHeaders(endpoint.getResponseHeaders()));
+        this.controlsHeaders.addAll(copyHeaders(endpoint.getControlsHeaders()));
+        this.conditionals.addAll(copyHeaders(endpoint.getConditionals()));
+        this.contentNegotiation.addAll(copyHeaders(endpoint.getContentNegotiation()));
+        this.authenticationCredentials.addAll(copyHeaders(endpoint.getAuthenticationCredentials()));
+        this.requestContext.addAll(copyHeaders(endpoint.getRequestContext()));
         this.parameters.addAll(copyEndpointParameters(endpoint.getParameters()));
+        this.representation.addAll(copyHeaders(endpoint.getRepresentation()));
+        //this.objects.addAll(endpoint.getObjects());
     }
 
     /**
@@ -455,7 +544,24 @@ public class Endpoint implements Serializable {
                 && endpoint.getConsumes().containsAll(consumes);
         final boolean producesEq = produces.containsAll(endpoint.getProduces())
                 && endpoint.getProduces().containsAll(produces);
-        return httpMethodEq && parametersEq && consumesEq && producesEq;
+        final boolean responseHeadersEq =
+                responseHeaders.containsAll(endpoint.getResponseHeaders());
+        final boolean controlsHeadersEq =
+                controlsHeaders.containsAll(endpoint.getControlsHeaders());
+        final boolean conditionalsEq = conditionals.containsAll(endpoint.getConditionals());
+        final boolean contentNegotiationEq =
+                contentNegotiation.containsAll(endpoint.getContentNegotiation());
+        final boolean authenticationCredentialsEq =
+                authenticationCredentials.containsAll(endpoint.getAuthenticationCredentials());
+        final boolean requestContextEq = requestContext.containsAll(endpoint.getRequestContext());
+        final boolean representationEq = representation.containsAll(endpoint.getRepresentation());
+        final boolean expectedResponsesEq =
+                expectedResponses.containsAll(endpoint.getExpectedResponses())
+                        && endpoint.getExpectedResponses().containsAll(expectedResponses);
+        return httpMethodEq && parametersEq && consumesEq && producesEq && responseHeadersEq
+                && controlsHeadersEq && conditionalsEq && contentNegotiationEq
+                && authenticationCredentialsEq && requestContextEq && representationEq
+                && expectedResponsesEq;
     }
 
 
@@ -466,9 +572,14 @@ public class Endpoint implements Serializable {
                 + ToJSONTools.convertSet(httpMethods) + ", \"requestBodies\": "
                 + ToJSONTools.convertSet(requestBodies) + ", \"responses\": "
                 + ToJSONTools.convertSet(expectedResponses) + ", \"parameters\": "
-                + ToJSONTools.convertSet(parameters) + ", \"produces\": "
-                + ToJSONTools.convertSet(produces) + ", \"consumes\": "
-                + ToJSONTools.convertSet(consumes) + " }";
+                + ToJSONTools.convertSet(parameters) + ", \"headers\": {" + " \"control\": "
+                + ToJSONTools.convertSet(controlsHeaders) + ", \"conditionals\":"
+                + ToJSONTools.convertSet(conditionals) + ", \"contentNegotiation\": "
+                + ToJSONTools.convertSet(contentNegotiation) + ", \"authentication\": "
+                + ToJSONTools.convertSet(authenticationCredentials) + ", \"requestContenxt\": "
+                + ToJSONTools.convertSet(requestContext) + ", \"representation\": "
+                + ToJSONTools.convertSet(representation) + ", \"response\": "
+                + ToJSONTools.convertSet(responseHeaders) + " } }";
     }
 
 

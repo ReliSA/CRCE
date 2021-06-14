@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 
@@ -8,9 +9,9 @@ public interface IWSClient {
 
     Enum<?> getInnerType();
 
-    Set<Set<ArgConfig>> getArgs();
+    Set<LinkedHashSet<ArgConfig>> getArgs();
 
-    Set<Set<ArgConfig>> getVarArgs();
+    Set<LinkedHashSet<ArgConfig>> getVarArgs();
 
     ArgConfig getReturns();
 }

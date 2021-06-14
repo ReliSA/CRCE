@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
@@ -8,7 +9,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 public class WSClient {
     String name;
     HttpMethod httpMethod;
-    Set<Set<ArgConfig>> args = new HashSet<>();
+    Set<LinkedHashSet<ArgConfig>> args = new HashSet<>();
 
     /**
      * @param owner Owner of this method
@@ -17,7 +18,7 @@ public class WSClient {
      * @param args Arguments which can be provided to this method
      */
     public WSClient(final String name, final HttpMethod httpMethod,
-            final Set<Set<ArgConfig>> args) {
+            final Set<LinkedHashSet<ArgConfig>> args) {
         this.name = name;
         this.httpMethod = httpMethod;
         this.args = args;
@@ -40,7 +41,7 @@ public class WSClient {
     /**
      * @return the args
      */
-    public Set<Set<ArgConfig>> getArgs() {
+    public Set<LinkedHashSet<ArgConfig>> getArgs() {
         return args;
     }
 

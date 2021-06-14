@@ -49,7 +49,8 @@ public class SafeStack {
      */
     public static Variable peekEndpoint(Stack<Variable> stack) {
         Variable var = peek(stack);
-        if (var != null && var.getType() == VariableType.ENDPOINT) {
+        if (var != null && (var.getType() == VariableType.ENDPOINT
+                || var.getType() == VariableType.ENDPOINT_DATA)) {
             return var;
         }
         return null;

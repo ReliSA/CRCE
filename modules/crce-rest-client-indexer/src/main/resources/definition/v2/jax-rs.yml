@@ -171,7 +171,7 @@ argDefinitions:
       - java.lang.Class
       - javax.ws.rs.core.GenericType
   entityParam:
-    type: REQUEST_BODY
+    type: OBJECT
     classes:
       - java.lang.String
   entityMediaType:
@@ -450,8 +450,65 @@ wsClient:
             - request
           varArgs:
             - - requestAcceptType
+        - names:
+            - path
+          args:
+            - - path
+  - interfaces:
+      - javax.ws.rs.client.SyncInvoker
+    request:
+      DELETE:
+        - names:
+            - delete
+          args:
+            - - responseType
+      GET:
+        - names:
+            - get
+          args:
+            - - responseType
+      HEAD:
+        - names:
+            - head
+      OPTIONS:
+        - names:
+            - options
+          args:
+            - - responseType
+      POST:
+        - names:
+            - post
+          args:
+            - - buildEntity
+            - - buildEntity
+              - responseType
+      PUT:
+        - names:
+            - put
+          args:
+            - - buildEntity
+              - responseType
+            - - buildEntity
+      TRACE:
+        - names:
+            - trace
+          args:
+            - - responseType
+      GENERIC:
+        - names:
+            - method
+          args:
+            - - methodTypeSkip
+              - responseType
+            - - methodTypeSkip
+              - responseType
+            - - methodTypeSkip
+              - buildEntity
+              - responseType
   - interfaces:
       - javax.ws.rs.client.Invocation$Builder
+    inherits:
+      - javax.ws.rs.client.SyncInvoker
     request:
       DELETE:
         - names:
@@ -503,53 +560,3 @@ wsClient:
             - - headerKey
               - headerValue
             - - headersParam
-  - interfaces:
-      - javax.ws.rs.client.SyncInvoker
-    request:
-      DELETE:
-        - names:
-            - delete
-          args:
-            - - responseType
-      GET:
-        - names:
-            - get
-          args:
-            - - responseType
-      HEAD:
-        - names:
-            - head
-      OPTIONS:
-        - names:
-            - options
-          args:
-            - - responseType
-      POST:
-        - names:
-            - post
-          args:
-            - - buildEntity
-            - - buildEntity
-              - responseType
-      PUT:
-        - names:
-            - put
-          args:
-            - - buildEntity
-              - responseType
-      TRACE:
-        - names:
-            - trace
-          args:
-            - - responseType
-      GENERIC:
-        - names:
-            - method
-          args:
-            - - methodTypeSkip
-              - responseType
-            - - methodTypeSkip
-              - responseType
-            - - methodTypeSkip
-              - buildEntity
-              - responseType

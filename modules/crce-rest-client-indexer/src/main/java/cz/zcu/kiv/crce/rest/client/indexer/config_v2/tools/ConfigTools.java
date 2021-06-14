@@ -163,10 +163,10 @@ public class ConfigTools {
         for (final MethodArgType settingsKey : settings.keySet()) {
             final Set<WSClientMethodConfig> settingsScope = settings.get(settingsKey);
             for (final WSClientMethodConfig methodConfig : settingsScope) {
-                final Set<Set<ArgConfig>> argConfig =
+                final Set<LinkedHashSet<ArgConfig>> argConfig =
                         loadArgs(methodConfig.getArgsReferences(), argDefinitions);
 
-                final Set<Set<ArgConfig>> varArgConfig =
+                final Set<LinkedHashSet<ArgConfig>> varArgConfig =
                         loadArgs(methodConfig.getVarArgsReferences(), argDefinitions);
                 final SettingsMethod settingsMethod =
                         new SettingsMethod(argDefinitions.get(methodConfig.getReturns()),
@@ -196,9 +196,9 @@ public class ConfigTools {
             final Map<String, Map<String, IWSClient>> data) throws Exception {
         for (final HttpMethodExt httpMethodType : request.keySet()) {
             for (final WSClientMethodConfig currentMethod : request.get(httpMethodType)) {
-                final Set<Set<ArgConfig>> argConfig =
+                final Set<LinkedHashSet<ArgConfig>> argConfig =
                         loadArgs(currentMethod.getArgsReferences(), argDefinitions);
-                final Set<Set<ArgConfig>> varArgConfig =
+                final Set<LinkedHashSet<ArgConfig>> varArgConfig =
                         loadArgs(currentMethod.getVarArgsReferences(), argDefinitions);
                 final RequestMethod settingsMethod =
                         new RequestMethod(argDefinitions.get(currentMethod.getReturns()),
@@ -250,16 +250,17 @@ public class ConfigTools {
      * @return
      * @throws Exception
      */
-    private static Set<Set<ArgConfig>> loadArgs(final Set<Set<String>> argsReferences,
+    private static Set<LinkedHashSet<ArgConfig>> loadArgs(
+            final Set<LinkedHashSet<String>> argsReferences,
             final Map<String, ArgConfig> argDefinitions) throws Exception {
 
-        final Set<Set<ArgConfig>> output = new HashSet<>();
+        final Set<LinkedHashSet<ArgConfig>> output = new HashSet<>();
         if (argsReferences == null) {
             return output;
         }
         for (final Set<String> argReferences : argsReferences) {
 
-            final Set<ArgConfig> args = new HashSet<>();
+            final LinkedHashSet<ArgConfig> args = new LinkedHashSet<>();
             output.add(args);
             for (final String argReference : argReferences) {
                 if (argDefinitions.containsKey(argReference)) {

@@ -23,7 +23,7 @@ public class ClassTools {
     private static final String descrToClassPathRegexp = "^((\\((\\w|\\/|;)*\\)\\[?)?[A-Z])";
     private static final String descrToClassPathRegexpEnd = "((\\$|\\.).*)";
     private static final String descrClassNameRegexpEnd = "((\\.).*)";
-    private static final String genericClasss = "<>";
+    private static final String genericClasss = "(<.*>)";
     private static final String baseTypeRegex = "[BCDFIJSZ]";
     private static final Pattern baseTypePattern = Pattern.compile(baseTypeRegex);
     private static final String objectTypeRegex = "^L[^;<>]+(<.*>)*;";
@@ -315,7 +315,11 @@ public class ClassTools {
             return false;
         }
         ClassStruct class_ = cWrapper.getClassStruct();
-        return class_ != null && class_.getSignature() != null
-                && genericClassPatern.matcher(class_.getSignature()).find();
+        if (class_ != null && class_.getSignature() != null) {
+            String signature = class_.getSignature();
+            boolean patternMatch = genericClassPatern.matcher(class_.getSignature()).find();
+            return signature != null && patternMatch;
+        }
+        return false;
     }
 }

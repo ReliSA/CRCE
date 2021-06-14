@@ -1,7 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,10 +28,21 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.Variabl
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
 
 public class VariableFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(VariableFactory.class);
+
+
+    private static String getStringValueFromArgValue(Variable varArg) {
+        String argVal = (String) varArg.getValue();
+
+        if (argVal == null || argVal.length() == 0) {
+            return varArg.getDescription();
+        }
+        return argVal;
+    }
 
     /**
      * Converts varArray into String list
@@ -55,7 +65,7 @@ public class VariableFactory {
      */
     private static Map<MethodArgType, MethodArg> getArgsFromStack(Stack<Variable> values,
             IWSClient method) {
-        Map<MethodArgType, MethodArg> output = new HashMap<>();
+        Map<MethodArgType, MethodArg> output = new LinkedHashMap<>();
         if (method.getArgs() == null && method.getVarArgs() == null || values.isEmpty()) {
             return output;
         }
@@ -68,6 +78,8 @@ public class VariableFactory {
                         continue;
                     }
                     mArg.setVar(var);
+                    mArg.setDataFromArgConfig(arg);
+                    output.put(arg.getType(), mArg);
                 }
             }
         }
@@ -116,8 +128,28 @@ public class VariableFactory {
             }
                 break;
             case REQUEST_BODY: {
-                endpointData.addParameter(new EndpointParameter(null, argValue.getDescription(),
-                        ClassTools.isArrayOrCollection(argValue.getDescription())));
+                if (argValue.getType() == VariableType.ENDPOINT_DATA) {
+                    Endpoint endpointFromArg = (Endpoint) argValue.getValue();
+                    if (endpointFromArg.getObjects().size() > 0) {
+                        for (String obj : endpointFromArg.getObjects()) {
+                            endpointData.addParameter(new EndpointParameter("", obj,
+                                    ClassTools.isArrayOrCollection(obj), ParameterCategory.BODY));
+                        }
+                        break;
+                    }
+                } else {
+                    final String request =
+                            ClassTools.descriptionToClassName(getStringValueFromArgValue(argValue));
+                    endpointData.addParameter(new EndpointParameter(null, request,
+                            ClassTools.isArrayOrCollection(request), ParameterCategory.BODY));
+                }
+            }
+                break;
+            case OBJECT: {
+                final String object =
+                        ClassTools.descriptionToClassName(getStringValueFromArgValue(argValue));
+                endpointData.addObject(object);
+
             }
                 break;
             case REQUEST_CALLBACK:
@@ -128,8 +160,21 @@ public class VariableFactory {
             }
                 break;
             case RESPONSE: {
-                endpointData.addExpectedResponse(new EndpointBody(argValue.getDescription(),
-                        ClassTools.isArrayOrCollection(argValue.getDescription())));
+                if (argValue.getType() == VariableType.ENDPOINT_DATA) {
+                    Endpoint endpointFromArg = (Endpoint) argValue.getValue();
+                    if (endpointFromArg.getObjects().size() > 0) {
+                        for (String obj : endpointFromArg.getObjects()) {
+                            endpointFromArg.addExpectedResponse(
+                                    new EndpointBody(obj, ClassTools.isArrayOrCollection(obj)));
+                        }
+                        break;
+                    }
+                } else {
+                    final String object =
+                            ClassTools.descriptionToClassName(getStringValueFromArgValue(argValue));
+                    endpointData.addExpectedResponse(
+                            new EndpointBody(object, ClassTools.isArrayOrCollection(object)));
+                }
             }
                 break;
             case UNKNOWN:
@@ -178,7 +223,7 @@ public class VariableFactory {
     private static void processHeaderArg(String argValue, MethodArgType argType,
             Endpoint endpointData) {
 
-        Header newHeader = new Header(null, argValue);
+        Header newHeader = new Header(argType.getMethodArgType(), argValue);
         if (HeaderTools.isControlType(argType)) {
             newHeader.setHeaderGroup(HeaderGroup.CONTROL);
             endpointData.addControlsHeaders(newHeader);
@@ -194,10 +239,13 @@ public class VariableFactory {
         } else if (HeaderTools.isRequestContext(argType)) {
             newHeader.setHeaderGroup(HeaderGroup.REQUEST_CONTEXT);
             endpointData.addRequestContext(newHeader);
+        } else if (HeaderTools.isRepresentation(argType)) {
+            newHeader.setHeaderGroup(HeaderGroup.REPRESENTATION);
+            endpointData.addRepresentationHeader(newHeader);
         }
 
         if (newHeader.getHeaderGroup() == null) {
-            endpointData.addProduces(newHeader);
+            endpointData.addResponseHeader(newHeader);
         }
     }
 
@@ -320,7 +368,6 @@ public class VariableFactory {
             if (argValue instanceof Endpoint || argValue instanceof EndpointData) {
                 Endpoint valCast = (Endpoint) argValue;
                 endpointData.merge(valCast);
-                continue;
             }
             if (arg.getType() == MethodArgType.KEY || arg.getType() == MethodArgType.VALUE
                     && method.getType() == WSClientType.SETTINGS) {
@@ -357,7 +404,11 @@ public class VariableFactory {
             List<MethodArg> mapValue = dataHolder.get(key);
             processGenericArgs(key, mapValue, (MethodArgType) method.getInnerType(), endpointData);
         }
-
+        if (method.getInnerType() instanceof HttpMethodExt) {
+            if (method.getInnerType().ordinal() < HttpMethodExt.GENERIC.ordinal()) {
+                endpointData.addHttpMethod(HttpMethod.values()[method.getInnerType().ordinal()]);
+            }
+        }
         return endpointData;
     }
 

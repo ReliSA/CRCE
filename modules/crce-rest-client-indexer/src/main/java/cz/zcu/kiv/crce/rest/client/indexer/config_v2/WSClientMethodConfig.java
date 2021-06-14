@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,10 +9,10 @@ public class WSClientMethodConfig {
     private Set<String> names;
 
     @JsonProperty("args")
-    private Set<Set<String>> argsReferences;
+    private Set<LinkedHashSet<String>> argsReferences;
 
     @JsonProperty("varArgs")
-    private Set<Set<String>> varArgsReferences;
+    private Set<LinkedHashSet<String>> varArgsReferences;
 
     @JsonProperty("returns")
     private String returns;
@@ -30,21 +31,21 @@ public class WSClientMethodConfig {
         this.returns = returns;
     }
 
-    public void setArgs(Set<Set<String>> argsReferences) {
+    public void setArgs(Set<LinkedHashSet<String>> argsReferences) {
         this.argsReferences = argsReferences;
     }
 
     /**
      * @return the varArgsReferences
      */
-    public Set<Set<String>> getVarArgsReferences() {
+    public Set<LinkedHashSet<String>> getVarArgsReferences() {
         return varArgsReferences;
     }
 
     /**
      * @param varArgsReferences the varArgsReferences to set
      */
-    public void setVarArgs(Set<Set<String>> varArgsReferences) {
+    public void setVarArgs(Set<LinkedHashSet<String>> varArgsReferences) {
         this.varArgsReferences = varArgsReferences;
     }
 
@@ -65,7 +66,7 @@ public class WSClientMethodConfig {
     /**
      * @return the argsReferences
      */
-    public Set<Set<String>> getArgsReferences() {
+    public Set<LinkedHashSet<String>> getArgsReferences() {
         return argsReferences;
     }
 }

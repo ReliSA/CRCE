@@ -239,7 +239,7 @@ public class EndpointDataMiningTools {
      * @param operation Operation which contains method description
      * @return Arguments extracted from stack
      */
-    private static Stack<Variable> methodArgsFromValues(Stack<Variable> values,
+    public static Stack<Variable> methodArgsFromValues(Stack<Variable> values,
             Operation operation) {
         String[] methodArgsDef = MethodTools.getArgsFromSignature(operation.getDescription());
         Stack<Variable> output = new Stack<>();

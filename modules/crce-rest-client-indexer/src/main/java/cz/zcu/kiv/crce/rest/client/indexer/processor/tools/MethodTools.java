@@ -1,23 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
-import cz.zcu.kiv.crce.rest.client.indexer.config.ArgConfigType;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VarArray;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 
 public class MethodTools {
 
@@ -30,6 +14,7 @@ public class MethodTools {
     private static final String initString = "<init>";
     private static final Pattern argPattern = Pattern.compile("\\((.*?)\\)");
     private static final Pattern methodNamePattern = Pattern.compile("\\.<?(\\w*)>?-?\\(");
+    private static final Pattern returnTypePattern = Pattern.compile("(\\))([A-Z])(.*)");
 
     /**
      * Checkes if
@@ -86,9 +71,18 @@ public class MethodTools {
         return null;
     }
 
+    public static String getReturnTypeFromMethodDescription(String description) {
+        Matcher matcher = returnTypePattern.matcher(description);
+        if (matcher.find()) {
+            return matcher.group(3).replace(";", "");
+        }
+        return null;
+    }
 
-
-
+    public static boolean hasReturnTypeVoid(String description) {
+        final String returnType = getReturnTypeFromMethodDescription(description);
+        return returnType != null && returnType != "" && returnType == "V";
+    }
 
     /**
      * Retrieves parameters from stack based on definition of method arguments

@@ -1,5 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
@@ -7,8 +8,8 @@ import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 public class SettingsMethod implements IWSClient {
 
     private MethodArgType innerType;
-    private Set<Set<ArgConfig>> args;
-    private Set<Set<ArgConfig>> varArgs;
+    private Set<LinkedHashSet<ArgConfig>> args;
+    private Set<LinkedHashSet<ArgConfig>> varArgs;
     private ArgConfig returns;
 
 
@@ -19,8 +20,8 @@ public class SettingsMethod implements IWSClient {
      * @param varArgs
      * @param returns
      */
-    public SettingsMethod(ArgConfig returns, MethodArgType innerType, Set<Set<ArgConfig>> args,
-            Set<Set<ArgConfig>> varArgs) {
+    public SettingsMethod(ArgConfig returns, MethodArgType innerType,
+            Set<LinkedHashSet<ArgConfig>> args, Set<LinkedHashSet<ArgConfig>> varArgs) {
         this.innerType = innerType;
         this.args = args;
         this.varArgs = varArgs;
@@ -38,12 +39,12 @@ public class SettingsMethod implements IWSClient {
     }
 
     @Override
-    public Set<Set<ArgConfig>> getArgs() {
+    public Set<LinkedHashSet<ArgConfig>> getArgs() {
         return args;
     }
 
     @Override
-    public Set<Set<ArgConfig>> getVarArgs() {
+    public Set<LinkedHashSet<ArgConfig>> getVarArgs() {
         return varArgs;
     }
 

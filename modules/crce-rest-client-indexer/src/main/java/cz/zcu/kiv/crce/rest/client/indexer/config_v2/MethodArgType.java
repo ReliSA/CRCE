@@ -5,8 +5,8 @@ import java.util.Map;
 
 public enum MethodArgType {
 
-        ENDPOINT_DATA("ENDPOINT_DATA"), RESPONSE("RESPONSE"), REQUEST_BODY(
-                        "REQUEST_BODY"), REQUEST_CALLBACK("REQUEST_CALLBACK"), URI_CALLBACK(
+        ENDPOINT_DATA("ENDPOINT_DATA"), RESPONSE("RESPONSE"), REQUEST_BODY("REQUEST_BODY"), OBJECT(
+                        "OBJECT"), REQUEST_CALLBACK("REQUEST_CALLBACK"), URI_CALLBACK(
                                         "URI_CALLBACK"), HEADER("HEADER"), KEY("KEY"), VALUE(
                                                         "VALUE"), HTTP_METHOD(
                                                                         "HTTP_METHOD"), URI_VARIABLE(
@@ -65,32 +65,12 @@ public enum MethodArgType {
                                                                                                                                                                                                                                                                                                                                                                                         "WWW-Authenticate");
 
         private String methodArgType;
-        private static Map<String, MethodArgType> mapValueToEnumName = Map.of("A-IM", A_IM,
-                        "Accept", ACCEPT, "Accept-Charset", ACCEPT_CHARSET, "Accept-Encoding",
-                        ACCEPT_ENCODING, "Accept-Language", ACCEPT_LANGUAGE, "Accept-Datetime",
-                        ACCEPT_DATETIME, "Access-Control-Request-Method",
-                        ACCESS_CONTROL_REQUEST_METHOD, "Access-Control-Request-Headers",
-                        ACCESS_CONTROL_REQUEST_HEADERS, "Authorization", AUTHORIZATION, "Cookie",
-                        COOKIE, "Expect", EXPECT, "Forwarded", FORWARDED, "From", FROM, "Host",
-                        HOST, "If-Match", IF_MATCH, "If-Modified-Since", IF_MODIFIED_SINCE,
-                        "If-None-Match", IF_NONE_MATCH, "If-Range", IF_RANGE, "If-Unmodified-Since",
-                        IF_UNMODIFIED_SINCE, "Max-Forwards", MAX_FORWARDS, "Origin", ORIGIN,
-                        "Proxy-Authorization", PROXY_AUTHORIZATION, "Range", RANGE, "Referer",
-                        REFERER, "TE", TE, "User-Agent", USER_AGENT, "Connection", CONNECTION,
-                        "Content-Length", CONTENT_LENGTH, "Content-Type", CONTENT_TYPE, "Date",
-                        DATE, "Pragma", PRAGMA, "Upgrade", UPGRADE, "Via", VIA, "Cache-Control",
-                        CACHE_CONTROL, "Accept-Patch", ACCEPT_PATCH, "Accept-Ranges", ACCEPT_RANGES,
-                        "Age", AGE, "Allow", ALLOW, "Alt-Svc", ALT_SVC, "Content-Disposition",
-                        CONTENT_DISPOSITION, "Content-Encoding", CONTENT_ENCODING,
-                        "Content-Language", CONTENT_LANGUAGE, "Content-Location", CONTENT_LOCATION,
-                        "Content-Range", CONTENT_RANGE, "Delta-Base", DELTA_BASE, "ETag", ETAG,
-                        "Expires", EXPIRES, "IM", IM, "Last-Modified", LAST_MODIFIED, "Link", LINK,
-                        "Location", LOCATION, "Proxy-Authenticate", PROXY_AUTHENTICATE,
-                        "Public-Key-Pins", PUBLIC_KEY_PINS, "Retry-After", RETRY_AFTER, "Server",
-                        SERVER, "Set-Cookie", SET_COOKIE, "Strict-Transport-Security",
-                        STRICT_TRANSPORT_SECURITY, "Trailer", TRAILER, "Transfer-Encoding",
-                        TRANSFER_ENCODING, "Tk", TK, "Vary", VARY, "Warning", WARNING,
-                        "WWW-Authenticate", WWW_AUTHENTICATE);
+        private static final Map<String, MethodArgType> mapValueToEnumName = new HashMap<>();
+        static {
+                for (MethodArgType type : MethodArgType.values()) {
+                        mapValueToEnumName.put(type.getMethodArgType(), type);
+                }
+        }
 
         public static MethodArgType ofValue(String value) {
                 return mapValueToEnumName.get(value);
@@ -109,5 +89,4 @@ public enum MethodArgType {
         public String getMethodArgType() {
                 return methodArgType;
         }
-
 }
