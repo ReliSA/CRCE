@@ -24,6 +24,10 @@ public class StringTools {
         return name.equals(APPEND_FC);
     }
 
+    public static boolean isEmpty(String string) {
+        return string == null || string.length() == 0;
+    }
+
     public enum OperationType {
         APPEND, TOSTRING
     }

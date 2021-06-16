@@ -18,7 +18,7 @@ public class Config {
     @JsonProperty("argDefinitions")
     private Map<String, ArgConfig> argDefinitions;
 
-    @JsonProperty("requestParams")
+    @JsonProperty("requestParameters")
     private Set<RequestParamConfig> requestParams;
 
 

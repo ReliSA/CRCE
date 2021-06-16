@@ -14,4 +14,5 @@ public interface IWSClient {
     Set<LinkedHashSet<ArgConfig>> getVarArgs();
 
     ArgConfig getReturns();
+
 }

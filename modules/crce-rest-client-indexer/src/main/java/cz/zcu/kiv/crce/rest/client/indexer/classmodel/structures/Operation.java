@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 
 /**
@@ -7,6 +9,8 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescrip
  */
 public class Operation {
 
+    private static String regexpOperationName = "<?(\\w*)>?";
+    private static Pattern operationNamePatter = Pattern.compile(regexpOperationName);
     private int opcode;
     private OperationType type;
     private Object value;
@@ -73,7 +77,12 @@ public class Operation {
     }
 
     public void setMethodName(String name) {
-        this.fName = name;
+        Matcher matcher = operationNamePatter.matcher(name);
+        if (matcher.find()) {
+            this.fName = matcher.group(1);
+        } else {
+            this.fName = name;
+        }
     }
 
     public void setFieldName(String name) {

@@ -1,6 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,8 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethodExt;
 
@@ -51,8 +54,13 @@ public class VariableFactory {
      */
     private static List<String> varArrayToStringList(VarArray varArray) {
         List<String> output = new LinkedList<>();
+        if (varArray.getInnerArray() == null || varArray.getInnerArray().length == 0) {
+            return output;
+        }
         for (final Variable variable : varArray.getInnerArray()) {
-            output.add((String) variable.getValue());
+            if (variable != null) {
+                output.add((String) variable.getValue());
+            }
         }
         return output;
     }
@@ -69,21 +77,115 @@ public class VariableFactory {
         if (method.getArgs() == null && method.getVarArgs() == null || values.isEmpty()) {
             return output;
         }
+        Set<ArgConfig> lastPossibleVersion = null;
+        Set<ArgConfig> lastPossibleVersionVar = null;
+        Set<ArgConfig> exactVersion = null;
+        Set<ArgConfig> exactVersionVar = null;
+        boolean varArgs = false;
         for (final Set<ArgConfig> versionOfArgs : method.getArgs()) {
+            exactVersion = versionOfArgs;
             if (versionOfArgs.size() == values.size()) {
-                for (ArgConfig arg : versionOfArgs) {
-                    final Variable var = values.pop();
-                    MethodArg mArg = new MethodArg();
-                    if (arg.getType() == MethodArgType.UNKNOWN) {
-                        continue;
+                lastPossibleVersion = versionOfArgs;
+                Iterator<ArgConfig> argIter = versionOfArgs.iterator();
+                for (int i = versionOfArgs.size() - 1; i >= 0; i--) {
+                    Variable var = values.get(i);
+                    final String desc = var.getOwner() != null ? var.getOwner() : var.getOwner();
+                    ArgConfig current = argIter.next();
+                    if (!current.getClasses().contains("java/lang/Object")
+                            && !current.getClasses().contains(desc)) {
+                        exactVersion = null;
+                        break;
                     }
-                    mArg.setVar(var);
-                    mArg.setDataFromArgConfig(arg);
-                    output.put(arg.getType(), mArg);
+                }
+            } else {
+                exactVersion = null;
+            }
+            if (exactVersionVar != null) {
+                break;
+            }
+        }
+        if (exactVersion == null) {
+            for (final Set<ArgConfig> versionOfArgs : method.getVarArgs()) {
+                exactVersionVar = versionOfArgs;
+                if (versionOfArgs.size() <= values.size()) {
+                    lastPossibleVersionVar = versionOfArgs;
+                    Iterator<ArgConfig> argIter = versionOfArgs.iterator();
+                    for (int i = versionOfArgs.size() - 1; i >= 0; i--) {
+                        Variable var = values.get(i);
+                        final String desc = !StringTools.isEmpty(var.getOwner()) ? var.getOwner()
+                                : var.getDescription();
+                        ArgConfig current = argIter.next();
+                        if (current.getClasses() == null
+                                || (!current.getClasses().contains("java/lang/Object")
+                                        && !current.getClasses().contains(desc))) {
+                            exactVersionVar = null;
+                            break;
+                        }
+                    }
+                } else {
+                    exactVersionVar = null;
+                }
+                if (exactVersionVar != null) {
+                    break;
                 }
             }
         }
+
+        Set<ArgConfig> versionOfArgs = null;
+
+        if (exactVersion != null) {
+            versionOfArgs = exactVersion;
+        }
+
+        if (exactVersionVar != null) {
+            varArgs = true;
+            versionOfArgs = exactVersionVar;
+        }
+
+        if (versionOfArgs == null) {
+            if (lastPossibleVersion != null) {
+                versionOfArgs = lastPossibleVersion;
+            } else if (lastPossibleVersionVar != null) {
+                versionOfArgs = lastPossibleVersionVar;
+                varArgs = true;
+            }
+        }
+
+        if (versionOfArgs == null) {
+            return output;
+        }
+        ArgConfig lastArg = null;
+        for (ArgConfig arg : versionOfArgs) {
+            final Variable var = values.pop();
+            MethodArg mArg = new MethodArg();
+            if (arg.getType() == MethodArgType.UNKNOWN) {
+                continue;
+            }
+            mArg.setVar(var);
+            mArg.setDataFromArgConfig(arg);
+            lastArg = mArg;
+            output.put(arg.getType(), mArg);
+        }
+        if (varArgs && lastArg != null && values.size() > 0) {
+            Variable newVariable = new Variable();
+            newVariable.setType(VariableType.LIST);
+            List<Variable> args = new LinkedList<>();
+            while (values.size() > 0) {
+                Variable last = SafeStack.peek(values);
+                final String desc =
+                        last.getOwner() != null ? last.getOwner() : last.getDescription();
+                if (lastArg.getClasses().contains(desc)) {
+                    args.add(new Variable().setValue(values.pop()));
+                }
+            }
+            newVariable.setValue(args);
+            MethodArg methodArg = new MethodArg();
+            methodArg.setDataFromArgConfig(lastArg);
+            methodArg.setVar(newVariable);
+            output.put(lastArg.getType(), methodArg);
+        }
         return output;
+
     }
 
     /**
@@ -164,7 +266,7 @@ public class VariableFactory {
                     Endpoint endpointFromArg = (Endpoint) argValue.getValue();
                     if (endpointFromArg.getObjects().size() > 0) {
                         for (String obj : endpointFromArg.getObjects()) {
-                            endpointFromArg.addExpectedResponse(
+                            endpointData.addExpectedResponse(
                                     new EndpointBody(obj, ClassTools.isArrayOrCollection(obj)));
                         }
                         break;
@@ -201,11 +303,17 @@ public class VariableFactory {
      * @param methodArg Method argument
      * @param endpointData Object which holds information about endpoint
      */
+    @SuppressWarnings("unchecked")
     private static void processHeaderArg(MethodArg methodArg, Endpoint endpointData) {
         List<String> values;
         if (methodArg.getVar().getType() == VariableType.ARRAY
                 && methodArg.getVar().getValue() instanceof VarArray) {
             values = varArrayToStringList((VarArray) (methodArg.getVar().getValue()));
+        } else if (methodArg.getVar().getType() == VariableType.LIST) {
+            values = new LinkedList<>();
+            for (Variable var : (List<Variable>) methodArg.getVar().getValue()) {
+                values.add((String) var.getValue());
+            }
         } else {
             values = List.of((String) methodArg.getVar().getValue());
         }

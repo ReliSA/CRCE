@@ -26,9 +26,10 @@ argDefinitions:
     classes:
       - org.springframework.web.client.RequestCallback
   requestObject:
-    type: ENDPOINT_DATA
+    type: REQUEST_BODY
     classes:
       - org.springframework.http.HttpEntity
+      - java.lang.Object
   requestObjectAny:
     type: REQUEST_BODY
     classes:
@@ -65,7 +66,14 @@ argDefinitions:
     type: VALUE
     classes:
       - java.lang.List
-
+  headerKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  headerValue:
+    type: VALUE
+    classes:
+      - java.lang.String
 wsClientData:
   - classes:
       - org.springframework.http.HttpEntity
@@ -85,9 +93,37 @@ wsClientData:
             - getHeaders
           returns: headersParam
   - classes:
+      - org.springframework.http.HttpHeaders
+    settings:
+      HEADER:
+        - names:
+            - init
+        - names:
+            - add
+            - set
+          args:
+            - - headerKey
+              - headerValue
+        - names:
+            - addAll
+            - setAll
+          args:
+            - - headersParam
+          varArgs:
+            - - headerKey
+              - headerValue
+  - classes:
+      - org.springframework.boot.web.client.RestTemplateBuilder
+    settings:
+      GENERIC:
+        - names:
+            - build
+  - classes:
       - org.springframework.util.MultiValueMap
     settings:
       GENERIC:
+        - names:
+            - init
         - names:
             - add
           args:
@@ -99,6 +135,12 @@ wsClientData:
             - - mValuedMapKey
               - mValuedMapValueList
             - - mValuedMap
+  - classes:
+      - org.springframework.util.LinkedMultiValueMap
+    settings:
+      GENERIC:
+        - names:
+            - init
 wsClient:
   - interfaces:
       - org.springframework.web.client.RestOperations
@@ -201,3 +243,7 @@ wsClient:
               - httpMethod
               - requestCallback
               - responseExtractor
+  - classes:
+      - org.springframework.web.client.RestTemplate
+    inherits:
+      - org.springframework.web.client.RestOperations

@@ -141,7 +141,8 @@ public class BasicProcessor {
      */
     protected void processSTRINGCONST(Operation operation, Stack<Variable> values) {
         String newValue = operation.getValue() != null ? operation.getValue().toString() : null;
-        values.add(new Variable(newValue).setType(VariableType.SIMPLE));
+        values.add(
+                new Variable(newValue).setType(VariableType.SIMPLE).setOwner("java/lang/String"));
     }
 
     /**
@@ -185,7 +186,7 @@ public class BasicProcessor {
             return;
         }
         VarArray varArray = (VarArray) array.getValue();
-        if (arrayItem.getType() == VariableType.SIMPLE && arrayItem.getValue() != null) {
+        if (arrayItem.getType() == VariableType.SIMPLE) {
             //varArray.set((String) arrayItem.getValue());
             varArray.set(arrayItem);
         }

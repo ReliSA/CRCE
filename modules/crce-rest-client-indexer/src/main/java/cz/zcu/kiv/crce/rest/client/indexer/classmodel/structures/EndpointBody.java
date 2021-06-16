@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 
 public class EndpointBody implements Serializable {
@@ -11,6 +10,7 @@ public class EndpointBody implements Serializable {
      */
     private static final long serialVersionUID = -1178419129599203262L;
 
+    private String type;
     private String structure;
     private boolean isArray;
 
@@ -20,12 +20,20 @@ public class EndpointBody implements Serializable {
      * @param structure Stringified sutucture of body
      * @param isArray Is it array
      */
-    public EndpointBody(String structure, boolean isArray) {
-        this.structure = structure;
+    public EndpointBody(String type, boolean isArray) {
+        this.type = type;
         this.isArray = isArray;
     }
 
     public EndpointBody() {}
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
 
     /**
      * 
@@ -60,23 +68,23 @@ public class EndpointBody implements Serializable {
 
     @Override
     public String toString() {
-        return "{ \"structure\": " + ToJSONTools.convertObject(structure) + ", \"isArray\" : "
-                + isArray + " }";
+        return "{ \"type\": " + ToJSONTools.convertString(type) + " ,\"structure\": "
+                + ToJSONTools.convertObject(structure) + ", \"isArray\" : " + isArray + " }";
 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(structure, isArray);
+        return Objects.hash(type, isArray);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof EndpointBody) {
             EndpointBody eReqBody = (EndpointBody) obj;
-            boolean structureEq = structure.compareTo(eReqBody.getStructure()) == 0;
+            boolean typeEq = type.compareTo(eReqBody.getType()) == 0;
             boolean isArrayEq = isArray == eReqBody.isArray();
-            return structureEq && isArrayEq;
+            return typeEq && isArrayEq;
         }
         return false;
     }

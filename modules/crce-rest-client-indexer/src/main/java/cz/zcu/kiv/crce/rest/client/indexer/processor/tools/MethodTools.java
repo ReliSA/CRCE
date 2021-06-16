@@ -14,7 +14,8 @@ public class MethodTools {
     private static final String initString = "<init>";
     private static final Pattern argPattern = Pattern.compile("\\((.*?)\\)");
     private static final Pattern methodNamePattern = Pattern.compile("\\.<?(\\w*)>?-?\\(");
-    private static final Pattern returnTypePattern = Pattern.compile("(\\))([A-Z])(.*)");
+    private static final Pattern returnTypePattern = Pattern.compile("(\\))([A-Z])(.*)(;?-\\w+)");
+    private static final Pattern classNamePattern = Pattern.compile("(.+)(\\.)");
 
     /**
      * Checkes if
@@ -48,7 +49,6 @@ public class MethodTools {
             // cleanup
             int counter = 0;
             for (String arg : args) {
-                //System.out.println("ARG=" + arg);
                 args[counter++] = ClassTools.descriptionToClassPath(arg);
             }
             return args;
@@ -72,6 +72,14 @@ public class MethodTools {
     }
 
     public static String getReturnTypeFromMethodDescription(String description) {
+        if (MethodTools.getType(description) == MethodType.INIT) {
+            Matcher matcher = classNamePattern.matcher(description);
+            if (matcher.find()) {
+                if (matcher.group(0) != null && matcher.group(0).length() > 0) {
+                    return matcher.group(0).replace(".", "");
+                }
+            }
+        }
         Matcher matcher = returnTypePattern.matcher(description);
         if (matcher.find()) {
             return matcher.group(3).replace(";", "");

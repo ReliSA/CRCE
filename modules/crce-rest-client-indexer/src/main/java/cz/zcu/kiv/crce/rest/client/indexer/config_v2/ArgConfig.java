@@ -1,15 +1,17 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config_v2;
 
+import java.util.HashSet;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ClassTools;
 
 public class ArgConfig {
     @JsonProperty("type")
     private MethodArgType type;
     @JsonProperty("classes")
-    private Set<String> classes;
+    private Set<String> classes = new HashSet<>();
     @JsonProperty("interfaces")
-    private Set<String> interfaces;
+    private Set<String> interfaces = new HashSet<>();
 
     /**
      * @return the type
@@ -29,6 +31,7 @@ public class ArgConfig {
      * @return the classes
      */
     public Set<String> getClasses() {
+
         return classes;
     }
 
@@ -36,7 +39,10 @@ public class ArgConfig {
      * @param classes the classes to set
      */
     public void setClasses(Set<String> classes) {
-        this.classes = classes;
+        for (final String className : classes) {
+            final String processed = ClassTools.processClassName(className);
+            this.classes.add(processed);
+        }
     }
 
     /**
@@ -50,7 +56,10 @@ public class ArgConfig {
      * @param interfaces the interfaces to set
      */
     public void setInterfaces(Set<String> interfaces) {
-        this.interfaces = interfaces;
+        for (final String className : interfaces) {
+            final String processed = ClassTools.processClassName(className);
+            this.interfaces.add(processed);
+        }
     }
 
 

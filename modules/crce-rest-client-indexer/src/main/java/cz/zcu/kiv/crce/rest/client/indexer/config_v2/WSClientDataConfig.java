@@ -18,10 +18,29 @@ public class WSClientDataConfig {
     @JsonProperty("inherits")
     private Set<String> inherits = new HashSet<>();
 
-
     @JsonProperty("settings")
     private Map<MethodArgType, Set<WSClientMethodConfig>> settings = new HashMap<>();
 
+    @JsonProperty("core")
+    private Set<String> core = new HashSet<>();
+
+
+    /**
+     * @param core the core to set
+     */
+    public void setCore(Set<String> core) {
+        for (final String className : core) {
+            final String processed = ClassTools.processClassName(className);
+            this.core.add(processed);
+        }
+    }
+
+    /**
+     * @return the core
+     */
+    public Set<String> getCore() {
+        return core;
+    }
 
     /**
      * @param inherits the inherits to set

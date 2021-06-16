@@ -34,7 +34,7 @@ public class BeanProcessor {
      * @return String
      */
     private String convertBodyToJson(EndpointBody body) {
-        final String className = body.getStructure();
+        final String className = body.getType();
         if (cache.containsKey(className)) {
             return cache.get(className);
         }

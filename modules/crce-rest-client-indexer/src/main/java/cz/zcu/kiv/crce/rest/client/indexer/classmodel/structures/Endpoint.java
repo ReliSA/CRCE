@@ -228,6 +228,15 @@ public class Endpoint implements Serializable {
         this.produces = copyHeaders(endpoint.getProduces());
         this.consumes = copyHeaders(endpoint.getConsumes());
         this.parameters = copyEndpointParameters(endpoint.getParameters());
+
+        this.responseHeaders = copyHeaders(endpoint.getResponseHeaders());
+        this.controlsHeaders = copyHeaders(endpoint.getControlsHeaders());
+        this.conditionals = copyHeaders(endpoint.getConditionals());
+        this.contentNegotiation = copyHeaders(endpoint.getContentNegotiation());
+        this.authenticationCredentials = copyHeaders(endpoint.getAuthenticationCredentials());
+        this.requestContext = copyHeaders(endpoint.getRequestContext());
+        this.representation = copyHeaders(endpoint.getRepresentation());
+
     }
 
     private Set<EndpointParameter> copyEndpointParameters(
@@ -250,7 +259,7 @@ public class Endpoint implements Serializable {
         Set<EndpointBody> copy = new HashSet<>();
 
         for (final EndpointBody body : setEbody) {
-            copy.add(new EndpointBody(body.getStructure(), body.isArray()));
+            copy.add(new EndpointBody(body.getType(), body.isArray()));
         }
         return copy;
     }

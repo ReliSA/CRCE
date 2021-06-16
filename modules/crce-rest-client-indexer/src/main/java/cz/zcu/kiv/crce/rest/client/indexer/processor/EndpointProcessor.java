@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
+import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamFieldType;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestParam;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools;
@@ -25,6 +26,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
+import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 class EndpointHandler extends MethodProcessor {
 
@@ -79,8 +81,9 @@ class EndpointHandler extends MethodProcessor {
      * @param operation Operation
      * @return Is it Enum method type of method call
      */
-    private boolean isRequestParamMethod(Operation operation) {
-        return requestParams.containsKey(operation.getOwner());
+    private boolean isRequestParamField(Operation operation) {
+        return requestParams.containsKey(operation.getOwner())
+                && requestParams.get(operation.getOwner()).containsKey(operation.getFieldName());
     }
 
     /**
@@ -299,24 +302,45 @@ class EndpointHandler extends MethodProcessor {
      * @param operation Operation
      */
     /*     private void processGETFIELDLibEnum(Stack<Variable> values, Operation operation) {
-        if (isRequestParamMethod(operation)) {
-            HashMap<String, EnumFieldOrMethodConfig> enumClass = ecMAp.get(operation.getOwner());
-            if (enumClass.containsKey(operation.getFieldName())) {
-                EnumFieldOrMethodConfig enumField = enumClass.get(operation.getFieldName());
-                if (enumField.getContentType() != null) {
-                    values.push(
-                            new Variable(enumField.getContentType()).setType(VariableType.SIMPLE));
-                } else if (enumField.getHttpMethod() != null) {
-                    values.push(
-                            new Variable(enumField.getHttpMethod()).setType(VariableType.SIMPLE));
+     if (isRequestParamMethod(operation)) {
+         HashMap<String, EnumFieldOrMethodConfig> enumClass = ecMAp.get(operation.getOwner());
+         if (enumClass.containsKey(operation.getFieldName())) {
+             EnumFieldOrMethodConfig enumField = enumClass.get(operation.getFieldName());
+             if (enumField.getContentType() != null) {
+                 values.push(
+                         new Variable(enumField.getContentType()).setType(VariableType.SIMPLE));
+             } else if (enumField.getHttpMethod() != null) {
+                 values.push(
+                         new Variable(enumField.getHttpMethod()).setType(VariableType.SIMPLE));
     
-                } else if (enumField.getHeaderType() != null) {
-                    values.push(
-                            new Variable(enumField.getHeaderType()).setType(VariableType.SIMPLE));
-                }
-            }
-        }
+             } else if (enumField.getHeaderType() != null) {
+                 values.push(
+                         new Variable(enumField.getHeaderType()).setType(VariableType.SIMPLE));
+             }
+         }
+     }
     } */
+
+    /**
+     * Processes enums and classes which holds essential informations about endpoints (e.g. Content-Type, Http method etc.)
+     * @param values Stack
+     * @param operation Operation
+     */
+    private void processFIELDRequestParameters(Stack<Variable> values, Operation operation) {
+        if (isRequestParamField(operation)) {
+            RequestParam param =
+                    requestParams.get(operation.getOwner()).get(operation.getFieldName());
+            Variable newVar = new Variable();
+            if (param.getType() == RequestParamFieldType.HTTP_METHOD) {
+                newVar.setValue(HttpMethod.valueOf(param.getValue()));
+            } else {
+                newVar.setValue(param.getValue());
+            }
+            values.push(newVar);
+        } else {
+            super.processGETSTATICFIELD(values, operation);
+        }
+    }
 
     /**
      * [+Enum processing]
@@ -325,9 +349,7 @@ class EndpointHandler extends MethodProcessor {
      */
     @Override
     protected void processGETSTATICFIELD(Stack<Variable> values, Operation operation) {
-        super.processGETSTATICFIELD(values, operation);
-        //processGETFIELDLibEnum(values, operation);
-
+        processFIELDRequestParameters(values, operation);
     }
 
     /**
@@ -357,16 +379,22 @@ class EndpointHandler extends MethodProcessor {
                         .get(operation.getMethodName());
                 endpointData = VariableFactory.getEndpointData(methodArgs, client);
                 if (SafeStack.peekEndpoint(values) != null) {
-                    Endpoint endpointFromStack = (Endpoint) values.pop().getValue();
+                    Endpoint endpointFromStack = (Endpoint) values.peek().getValue();
                     endpointData.merge(endpointFromStack);
                 }
             }
             final String returnType =
-                    MethodTools.getReturnTypeFromMethodDescription(operation.getDesc());
+                    MethodTools.getReturnTypeFromMethodDescription(operation.getDescription());
             if (wsClients.containsKey(returnType)
                     || wsClientDataContainers.containsKey(returnType)) {
                 final Variable variable = new Variable();
                 values.push(variable.setValue(endpointData).setType(VariableType.ENDPOINT_DATA));
+            } else {
+                //merge it into top of the stack endpoint (if it exsits)
+                if (SafeStack.peekEndpoint(values) != null) {
+                    Endpoint endpointFromStack = (Endpoint) values.peek().getValue();
+                    endpointFromStack.merge(endpointData);
+                }
             }
         } else {
             super.processCALL(operation, values);

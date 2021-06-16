@@ -32,7 +32,8 @@ requestParameters:
         SERVER_SENT_EVENTS: text/event-stream
         SERVER_SENT_EVENTS_TYPE: text/event-stream
         APPLICATION_JSON_PATCH_JSON: application/json-patch+json
-  - class: javax.ws.rs.core.HttpHeaders
+  - classes:
+      - javax.ws.rs.core.HttpHeaders
     fields:
       GENERIC:
         ACCEPT: Accept

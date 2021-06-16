@@ -5,7 +5,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 public class Variable {
 
     public enum VariableType {
-        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINT_DATA, WS_CLIENT_DATA, MAP
+        SIMPLE, OTHER, ENDPOINT, ARRAY, ENDPOINT_DATA, WS_CLIENT_DATA, MAP, LIST
     }
 
     private Object value = "";

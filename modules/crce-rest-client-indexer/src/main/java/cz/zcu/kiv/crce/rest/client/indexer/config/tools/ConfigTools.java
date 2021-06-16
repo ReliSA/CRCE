@@ -138,7 +138,6 @@ public class ConfigTools {
     private static void loadDefinitions() {
         try {
             final URL resource_url = ConfigTools.class.getResource(DEF_DIR_ABS);
-            // System.out.println("RESOURCE_URL="+resource_url.toURI().getScheme());
             if (resource_url == null) {
                 throw new Exception("Directory not found: " + DEF_DIR_ABS);
             }

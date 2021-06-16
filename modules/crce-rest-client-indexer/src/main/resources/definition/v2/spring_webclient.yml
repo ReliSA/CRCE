@@ -23,6 +23,10 @@ argDefinitions:
     type: URI_VARIABLE
     interfaces:
       - java.util.Map
+  uriVariableObj:
+    type: URI_VARIABLE
+    classes:
+      - java.lang.Object
   uriVariableKey:
     type: KEY
     classes:
@@ -52,8 +56,9 @@ argDefinitions:
   requestObject:
     type: REQUEST_BODY
     classes:
-      - java.lang.Class
-      - org.springframework.core.ParameterizedTypeReference
+      - java.lang.String
+  #      - java.lang.Class
+  #      - org.springframework.core.ParameterizedTypeReference
   contentLength:
     type: CONTENT_LENGTH
     isNumber: true
@@ -88,8 +93,9 @@ argDefinitions:
   responseTypeClass:
     type: RESPONSE
     classes:
-      - java.lang.Class
-      - org.springframework.core.ParameterizedTypeReference
+      - java.lang.String
+#      - java.lang.Class
+#      - org.springframework.core.ParameterizedTypeReference
 
 wsClient:
   - classes:
@@ -141,29 +147,8 @@ wsClient:
           varArgs:
             - - uriFunction
               - uriVariableVarArg
-  - interfaces:
-      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
-    settings:
-      GENERIC:
-        - names:
-            - bodyValue
-            - syncBody
-          args:
-            - - body
-        - names:
-            - body
-          args:
-            - - bodyInserted
-            - - skipArg
-              - requestObject
-        - names:
-            - contentLength
-          args:
-            - - contentLength
-        - names:
-            - contentType
-          args:
-            - - contentType
+            - - stringURI
+              - uriVariableObj
 
   - interfaces:
       - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
@@ -200,6 +185,31 @@ wsClient:
             - - uriVariableKey
               - uriVariableValue
             - - uriVariableSkip
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+    settings:
+      GENERIC:
+        - names:
+            - bodyValue
+            - syncBody
+          args:
+            - - body
+        - names:
+            - body
+          args:
+            - - bodyInserted
+            - - skipArg
+              - requestObject
+        - names:
+            - contentLength
+          args:
+            - - contentLength
+        - names:
+            - contentType
+          args:
+            - - contentType
 
   - classes:
       - org.springframework.web.reactive.function.client.WebClient$ResponseSpec
@@ -242,14 +252,13 @@ wsClient:
               - cookieValue
 
   - interfaces:
-      - org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
-    inherits:
-      - org.springframework.web.reactive.function.client.WebClient$UriSpec
-      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
-      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
-
-  - interfaces:
       - org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
     inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient
       - org.springframework.web.reactive.function.client.WebClient$UriSpec
       - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec

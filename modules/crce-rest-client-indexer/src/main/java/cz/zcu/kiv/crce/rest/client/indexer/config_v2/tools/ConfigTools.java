@@ -118,7 +118,6 @@ public class ConfigTools {
                 //load all classes
                 Set<String> methodOwners = loadClasses(item.getClasses(), item.getInterfaces(),
                         item.getInherits(), wsClientData);
-
                 setSettingsMethod(item.getSettings(), argDefinitions, methodOwners, wsClientData);
             }
         }
@@ -243,6 +242,20 @@ public class ConfigTools {
 
     }
 
+    /*     private static void loadImplofCoreInterfaces(final Set<String> coreInterfaces,
+            final Map<String, ArgConfig> argDefinitions, final Set<String> methodOwners,
+            final Map<String, Map<String, IWSClient>> data) throws Exception {
+        for (final String interfName : coreInterfaces) {
+            Class<?> class_ = Class.forName(interfName.replaceAll("/", "."));
+            class_.getMeth
+            for (final String methodOwner : methodOwners) {
+                for (IWSClient client : data.get(methodOwner).values()) {
+                    client.setClass_(class_);
+                }
+            }
+        }
+    }
+     */
     /**
      * Links argument references with their definitions
      * @param argsReferences Argument references

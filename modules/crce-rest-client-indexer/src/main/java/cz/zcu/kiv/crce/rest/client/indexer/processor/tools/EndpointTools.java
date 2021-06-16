@@ -18,7 +18,6 @@ public class EndpointTools {
 
 
         if (endpoints.containsKey(endpoint.getUrl())) {
-            //System.out.println("MERGE=" + endpoint);
             final Endpoint oldEndpoint = endpoints.get(endpoint.getUrl());
             oldEndpoint.merge(endpoint);
         } else {
