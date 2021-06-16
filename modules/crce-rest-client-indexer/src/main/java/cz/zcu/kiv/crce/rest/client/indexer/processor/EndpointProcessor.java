@@ -178,6 +178,10 @@ class EndpointHandler extends MethodProcessor {
             if (ClassTools.isGenericClass(class_)) {
                 Stack<Object> types =
                         ClassTools.processTypes(class_.getClassStruct().getSignature());
+                System.out.println(class_.getClassStruct().getSignature());
+                if (types.size() == 0) {
+                    return;
+                }
                 types.pop(); // Throw away generic wrapper
                 String type = (String) SafeStack.pop(types);
                 values.push(new Variable().setDescription(type).setType(VariableType.OTHER));
