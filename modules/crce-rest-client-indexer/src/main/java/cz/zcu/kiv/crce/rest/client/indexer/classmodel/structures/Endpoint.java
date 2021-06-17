@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
@@ -46,7 +45,31 @@ public class Endpoint implements Serializable {
     protected Set<Header> requestContext = new HashSet<>(); //https://datatracker.ietf.org/doc/html/rfc7231#section-5.5
     protected Set<Header> representation = new HashSet<>();
 
+    protected Set<EndpointParameter> bodyParameteres = new HashSet<>();
+    protected Set<EndpointParameter> cookies = new HashSet<>();
+    protected Set<EndpointParameter> uriParams = new HashSet<>();
 
+
+    /**
+     * @return the uriParams
+     */
+    public Set<EndpointParameter> getUriParams() {
+        return uriParams;
+    }
+
+    /**
+     * @return the cookies
+     */
+    public Set<EndpointParameter> getCookies() {
+        return cookies;
+    }
+
+    /**
+     * @return the bodyParameteres
+     */
+    public Set<EndpointParameter> getBodyParameteres() {
+        return bodyParameteres;
+    }
 
     /**
      * @return the objects
@@ -414,6 +437,15 @@ public class Endpoint implements Serializable {
      */
     public Endpoint addParameter(EndpointParameter param) {
         parameters.add(param);
+        if (param.getCategory() == ParameterCategory.BODY) {
+            System.out.println("NEW BODY=" + param);
+            this.bodyParameteres.add(param);
+        } else if (param.getCategory() == ParameterCategory.COOKIE) {
+            this.cookies.add(param);
+        } else if (param.getCategory() == ParameterCategory.MATRIX
+                || param.getCategory() == ParameterCategory.QUERY) {
+            this.uriParams.add(param);
+        }
         return this;
     }
 
@@ -522,7 +554,9 @@ public class Endpoint implements Serializable {
         this.contentNegotiation.addAll(copyHeaders(endpoint.getContentNegotiation()));
         this.authenticationCredentials.addAll(copyHeaders(endpoint.getAuthenticationCredentials()));
         this.requestContext.addAll(copyHeaders(endpoint.getRequestContext()));
-        this.parameters.addAll(copyEndpointParameters(endpoint.getParameters()));
+        for (EndpointParameter parameter : copyEndpointParameters(endpoint.getParameters())) {
+            addParameter(parameter);
+        }
         this.representation.addAll(copyHeaders(endpoint.getRepresentation()));
         //this.objects.addAll(endpoint.getObjects());
     }

@@ -406,6 +406,26 @@ public class VariableFactory {
         }
     }
 
+
+    private static void processGenericParameter(String key, Variable var, Endpoint endpointData,
+            ParameterCategory category) {
+        if (var.getType() == VariableType.ARRAY && var.getValue() instanceof VarArray) {
+            VarArray varArray = (VarArray) var.getValue();
+            for (Variable varArrayItem : varArray.getInnerArray()) {
+                endpointData
+                        .addParameter(new EndpointParameter(
+                                key, varArrayItem.getDescription(), BytecodeDescriptorsProcessor
+                                        .isArrayOrCollection(varArrayItem.getDescription()),
+                                category));
+                break;
+            }
+        } else {
+            endpointData.addParameter(new EndpointParameter(key, var.getDescription(),
+                    BytecodeDescriptorsProcessor.isArrayOrCollection(var.getDescription()),
+                    category));
+        }
+    }
+
     /**
      * Processes argumens and 
      * @param key Key under which data are stored 
@@ -422,21 +442,16 @@ public class VariableFactory {
             }
                 break;
             case URI_VARIABLE: {
-                processURIVariable(data.getVar(), endpointData);
+                processGenericParameter(key, data.getVar(), endpointData, ParameterCategory.QUERY);
             }
                 break;
             case MATRIX: {
-                endpointData
-                        .addParameter(new EndpointParameter(null, (String) data.getVar().getValue(),
-                                data.isArray(), ParameterCategory.MATRIX));
+                processGenericParameter(key, data.getVar(), endpointData, ParameterCategory.MATRIX);
             }
                 break;
             case SET_COOKIE:
             case COOKIE: {
-                endpointData.addParameter(new EndpointParameter(
-                        key, data.getVar().getDescription(), BytecodeDescriptorsProcessor
-                                .isArrayOrCollection(data.getVar().getDescription()),
-                        ParameterCategory.COOKIE));
+                processGenericParameter(key, data.getVar(), endpointData, ParameterCategory.COOKIE);
             }
             default:;
         }

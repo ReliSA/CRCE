@@ -17,10 +17,25 @@ public class EndpointParameter implements Serializable {
     private Header dataTypeH = null;
     private String name = "";
     private String dataType = ""; // T
+    private String structure = "";
     private boolean isArray = false;
 
     private ParameterCategory category;
 
+
+    /**
+     * @param structure the structure to set
+     */
+    public void setStructure(String structure) {
+        this.structure = structure;
+    }
+
+    /**
+     * @return the structure
+     */
+    public String getStructure() {
+        return structure;
+    }
 
     /**
      * Init

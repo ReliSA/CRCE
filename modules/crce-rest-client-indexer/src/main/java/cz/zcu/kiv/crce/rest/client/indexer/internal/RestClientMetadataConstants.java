@@ -18,20 +18,52 @@ public interface RestClientMetadataConstants {
         // capabilities namespaces
         String NS__CRCE_IDENTITY = NsCrceIdentity.NAMESPACE__CRCE_IDENTITY;
         String NS__REST_CLIENT_IDENTITY = MAIN_CATEGORY + ".identity";
-        String NS__REST_CLIENT_ENDPOINT = MAIN_CATEGORY + ".endpoint";
+        String NS__REST_CLIENT_ENDPOINT = MAIN_CATEGORY + ".ws";
 
         String NS_REST_CLIENT_REQUEST = NS__REST_CLIENT_ENDPOINT + ".request";
         String NS_REST_CLIENT_RESPONSE = NS__REST_CLIENT_ENDPOINT + ".response";
 
+        String NS_HEADER = "header.";
+        String NS_PARAMETER = "parameter.";
+        String NS_RESPONSE = "response.";
         // properties namespaces
-        String NS_REST_CLIENT_REQUEST_BODY = NS_REST_CLIENT_REQUEST + ".body";
+        /*         String NS_REST_CLIENT_REQUEST_BODY = NS_REST_CLIENT_REQUEST + ".body";
         String NS_REST_CLIENT_RESPONSE_BODY = NS_REST_CLIENT_RESPONSE + ".body";
         String NS_REST_CLIENT_REQUEST_PARAMETER = NS_REST_CLIENT_REQUEST + ".parameter";
-        String NS_REST_CLIENT_RESPONSE_PARAMETER = NS_REST_CLIENT_RESPONSE + ".parameter";
+        String NS_REST_CLIENT_RESPONSE_PARAMETER = NS_REST_CLIENT_RESPONSE + ".parameter"; */
 
-        SimpleAttributeType<String> ATTR__REST_CLIENT_ENDPOINT_URL =
-                        new SimpleAttributeType<>("url", String.class);
-        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_METHOD = new ListAttributeType("method");
+
+        SimpleAttributeType<String> ATTR__REST_CLIENT_ENDPOINT_BASEURL =
+                        new SimpleAttributeType<>("baseURL", String.class);
+        SimpleAttributeType<String> ATTR__REST_CLIENT_ENDPOINT_PATH =
+                        new SimpleAttributeType<>("path", String.class);
+
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_METHOD = new ListAttributeType("httpMethod");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_CONTROLS =
+                        new ListAttributeType(NS_HEADER + "control");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_CONDITIONALS =
+                        new ListAttributeType(NS_HEADER + "conditionals");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_CONTENT_NEGOTIATION =
+                        new ListAttributeType(NS_HEADER + "contentNegotiation");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_AUTHENTICATION_CREDENTIALS =
+                        new ListAttributeType(NS_HEADER + "authenticationCredentials");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_CONTEXT =
+                        new ListAttributeType(NS_HEADER + "requestContext");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_REPRESENTATION =
+                        new ListAttributeType(NS_HEADER + "representation");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_RESPONSE =
+                        new ListAttributeType(NS_HEADER + "response");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_EXPECTED_RESPONSE =
+                        new ListAttributeType(NS_RESPONSE + "expected");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_REQUEST_BODY_TYPES =
+                        new ListAttributeType("body");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_COOKIE =
+                        new ListAttributeType("cookie");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_PARAMETERS_OTHERS =
+                        new ListAttributeType("uriParameter");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_BODY_STRUCTURES =
+                        new ListAttributeType("structure");
+
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_CONSUMES = new ListAttributeType("consumes");
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_PRODUCES = new ListAttributeType("produces");
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_EXPECTS = new ListAttributeType("expects");

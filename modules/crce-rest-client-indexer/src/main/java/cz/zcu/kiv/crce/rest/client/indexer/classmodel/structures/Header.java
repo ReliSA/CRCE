@@ -54,7 +54,7 @@ public class Header {
 
     @Override
     public String toString() {
-        return "{ \"name\": " + ToJSONTools.convertString(type) + ", \"value\": "
+        return "{ \"type\": " + ToJSONTools.convertString(type) + ", \"value\": "
                 + ToJSONTools.convertString(value) + " }";
     }
 

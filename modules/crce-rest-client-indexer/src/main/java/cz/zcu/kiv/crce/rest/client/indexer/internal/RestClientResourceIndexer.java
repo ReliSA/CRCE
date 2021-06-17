@@ -54,7 +54,7 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
             logger.info("No endpoints found for resource " + resource.getId());
             return Collections.emptyList();
         } else {
-            logger.debug("REST API model (Client) extracted");
+            logger.debug("REST API client data extracted " + endpoints.size() + " endpoint calls");
             // save endpoints and metadata
             RestClientMetadataManager metadataManager =
                     new RestClientMetadataManager(metadataFactory);

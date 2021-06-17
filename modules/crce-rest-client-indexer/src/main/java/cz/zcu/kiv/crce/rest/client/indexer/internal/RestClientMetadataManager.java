@@ -6,16 +6,25 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
 import java.util.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
 
 /**
  * Inspired by ghessova on 18.04.2018.
  */
 public class RestClientMetadataManager {
+    private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Logger logger = LoggerFactory.getLogger(RestClientMetadataManager.class);
     private volatile MetadataFactory metadataFactory;
@@ -60,8 +69,8 @@ public class RestClientMetadataManager {
     private Set<Requirement> convertToMetadata(Collection<Endpoint> endpoints) {
         Set<Requirement> requirements = new HashSet<>();
         for (Endpoint endpoint : endpoints) {
-            logger.info("Client call:" + endpoint.toString());
-            if (endpoint.getPath() == null) {
+            logger.info("Client call:" + endpoint.getUrl());
+            if (endpoint.getUrl() == null) {
                 continue;
             }
             requirements.add(createEndpointRequirement(endpoint));
@@ -83,6 +92,55 @@ public class RestClientMetadataManager {
             stringSet.add(header.getValue());
         }
         return stringSet;
+    }
+
+    private ArrayList<String> convertEndpointParameterToString(Set<EndpointParameter> parameters) {
+        Set<String> output = new HashSet<>();
+        for (EndpointParameter parameter : parameters) {
+            String json = "{ ";
+            if (!StringTools.isEmpty(parameter.getName())) {
+                json += "\"key\": " + ToJSONTools.convertString(parameter.getName()) + ", ";
+            }
+            json += "\"type\": " + ToJSONTools.convertString(parameter.getDataType())
+                    + ", \"isArray\": " + parameter.isArray() + " }";
+            output.add(json);
+
+        }
+        return new ArrayList<>(output);
+    }
+
+
+    private Set<String> convertEndpointParameterToStructures(Set<EndpointParameter> parameters) {
+        Set<String> output = new HashSet<>();
+        for (EndpointParameter parameter : parameters) {
+            String json = parameter.getStructure();
+            if (!StringTools.isEmpty(json)) {
+                output.add(json);
+            }
+
+        }
+        return output;
+    }
+
+    private Set<String> convertEndpointBodyToStructures(Set<EndpointBody> endpointBodies) {
+        Set<String> output = new HashSet<>();
+        for (EndpointBody endpointBody : endpointBodies) {
+            String json = endpointBody.getStructure();
+            if (!StringTools.isEmpty(json)) {
+                output.add(json);
+            }
+        }
+        return output;
+    }
+
+    private ArrayList<String> convertHeadersToListOfJSON(Set<Header> headers) {
+        Set<String> output = new HashSet<>();
+        for (Header header : headers) {
+            String json = header.getType() + ": " + header.getValue();
+            output.add(json);
+
+        }
+        return new ArrayList<>(output);
     }
 
     /**
@@ -134,17 +192,67 @@ public class RestClientMetadataManager {
      * @return Requirement
      */
     private Requirement createEndpointRequirement(Endpoint endpoint) {
+        logger.info("New Endpoint=" + endpoint.getUrl() + " numParams="
+                + endpoint.getParameters().size());
         Requirement endpointRequirement = metadataFactory
                 .createRequirement(RestClientMetadataConstants.NS__REST_CLIENT_ENDPOINT);
         // set attributes (name, paths, methods, consumes, produces)
-        setIfSet(endpointRequirement, RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_URL,
-                endpoint.getUrl());
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_BASEURL,
+                endpoint.getBaseUrl());
+        setIfSet(endpointRequirement, RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PATH,
+                endpoint.getPath());
         setIfSet(endpointRequirement, RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_METHOD,
                 new ArrayList<>(convertHTTPEnumsToStrings(endpoint.getHttpMethods())));
-        setIfSet(endpointRequirement,
+        /*         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_CONSUMES,
-                new ArrayList<>(convertHeadersToStrings(endpoint.getConsumes())));
+                new ArrayList<>(convertHeadersToStrings(endpoint.getConsumes()))); */
+
         setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_CONTENT_NEGOTIATION,
+                convertHeadersToListOfJSON(endpoint.getContentNegotiation()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_CONTROLS,
+                convertHeadersToListOfJSON(endpoint.getControlsHeaders()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_AUTHENTICATION_CREDENTIALS,
+                convertHeadersToListOfJSON(endpoint.getAuthenticationCredentials()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_REPRESENTATION,
+                convertHeadersToListOfJSON(endpoint.getRepresentation()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_CONDITIONALS,
+                convertHeadersToListOfJSON(endpoint.getConditionals()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_RESPONSE,
+                convertHeadersToListOfJSON(endpoint.getResponseHeaders()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_CONTEXT,
+                convertHeadersToListOfJSON(endpoint.getRequestContext()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_REQUEST_BODY_TYPES,
+                convertEndpointParameterToString(endpoint.getBodyParameteres()));
+
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_COOKIE,
+                convertEndpointParameterToString(endpoint.getCookies()));
+        Set<String> structures = new HashSet<>();
+        structures.addAll(convertEndpointParameterToStructures(endpoint.getBodyParameteres()));
+        structures.addAll(convertEndpointBodyToStructures(endpoint.getExpectedResponses()));
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_BODY_STRUCTURES,
+                new ArrayList<>(structures));
+        /*         setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PARAMETERS_OTHERS,
+                convertEndpointParameterToStructures(endpoint.getOthers())); */
+        /*         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PRODUCES,
                 new ArrayList<>(convertHeadersToStrings(endpoint.getProduces())));
         setIfSet(endpointRequirement,
@@ -155,7 +263,7 @@ public class RestClientMetadataManager {
         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PARAMETERS,
                 new ArrayList<>(convertParametersToStringSet(endpoint.getParameters())));
-
+         */
         return endpointRequirement;
     }
 
@@ -174,15 +282,6 @@ public class RestClientMetadataManager {
     protected <T> boolean setIfSet(Requirement requirement, AttributeType<T> attribute, T value) {
         if (requirement != null && value != null) {
             requirement.addAttribute(attribute, value);
-            return true;
-        }
-        return false;
-    }
-
-    protected <T> boolean setIfSet(Requirement requirement, ListAttributeType attribute,
-            List<String> values) {
-        if (requirement != null && values != null) {
-            requirement.addAttribute(attribute, values);
             return true;
         }
         return false;

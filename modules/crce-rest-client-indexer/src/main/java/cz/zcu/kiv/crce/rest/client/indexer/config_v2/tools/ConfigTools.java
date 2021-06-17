@@ -38,7 +38,9 @@ public class ConfigTools {
     private static final String DEF_DIR_NAME = "definition" + "/v2";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
     private static final String DEF_DIR_REL = DEF_DIR_NAME + "/";
-    private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "new_version.yml");
+    private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "jax-rs.yml",
+            DEF_DIR_ABS + "/" + "spring_general.yml", DEF_DIR_ABS + "/" + "spring_resttemplate.yml",
+            DEF_DIR_ABS + "/" + "spring_webclient.yml");
     private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 
     private static HttpMethod httpMethodExtToHttpMethod(final HttpMethodExt httpMethodExt) {
