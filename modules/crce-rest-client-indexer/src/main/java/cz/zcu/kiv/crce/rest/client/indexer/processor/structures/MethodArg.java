@@ -1,6 +1,6 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.ArgConfig;
+import cz.zcu.kiv.crce.rest.client.indexer.config.ArgConfig;
 
 public class MethodArg extends ArgConfig {
     private Variable var;

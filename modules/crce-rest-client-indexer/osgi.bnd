@@ -3,6 +3,5 @@
 #-----------------------------------------------------------------
 
 Bundle-Activator: ${bundle.namespace}.internal.Activator
-#, ${bundle.namespace}.classmodel.structures, ${bundle.namespace}.classmodel.extracting, ${bundle.namespace}.tools, ${bundle.namespace}.config, ${bundle.namespace}.config.tools, ${bundle.namespace}.processor, ${bundle.namespace}.processor.structures, ${bundle.namespace}.processor.wrappers, ${bundle.namespace}.processor.tools
-Private-Package: ${bundle.namespace}.shared, ${bundle.namespace}.config_v2, ${bundle.namespace}.internal, ${bundle.namespace}.classmodel, ${bundle.namespace}.classmodel.structures, ${bundle.namespace}.classmodel.extracting, ${bundle.namespace}.cli, ${bundle.namespace}.config, ${bundle.namespace}.config_v2.structures, ${bundle.namespace}.config_v2.tools, ${bundle.namespace}.processor, ${bundle.namespace}.processor.structures, ${bundle.namespace}.config.tools, ${bundle.namespace}.processor.tools, ${bundle.namespace}.processor.wrappers
-Export-Package: ${bundle.namespace}
+Private-Package: ${bundle.namespace}.shared, ${bundle.namespace}.internal, ${bundle.namespace}.classmodel, ${bundle.namespace}.classmodel.structures, ${bundle.namespace}.classmodel.extracting, ${bundle.namespace}.cli, ${bundle.namespace}.config, ${bundle.namespace}.processor, ${bundle.namespace}.processor.structures, ${bundle.namespace}.config.tools, ${bundle.namespace}.config.structures, ${bundle.namespace}.processor.tools, ${bundle.namespace}.processor.wrappers
+Export-Package: ${bundle.namespace}, ${bundle.namespace}.classmodel.structures, ${bundle.namespace}.processor

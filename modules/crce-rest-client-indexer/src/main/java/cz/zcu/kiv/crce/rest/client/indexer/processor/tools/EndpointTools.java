@@ -1,7 +1,10 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import java.util.Map;
+import java.util.Stack;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 
 public class EndpointTools {
 
@@ -47,5 +50,25 @@ public class EndpointTools {
         }
     }
 
+    /**
+     * Retrieves arguments from method execution
+     * 
+     * @param values Stack
+     * @param operation Operation which contains method description
+     * @return Arguments extracted from stack
+     */
+    public static Stack<Variable> methodArgsFromValues(Stack<Variable> values,
+            Operation operation) {
+        String[] methodArgsDef = MethodTools.getArgsFromSignature(operation.getDescription());
+        Stack<Variable> output = new Stack<>();
+        if (methodArgsDef == null || methodArgsDef.length == 0 || values.isEmpty()) {
+            return output;
+        }
+
+        for (int counter = 0; counter < methodArgsDef.length; counter++) {
+            output.push(values.pop());
+        }
+        return output;
+    }
 
 }

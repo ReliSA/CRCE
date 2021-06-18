@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.metadata.AttributeType;
@@ -24,7 +23,6 @@ import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
  * Inspired by ghessova on 18.04.2018.
  */
 public class RestClientMetadataManager {
-    private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Logger logger = LoggerFactory.getLogger(RestClientMetadataManager.class);
     private volatile MetadataFactory metadataFactory;
@@ -69,7 +67,6 @@ public class RestClientMetadataManager {
     private Set<Requirement> convertToMetadata(Collection<Endpoint> endpoints) {
         Set<Requirement> requirements = new HashSet<>();
         for (Endpoint endpoint : endpoints) {
-            logger.info("Client call:" + endpoint.getUrl());
             if (endpoint.getUrl() == null) {
                 continue;
             }
@@ -77,21 +74,6 @@ public class RestClientMetadataManager {
         }
         return requirements;
 
-    }
-
-    /**
-     * Converts Headers into set of strings
-     * 
-     * @param consumes
-     * @return Set of strings
-     */
-    private Set<String> convertHeadersToStrings(Set<Header> consumes) {
-        Set<String> stringSet = new HashSet<>();
-
-        for (final Header header : consumes) {
-            stringSet.add(header.getValue());
-        }
-        return stringSet;
     }
 
     private ArrayList<String> convertEndpointParameterToString(Set<EndpointParameter> parameters) {
@@ -144,34 +126,6 @@ public class RestClientMetadataManager {
     }
 
     /**
-     * Converts endpoint parameters int set of strings
-     * 
-     * @param params
-     * @return Set of strings
-     */
-    private Set<String> convertParametersToStringSet(Set<EndpointParameter> params) {
-        Set<String> stringSet = new HashSet<>();
-        for (final EndpointParameter param : params) {
-            stringSet.add(param.getDataTypeS());
-        }
-        return stringSet;
-    }
-
-    /**
-     * Converts request bodies into set of strings
-     * 
-     * @param bodies Request bodies
-     * @return Set of strings
-     */
-    private Set<String> convertRequestBodiesToStringSet(Set<EndpointBody> bodies) {
-        Set<String> stringSet = new HashSet<>();
-        for (final EndpointBody body : bodies) {
-            stringSet.add(body.getStructure());
-        }
-        return stringSet;
-    }
-
-    /**
      * Converts set of Http methods into set of strings
      * 
      * @param enums Http methods
@@ -204,9 +158,6 @@ public class RestClientMetadataManager {
                 endpoint.getPath());
         setIfSet(endpointRequirement, RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_METHOD,
                 new ArrayList<>(convertHTTPEnumsToStrings(endpoint.getHttpMethods())));
-        /*         setIfSet(endpointRequirement,
-                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_CONSUMES,
-                new ArrayList<>(convertHeadersToStrings(endpoint.getConsumes()))); */
 
         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_CONTENT_NEGOTIATION,
@@ -254,22 +205,6 @@ public class RestClientMetadataManager {
         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_CALLED_FROM,
                 new ArrayList<>(endpoint.getDependency()));
-
-        /*         setIfSet(endpointRequirement,
-                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PARAMETERS_OTHERS,
-                convertEndpointParameterToStructures(endpoint.getOthers())); */
-        /*         setIfSet(endpointRequirement,
-                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PRODUCES,
-                new ArrayList<>(convertHeadersToStrings(endpoint.getProduces())));
-        setIfSet(endpointRequirement,
-                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_EXPECTS,
-                new ArrayList<>(convertRequestBodiesToStringSet(endpoint.getExpectedResponses())));
-        setIfSet(endpointRequirement, RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_SENDS,
-                new ArrayList<>(convertRequestBodiesToStringSet(endpoint.getRequestBodies())));
-        setIfSet(endpointRequirement,
-                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PARAMETERS,
-                new ArrayList<>(convertParametersToStringSet(endpoint.getParameters())));
-         */
         return endpointRequirement;
     }
 

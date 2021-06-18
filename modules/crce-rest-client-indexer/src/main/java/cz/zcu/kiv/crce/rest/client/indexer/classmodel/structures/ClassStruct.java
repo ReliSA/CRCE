@@ -10,8 +10,9 @@ import java.util.Set;
 /**
  * Created by ghessova on 05.03.2018.
  */
-public class ClassStruct extends PathPart {
+public class ClassStruct {
 
+    private String name;
     private String parent;
     private String signature;
     private Map<String, Method> methodsMap = new HashMap<>();
@@ -89,9 +90,8 @@ public class ClassStruct extends PathPart {
         this.interfaces = interfaces;
     }
 
-    @Override
     public String getName() {
-        return super.getName();
+        return name;
     }
 
     @Override

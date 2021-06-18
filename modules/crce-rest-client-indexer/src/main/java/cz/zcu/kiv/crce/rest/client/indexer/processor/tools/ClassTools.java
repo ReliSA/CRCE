@@ -218,24 +218,7 @@ public class ClassTools {
             if (BytecodeDescriptorsProcessor.isArrayOrCollection(typeS)) {
                 return List.of(signatureToType(signature, classes, recDetection));
             } else if (isMap(typeS)) {
-                /*                 if (!((signature.get(0)) instanceof String[])) {
-                    logger.error("Unspecified Map type");
-                    return "java/lang/Map";
-                } else if (!((List) signature.get(0)).get(0).equals("java/lang/String")) {
-                    logger.error("Key is type of " + signature.get(0));
-                    return "java/lang/Map";
-                }
-                Object types = signatureToType(signature, classes);
-                if (types instanceof List) {
-                    List typesList = (List) types;
-                    if (typesList.size() < 2) {
-                        logger.error("nspecified Map type");
-                        return "java/lang/Map";
-                    }
-                    signature.add(0, typesList.get(1));
-                    return Map.of((String) typesList.get(0), signatureToType(signature, classes));
-                } */
-                return "java/util/Map";
+                return typeS;
             } else if (isPrimitive(typeS)) {
                 return typeS;
             } else if (!recDetection.contains(typeS)) {
@@ -262,11 +245,12 @@ public class ClassTools {
      */
     public static Map<String, Object> fieldsToTypes(ClassMap classes, ClassWrapper class_,
             Set<String> recDetection) {
-        recDetection.add(class_.getClassStruct().getName());
-        Map<String, Object> map = new HashMap<>();
         if (class_ == null) {
             return null;
         }
+        recDetection.add(class_.getClassStruct().getName());
+        Map<String, Object> map = new HashMap<>();
+
         final Map<String, Field> fields = class_.getFieldsContainer();
 
         for (Field field : fields.values()) {

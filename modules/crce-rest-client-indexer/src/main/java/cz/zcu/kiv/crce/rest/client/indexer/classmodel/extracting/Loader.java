@@ -15,15 +15,23 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 
 public class Loader {
+    /**
+     * Loads classes from Jar
+     * @param jarFile
+     * @throws IOException
+     */
     public static void loadClasses(File jarFile) throws IOException {
-        // Map<String, ClassNode> classes = new HashMap<String, ClassNode>();
         JarFile jar = new JarFile(jarFile);
         Stream<JarEntry> str = jar.stream();
         str.forEach(z -> readJar(jar, z));
         jar.close();
-        // return classes;
     }
 
+    /**
+     * Loads classes from ZipInputStream
+     * @param jis
+     * @throws IOException
+     */
     public static void loadClasses(ZipInputStream jis) throws IOException {
         for (ZipEntry e = jis.getNextEntry(); e != null; e = jis.getNextEntry()) {
             if (e.getName().endsWith(".class")) {
@@ -32,12 +40,22 @@ public class Loader {
         }
     }
 
+    /**
+     * Visits all classes
+     * @param jis
+     * @throws IOException
+     */
     public static void processJARInputStream(InputStream jis) throws IOException {
         MyClassVisitor classVisitor = new MyClassVisitor(Opcodes.ASM7, null);
         ClassReader classReader = new ClassReader(getEntryInputStream(jis));
         classReader.accept(classVisitor, ClassReader.SKIP_DEBUG);
     }
 
+    /**
+     * Reads jar and its classes
+     * @param jar Jar
+     * @param entry
+     */
     static void readJar(JarFile jar, JarEntry entry) {
         String name = entry.getName();
         try (InputStream jis = jar.getInputStream(entry)) {
@@ -50,6 +68,12 @@ public class Loader {
     }
 
 
+    /**
+     * Process Input stream
+     * @param jis
+     * @return
+     * @throws IOException
+     */
     private static InputStream getEntryInputStream(InputStream jis) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf = new byte[1024];

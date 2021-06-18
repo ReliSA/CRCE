@@ -1,24 +1,54 @@
 package cz.zcu.kiv.crce.rest.client.indexer.config;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Config {
-    @JsonProperty("name")
+    @JsonProperty("package")
     private String name;
 
-    @JsonProperty("apiCall")
-    private Set<ApiCallConfig> methods;
+    @JsonProperty("wsClient")
+    private LinkedHashSet<WSClientConfig> wsClients;
 
-    @JsonProperty
-    private Set<EnumConfigItem> enums;
+    @JsonProperty("wsClientData")
+    private LinkedHashSet<WSClientDataConfig> wsClientDataHolders;
 
-    @JsonProperty
-    private Set<String> generics;
+    @JsonProperty("argDefinitions")
+    private Map<String, ArgConfig> argDefinitions;
 
-    @JsonProperty
-    private Set<EDataContainerConfig> endpointDataContainers;
+    @JsonProperty("requestParameters")
+    private Set<RequestParamConfig> requestParams;
+
+
+    /**
+     * @return the wsClients
+     */
+    public Set<WSClientConfig> getWsClients() {
+        return wsClients;
+    }
+
+    /**
+     * @param wsClients the wsClients to set
+     */
+    public void setWsClients(LinkedHashSet<WSClientConfig> wsClients) {
+        this.wsClients = wsClients;
+    }
+
+    /**
+     * @return the requestParams
+     */
+    public Set<RequestParamConfig> getRequestParams() {
+        return requestParams;
+    }
+
+    /**
+     * @param requestParams the requestParams to set
+     */
+    public void setRequestParams(Set<RequestParamConfig> requestParams) {
+        this.requestParams = requestParams;
+    }
 
     /**
      * @return the name
@@ -34,65 +64,34 @@ public class Config {
         this.name = name;
     }
 
+
+
     /**
-     * @return the methods
+     * @return the wsClientDataHolders
      */
-    public Set<ApiCallConfig> getMethods() {
-        return methods;
+    public Set<WSClientDataConfig> getWsClientDataHolders() {
+        return wsClientDataHolders;
     }
 
     /**
-     * @param methods the methods to set
+     * @param wsClientDataHolders the wsClientDataHolders to set
      */
-    public void setMethods(Set<ApiCallConfig> methods) {
-        this.methods = methods;
+    public void setWsClientDataHolders(LinkedHashSet<WSClientDataConfig> wsClientDataHolders) {
+        this.wsClientDataHolders = wsClientDataHolders;
     }
 
     /**
-     * @return the enums
+     * @return the argDefinitions
      */
-    public Set<EnumConfigItem> getEnums() {
-        return enums;
+    public Map<String, ArgConfig> getArgDefinitions() {
+        return argDefinitions;
     }
 
     /**
-     * @param enums the enums to set
+     * @param argDefinitions the argDefinitions to set
      */
-    public void setEnums(Set<EnumConfigItem> enums) {
-        this.enums = enums;
+    public void setArgDefinitions(Map<String, ArgConfig> argDefinitions) {
+        this.argDefinitions = argDefinitions;
     }
-
-    /**
-     * @param httpTypeContainer the typeHolders to set
-     */
-    public void setGenerics(Set<String> genericWrappers) {
-        Set<String> genericWrappersParsed = new HashSet<>();
-        for (String type : genericWrappers) {
-            genericWrappersParsed.add(DefinitionValuesProcessor.processClassName(type));
-        }
-        this.generics = genericWrappersParsed;
-    }
-
-    /**
-     * @return the endpointDataContainers
-     */
-    public Set<EDataContainerConfig> getEndpointDataContainers() {
-        return endpointDataContainers;
-    }
-
-    /**
-     * @param endpointDataContainer the endpointDataContainers to set
-     */
-    public void setEndpointDataContainers(Set<EDataContainerConfig> endpointDataContainer) {
-        this.endpointDataContainers = endpointDataContainer;
-    }
-
-    /**
-     * @return the httpTypeContainer
-     */
-    public Set<String> getGenerics() {
-        return generics;
-    }
-
 
 }

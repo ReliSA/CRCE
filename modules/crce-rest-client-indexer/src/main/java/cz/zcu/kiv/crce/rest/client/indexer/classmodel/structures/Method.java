@@ -7,11 +7,12 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescrip
 /**
  * Inspired by ghessova on 05.03.2018.
  */
-public class Method extends PathPart {
+public class Method {
 
     private int access;
     private String desc;
     private DataType returnType;
+    private String name;
     private String owner;
     private String description;
     private List<Variable> parameters;

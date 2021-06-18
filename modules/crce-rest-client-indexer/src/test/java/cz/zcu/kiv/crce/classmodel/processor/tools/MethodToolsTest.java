@@ -13,12 +13,9 @@ public class MethodToolsTest {
     private static List<Object[]> argsFromSignature;
     private static List<Object[]> methodNameFromSignature;
 
-    //private static List<String[]> returnFromSignature;
-
     @Before
     public void init() {
         initGetArgsFromSignature();
-        initReturnTypeFromSignature();
         initGetMethodnameFromSignature();
     }
 
@@ -50,16 +47,6 @@ public class MethodToolsTest {
 
     }
 
-    public void initReturnTypeFromSignature() {
-        String[] firstPair =
-                {"com/app/demo/service/ApiService$1.<init>(Lcom/app/demo/service/ApiService;)V",
-                        "com/app/demo/service/ApiService$1"};
-        String[] secondPair = {
-                "org/springframework/web/client/RestTemplate.postForEntity(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Class;[Ljava/lang/Object;)Lorg/springframework/http/ResponseEntity;",
-                "org/springframework/http/ResponseEntity"};
-        returnFromSignature = List.of(firstPair, secondPair);
-    }
-
     @Test
     public void testGetArgsFromSignature() {
         for (Object[] test : argsFromSignature) {
@@ -85,14 +72,4 @@ public class MethodToolsTest {
 
         }
     }
-    /* 
-    @Test
-    public void testGetReturnTypeFromDescription() {
-        for (String[] test : returnFromSignature) {
-            String description = (String) test[0];
-            String expected = (String) test[1];
-            String actual = MethodTools.getReturnTypeFromMethodDescription(description);
-            assertEquals(expected, actual);
-        }
-    } */
 }

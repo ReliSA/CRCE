@@ -1,26 +1,14 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor.tools;
 
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.HeaderGroup;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
+import cz.zcu.kiv.crce.rest.client.indexer.config.MethodArgType;
 
 public class HeaderTools {
-    private static final String ACCEPT = "Accept";
-
     /**
-     * Detects if header describes accepting 
-     * @source https://datatracker.ietf.org/doc/html/rfc7231#section-5
+     * 
      * @param headerType
      * @return
      */
-    public static boolean isConsumingType(String headerType) {
-        return headerType.startsWith(ACCEPT);
-    }
-
-    public static boolean isConsumingType(Header header) {
-        return header.getType().startsWith(ACCEPT);
-    }
-
     public static boolean isControlType(MethodArgType headerType) {
         switch (headerType) {
             case CACHE_CONTROL:
@@ -91,20 +79,4 @@ public class HeaderTools {
         return false;
     }
 
-    public static MethodArgType getHeaderType(String headerType) {
-        MethodArgType mArgType = MethodArgType.valueOf(headerType);
-
-        return null;
-    }
-
-    /**
-     * Detects if header describes sent content
-     * @source https://datatracker.ietf.org/doc/html/rfc7231#section-3
-     * 
-     * @param headerType
-     * @return
-     */
-    public static boolean isProducingType(String headerType) {
-        return !headerType.startsWith(ACCEPT);
-    }
 }

@@ -1,6 +1,5 @@
 package cz.zcu.kiv.crce.rest.client.indexer.internal;
 
-import cz.zcu.kiv.crce.metadata.AttributeType;
 import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
 import cz.zcu.kiv.crce.metadata.impl.SimpleAttributeType;
 import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
@@ -68,16 +67,5 @@ public interface RestClientMetadataConstants {
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_SENDS = new ListAttributeType("sends");
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_PARAMETERS =
                         new ListAttributeType("parameters");
-
-        AttributeType<String> ATTR__REST_CLIENT_DATATYPE =
-                        new SimpleAttributeType<>("datatype", String.class);
-        AttributeType<String> ATTR__REST_CLIENT_PARAMETER_CATEGORY =
-                        new SimpleAttributeType<>("category", String.class);
-        AttributeType<Long> ATTR__REST_CLIENT_IS_ARRAY =
-                        new SimpleAttributeType<>("isArray", Long.class);
-        AttributeType<String> ATTR__REST_CLIENT_STRUCTURE =
-                        new SimpleAttributeType<>("structure", String.class);
-
-
 
 }

@@ -14,6 +14,7 @@ public class MapTools {
      * @param entry
      * @return Stream of map object
      */
+    @SuppressWarnings("unchecked")
     public static Stream<Map.Entry<String, Object>> flatten(Map.Entry<String, Object> entry) {
         if (entry.getValue() instanceof Map<?, ?>) {
             Map<String, Object> nested = (Map<String, Object>) entry.getValue();

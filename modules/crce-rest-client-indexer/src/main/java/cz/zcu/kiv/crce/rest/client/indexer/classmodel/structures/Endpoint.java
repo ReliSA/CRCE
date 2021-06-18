@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.MethodArgType;
+import cz.zcu.kiv.crce.rest.client.indexer.config.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.UrlTools;
@@ -512,46 +512,7 @@ public class Endpoint implements Serializable {
      */
     public Endpoint setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-        /*         if (baseUrl != null && baseUrl.length() > 0 && baseUrl.startsWith("http")) {
-            URL url;
-            try {
-                url = new URL(baseUrl);
-                if (this.path == null) {
-                    this.path = url.getFile();
-                }
-                this.baseUrl = url.getProtocol() + "://" + url.getHost()
-                        + (url.getPort() > 0 ? (":" + url.getPort()) : "");
-                String query = UrlTools.getQuery(path);
-                String queryMatrix = UrlTools.getMatrixQuery(path);
-                if (query != null) {
-                    parameters.add(
-                            new EndpointParameter(null, query, false, ParameterCategory.QUERY));
-                }
-                if (queryMatrix != null) {
-                    parameters.add(new EndpointParameter(null, queryMatrix, false,
-                            ParameterCategory.MATRIX));
-                }
-            } catch (MalformedURLException e) {
-                logger.error("Wrong type of Base URL=" + baseUrl);
-            }
-        
-        } */
         return this;
-    }
-
-    /**
-     * Adds new header to endpoint
-     * @param header New header
-     */
-    public void addHeader(Header header) {
-        if (HeaderTools.isConsumingType(header.getType())) {
-            this.addConsumes(header);
-        } else if (HeaderTools.isProducingType(header.getType())) {
-            this.addProduces(header);
-        } else {
-            // some other header attrs
-            this.addParameter(new EndpointParameter(null, header, false, ParameterCategory.HEADER));
-        }
     }
 
     /**
@@ -597,10 +558,6 @@ public class Endpoint implements Serializable {
      */
     public boolean equals(Endpoint endpoint) {
         final boolean httpMethodEq = httpMethods.equals(endpoint.getHttpMethods());
-        /*         final boolean reqBodiesEq = requestBodies.containsAll(endpoint.getRequestBodies()); */
-        /*         final boolean expectedResponsesEq =
-                expectedResponses.containsAll(endpoint.getExpectedResponses())
-                        && endpoint.getExpectedResponses().containsAll(expectedResponses); */
         final boolean parametersEq = parameters.containsAll(endpoint.getParameters())
                 && endpoint.getParameters().containsAll(parameters);
         final boolean consumesEq = consumes.containsAll(endpoint.getConsumes())

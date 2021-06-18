@@ -5,4 +5,5 @@
 Bundle-Activator: ${bundle.namespace}.internal.Activator
 
 Private-Package: ${bundle.namespace}.internal, ${bundle.namespace}.classmodel.structures, ${bundle.namespace}.classmodel.extracting, ${bundle.namespace}.util, ${bundle.namespace}.restmodel.structures, ${bundle.namespace}.restmodel.extracting, ${bundle.namespace}.definition
+#Import-Package: cz.zcu.kiv.crce.rest.client.indexer.processor
 Export-Package: ${bundle.namespace}

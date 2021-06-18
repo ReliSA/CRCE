@@ -10,20 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.RequestParamFieldType;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.IWSClient;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.structures.RequestParam;
-import cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.EndpointData;
+import cz.zcu.kiv.crce.rest.client.indexer.config.RequestParamFieldType;
+import cz.zcu.kiv.crce.rest.client.indexer.config.structures.IWSClient;
+import cz.zcu.kiv.crce.rest.client.indexer.config.structures.RequestParam;
+import cz.zcu.kiv.crce.rest.client.indexer.config.tools.ConfigTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointDataMiningTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
@@ -36,12 +33,8 @@ class EndpointHandler extends MethodProcessor {
     private String currentMethod = "";
     private String classInProgress = "";
     private Set<String> callingChain = new LinkedHashSet<>();
-    private Map<String, Set<Endpoint>> dependencyEndpoints = new HashMap<>();
     private Map<String, Set<String>> callingChains = new HashMap<>();
-    private Map<String, Set<Endpoint>> endpointWrappingMethods = new HashMap<>();
-
     private Map<String, Endpoint> endpoints = new HashMap<>();
-
     private Map<String, Map<String, IWSClient>> wsClients = ConfigTools.getWSClients();
     private Map<String, Map<String, RequestParam>> requestParams = ConfigTools.getRequestParams();
     private Map<String, Map<String, IWSClient>> wsClientDataContainers =
@@ -55,10 +48,6 @@ class EndpointHandler extends MethodProcessor {
         return callingChains;
     }
 
-    /*     private EnumConfigMap ecMAp = ConfigTools.getEnumDefinitions();
-    private MethodConfigMap mcMap = ConfigTools.getMethodConfigs();
-    private EDataContainerConfigMap eDataConfigMap = ConfigTools.getEDataContainerConfigMap();
-     */
     private FieldProcessor fProcessor;
 
     public EndpointHandler(ClassMap classes) {
@@ -106,34 +95,6 @@ class EndpointHandler extends MethodProcessor {
     }
 
     /**
-     * Merges Endpoint data holders into one and pushes outcome into stack
-     * @param values Stack
-     * @param var Variable (Endpoint data holder)
-     */
-    private void mergeVarEndpointData(Stack<Variable> values, Variable var) {
-        Variable lastVar = SafeStack.peek(values);
-        if (!VariableTools.isEmpty(lastVar) && lastVar.getValue() instanceof EndpointData) {
-            EndpointData lastVarEData = (EndpointData) lastVar.getValue();
-            EndpointData varEData = (EndpointData) var.getValue();
-
-            lastVarEData.merge(varEData);
-        } else {
-            values.push(var);
-        }
-    }
-
-    /**
-     * Base method for processing INVOKE method calls
-     * @param values Stack
-     * @param operation Operation
-     */
-    private void processINVOKE(Stack<Variable> values, Operation operation) {
-        Variable newEndointData =
-                EndpointDataMiningTools.getEndpointAttrFromContainer(values, operation);
-        mergeVarEndpointData(values, newEndointData);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -166,23 +127,8 @@ class EndpointHandler extends MethodProcessor {
      * {@inheritDoc}
      */
     @Override
-    protected void processINVOKESTATIC(Stack<Variable> values, Operation operation) {
-        if (isWSClientDataContainer(operation)) {
-            processINVOKE(values, operation);
-            return;
-        }
-        super.processINVOKESTATIC(values, operation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void processINVOKESPECIAL(Stack<Variable> values, Operation operation) {
-        if (isWSClientDataContainer(operation)) {
-            processINVOKE(values, operation);
-            return;
-        } else if (isInitMethod(operation)) {
+        if (isInitMethod(operation)) {
             removeMethodArgsFromStack(values, operation);
             ClassWrapper class_ = this.classes.getOrDefault(operation.getOwner(), null);
             if (ClassTools.isGenericClass(class_)) {
@@ -203,137 +149,6 @@ class EndpointHandler extends MethodProcessor {
         }
         super.processINVOKESPECIAL(values, operation);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    /*     @Override
-    protected void processINVOKEVIRTUAL(Stack<Variable> values, Operation operation) {
-        if (isWSClientDataContainer(operation)) {
-            processINVOKE(values, operation);
-            return;
-        } else {
-            super.processINVOKEVIRTUAL(values, operation);
-        }
-    } */
-
-    /**
-     * Processes HEADER argumetns from Stack (parsing based on config.yml)
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param operation Operation
-     */
-    /* private void processHEADER(Stack<Variable> values, ApiCallMethodConfig methodConfig,
-            Operation operation) {
-        Variable varEndpoint =
-                EndpointDataMiningTools.setHeaderParamFromArgs(values, methodConfig, operation);
-        if (varEndpoint != null) {
-            EndpointTools.merge(endpoints, (Endpoint) varEndpoint.getValue());
-        }
-    } */
-
-    /**
-     * Processes GENERIC methods without additianol semantic information given by method name
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param operation Operation
-     */
-    /*     private void processGENERIC(Stack<Variable> values, ApiCallMethodConfig methodConfig,
-            Operation operation) {
-        Variable varEndpoint = EndpointDataMiningTools.setEndpointAttrFromArgs(values,
-                methodConfig.getArgs(), operation);
-        if (varEndpoint != null) {
-            EndpointTools.merge(endpoints, (Endpoint) varEndpoint.getValue());
-        }
-    
-    }
-     */
-    /**
-     * Processes HTTP methods from Stack (parsing based on config.yml)
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param type HTTP method retrieved from method name e.g. POST, GET, PUT, PATCH
-     * @param operation Operation
-     */
-    /*     private void processHTTPMetod(Stack<Variable> values, ApiCallMethodConfig methodConfig,
-            ApiCallMethodType type, Operation operation) {
-        processGENERIC(values, methodConfig, operation);
-        HttpMethod eType = HttpMethod.valueOf(methodConfig.getValue());
-        Endpoint endpoint = (Endpoint) SafeStack.peekEndpoint(values).getValue();
-        endpoint.addHttpMethod(eType);
-        if (endpoint != null) {
-            EndpointTools.merge(endpoints, endpoint);
-        }
-    } */
-
-    /**
-     * Processes PATH params
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param operation Operation
-     */
-    /*     private void processPathParam(Stack<Variable> values, ApiCallMethodConfig methodConfig,
-            Operation operation) {
-        Variable varEndpoint =
-                EndpointDataMiningTools.setPathParamFromArgs(values, methodConfig.getArgs(),
-                        operation, ParameterCategory.valueOf(methodConfig.getValue()));
-        if (varEndpoint != null) {
-            EndpointTools.merge(endpoints, (Endpoint) varEndpoint.getValue());
-        }
-    } */
-
-    /**
-     * Process PATH params stored in Endpoint Data container (holder of endpoints attributes)
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param operation Operation
-     */
-    /*    private void processPathParamEDataContainer(Stack<Variable> values,
-            EDataContainerMethodConfig methodConfig, Operation operation) {
-        ParameterCategory category = ParameterCategory.valueOf(methodConfig.getValue());
-        Variable varEndpoint = EndpointDataMiningTools.getPathParamFromContainer(values,
-                methodConfig, operation, category);
-        mergeVarEndpointData(values, varEndpoint);
-    }
-    */
-    /**
-     * Process PATH params (without semantic info) stored in Endpoint Data container (holder of endpoints attributes)
-     * @param values Stack
-     * @param methodConfig Method configuration (source config.yml)
-     * @param operation Operation
-     */
-    /*     private void processPathParamEDataContainerGENERIC(Stack<Variable> values,
-            EDataContainerMethodConfig methodConfig, Operation operation) {
-        Variable varEndpoint =
-                EndpointDataMiningTools.getEndpointAttrFromContainer(values, operation);
-        mergeVarEndpointData(values, varEndpoint);
-    }
-     */
-
-    /**
-     * Processes retrieving from framework Enums
-     * @param values Stack
-     * @param operation Operation
-     */
-    /*     private void processGETFIELDLibEnum(Stack<Variable> values, Operation operation) {
-     if (isRequestParamMethod(operation)) {
-         HashMap<String, EnumFieldOrMethodConfig> enumClass = ecMAp.get(operation.getOwner());
-         if (enumClass.containsKey(operation.getFieldName())) {
-             EnumFieldOrMethodConfig enumField = enumClass.get(operation.getFieldName());
-             if (enumField.getContentType() != null) {
-                 values.push(
-                         new Variable(enumField.getContentType()).setType(VariableType.SIMPLE));
-             } else if (enumField.getHttpMethod() != null) {
-                 values.push(
-                         new Variable(enumField.getHttpMethod()).setType(VariableType.SIMPLE));
-    
-             } else if (enumField.getHeaderType() != null) {
-                 values.push(
-                         new Variable(enumField.getHeaderType()).setType(VariableType.SIMPLE));
-             }
-         }
-     }
-    } */
 
     /**
      * Processes enums and classes which holds essential informations about endpoints (e.g. Content-Type, Http method etc.)
@@ -366,21 +181,14 @@ class EndpointHandler extends MethodProcessor {
         processFIELDRequestParameters(values, operation);
     }
 
-    private void connectEndpointToCallingChain(Endpoint endpoint) {
-        for (final String method : callingChain) {
-
-        }
-    }
-
+    /**
+     * Connects method with its wrapping methods
+     * @param description
+     * @param callingChain
+     */
     private void connectMethodToCallingChain(String description, Set<String> callingChain) {
-        System.out.println("MW=" + description);
         callingChains.putIfAbsent(description, new HashSet<>());
         callingChains.get(description).addAll(callingChain);
-    }
-
-    private void connectEndpointToMethod(String methodDescription, Endpoint endpoint) {
-        endpointWrappingMethods.putIfAbsent(methodDescription, new HashSet<>());
-        endpointWrappingMethods.get(methodDescription).add(endpoint);
     }
 
     /**
@@ -396,26 +204,23 @@ class EndpointHandler extends MethodProcessor {
                 operation.getOwner() + "." + operation.getMethodName() + operation.getDesc();
         connectMethodToCallingChain(description, Set.of(currentMethod));
         if (isWSClient(operation) || isWSClientDataContainer(operation)) {
-            Stack<Variable> methodArgs =
-                    EndpointDataMiningTools.methodArgsFromValues(values, operation);
+            Stack<Variable> methodArgs = EndpointTools.methodArgsFromValues(values, operation);
             Endpoint endpointData = null;
             if (isWSClient(operation)) {
                 //operation.get
                 final IWSClient client =
                         wsClients.get(operation.getOwner()).get(operation.getMethodName());
-                endpointData = VariableFactory.getEndpointData(methodArgs, client);
+                endpointData = EndpointDataFactory.getEndpointData(methodArgs, client);
                 if (SafeStack.peekEndpoint(values) != null) {
                     Endpoint endpointFromStack = (Endpoint) values.pop().getValue();
                     endpointData.merge(endpointFromStack);
                 }
                 Endpoint newEndpoint = EndpointTools.merge(endpoints, endpointData);
-                newEndpoint.addDependency(Set.of(currentMethod));
-                //connectEndpointToMethod(currentMethod, newEndpoint);
                 newEndpoint.addDependency(callingChain);
             } else if (isWSClientDataContainer(operation)) {
                 final IWSClient client = wsClientDataContainers.get(operation.getOwner())
                         .get(operation.getMethodName());
-                endpointData = VariableFactory.getEndpointData(methodArgs, client);
+                endpointData = EndpointDataFactory.getEndpointData(methodArgs, client);
                 if (SafeStack.peekEndpoint(values) != null) {
                     Endpoint endpointFromStack = (Endpoint) values.peek().getValue();
                     endpointData.merge(endpointFromStack);
@@ -453,7 +258,6 @@ class EndpointHandler extends MethodProcessor {
         classInProgress = mw.getOwner();
         final String currentClass = mw.getOwner();
         final String methodName = mw.getMethodStruct().getName();
-        //if (mw.getMethodStruct().set)
         final String chainKey = currentClass + "." + methodName + mw.getMethodStruct().getDesc();
 
         if (callingChain.contains(chainKey)) {

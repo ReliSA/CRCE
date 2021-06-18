@@ -28,7 +28,7 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
 
     private static final Logger logger = LoggerFactory.getLogger(RestClientResourceIndexer.class);
 
-    
+
 
     /**
      * Indexer's entry point.
@@ -56,16 +56,12 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
             logger.info("No endpoints found for resource " + resource.getId());
             return Collections.emptyList();
         } else {
-            logger.debug("REST API client data extracted " + endpoints.size() + " endpoint calls");
             // save endpoints and metadata
             RestClientMetadataManager metadataManager =
                     new RestClientMetadataManager(metadataFactory);
             metadataManager.setMetadata(resource, endpoints);
             // label the resource with categories and other common attributes
-            metadataService.addCategory(resource, RestClientMetadataConstants.MAIN_CATEGORY); // assign
-                                                                                              // main
-                                                                                              // category
-                                                                                              // tag
+            metadataService.addCategory(resource, RestClientMetadataConstants.MAIN_CATEGORY);
             logger.debug("Rest client indexer finished");
 
             return Collections.singletonList(RestClientMetadataConstants.MAIN_CATEGORY);
