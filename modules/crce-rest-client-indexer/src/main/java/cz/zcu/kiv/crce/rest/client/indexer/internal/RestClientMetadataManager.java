@@ -1,24 +1,24 @@
 package cz.zcu.kiv.crce.rest.client.indexer.internal;
 
-import cz.zcu.kiv.crce.metadata.*;
-import cz.zcu.kiv.crce.metadata.impl.ListAttributeType;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import cz.zcu.kiv.crce.metadata.AttributeType;
+import cz.zcu.kiv.crce.metadata.MetadataFactory;
+import cz.zcu.kiv.crce.metadata.Property;
+import cz.zcu.kiv.crce.metadata.Requirement;
+import cz.zcu.kiv.crce.metadata.Resource;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
-import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
+import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Header;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.util.*;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
 /**
  * Inspired by ghessova on 18.04.2018.
@@ -243,12 +243,18 @@ public class RestClientMetadataManager {
         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_COOKIE,
                 convertEndpointParameterToString(endpoint.getCookies()));
+
+
         Set<String> structures = new HashSet<>();
         structures.addAll(convertEndpointParameterToStructures(endpoint.getBodyParameteres()));
         structures.addAll(convertEndpointBodyToStructures(endpoint.getExpectedResponses()));
         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_BODY_STRUCTURES,
                 new ArrayList<>(structures));
+        setIfSet(endpointRequirement,
+                RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_CALLED_FROM,
+                new ArrayList<>(endpoint.getDependency()));
+
         /*         setIfSet(endpointRequirement,
                 RestClientMetadataConstants.ATTR__REST_CLIENT_ENDPOINT_PARAMETERS_OTHERS,
                 convertEndpointParameterToStructures(endpoint.getOthers())); */
@@ -306,4 +312,5 @@ public class RestClientMetadataManager {
         }
         return false;
     }
+
 }

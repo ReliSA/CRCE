@@ -50,6 +50,26 @@ public class Endpoint implements Serializable {
     protected Set<EndpointParameter> uriParams = new HashSet<>();
 
 
+    protected Set<String> dependency = new HashSet<>();
+
+    /**
+     * @param dependency the dependency to set
+     */
+    public void addDependency(Set<String> dependency) {
+        this.dependency.addAll(dependency);
+    }
+
+    public void addDependency(String dependency) {
+        this.dependency.add(dependency);
+    }
+
+    /**
+     * @return the dependency
+     */
+    public Set<String> getDependency() {
+        return dependency;
+    }
+
     /**
      * @return the uriParams
      */
@@ -259,6 +279,7 @@ public class Endpoint implements Serializable {
         this.authenticationCredentials = copyHeaders(endpoint.getAuthenticationCredentials());
         this.requestContext = copyHeaders(endpoint.getRequestContext());
         this.representation = copyHeaders(endpoint.getRepresentation());
+        this.dependency.addAll(endpoint.getDependency());
 
     }
 
@@ -438,7 +459,6 @@ public class Endpoint implements Serializable {
     public Endpoint addParameter(EndpointParameter param) {
         parameters.add(param);
         if (param.getCategory() == ParameterCategory.BODY) {
-            System.out.println("NEW BODY=" + param);
             this.bodyParameteres.add(param);
         } else if (param.getCategory() == ParameterCategory.COOKIE) {
             this.cookies.add(param);

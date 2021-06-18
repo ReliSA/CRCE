@@ -13,6 +13,7 @@ public class Method extends PathPart {
     private String desc;
     private DataType returnType;
     private String owner;
+    private String description;
     private List<Variable> parameters;
     private List<List<String>> responsesLog = new ArrayList<>();
     private List<Operation> bodyLog = new ArrayList<>();
@@ -25,6 +26,20 @@ public class Method extends PathPart {
         this.desc = desc;
         BytecodeDescriptorsProcessor.processMethodDescriptor(desc, this);
         this.owner = owner;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

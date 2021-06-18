@@ -2,6 +2,7 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -32,10 +33,12 @@ class EndpointHandler extends MethodProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
 
-    private String classInProgress = "";
     private String currentMethod = "";
-    private Set<String> callingChain = new HashSet<>();
-
+    private String classInProgress = "";
+    private Set<String> callingChain = new LinkedHashSet<>();
+    private Map<String, Set<Endpoint>> dependencyEndpoints = new HashMap<>();
+    private Map<String, Set<String>> callingChains = new HashMap<>();
+    private Map<String, Set<Endpoint>> endpointWrappingMethods = new HashMap<>();
 
     private Map<String, Endpoint> endpoints = new HashMap<>();
 
@@ -44,6 +47,13 @@ class EndpointHandler extends MethodProcessor {
     private Map<String, Map<String, IWSClient>> wsClientDataContainers =
             ConfigTools.getWSClientDataContainers();
 
+
+    /**
+     * @return the callingChains
+     */
+    public Map<String, Set<String>> getCallingChains() {
+        return callingChains;
+    }
 
     /*     private EnumConfigMap ecMAp = ConfigTools.getEnumDefinitions();
     private MethodConfigMap mcMap = ConfigTools.getMethodConfigs();
@@ -356,6 +366,23 @@ class EndpointHandler extends MethodProcessor {
         processFIELDRequestParameters(values, operation);
     }
 
+    private void connectEndpointToCallingChain(Endpoint endpoint) {
+        for (final String method : callingChain) {
+
+        }
+    }
+
+    private void connectMethodToCallingChain(String description, Set<String> callingChain) {
+        System.out.println("MW=" + description);
+        callingChains.putIfAbsent(description, new HashSet<>());
+        callingChains.get(description).addAll(callingChain);
+    }
+
+    private void connectEndpointToMethod(String methodDescription, Endpoint endpoint) {
+        endpointWrappingMethods.putIfAbsent(methodDescription, new HashSet<>());
+        endpointWrappingMethods.get(methodDescription).add(endpoint);
+    }
+
     /**
      * Processes possible endpoints by detecting method CALL like .uri(), .put() etc.
      * 
@@ -364,6 +391,10 @@ class EndpointHandler extends MethodProcessor {
      */
     @Override
     protected void processCALL(Operation operation, Stack<Variable> values) {
+        //connectEndpointToCallingChain(endpoint);
+        final String description =
+                operation.getOwner() + "." + operation.getMethodName() + operation.getDesc();
+        connectMethodToCallingChain(description, Set.of(currentMethod));
         if (isWSClient(operation) || isWSClientDataContainer(operation)) {
             Stack<Variable> methodArgs =
                     EndpointDataMiningTools.methodArgsFromValues(values, operation);
@@ -377,7 +408,10 @@ class EndpointHandler extends MethodProcessor {
                     Endpoint endpointFromStack = (Endpoint) values.pop().getValue();
                     endpointData.merge(endpointFromStack);
                 }
-                EndpointTools.merge(endpoints, endpointData);
+                Endpoint newEndpoint = EndpointTools.merge(endpoints, endpointData);
+                newEndpoint.addDependency(Set.of(currentMethod));
+                //connectEndpointToMethod(currentMethod, newEndpoint);
+                newEndpoint.addDependency(callingChain);
             } else if (isWSClientDataContainer(operation)) {
                 final IWSClient client = wsClientDataContainers.get(operation.getOwner())
                         .get(operation.getMethodName());
@@ -412,15 +446,15 @@ class EndpointHandler extends MethodProcessor {
      */
     @Override
     public void process(MethodWrapper mw) {
+        currentMethod = mw.getMethodStruct().getDescription();
         if (mw.isProcessed()) {
             return;
         }
-
         classInProgress = mw.getOwner();
         final String currentClass = mw.getOwner();
         final String methodName = mw.getMethodStruct().getName();
+        //if (mw.getMethodStruct().set)
         final String chainKey = currentClass + "." + methodName + mw.getMethodStruct().getDesc();
-        this.currentMethod = chainKey;
 
         if (callingChain.contains(chainKey)) {
             logger.info("Recursion detected method=" + methodName + " owner=" + mw.getOwner());
@@ -430,7 +464,7 @@ class EndpointHandler extends MethodProcessor {
         callingChain.add(chainKey);
         mw.setIsProcessed();
         super.process(mw);
-        callingChain = new HashSet<>();
+        callingChain = new LinkedHashSet<>();
     }
 
     /**
@@ -487,5 +521,9 @@ public class EndpointProcessor {
      */
     public Map<String, Endpoint> getEndpoints() {
         return this.endpoints;
+    }
+
+    public Map<String, Set<String>> getCallingChains() {
+        return endpointHandler.getCallingChains();
     }
 }

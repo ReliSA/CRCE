@@ -57,6 +57,7 @@ public class MyClassVisitor extends ClassVisitor {
             String[] exceptions) {
 
         Method newMethod = new Method(access, name, descriptor, lastClass.getName());
+        newMethod.setDescription(newMethod.getOwner() + "." + name + descriptor);
         state.getClassStruct().addMethod(newMethod);
         MethodVisitor mv = new MyMethodVisitor(newMethod);
         logger.info("[" + lastClass.getName() + "] method=" + newMethod.getName());

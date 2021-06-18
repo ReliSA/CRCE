@@ -11,18 +11,20 @@ public class EndpointTools {
      * @param endpoints Map of endpoints
      * @param endpoint  New endpoint
      */
-    public static void merge(Map<String, Endpoint> endpoints, Endpoint endpoint) {
+    public static Endpoint merge(Map<String, Endpoint> endpoints, Endpoint endpoint) {
         if (endpoint.getUrl() == null) {
-            return;
+            return endpoint;
         }
 
 
         if (endpoints.containsKey(endpoint.getUrl())) {
             final Endpoint oldEndpoint = endpoints.get(endpoint.getUrl());
             oldEndpoint.merge(endpoint);
+            return oldEndpoint;
         } else {
-            endpoints.put(endpoint.getUrl(), new Endpoint(endpoint));
-            return;
+            Endpoint newEndpoint = new Endpoint(endpoint);
+            endpoints.put(endpoint.getUrl(), newEndpoint);
+            return newEndpoint;
         }
 
 

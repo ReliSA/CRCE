@@ -54,8 +54,8 @@ public class Processor {
             endpointProcessor.process(class_);
             EndpointTools.merge(endpoints, endpointProcessor.getEndpoints());
         }
-        BeanProcessor beanProcessor = new BeanProcessor(classes, endpoints.values());
-        beanProcessor.process();
+        BeanProcessor.process(endpoints.values(), classes);
+        DependencyProcessor.process(endpointProcessor.getCallingChains(), endpoints.values());
         return endpoints;
     }
 }

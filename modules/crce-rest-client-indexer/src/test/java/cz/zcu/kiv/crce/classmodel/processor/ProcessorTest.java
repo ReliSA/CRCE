@@ -290,7 +290,7 @@ public class ProcessorTest {
         @Test
         @Parameters(name = "Testing the compatiblity with JAX-RS framework")
         public void testJaxRs() {
-                File file = new File(classLoader.getResource("jaxrs.jar").getFile());
+                File file = new File(classLoader.getResource("hrmanagermain.war").getFile());
                 try {
                         jaxRsEndpoints = Processor.process(file);
                 } catch (IOException e) {

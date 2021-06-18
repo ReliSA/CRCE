@@ -8,7 +8,7 @@ import cz.zcu.kiv.crce.metadata.namespace.NsCrceIdentity;
 /**
  * Inspired by ghessova on 18.04.2018.
  *
- * Constants for rest implementation representation in CRCE metada (namespaces, attributes).
+ * Constants for rest client implementation representation in CRCE metadata (namespaces, attributes).
  *
  */
 public interface RestClientMetadataConstants {
@@ -22,16 +22,12 @@ public interface RestClientMetadataConstants {
 
         String NS_REST_CLIENT_REQUEST = NS__REST_CLIENT_ENDPOINT + ".request";
         String NS_REST_CLIENT_RESPONSE = NS__REST_CLIENT_ENDPOINT + ".response";
+        String NS_REST_CLIENT_HEADERS = NS__REST_CLIENT_ENDPOINT + ".headers";
 
         String NS_HEADER = "header.";
         String NS_PARAMETER = "parameter.";
         String NS_RESPONSE = "response.";
         // properties namespaces
-        /*         String NS_REST_CLIENT_REQUEST_BODY = NS_REST_CLIENT_REQUEST + ".body";
-        String NS_REST_CLIENT_RESPONSE_BODY = NS_REST_CLIENT_RESPONSE + ".body";
-        String NS_REST_CLIENT_REQUEST_PARAMETER = NS_REST_CLIENT_REQUEST + ".parameter";
-        String NS_REST_CLIENT_RESPONSE_PARAMETER = NS_REST_CLIENT_RESPONSE + ".parameter"; */
-
 
         SimpleAttributeType<String> ATTR__REST_CLIENT_ENDPOINT_BASEURL =
                         new SimpleAttributeType<>("baseURL", String.class);
@@ -63,6 +59,8 @@ public interface RestClientMetadataConstants {
                         new ListAttributeType("uriParameter");
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_HEADER_REQUEST_BODY_STRUCTURES =
                         new ListAttributeType("structure");
+        ListAttributeType ATTR__REST_CLIENT_ENDPOINT_CALLED_FROM =
+                        new ListAttributeType("calledFrom");
 
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_CONSUMES = new ListAttributeType("consumes");
         ListAttributeType ATTR__REST_CLIENT_ENDPOINT_PRODUCES = new ListAttributeType("produces");

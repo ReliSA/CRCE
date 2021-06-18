@@ -28,6 +28,8 @@ public class RestClientResourceIndexer extends AbstractResourceIndexer {
 
     private static final Logger logger = LoggerFactory.getLogger(RestClientResourceIndexer.class);
 
+    
+
     /**
      * Indexer's entry point.
      *

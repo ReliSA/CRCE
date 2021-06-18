@@ -16,25 +16,17 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 
 public class BeanProcessor {
 
-    private Collection<Endpoint> endpoints;
-    private ClassMap classes;
-    private Map<String, String> cache = new HashMap<>();
-    private ObjectMapper mapperObj = new ObjectMapper();
+
 
     private static final Logger logger = LoggerFactory.getLogger(BeanProcessor.class);
-
-
-    public BeanProcessor(ClassMap classes, Collection<Endpoint> endpoints) {
-        this.classes = classes;
-        this.endpoints = endpoints;
-    }
 
     /**
      * Converts Endpoint body to json
      * @param body Body
      * @return String
      */
-    private String convertBodyToJson(EndpointBody body) {
+    private static String convertBodyToJson(EndpointBody body, Map<String, String> cache,
+            ClassMap classes, ObjectMapper mapperObj) {
         final String className = body.getType();
         if (cache.containsKey(className)) {
             return cache.get(className);
@@ -61,7 +53,8 @@ public class BeanProcessor {
      * @param body Body
      * @return String
      */
-    private String convertEndpointParameterToJson(EndpointParameter endpointParameter) {
+    private static String convertEndpointParameterToJson(EndpointParameter endpointParameter,
+            Map<String, String> cache, ClassMap classes, ObjectMapper mapperObj) {
         final String className = endpointParameter.getDataType();
         if (cache.containsKey(className)) {
             return cache.get(className);
@@ -87,18 +80,20 @@ public class BeanProcessor {
      * Process Beans inside Bodies
      * @return Endpoints
      */
-    public Collection<Endpoint> process() {
+    public static void process(Collection<Endpoint> endpoints, ClassMap classes) {
+        Map<String, String> cache = new HashMap<>();
+        ObjectMapper mapperObj = new ObjectMapper();
         for (Endpoint endpoint : endpoints) {
             for (EndpointBody body : endpoint.getRequestBodies()) {
-                body.setStructure(convertBodyToJson(body));
+                body.setStructure(convertBodyToJson(body, cache, classes, mapperObj));
             }
             for (EndpointBody body : endpoint.getExpectedResponses()) {
-                body.setStructure(convertBodyToJson(body));
+                body.setStructure(convertBodyToJson(body, cache, classes, mapperObj));
             }
             for (EndpointParameter endpointParameter : endpoint.getParameters()) {
-                endpointParameter.setStructure(convertEndpointParameterToJson(endpointParameter));
+                endpointParameter.setStructure(convertEndpointParameterToJson(endpointParameter,
+                        cache, classes, mapperObj));
             }
         }
-        return endpoints;
     }
 }
