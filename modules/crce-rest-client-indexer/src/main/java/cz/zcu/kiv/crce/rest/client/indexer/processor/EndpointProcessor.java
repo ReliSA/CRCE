@@ -134,7 +134,6 @@ class EndpointHandler extends MethodProcessor {
             if (ClassTools.isGenericClass(class_)) {
                 Stack<Object> types =
                         ClassTools.processTypes(class_.getClassStruct().getSignature());
-                System.out.println(class_.getClassStruct().getSignature());
                 if (types.size() == 0) {
                     return;
                 }

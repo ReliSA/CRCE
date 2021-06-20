@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -122,6 +123,21 @@ public class MyMethodVisitor extends MethodVisitor {
         method.addOperation(operation);
         operation.setDescription(owner + "." + name + "-" + desc + "-" + itf);
         super.visitMethodInsn(opcode, owner, name, desc, itf);
+    }
+
+    @Override
+    public void visitInvokeDynamicInsn(String name, String descriptor, Handle bootstrapMethodHandle,
+            Object... bootstrapMethodArguments) {
+        if (bootstrapMethodHandle.getOwner().startsWith("java/lang/invoke/LambdaMetafactor")) {
+            final String lambdaDescription = method.getNewLambdaDescription();
+            Operation operation = new Operation(Opcodes.INVOKEDYNAMIC, OperationType.CALL);
+            operation.setDescription(lambdaDescription);
+            operation.setRawMethodName(method.lastLambdaName());
+            operation.setOwner(state.getClassStruct().getName());
+            method.addOperation(operation);
+        }
+        super.visitInvokeDynamicInsn(name, descriptor, bootstrapMethodHandle,
+                bootstrapMethodArguments);
     }
 
     /**

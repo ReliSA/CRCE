@@ -170,7 +170,28 @@ public class MethodProcessor extends BasicProcessor {
      * @param operation
      */
     protected void processINVOKEINTERFACE(Stack<Variable> values, Operation operation) {
-        cleanupAfterMCall(values, operation);
+        if (SafeStack.peek(values) != null && values.peek().getType() == VariableType.LAMBDA) {
+            final Operation operationStored = (Operation) values.pop().getValue();
+            removeMethodArgsFromStack(values, operation);
+            if (!this.classes.containsKey(operationStored.getOwner())) {
+                return;
+            }
+            final MethodWrapper mw = getMethodWrapper(operationStored);
+            if (mw == null) {
+                return;
+            }
+            Variable variable = new Variable(mw.getMethodStruct().getReturnValue())
+                    .setType(VariableType.OTHER).setDescription(mw.getReturnType());
+
+            if (mw.hasPrimitiveReturnType()) {
+                variable.setType(VariableType.SIMPLE);
+            }
+            values.add(variable);
+        } else
+
+        {
+            cleanupAfterMCall(values, operation);
+        }
     }
 
     /**
@@ -199,7 +220,20 @@ public class MethodProcessor extends BasicProcessor {
     }
 
     /**
-     * Process CALL operation (toString, append - operation with Strings)
+     * Processes static invocation of methods
+     * @param values Stack
+     * @param operation INVOKESTATIC operation
+     */
+    protected void processINVOKEDYNAMIC(Stack<Variable> values, Operation operation) {
+        Variable variable = new Variable();
+        variable.setType(VariableType.LAMBDA);
+        variable.setDescription(operation.getDescription());
+        variable.setValue(operation);
+        values.push(variable);
+    }
+
+    /**
+         * Process CALL operation (toString, append - operation with Strings)
      * 
      * @param operation Operation to be handled
      * @param values String values
@@ -217,6 +251,9 @@ public class MethodProcessor extends BasicProcessor {
                 break;
             case Opcodes.INVOKEINTERFACE:
                 processINVOKEINTERFACE(values, operation);
+                break;
+            case Opcodes.INVOKEDYNAMIC:
+                processINVOKEDYNAMIC(values, operation);
                 break;
         }
     }

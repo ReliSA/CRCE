@@ -15,10 +15,9 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 
 public class MyClassVisitor extends ClassVisitor {
-
     private static final Logger logger = LoggerFactory.getLogger(MyClassVisitor.class);
     private State state = State.getInstance();
-    private ClassStruct lastClass = null;
+    private ClassStruct currentClass = null;
 
     public MyClassVisitor(int api, ClassVisitor classVisitor) {
         super(api, classVisitor);
@@ -28,7 +27,7 @@ public class MyClassVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName,
             String[] interfaces) {
         ClassStruct class_ = new ClassStruct(name, superName, signature, interfaces);
-        lastClass = class_;
+        currentClass = class_;
         state.setClassStruct(class_);
         super.visit(version, access, name, signature, superName, interfaces);
 
@@ -56,11 +55,12 @@ public class MyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
             String[] exceptions) {
 
-        Method newMethod = new Method(access, name, descriptor, lastClass.getName());
-        newMethod.setDescription(newMethod.getOwner() + "." + name + descriptor);
+        Method newMethod = new Method(access, name, descriptor, currentClass.getName());
+        newMethod.setDescription(BytecodeDescriptorsProcessor
+                .makeMethodDescriptor(newMethod.getOwner(), name, descriptor));
         state.getClassStruct().addMethod(newMethod);
         MethodVisitor mv = new MyMethodVisitor(newMethod);
-        logger.info("[" + lastClass.getName() + "] method=" + newMethod.getName());
+        logger.info("[" + currentClass.getName() + "] method=" + newMethod.getName());
         return mv;
     }
 

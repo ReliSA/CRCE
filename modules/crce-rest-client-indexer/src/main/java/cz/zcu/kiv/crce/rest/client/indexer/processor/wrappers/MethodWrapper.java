@@ -20,7 +20,7 @@ public class MethodWrapper {
      */
     public MethodWrapper(Method methodStruct, String owner) {
         this.methodStruct = methodStruct;
-        this.returnType = ClassTools.descriptionToClassPath(methodStruct.getDesc());
+        this.returnType = methodStruct.getReturnType().getBasicType();
         this.isStatic = (methodStruct.getAccess() & Opcodes.ACC_STATIC) != 0;
         if (isStatic) {
             this.vars = new VariablesContainer(methodStruct.getParameters());

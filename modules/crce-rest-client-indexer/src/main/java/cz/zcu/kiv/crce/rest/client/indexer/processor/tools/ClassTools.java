@@ -111,7 +111,8 @@ public class ClassTools {
         try {
             Matcher matcherStart = descrToClassPathPattern.matcher(description);
             Matcher matcherEnd = descrToClassPathEndPattern.matcher(matcherStart.replaceFirst(""));
-
+            matcherStart.find();
+            matcherEnd.find();
             String output = matcherEnd.replaceAll("").replace(";", "");
             return output;
         } catch (Exception ex) {

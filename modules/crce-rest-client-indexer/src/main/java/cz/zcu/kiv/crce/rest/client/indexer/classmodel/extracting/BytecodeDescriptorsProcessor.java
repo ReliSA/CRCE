@@ -36,6 +36,11 @@ public class BytecodeDescriptorsProcessor {
      */
 
 
+    public static String makeMethodDescriptor(String methodOwner, String methodName,
+            String methodDescriptor) {
+        return methodOwner + "." + methodName + methodDescriptor;
+    }
+
     private static boolean isPrimitive(String dataType) {
         return dataType.matches(baseTypeRegex);
     }

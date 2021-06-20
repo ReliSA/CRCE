@@ -85,6 +85,10 @@ public class Operation {
         }
     }
 
+    public void setRawMethodName(String name) {
+        this.fName = name;
+    }
+
     public void setFieldName(String name) {
         this.fieldName = name;
     }

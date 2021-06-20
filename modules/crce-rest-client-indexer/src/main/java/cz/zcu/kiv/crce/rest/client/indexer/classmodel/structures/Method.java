@@ -9,6 +9,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescrip
  */
 public class Method {
 
+    private int lambdaCounter = 0;
     private int access;
     private String desc;
     private DataType returnType;
@@ -19,7 +20,17 @@ public class Method {
     private List<List<String>> responsesLog = new ArrayList<>();
     private List<Operation> bodyLog = new ArrayList<>();
 
+
     private String returnValue = "";
+
+    public String lastLambdaName() {
+        return ("lambda" + "$" + this.name + "$" + this.lambdaCounter);
+    }
+
+    public String getNewLambdaDescription() {
+        return this.owner + "." + "lambda" + "$" + this.name + "$" + this.lambdaCounter + "-"
+                + this.desc + "-" + false;
+    }
 
     public Method(int access, String name, String desc, String owner) {
         this.access = access;

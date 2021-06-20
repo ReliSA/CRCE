@@ -3,9 +3,12 @@ package cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ghessova on 05.03.2018.
@@ -22,6 +25,8 @@ public class ClassStruct {
     private Method clnitMethod;
 
     public ClassStruct() {}
+
+
 
     /**
      * @return the cinitMethod

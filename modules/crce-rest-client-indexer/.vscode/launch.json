@@ -30,7 +30,10 @@
             "name": "Launch Main",
             "request": "launch",
             "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
-            "projectName": "crce-rest-client-indexer"
+            "projectName": "crce-rest-client-indexer",
+            "args": [
+                "-f=/home/tomas/Stažené/Main.jar"
+            ]
         },
         {
             "type": "java",
