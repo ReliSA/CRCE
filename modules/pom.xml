@@ -74,8 +74,8 @@
         <!--<module>crce-repository-maven-impl</module>-->
         
         <module>crce-webservices-indexer</module>
-        <module>crce-restimpl-indexer</module>
         <module>crce-rest-client-indexer</module>
+        <module>crce-restimpl-indexer</module>
 
 		<module>crce-default-modules</module>
         <module>crce-api-compatibility-checker</module>
