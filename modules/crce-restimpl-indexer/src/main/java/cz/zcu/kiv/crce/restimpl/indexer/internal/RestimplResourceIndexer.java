@@ -69,10 +69,6 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
         InputStream firstClone = new ByteArrayInputStream(baos.toByteArray());
         InputStream secondClone = new ByteArrayInputStream(baos.toByteArray());
         logger.info("Indexing resource " + resource.getId());
-        cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint test =
-                new cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint();
-        test.setBaseUrl("BLABLA");
-        System.out.println("LOOOOOL=" + test.getBaseUrl());
         Map<String, cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint> endpointClients =
                 new HashMap<>();
         try {
@@ -113,8 +109,8 @@ public class RestimplResourceIndexer extends AbstractResourceIndexer {
         } catch (Exception e) {
             logger.error("Could not extract endpoints", e);
         }
-
         for (Endpoint endpoint : endpoints) {
+
             for (cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint endpointClient : endpointClients
                     .values()) {
                 if (endpointClient.getDependency().contains(endpoint.getName())) {
