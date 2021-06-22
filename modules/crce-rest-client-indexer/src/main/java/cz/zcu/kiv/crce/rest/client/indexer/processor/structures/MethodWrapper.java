@@ -1,11 +1,9 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 import java.util.Stack;
 import org.objectweb.asm.Opcodes;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.DataType;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.VariablesContainer;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 
 public class MethodWrapper {

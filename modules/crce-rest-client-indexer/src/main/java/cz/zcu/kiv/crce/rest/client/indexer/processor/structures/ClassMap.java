@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 import java.util.HashMap;
 

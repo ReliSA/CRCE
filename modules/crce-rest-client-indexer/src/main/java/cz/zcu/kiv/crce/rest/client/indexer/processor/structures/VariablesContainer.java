@@ -1,8 +1,7 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 import java.util.ArrayList;
 import java.util.List;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 
 

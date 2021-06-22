@@ -35,7 +35,7 @@ public class ConfigTools {
     private static Map<String, Map<String, IWSClient>> wsClients = null;
     private static Map<String, Map<String, IWSClient>> wsClientData = null;
 
-    private static final String DEF_DIR_NAME = "definition" + "/v2";
+    private static final String DEF_DIR_NAME = "definition";
     private static final String DEF_DIR_ABS = "/" + DEF_DIR_NAME;
     private static final String DEF_DIR_REL = DEF_DIR_NAME + "/";
     private static final List<String> configs = List.of(DEF_DIR_ABS + "/" + "jax-rs.yml",

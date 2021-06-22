@@ -6,15 +6,17 @@ import org.objectweb.asm.Opcodes;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.OperationType;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassMap;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ConstPool;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.MethodWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VarArray;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.VariablesContainer;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.NumTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 public class BasicProcessor {
 

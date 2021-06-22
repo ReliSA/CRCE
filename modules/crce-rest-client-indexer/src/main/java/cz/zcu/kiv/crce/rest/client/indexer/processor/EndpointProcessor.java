@@ -13,6 +13,8 @@ import cz.zcu.kiv.crce.rest.client.indexer.config.RequestParamFieldType;
 import cz.zcu.kiv.crce.rest.client.indexer.config.structures.IWSClient;
 import cz.zcu.kiv.crce.rest.client.indexer.config.structures.RequestParam;
 import cz.zcu.kiv.crce.rest.client.indexer.config.tools.ConfigTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassMap;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
@@ -20,8 +22,6 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 class EndpointHandler extends MethodProcessor {

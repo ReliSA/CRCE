@@ -1,7 +1,6 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 import java.util.HashMap;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 
 public class ConstPool extends HashMap<String, Variable> {
 

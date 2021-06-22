@@ -10,9 +10,10 @@ import java.util.zip.ZipInputStream;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.Collector;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.Loader;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassMap;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassWrapper;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
 
 public class Processor {
     /**
@@ -48,7 +49,7 @@ public class Processor {
      */
     private static Map<String, Endpoint> process() {
         Map<String, Endpoint> endpoints = new HashMap<>();
-        ClassMap classes = Helpers.convertStructMap(Collector.getInstance().getClasses());
+        ClassMap classes = ClassTools.convertStructMap(Collector.getInstance().getClasses());
         EndpointProcessor endpointProcessor = new EndpointProcessor(classes);
         for (ClassWrapper class_ : classes.values()) {
             endpointProcessor.process(class_);

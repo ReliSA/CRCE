@@ -1,4 +1,4 @@
-package cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers;
+package cz.zcu.kiv.crce.rest.client.indexer.processor.structures;
 
 import java.util.Set;
 import java.util.Map;
@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Method;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.ConstPool;
 
 public class ClassWrapper {
     private ConstPool classPool;

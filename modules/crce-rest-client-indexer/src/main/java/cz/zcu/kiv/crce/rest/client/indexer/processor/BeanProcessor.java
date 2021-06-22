@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Endpoint;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointBody;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.EndpointParameter;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 
 public class BeanProcessor {
 

@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting.BytecodeDescriptorsProcessor;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.ClassStruct;
 import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Field;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassMap;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.ClassWrapper;
 
 public class ClassTools {
     private static final String descrToClassPathRegexp = "^((\\((\\w|\\/|;)*\\)\\[?)?[A-Z])";
@@ -306,5 +306,19 @@ public class ClassTools {
             return signature != null && patternMatch;
         }
         return false;
+    }
+
+    /**
+    * Wrappes class structure with additional fields and functions
+    * 
+    * @param classes Map of classes
+    * @return Wrapped classes
+    */
+    public static ClassMap convertStructMap(Map<String, ClassStruct> classes) {
+        ClassMap converted = new ClassMap();
+        for (String key : classes.keySet()) {
+            converted.put(key, new ClassWrapper(classes.get(key)));
+        }
+        return converted;
     }
 }
