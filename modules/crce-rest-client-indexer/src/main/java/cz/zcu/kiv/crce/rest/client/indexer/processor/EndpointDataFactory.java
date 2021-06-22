@@ -212,6 +212,9 @@ public class EndpointDataFactory {
      */
     private static void processSettingsArg(Variable argValue, MethodArgType argType,
             Stack<Header> headers, Endpoint endpointData) {
+        if (argValue == null) {
+            return;
+        }
         switch (argType) {
             case ENDPOINT_DATA:
                 //SKIP -> wrapped in EndpointData
@@ -278,11 +281,19 @@ public class EndpointDataFactory {
                 break;
             case BASE_URL:
             case URL: {
+                if (argValue.getValue() instanceof Endpoint) {
+                    endpointData.merge((Endpoint) argValue.getValue());
+                    break;
+                }
                 final String url = (String) argValue.getValue();
                 endpointData.setBaseUrl(url);
             }
                 break;
             case PATH: {
+                if (argValue.getValue() instanceof Endpoint) {
+                    endpointData.merge((Endpoint) argValue.getValue());
+                    break;
+                }
                 final String path = (String) argValue.getValue();
                 endpointData.setPath(path);
             }
@@ -407,6 +418,9 @@ public class EndpointDataFactory {
         if (var.getType() == VariableType.ARRAY && var.getValue() instanceof VarArray) {
             VarArray varArray = (VarArray) var.getValue();
             for (Variable varArrayItem : varArray.getInnerArray()) {
+                if (varArrayItem == null) {
+                    continue;
+                }
                 endpointData
                         .addParameter(new EndpointParameter(
                                 key, varArrayItem.getDescription(), BytecodeDescriptorsProcessor
@@ -460,9 +474,15 @@ public class EndpointDataFactory {
     private static void processKeyOrValue(MethodArg argValue,
             LinkedHashMap<String, List<MethodArg>> dataHolder) {
         if (argValue.getType() == MethodArgType.KEY) {
+            if (argValue.getVar().getValue() instanceof VarArray) {
+                return;
+            }
             dataHolder.put((String) argValue.getVar().getValue(), new LinkedList<>());
         } else if (argValue.getType() == MethodArgType.VALUE) {
             ArrayList<String> keys = new ArrayList<>(dataHolder.keySet());
+            if (keys.isEmpty()) {
+                return;
+            }
             final String lastKey = keys.get(keys.size() - 1);
             dataHolder.get(lastKey).add(argValue);
         }

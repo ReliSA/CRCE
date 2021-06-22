@@ -74,6 +74,18 @@ argDefinitions:
     type: VALUE
     classes:
       - java.lang.String
+  pathArg:
+    type: PATH
+    classes:
+      - java.lang.String
+  uriKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  uriValue:
+    type: VALUE
+    classes:
+      - java.lang.Object
 wsClientData:
   - classes:
       - org.springframework.http.HttpEntity
@@ -141,6 +153,34 @@ wsClientData:
       GENERIC:
         - names:
             - init
+  - classes:
+      - org.springframework.web.util.UriComponentsBuilder
+    settings:
+      GENERIC:
+        - names:
+            - fromPath
+            - replacePath
+            - path
+          args:
+            - - pathArg
+        - names:
+            - pathSegment
+          varArgs:
+            - - pathArg
+        - names:
+            - fromUri
+          args:
+            - - uriURL
+        - names:
+            - fromUriString
+          args:
+            - - stringURL
+      URI_VARIABLE:
+        - names:
+            - queryParam
+          varArgs:
+            - - uriKey
+              - uriValue
 wsClient:
   - interfaces:
       - org.springframework.web.client.RestOperations

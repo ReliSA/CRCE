@@ -81,11 +81,15 @@ public class VariablesContainer {
         if (owner != null) {
             vars.add(new Variable("").setType(VariableType.OTHER).setOwner(owner));
         }
+        if (varStructures == null) {
+            return;
+        }
         for (cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Variable varStruct : varStructures) {
             String basicType = varStruct.getDataType().getBasicType();
             vars.add(new Variable("").setDescription(basicType).setType(basicType));
         }
     }
+
 
     /**
      * Init wihout owner but with varStructures

@@ -15,6 +15,9 @@ public class VariableTools {
      * @return
      */
     public static boolean isNumberVar(Variable var) {
+        if (var.getDescription() == null || var.getOwner() == null) {
+            return false;
+        }
         return (var.getDescription().equals("I") || var.getDescription().equals("D")
                 || var.getDescription().equals("F") || var.getDescription().equals("L")
                 || var.getDescription().equals("java/lang/Integer")
@@ -30,6 +33,9 @@ public class VariableTools {
      * @return
      */
     public static boolean isStringVar(Variable var) {
+        if (var.getDescription() == null || var.getOwner() == null) {
+            return false;
+        }
         return (var.getType() == VariableType.SIMPLE
                 || var.getDescription().equals("java/lang/String")
                 || var.getOwner().equals("java/lang/StringBuilder"));

@@ -141,8 +141,8 @@ public class BasicProcessor {
      */
     protected void processSTRINGCONST(Operation operation, Stack<Variable> values) {
         String newValue = operation.getValue() != null ? operation.getValue().toString() : null;
-        values.add(
-                new Variable(newValue).setType(VariableType.SIMPLE).setOwner("java/lang/String"));
+        values.add(new Variable(newValue).setType(VariableType.SIMPLE)
+                .setDescription("java/lang/String"));
     }
 
     /**

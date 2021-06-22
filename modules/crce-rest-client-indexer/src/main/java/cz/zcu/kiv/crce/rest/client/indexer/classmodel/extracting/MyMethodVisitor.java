@@ -1,8 +1,12 @@
 package cz.zcu.kiv.crce.rest.client.indexer.classmodel.extracting;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Set;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
@@ -30,6 +34,26 @@ public class MyMethodVisitor extends MethodVisitor {
     private State state = State.getInstance();
     private Method method;
     private List<String> log = new ArrayList<>();
+    private static Map<String, Set<String>> callingChains = new HashMap<>();
+
+
+    /**
+     * @return the callingChains
+     */
+    public static Map<String, Set<String>> getCallingChains() {
+        return callingChains;
+    }
+
+    /**
+     * Connects method with its wrapping methods
+     * @param description
+     * @param callingChain
+     */
+    private static void connectMethodToCallingChain(String calledMethodDescription,
+            String fromMethodDescription) {
+        callingChains.putIfAbsent(calledMethodDescription, new LinkedHashSet<>());
+        callingChains.get(calledMethodDescription).add(fromMethodDescription);
+    }
 
     MyMethodVisitor(Method method) {
 
@@ -119,6 +143,10 @@ public class MyMethodVisitor extends MethodVisitor {
         operation.setOwner(owner);
         operation.setMethodName(name);
         operation.setDesc(desc);
+        connectMethodToCallingChain(
+                BytecodeDescriptorsProcessor.makeMethodDescriptor(operation.getOwner(),
+                        operation.getMethodName(), operation.getDesc()),
+                method.getDescription());
 
         method.addOperation(operation);
         operation.setDescription(owner + "." + name + "-" + desc + "-" + itf);

@@ -2,7 +2,6 @@ package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -23,7 +22,6 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodTyp
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassMap;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.ClassWrapper;
-import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
 class EndpointHandler extends MethodProcessor {
@@ -31,8 +29,7 @@ class EndpointHandler extends MethodProcessor {
     private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
 
     private String currentMethod = "";
-    private String classInProgress = "";
-    private Set<String> callingChain = new LinkedHashSet<>();
+
     private Map<String, Set<String>> callingChains = new HashMap<>();
     private Map<String, Endpoint> endpoints = new HashMap<>();
     private Map<String, Map<String, IWSClient>> wsClients = ConfigTools.getWSClients();
@@ -48,11 +45,8 @@ class EndpointHandler extends MethodProcessor {
         return callingChains;
     }
 
-    private FieldProcessor fProcessor;
-
     public EndpointHandler(ClassMap classes) {
         super(classes);
-        fProcessor = new FieldProcessor(classes);
     }
 
     /**
@@ -94,34 +88,6 @@ class EndpointHandler extends MethodProcessor {
         return MethodTools.getType(operation.getDescription()) == MethodType.INIT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected MethodWrapper getMethodWrapper(Operation operation) {
-        MethodWrapper mw = super.getMethodWrapper(operation);
-        if (mw == null) {
-            return null;
-        }
-        final String operationOwner = operation.getOwner();
-        if (!mw.isProcessed() && !classInProgress.equals(operationOwner)) {
-            //Method is from other class which was not processed yet
-            final ClassWrapper cw = this.classes.getOrDefault(operationOwner, null);
-            if (cw == null) {
-                mw.setIsProcessed();
-                logger.info("Missing class=" + operationOwner);
-                return null;
-            }
-            logger.info("Not processed class=" + cw.getClassStruct().getName());
-            process(mw);
-        } else if (!mw.isProcessed()) {
-            //Method is from this class but was not processed yet
-            logger.info("Not processed method=" + operation.getMethodName() + " class="
-                    + operationOwner);
-            process(mw);
-        }
-        return mw;
-    }
 
     /**
      * {@inheritDoc}
@@ -138,8 +104,12 @@ class EndpointHandler extends MethodProcessor {
                     return;
                 }
                 types.pop(); // Throw away generic wrapper
-                String type = (String) SafeStack.pop(types);
-                values.push(new Variable().setDescription(type).setType(VariableType.OTHER));
+                Object type = SafeStack.pop(types);
+                if (type instanceof String[]) {
+                    type = class_.getClassStruct().getSignature();
+                }
+                values.push(
+                        new Variable().setDescription((String) type).setType(VariableType.OTHER));
                 return;
             }
         } else {
@@ -242,51 +212,6 @@ class EndpointHandler extends MethodProcessor {
             super.processCALL(operation, values);
         }
 
-    }
-
-    /**
-     * [+Recursion detection]
-     * {@inheritDoc}
-     */
-    @Override
-    public void process(MethodWrapper mw) {
-        currentMethod = mw.getMethodStruct().getDescription();
-        if (mw.isProcessed()) {
-            return;
-        }
-        classInProgress = mw.getOwner();
-        final String currentClass = mw.getOwner();
-        final String methodName = mw.getMethodStruct().getName();
-        final String chainKey = currentClass + "." + methodName + mw.getMethodStruct().getDesc();
-
-        if (callingChain.contains(chainKey)) {
-            logger.info("Recursion detected method=" + methodName + " owner=" + mw.getOwner());
-            mw.setIsProcessed();
-            return;
-        }
-        callingChain.add(chainKey);
-        mw.setIsProcessed();
-        super.process(mw);
-        callingChain = new LinkedHashSet<>();
-    }
-
-    /**
-     * Processes whole class (fields + methods)
-     * @param class_ Input class
-     */
-    public void process(ClassWrapper class_) {
-
-        classInProgress = class_.getClassStruct().getName();
-        this.fProcessor.process(class_);
-        for (MethodWrapper method : class_.getMethods()) {
-            //calling chain
-            process(method);
-            if (!method.hasPrimitiveReturnType()) {
-                class_.removeMethod(method.getMethodStruct().getName());
-            }
-        }
-
-        callingChain = new HashSet<>();
     }
 
     /**

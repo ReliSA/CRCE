@@ -87,6 +87,17 @@ public class Variable {
         this.value = value;
     }
 
+    /**
+     * @param value
+     */
+    public Variable(Variable value) {
+        this.description = value.getDescription();
+        this.owner = value.getOwner();
+        this.vType = value.vType;
+        this.value = value.getValue();
+        this.value = value;
+    }
+
     public Variable() {
         this.value = "";
     }

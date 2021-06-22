@@ -169,7 +169,7 @@ public class ClassTools {
      */
     public static void processTypes(String signature, Stack<Object> types) {
         Matcher matcher = baseTypePattern.matcher(signature);
-        String dateType;
+        String dateType = "";
 
         if (matcher.find() && matcher.start() == 0) {
             dateType = signature.substring(0, matcher.end());

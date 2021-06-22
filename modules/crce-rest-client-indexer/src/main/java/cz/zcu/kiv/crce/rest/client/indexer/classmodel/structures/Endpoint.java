@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cz.zcu.kiv.crce.rest.client.indexer.config.MethodArgType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.HeaderTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ToJSONTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.UrlTools;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
@@ -50,7 +52,7 @@ public class Endpoint implements Serializable {
     protected Set<EndpointParameter> uriParams = new HashSet<>();
 
 
-    protected Set<String> dependency = new HashSet<>();
+    protected Set<String> dependency = new LinkedHashSet<>();
 
     /**
      * @param dependency the dependency to set
@@ -520,8 +522,9 @@ public class Endpoint implements Serializable {
      * @param endpoint Merges incoming endpoint into this
      */
     public void merge(Endpoint endpoint) {
-        String newPath = endpoint.getPath() != null ? endpoint.getPath() : this.path;
-        String newBaseUrl = endpoint.getBaseUrl() != null ? endpoint.getBaseUrl() : this.baseUrl;
+        String newPath = !StringTools.isEmpty(endpoint.getPath()) ? endpoint.getPath() : this.path;
+        String newBaseUrl =
+                !StringTools.isEmpty(endpoint.getBaseUrl()) ? endpoint.getBaseUrl() : this.baseUrl;
         this.setPath(newPath);
         this.setBaseUrl(newBaseUrl);
         this.httpMethods.addAll(endpoint.getHttpMethods());
@@ -599,7 +602,8 @@ public class Endpoint implements Serializable {
                 + ToJSONTools.convertSet(authenticationCredentials) + ", \"requestContenxt\": "
                 + ToJSONTools.convertSet(requestContext) + ", \"representation\": "
                 + ToJSONTools.convertSet(representation) + ", \"response\": "
-                + ToJSONTools.convertSet(responseHeaders) + " } }";
+                + ToJSONTools.convertSet(responseHeaders) + ", \"calledFrom\": "
+                + ToJSONTools.convertSet(dependency) + " } }";
     }
 
 

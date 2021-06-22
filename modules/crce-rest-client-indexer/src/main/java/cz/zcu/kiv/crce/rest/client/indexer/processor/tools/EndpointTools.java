@@ -61,10 +61,11 @@ public class EndpointTools {
             Operation operation) {
         String[] methodArgsDef = MethodTools.getArgsFromSignature(operation.getDescription());
         Stack<Variable> output = new Stack<>();
-        if (methodArgsDef == null || methodArgsDef.length == 0 || values.isEmpty()) {
+        if (methodArgsDef == null || methodArgsDef.length == 0
+                || values.size() < methodArgsDef.length) {
+            //unwanted state
             return output;
         }
-
         for (int counter = 0; counter < methodArgsDef.length; counter++) {
             output.push(values.pop());
         }

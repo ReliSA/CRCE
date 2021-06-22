@@ -72,6 +72,7 @@ public class BytecodeDescriptorsProcessor {
             method.setParameters(parameters);
             method.setReturnType(methodSignature.getReturnType());
         } catch (Exception e) {
+            System.out.println("EXCEPTION=" + e.getMessage());
             /*
              * logger.error("Error when processing method with desc: " + desc, e);
              */ }

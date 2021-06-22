@@ -1,5 +1,7 @@
 package cz.zcu.kiv.crce.rest.client.indexer.processor;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.Stack;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.classmodel.structures.Operation.Opera
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.structures.Variable.VariableType;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.ClassTools;
+import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.EndpointTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
@@ -21,8 +24,16 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.wrappers.MethodWrapper;
 
 public class MethodProcessor extends BasicProcessor {
 
+    private static int counter = 0;
+    protected String classInProgress = "";
+    protected Set<String> callingChain = new LinkedHashSet<>();
+    protected Set<MethodWrapper> processedMethods = new LinkedHashSet<>();
     private StringTools.OperationType stringOP = null;
     private static final Logger logger = LoggerFactory.getLogger(MethodProcessor.class);
+
+    private static final String INIT_STATIC = "<clinit>";
+    private static final String INIT = "<init>";
+
 
     /**
      * 
@@ -37,10 +48,11 @@ public class MethodProcessor extends BasicProcessor {
      * @param operation Operation of method execution
      * @return Method wrapper
      */
-    protected MethodWrapper getMethodWrapper(Operation operation) {
+    protected MethodWrapper getMethodWrapper(Operation operation, Stack<Variable> values) {
         final String methodName = operation.getMethodName();
         final String operationOwner = operation.getOwner();
         final ClassWrapper classWrapper = this.classes.getOrDefault(operationOwner, null);
+
         if (classWrapper == null) {
             logger.error("Missing class=" + operationOwner);
             return null;
@@ -52,7 +64,22 @@ public class MethodProcessor extends BasicProcessor {
             logger.error("Missing method=" + methodName + " class=" + operationOwner);
             return null;
         }
-
+        if (!methodWrapper.isProcessed() && !classInProgress.equals(operationOwner)) {
+            //Method is from other class which was not processed yet
+            final ClassWrapper cw = this.classes.getOrDefault(operationOwner, null);
+            if (cw == null) {
+                methodWrapper.setIsProcessed();
+                logger.info("Missing class=" + operationOwner);
+                return null;
+            }
+            logger.info("Not processed class=" + cw.getClassStruct().getName());
+            process(methodWrapper, values);
+        } else if (!methodWrapper.isProcessed()) {
+            //Method is from this class but was not processed yet
+            logger.info("Not processed method=" + operation.getMethodName() + " class="
+                    + operationOwner);
+            process(methodWrapper, values);
+        }
         return methodWrapper;
     }
 
@@ -83,14 +110,66 @@ public class MethodProcessor extends BasicProcessor {
         }
     }
 
-    /**
-     * Process method its Strings and numbers
-     * 
-     * @param method Method to process
-     */
-    protected void process(MethodWrapper method) {
+    public void process(MethodWrapper mw) {
+        if (mw.isProcessed()) {
+            return;
+        }
+        classInProgress = mw.getOwner();
+        final String currentClass = mw.getOwner();
+        final String methodName = mw.getMethodStruct().getName();
+        final String chainKey = currentClass + "." + methodName + mw.getMethodStruct().getDesc();
+
+        if (callingChain.contains(chainKey)) {
+            logger.info("Recursion detected method=" + methodName + " owner=" + mw.getOwner());
+            mw.setIsProcessed();
+            processedMethods.add(mw);
+            return;
+        }
+        callingChain.add(chainKey);
+        mw.setIsProcessed();
+        processedMethods.add(mw);
         Stack<Variable> values = new Stack<>();
-        this.processInner(method, values);
+        this.processInner(mw, values);
+        callingChain = new LinkedHashSet<>();
+    }
+
+    public void process(MethodWrapper mw, Stack<Variable> args) {
+        StringTools.OperationType stringOPStored = stringOP;
+        mw.recreateVars(args);
+        mw.setIsProcessed(false);
+        process(mw);
+        stringOP = stringOPStored;
+    }
+
+    /**
+     * Processes whole class (fields + methods)
+     * @param class_ Input class
+     */
+    public void process(ClassWrapper class_) {
+
+        classInProgress = class_.getClassStruct().getName();
+        MethodWrapper cInit = class_.getMethod(INIT_STATIC);
+        MethodWrapper init = class_.getMethod(INIT);
+        if (cInit != null) {
+            class_.removeMethod(INIT_STATIC);
+            process(cInit);
+        }
+
+        if (init != null) {
+            class_.removeMethod(INIT);
+            process(init);
+        }
+        for (MethodWrapper method : class_.getMethods()) {
+            for (MethodWrapper mw : processedMethods) {
+                mw.setIsProcessed(false);
+            }
+            process(method);
+            if (!method.hasPrimitiveReturnType()) {
+                //class_.removeMethod(method.getMethodStruct().getName());
+            }
+        }
+
+        callingChain = new LinkedHashSet<>();
     }
 
     /**
@@ -131,16 +210,16 @@ public class MethodProcessor extends BasicProcessor {
             processAppendString(values);
             this.stringOP = StringTools.OperationType.APPEND;
         } else {
-            removeMethodArgsFromStack(values, operation);
+            //removeMethodArgsFromStack(values, operation);
             if (!this.classes.containsKey(operation.getOwner())) {
                 return;
             }
-            final MethodWrapper mw = getMethodWrapper(operation);
+            final MethodWrapper mw = getMethodWrapper(operation,
+                    EndpointTools.methodArgsFromValues(values, operation));
             if (mw == null) {
                 return;
             }
-            Variable variable = new Variable(mw.getMethodStruct().getReturnValue())
-                    .setType(VariableType.OTHER).setDescription(mw.getReturnType());
+            Variable variable = mw.getReturnValue();
 
             if (mw.hasPrimitiveReturnType()) {
                 variable.setType(VariableType.SIMPLE);
@@ -172,11 +251,11 @@ public class MethodProcessor extends BasicProcessor {
     protected void processINVOKEINTERFACE(Stack<Variable> values, Operation operation) {
         if (SafeStack.peek(values) != null && values.peek().getType() == VariableType.LAMBDA) {
             final Operation operationStored = (Operation) values.pop().getValue();
-            removeMethodArgsFromStack(values, operation);
             if (!this.classes.containsKey(operationStored.getOwner())) {
                 return;
             }
-            final MethodWrapper mw = getMethodWrapper(operationStored);
+            final MethodWrapper mw = getMethodWrapper(operationStored,
+                    EndpointTools.methodArgsFromValues(values, operation));
             if (mw == null) {
                 return;
             }
@@ -200,11 +279,12 @@ public class MethodProcessor extends BasicProcessor {
      * @param operation INVOKESTATIC operation
      */
     protected void processINVOKESTATIC(Stack<Variable> values, Operation operation) {
-        final MethodWrapper mw = getMethodWrapper(operation);
+        final MethodWrapper mw =
+                getMethodWrapper(operation, EndpointTools.methodArgsFromValues(values, operation));
         if (mw == null) {
             return;
         }
-        final Method method = getMethodWrapper(operation).getMethodStruct();
+        final Method method = mw.getMethodStruct();
         if (mw.getOwner().equals("")) {
             return;
         }
@@ -214,9 +294,7 @@ public class MethodProcessor extends BasicProcessor {
         } else {
             newVar.setType(VariableType.OTHER);
         }
-        removeMethodArgsFromStack(values, operation);
-        newVar.setValue(method.getReturnValue());
-        values.push(newVar);
+        values.push(mw.getReturnValue());
     }
 
     /**
@@ -282,10 +360,10 @@ public class MethodProcessor extends BasicProcessor {
             case Opcodes.FRETURN:
             case Opcodes.DRETURN:
             case Opcodes.IRETURN:
-                method.setReturnValue(var.getValue() == null ? "" : var.getValue().toString());
+                methodWrapper.setReturnValue(var);
                 break;
             case Opcodes.RETURN:
-                method.setReturnValue("");
+                methodWrapper.setReturnValue(null);
                 break;
         }
         values.removeAll(values);

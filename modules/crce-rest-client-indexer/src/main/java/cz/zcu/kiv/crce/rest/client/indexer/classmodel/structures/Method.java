@@ -12,7 +12,7 @@ public class Method {
     private int lambdaCounter = 0;
     private int access;
     private String desc;
-    private DataType returnType;
+    private DataType returnType = new DataType("java/lang/Object");
     private String name;
     private String owner;
     private String description;
@@ -21,7 +21,7 @@ public class Method {
     private List<Operation> bodyLog = new ArrayList<>();
 
 
-    private String returnValue = "";
+    private Variable returnValue = null;
 
     public String lastLambdaName() {
         return ("lambda" + "$" + this.name + "$" + this.lambdaCounter);
@@ -158,17 +158,18 @@ public class Method {
                 + " returnValue=" + returnValue + '}';
     }
 
-    /**
-     * @return the returnValue
-     */
-    public String getReturnValue() {
-        return returnValue;
-    }
 
     /**
      * @param returnValue the returnValue to set
      */
-    public void setReturnValue(String returnValue) {
+    public void setReturnValue(Variable returnValue) {
         this.returnValue = returnValue;
+    }
+
+    /**
+     * @return the returnValue
+     */
+    public Variable getReturnValue() {
+        return returnValue;
     }
 }

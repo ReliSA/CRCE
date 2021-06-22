@@ -26,6 +26,9 @@ public class VarArray {
      * @param var New variable
      */
     public void set(Variable var) {
+        if (position >= value.length) {
+            value = new Variable[position + 1];
+        }
         value[position] = var;
     }
 
