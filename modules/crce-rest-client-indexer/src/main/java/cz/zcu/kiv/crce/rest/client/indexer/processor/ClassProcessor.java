@@ -22,14 +22,13 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.StringTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.VariableTools;
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodType;
 
-public class MethodProcessor extends BasicProcessor {
+public class ClassProcessor extends BasicProcessor {
 
-    private static int counter = 0;
     protected String classInProgress = "";
     protected Set<String> callingChain = new LinkedHashSet<>();
     protected Set<MethodWrapper> processedMethods = new LinkedHashSet<>();
     private StringTools.OperationType stringOP = null;
-    private static final Logger logger = LoggerFactory.getLogger(MethodProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClassProcessor.class);
 
     private static final String INIT_STATIC = "<clinit>";
     private static final String INIT = "<init>";
@@ -39,7 +38,7 @@ public class MethodProcessor extends BasicProcessor {
      * 
      * @param classes All classes available
      */
-    public MethodProcessor(ClassMap classes) {
+    public ClassProcessor(ClassMap classes) {
         super(classes);
     }
 

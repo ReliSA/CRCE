@@ -24,7 +24,7 @@ import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.MethodTools.MethodTyp
 import cz.zcu.kiv.crce.rest.client.indexer.processor.tools.SafeStack;
 import cz.zcu.kiv.crce.rest.client.indexer.shared.HttpMethod;
 
-class EndpointHandler extends MethodProcessor {
+class EndpointHandler extends ClassProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(EndpointHandler.class);
 
