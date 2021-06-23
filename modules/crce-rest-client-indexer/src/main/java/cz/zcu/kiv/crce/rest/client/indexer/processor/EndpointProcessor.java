@@ -98,18 +98,29 @@ class EndpointHandler extends ClassProcessor {
             removeMethodArgsFromStack(values, operation);
             ClassWrapper class_ = this.classes.getOrDefault(operation.getOwner(), null);
             if (ClassTools.isGenericClass(class_)) {
+                boolean isList = false;
                 Stack<Object> types =
                         ClassTools.processTypes(class_.getClassStruct().getSignature());
                 if (types.size() == 0) {
                     return;
                 }
-                types.pop(); // Throw away generic wrapper
+                String generic = (String) types.pop(); // Throw away generic wrapper
                 Object type = SafeStack.pop(types);
                 if (type instanceof String[]) {
                     type = class_.getClassStruct().getSignature();
+                } else if (!types.isEmpty()) {
+                    if (SafeStack.peek(types) instanceof String[]) {
+                        String signature = class_.getClassStruct().getSignature();
+                        final String parsed = signature.replace(generic + "<", "");
+                        type = parsed.substring(0, parsed.length() - 1);
+                        isList = true;
+                    } else {
+                        isList = ClassTools.isArrayOrCollection((String) type);
+                        type = types.pop();
+                    }
                 }
-                values.push(
-                        new Variable().setDescription((String) type).setType(VariableType.OTHER));
+                values.push(new Variable().setDescription((String) type).setType(VariableType.OTHER)
+                        .setDescriptionIsList(isList));
                 return;
             }
         } else {

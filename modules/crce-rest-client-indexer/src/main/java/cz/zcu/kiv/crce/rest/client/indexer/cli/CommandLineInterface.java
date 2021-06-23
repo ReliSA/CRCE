@@ -67,7 +67,6 @@ public class CommandLineInterface {
                 System.out.println("Relative or absolute path to JAR which will be processed: "
                                 + fileShort + " | " + fileLong
                                 + " = path to example.jar or example.war");
-                System.out.println("Debug ingo: " + debugShort + " | " + debugLong + "");
                 System.out.println("Manual: " + helpShort + " | " + helpLong + "");
 
         }

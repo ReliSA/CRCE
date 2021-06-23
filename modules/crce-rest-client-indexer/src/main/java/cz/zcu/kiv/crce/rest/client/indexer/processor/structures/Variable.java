@@ -12,7 +12,19 @@ public class Variable {
     private String owner = "";
     private String description = "";
     private VariableType vType = null;
+    private boolean descriptionIsList;
 
+    /**
+     * @param descriptionIsList the descriptionIsList to set
+     */
+    public Variable setDescriptionIsList(boolean descriptionIsList) {
+        this.descriptionIsList = descriptionIsList;
+        return this;
+    }
+
+    public boolean getDescriptionIsList() {
+        return this.descriptionIsList;
+    }
 
     /**
      * @return the value

@@ -272,8 +272,13 @@ public class EndpointDataFactory {
                 } else {
                     final String object =
                             ClassTools.descriptionToClassName(getStringValueFromArgValue(argValue));
-                    endpointData.addExpectedResponse(
-                            new EndpointBody(object, ClassTools.isArrayOrCollection(object)));
+                    EndpointBody endpointBody = new EndpointBody();
+                    endpointBody.setType(object);
+                    endpointBody.setIsArray(argValue.getDescriptionIsList());
+                    if (!endpointBody.isArray()) {
+                        endpointBody.setIsArray(ClassTools.isArrayOrCollection(object));
+                    }
+                    endpointData.addExpectedResponse(endpointBody);
                 }
             }
                 break;

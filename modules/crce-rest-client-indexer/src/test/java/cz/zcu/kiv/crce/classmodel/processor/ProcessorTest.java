@@ -114,7 +114,7 @@ public class ProcessorTest {
                 endpoint1Headers.add(new Header("Accept", "application/json"));
                 Endpoint endpoint1 = new Endpoint(baseURL + "/api/user/users", null,
                                 Set.of(HttpMethod.GET), Set.of(), endpoint1Headers);
-                endpoint1.addExpectedResponse(new EndpointBody("java/util/List", true));
+                endpoint1.addExpectedResponse(new EndpointBody("com/app/demo/model/User", true));
 
                 Endpoint endpoint2 = new Endpoint(baseURL + "/api/user/addUser", null,
                                 Set.of(HttpMethod.POST),
@@ -147,7 +147,8 @@ public class ProcessorTest {
                 test.add(new Header("Accept", "application/json"));
                 Endpoint endpoint1 = new Endpoint(baseUrl, "/emp", Set.of(HttpMethod.GET), Set.of(),
                                 test);
-                endpoint1.addExpectedResponse(new EndpointBody("java/util/List", true));
+                endpoint1.addExpectedResponse(
+                                new EndpointBody("com/nagarro/hrmanager/model/Employee", true));
                 Endpoint endpoint2 = new Endpoint(baseUrl, "/emp/addemp", Set.of(HttpMethod.POST),
                                 Set.of(new EndpointParameter(null,
                                                 "com/nagarro/hrmanager/model/Employee", false,

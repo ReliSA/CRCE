@@ -51,6 +51,13 @@ public class EndpointBody implements Serializable {
     }
 
     /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
      * 
      * @return Is it array
      */
