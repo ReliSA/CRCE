@@ -105,16 +105,20 @@ public class QueryBuilder {
         List<DBQuery.Query> tmp = new LinkedList<>();
 
         for (CapabilityFilter filter : filters) {
-            tmp.add(processCapabilityFilter(path, filter));
+            if (path.equals("")) {
+                tmp.add(processCapabilityFilter(filter));
+            } else {
+                tmp.add(DBQuery.elemMatch(path, processCapabilityFilter(filter)));
+            }
         }
 
         return joinQueries(tmp, operator);
     }
 
-    private static DBQuery.Query processCapabilityFilter(String prefix, CapabilityFilter filter) {
-        DBQuery.Query namespace = DBQuery.is(joinPath(prefix, DbCapability.NAMESPACE), filter.getNamespace());
-        DBQuery.Query attributes = processAttributeFilters(joinPath(prefix, DbCapability.ATTRIBUTES), filter.getOperator(), filter.getAttributes());
-        DBQuery.Query subFilters = processCapabilityFilters(joinPath(prefix, DbCapability.CHILDREN), Operator.AND, filter.getSubFilters());
+    private static DBQuery.Query processCapabilityFilter(CapabilityFilter filter) {
+        DBQuery.Query namespace = DBQuery.is(DbCapability.NAMESPACE, filter.getNamespace());
+        DBQuery.Query attributes = processAttributeFilters(DbCapability.ATTRIBUTES, filter.getOperator(), filter.getAttributes());
+        DBQuery.Query subFilters = processCapabilityFilters(DbCapability.CHILDREN, Operator.AND, filter.getSubFilters());
 
         return DBQuery.and(namespace, attributes, subFilters);
     }
@@ -122,36 +126,21 @@ public class QueryBuilder {
     private static DBQuery.Query processAttributeFilters(String path, Operator operator, List<Attribute<?>> attributes) {
         List<DBQuery.Query> tmp = new LinkedList<>();
         for (Attribute<?> attribute : attributes) {
-            tmp.add(processAttributeFilter(path, attribute));
+            tmp.add(DBQuery.elemMatch(path, processAttributeFilter(attribute)));
         }
 
         return joinQueries(tmp, operator);
     }
 
-    private static DBQuery.Query joinQueries(List<DBQuery.Query> queries, Operator operator) {
-        if(queries.size() > 1) {
-            if (operator == Operator.AND) {
-                return DBQuery.and(queries.toArray(new DBQuery.Query[0]));
-            } else {
-                return DBQuery.or(queries.toArray(new DBQuery.Query[0]));
-            }
-        } else if (queries.size() == 1){
-            return queries.get(0);
-        } else {
-            return DBQuery.empty();
-        }
-    }
-
-    private static DBQuery.Query processAttributeFilter(String prefix, Attribute<?> attribute) {
-        DBQuery.Query name = DBQuery.is(joinPath(prefix, DbAttribute.NAME), attribute.getName());
-        DBQuery.Query type = DBQuery.is(joinPath(prefix, DbAttribute.TYPE), attribute.getType().getName());
-        DBQuery.Query value = processAttributeValue(prefix, attribute.getOperator(), attribute.getValue());
+    private static DBQuery.Query processAttributeFilter(Attribute<?> attribute) {
+        DBQuery.Query name = DBQuery.is(DbAttribute.NAME, attribute.getName());
+        DBQuery.Query type = DBQuery.is(DbAttribute.TYPE, attribute.getType().getName());
+        DBQuery.Query value = processAttributeValue(DbAttribute.VALUE, attribute.getOperator(), attribute.getValue());
 
         return DBQuery.and(name, type, value);
     }
 
-    private static DBQuery.Query processAttributeValue(String prefix, cz.zcu.kiv.crce.metadata.Operator operator, Object value) {
-        String path = joinPath(prefix, DbAttribute.VALUE);
+    private static DBQuery.Query processAttributeValue(String path, cz.zcu.kiv.crce.metadata.Operator operator, Object value) {
         switch (operator) {
             case EQUAL:
                 return DBQuery.is(path, value);
@@ -177,6 +166,25 @@ public class QueryBuilder {
             default:
                 throw new UnsupportedOperationException("Operator " + operator + " is not supported for ... type.");
 
+        }
+    }
+
+    private static DBQuery.Query joinQueries(List<DBQuery.Query> queries, Operator operator) {
+        switch (queries.size()) {
+            case 0:
+                return DBQuery.empty();
+
+            case 1:
+                return queries.get(0);
+
+            default:
+                switch (operator) {
+                    case AND:
+                        return DBQuery.and(queries.toArray(new DBQuery.Query[0]));
+                    default:
+                    case OR:
+                        return DBQuery.or(queries.toArray(new DBQuery.Query[0]));
+                }
         }
     }
 
