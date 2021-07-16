@@ -15,7 +15,7 @@ elif [ "$CFG" == "onlyclean" ]; then
     BUILD="clean"
 elif [ "$CFG" == "fast" ]; then
     BUILD="install"
-    PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true";
+    PARAMS="-Dmaven.test.skip=true -Dfindbugs.skip=true -Denforcer.skip=true -Dpmd.skip=true";
 fi
 
 echo $'\n\n\n'; echo "=============================================================="

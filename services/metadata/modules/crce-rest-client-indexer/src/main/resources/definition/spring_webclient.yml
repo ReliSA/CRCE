@@ -1,0 +1,264 @@
+argDefinitions:
+  body:
+    type: REQUEST_BODY
+    classes:
+      - java.lang.Object
+  bodyInserted:
+    type: ENDPOINT_DATA
+    interfaces:
+      - org.springframework.web.reactive.function.BodyInserter
+  URI:
+    type: URL
+    classes:
+      - java.net.URI
+  stringURI:
+    type: URL
+    classes:
+      - java.lang.String
+  baseURL:
+    type: BASE_URL
+    classes:
+      - java.lang.String
+  uriVariable:
+    type: URI_VARIABLE
+    interfaces:
+      - java.util.Map
+  uriVariableObj:
+    type: URI_VARIABLE
+    classes:
+      - java.lang.Object
+  uriVariableKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  uriVariableValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  uriVariableSkip:
+    type: UNKNOWN
+    classes:
+      - java.util.function
+  uriVariableVarArg:
+    type: URI_VARIABLE
+    classes:
+      - java.lang.Object
+  uriFunction:
+    type: URI_CALLBACK
+  httpMethod:
+    type: HTTP_METHOD
+    classes:
+      - org.springframework.http.HttpMethod
+  skipArg:
+    type: UNKNOWN
+    classes:
+      - java.lang.Object
+  requestObject:
+    type: REQUEST_BODY
+    classes:
+      - java.lang.String
+  #      - java.lang.Class
+  #      - org.springframework.core.ParameterizedTypeReference
+  contentLength:
+    type: CONTENT_LENGTH
+    isNumber: true
+  contentType:
+    type: CONTENT_TYPE
+    classes:
+      - org.springframework.http.MediaType
+  acceptCharset:
+    type: ACCEPT
+    classes:
+      - java.nio.charset.Charset
+  cookieName:
+    type: KEY
+    classes:
+      - java.lang.String
+  cookieValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  headerKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  headerValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  ifNonMatch:
+    type: IF_NONE_MATCH
+    classes:
+      - java.lang.String
+  responseTypeClass:
+    type: RESPONSE
+    classes:
+      - java.lang.String
+#      - java.lang.Class
+#      - org.springframework.core.ParameterizedTypeReference
+
+wsClient:
+  - classes:
+      - org.springframework.web.reactive.function.client.WebClient
+    request:
+      GET:
+        - names:
+            - get
+      POST:
+        - names:
+            - post
+      DELETE:
+        - names:
+            - delete
+      HEAD:
+        - names:
+            - head
+      OPTIONS:
+        - names:
+            - options
+      PATCH:
+        - names:
+            - patch
+      PUT:
+        - names:
+            - put
+      GENERIC:
+        - names:
+            - create
+          args:
+            - - baseURL
+        - names:
+            - method
+          args:
+            - - httpMethod
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+    request:
+      GENERIC:
+        - names:
+            - uri
+          args:
+            - - URI
+            - - stringURI
+              - uriVariable
+            - - stringURI
+              - uriFunction
+            - - uriFunction
+          varArgs:
+            - - uriFunction
+              - uriVariableVarArg
+            - - stringURI
+              - uriVariableObj
+
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+    settings:
+      GENERIC:
+        - names:
+            - accept
+          varArgs:
+            - - contentType
+        - names:
+            - acceptCharset
+          varArgs:
+            - - acceptCharset
+        - names:
+            - ifNoneMatch
+          varArgs:
+            - - ifNonMatch
+      COOKIE:
+        - names:
+            - cookie
+          args:
+            - - cookieName
+              - cookieValue
+      HEADER:
+        - names:
+            - header
+          varArgs:
+            - - headerKey
+              - headerValue
+      URI_VARIABLE:
+        - names:
+            - attribute
+          args:
+            - - uriVariableKey
+              - uriVariableValue
+            - - uriVariableSkip
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodySpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+    settings:
+      GENERIC:
+        - names:
+            - bodyValue
+            - syncBody
+          args:
+            - - body
+        - names:
+            - body
+          args:
+            - - bodyInserted
+            - - skipArg
+              - requestObject
+        - names:
+            - contentLength
+          args:
+            - - contentLength
+        - names:
+            - contentType
+          args:
+            - - contentType
+
+  - classes:
+      - org.springframework.web.reactive.function.client.WebClient$ResponseSpec
+    settings:
+      GENERIC:
+        - names:
+            - bodyToFlux
+            - bodyToMono
+            - toEntity
+            - toEntityFlux
+          args:
+            - - responseTypeClass
+        - names:
+            - toEntityList
+          args:
+            - - responseTypeClass
+          expectArray: true
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$Builder
+    settings:
+      GENERIC:
+        - names:
+            - baseUrl
+          args:
+            - - baseURL
+        - names:
+            - defaultHeader
+          varArgs:
+            - - headerKey
+              - headerValue
+        - names:
+            - defaultUriVariables
+          args:
+            - - uriVariable
+      COOKIE:
+        - names:
+            - defaultCookie
+          varArgs:
+            - - cookieName
+              - cookieValue
+
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec
+  - interfaces:
+      - org.springframework.web.reactive.function.client.WebClient$RequestBodyUriSpec
+    inherits:
+      - org.springframework.web.reactive.function.client.WebClient
+      - org.springframework.web.reactive.function.client.WebClient$UriSpec
+      - org.springframework.web.reactive.function.client.WebClient$RequestHeadersSpec

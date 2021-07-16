@@ -1,0 +1,289 @@
+package: org.springframework
+argDefinitions:
+  stringURL:
+    type: URL
+    classes:
+      - java.lang.String
+  uriURL:
+    type: URL
+    classes:
+      - java.net.URI
+  responseTypeClass:
+    type: RESPONSE
+    classes:
+      - java.lang.Class
+  responseTypeCP:
+    type: RESPONSE
+    classes:
+      - java.lang.Class
+      - org.springframework.core.ParameterizedTypeReference
+  responseExtractor:
+    type: RESPONSE
+    classes:
+      - org.springframework.web.client.ResponseExtractor
+  requestCallback:
+    type: REQUEST_CALLBACK
+    classes:
+      - org.springframework.web.client.RequestCallback
+  requestObject:
+    type: REQUEST_BODY
+    classes:
+      - org.springframework.http.HttpEntity
+      - java.lang.Object
+  requestObjectAny:
+    type: REQUEST_BODY
+    classes:
+      - java.lang.String
+  headersParam:
+    type: HEADER
+    interfaces:
+      - org.springframework.util.MultiValueMap
+  requestParamBody:
+    type: REQUEST_BODY
+  uriVariable:
+    type: URI_VARIABLE
+    classes:
+      - java.lang.Object
+    interfaces:
+      - java.util.Map
+  httpMethod:
+    type: HTTP_METHOD
+    classes:
+      - org.springframework.http.HttpMethod
+  mValuedMap:
+    type: VALUE
+    classes:
+      - org.springframework.util.MultiValueMap
+  mValuedMapKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  mValuedMapValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  mValuedMapValueList:
+    type: VALUE
+    classes:
+      - java.lang.List
+  headerKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  headerValue:
+    type: VALUE
+    classes:
+      - java.lang.String
+  pathArg:
+    type: PATH
+    classes:
+      - java.lang.String
+  uriKey:
+    type: KEY
+    classes:
+      - java.lang.String
+  uriValue:
+    type: VALUE
+    classes:
+      - java.lang.Object
+wsClientData:
+  - classes:
+      - org.springframework.http.HttpEntity
+    settings:
+      GENERIC:
+        - names:
+            - init
+          args:
+            - - requestObjectAny
+              - headersParam
+            - - headersParam
+            - - requestParamBody
+        - names:
+            - getBody
+          returns: requestObjectAny
+        - names:
+            - getHeaders
+          returns: headersParam
+  - classes:
+      - org.springframework.http.HttpHeaders
+    settings:
+      HEADER:
+        - names:
+            - init
+        - names:
+            - add
+            - set
+          args:
+            - - headerKey
+              - headerValue
+        - names:
+            - addAll
+            - setAll
+          args:
+            - - headersParam
+          varArgs:
+            - - headerKey
+              - headerValue
+  - classes:
+      - org.springframework.boot.web.client.RestTemplateBuilder
+    settings:
+      GENERIC:
+        - names:
+            - build
+  - classes:
+      - org.springframework.util.MultiValueMap
+    settings:
+      GENERIC:
+        - names:
+            - init
+        - names:
+            - add
+          args:
+            - - mValuedMapKey
+              - mValuedMapValue
+        - names:
+            - addAll
+          args:
+            - - mValuedMapKey
+              - mValuedMapValueList
+            - - mValuedMap
+  - classes:
+      - org.springframework.util.LinkedMultiValueMap
+    settings:
+      GENERIC:
+        - names:
+            - init
+  - classes:
+      - org.springframework.web.util.UriComponentsBuilder
+    settings:
+      GENERIC:
+        - names:
+            - fromPath
+            - replacePath
+            - path
+          args:
+            - - pathArg
+        - names:
+            - pathSegment
+          varArgs:
+            - - pathArg
+        - names:
+            - fromUri
+          args:
+            - - uriURL
+        - names:
+            - fromUriString
+          args:
+            - - stringURL
+      URI_VARIABLE:
+        - names:
+            - queryParam
+          varArgs:
+            - - uriKey
+              - uriValue
+wsClient:
+  - interfaces:
+      - org.springframework.web.client.RestOperations
+    request:
+      GET:
+        - names:
+            - getForEntity
+            - getForObject
+          args:
+            - - stringURL
+              - responseTypeClass
+              - uriVariable
+            - - stringURL
+              - responseTypeClass
+      POST:
+        - names:
+            - postForEntity
+            - postForObject
+          args:
+            - - stringURL
+              - requestObject
+              - responseTypeClass
+              - uriVariable
+            - - stringURL
+              - requestObject
+              - responseTypeClass
+        - names:
+            - postForLocation
+          args:
+            - - stringURL
+              - requestObject
+              - uriVariable
+            - - stringURL
+              - requestObject
+      DELETE:
+        - names:
+            - delete
+          args:
+            - - stringURL
+              - uriVariable
+            - - uriURL
+      HEAD:
+        - names:
+            - headForHeaders
+          args:
+            - - stringURL
+              - uriVariable
+            - - uriURL
+      OPTIONS:
+        - names:
+            - optionsForAllow
+          args:
+            - - stringURL
+              - uriVariable
+            - - stringURL
+      PATCH:
+        - names:
+            - patchForObject
+          args:
+            - - stringURL
+              - requestObject
+              - responseTypeClass
+              - uriVariable
+            - - uriURL
+              - requestObject
+              - responseTypeClass
+      PUT:
+        - names:
+            - put
+          args:
+            - - stringURL
+              - requestObject
+              - uriVariable
+            - - uriURL
+              - requestObject
+      GENERIC:
+        - names:
+            - exchange
+          args:
+            - - requestObject
+              - responseTypeCP
+            - - stringURL
+              - httpMethod
+              - requestObject
+              - responseTypeCP
+              - uriVariable
+            - - uriURL
+              - httpMethod
+              - requestObject
+              - responseTypeCP
+        - names:
+            - execute
+          args:
+            - - stringURL
+              - httpMethod
+              - requestCallback
+              - responseExtractor
+              - uriVariable
+            - - stringURL
+              - httpMethod
+              - requestCallback
+              - responseExtractor
+  - classes:
+      - org.springframework.web.client.RestTemplate
+    inherits:
+      - org.springframework.web.client.RestOperations

@@ -1,6 +1,11 @@
 Manifest-Version: 1.0
+<<<<<<< HEAD:services/metadata/modules/crce-component-versioning/META-INF/MANIFEST.MF
 Bnd-LastModified: 1609752919772
 Build-Jdk: 11.0.9.1
+=======
+Bnd-LastModified: 1624372891884
+Build-Jdk: 11.0.11
+>>>>>>> dp_ballak:modules/crce-component-versioning/META-INF/MANIFEST.MF
 Built-By: tomas
 Bundle-Activator: cz.zcu.kiv.crce.crce_component_versioning.internal.Act
  ivator

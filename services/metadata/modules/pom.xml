@@ -38,6 +38,7 @@
         <module>crce-repository-impl</module>
         <module>crce-resolver-impl</module>
         <module>crce-webservices-indexer</module>
+        <module>crce-rest-client-indexer</module>
         <module>crce-restimpl-indexer</module>
         <module>crce-concurrency</module>
         <module>crce-vo</module>

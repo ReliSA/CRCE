@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch VariableFactory",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.processor.VariableFactory",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
+            "name": "Launch ConfigTools",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.config_v2.tools.ConfigTools",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
+            "name": "Launch ConfigTools",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.config_v2.tools.ConfigTools",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
+            "projectName": "crce-rest-client-indexer"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "args": [
+                "-f=/home/anonym/Dokumenty/diplomka_test_data/rest.war"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "cz.zcu.kiv.crce.rest.client.indexer.Main",
+            "projectName": "crce-rest-client-indexer",
+            "args": [
+                "-f=/home/anonym/Dokumenty/diplomka_test_data/rest.war"
+            ]
+        }
+    ]
+}
