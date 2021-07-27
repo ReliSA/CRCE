@@ -43,6 +43,7 @@
         <module>crce-metadata-indexer-impl</module>
         <module>crce-component-versioning</module>
         <module>crce-webservices-indexer</module>
+        <module>crce-rest-client-indexer</module>
         <module>crce-restimpl-indexer</module>
         <module>crce-concurrency</module>
     </modules>

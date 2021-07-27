@@ -14,6 +14,7 @@ crce-resolver-impl
 crce-repository-api
 crce-repository-impl
 crce-vo
+crce-rest-client-indexer
 crce-restimpl-indexer
 crce-webservices-indexer
 crce-concurrency

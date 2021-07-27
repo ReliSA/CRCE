@@ -6,7 +6,7 @@
   <!--url>http://www.example.com</url -->
 
   <parent>
-    <relativePath>../pom</relativePath>
+    <relativePath>../shared-third-party-dependencies</relativePath>
     <groupId>cz.zcu.kiv.crce</groupId>
     <artifactId>crce-modules-parent</artifactId>
     <version>2.1.1-SNAPSHOT</version>
@@ -77,9 +77,39 @@
       <artifactId>org.apache.felix.bundlerepository</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>crce-core</artifactId>
-      <type>pom</type>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>crce-metadata-impl</artifactId>
+        <version>3.0.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>crce-metadata-indexer-api</artifactId>
+          <version>2.1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>crce-metadata-indexer-impl</artifactId>
+          <version>2.1.1-SNAPSHOT</version>
+      </dependency>
+    <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>crce-metadata-service-api</artifactId>
+          <version>3.0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>crce-metadata-service-impl</artifactId>
+          <version>3.0.1-SNAPSHOT</version>
+      </dependency>
+
   </dependencies>
+
+  <repositories>
+    <repository>
+        <id>crce-shared-modules</id>
+        <name>CRCE plugin API with plugin manager</name>
+        <url>file:///home/crce/shared-modules</url>
+    </repository>
+</repositories>
+
 </project>

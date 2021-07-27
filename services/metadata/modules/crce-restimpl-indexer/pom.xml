@@ -75,7 +75,6 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <scope>provided</scope>
         </dependency>
-<<<<<<< HEAD:services/metadata/modules/crce-restimpl-indexer/pom.xml
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -108,13 +107,11 @@
             <version>3.0.1-SNAPSHOT</version>
         </dependency>
 
-=======
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crce-rest-client-indexer</artifactId>
             <version>2.1.1-SNAPSHOT</version>
         </dependency>
->>>>>>> dp_ballak:modules/crce-restimpl-indexer/pom.xml
     </dependencies>
 
     <repositories>

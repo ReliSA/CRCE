@@ -7,6 +7,7 @@ crce-repository-api
 crce-repository-impl
 crce-metadata-osgi-bundle
 crce-component-versioning
+crce-rest-client-indexer
 crce-restimpl-indexer
 crce-webservices-indexer
 crce-metadata-indexer-api

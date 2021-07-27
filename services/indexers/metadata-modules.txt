@@ -3,5 +3,6 @@ crce-metadata-service-impl
 crce-metadata-indexer-api
 crce-metadata-indexer-impl
 crce-webservices-indexer
+crce-rest-client-indexer
 crce-restimpl-indexer
 crce-concurrency

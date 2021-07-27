@@ -35,6 +35,11 @@ if [ "$1" = "all" ]; then
                                             -v maven-cache:/root/.m2 \
                                             metadatamodules_compiler:1.0;
     param=$2
+elif [ "$1" = "clean" ]; then
+    docker volume remove shared-modules
+    docker volume remove metadata-modules
+    docker volume remove metadata-felix
+    docker volume remove maven-cache
 else
     # BUILD FOR [metadata]
     docker image build --tag metadatamodules_compiler:1.0 --build-arg SERVICE_PATH_PREFIX="./services/metadata" -f ./deploy/docker/Dockerfile .
